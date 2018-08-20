@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sise-deploy
+spec:
+  template:
+    metadata:
+      labels:
+        app: sise
+    spec:
+      containers:
+      - name: sise
+        image: mhausenblas/simpleservice:0.5.0

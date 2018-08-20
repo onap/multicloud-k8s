@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  multicloud-k8s:
+    image: nexus3.onap.org:10003/onap/multicloud/k8plugin
+    build:
+      context: ./
+      args:
+        - HTTP_PROXY=$HTTP_PROXY
+        - HTTPS_PROXY=$HTTPS_PROXY
+    ports:
+      - "8081:8081"
+    environment:
+      - CSAR_DIR=/opt/csar
+      - KUBE_CONFIG_DIR=/opt/kubeconfig
+      - DATABASE_TYPE=consul
+      - DATABASE_IP=consul-svr
+    depends_on:
+      - "consul"
+    volumes:
+      - /opt/csar:/opt/csar
+      - /opt/kubeconfig:/opt/kubeconfig
+  consul:
+    image: consul
+    hostname: consul-svr
+    environment:
+      - CONSUL_LOCAL_CONFIG={"datacenter":"us_west","server":true}
+    command: ["agent", "-server", "-bootstrap-expect=3"]
+    volumes:
+      - /opt/consul/config:/consul/config

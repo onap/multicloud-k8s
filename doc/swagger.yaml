@@ -1,0 +1,184 @@
+# Copyright 2018 Intel Corporation.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+swagger: "2.0"
+info:
+  description: "API reference for MultiCloud Kubernetes Plugin."
+  version: "1.0.0"
+  title: "API reference for MultiCloud Kubernetes Plugin."
+  contact:
+    url: "https://wiki.onap.org/display/DW/Support+for+K8S+%28Kubernetes%29+based+Cloud+regions"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+basePath: "/v1.0"
+schemes:
+- "http"
+paths:
+  /vnf_instances:
+    post:
+      tags:
+      - "Deployment of VNF Containers"
+      summary: "Create Kubernetes based VNFs."
+      description: "Endpoint to create Kubernetes based VNFs."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Create new VNF containers"
+        required: true
+        schema:
+          $ref: "#/definitions/POSTRequest"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/POSTResponse"
+  /vnf_instances/:
+    get:
+      tags:
+      - "Deployment of VNF Containers"
+      summary: "List all Kubernetes based VNFs."
+      description: "Endpoint to list all Kubernetes based VNF."
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/GETSResponse"
+  /vnf_instances/{name}:
+    get:
+      tags:
+      - "Deployment of VNF Containers"
+      summary: "Get details of a Kubernetes based VNFs."
+      description: "Endpoint to get details of a Kubernetes based VNFs."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        description: "Name used to query"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/GETResponse"
+    patch:
+      tags:
+      - "Deployment of VNF Containers"
+      summary: "Update a Kubernetes based VNFs."
+      description: "Endp to update a Kubernetes based VNFs."
+      produces:
+        - "application/json"
+      parameters:
+        - name: "name"
+          in: "path"
+          description: "Name used to patch"
+          required: true
+          type: "string"
+        - name: "body"
+          in: "body"
+          description: "Patch an existing Kubernetes based VNFs."
+          required: true
+          schema:
+            $ref: "#/definitions/PATCHRequest"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PATCHResponse"
+    delete:
+      tags:
+        - "Deployment of VNF Containers"
+      summary: "Delete a Kubernetes based VNFs."
+      description: "Endpoint to delete a Kubernetes based VNFs."
+      produces:
+        - "application/json"
+      parameters:
+        - name: "name"
+          in: "path"
+          description: "Name used to delete"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/DELETEResponse"
+definitions:
+  POSTRequest:
+    type: "object"
+    properties:
+      cloud_region_id:
+        type: "string"
+      csar_id:
+        type: "string"
+      namespace:
+        type: "string"
+      oof_parameters:
+        items:
+          type: "object"
+          additionalProperties: true
+          example:
+            key1: value1
+            key2: value2
+            key3: {}
+      network_parameters:
+        type: "object"
+        properties:
+          oam_ip_address:
+            type: "object"
+            properties:
+              connection_point:
+                type: "string"
+              ip_address:
+                type: "string"
+              workload_name:
+                type: "string"
+  POSTResponse:
+    type: "object"
+    properties:
+      vnf_id:
+        type: "string"
+      name:
+        type: "string"
+  GETSResponse:
+    type: "object"
+    properties:
+      vnf_list:
+        items:
+          type: "string"
+  GETResponse:
+    type: "object"
+    properties:
+      response:
+        type: "string"
+  PATCHRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+  PATCHResponse:
+    type: "object"
+    properties:
+      response:
+        type: "string"
+  DELETEResponse:
+    type: "object"
+    properties:
+      response:
+        type: "string"

@@ -1,0 +1,18 @@
+language: go
+
+go:
+  - 1.10.x
+
+go_import_path: k8-plugin-multicloud
+
+before_install:
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+  - dep ensure
+
+script:
+ - go build -buildmode=plugin -o plugins/deployment/deployment.so plugins/deployment/plugin.go
+ - go build -buildmode=plugin -o plugins/namespace/namespace.so plugins/namespace/plugin.go
+ - go build -buildmode=plugin -o plugins/service/service.so plugins/service/plugin.go
+
+ - go build -buildmode=plugin -o csar/mock_plugins/mockplugin.so csar/mock_plugins/mockplugin.go
+ - go test -v ./... -cover

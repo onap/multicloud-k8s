@@ -1,0 +1,4 @@
+[gerrit]
+host=gerrit.onap.org
+port=29418
+project=multicloud/k8s.git

@@ -1,0 +1,23 @@
+# IDE
+.DS_Store
+.vscode
+*-workspace
+
+# Directories
+pkg
+bin
+target
+src/github.com
+src/golang.org
+src/k8splugin/vendor
+src/k8splugin/kubeconfig/*
+deployments/k8plugin
+
+# Binaries
+*.so
+src/k8splugin/csar/mock_plugins/*.so
+src/k8splugin/plugins/**/*.so
+
+# Tests
+*.test
+*.out

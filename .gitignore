@@ -1,0 +1,23 @@
+# IDE
+.DS_Store
+.vscode
+*-workspace
+
+# Directories
+src
+pkg
+bin
+target
+vendor
+kubeconfig/*
+deployments/k8plugin
+k8plugin
+
+# Binaries
+*.so
+csar/mock_plugins/*.so
+plugins/**/*.so
+
+# Tests
+*.test
+*.out

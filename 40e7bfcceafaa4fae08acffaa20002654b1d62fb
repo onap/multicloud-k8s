@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_7ca5bbb3",
+        "filename": "k8-plugin-multicloud/.travis.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "+1, this file doesn\u0027t make sense here",
+      "parentUuid": "1a76adc5_d05dd816",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_b0629cd6",
         "filename": "k8-plugin-multicloud/LICENSE",
         "patchSetId": 2
@@ -35,6 +53,29 @@
         "startChar": 0,
         "endLine": 1,
         "endChar": 47
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5c89df24",
+        "filename": "k8-plugin-multicloud/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "Can you also update this links and remove the first one?",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 143
       },
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
@@ -98,6 +139,75 @@
         "startChar": 35,
         "endLine": 106,
         "endChar": 48
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9c76973d",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "remove this commented line",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 26,
+        "endChar": 35
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5c90ff42",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "s/retrieve/retrieves",
+      "range": {
+        "startLine": 34,
+        "startChar": 16,
+        "endLine": 34,
+        "endChar": 24
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3c9d035a",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "This should contains a comment for future implementation",
+      "range": {
+        "startLine": 118,
+        "startChar": 2,
+        "endLine": 118,
+        "endChar": 63
       },
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
@@ -174,6 +284,29 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_bcd6f3ef",
+        "filename": "k8-plugin-multicloud/api/model.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "This struct type is not used",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 1
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_70d40420",
         "filename": "k8-plugin-multicloud/cmd/main.go",
         "patchSetId": 2
@@ -214,6 +347,81 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_7c085b91",
+        "filename": "k8-plugin-multicloud/cmd/uuid/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "AFAIK, this is part of testing. I included some information in the KRD project which is going to be included later in this repo. I suggest to remove this.",
+      "parentUuid": "1a76adc5_f020144b",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_1cffe768",
+        "filename": "k8-plugin-multicloud/cmd/uuid/metadata.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "If this is not used for UT, this can be removed",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_dcf88f7e",
+        "filename": "k8-plugin-multicloud/cmd/uuid/service.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "If this is not used for UT, this can be removed",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_fcf30b9d",
+        "filename": "k8-plugin-multicloud/csar/mock_plugins/mockplugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "update this import statement",
+      "range": {
+        "startLine": 6,
+        "startChar": 2,
+        "endLine": 6,
+        "endChar": 47
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_306e8c02",
         "filename": "k8-plugin-multicloud/csar/parser.go",
         "patchSetId": 2
@@ -225,6 +433,29 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "Any particular reason for this type of function definition?",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_dc3f2f24",
+        "filename": "k8-plugin-multicloud/csar/parser_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "nit: s/Metadata YAML file read error/Metadata YAML file unmarshal error",
+      "range": {
+        "startLine": 71,
+        "startChar": 41,
+        "endLine": 71,
+        "endChar": 70
+      },
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -311,6 +542,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_1c0da790",
+        "filename": "k8-plugin-multicloud/deployments/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "This is moved into the WORKDIR (/opt/multicloud/k8s)",
+      "parentUuid": "1a76adc5_330a1622",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 18
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_73272eb7",
         "filename": "k8-plugin-multicloud/deployments/build.sh",
         "patchSetId": 2
@@ -351,6 +606,23 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_9c20d7f8",
+        "filename": "k8-plugin-multicloud/docs/sampleCommands.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "I think that this needs to be converted into reStructured File format instead of MarkDown, otherwise can\u0027t be parsed by sphinx",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_f33a5ecc",
         "filename": "k8-plugin-multicloud/krd/plugins.go",
         "patchSetId": 2
@@ -368,6 +640,29 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_5c7a3ff2",
+        "filename": "k8-plugin-multicloud/krd/plugins.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "/is a struct which/d",
+      "range": {
+        "startLine": 22,
+        "startChar": 27,
+        "endLine": 22,
+        "endChar": 44
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_b334e6de",
         "filename": "k8-plugin-multicloud/plugins/deployment/plugin.go",
         "patchSetId": 2
@@ -379,6 +674,29 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_7c64db48",
+        "filename": "k8-plugin-multicloud/plugins/deployment/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "The implementation of this should use Get method instead of list. In that way, less information is transmitted and parsed.",
+      "range": {
+        "startLine": 111,
+        "startChar": 1,
+        "endLine": 131,
+        "endChar": 15
+      },
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -413,6 +731,52 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_dc540f56",
+        "filename": "k8-plugin-multicloud/plugins/service/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "The implementation of this should use Get method instead of list. In that way, less information is transmitted and parsed.",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 15
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_bc4913b9",
+        "filename": "k8-plugin-multicloud/swagger.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-21T14:07:07Z",
+      "side": 1,
+      "message": "nit: unnecessary space",
+      "range": {
+        "startLine": 70,
+        "startChar": 11,
+        "endLine": 70,
+        "endChar": 12
+      },
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

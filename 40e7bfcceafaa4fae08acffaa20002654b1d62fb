@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_a7582057",
+        "filename": "k8-plugin-multicloud/.travis.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Yes. It was leftover from github. Removed",
+      "parentUuid": "1a76adc5_7ca5bbb3",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_b0629cd6",
         "filename": "k8-plugin-multicloud/LICENSE",
         "patchSetId": 2
@@ -48,6 +66,30 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "Shouldn\u0027t this be the actual license instead of the definition of the Apache License?\nYou only need this file if you are referring to it from the other source files.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 47
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_67320812",
+        "filename": "k8-plugin-multicloud/LICENSE",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done. Removed.",
+      "parentUuid": "1a76adc5_b0629cd6",
       "range": {
         "startLine": 1,
         "startChar": 0,
@@ -83,6 +125,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_a72fc0a0",
+        "filename": "k8-plugin-multicloud/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Removed since they only run on Github.",
+      "parentUuid": "1a76adc5_5c89df24",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 143
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_f0afb4e1",
         "filename": "k8-plugin-multicloud/README.md",
         "patchSetId": 2
@@ -100,6 +166,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_871c0479",
+        "filename": "k8-plugin-multicloud/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "I\u0027ll update the links when docs gets updated on ONAP.",
+      "parentUuid": "1a76adc5_f0afb4e1",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_90ed2028",
         "filename": "k8-plugin-multicloud/api/api.go",
         "patchSetId": 2
@@ -111,6 +195,30 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "Prefer indenting this in its own block for better readability.",
+      "range": {
+        "startLine": 67,
+        "startChar": 34,
+        "endLine": 67,
+        "endChar": 86
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_4716ec56",
+        "filename": "k8-plugin-multicloud/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_90ed2028",
       "range": {
         "startLine": 67,
         "startChar": 34,
@@ -146,6 +254,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_e70cd844",
+        "filename": "k8-plugin-multicloud/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Removed. Just returning type.",
+      "parentUuid": "1a76adc5_d08b9866",
+      "range": {
+        "startLine": 106,
+        "startChar": 35,
+        "endLine": 106,
+        "endChar": 48
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_9c76973d",
         "filename": "k8-plugin-multicloud/api/handler.go",
         "patchSetId": 2
@@ -157,6 +289,30 @@
       "writtenOn": "2018-08-21T14:07:07Z",
       "side": 1,
       "message": "remove this commented line",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 26,
+        "endChar": 35
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_c7019c07",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_9c76973d",
       "range": {
         "startLine": 26,
         "startChar": 1,
@@ -192,6 +348,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_a706e01e",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_5c90ff42",
+      "range": {
+        "startLine": 34,
+        "startChar": 16,
+        "endLine": 34,
+        "endChar": 24
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_3c9d035a",
         "filename": "k8-plugin-multicloud/api/handler.go",
         "patchSetId": 2
@@ -215,6 +395,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_6200b601",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_3c9d035a",
+      "range": {
+        "startLine": 118,
+        "startChar": 2,
+        "endLine": 118,
+        "endChar": 63
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_9030c09f",
         "filename": "k8-plugin-multicloud/api/handler.go",
         "patchSetId": 2
@@ -226,6 +430,30 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "statuscreated should be written after the error check as WriteHeader will write created to the stream before the body is checked. You maybe seeing an error \"multiple response.WriteHeader calls\" in case this error condition is triggered.",
+      "range": {
+        "startLine": 147,
+        "startChar": 1,
+        "endLine": 153,
+        "endChar": 2
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_420d7a36",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Since we encode the CreateVnfResponse struct onto W. I removed the whole error check as it shouldn\u0027t be a problem as we create the struct anyway.",
+      "parentUuid": "1a76adc5_9030c09f",
       "range": {
         "startLine": 147,
         "startChar": 1,
@@ -307,6 +535,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_42249aae",
+        "filename": "k8-plugin-multicloud/api/model.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "1a76adc5_bcd6f3ef",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 1
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_70d40420",
         "filename": "k8-plugin-multicloud/cmd/main.go",
         "patchSetId": 2
@@ -318,6 +570,30 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "Handle SIGINT for graceful shutdown",
+      "range": {
+        "startLine": 46,
+        "startChar": 1,
+        "endLine": 46,
+        "endChar": 74
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_a24b2e58",
+        "filename": "k8-plugin-multicloud/cmd/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_70d40420",
       "range": {
         "startLine": 46,
         "startChar": 1,
@@ -365,6 +641,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_c2466a4f",
+        "filename": "k8-plugin-multicloud/cmd/uuid/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done removed.",
+      "parentUuid": "1a76adc5_7c085b91",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_1cffe768",
         "filename": "k8-plugin-multicloud/cmd/uuid/metadata.yaml",
         "patchSetId": 2
@@ -382,6 +676,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_62751697",
+        "filename": "k8-plugin-multicloud/cmd/uuid/metadata.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_1cffe768",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_dcf88f7e",
         "filename": "k8-plugin-multicloud/cmd/uuid/service.yaml",
         "patchSetId": 2
@@ -393,6 +705,24 @@
       "writtenOn": "2018-08-21T14:07:07Z",
       "side": 1,
       "message": "If this is not used for UT, this can be removed",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_82787290",
+        "filename": "k8-plugin-multicloud/cmd/uuid/service.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_dcf88f7e",
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -422,6 +752,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_226f1ec7",
+        "filename": "k8-plugin-multicloud/csar/mock_plugins/mockplugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_fcf30b9d",
+      "range": {
+        "startLine": 6,
+        "startChar": 2,
+        "endLine": 6,
+        "endChar": 47
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_306e8c02",
         "filename": "k8-plugin-multicloud/csar/parser.go",
         "patchSetId": 2
@@ -433,6 +787,24 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "Any particular reason for this type of function definition?",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_e26846bc",
+        "filename": "k8-plugin-multicloud/csar/parser.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Yes. For patching it during unit testing.",
+      "parentUuid": "1a76adc5_306e8c02",
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -462,6 +834,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_026462e3",
+        "filename": "k8-plugin-multicloud/csar/parser_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_dc3f2f24",
+      "range": {
+        "startLine": 71,
+        "startChar": 41,
+        "endLine": 71,
+        "endChar": 70
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_530d5236",
         "filename": "k8-plugin-multicloud/db/DB.go",
         "patchSetId": 2
@@ -473,6 +869,24 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_a2624ed6",
+        "filename": "k8-plugin-multicloud/db/DB.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_530d5236",
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -496,6 +910,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_629c36c1",
+        "filename": "k8-plugin-multicloud/db/consul.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_f3133e5a",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_901c4079",
         "filename": "k8-plugin-multicloud/db/consul.go",
         "patchSetId": 2
@@ -507,6 +939,30 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "Is \"test\" key expected to be in the kv store?",
+      "range": {
+        "startLine": 33,
+        "startChar": 13,
+        "endLine": 33,
+        "endChar": 33
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_c25d0a17",
+        "filename": "k8-plugin-multicloud/db/consul.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Its just a check to see if it can talk to consul. If it can\u0027t, err will not be nil. Err will be nil even if \"test\" is not present.",
+      "parentUuid": "1a76adc5_901c4079",
       "range": {
         "startLine": 33,
         "startChar": 13,
@@ -583,6 +1039,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_22a63e11",
+        "filename": "k8-plugin-multicloud/deployments/build.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_73272eb7",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_532472ae",
         "filename": "k8-plugin-multicloud/deployments/docker-compose.yml",
         "patchSetId": 2
@@ -594,6 +1068,30 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "For a single instance of consul, this should be 1",
+      "range": {
+        "startLine": 28,
+        "startChar": 35,
+        "endLine": 28,
+        "endChar": 54
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_42a9fadd",
+        "filename": "k8-plugin-multicloud/deployments/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_532472ae",
       "range": {
         "startLine": 28,
         "startChar": 35,
@@ -623,6 +1121,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_e2afe6e1",
+        "filename": "k8-plugin-multicloud/docs/sampleCommands.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_9c20d7f8",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_f33a5ecc",
         "filename": "k8-plugin-multicloud/krd/plugins.go",
         "patchSetId": 2
@@ -634,6 +1150,24 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_c2b42a37",
+        "filename": "k8-plugin-multicloud/krd/plugins.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_f33a5ecc",
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -663,6 +1197,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_82863264",
+        "filename": "k8-plugin-multicloud/krd/plugins.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_5c7a3ff2",
+      "range": {
+        "startLine": 22,
+        "startChar": 27,
+        "endLine": 22,
+        "endChar": 44
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_b334e6de",
         "filename": "k8-plugin-multicloud/plugins/deployment/plugin.go",
         "patchSetId": 2
@@ -674,6 +1232,24 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_227dde6e",
+        "filename": "k8-plugin-multicloud/plugins/deployment/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_b334e6de",
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -703,6 +1279,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_42801a46",
+        "filename": "k8-plugin-multicloud/plugins/deployment/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_7c64db48",
+      "range": {
+        "startLine": 111,
+        "startChar": 1,
+        "endLine": 131,
+        "endChar": 15
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_734e4e71",
         "filename": "k8-plugin-multicloud/plugins/namespace/plugin.go",
         "patchSetId": 2
@@ -720,6 +1320,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_e2960694",
+        "filename": "k8-plugin-multicloud/plugins/namespace/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_734e4e71",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_d32f2287",
         "filename": "k8-plugin-multicloud/plugins/service/plugin.go",
         "patchSetId": 2
@@ -731,6 +1349,24 @@
       "writtenOn": "2018-08-21T04:15:36Z",
       "side": 1,
       "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_0292229f",
+        "filename": "k8-plugin-multicloud/plugins/service/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_d32f2287",
       "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -760,6 +1396,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_62eaf610",
+        "filename": "k8-plugin-multicloud/plugins/service/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_dc540f56",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 15
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_bc4913b9",
         "filename": "k8-plugin-multicloud/swagger.yaml",
         "patchSetId": 2
@@ -771,6 +1431,30 @@
       "writtenOn": "2018-08-21T14:07:07Z",
       "side": 1,
       "message": "nit: unnecessary space",
+      "range": {
+        "startLine": 70,
+        "startChar": 11,
+        "endLine": 70,
+        "endChar": 12
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_82edd227",
+        "filename": "k8-plugin-multicloud/swagger.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-21T19:22:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_bc4913b9",
       "range": {
         "startLine": 70,
         "startChar": 11,

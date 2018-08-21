@@ -1,0 +1,421 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_d05dd816",
+        "filename": "k8-plugin-multicloud/.travis.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Do we need this in ONAP, since we are not using any travis-ci here?",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b0629cd6",
+        "filename": "k8-plugin-multicloud/LICENSE",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be the actual license instead of the definition of the Apache License?\nYou only need this file if you are referring to it from the other source files.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 47
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f0afb4e1",
+        "filename": "k8-plugin-multicloud/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Modify readme for ONAP specific environment.",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_90ed2028",
+        "filename": "k8-plugin-multicloud/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Prefer indenting this in its own block for better readability.",
+      "range": {
+        "startLine": 67,
+        "startChar": 34,
+        "endLine": 67,
+        "endChar": 86
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d08b9866",
+        "filename": "k8-plugin-multicloud/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Named return variable is not used in the function body.",
+      "range": {
+        "startLine": 106,
+        "startChar": 35,
+        "endLine": 106,
+        "endChar": 48
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9030c09f",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "statuscreated should be written after the error check as WriteHeader will write created to the stream before the body is checked. You maybe seeing an error \"multiple response.WriteHeader calls\" in case this error condition is triggered.",
+      "range": {
+        "startLine": 147,
+        "startChar": 1,
+        "endLine": 153,
+        "endChar": 2
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d0fe38ae",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Same as above.",
+      "range": {
+        "startLine": 197,
+        "startChar": 1,
+        "endLine": 203,
+        "endChar": 2
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_702de445",
+        "filename": "k8-plugin-multicloud/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Same comment as above regarding writeheader",
+      "range": {
+        "startLine": 387,
+        "startChar": 1,
+        "endLine": 393,
+        "endChar": 2
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_70d40420",
+        "filename": "k8-plugin-multicloud/cmd/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Handle SIGINT for graceful shutdown",
+      "range": {
+        "startLine": 46,
+        "startChar": 1,
+        "endLine": 46,
+        "endChar": 74
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f020144b",
+        "filename": "k8-plugin-multicloud/cmd/uuid/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "What are kubernetes deployment files doing here? Should these be part of the OOM directory for the plugin?",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_306e8c02",
+        "filename": "k8-plugin-multicloud/csar/parser.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Any particular reason for this type of function definition?",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_530d5236",
+        "filename": "k8-plugin-multicloud/db/DB.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f3133e5a",
+        "filename": "k8-plugin-multicloud/db/consul.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_901c4079",
+        "filename": "k8-plugin-multicloud/db/consul.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Is \"test\" key expected to be in the kv store?",
+      "range": {
+        "startLine": 33,
+        "startChar": 13,
+        "endLine": 33,
+        "endChar": 33
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_330a1622",
+        "filename": "k8-plugin-multicloud/deployments/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "Think about moving this into its own folder. Eg: /k8plugin and put the .so and binary in /k8plugin/bin\nThat can be used for subdividing function during kubernetes deployments.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 18
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_73272eb7",
+        "filename": "k8-plugin-multicloud/deployments/build.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "License update with Intel Corp",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_532472ae",
+        "filename": "k8-plugin-multicloud/deployments/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "For a single instance of consul, this should be 1",
+      "range": {
+        "startLine": 28,
+        "startChar": 35,
+        "endLine": 28,
+        "endChar": 54
+      },
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f33a5ecc",
+        "filename": "k8-plugin-multicloud/krd/plugins.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b334e6de",
+        "filename": "k8-plugin-multicloud/plugins/deployment/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_734e4e71",
+        "filename": "k8-plugin-multicloud/plugins/namespace/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d32f2287",
+        "filename": "k8-plugin-multicloud/plugins/service/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-21T04:15:36Z",
+      "side": 1,
+      "message": "License",
+      "revId": "40e7bfcceafaa4fae08acffaa20002654b1d62fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_56de9b40",
+        "filename": "api/handler.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-22T00:12:14Z",
+      "side": 1,
+      "message": "dep ensure with these paths seems to not work for me.\nunable to deduce repository and source type error",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 34
+      },
+      "revId": "4feef98980fb6ab547dc64148598579e6faa3956",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

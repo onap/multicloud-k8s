@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_603f49d7",
+        "filename": "Makefile",
+        "patchSetId": 11
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-22T21:44:45Z",
+      "side": 1,
+      "message": "Clarification: The name to use are \"build\" and \"deploy\" since those are used in the Golang job trigger [1] [2] and also they don\u0027t install dep so we have to take care of it here in the Makefile. \n\n[1] \u003d https://git.onap.org/ci-management/tree/jjb/global-templates-golang.yaml#n6\n[2] \u003d https://git.onap.org/ci-management/tree/jjb/global-templates-golang.yaml#n64",
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

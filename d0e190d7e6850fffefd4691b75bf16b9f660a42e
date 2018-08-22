@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_590a4c22",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-22T02:10:55Z",
+      "side": 1,
+      "message": "PTL is now Bin Yang.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "d0e190d7e6850fffefd4691b75bf16b9f660a42e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d6062b20",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-22T02:10:55Z",
+      "side": 1,
+      "message": "It should be 13:00 UTC which is 6am PDT on Wednesdays.",
+      "range": {
+        "startLine": 29,
+        "startChar": 15,
+        "endLine": 29,
+        "endChar": 24
+      },
+      "revId": "d0e190d7e6850fffefd4691b75bf16b9f660a42e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_160d833e",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-22T02:10:55Z",
+      "side": 1,
+      "message": "Is the convention to use \u0027-\u0027 or \u0027/\u0027, e.g. \u0027multicloud/framework\" or \"multicloud-framework\"?",
+      "range": {
+        "startLine": 31,
+        "startChar": 7,
+        "endLine": 31,
+        "endChar": 27
+      },
+      "revId": "d0e190d7e6850fffefd4691b75bf16b9f660a42e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b61ccf78",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-22T02:10:55Z",
+      "side": 1,
+      "message": "This should be \"azure\"",
+      "range": {
+        "startLine": 35,
+        "startChar": 18,
+        "endLine": 35,
+        "endChar": 33
+      },
+      "revId": "d0e190d7e6850fffefd4691b75bf16b9f660a42e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

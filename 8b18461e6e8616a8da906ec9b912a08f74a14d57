@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_c5498fd1",
+        "filename": "Makefile",
+        "patchSetId": 8
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-22T17:47:47Z",
+      "side": 1,
+      "message": "should dep ensure be called before build? Or is it assumed to be called as a pre-step?",
+      "revId": "8b18461e6e8616a8da906ec9b912a08f74a14d57",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

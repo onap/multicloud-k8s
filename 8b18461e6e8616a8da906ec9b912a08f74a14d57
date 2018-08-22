@@ -16,6 +16,24 @@
       "revId": "8b18461e6e8616a8da906ec9b912a08f74a14d57",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_450d7f8f",
+        "filename": "Makefile",
+        "patchSetId": 8
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-22T17:49:00Z",
+      "side": 1,
+      "message": "I think it is a pre-step.",
+      "parentUuid": "1a76adc5_c5498fd1",
+      "revId": "8b18461e6e8616a8da906ec9b912a08f74a14d57",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

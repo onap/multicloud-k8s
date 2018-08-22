@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_6548bb87",
+        "filename": "plugins/namespace/plugin.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-22T18:18:48Z",
+      "side": 1,
+      "message": "why this is using a List method? Isn\u0027t possible to use the kubernetes get method?",
+      "range": {
+        "startLine": 42,
+        "startChar": 1,
+        "endLine": 55,
+        "endChar": 18
+      },
+      "revId": "0cb7895556e20ab6a769df55a0116f99c1d1e110",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -22,6 +22,30 @@
       "revId": "4feef98980fb6ab547dc64148598579e6faa3956",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_aa8c6036",
+        "filename": "api/handler.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-22T13:39:55Z",
+      "side": 1,
+      "message": "the other one wasn\u0027t working for me. I have this repo in $HOME/go/src/git.onap.org/multicloud/k8s folder and my GOPATH is not defined. My understanding is that project will be installed with the following command:\n\n    go get git.onap.org/multicloud/k8s/...",
+      "parentUuid": "1a76adc5_56de9b40",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 34
+      },
+      "revId": "4feef98980fb6ab547dc64148598579e6faa3956",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

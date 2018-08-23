@@ -16,6 +16,29 @@
       "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5362203f",
+        "filename": "Makefile",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-08-23T15:50:54Z",
+      "side": 1,
+      "message": "Where is this being set? Jenkins build will fail when this repo is cloned during build.",
+      "range": {
+        "startLine": 24,
+        "startChar": 3,
+        "endLine": 24,
+        "endChar": 9
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

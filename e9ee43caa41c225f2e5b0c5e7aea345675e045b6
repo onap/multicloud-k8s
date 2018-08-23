@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a76adc5_7365dc43",
+        "filename": "Gopkg.toml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_135ca87d",
+        "filename": "Makefile",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_603f49d7",
         "filename": "Makefile",
         "patchSetId": 11
@@ -35,6 +81,236 @@
         "startChar": 3,
         "endLine": 24,
         "endChar": 9
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_33bbe473",
+        "filename": "README.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f3ac8c37",
+        "filename": "csar/mock_yamls/deployment.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b3a61452",
+        "filename": "csar/mock_yamls/metadata.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5365401c",
+        "filename": "csar/mock_yamls/service.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d37870c6",
+        "filename": "deployments/docker-compose.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9382f892",
+        "filename": "doc/create_vl.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_534c609e",
+        "filename": "doc/create_vnf.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_734f1c93",
+        "filename": "doc/sampleCommands.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f35a4c4f",
+        "filename": "kubeconfig/mock_config",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_53330014",
+        "filename": "swagger.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-08-23T16:18:39Z",
+      "side": 1,
+      "message": "Copyright statement and license statement are missing. Refer to plugins/service/plugin.go for example.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
       },
       "revId": "e9ee43caa41c225f2e5b0c5e7aea345675e045b6",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",

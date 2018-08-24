@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_21a389b3",
+        "filename": "README.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-24T21:11:06Z",
+      "side": 1,
+      "message": "You can use local references like (./doc/create_vnf.png)",
+      "range": {
+        "startLine": 37,
+        "startChar": 14,
+        "endLine": 37,
+        "endChar": 105
+      },
+      "revId": "7e85004aed0805f06c18897edfcc67bc2e5742c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_41a6c5c2",
+        "filename": "README.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-24T21:11:06Z",
+      "side": 1,
+      "message": "ditto: line 37",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 103
+      },
+      "revId": "7e85004aed0805f06c18897edfcc67bc2e5742c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_c178952d",
+        "filename": "deployments/build.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-24T21:11:06Z",
+      "side": 1,
+      "message": "#!/bin/bash\n# SPDX-license-identifier: Apache-2.0\n##############################################################################\n# Copyright (c) 2018\n# All rights reserved. This program and the accompanying materials\n# are made available under the terms of the Apache License, Version 2.0\n# which accompanies this distribution, and is available at\n# http://www.apache.org/licenses/LICENSE-2.0\n##############################################################################\n\nset -o nounset\nset -o pipefail\nset -o xtrace\n\nfunction generate_binary {\n    GOPATH\u003d$(go env GOPATH)\n    rm -f k8plugin\n    rm -f *.so\n    $GOPATH/bin/dep ensure -v\n    for plugin in deployment namespace service; do\n        go build -buildmode\u003dplugin -o ./$plugin.so ../src/k8splugin/plugins/$plugin/plugin.go\n    done\n    CGO_ENABLED\u003d0 GOOS\u003dlinux GOARCH\u003damd64 go build -a -tags netgo -ldflags \u0027-w\u0027 -o ./k8plugin ../src/k8splugin/cmd/main.go\n}\n\nfunction build_image {\n    echo \"Start build docker image.\"\n    docker-compose build --no-cache\n}\n\ngenerate_binary\nbuild_image",
+      "revId": "7e85004aed0805f06c18897edfcc67bc2e5742c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_019e8d56",
+        "filename": "src/k8splugin/Makefile",
+        "patchSetId": 12
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-24T21:11:06Z",
+      "side": 1,
+      "message": "These tasks need to include dep task like this:\n\n    build: clean dep plugins tests\n    deploy: clean dep plugins build_binary tests",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 40
+      },
+      "revId": "7e85004aed0805f06c18897edfcc67bc2e5742c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

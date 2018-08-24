@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_7c04c4bf",
+        "filename": "README.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-24T21:55:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_21a389b3",
+      "range": {
+        "startLine": 37,
+        "startChar": 14,
+        "endLine": 37,
+        "endChar": 105
+      },
+      "revId": "7e85004aed0805f06c18897edfcc67bc2e5742c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_41a6c5c2",
         "filename": "README.md",
         "patchSetId": 12
@@ -36,6 +60,30 @@
       "writtenOn": "2018-08-24T21:11:06Z",
       "side": 1,
       "message": "ditto: line 37",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 103
+      },
+      "revId": "7e85004aed0805f06c18897edfcc67bc2e5742c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9cff60aa",
+        "filename": "README.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-24T21:55:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_41a6c5c2",
       "range": {
         "startLine": 41,
         "startChar": 13,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_3c2e4c44",
+        "filename": "deployments/build.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-24T21:55:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_c178952d",
+      "revId": "7e85004aed0805f06c18897edfcc67bc2e5742c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_019e8d56",
         "filename": "src/k8splugin/Makefile",
         "patchSetId": 12
@@ -76,6 +142,30 @@
       "writtenOn": "2018-08-24T21:11:06Z",
       "side": 1,
       "message": "These tasks need to include dep task like this:\n\n    build: clean dep plugins tests\n    deploy: clean dep plugins build_binary tests",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 40
+      },
+      "revId": "7e85004aed0805f06c18897edfcc67bc2e5742c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5c31c8a0",
+        "filename": "src/k8splugin/Makefile",
+        "patchSetId": 12
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 991
+      },
+      "writtenOn": "2018-08-24T21:55:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_019e8d56",
       "range": {
         "startLine": 19,
         "startChar": 0,

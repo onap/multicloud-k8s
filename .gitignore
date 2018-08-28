@@ -1,7 +1,10 @@
-# IDE
+# Common
 .DS_Store
 .vscode
 *-workspace
+.tox/
+.*.swp
+*.log
 
 # Directories
 pkg
@@ -21,3 +24,11 @@ src/k8splugin/plugins/**/*.so
 # Tests
 *.test
 *.out
+
+# KRD
+.vagrant/
+vagrant/inventory/hosts.ini
+vagrant/inventory/group_vars/all.yml
+vagrant/config/pdf.yml
+*.retry
+*.vdi

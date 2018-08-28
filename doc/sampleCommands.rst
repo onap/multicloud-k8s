@@ -15,36 +15,38 @@
     URL:`localhost:8081/v1/vnf_instances/cloudregion1/namespacetest`
     Request Body:
 
-    ```
-    {
-	    "cloud_region_id": "region1",
-	    "csar_id": "uuid",
-        "namespace": "test",
-	    "oof_parameters": [{
-		    "key1": "value1",
-		    "key2": "value2",
-		    "key3": {}
-	    }],
-	    "network_parameters": {
-		    "oam_ip_address": {
-			    "connection_point": "string",
-			    "ip_address": "string",
-			    "workload_name": "string"
-		    }
-	    }
-    }
-    ```
+.. code-block:: json
 
-    Expected Response:
-    ```
+    {
+        "cloud_region_id": "region1",
+        "csar_id": "uuid",
+        "namespace": "test",
+        "oof_parameters": [{
+            "key1": "value1",
+            "key2": "value2",
+            "key3": {}
+        }],
+        "network_parameters": {
+            "oam_ip_address": {
+                "connection_point": "string",
+                "ip_address": "string",
+                "workload_name": "string"
+            }
+        }
+    }
+
+Expected Response:
+
+.. code-block:: json
+
     {
         "response": "Created Deployment:nginx-deployment"
     }
-    ```
 
-    The above POST request will download the following YAML file and run it on the Kubernetes cluster.
+The above POST request will download the following YAML file and run it on the Kubernetes cluster.
 
-    ```
+.. code-block:: yaml
+
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -66,6 +68,6 @@
             image: nginx:1.7.9
             ports:
             - containerPort: 80
-    ```
+
 * GET
     URL: `localhost:8081/v1/vnf_instances`

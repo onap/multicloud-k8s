@@ -1,0 +1,41 @@
+# Copyright 2018 Intel Corporation.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+version: '3'
+
+services:
+  multicloud-k8s:
+    image: nexus3.onap.org:10003/onap/multicloud/k8plugin
+    build:
+      context: ./
+      args:
+        - HTTP_PROXY=$HTTP_PROXY
+        - HTTPS_PROXY=$HTTPS_PROXY
+    ports:
+      - "8081:8081"
+    environment:
+      - CSAR_DIR=/opt/csar
+      - KUBE_CONFIG_DIR=/opt/kubeconfig
+      - DATABASE_TYPE=consul
+      - DATABASE_IP=consul-svr
+    depends_on:
+      - "consul"
+    volumes:
+      - /opt/csar:/opt/csar
+      - /opt/kubeconfig:/opt/kubeconfig
+  consul:
+    image: consul
+    hostname: consul-svr
+    environment:
+      - CONSUL_LOCAL_CONFIG={"datacenter":"us_west","server":true}
+    command: ["agent", "-server", "-bootstrap-expect=1"]
+    volumes:
+      - /opt/consul/config:/consul/config

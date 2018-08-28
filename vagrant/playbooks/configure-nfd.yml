@@ -1,0 +1,57 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: kube-node
+  tasks:
+    - name: Load krd variables
+      include_vars:
+        file: krd-vars.yml
+    - name: clone NFD repo
+      git:
+        repo: "{{ nfd_url }}"
+        dest: "{{ nfd_dest }}"
+        version: "{{ nfd_version }}"
+        force: yes
+      when: nfd_source_type == "source"
+    - name: build NFD image
+      become: yes
+      make:
+        chdir: "{{ nfd_dest }}"
+    - name: get NDF image name
+      become: yes
+      shell: "docker images | grep kubernetes_incubator | awk '{printf(\"%s:%s\\n\", $1,$2)}'"
+      register: nfd_image
+    - name: replace NFD image name
+      lineinfile:
+        path: "{{ nfd_dest }}/node-feature-discovery-{{ item }}.json.template"
+        regexp: "\"image\": \"quay.io/kubernetes_incubator.*i"
+        line: "\"image\": \"{{ nfd_image.stdout }}\","
+      with_items:
+        - daemonset
+        - job
+    - name: copying rbac and daemonset files
+      fetch:
+        src: "{{ nfd_dest }}/{{ item }}"
+        dest: "/tmp/"
+        flat: yes
+      with_items:
+        - rbac.yaml
+        - node-feature-discovery-daemonset.json.template
+
+- hosts: localhost
+  become: yes
+  roles:
+    - andrewrothstein.kubectl
+  tasks:
+    - name: create service accounts
+      command: "/usr/local/bin/kubectl apply -f /tmp/{{ item }}"
+      with_items:
+        - rbac.yaml
+        - node-feature-discovery-daemonset.json.template

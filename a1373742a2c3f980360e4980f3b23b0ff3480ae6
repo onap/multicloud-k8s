@@ -1,0 +1,9 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Bin Hu <bh526r@att.com>
+Code-Review+2: Victor Morales <victor.morales@intel.com>
+Verified+1: Victor Morales <victor.morales@intel.com>
+Submitted-by: Bin Hu <bh526r@att.com>
+Submitted-at: Tue, 28 Aug 2018 20:09:11 +0000
+Reviewed-on: https://gerrit.onap.org/r/61413
+Project: multicloud/k8s
+Branch: refs/heads/master

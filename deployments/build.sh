@@ -13,10 +13,12 @@ set -o pipefail
 set -o xtrace
 
 function generate_binary {
-    GOPATH=$(go env GOPATH)
+    export GOPATH="$(pwd)/../"
     rm -f k8plugin
     rm -f *.so
-    $GOPATH/bin/dep ensure -v
+    pushd ../src/k8splugin/
+    dep ensure -v
+    popd
     for plugin in deployment namespace service; do
         CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./$plugin.so ../src/k8splugin/plugins/$plugin/plugin.go
     done

@@ -10,25 +10,20 @@
 
 set -o nounset
 set -o pipefail
-set -o xtrace
 
-function generate_binary {
-    export GOPATH="$(pwd)/../"
-    rm -f k8plugin
-    rm -f *.so
-    pushd ../src/k8splugin/
-    dep ensure -v
-    popd
-    for plugin in deployment namespace service; do
-        CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./$plugin.so ../src/k8splugin/plugins/$plugin/plugin.go
-    done
-    CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -tags netgo -o ./k8plugin ../src/k8splugin/cmd/main.go
-}
+k8s_path="$(git rev-parse --show-toplevel)"
 
-function build_image {
-    echo "Start build docker image."
-    docker-compose build --no-cache
-}
+echo "Compiling source code"
+pushd $k8s_path/src/k8splugin/
+make
+popd
 
-generate_binary
-build_image
+pushd $k8s_path/deployments
+for file in k8plugin *so; do
+    rm -f $file
+    mv $k8s_path/src/k8splugin/$file .
+done
+
+echo "Starting docker building process"
+docker-compose build --no-cache
+popd

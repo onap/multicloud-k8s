@@ -28,7 +28,7 @@ import (
 
 // CheckEnvVariables checks for required Environment variables
 func CheckEnvVariables() error {
-	envList := []string{"CSAR_DIR", "KUBE_CONFIG_DIR", "DATABASE_TYPE", "DATABASE_IP"}
+	envList := []string{"CSAR_DIR", "KUBE_CONFIG_DIR", "PLUGINS_DIR", "DATABASE_TYPE", "DATABASE_IP"}
 	for _, env := range envList {
 		if _, ok := os.LookupEnv(env); !ok {
 			return pkgerrors.New("environment variable " + env + " not set")
@@ -60,10 +60,7 @@ func CheckDatabaseConnection() error {
 
 // LoadPlugins loads all the compiled .so plugins
 func LoadPlugins() error {
-	pluginsDir, ok := os.LookupEnv("PLUGINS_DIR")
-	if !ok {
-		pluginsDir, _ = filepath.Abs(filepath.Dir(os.Args[0]))
-	}
+	pluginsDir := os.Getenv("PLUGINS_DIR")
 	err := filepath.Walk(pluginsDir,
 		func(path string, info os.FileInfo, err error) error {
 			if strings.Contains(path, ".so") {

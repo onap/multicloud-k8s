@@ -17,7 +17,7 @@ Sample cURL commands
 POST
 ****
 
-URL: `localhost:8081/v1/vnf_instances/cloudregion1/namespacetest`
+URL: `localhost:8081/v1/vnf_instances/`
 
 Request Body
 ------------
@@ -26,6 +26,7 @@ Request Body
 
     {
         "cloud_region_id": "region1",
+        "namespace": "test-namespace",
         "csar_id": "uuid",
         "namespace": "test",
         "oof_parameters": [{
@@ -48,37 +49,68 @@ Expected Response
 .. code-block:: json
 
     {
-        "response": "Created Deployment:nginx-deployment"
+        "vnf_id": "52fdfc07",
+        "cloud_region_id": "cloudregion1",
+        "namespace": "test-namespace",
+        "vnf_components": {
+            "deployment": [
+                "cloudregion1-test-namespace-52fdfc07-kubedeployment"
+            ],
+            "service": [
+                "cloudregion1-test-namespace-52fdfc07-kubeservice"
+            ]
+        }
     }
-
-The above POST request will download the following YAML file and run it on the Kubernetes cluster.
-
-.. code-block:: yaml
-
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-    name: nginx-deployment
-    labels:
-        app: nginx
-    spec:
-    replicas: 3
-    selector:
-        matchLabels:
-        app: nginx
-    template:
-        metadata:
-        labels:
-            app: nginx
-        spec:
-        containers:
-        - name: nginx
-            image: nginx:1.7.9
-            ports:
-            - containerPort: 80
 
 ***
 GET
 ***
 
 URL: `localhost:8081/v1/vnf_instances`
+
+Expected Response
+-----------------
+
+.. code-block:: json
+
+    {
+        "vnf_id_list": [
+            "52fdfc07"
+        ]
+    }
+
+***
+GET
+***
+
+URL: `localhost:8081/v1/vnf_instances/cloudregion1/test-namespace/52fdfc07`
+
+Expected Response
+-----------------
+
+.. code-block:: json
+
+    {
+        "vnf_id": "52fdfc07",
+        "cloud_region_id": "cloudregion1",
+        "namespace": "test-namespace",
+        "vnf_components": {
+            "deployment": [
+                "cloudregion1-test-namespace-52fdfc07-kubedeployment"
+            ],
+            "service": [
+                "cloudregion1-test-namespace-52fdfc07-kubeservice"
+            ]
+        }
+    }
+
+***
+DELETE
+***
+
+URL: `localhost:8081/v1/vnf_instances/cloudregion1/test-namespace/52fdfc07`
+
+Expected Response
+-----------------
+
+202 Accepted

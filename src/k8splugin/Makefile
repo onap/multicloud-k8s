@@ -20,7 +20,7 @@ build: clean dep plugins tests
 deploy: clean dep plugins build_binary tests
 
 build_binary:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -ldflags '-w' -o ./k8plugin ./cmd/main.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -tags netgo -o ./k8plugin ./cmd/main.go
 
 tests:
 	go test -v ./... -cover
@@ -29,10 +29,10 @@ format:
 	go fmt ./...
 
 plugins:
-	go build -buildmode=plugin -o ./plugins/deployment/deployment.so ./plugins/deployment/plugin.go
-	go build -buildmode=plugin -o ./plugins/namespace/namespace.so ./plugins/namespace/plugin.go
-	go build -buildmode=plugin -o ./plugins/service/service.so ./plugins/service/plugin.go
-	go build -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./plugins/deployment/deployment.so ./plugins/deployment/plugin.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./plugins/namespace/namespace.so ./plugins/namespace/plugin.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./plugins/service/service.so ./plugins/service/plugin.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
 
 dep:
 	go get -u $(DEPENDENCIES)

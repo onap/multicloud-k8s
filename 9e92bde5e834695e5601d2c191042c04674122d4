@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_b55d6e49",
+        "filename": "docs/index.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T19:18:54Z",
+      "side": 1,
+      "message": "Rama, can you change the title and paragraph to provide information about the MultiCloud/k8s plugin instead of only KRD.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 48
+      },
+      "revId": "9e92bde5e834695e5601d2c191042c04674122d4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

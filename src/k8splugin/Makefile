@@ -16,11 +16,19 @@ export GOPATH ...
 
 .PHONY: plugins
 
-build: clean dep plugins tests
-deploy: clean dep plugins build_binary tests
+# The following is done this way as each patch on CI runs build and each merge runs deploy. So for build we don't need to build binary and hence
+# no need to create a static binary with additional flags. However, for generating binary, additional build flags are necessary. This if used with
+# mock plugin errors out for unit tests. So the seperation avoids the error.
 
-build_binary:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -ldflags '-w' -o ./k8plugin ./cmd/main.go
+build: clean dep plugins tests
+deploy: build clean dep generate_binary
+
+generate_binary:
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./plugins/deployment/deployment.so ./plugins/deployment/plugin.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./plugins/namespace/namespace.so ./plugins/namespace/plugin.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./plugins/service/service.so ./plugins/service/plugin.go
+
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -tags netgo -o ./k8plugin ./cmd/main.go
 
 tests:
 	go test -v ./... -cover

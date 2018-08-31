@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_d80a9f78",
+        "filename": "src/k8splugin/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T22:20:35Z",
+      "side": 1,
+      "message": "nit: s/seperation/separation",
+      "range": {
+        "startLine": 21,
+        "startChar": 48,
+        "endLine": 21,
+        "endChar": 58
+      },
+      "revId": "3cf3ab16ca22e65e7f6496baea1504b9037f386b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9828a7e3",
+        "filename": "src/k8splugin/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T22:20:35Z",
+      "side": 1,
+      "message": "remove build from deploy action",
+      "range": {
+        "startLine": 24,
+        "startChar": 8,
+        "endLine": 24,
+        "endChar": 13
+      },
+      "revId": "3cf3ab16ca22e65e7f6496baea1504b9037f386b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b825630a",
+        "filename": "src/k8splugin/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T22:20:35Z",
+      "side": 1,
+      "message": "nit: s/generate_binary/cross_compile",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 15
+      },
+      "revId": "3cf3ab16ca22e65e7f6496baea1504b9037f386b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

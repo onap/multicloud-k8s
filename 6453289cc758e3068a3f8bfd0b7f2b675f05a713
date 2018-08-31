@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_2034c391",
+        "filename": "docs/krd_architecture.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T00:22:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_a0dc5374",
+      "range": {
+        "startLine": 17,
+        "startChar": 45,
+        "endLine": 17,
+        "endChar": 46
+      },
+      "revId": "6453289cc758e3068a3f8bfd0b7f2b675f05a713",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_40e53f36",
         "filename": "docs/krd_architecture.rst",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2018-08-31T00:08:49Z",
       "side": 1,
       "message": "\"have\"",
+      "range": {
+        "startLine": 74,
+        "startChar": 51,
+        "endLine": 74,
+        "endChar": 54
+      },
+      "revId": "6453289cc758e3068a3f8bfd0b7f2b675f05a713",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_c024ef61",
+        "filename": "docs/krd_architecture.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T00:22:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_40e53f36",
       "range": {
         "startLine": 74,
         "startChar": 51,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_e029eb37",
+        "filename": "docs/krd_architecture.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T00:22:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_00d3c760",
+      "range": {
+        "startLine": 115,
+        "startChar": 54,
+        "endLine": 115,
+        "endChar": 62
+      },
+      "revId": "6453289cc758e3068a3f8bfd0b7f2b675f05a713",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_a0c3f387",
         "filename": "docs/krd_architecture.rst",
         "patchSetId": 5
@@ -82,6 +154,30 @@
       "writtenOn": "2018-08-31T00:08:49Z",
       "side": 1,
       "message": "\"guarantee\" (no \u0027s\u0027)",
+      "range": {
+        "startLine": 158,
+        "startChar": 51,
+        "endLine": 158,
+        "endChar": 61
+      },
+      "revId": "6453289cc758e3068a3f8bfd0b7f2b675f05a713",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_a01f7307",
+        "filename": "docs/krd_architecture.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T00:22:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_a0c3f387",
       "range": {
         "startLine": 158,
         "startChar": 51,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_4018df1d",
+        "filename": "docs/krd_architecture.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T00:22:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_60b95b14",
+      "range": {
+        "startLine": 159,
+        "startChar": 56,
+        "endLine": 159,
+        "endChar": 60
+      },
+      "revId": "6453289cc758e3068a3f8bfd0b7f2b675f05a713",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_804d9740",
         "filename": "docs/sampleCommands.rst",
         "patchSetId": 5
@@ -128,6 +248,24 @@
       "writtenOn": "2018-08-31T00:08:49Z",
       "side": 1,
       "message": "Do we need examples of expected response?",
+      "revId": "6453289cc758e3068a3f8bfd0b7f2b675f05a713",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_60fe3bb0",
+        "filename": "docs/sampleCommands.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-08-31T00:22:54Z",
+      "side": 1,
+      "message": "I\u0027m going to check if Shashank has something in other way I\u0027m going to get it from the testing.",
+      "parentUuid": "1a76adc5_804d9740",
       "revId": "6453289cc758e3068a3f8bfd0b7f2b675f05a713",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

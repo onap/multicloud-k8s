@@ -171,23 +171,18 @@ function install_plugin {
 
     mkdir -p /opt/{csar,kubeconfig,consul/config}
     cp $HOME/.kube/config /opt/kubeconfig/krd
-    export CSAR_DIR=/opt/csar
-    export KUBE_CONFIG_DIR=/opt/kubeconfig
-    echo "export CSAR_DIR=${CSAR_DIR}" >> /etc/environment
-    echo "export KUBE_CONFIG_DIR=${KUBE_CONFIG_DIR}" >> /etc/environment
 
     GOPATH=$(go env GOPATH)
-    git clone https://git.onap.org/multicloud/k8s $GOPATH/src/k8-plugin-multicloud
     pushd $GOPATH/src/k8-plugin-multicloud/deployments
     ./build.sh
-    docker-compose up -d
-    popd
 
     if [[ -n "${testing_enabled+x}" ]]; then
+        docker-compose up -d
         pushd $krd_tests
         bash plugin.sh
         popd
     fi
+    popd
 }
 
 # _install_crictl() - Install Container Runtime Interface (CRI) CLI

@@ -13,6 +13,7 @@ target
 src/github.com
 src/golang.org
 src/k8splugin/vendor
+src/k8splugin/.vendor-new/
 src/k8splugin/kubeconfig/*
 deployments/k8plugin
 

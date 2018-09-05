@@ -260,6 +260,11 @@ k8s_info_file=$krd_folder/k8s_info.log
 mkdir -p $log_folder
 
 # Install dependencies
+# Setup proxy variables
+if [ -f $krd_folder/sources.list ]; then
+    mv /etc/apt/sources.list /etc/apt/sources.list.backup
+    cp $krd_folder/sources.list /etc/apt/sources.list
+fi
 apt-get update
 install_k8s
 install_addons

@@ -30,5 +30,6 @@ src/k8splugin/plugins/**/*.so
 vagrant/inventory/hosts.ini
 vagrant/inventory/group_vars/all.yml
 vagrant/config/pdf.yml
+vagrant/sources.list
 *.retry
 *.vdi

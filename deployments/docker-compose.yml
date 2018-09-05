@@ -26,6 +26,7 @@ services:
       - KUBE_CONFIG_DIR=/opt/kubeconfig
       - DATABASE_TYPE=consul
       - DATABASE_IP=consul-svr
+      - PLUGINS_DIR=/opt/multicloud/k8s
     depends_on:
       - "consul"
     volumes:

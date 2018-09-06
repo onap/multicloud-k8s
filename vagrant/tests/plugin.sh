@@ -33,7 +33,7 @@ fi
 if [[ $(docker ps -q --all --filter "name=aai") ]]; then
     docker rm aai -f
 fi
-docker run --name aai -v $(pwd)/output:/tmp/generic_sim/ -v $(pwd)/generic_simulator/aai/:/etc/generic_sim/ -p 8443:8080 -d generic_sim
+docker run --name aai -v $(mktemp):/tmp/generic_sim/ -v $(pwd)/generic_simulator/aai/:/etc/generic_sim/ -p 8443:8080 -d generic_sim
 
 vnf_id_list=$(curl -s "${base_url}${cloud_region_id}/${namespace}" | jq -r '.vnf_id_list')
 
@@ -94,4 +94,4 @@ payload_raw="
 }
 "
 payload=$(echo $payload_raw | tr '\n' ' ')
-curl -v -X POST -d "$payload" "${base_url}"
+curl -v -d "$payload" "${base_url}"

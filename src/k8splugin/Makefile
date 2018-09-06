@@ -16,10 +16,9 @@ export GOPATH ...
 
 
 all: clean dep
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./deployment.so ./plugins/deployment/plugin.go
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./namespace.so ./plugins/namespace/plugin.go
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -tags netgo -o ./service.so ./plugins/service/plugin.go
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -tags netgo -o ./k8plugin ./cmd/main.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64
+	@find plugins -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -a -tags netgo -o $(basename {}).so" \;
+	go build -a -tags netgo -o ./k8plugin ./cmd/main.go
 
 # The following is done this way as each patch on CI runs build and each merge runs deploy. So for build we don't need to build binary and hence
 # no need to create a static binary with additional flags. However, for generating binary, additional build flags are necessary. This if used with
@@ -36,9 +35,7 @@ format:
 	go fmt ./...
 
 plugins:
-	go build -buildmode=plugin -o ./plugins/deployment/deployment.so ./plugins/deployment/plugin.go
-	go build -buildmode=plugin -o ./plugins/namespace/namespace.so ./plugins/namespace/plugin.go
-	go build -buildmode=plugin -o ./plugins/service/service.so ./plugins/service/plugin.go
+	@find plugins -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -o $(basename {}).so" \;
 
 dep:
 	go get -u $(DEPENDENCIES)

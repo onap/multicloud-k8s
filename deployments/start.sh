@@ -12,21 +12,21 @@ set -o nounset
 set -o pipefail
 
 k8s_path="$(git rev-parse --show-toplevel)"
+export GOPATH=$k8s_path
 
-echo "Compiling source code"
-pushd $k8s_path/src/k8splugin/
-make
-popd
+export CSAR_DIR=/opt/csar
+export KUBE_CONFIG_DIR=/opt/kubeconfig
+export DATABASE_TYPE=consul
+export DATABASE_IP=consul-svr
+export PLUGINS_DIR=$k8s_path/src/k8splugin/plugins
 
-rm -f k8plugin *so
-mv $k8s_path/src/k8splugin/k8plugin .
-mv $k8s_path/src/k8splugin/plugins/*.so .
-
-echo "Cleaning previous execution"
+echo "Starting consul services"
 docker-compose kill
-image=$(grep "image.*k8plugin" docker-compose.yml)
-docker images ${image#*:} -q | xargs docker rmi -f
-docker ps -a --filter "status=exited" -q | xargs docker rm
+docker-compose up -d consul
+echo "Compiling source code"
 
-echo "Starting docker building process"
-docker-compose build --no-cache
+pushd $k8s_path/src/k8splugin/
+make clean
+make plugins
+go run cmd/main.go
+popd

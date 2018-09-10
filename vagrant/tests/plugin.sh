@@ -38,7 +38,7 @@ docker run --name aai -v $(mktemp):/tmp/generic_sim/ -v $(pwd)/generic_simulator
 vnf_id_list=$(curl -s "${base_url}${cloud_region_id}/${namespace}" | jq -r '.vnf_id_list')
 
 mkdir -p ${CSAR_DIR}/${csar_id}
-cat << SEQ > ${CSAR_DIR}/${csar_id}/sequence.yaml
+cat << SEQ > ${CSAR_DIR}/${csar_id}/metadata.yaml
 deployment:
   - deployment.yaml
 service:

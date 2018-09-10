@@ -26,9 +26,6 @@ type ConsulDB struct {
 
 // InitializeDatabase initialized the initial steps
 func (c *ConsulDB) InitializeDatabase() error {
-	if os.Getenv("DATABASE_IP") == "" {
-		return pkgerrors.New("DATABASE_IP environment variable not set.")
-	}
 	config := consulapi.DefaultConfig()
 	config.Address = os.Getenv("DATABASE_IP") + ":8500"
 

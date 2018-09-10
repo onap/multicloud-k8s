@@ -171,6 +171,10 @@ function install_plugin {
 
     mkdir -p /opt/{csar,kubeconfig,consul/config}
     cp $HOME/.kube/config /opt/kubeconfig/krd
+    export CSAR_DIR=/opt/csar
+    export KUBE_CONFIG_DIR=/opt/kubeconfig
+    echo "export CSAR_DIR=${CSAR_DIR}" >> /etc/environment
+    echo "export KUBE_CONFIG_DIR=${KUBE_CONFIG_DIR}" >> /etc/environment
 
     GOPATH=$(go env GOPATH)
     pushd $GOPATH/src/k8-plugin-multicloud/deployments

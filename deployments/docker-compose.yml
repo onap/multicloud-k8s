@@ -19,6 +19,7 @@ services:
       args:
         - HTTP_PROXY=$HTTP_PROXY
         - HTTPS_PROXY=$HTTPS_PROXY
+        - NO_PROXY=$NO_PROXY
     ports:
       - "8081:8081"
     environment:

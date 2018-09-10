@@ -120,7 +120,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	// "{"deployment":<>,"service":<>}"
 	out, err := json.Marshal(resourceNameMap)
 	if err != nil {
-		werr := pkgerrors.Wrap(err, "Create VNF deployment error")
+		werr := pkgerrors.Wrap(err, "Create VNF deployment JSON Marshalling error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -130,7 +130,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	// value: "{"deployment":<>,"service":<>}"
 	err = db.DBconn.CreateEntry(internalVNFID, serializedResourceNameMap)
 	if err != nil {
-		werr := pkgerrors.Wrap(err, "Create VNF deployment error")
+		werr := pkgerrors.Wrap(err, "Create VNF deployment DB error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}

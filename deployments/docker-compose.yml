@@ -14,6 +14,9 @@ version: '2'
 services:
   multicloud-k8s:
     image: nexus3.onap.org:10003/onap/multicloud/k8plugin
+    networks:
+      multicloud_net:
+        ipv4_address: 172.19.0.3
     build:
       context: ./
       args:
@@ -26,18 +29,38 @@ services:
       - CSAR_DIR=/opt/csar
       - KUBE_CONFIG_DIR=/opt/kubeconfig
       - DATABASE_TYPE=consul
-      - DATABASE_IP=consul-svr
+      - DATABASE_IP=172.19.0.2
       - PLUGINS_DIR=/opt/multicloud/k8s
+      - HTTP_PROXY=$HTTP_PROXY
+      - HTTPS_PROXY=$HTTPS_PROXY
+      - NO_PROXY=$NO_PROXY,172.19.0.2
     depends_on:
-      - "consul"
+      - consul
+    links:
+      - consul
     volumes:
       - /opt/csar:/opt/csar
       - /opt/kubeconfig:/opt/kubeconfig
   consul:
     image: consul
-    hostname: consul-svr
+    networks:
+      multicloud_net:
+        ipv4_address: 172.19.0.2
     environment:
-      - CONSUL_LOCAL_CONFIG={"datacenter":"us_west","server":true}
+      CONSUL_CLIENT_INTERFACE: 'eth0'
+      CONSUL_BIND_INTERFACE: 'eth0'
+      HTTP_PROXY: $HTTP_PROXY
+      HTTPS_PROXY: $HTTPS_PROXY
+      NO_PROXY: $NO_PROXY
     command: ["agent", "-server", "-bootstrap-expect=1"]
     volumes:
       - /opt/consul/config:/consul/config
+
+networks:
+  multicloud_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.19.0.0/27

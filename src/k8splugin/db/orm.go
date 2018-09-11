@@ -20,7 +20,7 @@ import (
 // DBconn interface used to talk a concrete Database connection
 var DBconn DatabaseConnection
 
-// DatabaseConnection is an interface for accessing a database
+// DatabaseConnection provides methods which are going to be accesed by API handlers
 type DatabaseConnection interface {
 	InitializeDatabase() error
 	CheckDatabase() error
@@ -37,6 +37,6 @@ var CreateDBClient = func(dbType string) error {
 		DBconn = &ConsulDB{}
 		return nil
 	default:
-		return pkgerrors.New(dbType + "DB not supported")
+		return pkgerrors.New(dbType + " type is not supported")
 	}
 }

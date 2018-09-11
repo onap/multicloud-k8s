@@ -63,7 +63,7 @@ func validateBody(body interface{}) error {
 	return nil
 }
 
-// CreateHandler is the POST method creates a new VNF instance resource.
+// CreateHandler is the POST method which creates a new VNF instance resource.
 func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	var resource CreateVnfRequest
 
@@ -74,13 +74,15 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&resource)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		werr := pkgerrors.Wrap(err, "Create VNF entity Decoding error")
+		http.Error(w, werr.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	err = validateBody(resource)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		werr := pkgerrors.Wrap(err, "Create VNF entity unvalid resource")
+		http.Error(w, werr.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -89,18 +91,11 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	// err := DownloadKubeConfigFromAAI(resource.CloudRegionID, os.Getenv("KUBE_CONFIG_DIR")
 	kubeclient, err := GetVNFClient(os.Getenv("KUBE_CONFIG_DIR") + "/" + resource.CloudRegionID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		werr := pkgerrors.Wrap(err, "Get kubeclient error during VNF entity creation")
+		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	/*
-		uuid,
-		{
-			"deployment": ["cloud1-default-uuid-sisedeploy1", "cloud1-default-uuid-sisedeploy2", ... ]
-			"service": ["cloud1-default-uuid-sisesvc1", "cloud1-default-uuid-sisesvc2", ... ]
-		},
-		nil
-	*/
 	externalVNFID, resourceNameMap, err := csar.CreateVNF(resource.CsarID, resource.CloudRegionID, resource.Namespace, &kubeclient)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Read Kubernetes Data information error")
@@ -108,29 +103,23 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// cloud1-default-uuid
 	internalVNFID := resource.CloudRegionID + "-" + resource.Namespace + "-" + externalVNFID
-
-	// Persist in AAI database.
 	log.Printf("Cloud Region ID: %s, Namespace: %s, VNF ID: %s ", resource.CloudRegionID, resource.Namespace, externalVNFID)
 
 	// TODO: Uncomment when annotations are done
 	// krd.AddNetworkAnnotationsToPod(kubeData, resource.Networks)
 
-	// "{"deployment":<>,"service":<>}"
 	out, err := json.Marshal(resourceNameMap)
 	if err != nil {
-		werr := pkgerrors.Wrap(err, "Create VNF deployment JSON Marshalling error")
+		werr := pkgerrors.Wrap(err, "Create VNF entity JSON Marshalling error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}
 	serializedResourceNameMap := string(out)
 
-	// key: cloud1-default-uuid
-	// value: "{"deployment":<>,"service":<>}"
 	err = db.DBconn.CreateEntry(internalVNFID, serializedResourceNameMap)
 	if err != nil {
-		werr := pkgerrors.Wrap(err, "Create VNF deployment DB error")
+		werr := pkgerrors.Wrap(err, "Create VNF entity DB error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}

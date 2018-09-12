@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_770243b5",
+        "filename": "src/k8splugin/api/handler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-09-12T23:19:07Z",
+      "side": 0,
+      "message": "I consider that this information should be placed in the Unit tests and use logging to print out what it\u0027s happening inside.",
+      "parentUuid": "1a76adc5_ba70c572",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 3
+      },
+      "revId": "e7a7b50f6fc0f036eeb116f95e8e5fb8d56aa4ef",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_5a6bb184",
         "filename": "src/k8splugin/api/handler.go",
         "patchSetId": 1

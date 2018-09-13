@@ -10,7 +10,7 @@
 # limitations under the License.
 
 resources:
-  - deployment:
+  deployment:
     - deployment.yaml
-  - service:
+  service:
     - service.yaml

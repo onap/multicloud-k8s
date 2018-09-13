@@ -11,6 +11,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
+#set -o xtrace
 
 # _build_generic_sim() - Creates a generic simulator image in case that doesn't exist
 function _build_generic_sim {
@@ -44,12 +45,14 @@ function start_aai_service {
 # populate_csar_dir()- Creates content used for Functional tests
 function populate_csar_dir {
     mkdir -p ${CSAR_DIR}/${csar_id}
-    cat << SEQ > ${CSAR_DIR}/${csar_id}/metadata.yaml
-deployment:
-  - deployment.yaml
-service:
-  - service.yaml
-SEQ
+    cat << META > ${CSAR_DIR}/${csar_id}/metadata.yaml
+resources:
+  deployment:
+    - deployment.yaml
+  service:
+    - service.yaml
+META
+
     cat << DEPLOYMENT > ${CSAR_DIR}/${csar_id}/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -98,8 +101,8 @@ base_url="http://localhost:8081/v1/vnf_instances/"
 cloud_region_id="krd"
 namespace="default"
 csar_id="94e414f6-9ca4-11e8-bb6a-52540067263b"
-deployment_name="plugin_functional_test_deployment"
-service_name="plugin_functional_test_service"
+deployment_name="test-deployment"
+service_name="test-service"
 
 #start_aai_service
 populate_csar_dir
@@ -114,16 +117,18 @@ payload_raw="
 "
 payload=$(echo $payload_raw | tr '\n' ' ')
 echo "Creating VNF Instance"
-curl -d "$payload" "${base_url}"
+vnf_id=$(curl -s -d "$payload" "${base_url}" | jq -r '.vnf_id')
+echo "=== Validating Kubernetes ==="
+kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-${deployment_name}
+kubectl get --no-headers=true --namespace=${namespace} service ${cloud_region_id}-${namespace}-${vnf_id}-$service_name
+echo "VNF Instance created succesfully with id: $vnf_id"
 
-vnf_id=$(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}" | jq -r '.vnf_id_list[0]')
-if [[ -z "$vnf_id" ]]; then
-    echo "VNF Instance not created"
+vnf_id_list=$(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}" | jq -r '.vnf_id_list')
+if [[ "$vnf_id_list" != *"${vnf_id}"* ]]; then
+    echo $vnf_id_list
+    echo "VNF Instance not stored"
     exit 1
 fi
-echo "VNF Instance created succesfully with id: $vnf_id"
-#kubectl get deployment $deployment_name
-#kubectl get service $service_name
 
 vnf_details=$(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}/${vnf_id}")
 if [[ -z "$vnf_details" ]]; then
@@ -138,4 +143,3 @@ if [[ -n $(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}/${vnf_id}"
     echo "VNF Instance not deleted"
     exit 1
 fi
-docker logs deployments_multicloud-k8s_1

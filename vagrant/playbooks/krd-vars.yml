@@ -35,7 +35,7 @@ criproxy_url: "https://github.com/Mirantis/criproxy/releases/download/v{{ cripro
 #criproxy_url: "https://github.com/Mirantis/criproxy"
 virtlet_dest: "{{ base_dest }}/virtlet"
 virtlet_source_type: "binary"
-virtlet_version: 1.2.0
+virtlet_version: 1.3.0
 virtlet_url: "https://github.com/Mirantis/virtlet/releases/download/v{{ virtlet_version }}/virtletctl"
 #virtlet_source_type: "source"
 #virtlet_version: 68e11b8f1db2c78b063126899f0e60910700975d

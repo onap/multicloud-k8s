@@ -109,7 +109,7 @@ Vagrant.configure("2") do |config|
     installer.vm.synced_folder '../', '/root/go/src/k8-plugin-multicloud/', type: sync_type
     installer.vm.provision 'shell' do |sh|
       sh.path =  "installer.sh"
-      sh.args = ['-p', '-v', '-w', '/vagrant']
+      sh.args = ['-p', '-v', '-w', '/root/go/src/k8-plugin-multicloud/vagrant']
     end
   end
 end

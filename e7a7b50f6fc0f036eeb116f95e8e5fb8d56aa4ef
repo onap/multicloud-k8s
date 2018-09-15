@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_b2cc5cbc",
+        "filename": "src/k8splugin/api/handler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 845
+      },
+      "writtenOn": "2018-09-15T04:28:53Z",
+      "side": 0,
+      "message": "Does above information explain the structure in the code? e.g. externalVNFID \u003c-\u003e uuid, resourceNameMap \u003c-\u003e { ... }? If it explains the code, I think it helps readability.\n\nLogging perhaps prints out the specific value of each instance at run-time, right? Readers of the code may not have to run Unit test in order to understand more details of data structure.",
+      "parentUuid": "1a76adc5_770243b5",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 3
+      },
+      "revId": "e7a7b50f6fc0f036eeb116f95e8e5fb8d56aa4ef",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_5a6bb184",
         "filename": "src/k8splugin/api/handler.go",
         "patchSetId": 1

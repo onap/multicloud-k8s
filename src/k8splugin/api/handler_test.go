@@ -1,3 +1,5 @@
+// +build unit
+
 /*
 Copyright 2018 Intel Corporation.
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +18,12 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"k8s.io/client-go/kubernetes"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"k8s.io/client-go/kubernetes"
 
 	"k8splugin/csar"
 	"k8splugin/db"

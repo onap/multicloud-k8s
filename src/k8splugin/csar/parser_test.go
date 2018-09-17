@@ -1,3 +1,5 @@
+// +build integration
+
 /*
 Copyright 2018 Intel Corporation.
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +17,12 @@ package csar
 
 import (
 	"io/ioutil"
-	"k8s.io/client-go/kubernetes"
 	"log"
 	"os"
 	"plugin"
 	"testing"
+
+	"k8s.io/client-go/kubernetes"
 
 	pkgerrors "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"

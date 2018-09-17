@@ -187,20 +187,6 @@ function install_plugin {
     popd
 }
 
-# _install_crictl() - Install Container Runtime Interface (CRI) CLI
-function _install_crictl {
-    local version="v1.0.0-alpha.0" # More info: https://github.com/kubernetes-incubator/cri-tools#current-status
-
-    wget https://github.com/kubernetes-incubator/cri-tools/releases/download/$version/crictl-$version-linux-amd64.tar.gz
-    tar zxvf crictl-$version-linux-amd64.tar.gz -C /usr/local/bin
-    rm -f crictl-$version-linux-amd64.tar.gz
-
-    cat << EOL > /etc/crictl.yaml
-runtime-endpoint: unix:///run/criproxy.sock
-image-endpoint: unix:///run/criproxy.sock
-EOL
-}
-
 # _print_kubernetes_info() - Prints the login Kubernetes information
 function _print_kubernetes_info {
     if ! $(kubectl version &>/dev/null); then
@@ -219,7 +205,7 @@ function _print_kubernetes_info {
 }
 
 # Configuration values
-addons="virtlet ovn-kubernetes multus nfd"
+addons="virtlet ovn-kubernetes multus"
 krd_folder="$(dirname "$0")"
 verbose=""
 

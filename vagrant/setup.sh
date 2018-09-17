@@ -11,7 +11,7 @@
 set -o nounset
 set -o pipefail
 
-vagrant_version=2.1.4
+vagrant_version=2.1.5
 if ! $(vagrant version &>/dev/null); then
     enable_vagrant_install=true
 else
@@ -153,8 +153,8 @@ esac
 if ! which pip; then
     curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
 fi
-sudo pip install --upgrade pip
-sudo pip install tox
+sudo -H pip install --upgrade pip
+sudo -H pip install tox
 
 ${INSTALLER_CMD} ${packages[@]}
 if [[ ${http_proxy+x} ]]; then

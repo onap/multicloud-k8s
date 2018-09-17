@@ -169,11 +169,9 @@ function install_plugin {
     _install_docker
     pip install docker-compose
 
-    mkdir -p /opt/{csar,kubeconfig,consul/config}
+    mkdir -p /opt/{kubeconfig,consul/config}
     cp $HOME/.kube/config /opt/kubeconfig/krd
-    export CSAR_DIR=/opt/csar
     export KUBE_CONFIG_DIR=/opt/kubeconfig
-    echo "export CSAR_DIR=${CSAR_DIR}" >> /etc/environment
     echo "export KUBE_CONFIG_DIR=${KUBE_CONFIG_DIR}" >> /etc/environment
 
     GOPATH=$(go env GOPATH)
@@ -257,6 +255,9 @@ krd_tests=$krd_folder/tests
 k8s_info_file=$krd_folder/k8s_info.log
 
 mkdir -p $log_folder
+mkdir -p /opt/csar
+export CSAR_DIR=/opt/csar
+echo "export CSAR_DIR=${CSAR_DIR}" >> /etc/environment
 
 # Install dependencies
 # Setup proxy variables

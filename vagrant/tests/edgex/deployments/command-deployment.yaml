@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-core-command
+  name: edgex-core-command
+spec:
+  selector:
+    matchLabels:
+      io.kompose.service: edgex-core-command
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-core-command
+    spec:
+      containers:
+      - image: edgexfoundry/docker-core-command:0.2.1
+        name: edgex-core-command
+        ports:
+        - containerPort: 48082
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        hostPath:
+          path: /data/db
+      - name: edgex-logs
+        hostPath:
+          path: /edgex/logs
+      - name: consul-config
+        hostPath:
+          path: /consul/config
+      - name: consul-data
+        hostPath:
+          path: /consul/data
+status: {}

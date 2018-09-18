@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: edgex-core-consul
+  name: edgex-core-consul
+spec:
+  ports:
+  - name: "8400"
+    port: 8400
+    targetPort: 8400
+  - name: "8500"
+    port: 8500
+    targetPort: 8500
+  - name: "8600"
+    port: 8600
+    targetPort: 8600
+  selector:
+    io.kompose.service: edgex-core-consul
+status:
+  loadBalancer: {}

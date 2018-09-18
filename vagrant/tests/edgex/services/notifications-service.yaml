@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: edgex-support-notifications
+  name: edgex-support-notifications
+spec:
+  ports:
+  - name: "48060"
+    port: 48060
+    targetPort: 48060
+  selector:
+    io.kompose.service: edgex-support-notifications
+status:
+  loadBalancer: {}

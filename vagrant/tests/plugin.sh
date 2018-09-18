@@ -13,6 +13,14 @@ set -o nounset
 set -o pipefail
 #set -o xtrace
 
+source _common.sh
+source _functions.sh
+
+base_url="http://localhost:8081/v1/vnf_instances/"
+cloud_region_id="krd"
+namespace="default"
+csar_id="94e414f6-9ca4-11e8-bb6a-52540067263b"
+
 # _build_generic_sim() - Creates a generic simulator image in case that doesn't exist
 function _build_generic_sim {
     if [[ -n $(docker images -q generic_sim) ]]; then
@@ -42,72 +50,13 @@ function start_aai_service {
     docker run --name aai -v $(mktemp):/tmp/generic_sim/ -v $(pwd)/generic_simulator/aai/:/etc/generic_sim/ -p 8443:8080 -d generic_sim
 }
 
-# populate_csar_dir()- Creates content used for Functional tests
-function populate_csar_dir {
-    mkdir -p ${CSAR_DIR}/${csar_id}
-    cat << META > ${CSAR_DIR}/${csar_id}/metadata.yaml
-resources:
-  deployment:
-    - deployment.yaml
-  service:
-    - service.yaml
-META
-
-    cat << DEPLOYMENT > ${CSAR_DIR}/${csar_id}/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: $deployment_name
-  labels:
-    app: multus
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: multus
-  template:
-    metadata:
-      labels:
-        app: multus
-      annotations:
-        kubernetes.v1.cni.cncf.io/networks: '[
-          { "name": "bridge-conf", "interfaceRequest": "eth1" },
-          { "name": "bridge-conf", "interfaceRequest": "eth2" }
-        ]'
-    spec:
-      containers:
-      - name: multus-deployment
-        image: "busybox"
-        command: ["top"]
-        stdin: true
-        tty: true
-DEPLOYMENT
-    cat << SERVICE >  ${CSAR_DIR}/${csar_id}/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: $service_name
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-  selector:
-    app: sise
-SERVICE
-}
-
-# Configuration
-base_url="http://localhost:8081/v1/vnf_instances/"
-cloud_region_id="krd"
-namespace="default"
-csar_id="94e414f6-9ca4-11e8-bb6a-52540067263b"
-deployment_name="test-deployment"
-service_name="test-service"
+# Setup
+destroy_deployment $plugin_deployment_name
 
 #start_aai_service
-populate_csar_dir
+populate_CSAR_plugin $csar_id
 
-#Functional Tests execution
+# Test
 payload_raw="
 {
     \"cloud_region_id\": \"$cloud_region_id\",
@@ -119,8 +68,8 @@ payload=$(echo $payload_raw | tr '\n' ' ')
 echo "Creating VNF Instance"
 vnf_id=$(curl -s -d "$payload" "${base_url}" | jq -r '.vnf_id')
 echo "=== Validating Kubernetes ==="
-kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-${deployment_name}
-kubectl get --no-headers=true --namespace=${namespace} service ${cloud_region_id}-${namespace}-${vnf_id}-$service_name
+kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-${plugin_deployment_name}
+kubectl get --no-headers=true --namespace=${namespace} service ${cloud_region_id}-${namespace}-${vnf_id}-${plugin_service_name}
 echo "VNF Instance created succesfully with id: $vnf_id"
 
 vnf_id_list=$(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}" | jq -r '.vnf_id_list')
@@ -143,3 +92,6 @@ if [[ -n $(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}/${vnf_id}"
     echo "VNF Instance not deleted"
     exit 1
 fi
+
+# Teardown
+teardown $plugin_deployment_name

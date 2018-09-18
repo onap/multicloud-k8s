@@ -19,6 +19,8 @@ image_name=virtlet.cloud/ubuntu/16.04
 multus_deployment_name=multus-deployment
 virtlet_image=virtlet.cloud/fedora
 virtlet_deployment_name=virtlet-deployment
+plugin_deployment_name=plugin-deployment
+plugin_service_name=plugin-service
 
 # popule_CSAR_containers_vFW() - This function creates the content of CSAR file
 # required for vFirewal using only containers
@@ -572,5 +574,59 @@ spec:
             # This memory limit is applied to the libvirt domain definition
             memory: 160Mi
 DEPLOYMENT
-popd
+    popd
 }
+
+# populate_CSAR_plugin()- Creates content used for Plugin functional tests
+function populate_CSAR_plugin {
+    local csar_id=$1
+
+    _checks_args $csar_id
+    pushd ${CSAR_DIR}/${csar_id}
+
+    cat << META > metadata.yaml
+resources:
+  deployment:
+    - $plugin_deployment_name.yaml
+  service:
+    - service.yaml
+META
+
+    cat << DEPLOYMENT > $plugin_deployment_name.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $plugin_deployment_name
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plugin
+  template:
+    metadata:
+      labels:
+        app: plugin
+    spec:
+      containers:
+      - name: $plugin_deployment_name
+        image: "busybox"
+        command: ["top"]
+        stdin: true
+        tty: true
+DEPLOYMENT
+
+    cat << SERVICE > service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: $plugin_service_name
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: sise
+SERVICE
+    popd
+}
+

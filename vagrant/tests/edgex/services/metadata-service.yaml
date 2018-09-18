@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: edgex-core-metadata
+  name: edgex-core-metadata
+spec:
+  ports:
+  - name: "48081"
+    port: 48081
+    targetPort: 48081
+  selector:
+    io.kompose.service: edgex-core-metadata
+status:
+  loadBalancer: {}

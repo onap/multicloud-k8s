@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-support-scheduler
+  name: edgex-support-scheduler
+spec:
+  selector:
+    matchLabels:
+      io.kompose.service: edgex-support-scheduler
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-support-scheduler
+    spec:
+      containers:
+      - image: edgexfoundry/docker-support-scheduler:0.2.1
+        name: edgex-support-scheduler
+        ports:
+        - containerPort: 48085
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        hostPath:
+          path: /data/db
+      - name: edgex-logs
+        hostPath:
+          path: /edgex/logs
+      - name: consul-config
+        hostPath:
+          path: /consul/config
+      - name: consul-data
+        hostPath:
+          path: /consul/data
+status: {}

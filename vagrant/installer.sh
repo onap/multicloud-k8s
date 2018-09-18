@@ -181,7 +181,9 @@ function install_plugin {
     if [[ -n "${testing_enabled+x}" ]]; then
         docker-compose up -d
         pushd $krd_tests
-        bash plugin.sh
+        for functional_test in plugin plugin_edgex; do
+            bash ${functional_test}.sh
+        done
         popd
     fi
     popd

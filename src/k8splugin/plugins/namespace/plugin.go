@@ -14,55 +14,85 @@ limitations under the License.
 package main
 
 import (
+	"log"
+
+	"k8s.io/client-go/kubernetes"
+
 	pkgerrors "github.com/pkg/errors"
 
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
+
+	"k8splugin/krd"
 )
 
-// CreateResource is used to create a new Namespace
-func CreateResource(namespace string, client *kubernetes.Clientset) error {
-	namespaceStruct := &coreV1.Namespace{
+// Create a namespace object in a specific Kubernetes cluster
+func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error) {
+	namespace := &coreV1.Namespace{
 		ObjectMeta: metaV1.ObjectMeta{
-			Name: namespace,
+			Name: data.Namespace,
 		},
 	}
-	_, err := client.CoreV1().Namespaces().Create(namespaceStruct)
+	_, err := client.CoreV1().Namespaces().Create(namespace)
 	if err != nil {
-		return pkgerrors.Wrap(err, "Create Namespace error")
+		return "", pkgerrors.Wrap(err, "Create Namespace error")
 	}
-	return nil
+	return data.Namespace, nil
 }
 
-// GetResource is used to check if a given namespace actually exists in Kubernetes
-func GetResource(namespace string, client *kubernetes.Clientset) (bool, error) {
+// Get an existing namespace hosted in a specific Kubernetes cluster
+func Get(name string, namespace string, client kubernetes.Interface) (string, error) {
 	opts := metaV1.ListOptions{}
 
-	namespaceList, err := client.CoreV1().Namespaces().List(opts)
+	list, err := client.CoreV1().Namespaces().List(opts)
 	if err != nil {
-		return false, pkgerrors.Wrap(err, "Get Namespace list error")
+		return "", pkgerrors.Wrap(err, "Get Namespace list error")
 	}
 
-	for _, ns := range namespaceList.Items {
+	for _, ns := range list.Items {
 		if namespace == ns.Name {
-			return true, nil
+			return ns.Name, nil
 		}
 	}
 
-	return false, nil
+	return "", nil
 }
 
-// DeleteResource is used to delete a namespace
-func DeleteResource(namespace string, client *kubernetes.Clientset) error {
+// Delete an existing namespace hosted in a specific Kubernetes cluster
+func Delete(name string, namespace string, client kubernetes.Interface) error {
 	deletePolicy := metaV1.DeletePropagationForeground
-
-	err := client.CoreV1().Namespaces().Delete(namespace, &metaV1.DeleteOptions{
+	opts := &metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
-	})
-
-	if err != nil {
-		return pkgerrors.Wrap(err, "Delete Namespace error")
 	}
+
+	log.Println("Deleting namespace: " + name)
+	if err := client.CoreV1().Namespaces().Delete(name, opts); err != nil {
+		return pkgerrors.Wrap(err, "Delete namespace error")
+	}
+
 	return nil
+}
+
+// List of existing namespaces hosted in a specific Kubernetes cluster
+func List(namespace string, client kubernetes.Interface) ([]string, error) {
+	opts := metaV1.ListOptions{
+		Limit: krd.ResourcesListLimit,
+	}
+	opts.APIVersion = "apps/v1"
+	opts.Kind = "Namespace"
+
+	list, err := client.CoreV1().Namespaces().List(opts)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Get Namespace list error")
+	}
+
+	result := make([]string, 0, krd.ResourcesListLimit)
+	if list != nil {
+		for _, deployment := range list.Items {
+			log.Printf("%v", deployment.Name)
+			result = append(result, deployment.Name)
+		}
+	}
+
+	return result, nil
 }

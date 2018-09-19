@@ -39,20 +39,16 @@ integration: clean
 	@go build -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
 	@go test -v -tags 'integration' ./...
 
-.PHONY: format
 format:
 	@go fmt ./...
 
-.PHONY: plugins
 plugins:
 	@find plugins -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -o $(basename {}).so" \;
 
-.PHONY: dep
 dep:
 	@go get -u $(DEPENDENCIES)
 	$(GOPATH)/bin/dep ensure
 
-.PHONY: clean
 clean:
 	find . -name "*so" -delete
 	@rm -f k8plugin

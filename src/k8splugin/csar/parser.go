@@ -34,31 +34,31 @@ func generateExternalVNFID() string {
 	return hex.EncodeToString(b)
 }
 
-func ensuresNamespace(namespace string, kubeclient *kubernetes.Clientset) error {
+func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
 	namespacePlugin, ok := krd.LoadedPlugins["namespace"]
 	if !ok {
 		return pkgerrors.New("No plugin for namespace resource found")
 	}
 
-	symGetNamespaceFunc, err := namespacePlugin.Lookup("GetResource")
+	symGetNamespaceFunc, err := namespacePlugin.Lookup("Get")
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error fetching get namespace function")
 	}
 
-	exists, err := symGetNamespaceFunc.(func(string, *kubernetes.Clientset) (bool, error))(
-		namespace, kubeclient)
+	ns, err := symGetNamespaceFunc.(func(string, string, kubernetes.Interface) (string, error))(
+		namespace, "", kubeclient)
 	if err != nil {
 		return pkgerrors.Wrap(err, "An error ocurred during the get namespace execution")
 	}
 
-	if !exists {
+	if ns == "" {
 		log.Println("Creating " + namespace + " namespace")
-		symGetNamespaceFunc, err := namespacePlugin.Lookup("CreateResource")
+		symGetNamespaceFunc, err := namespacePlugin.Lookup("Create")
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error fetching create namespace plugin")
 		}
 
-		err = symGetNamespaceFunc.(func(string, *kubernetes.Clientset) error)(
+		err = symGetNamespaceFunc.(func(string, kubernetes.Interface) error)(
 			namespace, kubeclient)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating "+namespace+" namespace")
@@ -99,10 +99,10 @@ var CreateVNF = func(csarID string, cloudRegionID string, namespace string, kube
 			}
 			log.Println("Processing file: " + path)
 
-			genericKubeData := &krd.GenericKubeResourceData{
-				YamlFilePath:  path,
-				Namespace:     namespace,
-				InternalVNFID: internalVNFID,
+			genericKubeData := &krd.ResourceData{
+				YamlFilePath: path,
+				Namespace:    namespace,
+				VnfId:        internalVNFID,
 			}
 
 			typePlugin, ok := krd.LoadedPlugins[resource]
@@ -110,12 +110,12 @@ var CreateVNF = func(csarID string, cloudRegionID string, namespace string, kube
 				return "", nil, pkgerrors.New("No plugin for resource " + resource + " found")
 			}
 
-			symCreateResourceFunc, err := typePlugin.Lookup("CreateResource")
+			symCreateResourceFunc, err := typePlugin.Lookup("Create")
 			if err != nil {
 				return "", nil, pkgerrors.Wrap(err, "Error fetching "+resource+" plugin")
 			}
 
-			internalResourceName, err := symCreateResourceFunc.(func(*krd.GenericKubeResourceData, *kubernetes.Clientset) (string, error))(
+			internalResourceName, err := symCreateResourceFunc.(func(*krd.ResourceData, kubernetes.Interface) (string, error))(
 				genericKubeData, kubeclient)
 			if err != nil {
 				return "", nil, pkgerrors.Wrap(err, "Error in plugin "+resource+" plugin")
@@ -144,7 +144,7 @@ var DestroyVNF = func(data map[string][]string, namespace string, kubeclient *ku
 			return pkgerrors.New("No plugin for resource " + resourceName + " found")
 		}
 
-		symDeleteResourceFunc, err := typePlugin.Lookup("DeleteResource")
+		symDeleteResourceFunc, err := typePlugin.Lookup("Delete")
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error fetching "+resourceName+" plugin")
 		}
@@ -153,7 +153,7 @@ var DestroyVNF = func(data map[string][]string, namespace string, kubeclient *ku
 
 			log.Println("Deleting resource: " + resourceName)
 
-			err = symDeleteResourceFunc.(func(string, string, *kubernetes.Clientset) error)(
+			err = symDeleteResourceFunc.(func(string, string, kubernetes.Interface) error)(
 				resourceName, namespace, kubeclient)
 			if err != nil {
 				return pkgerrors.Wrap(err, "Error destroying "+resourceName)

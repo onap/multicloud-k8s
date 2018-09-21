@@ -14,31 +14,46 @@ limitations under the License.
 package krd
 
 import (
+	"io/ioutil"
+	"log"
+	"os"
 	"plugin"
 
-	appsV1 "k8s.io/api/apps/v1"
-	coreV1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/kubernetes"
+	pkgerrors "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes/scheme"
 )
 
 // LoadedPlugins stores references to the stored plugins
 var LoadedPlugins = map[string]*plugin.Plugin{}
 
-// KubeResourceClient has the signature methods to create Kubernetes reources
-type KubeResourceClient interface {
-	CreateResource(GenericKubeResourceData, *kubernetes.Clientset) (string, error)
-	ListResources(string, string) (*[]string, error)
-	DeleteResource(string, string, *kubernetes.Clientset) error
-	GetResource(string, string, *kubernetes.Clientset) (string, error)
+const ResourcesListLimit = 10
+
+// ResourceData stores all supported Kubernetes plugin types
+type ResourceData struct {
+	YamlFilePath string
+	Namespace    string
+	VnfId        string
 }
 
-// GenericKubeResourceData stores all supported Kubernetes plugin types
-type GenericKubeResourceData struct {
-	YamlFilePath  string
-	Namespace     string
-	InternalVNFID string
+// DecodeYAML reads a YAMl file to extract the Kubernetes object definition
+var DecodeYAML = func(path string) (runtime.Object, error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil, pkgerrors.New("File " + path + " not found")
+	}
 
-	// Add additional Kubernetes plugins below kinds
-	DeploymentData *appsV1.Deployment
-	ServiceData    *coreV1.Service
+	log.Println("Reading deployment YAML")
+	rawBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Deployment YAML file read error")
+	}
+
+	log.Println("Decoding deployment YAML")
+	decode := scheme.Codecs.UniversalDeserializer().Decode
+	obj, _, err := decode(rawBytes, nil, nil)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Deserialize deployment error")
+	}
+
+	return obj, nil
 }

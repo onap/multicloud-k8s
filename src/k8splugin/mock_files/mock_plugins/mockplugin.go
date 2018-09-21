@@ -21,23 +21,23 @@ import (
 
 func main() {}
 
-// CreateResource object in a specific Kubernetes resource
-func CreateResource(kubedata *krd.GenericKubeResourceData, kubeclient *kubernetes.Clientset) (string, error) {
+// Create object in a specific Kubernetes resource
+func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error) {
 	return "externalUUID", nil
 }
 
-// ListResources of existing resources
-func ListResources(limit int64, namespace string, kubeclient *kubernetes.Clientset) (*[]string, error) {
+// List of existing resources
+func List(namespace string, client kubernetes.Interface) ([]string, error) {
 	returnVal := []string{"cloud1-default-uuid1", "cloud1-default-uuid2"}
-	return &returnVal, nil
+	return returnVal, nil
 }
 
-// DeleteResource existing resources
-func DeleteResource(name string, namespace string, kubeclient *kubernetes.Clientset) error {
+// Delete existing resources
+func Delete(name string, namespace string, client kubernetes.Interface) error {
 	return nil
 }
 
-// GetResource existing resource host
-func GetResource(namespace string, client *kubernetes.Clientset) (bool, error) {
-	return true, nil
+// Get existing resource host
+func Get(name string, namespace string, client kubernetes.Interface) (string, error) {
+	return name, nil
 }

@@ -14,55 +14,36 @@ limitations under the License.
 package main
 
 import (
-	"io/ioutil"
 	"log"
-	"os"
-
-	"k8s.io/client-go/kubernetes"
 
 	pkgerrors "github.com/pkg/errors"
 
 	appsV1 "k8s.io/api/apps/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/kubernetes"
 
 	"k8splugin/krd"
 )
 
-// CreateResource object in a specific Kubernetes Deployment
-func CreateResource(kubedata *krd.GenericKubeResourceData, kubeclient *kubernetes.Clientset) (string, error) {
-	if kubedata.Namespace == "" {
-		kubedata.Namespace = "default"
+// Create deployment object in a specific Kubernetes cluster
+func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error) {
+	namespace := data.Namespace
+	if namespace == "" {
+		namespace = "default"
 	}
-
-	if _, err := os.Stat(kubedata.YamlFilePath); err != nil {
-		return "", pkgerrors.New("File " + kubedata.YamlFilePath + " not found")
-	}
-
-	log.Println("Reading deployment YAML")
-	rawBytes, err := ioutil.ReadFile(kubedata.YamlFilePath)
+	obj, err := krd.DecodeYAML(data.YamlFilePath)
 	if err != nil {
-		return "", pkgerrors.Wrap(err, "Deployment YAML file read error")
+		return "", pkgerrors.Wrap(err, "Decode deployment object error")
 	}
 
-	log.Println("Decoding deployment YAML")
-	decode := scheme.Codecs.UniversalDeserializer().Decode
-	obj, _, err := decode(rawBytes, nil, nil)
-	if err != nil {
-		return "", pkgerrors.Wrap(err, "Deserialize deployment error")
+	deployment, ok := obj.(*appsV1.Deployment)
+	if !ok {
+		return "", pkgerrors.New("Decoded object contains another resource different than Deployment")
 	}
+	deployment.Namespace = namespace
+	deployment.Name = data.VnfId + "-" + deployment.Name
 
-	switch o := obj.(type) {
-	case *appsV1.Deployment:
-		kubedata.DeploymentData = o
-	default:
-		return "", pkgerrors.New(kubedata.YamlFilePath + " contains another resource different than Deployment")
-	}
-
-	kubedata.DeploymentData.Namespace = kubedata.Namespace
-	kubedata.DeploymentData.Name = kubedata.InternalVNFID + "-" + kubedata.DeploymentData.Name
-
-	result, err := kubeclient.AppsV1().Deployments(kubedata.Namespace).Create(kubedata.DeploymentData)
+	result, err := client.AppsV1().Deployments(namespace).Create(deployment)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Deployment error")
 	}
@@ -70,14 +51,14 @@ func CreateResource(kubedata *krd.GenericKubeResourceData, kubeclient *kubernete
 	return result.GetObjectMeta().GetName(), nil
 }
 
-// ListResources of existing deployments hosted in a specific Kubernetes Deployment
-func ListResources(limit int64, namespace string, kubeclient *kubernetes.Clientset) (*[]string, error) {
+// List of existing deployments hosted in a specific Kubernetes cluster
+func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
 	if namespace == "" {
 		namespace = "default"
 	}
 
 	opts := metaV1.ListOptions{
-		Limit: limit,
+		Limit: krd.ResourcesListLimit,
 	}
 	opts.APIVersion = "apps/v1"
 	opts.Kind = "Deployment"
@@ -87,38 +68,38 @@ func ListResources(limit int64, namespace string, kubeclient *kubernetes.Clients
 		return nil, pkgerrors.Wrap(err, "Get Deployment list error")
 	}
 
-	result := make([]string, 0, limit)
+	result := make([]string, 0, krd.ResourcesListLimit)
 	if list != nil {
 		for _, deployment := range list.Items {
+			log.Printf("%v", deployment.Name)
 			result = append(result, deployment.Name)
 		}
 	}
 
-	return &result, nil
+	return result, nil
 }
 
-// DeleteResource existing deployments hosting in a specific Kubernetes Deployment
-func DeleteResource(name string, namespace string, kubeclient *kubernetes.Clientset) error {
+// Delete an existing deployment hosted in a specific Kubernetes cluster
+func Delete(name string, namespace string, kubeclient kubernetes.Interface) error {
 	if namespace == "" {
 		namespace = "default"
 	}
 
-	log.Println("Deleting deployment: " + name)
-
 	deletePolicy := metaV1.DeletePropagationForeground
-	err := kubeclient.AppsV1().Deployments(namespace).Delete(name, &metaV1.DeleteOptions{
+	opts := &metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
-	})
+	}
 
-	if err != nil {
+	log.Println("Deleting deployment: " + name)
+	if err := kubeclient.AppsV1().Deployments(namespace).Delete(name, opts); err != nil {
 		return pkgerrors.Wrap(err, "Delete Deployment error")
 	}
 
 	return nil
 }
 
-// GetResource existing deployment hosting in a specific Kubernetes Deployment
-func GetResource(name string, namespace string, kubeclient *kubernetes.Clientset) (string, error) {
+// Get an existing deployment hosted in a specific Kubernetes cluster
+func Get(name string, namespace string, kubeclient kubernetes.Interface) (string, error) {
 	if namespace == "" {
 		namespace = "default"
 	}

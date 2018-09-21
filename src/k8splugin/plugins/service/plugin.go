@@ -14,9 +14,7 @@ limitations under the License.
 package main
 
 import (
-	"io/ioutil"
 	"log"
-	"os"
 
 	"k8s.io/client-go/kubernetes"
 
@@ -24,58 +22,44 @@ import (
 
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/scheme"
 
 	"k8splugin/krd"
 )
 
-// CreateResource object in a specific Kubernetes Deployment
-func CreateResource(kubedata *krd.GenericKubeResourceData, kubeclient *kubernetes.Clientset) (string, error) {
-	if kubedata.Namespace == "" {
-		kubedata.Namespace = "default"
-	}
-
-	if _, err := os.Stat(kubedata.YamlFilePath); err != nil {
-		return "", pkgerrors.New("File " + kubedata.YamlFilePath + " not found")
-	}
-
-	log.Println("Reading service YAML")
-	rawBytes, err := ioutil.ReadFile(kubedata.YamlFilePath)
-	if err != nil {
-		return "", pkgerrors.Wrap(err, "Service YAML file read error")
-	}
-
-	log.Println("Decoding service YAML")
-	decode := scheme.Codecs.UniversalDeserializer().Decode
-	obj, _, err := decode(rawBytes, nil, nil)
-	if err != nil {
-		return "", pkgerrors.Wrap(err, "Deserialize service error")
-	}
-
-	switch o := obj.(type) {
-	case *coreV1.Service:
-		kubedata.ServiceData = o
-	default:
-		return "", pkgerrors.New(kubedata.YamlFilePath + " contains another resource different than Service")
-	}
-
-	kubedata.ServiceData.Namespace = kubedata.Namespace
-	kubedata.ServiceData.Name = kubedata.InternalVNFID + "-" + kubedata.ServiceData.Name
-
-	result, err := kubeclient.CoreV1().Services(kubedata.Namespace).Create(kubedata.ServiceData)
-	if err != nil {
-		return "", pkgerrors.Wrap(err, "Create Service error")
-	}
-	return result.GetObjectMeta().GetName(), nil
-}
-
-// ListResources of existing deployments hosted in a specific Kubernetes Deployment
-func ListResources(limit int64, namespace string, kubeclient *kubernetes.Clientset) (*[]string, error) {
+// Create a service object in a specific Kubernetes cluster
+func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error) {
+	namespace := data.Namespace
 	if namespace == "" {
 		namespace = "default"
 	}
+	obj, err := krd.DecodeYAML(data.YamlFilePath)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Decode service object error")
+	}
+
+	service, ok := obj.(*coreV1.Service)
+	if !ok {
+		return "", pkgerrors.New("Decoded object contains another resource different than Service")
+	}
+	service.Namespace = namespace
+	service.Name = data.VnfId + "-" + service.Name
+
+	result, err := client.CoreV1().Services(namespace).Create(service)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Create Service error")
+	}
+
+	return result.GetObjectMeta().GetName(), nil
+}
+
+// List of existing services hosted in a specific Kubernetes cluster
+func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
+	if namespace == "" {
+		namespace = "default"
+	}
+
 	opts := metaV1.ListOptions{
-		Limit: limit,
+		Limit: krd.ResourcesListLimit,
 	}
 	opts.APIVersion = "apps/v1"
 	opts.Kind = "Service"
@@ -84,36 +68,39 @@ func ListResources(limit int64, namespace string, kubeclient *kubernetes.Clients
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Service list error")
 	}
-	result := make([]string, 0, limit)
+
+	result := make([]string, 0, krd.ResourcesListLimit)
 	if list != nil {
-		for _, service := range list.Items {
-			result = append(result, service.Name)
+		for _, deployment := range list.Items {
+			log.Printf("%v", deployment.Name)
+			result = append(result, deployment.Name)
 		}
 	}
-	return &result, nil
+
+	return result, nil
 }
 
-// DeleteResource deletes an existing Kubernetes service
-func DeleteResource(name string, namespace string, kubeclient *kubernetes.Clientset) error {
+// Delete an existing service hosted in a specific Kubernetes cluster
+func Delete(name string, namespace string, kubeclient kubernetes.Interface) error {
 	if namespace == "" {
 		namespace = "default"
 	}
 
-	log.Println("Deleting service: " + name)
-
 	deletePolicy := metaV1.DeletePropagationForeground
-	err := kubeclient.CoreV1().Services(namespace).Delete(name, &metaV1.DeleteOptions{
+	opts := &metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
-	})
-	if err != nil {
-		return pkgerrors.Wrap(err, "Delete Service error")
+	}
+
+	log.Println("Deleting service: " + name)
+	if err := kubeclient.CoreV1().Services(namespace).Delete(name, opts); err != nil {
+		return pkgerrors.Wrap(err, "Delete service error")
 	}
 
 	return nil
 }
 
-// GetResource existing service hosting in a specific Kubernetes Service
-func GetResource(name string, namespace string, kubeclient *kubernetes.Clientset) (string, error) {
+// Get an existing service hosted in a specific Kubernetes cluster
+func Get(name string, namespace string, kubeclient kubernetes.Interface) (string, error) {
 	if namespace == "" {
 		namespace = "default"
 	}

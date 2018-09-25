@@ -37,25 +37,23 @@ func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Namespace error")
 	}
+	log.Printf("Namespace (%s) created", data.Namespace)
+
 	return data.Namespace, nil
 }
 
 // Get an existing namespace hosted in a specific Kubernetes cluster
 func Get(name string, namespace string, client kubernetes.Interface) (string, error) {
-	opts := metaV1.ListOptions{}
+	opts := metaV1.GetOptions{}
+	opts.APIVersion = "apps/v1"
+	opts.Kind = "Deployment"
 
-	list, err := client.CoreV1().Namespaces().List(opts)
+	ns, err := client.CoreV1().Namespaces().Get(name, opts)
 	if err != nil {
-		return "", pkgerrors.Wrap(err, "Get Namespace list error")
+		return "", pkgerrors.Wrap(err, "Get Namespace error")
 	}
 
-	for _, ns := range list.Items {
-		if namespace == ns.Name {
-			return ns.Name, nil
-		}
-	}
-
-	return "", nil
+	return ns.Name, nil
 }
 
 // Delete an existing namespace hosted in a specific Kubernetes cluster

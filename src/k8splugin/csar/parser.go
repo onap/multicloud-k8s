@@ -23,7 +23,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	pkgerrors "github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 
 	"k8splugin/krd"
 )
@@ -46,7 +46,7 @@ func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
 	}
 
 	ns, err := symGetNamespaceFunc.(func(string, string, kubernetes.Interface) (string, error))(
-		namespace, "", kubeclient)
+		namespace, namespace, kubeclient)
 	if err != nil {
 		return pkgerrors.Wrap(err, "An error ocurred during the get namespace execution")
 	}
@@ -57,9 +57,12 @@ func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error fetching create namespace plugin")
 		}
+		namespaceResource := &krd.ResourceData{
+			Namespace: namespace,
+		}
 
-		err = symGetNamespaceFunc.(func(string, kubernetes.Interface) error)(
-			namespace, kubeclient)
+		_, err = symGetNamespaceFunc.(func(*krd.ResourceData, kubernetes.Interface) (string, error))(
+			namespaceResource, kubeclient)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating "+namespace+" namespace")
 		}

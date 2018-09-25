@@ -24,7 +24,7 @@ all: clean dep
 # no need to create a static binary with additional flags. However, for generating binary, additional build flags are necessary. This if used with
 # mock plugin errors out for unit tests. So the seperation avoids the error.
 
-build: clean dep plugins test
+build: clean dep plugins test cover
 deploy: build
 
 .PHONY: test
@@ -52,3 +52,8 @@ dep:
 clean:
 	find . -name "*so" -delete
 	@rm -f k8plugin
+
+.PHONY: cover
+cover:
+	@go test -tags 'unit' ./... -coverprofile=coverage.out
+	@go tool cover -html=coverage.out -o coverage.html

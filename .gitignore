@@ -5,6 +5,7 @@
 .tox/
 .*.swp
 *.log
+coverage.html
 
 # Directories
 pkg

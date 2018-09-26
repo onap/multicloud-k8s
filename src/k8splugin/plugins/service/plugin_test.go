@@ -39,14 +39,6 @@ func TestCreateService(t *testing.T) {
 		expectedError  string
 	}{
 		{
-			label: "Fail to create a service with non-existing file",
-			input: &krd.ResourceData{
-				YamlFilePath: "non-existing_test_file.yaml",
-			},
-			clientOutput:  &coreV1.Service{},
-			expectedError: "not found",
-		},
-		{
 			label: "Fail to create a service with invalid type",
 			input: &krd.ResourceData{
 				YamlFilePath: "../../mock_files/mock_yamls/deployment.yaml",
@@ -75,12 +67,23 @@ func TestCreateService(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			result, err := Create(testCase.input, client)
 			if err != nil {
+				if testCase.expectedError == "" {
+					t.Fatalf("Create method return an un-expected (%s)", err)
+				}
 				if !strings.Contains(string(err.Error()), testCase.expectedError) {
 					t.Fatalf("Create method returned an error (%s)", err)
 				}
-			}
-			if !reflect.DeepEqual(testCase.expectedResult, result) {
-				t.Fatalf("Create method returned %v and it was expected (%v)", result, testCase.expectedResult)
+			} else {
+				if testCase.expectedError != "" && testCase.expectedResult == "" {
+					t.Fatalf("Create method was expecting \"%s\" error message", testCase.expectedError)
+				}
+				if result == "" {
+					t.Fatal("Create method returned nil result")
+				}
+				if !reflect.DeepEqual(testCase.expectedResult, result) {
+
+					t.Fatalf("Create method returned: \n%v\n and it was expected: \n%v", result, testCase.expectedResult)
+				}
 			}
 		})
 	}
@@ -115,6 +118,27 @@ func TestListService(t *testing.T) {
 			},
 			expectedResult: []string{"test"},
 		},
+		{
+			label: "Sucessfully display a list of existing services in default namespace",
+			input: "",
+			clientOutput: &coreV1.ServiceList{
+				Items: []coreV1.Service{
+					coreV1.Service{
+						ObjectMeta: metaV1.ObjectMeta{
+							Name:      "test",
+							Namespace: "default",
+						},
+					},
+					coreV1.Service{
+						ObjectMeta: metaV1.ObjectMeta{
+							Name:      "test2",
+							Namespace: namespace,
+						},
+					},
+				},
+			},
+			expectedResult: []string{"test"},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -123,29 +147,42 @@ func TestListService(t *testing.T) {
 			result, err := List(testCase.input, client)
 			if err != nil {
 				t.Fatalf("List method returned an error (%s)", err)
-			}
-			if !reflect.DeepEqual(testCase.expectedResult, result) {
-				t.Fatalf("List method returned %v and it was expected (%v)", result, testCase.expectedResult)
+			} else {
+				if result == nil {
+					t.Fatal("List method returned nil result")
+				}
+				if !reflect.DeepEqual(testCase.expectedResult, result) {
+
+					t.Fatalf("List method returned: \n%v\n and it was expected: \n%v", result, testCase.expectedResult)
+				}
 			}
 		})
 	}
 }
 
 func TestDeleteService(t *testing.T) {
-	namespace := "test1"
-	name := "mock-service"
 	testCases := []struct {
 		label        string
-		input        string
+		input        map[string]string
 		clientOutput *coreV1.Service
 	}{
 		{
 			label: "Sucessfully to delete an existing service",
-			input: name,
+			input: map[string]string{"name": "test-service", "namespace": "test-namespace"},
 			clientOutput: &coreV1.Service{
 				ObjectMeta: metaV1.ObjectMeta{
-					Name:      name,
-					Namespace: namespace,
+					Name:      "test-service",
+					Namespace: "test-namespace",
+				},
+			},
+		},
+		{
+			label: "Sucessfully delete an existing service in default namespace",
+			input: map[string]string{"name": "test-service", "namespace": ""},
+			clientOutput: &coreV1.Service{
+				ObjectMeta: metaV1.ObjectMeta{
+					Name:      "test-service",
+					Namespace: "default",
 				},
 			},
 		},
@@ -154,7 +191,7 @@ func TestDeleteService(t *testing.T) {
 	for _, testCase := range testCases {
 		client := testclient.NewSimpleClientset(testCase.clientOutput)
 		t.Run(testCase.label, func(t *testing.T) {
-			err := Delete(testCase.input, namespace, client)
+			err := Delete(testCase.input["name"], testCase.input["namespace"], client)
 			if err != nil {
 				t.Fatalf("Delete method returned an error (%s)", err)
 			}
@@ -163,36 +200,70 @@ func TestDeleteService(t *testing.T) {
 }
 
 func TestGetService(t *testing.T) {
-	namespace := "test1"
-	name := "mock-service"
 	testCases := []struct {
 		label          string
-		input          string
+		input          map[string]string
 		clientOutput   *coreV1.Service
 		expectedResult string
+		expectedError  string
 	}{
 		{
 			label: "Sucessfully to get an existing service",
-			input: name,
+			input: map[string]string{"name": "test-service", "namespace": "test-namespace"},
 			clientOutput: &coreV1.Service{
 				ObjectMeta: metaV1.ObjectMeta{
-					Name:      name,
-					Namespace: namespace,
+					Name:      "test-service",
+					Namespace: "test-namespace",
 				},
 			},
-			expectedResult: name,
+			expectedResult: "test-service",
+		},
+		{
+			label: "Sucessfully get an existing service from default namespaces",
+			input: map[string]string{"name": "test-service", "namespace": ""},
+			clientOutput: &coreV1.Service{
+				ObjectMeta: metaV1.ObjectMeta{
+					Name:      "test-service",
+					Namespace: "default",
+				},
+			},
+			expectedResult: "test-service",
+		},
+		{
+			label: "Fail to get an non-existing namespace",
+			input: map[string]string{"name": "test-name", "namespace": "test-namespace"},
+			clientOutput: &coreV1.Service{
+				ObjectMeta: metaV1.ObjectMeta{
+					Name:      "test-service",
+					Namespace: "default",
+				},
+			},
+			expectedError: "not found",
 		},
 	}
 
 	for _, testCase := range testCases {
 		client := testclient.NewSimpleClientset(testCase.clientOutput)
 		t.Run(testCase.label, func(t *testing.T) {
-			result, err := Get(testCase.input, namespace, client)
+			result, err := Get(testCase.input["name"], testCase.input["namespace"], client)
 			if err != nil {
-				t.Fatalf("Get method returned an error (%s)", err)
-			}
-			if !reflect.DeepEqual(testCase.expectedResult, result) {
-				t.Fatalf("Get method returned %v and it was expected (%v)", result, testCase.expectedResult)
+				if testCase.expectedError == "" {
+					t.Fatalf("Get method return an un-expected (%s)", err)
+				}
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Get method returned an error (%s)", err)
+				}
+			} else {
+				if testCase.expectedError != "" && testCase.expectedResult == "" {
+					t.Fatalf("Get method was expecting \"%s\" error message", testCase.expectedError)
+				}
+				if result == "" {
+					t.Fatal("Get method returned nil result")
+				}
+				if !reflect.DeepEqual(testCase.expectedResult, result) {
+
+					t.Fatalf("Get method returned: \n%v\n and it was expected: \n%v", result, testCase.expectedResult)
+				}
 			}
 		})
 	}

@@ -38,21 +38,25 @@ type ResourceData struct {
 
 // DecodeYAML reads a YAMl file to extract the Kubernetes object definition
 var DecodeYAML = func(path string) (runtime.Object, error) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, pkgerrors.New("File " + path + " not found")
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return nil, pkgerrors.New("File " + path + " not found")
+		} else {
+			return nil, pkgerrors.Wrap(err, "Stat file error")
+		}
 	}
 
-	log.Println("Reading deployment YAML")
+	log.Println("Reading YAML file")
 	rawBytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, pkgerrors.Wrap(err, "Deployment YAML file read error")
+		return nil, pkgerrors.Wrap(err, "Read YAML file error")
 	}
 
 	log.Println("Decoding deployment YAML")
 	decode := scheme.Codecs.UniversalDeserializer().Decode
 	obj, _, err := decode(rawBytes, nil, nil)
 	if err != nil {
-		return nil, pkgerrors.Wrap(err, "Deserialize deployment error")
+		return nil, pkgerrors.Wrap(err, "Deserialize YAML error")
 	}
 
 	return obj, nil

@@ -53,3 +53,7 @@ if [[ -n "${dict_volumes+x}" ]]; then
         mount_external_partition ${kv%=*} ${kv#*=}
     done
 fi
+rmmod kvm-intel
+echo 'options kvm-intel nested=y' >> /etc/modprobe.d/dist.conf
+modprobe kvm-intel
+grep -q -i ^Y$ /sys/module/kvm_intel/parameters/nested || { echo "Nested virtualization is not enabled"; exit 1; }

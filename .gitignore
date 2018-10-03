@@ -30,6 +30,7 @@ src/k8splugin/plugins/**/*.so
 # KRD
 .vagrant/
 vagrant/inventory/hosts.ini
+vagrant/inventory/artifacts
 vagrant/inventory/group_vars/all.yml
 vagrant/config/pdf.yml
 vagrant/sources.list

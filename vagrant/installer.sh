@@ -140,7 +140,7 @@ function install_k8s {
 
     # Configure environment
     mkdir -p $HOME/.kube
-    mv $HOME/admin.conf $HOME/.kube/config
+    mv $krd_inventory_folder/admin.conf $HOME/.kube/config
 }
 
 # install_addons() - Install Kubenertes AddOns

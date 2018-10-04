@@ -195,10 +195,11 @@ function _print_kubernetes_info {
         return
     fi
     # Expose Dashboard using NodePort
+    node_port=30080
     KUBE_EDITOR="sed -i \"s|type\: ClusterIP|type\: NodePort|g\"" kubectl -n kube-system edit service kubernetes-dashboard
+    KUBE_EDITOR="sed -i \"s|nodePort\: .*|nodePort\: $node_port|g\"" kubectl -n kube-system edit service kubernetes-dashboard
 
     master_ip=$(kubectl cluster-info | grep "Kubernetes master" | awk -F ":" '{print $2}')
-    node_port=$(kubectl get service -n kube-system | grep kubernetes-dashboard | awk '{print $5}' |awk -F "[:/]" '{print $2}')
 
     printf "Kubernetes Info\n===============\n" > $k8s_info_file
     echo "Dashboard URL: https:$master_ip:$node_port" >> $k8s_info_file

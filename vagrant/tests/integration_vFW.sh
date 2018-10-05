@@ -24,10 +24,11 @@ fi
 popule_CSAR_vms_vFW $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
-for network in unprotected-private-net-cidr-network protected-private-net-cidr-network onap-private-net-cidr-network; do
-    kubectl apply -f $network.yaml
+for resource in unprotected-private-net-cidr-network protected-private-net-cidr-network onap-private-net-cidr-network sink-service sink-ingress; do
+    kubectl apply -f $resource.yaml
 done
 setup $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
+#kubectl port-forward deployment/$sink_deployment_name 667:667
 
 # Test
 for deployment_name in $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name; do
@@ -35,6 +36,7 @@ for deployment_name in $packetgen_deployment_name $firewall_deployment_name $sin
     vm=$(kubectl plugin virt virsh list | grep ".*$deployment_name"  | awk '{print $2}')
     echo "Pod name: $pod_name Virsh domain: $vm"
     echo "ssh -i ~/.ssh/id_rsa.pub admin@$(kubectl get pods $pod_name -o jsonpath="{.status.podIP}")"
+    echo "kubectl attach -it $pod_name"
     echo "=== Virtlet details ===="
     echo "$(kubectl plugin virt virsh dumpxml $vm | grep VIRTLET_)\n"
 done

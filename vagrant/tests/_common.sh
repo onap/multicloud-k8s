@@ -212,7 +212,40 @@ resources:
     - $packetgen_deployment_name.yaml
     - $firewall_deployment_name.yaml
     - $sink_deployment_name.yaml
+  service:
+    - sink-service.yaml
+  ingress:
+    - sink-ingress.yaml
 META
+
+    cat << SERVICE > sink-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sink-service
+  labels:
+    app: vFirewall
+spec:
+  ports:
+  - port: 667
+  selector:
+    app: vFirewall
+SERVICE
+
+    cat << INGRESS > sink-ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: sink-ingress
+spec:
+  rules:
+    - host: sink.vfirewall.demo.com
+      http:
+        paths:
+          - backend:
+              serviceName: sink-service
+              servicePort: 667
+INGRESS
 
     cat << NET > unprotected-private-net-cidr-network.yaml
 apiVersion: "kubernetes.cni.cncf.io/v1"
@@ -262,20 +295,23 @@ spec:
 }'
 NET
 
-    proxy="#!/bin/bash"
+    proxy="apt:"
+    cloud_init_proxy=""
     if [[ -n "${http_proxy+x}" ]]; then
         proxy+="
-                export http_proxy=$http_proxy
-                echo \"Acquire::http::Proxy \\\"$http_proxy\\\";\" | sudo tee --append /etc/apt/apt.conf.d/01proxy"
+            http_proxy: $http_proxy"
+        cloud_init_proxy+="
+            - export http_proxy=$http_proxy"
     fi
     if [[ -n "${https_proxy+x}" ]]; then
         proxy+="
-                export https_proxy=$https_proxy
-                echo \"Acquire::https::Proxy \\\"$https_proxy\\\";\" | sudo tee --append /etc/apt/apt.conf.d/01proxy"
+            https_proxy: $https_proxy"
+        cloud_init_proxy+="
+            - export https_proxy=$https_proxy"
     fi
     if [[ -n "${no_proxy+x}" ]]; then
-        proxy+="
-                export no_proxy=$no_proxy"
+        cloud_init_proxy+="
+            - export no_proxy=$no_proxy"
     fi
 
     cat << DEPLOYMENT > $packetgen_deployment_name.yaml
@@ -296,18 +332,24 @@ spec:
         app: vFirewall
       annotations:
         VirtletCloudInitUserData: |
+          ssh_pwauth: True
           users:
-          - default
           - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
             sudo: ALL=(ALL) NOPASSWD:ALL
-            plain_text_passwd: secret
-            groups: sudo
+            lock_passwd: false
+            # the password is "admin"
+            passwd: "\$6\$rounds=4096\$QA5OCKHTE41\$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
             ssh_authorized_keys:
-            - $ssh_key
-        VirtletCloudInitUserDataScript: |
-            $proxy
-
-            wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$packetgen_deployment_name | sudo -E bash
+              $ssh_key
+          $proxy
+          runcmd:
+          $cloud_init_proxy
+            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$packetgen_deployment_name | sudo -E bash
+        VirtletSSHKeys: |
+          $ssh_key
         kubernetes.v1.cni.cncf.io/networks: '[
             { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
@@ -332,6 +374,8 @@ spec:
         resources:
           limits:
             memory: 256Mi
+        ports:
+          - containerPort: 8183
 DEPLOYMENT
 
     cat << DEPLOYMENT > $firewall_deployment_name.yaml
@@ -352,18 +396,22 @@ spec:
         app: vFirewall
       annotations:
         VirtletCloudInitUserData: |
+          ssh_pwauth: True
           users:
-          - default
           - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
             sudo: ALL=(ALL) NOPASSWD:ALL
-            plain_text_passwd: secret
-            groups: sudo
+            lock_passwd: false
+            # the password is "admin"
+            passwd: "\$6\$rounds=4096\$QA5OCKHTE41\$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
             ssh_authorized_keys:
-            - $ssh_key
-        VirtletCloudInitUserDataScript: |
-            $proxy
-
-            wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$firewall_deployment_name | sudo -E bash
+              $ssh_key
+          $proxy
+          runcmd:
+            $cloud_init_proxy
+            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$firewall_deployment_name | sudo -E bash
         kubernetes.v1.cni.cncf.io/networks: '[
             { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth2" },
@@ -409,18 +457,24 @@ spec:
         app: vFirewall
       annotations:
         VirtletCloudInitUserData: |
+          ssh_pwauth: True
           users:
-          - default
           - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
             sudo: ALL=(ALL) NOPASSWD:ALL
-            plain_text_passwd: secret
-            groups: sudo
+            lock_passwd: false
+            # the password is "admin"
+            passwd: "\$6\$rounds=4096\$QA5OCKHTE41\$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
             ssh_authorized_keys:
-            - $ssh_key
-        VirtletCloudInitUserDataScript: |
-            $proxy
-
-            wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$sink_deployment_name | sudo -E bash
+              $ssh_key
+          $proxy
+          runcmd:
+            $cloud_init_proxy
+            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$sink_deployment_name | sudo -E bash
+        VirtletSSHKeys: |
+          $ssh_key
         kubernetes.v1.cni.cncf.io/networks: '[
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
@@ -445,6 +499,8 @@ spec:
         resources:
           limits:
             memory: 160Mi
+        ports:
+          - containerPort: 667
 DEPLOYMENT
     popd
 }
@@ -546,9 +602,20 @@ spec:
       annotations:
         # This tells CRI Proxy that this pod belongs to Virtlet runtime
         kubernetes.io/target-runtime: virtlet.cloud
-        VirtletCloudInitUserDataScript: |
-          #!/bin/sh
-          echo hello world
+        VirtletCloudInitUserData: |
+          ssh_pwauth: True
+          users:
+          - name: testuser
+            gecos: User
+            primary-group: testuser
+            groups: users
+            lock_passwd: false
+            shell: /bin/bash
+            # the password is "testuser"
+            passwd: "\$6\$rounds=4096\$wPs4Hz4tfs\$a8ssMnlvH.3GX88yxXKF2cKMlVULsnydoOKgkuStTErTq2dzKZiIx9R/pPWWh5JLxzoZEx7lsSX5T2jW5WISi1"
+            sudo: ALL=(ALL) NOPASSWD:ALL
+          runcmd:
+            - echo hello world
     spec:
       affinity:
         nodeAffinity:

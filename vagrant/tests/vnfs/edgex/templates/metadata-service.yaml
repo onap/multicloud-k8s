@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.service.metadata.name }}
+    release: {{ .Release.Name }}
+  name: {{ .Values.service.metadata.name }}
+spec:
+  ports:
+  - name: {{ .Values.service.metadata.portName }}
+    port: {{ .Values.service.metadata.port }}
+    targetPort: {{ .Values.service.metadata.port }}
+  selector:
+    app: edgex-core-metadata
+    release: {{ .Release.Name }}

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.service.notifications.name }}
+  name: {{ .Values.service.notifications.name }}
+spec:
+  ports:
+  - name: {{ .Values.service.notifications.portName }}
+    port: {{ .Values.service.notifications.port }}
+    targetPort: {{ .Values.service.notifications.port }}
+  selector:
+    io.kompose.service: {{ .Values.service.notifications.name }}

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-core-consul
+  name: edgex-core-consul
+spec:
+  selector:
+      matchLabels:
+        io.kompose.service: edgex-core-consul
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-core-consul
+    spec:
+      containers:
+      - image: edgexfoundry/docker-core-consul:latest
+        name: edgex-core-consul
+        ports:
+        {{- range $k, $v := .Values.service.ports }}
+        - containerPort: {{ $v.port }}
+        {{- end }}
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        persistentVolumeClaim:
+          claimName: {{ .Release.name }}-edgex-data
+      - name: edgex-logs
+        persistentVolumeClaim:
+          claimName: {{ .Release.name }}-edgex-logs
+      - name: consul-config
+        persistentVolumeClaim:
+          claimName: {{ .Release.name }}-edgex-consul-config
+      - name: consul-data
+        persistentVolumeClaim:
+          claimName: {{ .Release.name }}-edgex-consul-data

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.service.metadata.name }}
+  name: {{ .Values.service.metadata.name }}
+spec:
+  ports:
+  - name: {{ .Values.service.metadata.portName }}
+    port: {{ .Values.service.metadata.port }}
+    targetPort: {{ .Values.service.metadata.port }}
+  selector:
+    io.kompose.service: {{ .Values.service.metadata.name }}

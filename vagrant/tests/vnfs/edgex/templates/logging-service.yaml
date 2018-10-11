@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.service.logging.name }}
+  name: {{ .Values.service.logging.name }}
+spec:
+  ports:
+  - name: {{ .Values.service.logging.portName }}
+    port: {{ .Values.service.logging.port }}
+    targetPort: {{ .Values.service.logging.port }}
+  selector:
+    io.kompose.service: {{ .Values.service.logging.name }}

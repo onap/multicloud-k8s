@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.service.scheduler.name }}
+  name: {{ .Values.service.scheduler.name }}
+spec:
+  ports:
+  - name: {{ .Values.service.scheduler.portName }}
+    port: {{ .Values.service.scheduler.port }}
+    targetPort: {{ .Values.service.scheduler.port }}
+  selector:
+    io.kompose.service: {{ .Values.service.scheduler.name }}

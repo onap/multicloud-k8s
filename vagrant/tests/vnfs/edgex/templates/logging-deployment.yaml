@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-support-logging
+  name: edgex-support-logging
+spec:
+  selector:
+    matchLabels:
+      io.kompose.service: edgex-support-logging
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-support-logging
+    spec:
+      containers:
+      - image: edgexfoundry/docker-support-logging:0.2.1
+        name: edgex-support-logging
+        ports:
+        - containerPort: {{ .Values.service.logging.port }}
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        persistentVolumeClaim:
+          claimName: {{ include "common.fullname" . }}-data
+      - name: edgex-logs
+        persistentVolumeClaim:
+          claimName: {{ include "common.fullname" . }}-logs
+      - name: consul-config
+        persistentVolumeClaim:
+          claimName: {{ include "common.fullname" . }}-consul-config
+      - name: consul-data
+        persistentVolumeClaim:
+          claimName: {{ include "common.fullname" . }}-consul-data

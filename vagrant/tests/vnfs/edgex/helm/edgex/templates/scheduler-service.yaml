@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.service.scheduler.name }}
+    release: {{ .Release.Name }}
+  name: {{ .Values.service.scheduler.name }}
+spec:
+  ports:
+  - name: {{ .Values.service.scheduler.portName }}
+    port: {{ .Values.service.scheduler.port }}
+    targetPort: {{ .Values.service.scheduler.port }}
+  selector:
+    app: edgex-support-scheduler
+    release: {{ .Release.Name }}

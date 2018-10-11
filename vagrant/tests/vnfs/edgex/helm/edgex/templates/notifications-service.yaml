@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.service.notifications.name }}
+    release: {{ .Release.Name }}
+  name: {{ .Values.service.notifications.name }}
+spec:
+  ports:
+  - name: {{ .Values.service.notifications.portName }}
+    port: {{ .Values.service.notifications.port }}
+    targetPort: {{ .Values.service.notifications.port }}
+  selector:
+    app: edgex-support-notifications
+    release: {{ .Release.Name }}

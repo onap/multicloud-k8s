@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: edgex-support-notifications
+    release: {{ .Release.Name }}
+  name: edgex-support-notifications
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edgex-support-notifications
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: edgex-support-notifications
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - image: edgexfoundry/docker-support-notifications:0.2
+        name: edgex-support-notifications
+        ports:
+        - containerPort: {{ .Values.service.notifications.port }}
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        persistentVolumeClaim:
+          claimName: {{ printf "%s-%s" .Release.Name .Chart.Name }}-data
+      - name: edgex-logs
+        persistentVolumeClaim:
+          claimName: {{ printf "%s-%s" .Release.Name .Chart.Name }}-logs
+      - name: consul-config
+        persistentVolumeClaim:
+          claimName: {{ printf "%s-%s" .Release.Name .Chart.Name }}-consul-config
+      - name: consul-data
+        persistentVolumeClaim:
+          claimName: {{ printf "%s-%s" .Release.Name .Chart.Name }}-consul-data

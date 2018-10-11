@@ -1,0 +1,125 @@
+# Copyright 2018 Intel Corporation, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#################################################################
+# Global configuration defaults.
+#################################################################
+global:
+  persistence: {}
+#################################################################
+# Application configuration defaults.
+#################################################################
+
+# flag to enable debugging - application support required
+debugEnabled: false
+
+# default number of instances
+replicaCount: 1
+
+nodeSelector: {}
+
+affinity: {}
+
+# probe configuration parameters
+liveness:
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  # necessary to disable liveness probe when setting breakpoints
+  # in debugger so K8s doesn't restart unresponsive container
+  enabled: true
+
+readiness:
+  initialDelaySeconds: 10
+  periodSeconds: 30
+
+service:
+  command:
+    name: edgex-core-command
+    portName: core-command
+    port: 48082
+  data:
+    name: edgex-core-data
+    ports:
+    - portName: data-port-1
+      port: 48080
+    - portName: data-port-2
+      port: 5563
+  deviceBluetooth:
+    name: edgex-device-bluetooth
+    portName: device-bluetooth
+    port: 49988
+  exportClient:
+    name: edgex-export-client
+    portName: export-client
+    port: 48071
+  exportDistro:
+    name: edgex-export-distro
+    ports:
+    - portName: export-distro-port1
+      port: 48070
+    - portName: export-distro-port2
+      port: 5566
+  logging:
+    name: edgex-support-logging
+    portName: logging
+    port: 48061
+  metadata:
+    name: edgex-core-metadata
+    portName: metadata
+    port: 48081
+  notifications:
+    name: edgex-support-notifications
+    portName: notifications
+    port: 48060
+  rulesengine:
+    name: edgex-support-rulesengine
+    portName: rulesengine
+    port: 48075
+  scheduler:
+    name: edgex-support-scheduler
+    portName: scheduler
+    port: 48085
+
+persistence:
+  enabled: true
+  volumeReclaimPolicy: Retain
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  mountPath: /dockerdata-nfs
+  mountSubPathData: vnfs/edgex/data/db
+  mountSubPathLogs: vnfs/edgex/logs
+  mountSubPathConsulConf: vnfs/edgex/consul/config
+  mountSubPathConsulData: vnfs/edgex/consul/data
+
+ingress:
+  enabled: false
+
+# Configure resource requests and limits
+flavor: small
+resources:
+  small:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      memory: 10Mi
+  large:
+    limits:
+      cpu: 400m
+      memory: 1Gi
+    requests:
+      cpu: 10m
+      memory: 100Mi
+  unlimited: {}

@@ -114,7 +114,7 @@ case ${ID,,} in
         ;;
         libvirt)
         # vagrant-libvirt dependencies
-        packages+=(qemu libvirt-bin ebtables dnsmasq libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev)
+        packages+=(qemu libvirt-bin ebtables dnsmasq libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev cpu-checker)
         # NFS
         packages+=(nfs-kernel-server)
         ;;
@@ -153,6 +153,27 @@ case ${ID,,} in
 
 esac
 
+# Enable Nested-Virtualization
+vendor_id=$(lscpu|grep "Vendor ID")
+if [[ $vendor_id == *GenuineIntel* ]]; then
+    kvm_ok=$(cat /sys/module/kvm_intel/parameters/nested)
+    if [[ $kvm_ok == 'N' ]]; then
+        echo "Enable Intel Nested-Virtualization"
+        rmmod kvm-intel
+        echo 'options kvm-intel nested=y' >> /etc/modprobe.d/dist.conf
+        modprobe kvm-intel
+    fi
+else
+    kvm_ok=$(cat /sys/module/kvm_amd/parameters/nested)
+    if [[ $kvm_ok == '0' ]]; then
+        echo "Enable AMD Nested-Virtualization"
+        rmmod kvm-amd
+        sh -c "echo 'options kvm-amd nested=1' >> /etc/modprobe.d/dist.conf"
+        modprobe kvm-amd
+    fi
+fi
+modprobe vhost_net
+
 ${INSTALLER_CMD} ${packages[@]}
 if ! which pip; then
     curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
@@ -166,4 +187,5 @@ if [ $VAGRANT_DEFAULT_PROVIDER == libvirt ]; then
     vagrant plugin install vagrant-libvirt
     sudo usermod -a -G $libvirt_group $USER # This might require to reload user's group assigments
     sudo systemctl restart libvirtd
+    kvm-ok
 fi

@@ -10,7 +10,6 @@
 
 set -o nounset
 set -o pipefail
-set -o xtrace
 
 # usage() - Prints the usage of the program
 function usage {
@@ -62,6 +61,7 @@ if [[ $vendor_id == *GenuineIntel* ]]; then
         rmmod kvm-intel
         echo 'options kvm-intel nested=y' >> /etc/modprobe.d/dist.conf
         modprobe kvm-intel
+        echo kvm-intel >> /etc/modules
     fi
 else
     kvm_ok=$(cat /sys/module/kvm_amd/parameters/nested)
@@ -70,8 +70,11 @@ else
         rmmod kvm-amd
         sh -c "echo 'options kvm-amd nested=1' >> /etc/modprobe.d/dist.conf"
         modprobe kvm-amd
+        echo kvm-amd >> /etc/modules
     fi
 fi
+modprobe vhost_net
+echo vhost_net >> /etc/modules
 source /etc/os-release || source /usr/lib/os-release
 case ${ID,,} in
     *suse)

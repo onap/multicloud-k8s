@@ -29,6 +29,7 @@ function _checks_args {
 function destroy_deployment {
     local deployment_name=$1
 
+    echo "$(date +%H:%M:%S) - $deployment_name : Destroying deployment"
     kubectl delete deployment $deployment_name --ignore-not-found=true --now
     while kubectl get deployment $deployment_name &>/dev/null; do
         echo "$(date +%H:%M:%S) - $deployment_name : Destroying deployment"

@@ -152,9 +152,6 @@ spec:
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
-        resources:
-          limits:
-            memory: 160Mi
 DEPLOYMENT
 
     cat << DEPLOYMENT > $sink_deployment_name.yaml
@@ -185,17 +182,14 @@ spec:
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
-        resources:
-          limits:
-            memory: 160Mi
 DEPLOYMENT
-
     popd
 }
 
-# popule_CSAR_vms_vFW() - This function creates the content of CSAR file
-# required for vFirewal using only virtual machines
-function popule_CSAR_vms_vFW {
+# popule_CSAR_vms_containers_vFW() - This function creates the content of CSAR file
+# required for vFirewal using an hybrid combination between virtual machines and
+# cotainers
+function popule_CSAR_vms_containers_vFW {
     local csar_id=$1
     ssh_key=$(cat $HOME/.ssh/id_rsa.pub)
 
@@ -226,8 +220,10 @@ metadata:
   labels:
     app: vFirewall
 spec:
+  type: NodePort
   ports:
   - port: 667
+    nodePort: 30667
   selector:
     app: vFirewall
 SERVICE
@@ -331,6 +327,261 @@ spec:
       labels:
         app: vFirewall
       annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
+        VirtletCloudInitUserData: |
+          ssh_pwauth: True
+          users:
+          - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            lock_passwd: false
+            # the password is "admin"
+            passwd: "\$6\$rounds=4096\$QA5OCKHTE41\$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
+            ssh_authorized_keys:
+              $ssh_key
+          $proxy
+          runcmd:
+          $cloud_init_proxy
+            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$packetgen_deployment_name | sudo -E bash
+        VirtletSSHKeys: |
+          $ssh_key
+        VirtletRootVolumeSize: 4Gi
+        kubernetes.v1.cni.cncf.io/networks: '[
+            { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
+            { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
+        ]'
+        kubernetes.io/target-runtime: virtlet.cloud
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: extraRuntime
+                operator: In
+                values:
+                - virtlet
+      containers:
+      - name: $packetgen_deployment_name
+        image: $image_name
+        imagePullPolicy: IfNotPresent
+        tty: true
+        stdin: true
+        ports:
+          - containerPort: 8183
+        resources:
+          limits:
+            memory: 2Gi
+DEPLOYMENT
+
+    cat << DEPLOYMENT > $firewall_deployment_name.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $firewall_deployment_name
+  labels:
+    app: vFirewall
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vFirewall
+  template:
+    metadata:
+      labels:
+        app: vFirewall
+      annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
+        VirtletCloudInitUserData: |
+          ssh_pwauth: True
+          users:
+          - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            lock_passwd: false
+            # the password is "admin"
+            passwd: "\$6\$rounds=4096\$QA5OCKHTE41\$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
+            ssh_authorized_keys:
+              $ssh_key
+          $proxy
+          runcmd:
+            $cloud_init_proxy
+            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$firewall_deployment_name | sudo -E bash
+        VirtletSSHKeys: |
+          $ssh_key
+        VirtletRootVolumeSize: 4Gi
+        kubernetes.v1.cni.cncf.io/networks: '[
+            { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
+            { "name": "protected-private-net-cidr", "interfaceRequest": "eth2" },
+            { "name": "onap-private-net-cidr", "interfaceRequest": "eth3" }
+        ]'
+        kubernetes.io/target-runtime: virtlet.cloud
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: extraRuntime
+                operator: In
+                values:
+                - virtlet
+      containers:
+      - name: $firewall_deployment_name
+        image: $image_name
+        imagePullPolicy: IfNotPresent
+        tty: true
+        stdin: true
+        resources:
+          limits:
+            memory: 2Gi
+DEPLOYMENT
+
+    cat << DEPLOYMENT > $sink_deployment_name.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $sink_deployment_name
+  labels:
+    app: vFirewall
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vFirewall
+  template:
+    metadata:
+      labels:
+        app: vFirewall
+      annotations:
+        kubernetes.v1.cni.cncf.io/networks: '[
+            { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },
+            { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
+        ]'
+    spec:
+      containers:
+      - name: $sink_deployment_name
+        image: electrocucaracha/sink
+        imagePullPolicy: IfNotPresent
+        tty: true
+        stdin: true
+DEPLOYMENT
+    popd
+}
+
+# popule_CSAR_vms_vFW() - This function creates the content of CSAR file
+# required for vFirewal using only virtual machines
+function popule_CSAR_vms_vFW {
+    local csar_id=$1
+    ssh_key=$(cat $HOME/.ssh/id_rsa.pub)
+
+    _checks_args $csar_id
+    pushd ${CSAR_DIR}/${csar_id}
+
+    cat << META > metadata.yaml
+resources:
+  network:
+    - unprotected-private-net-cidr-network.yaml
+    - protected-private-net-cidr-network.yaml
+    - onap-private-net-cidr-network.yaml
+  deployment:
+    - $packetgen_deployment_name.yaml
+    - $firewall_deployment_name.yaml
+    - $sink_deployment_name.yaml
+META
+
+    cat << NET > unprotected-private-net-cidr-network.yaml
+apiVersion: "kubernetes.cni.cncf.io/v1"
+kind: Network
+metadata:
+  name: unprotected-private-net-cidr
+spec:
+  config: '{
+    "name": "unprotected",
+    "type": "bridge",
+    "ipam": {
+        "type": "host-local",
+        "subnet": "192.168.10.0/24"
+    }
+}'
+NET
+
+    cat << NET > protected-private-net-cidr-network.yaml
+apiVersion: "kubernetes.cni.cncf.io/v1"
+kind: Network
+metadata:
+  name: protected-private-net-cidr
+spec:
+  config: '{
+    "name": "protected",
+    "type": "bridge",
+    "ipam": {
+        "type": "host-local",
+        "subnet": "192.168.20.0/24"
+    }
+}'
+NET
+
+    cat << NET > onap-private-net-cidr-network.yaml
+apiVersion: "kubernetes.cni.cncf.io/v1"
+kind: Network
+metadata:
+  name: onap-private-net-cidr
+spec:
+  config: '{
+    "name": "onap",
+    "type": "bridge",
+    "ipam": {
+        "type": "host-local",
+        "subnet": "10.10.0.0/16"
+    }
+}'
+NET
+
+    proxy="apt:"
+    cloud_init_proxy=""
+    if [[ -n "${http_proxy+x}" ]]; then
+        proxy+="
+            http_proxy: $http_proxy"
+        cloud_init_proxy+="
+            - export http_proxy=$http_proxy"
+    fi
+    if [[ -n "${https_proxy+x}" ]]; then
+        proxy+="
+            https_proxy: $https_proxy"
+        cloud_init_proxy+="
+            - export https_proxy=$https_proxy"
+    fi
+    if [[ -n "${no_proxy+x}" ]]; then
+        cloud_init_proxy+="
+            - export no_proxy=$no_proxy"
+    fi
+
+    cat << DEPLOYMENT > $packetgen_deployment_name.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $packetgen_deployment_name
+  labels:
+    app: vFirewall
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vFirewall
+  template:
+    metadata:
+      labels:
+        app: vFirewall
+      annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
         VirtletCloudInitUserData: |
           ssh_pwauth: True
           users:
@@ -371,9 +622,6 @@ spec:
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
-        resources:
-          limits:
-            memory: 256Mi
         ports:
           - containerPort: 8183
 DEPLOYMENT
@@ -395,6 +643,8 @@ spec:
       labels:
         app: vFirewall
       annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
         VirtletCloudInitUserData: |
           ssh_pwauth: True
           users:
@@ -434,9 +684,6 @@ spec:
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
-        resources:
-          limits:
-            memory: 160Mi
 DEPLOYMENT
 
     cat << DEPLOYMENT > $sink_deployment_name.yaml
@@ -456,6 +703,8 @@ spec:
       labels:
         app: vFirewall
       annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
         VirtletCloudInitUserData: |
           ssh_pwauth: True
           users:
@@ -496,9 +745,6 @@ spec:
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
-        resources:
-          limits:
-            memory: 160Mi
         ports:
           - containerPort: 667
 DEPLOYMENT
@@ -600,6 +846,8 @@ spec:
       labels:
         app: virtlet
       annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-passthrough
         # This tells CRI Proxy that this pod belongs to Virtlet runtime
         kubernetes.io/target-runtime: virtlet.cloud
         VirtletCloudInitUserData: |

@@ -11,8 +11,6 @@
 set -o nounset
 set -o pipefail
 
-source /etc/environment
-
 k8s_path="$(git rev-parse --show-toplevel)"
 export GOPATH=$k8s_path
 

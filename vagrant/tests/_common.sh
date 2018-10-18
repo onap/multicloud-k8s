@@ -791,12 +791,13 @@ resources:
 META
 
     cat << NET > bridge-network.yaml
-apiVersion: "kubernetes.cni.cncf.io/v1"
-kind: Network
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
 metadata:
   name: bridge-conf
 spec:
   config: '{
+    "cniVersion": "0.3.0",
     "name": "mynet",
     "type": "bridge",
     "ipam": {
@@ -823,7 +824,7 @@ spec:
       labels:
         app: multus
       annotations:
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
           { "name": "bridge-conf", "interfaceRequest": "eth1" },
           { "name": "bridge-conf", "interfaceRequest": "eth2" }
         ]'

@@ -107,7 +107,7 @@ spec:
       labels:
         app: vFirewall
       annotations:
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
         ]'
@@ -140,7 +140,7 @@ spec:
       labels:
         app: vFirewall
       annotations:
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth2" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth3" }
@@ -171,7 +171,7 @@ spec:
       labels:
         app: vFirewall
       annotations:
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
         ]'
@@ -349,7 +349,7 @@ spec:
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
         ]'
@@ -416,7 +416,7 @@ spec:
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth2" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth3" }
@@ -460,7 +460,7 @@ spec:
       labels:
         app: vFirewall
       annotations:
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
         ]'
@@ -611,7 +611,7 @@ spec:
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
         ]'
@@ -678,7 +678,7 @@ spec:
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth2" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth3" }
@@ -744,7 +744,7 @@ spec:
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },
             { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
         ]'
@@ -791,12 +791,13 @@ resources:
 META
 
     cat << NET > bridge-network.yaml
-apiVersion: "kubernetes.cni.cncf.io/v1"
-kind: Network
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
 metadata:
   name: bridge-conf
 spec:
   config: '{
+    "cniVersion": "0.3.0",
     "name": "mynet",
     "type": "bridge",
     "ipam": {
@@ -823,7 +824,7 @@ spec:
       labels:
         app: multus
       annotations:
-        kubernetes.v1.cni.cncf.io/networks: '[
+        k8s.v1.cni.cncf.io/networks: '[
           { "name": "bridge-conf", "interfaceRequest": "eth1" },
           { "name": "bridge-conf", "interfaceRequest": "eth2" }
         ]'

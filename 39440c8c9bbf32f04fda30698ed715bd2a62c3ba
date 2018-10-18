@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bada0100_11e846e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-10-18T18:49:58Z",
+      "side": 1,
+      "message": "I will update the commit message.",
+      "parentUuid": "bada0100_b1093adf",
+      "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bada0100_71451216",
         "filename": "vagrant/tests/vnfs/edgex/helm/charts/common/templates/_name.tpl",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2018-10-18T18:41:07Z",
       "side": 1,
       "message": "Do we require those templates?",
+      "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_b1d7fa22",
+        "filename": "vagrant/tests/vnfs/edgex/helm/charts/common/templates/_name.tpl",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-10-18T18:49:58Z",
+      "side": 1,
+      "message": "We are using these templates for resolving {{ include \"common.name\" . }} type statements in the templates.",
+      "parentUuid": "bada0100_71451216",
       "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -59,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "bada0100_51dece40",
+        "filename": "vagrant/tests/vnfs/edgex/helm/charts/common/templates/_name.tpl",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-10-18T18:49:58Z",
+      "side": 1,
+      "message": "I will update this.",
+      "parentUuid": "bada0100_51cb2ea5",
+      "range": {
+        "startLine": 2,
+        "startChar": 14,
+        "endLine": 2,
+        "endChar": 38
+      },
+      "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bada0100_71ce72b6",
         "filename": "vagrant/tests/vnfs/edgex/helm/charts/common/templates/_namespace.tpl",
         "patchSetId": 3
@@ -70,6 +130,30 @@
       "writtenOn": "2018-10-18T18:41:07Z",
       "side": 1,
       "message": "s/2017 Amdocs, Bell Canada/2018 Intel Corporation",
+      "range": {
+        "startLine": 2,
+        "startChar": 14,
+        "endLine": 2,
+        "endChar": 35
+      },
+      "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_31e30a07",
+        "filename": "vagrant/tests/vnfs/edgex/helm/charts/common/templates/_namespace.tpl",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-10-18T18:49:58Z",
+      "side": 1,
+      "message": "I will update these too.",
+      "parentUuid": "bada0100_71ce72b6",
       "range": {
         "startLine": 2,
         "startChar": 14,

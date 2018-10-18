@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bada0100_b1093adf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-10-18T18:41:07Z",
+      "side": 1,
+      "message": "Given that this is adding the helm charts, maybe the title and the description of this commit message needs to change.",
+      "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_71451216",
+        "filename": "vagrant/tests/vnfs/edgex/helm/charts/common/templates/_name.tpl",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-10-18T18:41:07Z",
+      "side": 1,
+      "message": "Do we require those templates?",
+      "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_51cb2ea5",
+        "filename": "vagrant/tests/vnfs/edgex/helm/charts/common/templates/_name.tpl",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-10-18T18:41:07Z",
+      "side": 1,
+      "message": "s/2017 Amdocs, Bell Canada/2018 Intel Corporation",
+      "range": {
+        "startLine": 2,
+        "startChar": 14,
+        "endLine": 2,
+        "endChar": 38
+      },
+      "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_71ce72b6",
+        "filename": "vagrant/tests/vnfs/edgex/helm/charts/common/templates/_namespace.tpl",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-10-18T18:41:07Z",
+      "side": 1,
+      "message": "s/2017 Amdocs, Bell Canada/2018 Intel Corporation",
+      "range": {
+        "startLine": 2,
+        "startChar": 14,
+        "endLine": 2,
+        "endChar": 35
+      },
+      "revId": "39440c8c9bbf32f04fda30698ed715bd2a62c3ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,3 +1,12 @@
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
 ## For some things, kubelet needs to load kernel modules.  For example, dynamic kernel services are needed
 ## for mounting persistent volumes into containers.  These may not be loaded by preinstall kubernetes
 ## processes.  For example, ceph and rbd backed volumes.  Set to true to allow kubelet to load kernel

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bada0100_1cd29d00",
+        "filename": "vagrant/playbooks/configure-ovn-kubernetes.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-10-19T04:04:28Z",
+      "side": 1,
+      "message": "The change on this file shouldn\u0027t be proposed.",
+      "revId": "449316a997c10182f248853aab6e9109552d554b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

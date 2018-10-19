@@ -1,0 +1,10 @@
+Code-Review+2: Victor Morales <victor.morales@intel.com>
+Verified+1: Victor Morales <victor.morales@intel.com>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Kiran Kamineni <kiran.k.kamineni@intel.com>
+Code-Review+2: Bin Yang <bin.yang@windriver.com>
+Submitted-by: Bin Yang <bin.yang@windriver.com>
+Submitted-at: Fri, 19 Oct 2018 01:17:10 +0000
+Reviewed-on: https://gerrit.onap.org/r/70742
+Project: multicloud/k8s
+Branch: refs/heads/master

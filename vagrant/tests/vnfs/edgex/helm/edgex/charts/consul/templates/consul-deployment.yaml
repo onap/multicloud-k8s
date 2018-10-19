@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edgex-core-consul
+  labels:
+    app: edgex-core-consul
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edgex-core-consul
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: edgex-core-consul
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - image: edgexfoundry/docker-core-consul:latest
+        name: edgex-core-consul
+        ports:
+        {{- range $k, $v := .Values.service.ports }}
+        - containerPort: {{ $v.port }}
+        {{- end }}
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-edgex-data
+      - name: edgex-logs
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-edgex-logs
+      - name: consul-config
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-edgex-consul-config
+      - name: consul-data
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-edgex-consul-data

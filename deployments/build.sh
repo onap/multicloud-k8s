@@ -10,25 +10,59 @@
 
 set -o nounset
 set -o pipefail
-set -o xtrace
 
 k8s_path="$(git rev-parse --show-toplevel)"
 export GOPATH=$k8s_path
 
-echo "Compiling source code"
-pushd $k8s_path/src/k8splugin/
-make
-popd
+VERSION="0.1.0"
+export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 
-rm -f k8plugin *so
-mv $k8s_path/src/k8splugin/k8plugin .
-mv $k8s_path/src/k8splugin/plugins/*.so .
+function _compile_src {
+    echo "Compiling source code"
+    pushd $k8s_path/src/k8splugin/
+    make
+    popd
+}
 
-echo "Cleaning previous execution"
-docker-compose kill
-image=$(grep "image.*k8plugin" docker-compose.yml)
-docker images ${image#*:} -q | xargs docker rmi -f
-docker ps -a --filter "status=exited" -q | xargs docker rm
+function _move_bin {
+    echo "Moving binaries"
+    rm -f k8plugin *so
+    mv $k8s_path/src/k8splugin/k8plugin .
+    mv $k8s_path/src/k8splugin/plugins/*.so .
+}
 
-echo "Starting docker building process"
-docker-compose build --no-cache
+function _cleanup {
+    echo "Cleaning previous execution"
+    docker-compose kill
+    image=$(grep "image.*k8plugin" docker-compose.yml)
+    docker images ${image#*:} -q | xargs docker rmi -f
+    docker ps -a --filter "status=exited" -q | xargs docker rm
+}
+
+function _build_docker {
+    echo "Building docker image"
+    docker-compose build --no-cache
+}
+
+function _push_image {
+    local tag_name=${IMAGE_NAME}:${1:-latest}
+
+    echo "Start push {$tag_name}"
+    docker tag ${IMAGE_NAME}:latest ${tag_name}
+    docker push ${tag_name}
+}
+
+if [[ -n "${JENKINS_HOME+x}" ]]; then
+    set -o xtrace
+    _compile_src
+    _move_bin
+    _build_docker
+    _push_image $VERSION
+else
+    source /etc/environment
+
+    _compile_src
+    _move_bin
+    _cleanup
+    _build_docker
+fi

@@ -13,7 +13,7 @@ version: '2'
 
 services:
   multicloud-k8s:
-    image: nexus3.onap.org:10003/onap/multicloud/k8plugin
+    image: ${IMAGE_NAME}
     networks:
       multicloud_net:
         ipv4_address: 172.19.0.3

@@ -123,7 +123,7 @@ function install_k8s {
 
     pushd $dest_folder/kubespray-$version
         pip install -r requirements.txt
-        rm -f $krd_inventory_folder/group_vars/all.yml
+        rm -f $krd_inventory_folder/group_vars/all.yml 2> /dev/null
         if [[ -n "${verbose+x}" ]]; then
             echo "kube_log_level: 5" >> $krd_inventory_folder/group_vars/all.yml
         else

@@ -9,21 +9,7 @@
 ##############################################################################
 
 set -o errexit
-set -o nounset
 set -o pipefail
-
-# usage() - Prints the usage of the program
-function usage {
-    cat <<EOF
-usage: $0 [-a addons] [-p] [-v] [-w dir ]
-Optional Argument:
-    -a List of Kubernetes AddOns to be installed ( e.g. "ovn-kubernetes virtlet multus")
-    -p Installation of ONAP MultiCloud Kubernetes plugin
-    -v Enable verbosity
-    -w Working directory
-    -t Running healthchecks
-EOF
-}
 
 # _install_go() - Install GoLang package
 function _install_go {
@@ -57,10 +43,6 @@ function _install_pip {
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
     mkdir -p /etc/ansible/
-    cat <<EOL > /etc/ansible/ansible.cfg
-[defaults]
-host_key_checking = false
-EOL
     if $(ansible --version &>/dev/null); then
         return
     fi
@@ -76,7 +58,7 @@ function _install_docker {
         return
     fi
     apt-get install -y software-properties-common linux-image-extra-$(uname -r) linux-image-extra-virtual apt-transport-https ca-certificates curl
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     apt-get update
     apt-get install -y docker-ce
@@ -101,7 +83,7 @@ Environment="NO_PROXY=$no_proxy"
 EOL
     fi
     systemctl daemon-reload
-    echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --max-concurrent-downloads $max_concurrent_downloads \"" >> /etc/default/docker
+    echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --max-concurrent-downloads $max_concurrent_downloads \"" | tee --append /etc/default/docker
     usermod -aG docker $USER
 
     systemctl restart docker
@@ -119,24 +101,23 @@ function install_k8s {
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     tar -C $dest_folder -xzf $tarball
+    mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
     rm $tarball
 
-    pushd $dest_folder/kubespray-$version
-        pip install -r requirements.txt
-        rm -f $krd_inventory_folder/group_vars/all.yml
-        if [[ -n "${verbose+x}" ]]; then
-            echo "kube_log_level: 5" >> $krd_inventory_folder/group_vars/all.yml
-        else
-            echo "kube_log_level: 2" >> $krd_inventory_folder/group_vars/all.yml
-        fi
-        if [[ -n "${http_proxy+x}" ]]; then
-            echo "http_proxy: \"$http_proxy\"" >> $krd_inventory_folder/group_vars/all.yml
-        fi
-        if [[ -n "${https_proxy+x}" ]]; then
-            echo "https_proxy: \"$https_proxy\"" >> $krd_inventory_folder/group_vars/all.yml
-        fi
-        ansible-playbook $verbose -i $krd_inventory cluster.yml -b | tee $log_folder/setup-kubernetes.log
-    popd
+    pip install -r $dest_folder/kubespray-$version/requirements.txt
+    rm -f $krd_inventory_folder/group_vars/all.yml
+    if [[ -n "${verbose}" ]]; then
+        echo "kube_log_level: 5" | tee $krd_inventory_folder/group_vars/all.yml
+    else
+        echo "kube_log_level: 2" | tee $krd_inventory_folder/group_vars/all.yml
+    fi
+    if [[ -n "${http_proxy}" ]]; then
+        echo "http_proxy: \"$http_proxy\"" | tee --append $krd_inventory_folder/group_vars/all.yml
+    fi
+    if [[ -n "${https_proxy}" ]]; then
+        echo "https_proxy: \"$https_proxy\"" | tee --append $krd_inventory_folder/group_vars/all.yml
+    fi
+    ansible-playbook $verbose -i $krd_inventory $dest_folder/kubespray-$version/cluster.yml -b | tee $log_folder/setup-kubernetes.log
 
     # Configure environment
     mkdir -p $HOME/.kube
@@ -146,15 +127,14 @@ function install_k8s {
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
     echo "Installing Kubernetes AddOns"
-    apt-get install -y sshpass
     _install_ansible
-    ansible-galaxy install -r $krd_folder/galaxy-requirements.yml --ignore-errors
+    ansible-galaxy install $verbose -r $krd_folder/galaxy-requirements.yml --ignore-errors
 
     ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-krd.yml | tee $log_folder/setup-krd.log
-    for addon in $addons; do
+    for addon in ${KRD_ADDONS:-virtlet ovn-kubernetes multus}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-${addon}.yml | tee $log_folder/setup-${addon}.log
-        if [[ -n "${testing_enabled+x}" ]]; then
+        if [[ "${testing_enabled}" == "true" ]]; then
             pushd $krd_tests
             bash ${addon}.sh
             popd
@@ -178,7 +158,7 @@ function install_plugin {
     pushd $GOPATH/src/k8-plugin-multicloud/deployments
     ./build.sh
 
-    if [[ -n "${testing_enabled+x}" ]]; then
+    if [[ "${testing_enabled}" = "true" ]]; then
         docker-compose up -d
         pushd $krd_tests
         for functional_test in plugin plugin_edgex; do
@@ -207,46 +187,25 @@ function _print_kubernetes_info {
     echo "Admin password: secret" >> $k8s_info_file
 }
 
-# Configuration values
-addons="virtlet ovn-kubernetes multus"
-krd_folder="$(dirname "$0")"
-verbose=""
+if [[ -n "${KRD_DEBUG}" ]]; then
+    set -o xtrace
+    verbose="-vvv"
+fi
 
-while getopts "a:pvw:t" opt; do
-    case $opt in
-        a)
-            addons="$OPTARG"
-            ;;
-        p)
-            plugin_enabled="true"
-            ;;
-        v)
-            set -o xtrace
-            verbose="-vvv"
-            ;;
-        w)
-            krd_folder="$OPTARG"
-            ;;
-        t)
-            testing_enabled="true"
-            ;;
-        ?)
-            usage
-            exit
-            ;;
-    esac
-done
+# Configuration values
 log_folder=/var/log/krd
+krd_folder=$(pwd)
 krd_inventory_folder=$krd_folder/inventory
 krd_inventory=$krd_inventory_folder/hosts.ini
 krd_playbooks=$krd_folder/playbooks
 krd_tests=$krd_folder/tests
 k8s_info_file=$krd_folder/k8s_info.log
+testing_enabled=${KRD_ENABLE_TESTS:-true}
 
 mkdir -p $log_folder
 mkdir -p /opt/csar
 export CSAR_DIR=/opt/csar
-echo "export CSAR_DIR=${CSAR_DIR}" >> /etc/environment
+echo "export CSAR_DIR=${CSAR_DIR}" | tee --append /etc/environment
 
 # Install dependencies
 # Setup proxy variables
@@ -257,7 +216,7 @@ fi
 apt-get update
 install_k8s
 install_addons
-if [[ -n "${plugin_enabled+x}" ]]; then
+if [[ "${KRD_PLUGIN_ENABLED:-true}" ]]; then
     install_plugin
 fi
 _print_kubernetes_info

@@ -47,12 +47,7 @@ func CheckDatabaseConnection() error {
 		return pkgerrors.Cause(err)
 	}
 
-	err = db.DBconn.InitializeDatabase()
-	if err != nil {
-		return pkgerrors.Cause(err)
-	}
-
-	err = db.DBconn.CheckDatabase()
+	err = db.DBconn.HealthCheck()
 	if err != nil {
 		return pkgerrors.Cause(err)
 	}

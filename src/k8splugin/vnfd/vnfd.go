@@ -67,7 +67,7 @@ func (v *VNFDefinitionClient) Create(vnfd VNFDefinition) (VNFDefinition, error) 
 		return VNFDefinition{}, pkgerrors.Wrap(err, "Serialize VNF Definition")
 	}
 
-	err = db.DBconn.CreateEntry(key, serData)
+	err = db.DBconn.Create(key, serData)
 	if err != nil {
 		return VNFDefinition{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -85,12 +85,12 @@ func (v *VNFDefinitionClient) List() ([]VNFDefinition, error) {
 	var retData []VNFDefinition
 
 	for _, key := range strArray {
-		value, ok, err := db.DBconn.ReadEntry(key)
+		value, err := db.DBconn.Read(key)
 		if err != nil {
 			log.Printf("Error Reading Key: %s", key)
 			continue
 		}
-		if ok {
+		if value != "" {
 			vnfd := VNFDefinition{}
 			err = db.DeSerialize(value, &vnfd)
 			if err != nil {
@@ -106,12 +106,12 @@ func (v *VNFDefinitionClient) List() ([]VNFDefinition, error) {
 
 // Get returns the VNF Definition for corresponding ID
 func (v *VNFDefinitionClient) Get(vnfID string) (VNFDefinition, error) {
-	value, ok, err := db.DBconn.ReadEntry(v.keyPrefix + vnfID)
+	value, err := db.DBconn.Read(v.keyPrefix + vnfID)
 	if err != nil {
 		return VNFDefinition{}, pkgerrors.Wrap(err, "Get VNF Definitions")
 	}
 
-	if ok {
+	if value != "" {
 		vnfd := VNFDefinition{}
 		err = db.DeSerialize(value, &vnfd)
 		if err != nil {
@@ -125,7 +125,7 @@ func (v *VNFDefinitionClient) Get(vnfID string) (VNFDefinition, error) {
 
 // Delete deletes the VNF Definition from database
 func (v *VNFDefinitionClient) Delete(vnfID string) error {
-	err := db.DBconn.DeleteEntry(v.keyPrefix + vnfID)
+	err := db.DBconn.Delete(v.keyPrefix + vnfID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete VNF Definitions")
 	}

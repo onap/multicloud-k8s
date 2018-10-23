@@ -127,7 +127,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	err = db.DBconn.CreateEntry(internalVNFID, serializedResourceNameMap)
+	err = db.DBconn.Create(internalVNFID, serializedResourceNameMap)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Create VNF deployment DB error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
@@ -156,8 +156,8 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 
 	internalVNFIDs, err := db.DBconn.ReadAll(prefix)
 	if err != nil {
-		werr := pkgerrors.Wrap(err, "Get VNF list error")
-		http.Error(w, werr.Error(), http.StatusInternalServerError)
+		http.Error(w, pkgerrors.Wrap(err, "Get VNF list error").Error(),
+			http.StatusInternalServerError)
 		return
 	}
 
@@ -202,24 +202,15 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// cloud1-default-uuid
 	internalVNFID := cloudRegionID + "-" + namespace + "-" + externalVNFID
 
-	// (TODO): Read kubeconfig for specific Cloud Region from local file system
-	// if present or download it from AAI
-	// err := DownloadKubeConfigFromAAI(resource.CloudRegionID, os.Getenv("KUBE_CONFIG_DIR")
-	kubeclient, err := GetVNFClient(os.Getenv("KUBE_CONFIG_DIR") + "/" + cloudRegionID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	serializedResourceNameMap, found, err := db.DBconn.ReadEntry(internalVNFID)
+	serializedResourceNameMap, err := db.DBconn.Read(internalVNFID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if found == false {
+	if serializedResourceNameMap == "" {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -233,11 +224,19 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	deserializedResourceNameMap := make(map[string][]string)
 	err = db.DeSerialize(serializedResourceNameMap, &deserializedResourceNameMap)
 	if err != nil {
-		werr := pkgerrors.Wrap(err, "Delete VNF error")
+		werr := pkgerrors.Wrap(err, "Unmarshal VNF error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// (TODO): Read kubeconfig for specific Cloud Region from local file system
+	// if present or download it from AAI
+	// err := DownloadKubeConfigFromAAI(resource.CloudRegionID, os.Getenv("KUBE_CONFIG_DIR")
+	kubeclient, err := GetVNFClient(os.Getenv("KUBE_CONFIG_DIR") + "/" + cloudRegionID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	err = csar.DestroyVNF(deserializedResourceNameMap, namespace, &kubeclient)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Delete VNF error")
@@ -245,9 +244,9 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.DBconn.DeleteEntry(internalVNFID)
+	err = db.DBconn.Delete(internalVNFID)
 	if err != nil {
-		werr := pkgerrors.Wrap(err, "Delete VNF error")
+		werr := pkgerrors.Wrap(err, "Delete VNF db record error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -338,13 +337,13 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	serializedResourceNameMap, found, err := db.DBconn.ReadEntry(internalVNFID)
+	serializedResourceNameMap, err := db.DBconn.Read(internalVNFID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if found == false {
+	if serializedResourceNameMap == "" {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -358,7 +357,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	deserializedResourceNameMap := make(map[string][]string)
 	err = db.DeSerialize(serializedResourceNameMap, &deserializedResourceNameMap)
 	if err != nil {
-		werr := pkgerrors.Wrap(err, "Get VNF error")
+		werr := pkgerrors.Wrap(err, "Unmarshal VNF error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}

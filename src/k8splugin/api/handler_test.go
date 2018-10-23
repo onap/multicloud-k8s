@@ -18,48 +18,34 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 
+	"github.com/hashicorp/consul/api"
+	pkgerrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
 	"k8splugin/csar"
 	"k8splugin/db"
 )
 
-//Creating an embedded interface via anonymous variable
-//This allows us to make mockDB satisfy the DatabaseConnection
-//interface even if we are not implementing all the methods in it
-type mockDB struct {
-	db.DatabaseConnection
+type mockCSAR struct {
+	externalVNFID       string
+	resourceYAMLNameMap map[string][]string
+	err                 error
 }
 
-func (c *mockDB) InitializeDatabase() error {
-	return nil
+func (c *mockCSAR) CreateVNF(id, r, n string,
+	kubeclient *kubernetes.Clientset) (string, map[string][]string, error) {
+	return c.externalVNFID, c.resourceYAMLNameMap, c.err
 }
 
-func (c *mockDB) CheckDatabase() error {
-	return nil
-}
-
-func (c *mockDB) CreateEntry(key string, value string) error {
-	return nil
-}
-
-func (c *mockDB) ReadEntry(key string) (string, bool, error) {
-	str := "{\"deployment\":[\"cloud1-default-uuid-sisedeploy\"],\"service\":[\"cloud1-default-uuid-sisesvc\"]}"
-	return str, true, nil
-}
-
-func (c *mockDB) DeleteEntry(key string) error {
-	return nil
-}
-
-func (c *mockDB) ReadAll(key string) ([]string, error) {
-	returnVal := []string{"cloud1-default-uuid1", "cloud1-default-uuid2"}
-	return returnVal, nil
+func (c *mockCSAR) DestroyVNF(data map[string][]string, namespace string,
+	kubeclient *kubernetes.Clientset) error {
+	return c.err
 }
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
@@ -76,146 +62,308 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 	}
 }
 
-func TestVNFInstanceCreation(t *testing.T) {
-	t.Run("Succesful create a VNF", func(t *testing.T) {
-		payload := []byte(`{
-			"cloud_region_id": "region1",
-			"namespace": "test",
-			"csar_id": "UUID-1",
-			"oof_parameters": [{
-				"key1": "value1",
-				"key2": "value2",
-				"key3": {}
-			}],
-			"network_parameters": {
-				"oam_ip_address": {
-					"connection_point": "string",
-					"ip_address": "string",
-					"workload_name": "string"
+func TestCreateHandler(t *testing.T) {
+	testCases := []struct {
+		label               string
+		input               io.Reader
+		expectedCode        int
+		mockGetVNFClientErr error
+		mockCreateVNF       *mockCSAR
+		mockStore           *db.MockDB
+	}{
+		{
+			label:        "Missing body failure",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			label:        "Invalid JSON request format",
+			input:        bytes.NewBuffer([]byte("invalid")),
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			label: "Missing parameter failure",
+			input: bytes.NewBuffer([]byte(`{
+				"csar_id": "testID",
+				"oof_parameters": {
+					"key_values": {
+						"key1": "value1",
+						"key2": "value2"
+					}
+				},
+				"vnf_instance_name": "test",
+				"vnf_instance_description": "vRouter_test_description"
+			}`)),
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			label: "Fail to get the VNF client",
+			input: bytes.NewBuffer([]byte(`{
+				"cloud_region_id": "region1",
+				"namespace": "test",
+				"csar_id": "UUID-1"
+			}`)),
+			expectedCode:        http.StatusInternalServerError,
+			mockGetVNFClientErr: pkgerrors.New("Get VNF client error"),
+		},
+		{
+			label: "Fail to create the VNF instance",
+			input: bytes.NewBuffer([]byte(`{
+				"cloud_region_id": "region1",
+				"namespace": "test",
+				"csar_id": "UUID-1"
+			}`)),
+			expectedCode: http.StatusInternalServerError,
+			mockCreateVNF: &mockCSAR{
+				err: pkgerrors.New("Internal error"),
+			},
+		},
+		{
+			label: "Fail to create a VNF DB record",
+			input: bytes.NewBuffer([]byte(`{
+				"cloud_region_id": "region1",
+				"namespace": "test",
+				"csar_id": "UUID-1"
+			}`)),
+			expectedCode: http.StatusInternalServerError,
+			mockCreateVNF: &mockCSAR{
+				resourceYAMLNameMap: map[string][]string{},
+			},
+			mockStore: &db.MockDB{
+				Err: pkgerrors.New("Internal error"),
+			},
+		},
+		{
+			label: "Succesful create a VNF",
+			input: bytes.NewBuffer([]byte(`{
+				"cloud_region_id": "region1",
+				"namespace": "test",
+				"csar_id": "UUID-1"
+			}`)),
+			expectedCode: http.StatusCreated,
+			mockCreateVNF: &mockCSAR{
+				resourceYAMLNameMap: map[string][]string{
+					"deployment": []string{"cloud1-default-uuid-sisedeploy"},
+					"service":    []string{"cloud1-default-uuid-sisesvc"},
+				},
+			},
+			mockStore: &db.MockDB{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			GetVNFClient = func(configPath string) (kubernetes.Clientset, error) {
+				return kubernetes.Clientset{}, testCase.mockGetVNFClientErr
+			}
+			if testCase.mockCreateVNF != nil {
+				csar.CreateVNF = testCase.mockCreateVNF.CreateVNF
+			}
+			if testCase.mockStore != nil {
+				db.DBconn = testCase.mockStore
+			}
+
+			request, _ := http.NewRequest("POST", "/v1/vnf_instances/", testCase.input)
+			result := executeRequest(request)
+
+			if testCase.expectedCode != result.Code {
+				t.Fatalf("Request method returned: \n%v\n and it was expected: \n%v", result.Code, testCase.expectedCode)
+			}
+			if result.Code == http.StatusCreated {
+				var response CreateVnfResponse
+				err := json.NewDecoder(result.Body).Decode(&response)
+				if err != nil {
+					t.Fatalf("Parsing the returned response got an error (%s)", err)
 				}
 			}
-		}`)
+		})
+	}
+}
 
-		data := map[string][]string{
-			"deployment": []string{"cloud1-default-uuid-sisedeploy"},
-			"service":    []string{"cloud1-default-uuid-sisesvc"},
-		}
-
-		expected := &CreateVnfResponse{
-			VNFID:         "test_UUID",
-			CloudRegionID: "region1",
-			Namespace:     "test",
-			VNFComponents: data,
-		}
-
-		var result CreateVnfResponse
-
-		req, _ := http.NewRequest("POST", "/v1/vnf_instances/", bytes.NewBuffer(payload))
-
-		GetVNFClient = func(configPath string) (kubernetes.Clientset, error) {
-			return kubernetes.Clientset{}, nil
-		}
-
-		csar.CreateVNF = func(id string, r string, n string, kubeclient *kubernetes.Clientset) (string, map[string][]string, error) {
-			return "externaluuid", data, nil
-		}
-
-		db.DBconn = &mockDB{}
-
-		response := executeRequest(req)
-		checkResponseCode(t, http.StatusCreated, response.Code)
-
-		err := json.NewDecoder(response.Body).Decode(&result)
-		if err != nil {
-			t.Fatalf("TestVNFInstanceCreation returned:\n result=%v\n expected=%v", err, expected.VNFComponents)
-		}
-	})
-	t.Run("Missing body failure", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/v1/vnf_instances/", nil)
-		response := executeRequest(req)
-
-		checkResponseCode(t, http.StatusBadRequest, response.Code)
-	})
-	t.Run("Invalid JSON request format", func(t *testing.T) {
-		payload := []byte("invalid")
-		req, _ := http.NewRequest("POST", "/v1/vnf_instances/", bytes.NewBuffer(payload))
-		response := executeRequest(req)
-		checkResponseCode(t, http.StatusUnprocessableEntity, response.Code)
-	})
-	t.Run("Missing parameter failure", func(t *testing.T) {
-		payload := []byte(`{
-			"csar_id": "testID",
-			"oof_parameters": {
-				"key_values": {
-					"key1": "value1",
-					"key2": "value2"
-				}
+func TestListHandler(t *testing.T) {
+	testCases := []struct {
+		label            string
+		expectedCode     int
+		expectedResponse []string
+		mockStore        *db.MockDB
+	}{
+		{
+			label:        "Fail to retrieve DB records",
+			expectedCode: http.StatusInternalServerError,
+			mockStore: &db.MockDB{
+				Err: pkgerrors.New("Internal error"),
 			},
-			"vnf_instance_name": "test",
-			"vnf_instance_description": "vRouter_test_description"
-		}`)
-		req, _ := http.NewRequest("POST", "/v1/vnf_instances/", bytes.NewBuffer(payload))
-		response := executeRequest(req)
-		checkResponseCode(t, http.StatusUnprocessableEntity, response.Code)
-	})
+		},
+		{
+			label:        "Get result from DB non-records",
+			expectedCode: http.StatusNotFound,
+			mockStore:    &db.MockDB{},
+		},
+		{
+			label:            "Get empty list",
+			expectedCode:     http.StatusOK,
+			expectedResponse: []string{""},
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{
+					&api.KVPair{
+						Key:   "",
+						Value: []byte("{}"),
+					},
+				},
+			},
+		},
+		{
+			label:            "Succesful get a list of VNF",
+			expectedCode:     http.StatusOK,
+			expectedResponse: []string{"uid1", "uid2"},
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{
+					&api.KVPair{
+						Key:   "uuid1",
+						Value: []byte("{}"),
+					},
+					&api.KVPair{
+						Key:   "uuid2",
+						Value: []byte("{}"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			if testCase.mockStore != nil {
+				db.DBconn = testCase.mockStore
+			}
+
+			request, _ := http.NewRequest("GET", "/v1/vnf_instances/cloud1/default", nil)
+			result := executeRequest(request)
+
+			if testCase.expectedCode != result.Code {
+				t.Fatalf("Request method returned: \n%v\n and it was expected: \n%v",
+					result.Code, testCase.expectedCode)
+			}
+			if result.Code == http.StatusOK {
+				var response ListVnfsResponse
+				err := json.NewDecoder(result.Body).Decode(&response)
+				if err != nil {
+					t.Fatalf("Parsing the returned response got an error (%s)", err)
+				}
+				if !reflect.DeepEqual(testCase.expectedResponse, response.VNFs) {
+					t.Fatalf("TestListHandler returned:\n result=%v\n expected=%v",
+						response.VNFs, testCase.expectedResponse)
+				}
+			}
+		})
+	}
 }
 
-func TestVNFInstancesRetrieval(t *testing.T) {
-	t.Run("Succesful get a list of VNF", func(t *testing.T) {
-		expected := &ListVnfsResponse{
-			VNFs: []string{"uuid1", "uuid2"},
-		}
-		var result ListVnfsResponse
+func TestDeleteHandler(t *testing.T) {
+	testCases := []struct {
+		label               string
+		expectedCode        int
+		mockGetVNFClientErr error
+		mockDeleteVNF       *mockCSAR
+		mockStore           *db.MockDB
+	}{
+		{
+			label:        "Fail to read a VNF DB record",
+			expectedCode: http.StatusInternalServerError,
+			mockStore: &db.MockDB{
+				Err: pkgerrors.New("Internal error"),
+			},
+		},
+		{
+			label:        "Fail to find VNF record be deleted",
+			expectedCode: http.StatusNotFound,
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{},
+			},
+		},
+		{
+			label:        "Fail to unmarshal the DB record",
+			expectedCode: http.StatusInternalServerError,
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{
+					&api.KVPair{
+						Key:   "cloudregion1-testnamespace-uuid1",
+						Value: []byte("{invalid format}"),
+					},
+				},
+			},
+		},
+		{
+			label:               "Fail to get the VNF client",
+			expectedCode:        http.StatusInternalServerError,
+			mockGetVNFClientErr: pkgerrors.New("Get VNF client error"),
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{
+					&api.KVPair{
+						Key: "cloudregion1-testnamespace-uuid1",
+						Value: []byte("{" +
+							"\"deployment\": [\"deploy1\", \"deploy2\"]," +
+							"\"service\": [\"svc1\", \"svc2\"]" +
+							"}"),
+					},
+				},
+			},
+		},
+		{
+			label:        "Fail to destroy VNF",
+			expectedCode: http.StatusInternalServerError,
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{
+					&api.KVPair{
+						Key: "cloudregion1-testnamespace-uuid1",
+						Value: []byte("{" +
+							"\"deployment\": [\"deploy1\", \"deploy2\"]," +
+							"\"service\": [\"svc1\", \"svc2\"]" +
+							"}"),
+					},
+				},
+			},
+			mockDeleteVNF: &mockCSAR{
+				err: pkgerrors.New("Internal error"),
+			},
+		},
+		{
+			label:        "Succesful delete a VNF",
+			expectedCode: http.StatusAccepted,
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{
+					&api.KVPair{
+						Key: "cloudregion1-testnamespace-uuid1",
+						Value: []byte("{" +
+							"\"deployment\": [\"deploy1\", \"deploy2\"]," +
+							"\"service\": [\"svc1\", \"svc2\"]" +
+							"}"),
+					},
+				},
+			},
+			mockDeleteVNF: &mockCSAR{},
+		},
+	}
 
-		req, _ := http.NewRequest("GET", "/v1/vnf_instances/cloud1/default", nil)
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			GetVNFClient = func(configPath string) (kubernetes.Clientset, error) {
+				return kubernetes.Clientset{}, testCase.mockGetVNFClientErr
+			}
+			if testCase.mockStore != nil {
+				db.DBconn = testCase.mockStore
+			}
+			if testCase.mockDeleteVNF != nil {
+				csar.DestroyVNF = testCase.mockDeleteVNF.DestroyVNF
+			}
 
-		db.DBconn = &mockDB{}
+			request, _ := http.NewRequest("DELETE", "/v1/vnf_instances/cloudregion1/testnamespace/uuid1", nil)
+			result := executeRequest(request)
 
-		response := executeRequest(req)
-		checkResponseCode(t, http.StatusOK, response.Code)
-
-		err := json.NewDecoder(response.Body).Decode(&result)
-		if err != nil {
-			t.Fatalf("TestVNFInstancesRetrieval returned:\n result=%v\n expected=list", err)
-		}
-		if !reflect.DeepEqual(*expected, result) {
-			t.Fatalf("TestVNFInstancesRetrieval returned:\n result=%v\n expected=%v", result, *expected)
-		}
-	})
-	t.Run("Get empty list", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/v1/vnf_instances/cloudregion1/testnamespace", nil)
-		db.DBconn = &mockDB{}
-		response := executeRequest(req)
-		checkResponseCode(t, http.StatusOK, response.Code)
-	})
-}
-
-func TestVNFInstanceDeletion(t *testing.T) {
-	t.Run("Succesful delete a VNF", func(t *testing.T) {
-		req, _ := http.NewRequest("DELETE", "/v1/vnf_instances/cloudregion1/testnamespace/1", nil)
-
-		GetVNFClient = func(configPath string) (kubernetes.Clientset, error) {
-			return kubernetes.Clientset{}, nil
-		}
-
-		csar.DestroyVNF = func(d map[string][]string, n string, kubeclient *kubernetes.Clientset) error {
-			return nil
-		}
-
-		db.DBconn = &mockDB{}
-
-		response := executeRequest(req)
-		checkResponseCode(t, http.StatusAccepted, response.Code)
-
-		if result := response.Body.String(); result != "" {
-			t.Fatalf("TestVNFInstanceDeletion returned:\n result=%v\n expected=%v", result, "")
-		}
-	})
-	// t.Run("Malformed delete request", func(t *testing.T) {
-	// 	req, _ := http.NewRequest("DELETE", "/v1/vnf_instances/foo", nil)
-	// 	response := executeRqequest(req)
-	// 	checkResponseCode(t, http.StatusBadRequest, response.Code)
-	// })
+			if testCase.expectedCode != result.Code {
+				t.Fatalf("Request method returned: %v and it was expected: %v", result.Code, testCase.expectedCode)
+			}
+		})
+	}
 }
 
 // TODO: Update this test when the UpdateVNF endpoint is fixed.
@@ -276,47 +424,88 @@ func TestVNFInstanceUpdate(t *testing.T) {
 }
 */
 
-func TestVNFInstanceRetrieval(t *testing.T) {
-	t.Run("Succesful get a VNF", func(t *testing.T) {
+func TestGetHandler(t *testing.T) {
+	testCases := []struct {
+		label            string
+		expectedCode     int
+		expectedResponse *GetVnfResponse
+		mockStore        *db.MockDB
+	}{
+		{
+			label:        "Fail to retrieve DB record",
+			expectedCode: http.StatusInternalServerError,
+			mockStore: &db.MockDB{
+				Err: pkgerrors.New("Internal error"),
+			},
+		},
+		{
+			label:        "Not found DB record",
+			expectedCode: http.StatusNotFound,
+			mockStore:    &db.MockDB{},
+		},
+		{
+			label:        "Fail to unmarshal the DB record",
+			expectedCode: http.StatusInternalServerError,
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{
+					&api.KVPair{
+						Key:   "cloud1-default-1",
+						Value: []byte("{invalid-format}"),
+					},
+				},
+			},
+		},
+		{
+			label:        "Succesful get a list of VNF",
+			expectedCode: http.StatusOK,
+			expectedResponse: &GetVnfResponse{
+				VNFID:         "1",
+				CloudRegionID: "cloud1",
+				Namespace:     "default",
+				VNFComponents: map[string][]string{
+					"deployment": []string{"deploy1", "deploy2"},
+					"service":    []string{"svc1", "svc2"},
+				},
+			},
+			mockStore: &db.MockDB{
+				Items: api.KVPairs{
+					&api.KVPair{
+						Key: "cloud1-default-1",
+						Value: []byte("{" +
+							"\"deployment\": [\"deploy1\", \"deploy2\"]," +
+							"\"service\": [\"svc1\", \"svc2\"]" +
+							"}"),
+					},
+					&api.KVPair{
+						Key:   "cloud1-default-2",
+						Value: []byte("{}"),
+					},
+				},
+			},
+		},
+	}
 
-		data := map[string][]string{
-			"deployment": []string{"cloud1-default-uuid-sisedeploy"},
-			"service":    []string{"cloud1-default-uuid-sisesvc"},
-		}
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			db.DBconn = testCase.mockStore
+			request, _ := http.NewRequest("GET", "/v1/vnf_instances/cloud1/default/1", nil)
+			result := executeRequest(request)
 
-		expected := GetVnfResponse{
-			VNFID:         "1",
-			CloudRegionID: "cloud1",
-			Namespace:     "default",
-			VNFComponents: data,
-		}
-
-		req, _ := http.NewRequest("GET", "/v1/vnf_instances/cloud1/default/1", nil)
-
-		GetVNFClient = func(configPath string) (kubernetes.Clientset, error) {
-			return kubernetes.Clientset{}, nil
-		}
-
-		db.DBconn = &mockDB{}
-
-		response := executeRequest(req)
-		checkResponseCode(t, http.StatusOK, response.Code)
-
-		var result GetVnfResponse
-
-		err := json.NewDecoder(response.Body).Decode(&result)
-		if err != nil {
-			t.Fatalf("TestVNFInstanceRetrieval returned:\n result=%v\n expected=%v", err, expected)
-		}
-
-		if !reflect.DeepEqual(expected, result) {
-			t.Fatalf("TestVNFInstanceRetrieval returned:\n result=%v\n expected=%v", result, expected)
-		}
-	})
-	t.Run("VNF not found", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/v1/vnf_instances/cloudregion1/testnamespace/1", nil)
-		response := executeRequest(req)
-
-		checkResponseCode(t, http.StatusOK, response.Code)
-	})
+			if testCase.expectedCode != result.Code {
+				t.Fatalf("Request method returned: %v and it was expected: %v",
+					result.Code, testCase.expectedCode)
+			}
+			if result.Code == http.StatusOK {
+				var response GetVnfResponse
+				err := json.NewDecoder(result.Body).Decode(&response)
+				if err != nil {
+					t.Fatalf("Parsing the returned response got an error (%s)", err)
+				}
+				if !reflect.DeepEqual(testCase.expectedResponse, &response) {
+					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+						&response, testCase.expectedResponse)
+				}
+			}
+		})
+	}
 }

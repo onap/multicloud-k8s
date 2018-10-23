@@ -1,3 +1,5 @@
+// +build unit
+
 /*
  * Copyright 2018 Intel Corporation, Inc
  *
@@ -26,57 +28,12 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-//Creating an embedded interface via anonymous variable
-//This allows us to make mockDB satisfy the DatabaseConnection
-//interface even if we are not implementing all the methods in it
-type mockDB struct {
-	db.DatabaseConnection
-	Items api.KVPairs
-	Err   error
-}
-
-func (m *mockDB) CreateEntry(key string, value string) error {
-	return m.Err
-}
-
-func (m *mockDB) ReadEntry(key string) (string, bool, error) {
-	if m.Err != nil {
-		return "", false, m.Err
-	}
-
-	for _, kvpair := range m.Items {
-		if kvpair.Key == key {
-			return string(kvpair.Value), true, nil
-		}
-	}
-
-	return "", false, nil
-}
-
-func (m *mockDB) DeleteEntry(key string) error {
-	return m.Err
-}
-
-func (m *mockDB) ReadAll(prefix string) ([]string, error) {
-	if m.Err != nil {
-		return []string{}, m.Err
-	}
-
-	var res []string
-
-	for _, keypair := range m.Items {
-		res = append(res, keypair.Key)
-	}
-
-	return res, nil
-}
-
 func TestCreate(t *testing.T) {
 	testCases := []struct {
 		label         string
 		inp           VNFDefinition
 		expectedError string
-		mockdb        *mockDB
+		mockdb        *db.MockDB
 		expected      VNFDefinition
 	}{
 		{
@@ -94,12 +51,12 @@ func TestCreate(t *testing.T) {
 				ServiceType: "firewall",
 			},
 			expectedError: "",
-			mockdb:        &mockDB{},
+			mockdb:        &db.MockDB{},
 		},
 		{
 			label:         "Failed Create VNF Definition",
 			expectedError: "Error Creating Definition",
-			mockdb: &mockDB{
+			mockdb: &db.MockDB{
 				Err: pkgerrors.New("Error Creating Definition"),
 			},
 		},
@@ -132,7 +89,7 @@ func TestList(t *testing.T) {
 	testCases := []struct {
 		label         string
 		expectedError string
-		mockdb        *mockDB
+		mockdb        *db.MockDB
 		expected      []VNFDefinition
 	}{
 		{
@@ -152,7 +109,7 @@ func TestList(t *testing.T) {
 				},
 			},
 			expectedError: "",
-			mockdb: &mockDB{
+			mockdb: &db.MockDB{
 				Items: api.KVPairs{
 					&api.KVPair{
 						Key: "vnfd/123e4567-e89b-12d3-a456-426655440000",
@@ -174,7 +131,7 @@ func TestList(t *testing.T) {
 		{
 			label:         "List Error",
 			expectedError: "DB Error",
-			mockdb: &mockDB{
+			mockdb: &db.MockDB{
 				Err: pkgerrors.New("DB Error"),
 			},
 		},
@@ -207,7 +164,7 @@ func TestGet(t *testing.T) {
 	testCases := []struct {
 		label         string
 		expectedError string
-		mockdb        *mockDB
+		mockdb        *db.MockDB
 		inp           string
 		expected      VNFDefinition
 	}{
@@ -221,7 +178,7 @@ func TestGet(t *testing.T) {
 				ServiceType: "firewall",
 			},
 			expectedError: "",
-			mockdb: &mockDB{
+			mockdb: &db.MockDB{
 				Items: api.KVPairs{
 					&api.KVPair{
 						Key: "vnfd/123e4567-e89b-12d3-a456-426655440000",
@@ -236,7 +193,7 @@ func TestGet(t *testing.T) {
 		{
 			label:         "Get Error",
 			expectedError: "DB Error",
-			mockdb: &mockDB{
+			mockdb: &db.MockDB{
 				Err: pkgerrors.New("DB Error"),
 			},
 		},
@@ -270,18 +227,18 @@ func TestDelete(t *testing.T) {
 		label         string
 		inp           string
 		expectedError string
-		mockdb        *mockDB
+		mockdb        *db.MockDB
 		expected      []VNFDefinition
 	}{
 		{
 			label:  "Delete VNF Definition",
 			inp:    "123e4567-e89b-12d3-a456-426655440000",
-			mockdb: &mockDB{},
+			mockdb: &db.MockDB{},
 		},
 		{
 			label:         "Delete Error",
 			expectedError: "DB Error",
-			mockdb: &mockDB{
+			mockdb: &db.MockDB{
 				Err: pkgerrors.New("DB Error"),
 			},
 		},

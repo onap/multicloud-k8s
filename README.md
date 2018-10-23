@@ -34,8 +34,8 @@ Steps:
 
 Create Virtual Network Function
 
-![Create VNF](./doc/create_vnf.png)
+![Create VNF](./docs/create_vnf.png)
 
 Create Virtual Link
 
-![Create VL](./doc/create_vl.png)
+![Create VL](./docs/create_vl.png)

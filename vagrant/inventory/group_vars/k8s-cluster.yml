@@ -58,3 +58,7 @@ local_volumes_enabled: true
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
 kube_version: v1.11.3
+
+# Helm deployment
+# NOTE(electrocuracha): This value might be changed for the istio implementation
+helm_enabled: false

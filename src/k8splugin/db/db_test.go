@@ -17,26 +17,29 @@ package db
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
 func TestCreateDBClient(t *testing.T) {
-	oldDBconn := DBconn
-
-	defer func() {
-		DBconn = oldDBconn
-	}()
-
 	t.Run("Successfully create DB client", func(t *testing.T) {
-		expectedDB := ConsulDB{}
+		expected := &ConsulStore{}
 
 		err := CreateDBClient("consul")
 		if err != nil {
-			t.Fatalf("TestCreateDBClient returned an error (%s)", err)
+			t.Fatalf("CreateDBClient returned an error (%s)", err)
 		}
-
-		if !reflect.DeepEqual(DBconn, &expectedDB) {
-			t.Fatalf("TestCreateDBClient set DBconn as:\n result=%v\n expected=%v", DBconn, expectedDB)
+		if reflect.TypeOf(DBconn) != reflect.TypeOf(expected) {
+			t.Fatalf("CreateDBClient set DBconn as:\n result=%T\n expected=%T", DBconn, expected)
+		}
+	})
+	t.Run("Fail to create client for unsupported DB", func(t *testing.T) {
+		err := CreateDBClient("fakeDB")
+		if err == nil {
+			t.Fatal("CreateDBClient didn't return an error")
+		}
+		if !strings.Contains(string(err.Error()), "DB not supported") {
+			t.Fatalf("CreateDBClient method returned an error (%s)", err)
 		}
 	})
 }

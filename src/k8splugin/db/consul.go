@@ -14,96 +14,90 @@ limitations under the License.
 package db
 
 import (
-	consulapi "github.com/hashicorp/consul/api"
-	pkgerrors "github.com/pkg/errors"
 	"os"
+
+	"github.com/hashicorp/consul/api"
+	pkgerrors "github.com/pkg/errors"
 )
 
-// ConsulDB is an implementation of the DatabaseConnection interface
-type ConsulDB struct {
-	consulClient *consulapi.Client
+// ConsulKVStore defines the a subset of Consul DB operations
+type ConsulKVStore interface {
+	List(prefix string, q *api.QueryOptions) (api.KVPairs, *api.QueryMeta, error)
+	Get(key string, q *api.QueryOptions) (*api.KVPair, *api.QueryMeta, error)
+	Put(p *api.KVPair, q *api.WriteOptions) (*api.WriteMeta, error)
+	Delete(key string, w *api.WriteOptions) (*api.WriteMeta, error)
 }
 
-// InitializeDatabase initialized the initial steps
-func (c *ConsulDB) InitializeDatabase() error {
-	config := consulapi.DefaultConfig()
-	config.Address = os.Getenv("DATABASE_IP") + ":8500"
+// ConsulStore is an implementation of the ConsulKVStore interface
+type ConsulStore struct {
+	client ConsulKVStore
+}
 
-	client, err := consulapi.NewClient(config)
-	if err != nil {
-		return err
+// NewConsulStore initializes a Consul Store instance using the default values
+func NewConsulStore(store ConsulKVStore) (Store, error) {
+	if store == nil {
+		config := api.DefaultConfig()
+		config.Address = os.Getenv("DATABASE_IP") + ":8500"
+
+		consulClient, err := api.NewClient(config)
+		if err != nil {
+			return nil, err
+		}
+		store = consulClient.KV()
 	}
-	c.consulClient = client
-	return nil
+
+	return &ConsulStore{
+		client: store,
+	}, nil
 }
 
-// CheckDatabase checks if the database is running
-func (c *ConsulDB) CheckDatabase() error {
-	kv := c.consulClient.KV()
-	_, _, err := kv.Get("test", nil)
+// HealthCheck verifies if the database is up and running
+func (c *ConsulStore) HealthCheck() error {
+	_, err := c.Read("test")
 	if err != nil {
 		return pkgerrors.New("[ERROR] Cannot talk to Datastore. Check if it is running/reachable.")
 	}
 	return nil
 }
 
-// CreateEntry is used to create a DB entry
-func (c *ConsulDB) CreateEntry(key string, value string) error {
-	kv := c.consulClient.KV()
-
-	p := &consulapi.KVPair{Key: key, Value: []byte(value)}
-
-	_, err := kv.Put(p, nil)
-
-	if err != nil {
-		return err
+// Create is used to create a DB entry
+func (c *ConsulStore) Create(key, value string) error {
+	p := &api.KVPair{
+		Key:   key,
+		Value: []byte(value),
 	}
-
-	return nil
+	_, err := c.client.Put(p, nil)
+	return err
 }
 
-// ReadEntry returns the internalID for a particular externalID is present in a namespace
-func (c *ConsulDB) ReadEntry(key string) (string, bool, error) {
-
-	kv := c.consulClient.KV()
-
-	pair, _, err := kv.Get(key, nil)
-
+// Read method returns the internalID for a particular externalID
+func (c *ConsulStore) Read(key string) (string, error) {
+	pair, _, err := c.client.Get(key, nil)
+	if err != nil {
+		return "", err
+	}
 	if pair == nil {
-		return string("No value found for ID: " + key), false, err
+		return "", pkgerrors.New("No value found for ID: " + key)
 	}
-	return string(pair.Value), true, err
+	return string(pair.Value), nil
 }
 
-// DeleteEntry is used to delete an ID
-func (c *ConsulDB) DeleteEntry(key string) error {
-
-	kv := c.consulClient.KV()
-
-	_, err := kv.Delete(key, nil)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+// Delete method removes an internalID from the Database
+func (c *ConsulStore) Delete(key string) error {
+	_, err := c.client.Delete(key, nil)
+	return err
 }
 
 // ReadAll is used to get all ExternalIDs in a namespace
-func (c *ConsulDB) ReadAll(prefix string) ([]string, error) {
-	kv := c.consulClient.KV()
-
-	pairs, _, err := kv.List(prefix, nil)
-
-	if len(pairs) == 0 {
-		return []string{""}, err
+func (c *ConsulStore) ReadAll(prefix string) ([]string, error) {
+	pairs, _, err := c.client.List(prefix, nil)
+	if err != nil {
+		return nil, err
 	}
-
-	var res []string
-
+	var result []string
 	for _, keypair := range pairs {
-		res = append(res, keypair.Key)
+		result = append(result, keypair.Key)
 	}
 
-	return res, err
+	return result, nil
 }

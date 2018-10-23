@@ -18,25 +18,28 @@ import (
 )
 
 // DBconn interface used to talk a concrete Database connection
-var DBconn DatabaseConnection
+var DBconn Store
 
-// DatabaseConnection is an interface for accessing a database
-type DatabaseConnection interface {
-	InitializeDatabase() error
-	CheckDatabase() error
-	CreateEntry(string, string) error
-	ReadEntry(string) (string, bool, error)
-	DeleteEntry(string) error
+// Store is an interface for accessing a database
+type Store interface {
+	HealthCheck() error
+
+	Create(string, string) error
+	Read(string) (string, error)
+	// Update(string) (string, error)
+	Delete(string) error
+
 	ReadAll(string) ([]string, error)
 }
 
 // CreateDBClient creates the DB client
 var CreateDBClient = func(dbType string) error {
+	var err error
 	switch dbType {
 	case "consul":
-		DBconn = &ConsulDB{}
-		return nil
+		DBconn, err = NewConsulStore(nil)
 	default:
 		return pkgerrors.New(dbType + "DB not supported")
 	}
+	return err
 }

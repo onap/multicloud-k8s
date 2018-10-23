@@ -67,7 +67,7 @@ function setup {
     for deployment_name in $@; do
         recreate_deployment $deployment_name
     done
-
+    sleep 5
     for deployment_name in $@; do
         wait_deployment $deployment_name
     done

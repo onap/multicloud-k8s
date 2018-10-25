@@ -18,7 +18,7 @@ source _functions.sh
 csar_id=4f726e2a-b74a-11e8-ad7c-525400feed2
 
 # Setup
-popule_CSAR_containers_vFW $csar_id
+populate_CSAR_containers_vFW $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
 for network in unprotected-private-net-cidr-network protected-private-net-cidr-network onap-private-net-cidr-network; do

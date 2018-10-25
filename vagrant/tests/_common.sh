@@ -22,9 +22,9 @@ virtlet_deployment_name=virtlet-deployment
 plugin_deployment_name=plugin-deployment
 plugin_service_name=plugin-service
 
-# popule_CSAR_containers_vFW() - This function creates the content of CSAR file
+# populate_CSAR_containers_vFW() - This function creates the content of CSAR file
 # required for vFirewal using only containers
-function popule_CSAR_containers_vFW {
+function populate_CSAR_containers_vFW {
     local csar_id=$1
 
     _checks_args $csar_id
@@ -186,10 +186,10 @@ DEPLOYMENT
     popd
 }
 
-# popule_CSAR_vms_containers_vFW() - This function creates the content of CSAR file
+# populate_CSAR_vms_containers_vFW() - This function creates the content of CSAR file
 # required for vFirewal using an hybrid combination between virtual machines and
 # cotainers
-function popule_CSAR_vms_containers_vFW {
+function populate_CSAR_vms_containers_vFW {
     local csar_id=$1
     ssh_key=$(cat $HOME/.ssh/id_rsa.pub)
 
@@ -484,9 +484,9 @@ DEPLOYMENT
     popd
 }
 
-# popule_CSAR_vms_vFW() - This function creates the content of CSAR file
+# populate_CSAR_vms_vFW() - This function creates the content of CSAR file
 # required for vFirewal using only virtual machines
-function popule_CSAR_vms_vFW {
+function populate_CSAR_vms_vFW {
     local csar_id=$1
     ssh_key=$(cat $HOME/.ssh/id_rsa.pub)
 
@@ -774,9 +774,9 @@ DEPLOYMENT
     popd
 }
 
-# popule_CSAR_multus() - This function creates the content of CSAR file
+# populate_CSAR_multus() - This function creates the content of CSAR file
 # required for testing Multus feature
-function popule_CSAR_multus {
+function populate_CSAR_multus {
     local csar_id=$1
 
     _checks_args $csar_id
@@ -839,9 +839,9 @@ DEPLOYMENT
     popd
 }
 
-# popule_CSAR_virtlet() - This function creates the content of CSAR file
+# populate_CSAR_virtlet() - This function creates the content of CSAR file
 # required for testing Virtlet feature
-function popule_CSAR_virtlet {
+function populate_CSAR_virtlet {
     local csar_id=$1
 
     _checks_args $csar_id

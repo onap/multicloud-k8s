@@ -21,7 +21,7 @@ csar_id=66fea6f0-b74d-11e8-95a0-525400feed26
 if [[ ! -f $HOME/.ssh/id_rsa.pub ]]; then
     echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 fi
-popule_CSAR_vms_vFW $csar_id
+populate_CSAR_vms_vFW $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
 for resource in unprotected-private-net-cidr-network protected-private-net-cidr-network onap-private-net-cidr-network; do

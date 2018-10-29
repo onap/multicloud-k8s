@@ -22,6 +22,30 @@
       "revId": "8825e3e7098a0501825b6360c02d4c25996cd607",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_4a3cbb93",
+        "filename": "vagrant/Vagrantfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-10-29T21:41:28Z",
+      "side": 1,
+      "message": "True, this has to be in a separated patch.",
+      "parentUuid": "bada0100_aac5278f",
+      "range": {
+        "startLine": 41,
+        "startChar": 47,
+        "endLine": 41,
+        "endChar": 55
+      },
+      "revId": "8825e3e7098a0501825b6360c02d4c25996cd607",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

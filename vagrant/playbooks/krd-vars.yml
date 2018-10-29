@@ -46,5 +46,5 @@ nfd_source_type: "source"
 nfd_version: 175305b1ad73be7301ac94add475cec6fef797a9
 nfd_url: "https://github.com/kubernetes-incubator/node-feature-discovery"
 
-go_version: 1.10.3
+go_version: 1.11.1
 kubespray_version: 2.7.0

@@ -14,6 +14,7 @@ limitations under the License.
 package api
 
 import (
+	"k8splugin/vnfd"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -109,6 +110,14 @@ func NewRouter(kubeconfig string) *mux.Router {
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}", ListHandler).Methods("GET")
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", DeleteHandler).Methods("DELETE")
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", GetHandler).Methods("GET")
+
+	vnfdRouter := router.PathPrefix("/v1/vnfd").Subrouter()
+	vh := vnfdHandler{vnfdImpl: vnfd.GetVNFDImplementation()}
+	vnfdRouter.HandleFunc("", vh.vnfdCreateHandler).Methods("POST")
+	vnfdRouter.HandleFunc("/{vnfdID}/upload", vh.vnfdUploadHandler).Methods("POST")
+	vnfdRouter.HandleFunc("", vh.vnfdListHandler).Methods("GET")
+	vnfdRouter.HandleFunc("/{vnfdID}", vh.vnfdGetHandler).Methods("GET")
+	vnfdRouter.HandleFunc("/{vnfdID}", vh.vnfdDeleteHandler).Methods("DELETE")
 
 	// (TODO): Fix update method
 	// vnfInstanceHandler.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

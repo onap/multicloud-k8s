@@ -14,6 +14,9 @@ limitations under the License.
 package db
 
 import (
+	"encoding/json"
+	"reflect"
+
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -39,4 +42,22 @@ var CreateDBClient = func(dbType string) error {
 	default:
 		return pkgerrors.New(dbType + "DB not supported")
 	}
+}
+
+// Serialize converts given data into a JSON string
+func Serialize(v interface{}) (string, error) {
+	out, err := json.Marshal(v)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Error serializing "+reflect.TypeOf(v).String())
+	}
+	return string(out), nil
+}
+
+// DeSerialize converts string to a json object specified by type
+func DeSerialize(str string, v interface{}) error {
+	err := json.Unmarshal([]byte(str), &v)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error deSerializing "+str)
+	}
+	return nil
 }

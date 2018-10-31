@@ -31,5 +31,5 @@ export NO_PROXY=$NO_PROXY,$DATABASE_IP
 echo "Compiling source code"
 pushd $k8s_path/src/k8splugin/
 make plugins
-go run cmd/main.go
+env GO111MODULE=on go run cmd/main.go
 popd

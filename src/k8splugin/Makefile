@@ -8,14 +8,14 @@
 ##############################################################################
 
 GOPATH := $(shell realpath "$(PWD)/../../")
-DEPENDENCIES := github.com/golang/dep/cmd/dep
 
 export GOPATH ...
+export GO111MODULE=on
 
 .PHONY: plugins
 
 
-all: clean dep
+all: clean
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64
 	@find plugins -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -a -tags netgo -o $(basename {}).so" \;
 	@go build -a -tags netgo -o ./k8plugin ./cmd/main.go
@@ -24,7 +24,7 @@ all: clean dep
 # no need to create a static binary with additional flags. However, for generating binary, additional build flags are necessary. This if used with
 # mock plugin errors out for unit tests. So the seperation avoids the error.
 
-build: clean dep plugins test cover
+build: clean plugins test cover
 deploy: build
 
 .PHONY: test
@@ -44,10 +44,6 @@ format:
 
 plugins:
 	@find plugins -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -o $(basename {}).so" \;
-
-dep:
-	@go get -u $(DEPENDENCIES)
-	$(GOPATH)/bin/dep ensure
 
 clean:
 	find . -name "*so" -delete

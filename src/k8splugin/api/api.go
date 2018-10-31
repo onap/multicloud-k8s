@@ -110,6 +110,13 @@ func NewRouter(kubeconfig string) *mux.Router {
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", DeleteHandler).Methods("DELETE")
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", GetHandler).Methods("GET")
 
+	vnfdHandler := router.PathPrefix("/v1/vnfd").Subrouter()
+	vnfdHandler.HandleFunc("", vnfdCreateHandler).Methods("POST")
+	vnfdHandler.HandleFunc("/{vnfdID}/upload", vnfdUploadHandler).Methods("POST")
+	vnfdHandler.HandleFunc("", vnfdListHandler).Methods("GET")
+	vnfdHandler.HandleFunc("/{vnfdID}", vnfdGetHandler).Methods("GET")
+	vnfdHandler.HandleFunc("/{vnfdID}", vnfdDeleteHandler).Methods("DELETE")
+
 	// (TODO): Fix update method
 	// vnfInstanceHandler.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")
 

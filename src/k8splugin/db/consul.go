@@ -14,9 +14,10 @@ limitations under the License.
 package db
 
 import (
+	"os"
+
 	consulapi "github.com/hashicorp/consul/api"
 	pkgerrors "github.com/pkg/errors"
-	"os"
 )
 
 // ConsulDB is an implementation of the DatabaseConnection interface

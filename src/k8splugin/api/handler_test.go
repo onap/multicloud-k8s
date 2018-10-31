@@ -29,6 +29,9 @@ import (
 	"k8splugin/db"
 )
 
+//Creating an embedded interface via anonymous variable
+//This allows us to make mockDB satisfy the DatabaseConnection
+//interface even if we are not implementing all the methods in it
 type mockDB struct {
 	db.DatabaseConnection
 }

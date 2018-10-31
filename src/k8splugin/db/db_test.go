@@ -40,3 +40,60 @@ func TestCreateDBClient(t *testing.T) {
 		}
 	})
 }
+
+func TestSerialize(t *testing.T) {
+
+	inp := map[string]interface{}{
+		"UUID":   "123e4567-e89b-12d3-a456-426655440000",
+		"Data":   "sdaijsdiodalkfjsdlagf",
+		"Number": 23,
+		"Float":  34.4,
+		"Map": map[string]interface{}{
+			"m1": "m1",
+			"m2": 2,
+			"m3": 3.0,
+		},
+	}
+
+	got, err := Serialize(inp)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := "{\"Data\":\"sdaijsdiodalkfjsdlagf\"," +
+		"\"Float\":34.4,\"Map\":{\"m1\":\"m1\",\"m2\":2,\"m3\":3}," +
+		"\"Number\":23,\"UUID\":\"123e4567-e89b-12d3-a456-426655440000\"}"
+
+	if expected != got {
+		t.Errorf("Serialize returned unexpected string: %s;"+
+			" expected %sv", got, expected)
+	}
+}
+
+func TestDeSerialize(t *testing.T) {
+
+	inp := "{\"Data\":\"sdaijsdiodalkfjsdlagf\"," +
+		"\"Float\":34.4,\"Map\":{\"m1\":\"m1\",\"m3\":3}," +
+		"\"UUID\":\"123e4567-e89b-12d3-a456-426655440000\"}"
+
+	got := make(map[string]interface{})
+	err := DeSerialize(inp, &got)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := map[string]interface{}{
+		"UUID":  "123e4567-e89b-12d3-a456-426655440000",
+		"Data":  "sdaijsdiodalkfjsdlagf",
+		"Float": 34.4,
+		"Map": map[string]interface{}{
+			"m1": "m1",
+			"m3": 3.0,
+		},
+	}
+
+	if reflect.DeepEqual(expected, got) == false {
+		t.Errorf("Serialize returned unexpected : %s;"+
+			" expected %s", got, expected)
+	}
+}

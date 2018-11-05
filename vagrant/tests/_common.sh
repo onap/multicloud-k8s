@@ -226,6 +226,7 @@ spec:
     nodePort: 30667
   selector:
     app: vFirewall
+    context: darkstat
 SERVICE
 
     cat << INGRESS > sink-ingress.yaml
@@ -455,10 +456,12 @@ spec:
   selector:
     matchLabels:
       app: vFirewall
+      context: darkstat
   template:
     metadata:
       labels:
         app: vFirewall
+        context: darkstat
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
             { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },

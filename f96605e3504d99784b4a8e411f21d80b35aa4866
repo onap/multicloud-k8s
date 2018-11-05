@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_6c9ed258",
+        "filename": "src/k8splugin/api/vnfdhandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-05T17:11:29Z",
+      "side": 1,
+      "message": "Is this comment accurate?",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 71
+      },
+      "revId": "f96605e3504d99784b4a8e411f21d80b35aa4866",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0ca3869f",
+        "filename": "src/k8splugin/api/vnfdhandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-05T17:11:29Z",
+      "side": 1,
+      "message": "If this method will be implemented later, shouldn\u0027t be better to add a NOTE in the comments?",
+      "range": {
+        "startLine": 72,
+        "startChar": 21,
+        "endLine": 72,
+        "endChar": 38
+      },
+      "revId": "f96605e3504d99784b4a8e411f21d80b35aa4866",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_ccac9e8f",
+        "filename": "src/k8splugin/api/vnfdhandler_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-05T17:11:29Z",
+      "side": 1,
+      "message": "does this require to be public? I don\u0027t think that it\u0027s called from another place",
+      "range": {
+        "startLine": 31,
+        "startChar": 5,
+        "endLine": 31,
+        "endChar": 22
+      },
+      "revId": "f96605e3504d99784b4a8e411f21d80b35aa4866",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_eca9627c",
+        "filename": "src/k8splugin/api/vnfdhandler_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-05T17:11:29Z",
+      "side": 1,
+      "message": "I\u0027d prefer that these responses are defined in the testing instead of hardcoded here so in that way it\u0027s possible to define more scenarios for ever Unit Tests",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 7
+      },
+      "revId": "f96605e3504d99784b4a8e411f21d80b35aa4866",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4cb0aedd",
+        "filename": "src/k8splugin/vnfd/vnfd.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-05T17:11:29Z",
+      "side": 1,
+      "message": "what about VNFDefinitionMaintanable?",
+      "range": {
+        "startLine": 26,
+        "startChar": 3,
+        "endLine": 26,
+        "endChar": 25
+      },
+      "revId": "f96605e3504d99784b4a8e411f21d80b35aa4866",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_6cb572cc",
+        "filename": "src/k8splugin/vnfd/vnfd.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-05T17:11:29Z",
+      "side": 1,
+      "message": "Those methods manages VNFDefinitions, so it\u0027s redundant to name them, so Create, List, Get and Delete should be enough",
+      "range": {
+        "startLine": 28,
+        "startChar": 1,
+        "endLine": 28,
+        "endChar": 20
+      },
+      "revId": "f96605e3504d99784b4a8e411f21d80b35aa4866",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0ccaa64f",
+        "filename": "src/k8splugin/vnfd/vnfd.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-05T17:11:29Z",
+      "side": 1,
+      "message": "IMOH: s/VNFDefinitionImpl/VNFDefinitionClient",
+      "range": {
+        "startLine": 61,
+        "startChar": 5,
+        "endLine": 61,
+        "endChar": 22
+      },
+      "revId": "f96605e3504d99784b4a8e411f21d80b35aa4866",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

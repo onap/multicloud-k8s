@@ -166,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_edee3222",
+        "filename": "src/k8splugin/api/vnfdhandler_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-07T22:58:32Z",
+      "side": 1,
+      "message": "Thanks for the suggestion. Implemented similar to patch 71090",
+      "parentUuid": "9adffdf1_eca9627c",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 7
+      },
+      "revId": "f96605e3504d99784b4a8e411f21d80b35aa4866",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_4cb0aedd",
         "filename": "src/k8splugin/vnfd/vnfd.go",
         "patchSetId": 2

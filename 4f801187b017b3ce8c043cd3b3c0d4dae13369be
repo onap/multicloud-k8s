@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_2de43a3a",
+        "filename": "src/k8splugin/vnfd/vnfd_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-07T23:07:15Z",
+      "side": 1,
+      "message": "Why this didn\u0027t follow the same approach that the other tests? \n\n* https://gerrit.onap.org/r/#/c/71760/6/src/k8splugin/api/vnfdhandler_test.go@35",
+      "revId": "4f801187b017b3ce8c043cd3b3c0d4dae13369be",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -252,6 +252,98 @@
       "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_59513c61",
+        "filename": "src/k8splugin/plugins/network/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:31:00Z",
+      "side": 1,
+      "message": "return error",
+      "range": {
+        "startLine": 116,
+        "startChar": 2,
+        "endLine": 116,
+        "endChar": 8
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_f94d90c5",
+        "filename": "src/k8splugin/plugins/network/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:31:00Z",
+      "side": 1,
+      "message": "return the values calculated",
+      "range": {
+        "startLine": 121,
+        "startChar": 1,
+        "endLine": 121,
+        "endChar": 7
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_d9cc4c38",
+        "filename": "src/k8splugin/plugins/network/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:31:00Z",
+      "side": 1,
+      "message": "Check for error from extract",
+      "range": {
+        "startLine": 179,
+        "startChar": 1,
+        "endLine": 179,
+        "endChar": 46
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_79d1a0cc",
+        "filename": "src/k8splugin/plugins/network/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:31:00Z",
+      "side": 1,
+      "message": "Check for error from extract",
+      "range": {
+        "startLine": 204,
+        "startChar": 1,
+        "endLine": 204,
+        "endChar": 46
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

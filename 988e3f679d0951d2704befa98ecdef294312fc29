@@ -229,6 +229,29 @@
       "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_396d5833",
+        "filename": "src/k8splugin/plugins/network/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:27:07Z",
+      "side": 1,
+      "message": "Should be extractData as per golang convention:\nhttps://golang.org/doc/effective_go.html#mixed-caps",
+      "range": {
+        "startLine": 111,
+        "startChar": 5,
+        "endLine": 111,
+        "endChar": 17
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

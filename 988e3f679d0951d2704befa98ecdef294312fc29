@@ -1,0 +1,234 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_19c1742e",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Use Printf here if you are using formatters.",
+      "range": {
+        "startLine": 124,
+        "startChar": 5,
+        "endLine": 124,
+        "endChar": 12
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_b9ddc816",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 136,
+        "startChar": 5,
+        "endLine": 136,
+        "endChar": 12
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_d9e20cd5",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 166,
+        "startChar": 6,
+        "endLine": 166,
+        "endChar": 13
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_99ec84c9",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 203,
+        "startChar": 6,
+        "endLine": 203,
+        "endChar": 13
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_f9da7016",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 213,
+        "startChar": 6,
+        "endLine": 213,
+        "endChar": 13
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_19d8941c",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 220,
+        "startChar": 6,
+        "endLine": 220,
+        "endChar": 13
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_b904e87e",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 227,
+        "startChar": 6,
+        "endLine": 227,
+        "endChar": 13
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_d909ac96",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 238,
+        "startChar": 6,
+        "endLine": 238,
+        "endChar": 13
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_99032473",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 244,
+        "startChar": 6,
+        "endLine": 244,
+        "endChar": 13
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_39f8f87b",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-08T18:16:08Z",
+      "side": 1,
+      "message": "Same",
+      "range": {
+        "startLine": 250,
+        "startChar": 6,
+        "endLine": 250,
+        "endChar": 13
+      },
+      "revId": "988e3f679d0951d2704befa98ecdef294312fc29",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

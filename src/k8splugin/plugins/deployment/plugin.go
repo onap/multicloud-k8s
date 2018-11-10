@@ -31,7 +31,7 @@ func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error)
 	if namespace == "" {
 		namespace = "default"
 	}
-	obj, err := krd.DecodeYAML(data.YamlFilePath)
+	obj, err := krd.DecodeYAML(data.YamlFilePath, nil)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Decode deployment object error")
 	}

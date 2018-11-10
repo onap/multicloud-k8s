@@ -37,13 +37,14 @@ unit:
 .PHONY: integration
 integration: clean
 	@go build -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
+	@go build -buildmode=plugin -o ./mock_files/mock_plugins/mocknetworkplugin.so ./mock_files/mock_plugins/mocknetworkplugin.go
 	@go test -v -tags 'integration' ./...
 
 format:
 	@go fmt ./...
 
 plugins:
-	@find plugins -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -o $(basename {}).so" \;
+	@find plugins -maxdepth 1 -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -o $(basename {}).so" \;
 
 clean:
 	find . -name "*so" -delete

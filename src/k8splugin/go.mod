@@ -34,4 +34,5 @@ require (
 	k8s.io/api v0.0.0-20180607235014-72d6e4405f81
 	k8s.io/apimachinery v0.0.0-20180515182440-31dade610c05
 	k8s.io/client-go v7.0.0+incompatible
+	k8s.io/utils v0.0.0-20181102055113-1bd4f387aa67 // indirect
 )

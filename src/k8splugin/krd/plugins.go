@@ -36,6 +36,12 @@ type ResourceData struct {
 	VnfId        string
 }
 
+// Initialization Data required by some Plugins
+type InitData struct {
+	// TODO: Placeholder field. Fields needs to be updated during integration with AA&I
+	EsrData string
+}
+
 // DecodeYAML reads a YAMl file to extract the Kubernetes object definition
 var DecodeYAML = func(path string) (runtime.Object, error) {
 	if _, err := os.Stat(path); err != nil {

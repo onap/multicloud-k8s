@@ -21,6 +21,7 @@ export CSAR_DIR=/opt/csar
 export KUBE_CONFIG_DIR=/opt/kubeconfig
 export DATABASE_TYPE=consul
 export PLUGINS_DIR=$k8s_path/src/k8splugin/plugins
+export NW_PLUGINS_DIR=$k8s_path/src/k8splugin/plugins/network
 
 echo "Starting consul services"
 docker-compose kill

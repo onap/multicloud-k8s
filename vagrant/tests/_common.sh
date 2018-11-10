@@ -932,6 +932,8 @@ resources:
     - $plugin_deployment_name.yaml
   service:
     - service.yaml
+  network:
+    - ovn4nfv-network.yaml
 META
 
     cat << DEPLOYMENT > $plugin_deployment_name.yaml
@@ -969,6 +971,21 @@ spec:
   selector:
     app: sise
 SERVICE
+
+    cat << NETWORK > ovn4nfv-network.yaml
+apiVersion: v1
+kind: OnapNetwork
+metadata:
+  name: ovn-priv-net
+  cnitype: ovn4nfvk8s
+spec:
+  name:  ovn-priv-net
+  subnet:  172.16.33.0/24
+  gateway:  172.16.33.1
+  routes: [{ "dst":"172.16.29.1/24", "gw":“100.64.1.1”}]
+
+NETWORK
+
     popd
 }
 

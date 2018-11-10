@@ -24,6 +24,7 @@ import (
 
 	"k8splugin/db"
 	"k8splugin/krd"
+	"log"
 )
 
 // CheckEnvVariables checks for required Environment variables
@@ -68,8 +69,20 @@ func LoadPlugins() error {
 				if err != nil {
 					return pkgerrors.Cause(err)
 				}
-
 				krd.LoadedPlugins[info.Name()[:len(info.Name())-3]] = p
+				symCreateResourceFunc, err := p.Lookup("Initialize")
+				if err == nil {
+					initData := &krd.InitData{
+						// TODO: Placeholder. Needs to be updated during integration with AA&I
+						EsrData: "",
+					}
+					internalResourceName, err := symCreateResourceFunc.(func(*krd.InitData) (string, error))(
+						initData)
+					if err != nil {
+						return pkgerrors.Wrap(err, "Error in plugin "+internalResourceName+" plugin")
+					}
+					log.Print(internalResourceName + " succesful Plugin Initialized")
+				}
 			}
 			return err
 		})

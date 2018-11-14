@@ -60,8 +60,7 @@ local_volumes_enabled: true
 kube_version: v1.11.3
 
 # Helm deployment
-# NOTE(electrocuracha): This value might be changed for the istio implementation
-helm_enabled: false
+helm_enabled: true
 
 # Kube-proxy proxyMode configuration.
 # NOTE: Ipvs is based on netfilter hook function, but uses hash table as the underlying data structure and

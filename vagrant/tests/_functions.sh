@@ -84,3 +84,4 @@ if ! $(kubectl version &>/dev/null); then
     echo "This funtional test requires kubectl client"
     exit 1
 fi
+test_folder=$(pwd)

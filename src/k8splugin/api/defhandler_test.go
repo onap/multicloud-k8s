@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"k8splugin/vnfd"
+	"k8splugin/resource"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -32,54 +32,54 @@ import (
 //Creating an embedded interface via anonymous variable
 //This allows us to make mockDB satisfy the DatabaseConnection
 //interface even if we are not implementing all the methods in it
-type mockVNFDefinition struct {
-	vnfd.VNFDefinitionInterface
+type mockBundleDefinition struct {
+	resource.BundleDefInterface
 	// Items and err will be used to customize each test
-	// via a localized instantiation of mockVNFDefinition
-	Items []vnfd.VNFDefinition
+	// via a localized instantiation of mockBundleDefinition
+	Items []resource.BundleDefinition
 	Err   error
 }
 
-func (m *mockVNFDefinition) Create(inp vnfd.VNFDefinition) (vnfd.VNFDefinition, error) {
+func (m *mockBundleDefinition) Create(inp resource.BundleDefinition) (resource.BundleDefinition, error) {
 	if m.Err != nil {
-		return vnfd.VNFDefinition{}, m.Err
+		return resource.BundleDefinition{}, m.Err
 	}
 
 	return m.Items[0], nil
 }
 
-func (m *mockVNFDefinition) List() ([]vnfd.VNFDefinition, error) {
+func (m *mockBundleDefinition) List() ([]resource.BundleDefinition, error) {
 	if m.Err != nil {
-		return []vnfd.VNFDefinition{}, m.Err
+		return []resource.BundleDefinition{}, m.Err
 	}
 
 	return m.Items, nil
 }
 
-func (m *mockVNFDefinition) Get(vnfID string) (vnfd.VNFDefinition, error) {
+func (m *mockBundleDefinition) Get(id string) (resource.BundleDefinition, error) {
 	if m.Err != nil {
-		return vnfd.VNFDefinition{}, m.Err
+		return resource.BundleDefinition{}, m.Err
 	}
 
 	return m.Items[0], nil
 }
 
-func (m *mockVNFDefinition) Delete(vnfID string) error {
+func (m *mockBundleDefinition) Delete(id string) error {
 	return m.Err
 }
 
-func TestVnfdCreateHandler(t *testing.T) {
+func TestBundleDefCreateHandler(t *testing.T) {
 	testCases := []struct {
-		label        string
-		reader       io.Reader
-		expected     vnfd.VNFDefinition
-		expectedCode int
-		vnfdClient   *mockVNFDefinition
+		label           string
+		reader          io.Reader
+		expected        resource.BundleDefinition
+		expectedCode    int
+		bundleDefClient *mockBundleDefinition
 	}{
 		{
-			label:        "Missing Body Failure",
-			expectedCode: http.StatusBadRequest,
-			vnfdClient:   &mockVNFDefinition{},
+			label:           "Missing Body Failure",
+			expectedCode:    http.StatusBadRequest,
+			bundleDefClient: &mockBundleDefinition{},
 		},
 		{
 			label:        "Create without UUID",
@@ -89,18 +89,18 @@ func TestVnfdCreateHandler(t *testing.T) {
 				"description":"test description",
 				"service-type":"firewall"
 				}`)),
-			expected: vnfd.VNFDefinition{
+			expected: resource.BundleDefinition{
 				UUID:        "123e4567-e89b-12d3-a456-426655440000",
-				Name:        "testvnf",
+				Name:        "testresourcebundle",
 				Description: "test description",
 				ServiceType: "firewall",
 			},
-			vnfdClient: &mockVNFDefinition{
+			bundleDefClient: &mockBundleDefinition{
 				//Items that will be returned by the mocked Client
-				Items: []vnfd.VNFDefinition{
+				Items: []resource.BundleDefinition{
 					{
 						UUID:        "123e4567-e89b-12d3-a456-426655440000",
-						Name:        "testvnf",
+						Name:        "testresourcebundle",
 						Description: "test description",
 						ServiceType: "firewall",
 					},
@@ -111,15 +111,15 @@ func TestVnfdCreateHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := vnfdHandler{vnfdClient: testCase.vnfdClient}
-			req, err := http.NewRequest("POST", "/v1/vnfd", testCase.reader)
+			vh := bundleDefHandler{client: testCase.bundleDefClient}
+			req, err := http.NewRequest("POST", "/v1/resource/definition", testCase.reader)
 
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.vnfdCreateHandler)
+			hr := http.HandlerFunc(vh.createHandler)
 			hr.ServeHTTP(rr, req)
 
 			//Check returned code
@@ -129,11 +129,11 @@ func TestVnfdCreateHandler(t *testing.T) {
 
 			//Check returned body only if statusCreated
 			if rr.Code == http.StatusCreated {
-				got := vnfd.VNFDefinition{}
+				got := resource.BundleDefinition{}
 				json.NewDecoder(rr.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("vnfdCreateHandler returned unexpected body: got %v;"+
+					t.Errorf("createHandler returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}
@@ -141,43 +141,43 @@ func TestVnfdCreateHandler(t *testing.T) {
 	}
 }
 
-func TestVnfdListHandler(t *testing.T) {
+func TestBundleDefListHandler(t *testing.T) {
 
 	testCases := []struct {
-		label        string
-		expected     []vnfd.VNFDefinition
-		expectedCode int
-		vnfdClient   *mockVNFDefinition
+		label           string
+		expected        []resource.BundleDefinition
+		expectedCode    int
+		bundleDefClient *mockBundleDefinition
 	}{
 		{
-			label:        "List VNF Definitions",
+			label:        "List Bundle Definitions",
 			expectedCode: http.StatusOK,
-			expected: []vnfd.VNFDefinition{
+			expected: []resource.BundleDefinition{
 				{
 					UUID:        "123e4567-e89b-12d3-a456-426655440000",
-					Name:        "testvnf",
+					Name:        "testresourcebundle",
 					Description: "test description",
 					ServiceType: "firewall",
 				},
 				{
 					UUID:        "123e4567-e89b-12d3-a456-426655441111",
-					Name:        "testvnf2",
+					Name:        "testresourcebundle2",
 					Description: "test description",
 					ServiceType: "dns",
 				},
 			},
-			vnfdClient: &mockVNFDefinition{
+			bundleDefClient: &mockBundleDefinition{
 				// list of definitions that will be returned by the mockclient
-				Items: []vnfd.VNFDefinition{
+				Items: []resource.BundleDefinition{
 					{
 						UUID:        "123e4567-e89b-12d3-a456-426655440000",
-						Name:        "testvnf",
+						Name:        "testresourcebundle",
 						Description: "test description",
 						ServiceType: "firewall",
 					},
 					{
 						UUID:        "123e4567-e89b-12d3-a456-426655441111",
-						Name:        "testvnf2",
+						Name:        "testresourcebundle2",
 						Description: "test description",
 						ServiceType: "dns",
 					},
@@ -188,14 +188,14 @@ func TestVnfdListHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := vnfdHandler{vnfdClient: testCase.vnfdClient}
-			req, err := http.NewRequest("GET", "/v1/vnfd", nil)
+			vh := bundleDefHandler{client: testCase.bundleDefClient}
+			req, err := http.NewRequest("GET", "/v1/resource/definition", nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.vnfdListHandler)
+			hr := http.HandlerFunc(vh.listHandler)
 
 			hr.ServeHTTP(rr, req)
 			//Check returned code
@@ -205,11 +205,11 @@ func TestVnfdListHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if rr.Code == http.StatusOK {
-				got := []vnfd.VNFDefinition{}
+				got := []resource.BundleDefinition{}
 				json.NewDecoder(rr.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("vnfdListHandler returned unexpected body: got %v;"+
+					t.Errorf("listHandler returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}
@@ -217,31 +217,31 @@ func TestVnfdListHandler(t *testing.T) {
 	}
 }
 
-func TestVnfdGetHandler(t *testing.T) {
+func TestBundleDefGetHandler(t *testing.T) {
 
 	testCases := []struct {
-		label        string
-		expected     vnfd.VNFDefinition
-		inpUUID      string
-		expectedCode int
-		vnfdClient   *mockVNFDefinition
+		label           string
+		expected        resource.BundleDefinition
+		inpUUID         string
+		expectedCode    int
+		bundleDefClient *mockBundleDefinition
 	}{
 		{
-			label:        "Get VNF Definition",
+			label:        "Get Bundle Definition",
 			expectedCode: http.StatusOK,
-			expected: vnfd.VNFDefinition{
+			expected: resource.BundleDefinition{
 				UUID:        "123e4567-e89b-12d3-a456-426655441111",
-				Name:        "testvnf2",
+				Name:        "testresourcebundle2",
 				Description: "test description",
 				ServiceType: "dns",
 			},
 			inpUUID: "123e4567-e89b-12d3-a456-426655441111",
-			vnfdClient: &mockVNFDefinition{
+			bundleDefClient: &mockBundleDefinition{
 				// list of definitions that will be returned by the mockclient
-				Items: []vnfd.VNFDefinition{
+				Items: []resource.BundleDefinition{
 					{
 						UUID:        "123e4567-e89b-12d3-a456-426655441111",
-						Name:        "testvnf2",
+						Name:        "testresourcebundle2",
 						Description: "test description",
 						ServiceType: "dns",
 					},
@@ -249,12 +249,12 @@ func TestVnfdGetHandler(t *testing.T) {
 			},
 		},
 		{
-			label:        "Get Non-Exiting VNF Definition",
+			label:        "Get Non-Exiting Bundle Definition",
 			expectedCode: http.StatusInternalServerError,
 			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
-			vnfdClient: &mockVNFDefinition{
+			bundleDefClient: &mockBundleDefinition{
 				// list of definitions that will be returned by the mockclient
-				Items: []vnfd.VNFDefinition{},
+				Items: []resource.BundleDefinition{},
 				Err:   pkgerrors.New("Internal Error"),
 			},
 		},
@@ -262,14 +262,14 @@ func TestVnfdGetHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := vnfdHandler{vnfdClient: testCase.vnfdClient}
-			req, err := http.NewRequest("GET", "/v1/vnfd/"+testCase.inpUUID, nil)
+			vh := bundleDefHandler{client: testCase.bundleDefClient}
+			req, err := http.NewRequest("GET", "/v1/resource/definition/"+testCase.inpUUID, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.vnfdGetHandler)
+			hr := http.HandlerFunc(vh.getHandler)
 
 			hr.ServeHTTP(rr, req)
 			//Check returned code
@@ -279,11 +279,11 @@ func TestVnfdGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if rr.Code == http.StatusOK {
-				got := vnfd.VNFDefinition{}
+				got := resource.BundleDefinition{}
 				json.NewDecoder(rr.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("vnfdListHandler returned unexpected body: got %v;"+
+					t.Errorf("listHandler returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}
@@ -291,25 +291,25 @@ func TestVnfdGetHandler(t *testing.T) {
 	}
 }
 
-func TestVnfdDeleteHandler(t *testing.T) {
+func TestBundleDefDeleteHandler(t *testing.T) {
 
 	testCases := []struct {
-		label        string
-		inpUUID      string
-		expectedCode int
-		vnfdClient   *mockVNFDefinition
+		label           string
+		inpUUID         string
+		expectedCode    int
+		bundleDefClient *mockBundleDefinition
 	}{
 		{
-			label:        "Delete VNF Definition",
-			expectedCode: http.StatusNoContent,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655441111",
-			vnfdClient:   &mockVNFDefinition{},
+			label:           "Delete Bundle Definition",
+			expectedCode:    http.StatusNoContent,
+			inpUUID:         "123e4567-e89b-12d3-a456-426655441111",
+			bundleDefClient: &mockBundleDefinition{},
 		},
 		{
-			label:        "Delete Non-Exiting VNF Definition",
+			label:        "Delete Non-Exiting Bundle Definition",
 			expectedCode: http.StatusInternalServerError,
 			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
-			vnfdClient: &mockVNFDefinition{
+			bundleDefClient: &mockBundleDefinition{
 				Err: pkgerrors.New("Internal Error"),
 			},
 		},
@@ -317,14 +317,14 @@ func TestVnfdDeleteHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := vnfdHandler{vnfdClient: testCase.vnfdClient}
-			req, err := http.NewRequest("GET", "/v1/vnfd/"+testCase.inpUUID, nil)
+			vh := bundleDefHandler{client: testCase.bundleDefClient}
+			req, err := http.NewRequest("GET", "/v1/resource/definition/"+testCase.inpUUID, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.vnfdDeleteHandler)
+			hr := http.HandlerFunc(vh.deleteHandler)
 
 			hr.ServeHTTP(rr, req)
 			//Check returned code

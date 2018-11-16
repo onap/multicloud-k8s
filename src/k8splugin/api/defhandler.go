@@ -20,22 +20,22 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"k8splugin/vnfd"
+	"k8splugin/resource"
 
 	"github.com/gorilla/mux"
 )
 
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
-type vnfdHandler struct {
-	// Interface that implements vnfDefinition operations
+type bundleDefHandler struct {
+	// Interface that implements bundle Definition operations
 	// We will set this variable with a mock interface for testing
-	vnfdClient vnfd.VNFDefinitionInterface
+	client resource.BundleDefInterface
 }
 
-// vnfdCreateHandler handles creation of the vnfd entry in the database
-func (h vnfdHandler) vnfdCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var v vnfd.VNFDefinition
+// createHandler handles creation of the definition entry in the database
+func (h bundleDefHandler) createHandler(w http.ResponseWriter, r *http.Request) {
+	var v resource.BundleDefinition
 
 	if r.Body == nil {
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -54,7 +54,7 @@ func (h vnfdHandler) vnfdCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.vnfdClient.Create(v)
+	ret, err := h.client.Create(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -69,15 +69,15 @@ func (h vnfdHandler) vnfdCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// vnfdUploadHandler handles upload of the vnf tar file into the database
+// uploadHandler handles upload of the bundle tar file into the database
 // Note: This will be implemented in a different patch
-func (h vnfdHandler) vnfdUploadHandler(w http.ResponseWriter, r *http.Request) {
+func (h bundleDefHandler) uploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
-// vnfdListHandler handles GET (list) operations on the /v1/vnfd endpoint
-// Returns a list of vnfd.VNFDefinitions
-func (h vnfdHandler) vnfdListHandler(w http.ResponseWriter, r *http.Request) {
-	ret, err := h.vnfdClient.List()
+// listHandler handles GET (list) operations on the endpoint
+// Returns a list of resource.BundleDefinitions
+func (h bundleDefHandler) listHandler(w http.ResponseWriter, r *http.Request) {
+	ret, err := h.client.List()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -92,13 +92,13 @@ func (h vnfdHandler) vnfdListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// vnfdGetHandler handles GET operations on a particular VNFID
-// Returns a vnfd.VNFDefinition
-func (h vnfdHandler) vnfdGetHandler(w http.ResponseWriter, r *http.Request) {
+// getHandler handles GET operations on a particular ids
+// Returns a resource.BundleDefinition
+func (h bundleDefHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	vnfdID := vars["vnfdID"]
+	id := vars["resID"]
 
-	ret, err := h.vnfdClient.Get(vnfdID)
+	ret, err := h.client.Get(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -113,12 +113,12 @@ func (h vnfdHandler) vnfdGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// vnfdDeleteHandler handles DELETE operations on a particular VNFID
-func (h vnfdHandler) vnfdDeleteHandler(w http.ResponseWriter, r *http.Request) {
+// deleteHandler handles DELETE operations on a particular bundle id
+func (h bundleDefHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	vnfdID := vars["vnfdID"]
+	id := vars["resID"]
 
-	err := h.vnfdClient.Delete(vnfdID)
+	err := h.client.Delete(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

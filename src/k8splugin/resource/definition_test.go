@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package vnfd
+package resource
 
 import (
 	"k8splugin/db"
@@ -31,30 +31,30 @@ import (
 func TestCreate(t *testing.T) {
 	testCases := []struct {
 		label         string
-		inp           VNFDefinition
+		inp           BundleDefinition
 		expectedError string
 		mockdb        *db.MockDB
-		expected      VNFDefinition
+		expected      BundleDefinition
 	}{
 		{
-			label: "Create VNF Definition",
-			inp: VNFDefinition{
+			label: "Create Bundle Definition",
+			inp: BundleDefinition{
 				UUID:        "123e4567-e89b-12d3-a456-426655440000",
-				Name:        "testvnf",
-				Description: "testvnf",
+				Name:        "testresourcebundle",
+				Description: "testresourcebundle",
 				ServiceType: "firewall",
 			},
-			expected: VNFDefinition{
+			expected: BundleDefinition{
 				UUID:        "123e4567-e89b-12d3-a456-426655440000",
-				Name:        "testvnf",
-				Description: "testvnf",
+				Name:        "testresourcebundle",
+				Description: "testresourcebundle",
 				ServiceType: "firewall",
 			},
 			expectedError: "",
 			mockdb:        &db.MockDB{},
 		},
 		{
-			label:         "Failed Create VNF Definition",
+			label:         "Failed Create Bundle Definition",
 			expectedError: "Error Creating Definition",
 			mockdb: &db.MockDB{
 				Err: pkgerrors.New("Error Creating Definition"),
@@ -65,8 +65,8 @@ func TestCreate(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
-			vimpl := GetVNFDClient()
-			got, err := vimpl.Create(testCase.inp)
+			impl := GetBundleDefClient()
+			got, err := impl.Create(testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -76,7 +76,7 @@ func TestCreate(t *testing.T) {
 				}
 			} else {
 				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("Create VNF returned unexpected body: got %v;"+
+					t.Errorf("Create Bundle returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}
@@ -90,21 +90,21 @@ func TestList(t *testing.T) {
 		label         string
 		expectedError string
 		mockdb        *db.MockDB
-		expected      []VNFDefinition
+		expected      []BundleDefinition
 	}{
 		{
-			label: "List VNF Definition",
-			expected: []VNFDefinition{
+			label: "List Bundle Definition",
+			expected: []BundleDefinition{
 				{
 					UUID:        "123e4567-e89b-12d3-a456-426655440000",
-					Name:        "testvnf",
-					Description: "testvnf",
+					Name:        "testresourcebundle",
+					Description: "testresourcebundle",
 					ServiceType: "firewall",
 				},
 				{
 					UUID:        "123e4567-e89b-12d3-a456-426655441111",
-					Name:        "testvnf2",
-					Description: "testvnf2",
+					Name:        "testresourcebundle2",
+					Description: "testresourcebundle2",
 					ServiceType: "dns",
 				},
 			},
@@ -112,16 +112,16 @@ func TestList(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: api.KVPairs{
 					&api.KVPair{
-						Key: "vnfd/123e4567-e89b-12d3-a456-426655440000",
-						Value: []byte("{\"name\":\"testvnf\"," +
-							"\"description\":\"testvnf\"," +
+						Key: "resource/def/123e4567-e89b-12d3-a456-426655440000",
+						Value: []byte("{\"name\":\"testresourcebundle\"," +
+							"\"description\":\"testresourcebundle\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
 							"\"service-type\":\"firewall\"}"),
 					},
 					&api.KVPair{
-						Key: "vnfd/123e4567-e89b-12d3-a456-426655441111",
-						Value: []byte("{\"name\":\"testvnf2\"," +
-							"\"description\":\"testvnf2\"," +
+						Key: "resource/def/123e4567-e89b-12d3-a456-426655441111",
+						Value: []byte("{\"name\":\"testresourcebundle2\"," +
+							"\"description\":\"testresourcebundle2\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
 							"\"service-type\":\"dns\"}"),
 					},
@@ -140,8 +140,8 @@ func TestList(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
-			vimpl := GetVNFDClient()
-			got, err := vimpl.List()
+			impl := GetBundleDefClient()
+			got, err := impl.List()
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("List returned an unexpected error %s", err)
@@ -151,7 +151,7 @@ func TestList(t *testing.T) {
 				}
 			} else {
 				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("List VNF returned unexpected body: got %v;"+
+					t.Errorf("List Bundle returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}
@@ -166,24 +166,24 @@ func TestGet(t *testing.T) {
 		expectedError string
 		mockdb        *db.MockDB
 		inp           string
-		expected      VNFDefinition
+		expected      BundleDefinition
 	}{
 		{
-			label: "Get VNF Definition",
+			label: "Get Bundle Definition",
 			inp:   "123e4567-e89b-12d3-a456-426655440000",
-			expected: VNFDefinition{
+			expected: BundleDefinition{
 				UUID:        "123e4567-e89b-12d3-a456-426655440000",
-				Name:        "testvnf",
-				Description: "testvnf",
+				Name:        "testresourcebundle",
+				Description: "testresourcebundle",
 				ServiceType: "firewall",
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
 				Items: api.KVPairs{
 					&api.KVPair{
-						Key: "vnfd/123e4567-e89b-12d3-a456-426655440000",
-						Value: []byte("{\"name\":\"testvnf\"," +
-							"\"description\":\"testvnf\"," +
+						Key: "resource/def/123e4567-e89b-12d3-a456-426655440000",
+						Value: []byte("{\"name\":\"testresourcebundle\"," +
+							"\"description\":\"testresourcebundle\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
 							"\"service-type\":\"firewall\"}"),
 					},
@@ -202,8 +202,8 @@ func TestGet(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
-			vimpl := GetVNFDClient()
-			got, err := vimpl.Get(testCase.inp)
+			impl := GetBundleDefClient()
+			got, err := impl.Get(testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get returned an unexpected error %s", err)
@@ -213,7 +213,7 @@ func TestGet(t *testing.T) {
 				}
 			} else {
 				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("Get VNF returned unexpected body: got %v;"+
+					t.Errorf("Get Bundle returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}
@@ -228,10 +228,10 @@ func TestDelete(t *testing.T) {
 		inp           string
 		expectedError string
 		mockdb        *db.MockDB
-		expected      []VNFDefinition
+		expected      []BundleDefinition
 	}{
 		{
-			label:  "Delete VNF Definition",
+			label:  "Delete Bundle Definition",
 			inp:    "123e4567-e89b-12d3-a456-426655440000",
 			mockdb: &db.MockDB{},
 		},
@@ -247,8 +247,8 @@ func TestDelete(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
-			vimpl := GetVNFDClient()
-			err := vimpl.Delete(testCase.inp)
+			impl := GetBundleDefClient()
+			err := impl.Delete(testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Delete returned an unexpected error %s", err)

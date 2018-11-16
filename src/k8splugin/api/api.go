@@ -14,7 +14,7 @@ limitations under the License.
 package api
 
 import (
-	"k8splugin/vnfd"
+	"k8splugin/rb"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -106,13 +106,13 @@ func NewRouter(kubeconfig string) *mux.Router {
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", DeleteHandler).Methods("DELETE")
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", GetHandler).Methods("GET")
 
-	vnfdRouter := router.PathPrefix("/v1/vnfd").Subrouter()
-	vh := vnfdHandler{vnfdClient: vnfd.GetVNFDClient()}
-	vnfdRouter.HandleFunc("", vh.vnfdCreateHandler).Methods("POST")
-	vnfdRouter.HandleFunc("/{vnfdID}/upload", vh.vnfdUploadHandler).Methods("POST")
-	vnfdRouter.HandleFunc("", vh.vnfdListHandler).Methods("GET")
-	vnfdRouter.HandleFunc("/{vnfdID}", vh.vnfdGetHandler).Methods("GET")
-	vnfdRouter.HandleFunc("/{vnfdID}", vh.vnfdDeleteHandler).Methods("DELETE")
+	resRouter := router.PathPrefix("/v1/rb").Subrouter()
+	rbdef := rbDefinitionHandler{client: rb.GetDefinitionClient()}
+	resRouter.HandleFunc("/definition", rbdef.createHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbdID}/upload", rbdef.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition", rbdef.listHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbdID}", rbdef.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbdID}", rbdef.deleteHandler).Methods("DELETE")
 
 	// (TODO): Fix update method
 	// vnfInstanceHandler.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

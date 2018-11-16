@@ -18,5 +18,6 @@ Table of contents
 .. toctree::
    :maxdepth: 3
 
-   Project Architecture <krd_architecture>
-   Sample Commands <sampleCommands>
+   KRD Project Architecture <krd_architecture>
+   Bare Metal All-in-One KRD deployment<bare_metal_provisioning>
+   Kubernetes MultiCloud API sample ommands <sampleCommands>

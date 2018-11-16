@@ -158,7 +158,7 @@ function install_plugin {
     pushd $GOPATH/src/k8-plugin-multicloud/deployments
     ./build.sh
 
-    if [[ "${testing_enabled}" = "true" ]]; then
+    if [[ "${testing_enabled}" == "true" ]]; then
         docker-compose up -d
         pushd $krd_tests
         for functional_test in plugin plugin_edgex; do
@@ -200,7 +200,7 @@ krd_inventory=$krd_inventory_folder/hosts.ini
 krd_playbooks=$krd_folder/playbooks
 krd_tests=$krd_folder/tests
 k8s_info_file=$krd_folder/k8s_info.log
-testing_enabled=${KRD_ENABLE_TESTS:-true}
+testing_enabled=${KRD_ENABLE_TESTS:-false}
 
 mkdir -p $log_folder
 mkdir -p /opt/csar
@@ -216,7 +216,7 @@ fi
 apt-get update
 install_k8s
 install_addons
-if [[ "${KRD_PLUGIN_ENABLED:-true}" ]]; then
+if [[ "${KRD_PLUGIN_ENABLED:-false}" ]]; then
     install_plugin
 fi
 _print_kubernetes_info

@@ -6,6 +6,7 @@
 .*.swp
 *.log
 coverage.html
+docs/build
 
 # Directories
 pkg

@@ -1,0 +1,147 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_bf658ce2",
+        "filename": "deployments/start.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-17T00:13:36Z",
+      "side": 1,
+      "message": "this new variable is not needed",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 61
+      },
+      "revId": "c02c829453b01e56dee74018286a6e996a69cbfa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_5f6260d9",
+        "filename": "src/k8splugin/api/api.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-17T00:13:36Z",
+      "side": 1,
+      "message": "This change seems to be no related with this change. It should be better to create another patch for that",
+      "revId": "c02c829453b01e56dee74018286a6e996a69cbfa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_1f9cd8bf",
+        "filename": "src/k8splugin/krd/plugins.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-17T00:13:36Z",
+      "side": 1,
+      "message": "Remove this placeholder on this patch",
+      "revId": "c02c829453b01e56dee74018286a6e996a69cbfa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_dfa5f004",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-17T00:13:36Z",
+      "side": 1,
+      "message": "This file can be placed here: src/k8splugin/plugins/ovn4nfv-network/plugin.go",
+      "revId": "c02c829453b01e56dee74018286a6e996a69cbfa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_1f837857",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-17T00:13:36Z",
+      "side": 1,
+      "message": "remove this",
+      "range": {
+        "startLine": 163,
+        "startChar": 1,
+        "endLine": 163,
+        "endChar": 62
+      },
+      "revId": "c02c829453b01e56dee74018286a6e996a69cbfa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_bfacacee",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-17T00:13:36Z",
+      "side": 1,
+      "message": "the workaround for this is to use a global environment",
+      "range": {
+        "startLine": 195,
+        "startChar": 9,
+        "endLine": 195,
+        "endChar": 33
+      },
+      "revId": "c02c829453b01e56dee74018286a6e996a69cbfa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_7fb6443f",
+        "filename": "src/k8splugin/plugins/network/ovn4nfvk8s/plugin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-17T00:13:36Z",
+      "side": 1,
+      "message": "remove this leftover",
+      "range": {
+        "startLine": 201,
+        "startChar": 1,
+        "endLine": 201,
+        "endChar": 107
+      },
+      "revId": "c02c829453b01e56dee74018286a6e996a69cbfa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

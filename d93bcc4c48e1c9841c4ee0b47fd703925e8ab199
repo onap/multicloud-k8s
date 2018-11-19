@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_1f75b897",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-19T18:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_3f2c3c99",
+      "range": {
+        "startLine": 36,
+        "startChar": 3,
+        "endLine": 36,
+        "endChar": 22
+      },
+      "revId": "d93bcc4c48e1c9841c4ee0b47fd703925e8ab199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_bf37cce2",
         "filename": "src/k8splugin/rb/definition.go",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2018-11-16T22:10:45Z",
       "side": 1,
       "message": "nit: s/Returns/returns",
+      "range": {
+        "startLine": 50,
+        "startChar": 23,
+        "endLine": 50,
+        "endChar": 30
+      },
+      "revId": "d93bcc4c48e1c9841c4ee0b47fd703925e8ab199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_27d752c1",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-19T18:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_bf37cce2",
       "range": {
         "startLine": 50,
         "startChar": 23,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_c7e526a9",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-19T18:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_ff2554ab",
+      "range": {
+        "startLine": 53,
+        "startChar": 5,
+        "endLine": 53,
+        "endChar": 24
+      },
+      "revId": "d93bcc4c48e1c9841c4ee0b47fd703925e8ab199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_5f34a0dd",
         "filename": "src/k8splugin/rb/definition.go",
         "patchSetId": 2
@@ -82,6 +154,30 @@
       "writtenOn": "2018-11-16T22:10:45Z",
       "side": 1,
       "message": "nit: this \"creates\" can be omitted",
+      "range": {
+        "startLine": 58,
+        "startChar": 10,
+        "endLine": 58,
+        "endChar": 17
+      },
+      "revId": "d93bcc4c48e1c9841c4ee0b47fd703925e8ab199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_e7e06a98",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-19T18:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_5f34a0dd",
       "range": {
         "startLine": 58,
         "startChar": 10,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_87ef1e87",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-19T18:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_7f3164eb",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 13
+      },
+      "revId": "d93bcc4c48e1c9841c4ee0b47fd703925e8ab199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_3f53dc18",
         "filename": "src/k8splugin/rb/definition.go",
         "patchSetId": 2
@@ -140,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_a7f2626d",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-19T18:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_3f53dc18",
+      "range": {
+        "startLine": 108,
+        "startChar": 19,
+        "endLine": 108,
+        "endChar": 25
+      },
+      "revId": "d93bcc4c48e1c9841c4ee0b47fd703925e8ab199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_df573001",
         "filename": "src/k8splugin/rb/definition.go",
         "patchSetId": 2
@@ -151,6 +295,30 @@
       "writtenOn": "2018-11-16T22:10:45Z",
       "side": 1,
       "message": "nit: s/Definitions/Definition",
+      "range": {
+        "startLine": 112,
+        "startChar": 64,
+        "endLine": 112,
+        "endChar": 75
+      },
+      "revId": "d93bcc4c48e1c9841c4ee0b47fd703925e8ab199",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_47e9367f",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-19T18:32:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_df573001",
       "range": {
         "startLine": 112,
         "startChar": 64,

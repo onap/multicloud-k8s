@@ -68,6 +68,10 @@ func (m *mockRBDefinition) Delete(id string) error {
 	return m.Err
 }
 
+func (m *mockRBDefinition) Upload(id string, inp []byte) error {
+	return m.Err
+}
+
 func TestRBDefCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label        string
@@ -325,6 +329,67 @@ func TestRBDefDeleteHandler(t *testing.T) {
 
 			rr := httptest.NewRecorder()
 			hr := http.HandlerFunc(vh.deleteHandler)
+
+			hr.ServeHTTP(rr, req)
+			//Check returned code
+			if rr.Code != testCase.expectedCode {
+				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, rr.Code)
+			}
+		})
+	}
+}
+
+func TestRBDefUploadHandler(t *testing.T) {
+
+	testCases := []struct {
+		label        string
+		inpUUID      string
+		body         io.Reader
+		expectedCode int
+		rbDefClient  *mockRBDefinition
+	}{
+		{
+			label:        "Upload Bundle Definition Content",
+			expectedCode: http.StatusOK,
+			inpUUID:      "123e4567-e89b-12d3-a456-426655441111",
+			body: bytes.NewBuffer([]byte{
+				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0xff, 0xf2, 0x48, 0xcd,
+			}),
+			rbDefClient: &mockRBDefinition{},
+		},
+		{
+			label:        "Upload Invalid Bundle Definition Content",
+			expectedCode: http.StatusInternalServerError,
+			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
+			body: bytes.NewBuffer([]byte{
+				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0xff, 0xf2, 0x48, 0xcd,
+			}),
+			rbDefClient: &mockRBDefinition{
+				Err: pkgerrors.New("Internal Error"),
+			},
+		},
+		{
+			label:        "Upload Empty Body Content",
+			expectedCode: http.StatusBadRequest,
+			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
+			rbDefClient:  &mockRBDefinition{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			vh := rbDefinitionHandler{client: testCase.rbDefClient}
+			req, err := http.NewRequest("POST",
+				"/v1/resource/definition/"+testCase.inpUUID+"/content", testCase.body)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			rr := httptest.NewRecorder()
+			hr := http.HandlerFunc(vh.uploadHandler)
 
 			hr.ServeHTTP(rr, req)
 			//Check returned code

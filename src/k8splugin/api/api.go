@@ -109,7 +109,7 @@ func NewRouter(kubeconfig string) *mux.Router {
 	resRouter := router.PathPrefix("/v1/rb").Subrouter()
 	rbdef := rbDefinitionHandler{client: rb.NewDefinitionClient()}
 	resRouter.HandleFunc("/definition", rbdef.createHandler).Methods("POST")
-	resRouter.HandleFunc("/definition/{rbdID}/upload", rbdef.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbdID}/content", rbdef.uploadHandler).Methods("POST")
 	resRouter.HandleFunc("/definition", rbdef.listHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbdID}", rbdef.getHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbdID}", rbdef.deleteHandler).Methods("DELETE")

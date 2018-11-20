@@ -66,4 +66,4 @@ helm_enabled: true
 # NOTE: Ipvs is based on netfilter hook function, but uses hash table as the underlying data structure and
 # works in the kernel space
 # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-ipvs
-kube_proxy_mode: ipvs
+#kube_proxy_mode: ipvs

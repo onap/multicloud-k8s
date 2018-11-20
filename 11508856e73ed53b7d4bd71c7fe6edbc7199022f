@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_36cd3e5e",
+        "filename": "docs/bare_metal_provisioning.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-20T16:58:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_27fe7239",
+      "range": {
+        "startLine": 117,
+        "startChar": 77,
+        "endLine": 117,
+        "endChar": 78
+      },
+      "revId": "11508856e73ed53b7d4bd71c7fe6edbc7199022f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_a7990221",
         "filename": "docs/bare_metal_provisioning.rst",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_96050a7c",
+        "filename": "docs/bare_metal_provisioning.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-20T16:58:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_a7990221",
+      "range": {
+        "startLine": 125,
+        "startChar": 2,
+        "endLine": 125,
+        "endChar": 11
+      },
+      "revId": "11508856e73ed53b7d4bd71c7fe6edbc7199022f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_47a05643",
         "filename": "docs/bare_metal_provisioning.rst",
         "patchSetId": 2
@@ -59,6 +107,30 @@
       "writtenOn": "2018-11-19T18:38:13Z",
       "side": 1,
       "message": "nit: space",
+      "range": {
+        "startLine": 140,
+        "startChar": 71,
+        "endLine": 140,
+        "endChar": 72
+      },
+      "revId": "11508856e73ed53b7d4bd71c7fe6edbc7199022f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_b6084e92",
+        "filename": "docs/bare_metal_provisioning.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-20T16:58:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_47a05643",
       "range": {
         "startLine": 140,
         "startChar": 71,

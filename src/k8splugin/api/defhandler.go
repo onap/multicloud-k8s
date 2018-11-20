@@ -18,9 +18,9 @@ package api
 
 import (
 	"encoding/json"
-	"net/http"
-
+	"io/ioutil"
 	"k8splugin/rb"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -72,6 +72,27 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 // uploadHandler handles upload of the bundle tar file into the database
 // Note: This will be implemented in a different patch
 func (h rbDefinitionHandler) uploadHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["rbdID"]
+
+	if r.Body == nil {
+		http.Error(w, "Empty Body", http.StatusBadRequest)
+		return
+	}
+
+	inpBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Unable to read body", http.StatusBadRequest)
+		return
+	}
+
+	err = h.client.Upload(uuid, inpBytes)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // listHandler handles GET (list) operations on the endpoint

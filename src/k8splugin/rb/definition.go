@@ -17,6 +17,8 @@
 package rb
 
 import (
+	"bytes"
+	"encoding/base64"
 	"k8splugin/db"
 	"log"
 
@@ -39,6 +41,7 @@ type DefinitionManager interface {
 	List() ([]Definition, error)
 	Get(resID string) (Definition, error)
 	Delete(resID string) error
+	Upload(resID string, inp []byte) error
 }
 
 // DefinitionClient implements the DefinitionManager
@@ -63,7 +66,7 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 	}
 	key := v.keyPrefix + def.UUID
 
-	serData, err := db.Serialize(v)
+	serData, err := db.Serialize(def)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Serialize Resource Bundle Definition")
 	}
@@ -129,6 +132,24 @@ func (v *DefinitionClient) Delete(id string) error {
 	err := db.DBconn.Delete(v.keyPrefix + id)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definitions")
+	}
+
+	return nil
+}
+
+// Upload the contents of resource bundle into database
+func (v *DefinitionClient) Upload(id string, inp []byte) error {
+
+	err := isTarGz(bytes.NewBuffer(inp))
+	if err != nil {
+		return pkgerrors.Errorf("Error in file format %s", err.Error())
+	}
+
+	encodedStr := base64.StdEncoding.EncodeToString(inp)
+	key := v.keyPrefix + id + "/content"
+	err = db.DBconn.Create(key, encodedStr)
+	if err != nil {
+		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
 	}
 
 	return nil

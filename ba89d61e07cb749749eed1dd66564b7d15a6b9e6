@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_46360fe9",
+        "filename": "src/k8splugin/api/defhandler_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-21T16:51:58Z",
+      "side": 1,
+      "message": "The only missing test case is reading an invalid Bundle definition, isn\u0027t it?",
+      "revId": "ba89d61e07cb749749eed1dd66564b7d15a6b9e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_26698bbe",
+        "filename": "src/k8splugin/rb/archive_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-21T16:51:58Z",
+      "side": 1,
+      "message": "is it possible to generate the content to have it in more human-readable way?",
+      "revId": "ba89d61e07cb749749eed1dd66564b7d15a6b9e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_46d92f82",
+        "filename": "src/k8splugin/rb/definition_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-21T16:51:58Z",
+      "side": 1,
+      "message": "Is it possible to mock the isTarGz method to force it to raise an error?",
+      "revId": "ba89d61e07cb749749eed1dd66564b7d15a6b9e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

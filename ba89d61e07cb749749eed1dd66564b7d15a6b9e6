@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_668473d4",
+        "filename": "src/k8splugin/api/defhandler_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-21T19:17:57Z",
+      "side": 1,
+      "message": "Good catch. I am not checking that in the upload function. Will fix.",
+      "parentUuid": "9adffdf1_46360fe9",
+      "revId": "ba89d61e07cb749749eed1dd66564b7d15a6b9e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_26698bbe",
         "filename": "src/k8splugin/rb/archive_test.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_a6133bb7",
+        "filename": "src/k8splugin/rb/archive_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-21T19:17:57Z",
+      "side": 1,
+      "message": "Initially I had it as a tar.gz file in a folder called testdata. But, I didn\u0027t want to upload binary files into the repository. So, I converted that tar.gz into a byte array.\nI am using a testing paradigm similar to here. https://golang.org/src/compress/gzip/gunzip_test.go",
+      "parentUuid": "9adffdf1_26698bbe",
+      "revId": "ba89d61e07cb749749eed1dd66564b7d15a6b9e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_46d92f82",
         "filename": "src/k8splugin/rb/definition_test.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2018-11-21T16:51:58Z",
       "side": 1,
       "message": "Is it possible to mock the isTarGz method to force it to raise an error?",
+      "revId": "ba89d61e07cb749749eed1dd66564b7d15a6b9e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_868717d7",
+        "filename": "src/k8splugin/rb/definition_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-11-21T19:17:57Z",
+      "side": 1,
+      "message": "Let me see if it I can mock it for that.",
+      "parentUuid": "9adffdf1_46d92f82",
       "revId": "ba89d61e07cb749749eed1dd66564b7d15a6b9e6",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

@@ -16,8 +16,10 @@
       include_vars:
         file: krd-vars.yml
   roles:
-    - andrewrothstein.kubectl
-    - { role: geerlingguy.docker, when: virtlet_source_type == "source" }
+    - role: andrewrothstein.kubectl
+      kubectl_ver: "v{{ kubectl_version }}"
+    - role: geerlingguy.docker
+      when: virtlet_source_type == "source"
   tasks:
     - name: create Virtlet binary folder
       file:

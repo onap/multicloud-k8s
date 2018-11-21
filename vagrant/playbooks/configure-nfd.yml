@@ -48,7 +48,8 @@
 - hosts: localhost
   become: yes
   roles:
-    - andrewrothstein.kubectl
+    - role: andrewrothstein.kubectl
+      kubectl_ver: "v{{ kubectl_version }}
   tasks:
     - name: create service accounts
       command: "/usr/local/bin/kubectl apply -f /tmp/{{ item }}"

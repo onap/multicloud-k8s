@@ -15,9 +15,10 @@
       include_vars:
         file: krd-vars.yml
   roles:
-    - andrewrothstein.kubectl
+    - role: andrewrothstein.kubectl
+      kubectl_ver: "v{{ kubectl_version }}"
     - role: andrewrothstein.kubernetes-helm
-      kubernetes_helm_ver: v2.9.1
+      kubernetes_helm_ver: "v{{ helm_client_version }}"
   tasks:
     - name: create istio folder
       file:

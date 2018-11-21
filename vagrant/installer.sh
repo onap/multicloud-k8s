@@ -13,7 +13,7 @@ set -o pipefail
 
 # _install_go() - Install GoLang package
 function _install_go {
-    version=$(grep "go_version" ${krd_playbooks}/krd-vars.yml | awk -F ': ' '{print $2}')
+    version=$(grep "go_version" ${krd_playbooks}/krd-vars.yml | awk -F "'" '{print $2}')
     local tarball=go$version.linux-amd64.tar.gz
 
     if $(go version &>/dev/null); then

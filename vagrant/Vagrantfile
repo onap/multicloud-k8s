@@ -23,7 +23,7 @@ nodes = YAML.load_file(pdf)
 
 # Inventory file creation
 File.open(File.dirname(__FILE__) + "/inventory/hosts.ini", "w") do |inventory_file|
-  inventory_file.puts("[all:vars]\nansible_connection=ssh\nansible_ssh_user=vagrant\n[all]")
+  inventory_file.puts("[all]")
   nodes.each do |node|
     inventory_file.puts("#{node['name']}\tansible_ssh_host=#{node['ip']} ansible_ssh_port=22")
   end

@@ -18,13 +18,19 @@ source _functions.sh
 csar_id=aa443e7e-c8ba-11e8-8877-525400b164ff
 
 # Setup
+install_ovn_deps
 if [[ ! -f $HOME/.ssh/id_rsa.pub ]]; then
     echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 fi
 populate_CSAR_vms_containers_vFW $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
-for resource in $unprotected_private_net $protected_private_net $onap_private_net sink-service; do
+for net in $unprotected_private_net $protected_private_net $onap_private_net; do
+    cleanup_network $net.yaml
+    echo "Create OVN Network $net network"
+    init_network $net.yaml
+done
+for resource in onap-ovn4nfvk8s-network sink-service; do
     kubectl apply -f $resource.yaml
 done
 setup $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
@@ -43,4 +49,7 @@ done
 
 # Teardown
 #teardown $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
+#for net in $unprotected_private_net $protected_private_net $onap_private_net; do
+#    cleanup_network $net.yaml
+#done
 popd

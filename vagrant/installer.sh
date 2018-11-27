@@ -131,7 +131,7 @@ function install_addons {
     sudo ansible-galaxy install $verbose -r $krd_folder/galaxy-requirements.yml --ignore-errors
 
     ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-krd.yml | sudo tee $log_folder/setup-krd.log
-    for addon in ${KRD_ADDONS:-virtlet ovn-kubernetes multus}; do
+    for addon in ${KRD_ADDONS:-virtlet ovn4nfv}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
         if [[ "${testing_enabled}" == "true" ]]; then

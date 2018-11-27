@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9adffdf1_91e17dd2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-11-27T23:52:17Z",
+      "side": 1,
+      "message": "s/MULTICLOUD-303/ONAPARC-351",
+      "range": {
+        "startLine": 14,
+        "startChar": 10,
+        "endLine": 14,
+        "endChar": 24
+      },
+      "revId": "c02c829453b01e56dee74018286a6e996a69cbfa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_bf658ce2",
         "filename": "deployments/start.sh",
         "patchSetId": 4

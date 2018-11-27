@@ -21,6 +21,25 @@ virtlet_image=virtlet.cloud/fedora
 virtlet_deployment_name=virtlet-deployment
 plugin_deployment_name=plugin-deployment
 plugin_service_name=plugin-service
+onap_private_net=onap-private-net
+unprotected_private_net=unprotected-private-net
+protected_private_net=protected-private-net
+
+# vFirewall vars
+demo_artifacts_version=1.3.0
+vfw_private_ip_0='192.168.10.3'
+vfw_private_ip_1='192.168.20.2'
+vfw_private_ip_2='10.10.100.3'
+vpg_private_ip_0='192.168.10.2'
+vpg_private_ip_1='10.0.100.2'
+vsn_private_ip_0='192.168.20.3'
+vsn_private_ip_1='10.10.100.4'
+dcae_collector_ip='10.0.4.1'
+dcae_collector_port='8081'
+protected_net_gw='192.168.20.100'
+protected_net_cidr='192.168.20.0/24'
+protected_private_net_cidr='192.168.10.0/24'
+onap_private_net_cidr='10.10.0.0/16'
 
 # populate_CSAR_containers_vFW() - This function creates the content of CSAR file
 # required for vFirewal using only containers
@@ -33,59 +52,59 @@ function populate_CSAR_containers_vFW {
     cat << META > metadata.yaml
 resources:
   network:
-    - unprotected-private-net-cidr-network.yaml
-    - protected-private-net-cidr-network.yaml
-    - onap-private-net-cidr-network.yaml
+    - $unprotected_private_net.yaml
+    - $protected_private_net.yaml
+    - $onap_private_net.yaml
   deployment:
     - $packetgen_deployment_name.yaml
     - $firewall_deployment_name.yaml
     - $sink_deployment_name.yaml
 META
 
-    cat << NET > unprotected-private-net-cidr-network.yaml
+    cat << NET > $unprotected_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: unprotected-private-net-cidr
+  name: $unprotected_private_net
 spec:
   config: '{
     "name": "unprotected",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "192.168.10.0/24"
+        "subnet": "$protected_private_net_cidr"
     }
 }'
 NET
 
-    cat << NET > protected-private-net-cidr-network.yaml
+    cat << NET > $protected_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: protected-private-net-cidr
+  name: $protected_private_net
 spec:
   config: '{
     "name": "protected",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "192.168.20.0/24"
+        "subnet": "$protected_net_cidr"
     }
 }'
 NET
 
-    cat << NET > onap-private-net-cidr-network.yaml
+    cat << NET > $onap_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: onap-private-net-cidr
+  name: $onap_private_net
 spec:
   config: '{
     "name": "onap",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "10.10.0.0/16"
+        "subnet": "$onap_private_net_cidr"
     }
 }'
 NET
@@ -108,8 +127,8 @@ spec:
         app: vFirewall
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
+            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
         ]'
     spec:
       containers:
@@ -141,9 +160,9 @@ spec:
         app: vFirewall
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "protected-private-net-cidr", "interfaceRequest": "eth2" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth3" }
+            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$protected_private_net", "interfaceRequest": "eth2" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth3" }
         ]'
     spec:
       containers:
@@ -166,14 +185,16 @@ spec:
   selector:
     matchLabels:
       app: vFirewall
+      context: darkstat
   template:
     metadata:
       labels:
         app: vFirewall
+        context: darkstat
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
+            { "name": "$protected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
         ]'
     spec:
       containers:
@@ -182,6 +203,15 @@ spec:
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
+        securityContext:
+          privileged: true
+      - name: darkstat
+        image: electrocucaracha/darkstat
+        imagePullPolicy: IfNotPresent
+        tty: true
+        stdin: true
+        ports:
+          - containerPort: 667
 DEPLOYMENT
     popd
 }
@@ -199,17 +229,15 @@ function populate_CSAR_vms_containers_vFW {
     cat << META > metadata.yaml
 resources:
   network:
-    - unprotected-private-net-cidr-network.yaml
-    - protected-private-net-cidr-network.yaml
-    - onap-private-net-cidr-network.yaml
+    - $unprotected_private_net.yaml
+    - $protected_private_net.yaml
+    - $onap_private_net.yaml
   deployment:
     - $packetgen_deployment_name.yaml
     - $firewall_deployment_name.yaml
     - $sink_deployment_name.yaml
   service:
     - sink-service.yaml
-  ingress:
-    - sink-ingress.yaml
 META
 
     cat << SERVICE > sink-service.yaml
@@ -217,8 +245,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sink-service
-  labels:
-    app: vFirewall
 spec:
   type: NodePort
   ports:
@@ -229,71 +255,65 @@ spec:
     context: darkstat
 SERVICE
 
-    cat << INGRESS > sink-ingress.yaml
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: sink-ingress
-spec:
-  rules:
-    - host: sink.vfirewall.demo.com
-      http:
-        paths:
-          - backend:
-              serviceName: sink-service
-              servicePort: 667
-INGRESS
-
-    cat << NET > unprotected-private-net-cidr-network.yaml
+    cat << NET > $unprotected_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: unprotected-private-net-cidr
+  name: $unprotected_private_net
 spec:
   config: '{
     "name": "unprotected",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "192.168.10.0/24"
+        "subnet": "$protected_private_net_cidr"
     }
 }'
 NET
 
-    cat << NET > protected-private-net-cidr-network.yaml
+    cat << NET > $protected_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: protected-private-net-cidr
+  name: $protected_private_net
 spec:
   config: '{
     "name": "protected",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "192.168.20.0/24"
+        "subnet": "$protected_net_cidr"
     }
 }'
 NET
 
-    cat << NET > onap-private-net-cidr-network.yaml
+    cat << NET > $onap_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: onap-private-net-cidr
+  name: $onap_private_net
 spec:
   config: '{
     "name": "onap",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "10.10.0.0/16"
+        "subnet": "$onap_private_net_cidr"
     }
 }'
 NET
 
     proxy="apt:"
-    cloud_init_proxy=""
+    cloud_init_proxy="
+            - export demo_artifacts_version=$demo_artifacts_version
+            - export vfw_private_ip_0=$vfw_private_ip_0
+            - export vsn_private_ip_0=$vsn_private_ip_0
+            - export protected_net_cidr=$protected_net_cidr
+            - export dcae_collector_ip=$dcae_collector_ip
+            - export dcae_collector_port=$dcae_collector_port
+            - export protected_net_gw=$protected_net_gw
+            - export protected_private_net_cidr=$protected_private_net_cidr
+"
     if [[ -n "${http_proxy+x}" ]]; then
         proxy+="
             http_proxy: $http_proxy"
@@ -351,8 +371,8 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
+            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
         ]'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
@@ -418,9 +438,9 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "protected-private-net-cidr", "interfaceRequest": "eth2" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth3" }
+            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$protected_private_net", "interfaceRequest": "eth2" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth3" }
         ]'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
@@ -464,8 +484,8 @@ spec:
         context: darkstat
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
+            { "name": "$protected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
         ]'
     spec:
       containers:
@@ -499,65 +519,74 @@ function populate_CSAR_vms_vFW {
     cat << META > metadata.yaml
 resources:
   network:
-    - unprotected-private-net-cidr-network.yaml
-    - protected-private-net-cidr-network.yaml
-    - onap-private-net-cidr-network.yaml
+    - $unprotected_private_net.yaml
+    - $protected_private_net.yaml
+    - $onap_private_net.yaml
   deployment:
     - $packetgen_deployment_name.yaml
     - $firewall_deployment_name.yaml
     - $sink_deployment_name.yaml
 META
 
-    cat << NET > unprotected-private-net-cidr-network.yaml
+    cat << NET > $unprotected_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: unprotected-private-net-cidr
+  name: $unprotected_private_net
 spec:
   config: '{
     "name": "unprotected",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "192.168.10.0/24"
+        "subnet": "$protected_private_net_cidr"
     }
 }'
 NET
 
-    cat << NET > protected-private-net-cidr-network.yaml
+    cat << NET > $protected_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: protected-private-net-cidr
+  name: $protected_private_net
 spec:
   config: '{
     "name": "protected",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "192.168.20.0/24"
+        "subnet": "$protected_net_cidr"
     }
 }'
 NET
 
-    cat << NET > onap-private-net-cidr-network.yaml
+    cat << NET > $onap_private_net.yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: onap-private-net-cidr
+  name: $onap_private_net
 spec:
   config: '{
     "name": "onap",
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "10.10.0.0/16"
+        "subnet": "$onap_private_net_cidr"
     }
 }'
 NET
 
     proxy="apt:"
-    cloud_init_proxy=""
+    cloud_init_proxy="
+            - export demo_artifacts_version=$demo_artifacts_version
+            - export vfw_private_ip_0=$vfw_private_ip_0
+            - export vsn_private_ip_0=$vsn_private_ip_0
+            - export protected_net_cidr=$protected_net_cidr
+            - export dcae_collector_ip=$dcae_collector_ip
+            - export dcae_collector_port=$dcae_collector_port
+            - export protected_net_gw=$protected_net_gw
+            - export protected_private_net_cidr=$protected_private_net_cidr
+"
     if [[ -n "${http_proxy+x}" ]]; then
         proxy+="
             http_proxy: $http_proxy"
@@ -615,8 +644,8 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
+            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
         ]'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
@@ -682,9 +711,9 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "unprotected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "protected-private-net-cidr", "interfaceRequest": "eth2" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth3" }
+            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$protected_private_net", "interfaceRequest": "eth2" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth3" }
         ]'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
@@ -748,8 +777,8 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "protected-private-net-cidr", "interfaceRequest": "eth1" },
-            { "name": "onap-private-net-cidr", "interfaceRequest": "eth2" }
+            { "name": "$protected_private_net", "interfaceRequest": "eth1" },
+            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
         ]'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
@@ -805,7 +834,7 @@ spec:
     "type": "bridge",
     "ipam": {
         "type": "host-local",
-        "subnet": "10.10.0.0/16"
+        "subnet": "$onap_private_net_cidr"
     }
 }'
 NET

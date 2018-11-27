@@ -24,7 +24,7 @@ fi
 populate_CSAR_vms_containers_vFW $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
-for resource in unprotected-private-net-cidr-network protected-private-net-cidr-network onap-private-net-cidr-network sink-service sink-ingress; do
+for resource in $unprotected_private_net $protected_private_net $onap_private_net sink-service; do
     kubectl apply -f $resource.yaml
 done
 setup $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
@@ -40,7 +40,7 @@ for deployment_name in $packetgen_deployment_name $firewall_deployment_name; do
     echo "=== Virtlet details ===="
     echo "$(kubectl plugin virt virsh dumpxml $vm | grep VIRTLET_)\n"
 done
-popd
 
 # Teardown
 #teardown $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
+popd

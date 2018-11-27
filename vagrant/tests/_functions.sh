@@ -12,6 +12,66 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+function _get_ovn_central_address {
+    ansible_ifconfig=$(ansible -i $test_folder/../inventory/hosts.ini -l ovn-central[0] -m shell -a "ifconfig eth1 |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'" all)
+    if [[ $ansible_ifconfig != *SUCCESS* ]]; then
+        echo "Fail to get the OVN central IP address from eth1 nic"
+        exit
+    fi
+    echo "$(echo ${ansible_ifconfig#*>>} | tr '\n' ':')6641"
+}
+
+# install_ovn_deps() - Install dependencies required for tests that require OVN
+function install_ovn_deps {
+    if ! $(yq --version &>/dev/null); then
+        pip install yq
+    fi
+    if ! $(ovn-nbctl --version &>/dev/null); then
+        source /etc/os-release || source /usr/lib/os-release
+        case ${ID,,} in
+            *suse)
+            ;;
+            ubuntu|debian)
+                apt-get install -y apt-transport-https
+                echo "deb https://packages.wand.net.nz $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/wand.list
+                curl https://packages.wand.net.nz/keyring.gpg -o /etc/apt/trusted.gpg.d/wand.gpg
+                apt-get update
+                apt install -y ovn-common
+            ;;
+            rhel|centos|fedora)
+            ;;
+        esac
+    fi
+}
+
+# init_network() - This function creates the OVN resouces required by the test
+function init_network {
+    local fname=$1
+    local router_name="ovn4nfv-master"
+
+    name=$(cat $fname | yq '.spec.name' | xargs)
+    subnet=$(cat $fname  | yq '.spec.subnet' | xargs)
+    gateway=$(cat $fname  | yq '.spec.gateway' | xargs)
+    ovn_central_address=$(_get_ovn_central_address)
+
+    router_mac=$(printf '00:00:00:%02X:%02X:%02X' $[RANDOM%256] $[RANDOM%256] $[RANDOM%256])
+    ovn-nbctl --may-exist --db tcp:$ovn_central_address ls-add $name -- set logical_switch $name other-config:subnet=$subnet external-ids:gateway_ip=$gateway
+    ovn-nbctl --may-exist --db tcp:$ovn_central_address lrp-add $router_name rtos-$name $router_mac $gateway
+    ovn-nbctl --may-exist --db tcp:$ovn_central_address lsp-add $name stor-$name -- set logical_switch_port stor-$name type=router options:router-port=rtos-$name addresses=\"$router_mac\"
+}
+
+# cleanup_network() - This function removes the OVN resources created for the test
+function cleanup_network {
+    local fname=$1
+
+    name=$(cat $fname | yq '.spec.name' | xargs)
+    ovn_central_address=$(_get_ovn_central_address)
+
+    for cmd in "ls-del $name" "lrp-del rtos-$name" "lsp-del stor-$name"; do
+        ovn-nbctl --if-exist --db tcp:$ovn_central_address $cmd
+    done
+}
+
 function _checks_args {
     if [[ -z $1 ]]; then
         echo "Missing CSAR ID argument"

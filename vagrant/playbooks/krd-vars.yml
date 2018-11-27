@@ -11,12 +11,12 @@
 base_dest: /tmp
 
 multus_dest: "{{ base_dest }}/multus-cni"
-multus_source_type: "tarball"
-multus_version: 3.1
-multus_url: "https://github.com/intel/multus-cni/releases/download/v{{ multus_version }}/multus-cni_v{{ multus_version }}_linux_amd64.tar.gz"
-#multus_source_type: "source"
-#multus_version: def72938cd2fb272eb3a6f64a8162b1049404357
-#multus_url: "https://github.com/intel/multus-cni"
+#multus_source_type: "tarball"
+#multus_version: 3.1
+#multus_url: "https://github.com/intel/multus-cni/releases/download/v{{ multus_version }}/multus-cni_v{{ multus_version }}_linux_amd64.tar.gz"
+multus_source_type: "source"
+multus_version: 366f2120cb88c85deab6343b7062fd38fdb0ece9
+multus_url: "https://github.com/ritusood/multus-cni"
 
 ovn_kubernetes_dest: "{{ base_dest }}/ovn-kubernetes"
 ovn_kubernetes_source_type: "tarball"
@@ -52,6 +52,12 @@ istio_version: 1.0.3
 istio_url: "https://github.com/istio/istio/releases/download/{{ istio_version }}/istio-{{ istio_version }}-linux.tar.gz"
 
 go_version: '1.11'
+go_path: "{{ base_dest }}/go"
+ovn4nfv_dest: "{{ go_path }}/src/ovn4nfv-k8s-plugin"
+ovn4nfv_source_type: "source"
+ovn4nfv_version: 5026d1d89b05eac5e004279b742df6745a73d93a
+ovn4nfv_url: "https://git.opnfv.org/ovn4nfv-k8s-plugin/"
+
 kubespray_version: 2.7.0
 kubectl_version: 1.11.2
 helm_client_version: 2.9.1

@@ -29,9 +29,9 @@ import (
 // Definition contains the parameters needed for resource bundle (rb) definitions
 // It implements the interface for managing the definitions
 type Definition struct {
+	UUID        string `json:"uuid,omitempty"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	UUID        string `json:"uuid,omitempty"`
 	ServiceType string `json:"service-type"`
 }
 
@@ -87,11 +87,12 @@ func (v *DefinitionClient) List() ([]Definition, error) {
 
 	var results []Definition
 	for key, value := range res {
+		//value is a byte array
 		if len(value) > 0 {
 			def := Definition{}
 			err = db.DBconn.Unmarshal(value, &def)
 			if err != nil {
-				log.Printf("Error Unmarshaling value for: %s", key)
+				log.Printf("[Definition] Error Unmarshaling value for: %s", key)
 				continue
 			}
 			results = append(results, def)
@@ -108,6 +109,7 @@ func (v *DefinitionClient) Get(id string) (Definition, error) {
 		return Definition{}, pkgerrors.Wrap(err, "Get Resource Bundle definition")
 	}
 
+	//value is a byte array
 	if value != nil {
 		def := Definition{}
 		err = db.DBconn.Unmarshal(value, &def)
@@ -124,7 +126,7 @@ func (v *DefinitionClient) Get(id string) (Definition, error) {
 func (v *DefinitionClient) Delete(id string) error {
 	err := db.DBconn.Delete(v.storeName, id, v.tagMeta)
 	if err != nil {
-		return pkgerrors.Wrap(err, "Delete Resource Bundle Definitions")
+		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition")
 	}
 
 	return nil
@@ -136,7 +138,7 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 	//ignore the returned data here
 	_, err := v.Get(id)
 	if err != nil {
-		return pkgerrors.Errorf("Invalid ID provided: %s", err.Error())
+		return pkgerrors.Errorf("Invalid Definition ID provided: %s", err.Error())
 	}
 
 	err = isTarGz(bytes.NewBuffer(inp))
@@ -146,7 +148,7 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, id, encodedStr, v.tagContent)
+	err = db.DBconn.Create(v.storeName, id, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
 	}

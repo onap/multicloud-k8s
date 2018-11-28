@@ -298,7 +298,7 @@ func TestUpload(t *testing.T) {
 		{
 			label:         "Upload with an Invalid Resource Bundle Definition",
 			inp:           "123e4567-e89b-12d3-a456-426655440000",
-			expectedError: "Invalid ID provided",
+			expectedError: "Invalid Definition ID provided",
 			content: []byte{
 				0x1f, 0x8b, 0x08, 0x08, 0xb0, 0x6b, 0xf4, 0x5b,
 				0x00, 0x03, 0x74, 0x65, 0x73, 0x74, 0x2e, 0x74,

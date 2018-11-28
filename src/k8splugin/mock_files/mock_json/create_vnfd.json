@@ -1,6 +1,0 @@
-{
-    "name": "test-vnfd",
-    "description": "testing vnfd creation api",
-    "uuid": "",
-    "service-type": "firewall"
-}

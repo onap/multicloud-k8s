@@ -106,6 +106,7 @@ func NewRouter(kubeconfig string) *mux.Router {
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", DeleteHandler).Methods("DELETE")
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", GetHandler).Methods("GET")
 
+	//rbd is resource bundle definition
 	resRouter := router.PathPrefix("/v1/rb").Subrouter()
 	rbdef := rbDefinitionHandler{client: rb.NewDefinitionClient()}
 	resRouter.HandleFunc("/definition", rbdef.createHandler).Methods("POST")
@@ -113,6 +114,15 @@ func NewRouter(kubeconfig string) *mux.Router {
 	resRouter.HandleFunc("/definition", rbdef.listHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbdID}", rbdef.getHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbdID}", rbdef.deleteHandler).Methods("DELETE")
+
+	//rbp is resource bundle profile
+	rbprofile := rbProfileHandler{client: rb.NewProfileClient()}
+	resRouter.HandleFunc("/profile", rbprofile.createHandler).Methods("POST")
+	resRouter.HandleFunc("/profile/{rbpID}/content", rbprofile.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/profile/help", rbprofile.helpHandler).Methods("GET")
+	resRouter.HandleFunc("/profile", rbprofile.listHandler).Methods("GET")
+	resRouter.HandleFunc("/profile/{rbpID}", rbprofile.getHandler).Methods("GET")
+	resRouter.HandleFunc("/profile/{rbpID}", rbprofile.deleteHandler).Methods("DELETE")
 
 	// (TODO): Fix update method
 	// vnfInstanceHandler.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

@@ -1,0 +1,7 @@
+{
+    "name": "test-rbprofile",
+    "description": "testing resource bundle profile api",
+    "rbdid": "7eb09e38-4363-9942-1234-3beb2e95fd85",
+    "uuid": "7eb09e38-4363-9942-5678-3beb2e95fd85",
+    "service-type": "firewall"
+}

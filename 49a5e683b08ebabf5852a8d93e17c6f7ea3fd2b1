@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_3bc17ee4",
+        "filename": "vagrant/playbooks/configure-ovn4nfv.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2018-11-30T18:40:58Z",
+      "side": 1,
+      "message": "change this name to ovn4nfv_k8s.conf. This is the default name expected by ovn4nfvk8s plugin",
+      "range": {
+        "startLine": 46,
+        "startChar": 31,
+        "endLine": 46,
+        "endChar": 42
+      },
+      "revId": "49a5e683b08ebabf5852a8d93e17c6f7ea3fd2b1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

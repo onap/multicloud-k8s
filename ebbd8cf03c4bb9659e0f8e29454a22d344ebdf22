@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_44457eb1",
+        "filename": "vagrant/tests/ovn4nfv.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2018-12-04T17:56:43Z",
+      "side": 1,
+      "message": "File not accessible in the path",
+      "range": {
+        "startLine": 45,
+        "startChar": 16,
+        "endLine": 45,
+        "endChar": 33
+      },
+      "revId": "ebbd8cf03c4bb9659e0f8e29454a22d344ebdf22",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_e41352b6",
+        "filename": "vagrant/tests/ovn4nfv.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2018-12-04T17:56:43Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 46,
+        "startChar": 16,
+        "endLine": 46,
+        "endChar": 33
+      },
+      "revId": "ebbd8cf03c4bb9659e0f8e29454a22d344ebdf22",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

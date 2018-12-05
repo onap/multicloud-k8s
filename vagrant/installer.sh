@@ -111,6 +111,7 @@ function install_k8s {
     else
         echo "kube_log_level: 2" | tee $krd_inventory_folder/group_vars/all.yml
     fi
+    echo "kubeadm_enabled: true" | tee --append $krd_inventory_folder/group_vars/all.yml
     if [[ -n "${http_proxy}" ]]; then
         echo "http_proxy: \"$http_proxy\"" | tee --append $krd_inventory_folder/group_vars/all.yml
     fi

@@ -111,7 +111,7 @@ necessary to remove those instructions from all the ansible playbooks.
 
 .. code-block:: bash
 
-    # sed -i '/andrewrothstein.kubectl/d' playbooks/configure-*.ymlb
+    # sed -i '/andrewrothstein.kubectl/d' playbooks/configure-*.yml
 
 Ansible uses SSH protocol for executing remote instructions. The following
 instructions create and register ssh keys which avoid the usage of passwords.

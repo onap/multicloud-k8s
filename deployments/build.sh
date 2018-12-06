@@ -35,7 +35,9 @@ function _cleanup {
     echo "Cleaning previous execution"
     docker-compose kill
     image=$(grep "image.*k8plugin" docker-compose.yml)
-    docker images ${image#*:} -q | xargs docker rmi -f
+    if [[ -n ${image} ]]; then
+        docker images ${image#*:} -q | xargs docker rmi -f
+    fi
     docker ps -a --filter "status=exited" -q | xargs docker rm
 }
 

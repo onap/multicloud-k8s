@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_d427d7b4",
+        "filename": "src/k8splugin/plugins/network/plugin_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-06T00:35:22Z",
+      "side": 1,
+      "message": "s/Create/Delete",
+      "range": {
+        "startLine": 164,
+        "startChar": 15,
+        "endLine": 164,
+        "endChar": 21
+      },
+      "revId": "a1abd829315d72adb258da20470eaa2445cf3e32",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_f42a1b7d",
+        "filename": "src/k8splugin/plugins/network/plugin_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-06T00:35:22Z",
+      "side": 1,
+      "message": "ditto: line 164",
+      "range": {
+        "startLine": 167,
+        "startChar": 15,
+        "endLine": 167,
+        "endChar": 21
+      },
+      "revId": "a1abd829315d72adb258da20470eaa2445cf3e32",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

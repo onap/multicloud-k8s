@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_a89d145b",
+        "filename": "vagrant/installer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2018-12-07T21:06:00Z",
+      "side": 1,
+      "message": "Changes here don\u0027t seem to be related to ovn4nfv integration",
+      "revId": "34c645017e73a9ddb3d5c96a387d7519aa5d04bd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

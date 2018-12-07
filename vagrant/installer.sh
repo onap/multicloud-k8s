@@ -21,33 +21,31 @@ function _install_go {
     fi
 
     wget https://dl.google.com/go/$tarball
-    tar -C /usr/local -xzf $tarball
+    sudo tar -C /usr/local -xzf $tarball
     rm $tarball
 
     export PATH=$PATH:/usr/local/go/bin
-    sed -i "s|^PATH=.*|PATH=\"$PATH\"|" /etc/environment
-    export INSTALL_DIRECTORY=/usr/local/bin
-    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    sudo sed -i "s|^PATH=.*|PATH=\"$PATH\"|" /etc/environment
 }
 
 # _install_pip() - Install Python Package Manager
 function _install_pip {
     if $(pip --version &>/dev/null); then
-        return
+        sudo apt-get install -y python-dev
+        curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
+    else
+        sudo -E pip install --upgrade pip
     fi
-    apt-get install -y python-dev
-    curl -sL https://bootstrap.pypa.io/get-pip.py | python
-    pip install --upgrade pip
 }
 
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
-    mkdir -p /etc/ansible/
+    sudo mkdir -p /etc/ansible/
     if $(ansible --version &>/dev/null); then
         return
     fi
     _install_pip
-    pip install ansible
+    sudo -E pip install ansible
 }
 
 # _install_docker() - Download and install docker-engine
@@ -57,36 +55,33 @@ function _install_docker {
     if $(docker version &>/dev/null); then
         return
     fi
-    apt-get install -y software-properties-common linux-image-extra-$(uname -r) linux-image-extra-virtual apt-transport-https ca-certificates curl
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    apt-get update
-    apt-get install -y docker-ce
+    sudo apt-get install -y software-properties-common linux-image-extra-$(uname -r) linux-image-extra-virtual apt-transport-https ca-certificates curl
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    sudo apt-get install -y docker-ce
 
-    mkdir -p /etc/systemd/system/docker.service.d
+    sudo mkdir -p /etc/systemd/system/docker.service.d
     if [ $http_proxy ]; then
-        cat <<EOL > /etc/systemd/system/docker.service.d/http-proxy.conf
-[Service]
-Environment="HTTP_PROXY=$http_proxy"
-EOL
+        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
+        echo "Environment=\"HTTP_PROXY=$http_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/http-proxy.conf
     fi
     if [ $https_proxy ]; then
-        cat <<EOL > /etc/systemd/system/docker.service.d/https-proxy.conf
-[Service]
-Environment="HTTPS_PROXY=$https_proxy"
-EOL
+        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/https-proxy.conf
+        echo "Environment=\"HTTPS_PROXY=$https_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/https-proxy.conf
     fi
     if [ $no_proxy ]; then
-        cat <<EOL > /etc/systemd/system/docker.service.d/no-proxy.conf
-[Service]
-Environment="NO_PROXY=$no_proxy"
-EOL
+        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/no-proxy.conf
+        echo "Environment=\"NO_PROXY=$no_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/no-proxy.conf
     fi
-    systemctl daemon-reload
-    echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --max-concurrent-downloads $max_concurrent_downloads \"" | tee --append /etc/default/docker
-    usermod -aG docker $USER
+    sudo systemctl daemon-reload
+    echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --max-concurrent-downloads $max_concurrent_downloads \"" | sudo tee --append /etc/default/docker
+    if [[ -z $(groups | grep docker) ]]; then
+        sudo usermod -aG docker $USER
+        newgrp docker
+    fi
 
-    systemctl restart docker
+    sudo systemctl restart docker
     sleep 10
 }
 
@@ -95,16 +90,20 @@ function install_k8s {
     echo "Deploying kubernetes"
     local dest_folder=/opt
     version=$(grep "kubespray_version" ${krd_playbooks}/krd-vars.yml | awk -F ': ' '{print $2}')
+    local_release_dir=$(grep "local_release_dir" $krd_inventory_folder/group_vars/k8s-cluster.yml | awk -F "\"" '{print $2}')
     local tarball=v$version.tar.gz
 
-    apt-get install -y sshpass
+    sudo apt-get install -y sshpass
+    _install_docker
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
-    tar -C $dest_folder -xzf $tarball
-    mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
+    sudo tar -C $dest_folder -xzf $tarball
+    sudo mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
+    sudo chown -R $USER $dest_folder/kubespray-$version
+    sudo mkdir -p ${local_release_dir}/containers
     rm $tarball
 
-    pip install -r $dest_folder/kubespray-$version/requirements.txt
+    sudo -E pip install -r $dest_folder/kubespray-$version/requirements.txt
     rm -f $krd_inventory_folder/group_vars/all.yml 2> /dev/null
     if [[ -n "${verbose}" ]]; then
         echo "kube_log_level: 5" | tee $krd_inventory_folder/group_vars/all.yml
@@ -118,23 +117,23 @@ function install_k8s {
     if [[ -n "${https_proxy}" ]]; then
         echo "https_proxy: \"$https_proxy\"" | tee --append $krd_inventory_folder/group_vars/all.yml
     fi
-    ansible-playbook $verbose -i $krd_inventory $dest_folder/kubespray-$version/cluster.yml -b | tee $log_folder/setup-kubernetes.log
+    ansible-playbook $verbose -i $krd_inventory $dest_folder/kubespray-$version/cluster.yml --become --become-user=root | sudo tee $log_folder/setup-kubernetes.log
 
     # Configure environment
     mkdir -p $HOME/.kube
-    mv $krd_inventory_folder/artifacts/admin.conf $HOME/.kube/config
+    cp $krd_inventory_folder/artifacts/admin.conf $HOME/.kube/config
 }
 
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
     echo "Installing Kubernetes AddOns"
     _install_ansible
-    ansible-galaxy install $verbose -r $krd_folder/galaxy-requirements.yml --ignore-errors
+    sudo ansible-galaxy install $verbose -r $krd_folder/galaxy-requirements.yml --ignore-errors
 
-    ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-krd.yml | tee $log_folder/setup-krd.log
+    ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-krd.yml | sudo tee $log_folder/setup-krd.log
     for addon in ${KRD_ADDONS:-virtlet ovn-kubernetes multus}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
-        ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-${addon}.yml | tee $log_folder/setup-${addon}.log
+        ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
         if [[ "${testing_enabled}" == "true" ]]; then
             pushd $krd_tests
             bash ${addon}.sh
@@ -148,17 +147,15 @@ function install_plugin {
     echo "Installing multicloud/k8s plugin"
     _install_go
     _install_docker
-    pip install docker-compose
+    sudo -E pip install docker-compose
 
-    mkdir -p /opt/{kubeconfig,consul/config}
-    cp $HOME/.kube/config /opt/kubeconfig/krd
+    sudo mkdir -p /opt/{kubeconfig,consul/config}
+    sudo cp $HOME/.kube/config /opt/kubeconfig/krd
     export KUBE_CONFIG_DIR=/opt/kubeconfig
-    echo "export KUBE_CONFIG_DIR=${KUBE_CONFIG_DIR}" >> /etc/environment
+    echo "export KUBE_CONFIG_DIR=${KUBE_CONFIG_DIR}" | sudo tee --append /etc/environment
 
-    GOPATH=$(go env GOPATH)
-    pushd $GOPATH/src/k8-plugin-multicloud/deployments
-    ./build.sh
-
+    pushd $krd_folder/../deployments
+    sudo ./build.sh
     if [[ "${testing_enabled}" == "true" ]]; then
         docker-compose up -d
         pushd $krd_tests
@@ -206,25 +203,25 @@ fi
 # Configuration values
 log_folder=/var/log/krd
 krd_folder=$(pwd)
-krd_inventory_folder=$krd_folder/inventory
+export krd_inventory_folder=$krd_folder/inventory
 krd_inventory=$krd_inventory_folder/hosts.ini
 krd_playbooks=$krd_folder/playbooks
 krd_tests=$krd_folder/tests
 k8s_info_file=$krd_folder/k8s_info.log
 testing_enabled=${KRD_ENABLE_TESTS:-false}
 
-mkdir -p $log_folder
-mkdir -p /opt/csar
+sudo mkdir -p $log_folder
+sudo mkdir -p /opt/csar
 export CSAR_DIR=/opt/csar
-echo "export CSAR_DIR=${CSAR_DIR}" | tee --append /etc/environment
+echo "export CSAR_DIR=${CSAR_DIR}" | sudo tee --append /etc/environment
 
 # Install dependencies
 # Setup proxy variables
 if [ -f $krd_folder/sources.list ]; then
-    mv /etc/apt/sources.list /etc/apt/sources.list.backup
-    cp $krd_folder/sources.list /etc/apt/sources.list
+    sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup
+    sudo cp $krd_folder/sources.list /etc/apt/sources.list
 fi
-apt-get update
+sudo apt-get update
 install_k8s
 install_addons
 if [[ "${KRD_PLUGIN_ENABLED:-false}" ]]; then

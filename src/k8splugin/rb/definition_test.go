@@ -24,7 +24,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/consul/api"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -110,21 +109,17 @@ func TestList(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "rb/def/123e4567-e89b-12d3-a456-426655440000",
-						Value: []byte("{\"name\":\"testresourcebundle\"," +
+				Items: map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": []byte(
+						"{\"name\":\"testresourcebundle\"," +
 							"\"description\":\"testresourcebundle\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
 							"\"service-type\":\"firewall\"}"),
-					},
-					&api.KVPair{
-						Key: "rb/def/123e4567-e89b-12d3-a456-426655441111",
-						Value: []byte("{\"name\":\"testresourcebundle2\"," +
+					"123e4567-e89b-12d3-a456-426655441111": []byte(
+						"{\"name\":\"testresourcebundle2\"," +
 							"\"description\":\"testresourcebundle2\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
 							"\"service-type\":\"dns\"}"),
-					},
 				},
 			},
 		},
@@ -179,14 +174,12 @@ func TestGet(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "rb/def/123e4567-e89b-12d3-a456-426655440000",
-						Value: []byte("{\"name\":\"testresourcebundle\"," +
+				Items: map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": []byte(
+						"{\"name\":\"testresourcebundle\"," +
 							"\"description\":\"testresourcebundle\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
 							"\"service-type\":\"firewall\"}"),
-					},
 				},
 			},
 		},
@@ -293,14 +286,12 @@ func TestUpload(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "rb/def/123e4567-e89b-12d3-a456-426655440000",
-						Value: []byte("{\"name\":\"testresourcebundle\"," +
+				Items: map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": []byte(
+						"{\"name\":\"testresourcebundle\"," +
 							"\"description\":\"testresourcebundle\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
 							"\"service-type\":\"firewall\"}"),
-					},
 				},
 			},
 		},
@@ -330,14 +321,12 @@ func TestUpload(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "rb/def/123e4567-e89b-12d3-a456-426655441111",
-						Value: []byte("{\"name\":\"testresourcebundle\"," +
+				Items: map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655441111": []byte(
+						"{\"name\":\"testresourcebundle\"," +
 							"\"description\":\"testresourcebundle\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
 							"\"service-type\":\"firewall\"}"),
-					},
 				},
 			},
 		},
@@ -350,14 +339,12 @@ func TestUpload(t *testing.T) {
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
 			},
 			mockdb: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "rb/def/123e4567-e89b-12d3-a456-426655440000",
-						Value: []byte("{\"name\":\"testresourcebundle\"," +
+				Items: map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": []byte(
+						"{\"name\":\"testresourcebundle\"," +
 							"\"description\":\"testresourcebundle\"," +
 							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
 							"\"service-type\":\"firewall\"}"),
-					},
 				},
 			},
 		},

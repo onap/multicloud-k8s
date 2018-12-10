@@ -19,6 +19,7 @@ package rb
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"k8splugin/db"
 	"log"
 
@@ -47,15 +48,19 @@ type DefinitionManager interface {
 // DefinitionClient implements the DefinitionManager
 // It will also be used to maintain some localized state
 type DefinitionClient struct {
-	keyPrefix string
+	storeName           string
+	tagMeta, tagContent string
 }
 
 // NewDefinitionClient returns an instance of the DefinitionClient
 // which implements the DefinitionManager
-// Uses rb/def prefix
+// Uses rbdef collection in underlying db
 func NewDefinitionClient() *DefinitionClient {
 	return &DefinitionClient{
-		keyPrefix: "rb/def/"}
+		storeName:  "rbdef",
+		tagMeta:    "metadata",
+		tagContent: "content",
+	}
 }
 
 // Create an entry for the resource in the database
@@ -64,14 +69,9 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 	if def.UUID == "" {
 		def.UUID, _ = uuid.GenerateUUID()
 	}
-	key := v.keyPrefix + def.UUID
+	key := def.UUID
 
-	serData, err := db.Serialize(def)
-	if err != nil {
-		return Definition{}, pkgerrors.Wrap(err, "Serialize Resource Bundle Definition")
-	}
-
-	err = db.DBconn.Create(key, serData)
+	err := db.DBconn.Create(v.storeName, key, v.tagMeta, def)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -81,24 +81,19 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 
 // List all resource entries in the database
 func (v *DefinitionClient) List() ([]Definition, error) {
-	strArray, err := db.DBconn.ReadAll(v.keyPrefix)
+	byteSlice, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
 	if err != nil {
 		return []Definition{}, pkgerrors.Wrap(err, "Listing Resource Bundle Definitions")
 	}
 
 	var retData []Definition
 
-	for _, key := range strArray {
-		value, err := db.DBconn.Read(key)
-		if err != nil {
-			log.Printf("Error Reading Key: %s", key)
-			continue
-		}
-		if value != "" {
+	for _, key := range byteSlice {
+		if key != nil {
 			def := Definition{}
-			err = db.DeSerialize(value, &def)
+			err = json.Unmarshal(key, &def)
 			if err != nil {
-				log.Printf("Error Deserializing Value: %s", value)
+				log.Printf("Error Unmarshaling data: %s", key)
 				continue
 			}
 			retData = append(retData, def)
@@ -110,14 +105,14 @@ func (v *DefinitionClient) List() ([]Definition, error) {
 
 // Get returns the Resource Bundle Definition for corresponding ID
 func (v *DefinitionClient) Get(id string) (Definition, error) {
-	value, err := db.DBconn.Read(v.keyPrefix + id)
+	value, err := db.DBconn.Read(v.storeName, id, v.tagMeta)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Get Resource Bundle definition")
 	}
 
-	if value != "" {
+	if value != nil {
 		def := Definition{}
-		err = db.DeSerialize(value, &def)
+		err = json.Unmarshal(value, &def)
 		if err != nil {
 			return Definition{}, pkgerrors.Wrap(err, "Deserializing Value")
 		}
@@ -129,7 +124,7 @@ func (v *DefinitionClient) Get(id string) (Definition, error) {
 
 // Delete the Resource Bundle definition from database
 func (v *DefinitionClient) Delete(id string) error {
-	err := db.DBconn.Delete(v.keyPrefix + id)
+	err := db.DBconn.Delete(v.storeName, id, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definitions")
 	}
@@ -140,20 +135,14 @@ func (v *DefinitionClient) Delete(id string) error {
 // Upload the contents of resource bundle into database
 func (v *DefinitionClient) Upload(id string, inp []byte) error {
 
-	//ignore the returned data here.
-	_, err := v.Get(id)
-	if err != nil {
-		return pkgerrors.Errorf("Invalid ID provided %s", err.Error())
-	}
-
-	err = isTarGz(bytes.NewBuffer(inp))
+	err := isTarGz(bytes.NewBuffer(inp))
 	if err != nil {
 		return pkgerrors.Errorf("Error in file format %s", err.Error())
 	}
 
+	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	key := v.keyPrefix + id + "/content"
-	err = db.DBconn.Create(key, encodedStr)
+	err = db.DBconn.Create(v.storeName, id, encodedStr, v.tagContent)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
 	}

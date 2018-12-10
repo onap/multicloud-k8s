@@ -15,51 +15,43 @@ limitations under the License.
 
 package db
 
-import (
-	"github.com/hashicorp/consul/api"
-)
+import ()
 
 //Creating an embedded interface via anonymous variable
 //This allows us to make mockDB satisfy the DatabaseConnection
 //interface even if we are not implementing all the methods in it
 type MockDB struct {
 	Store
-	Items api.KVPairs
+	Items map[string][]byte
 	Err   error
 }
 
-func (m *MockDB) Create(key string, value string) error {
+func (m *MockDB) Create(table, key, tag string, data interface{}) error {
 	return m.Err
 }
 
-func (m *MockDB) Read(key string) (string, error) {
+func (m *MockDB) Read(table, key, tag string) ([]byte, error) {
 	if m.Err != nil {
-		return "", m.Err
+		return nil, m.Err
 	}
 
-	for _, kvpair := range m.Items {
-		if kvpair.Key == key {
-			return string(kvpair.Value), nil
+	for k, v := range m.Items {
+		if k == key {
+			return v, nil
 		}
 	}
 
-	return "", nil
+	return nil, m.Err
 }
 
-func (m *MockDB) Delete(key string) error {
+func (m *MockDB) Delete(table, key, tag string) error {
 	return m.Err
 }
 
-func (m *MockDB) ReadAll(prefix string) ([]string, error) {
+func (m *MockDB) ReadAll(table, tag string) (map[string][]byte, error) {
 	if m.Err != nil {
-		return []string{}, m.Err
+		return nil, m.Err
 	}
 
-	var res []string
-
-	for _, keypair := range m.Items {
-		res = append(res, keypair.Key)
-	}
-
-	return res, nil
+	return m.Items, nil
 }

@@ -24,7 +24,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/hashicorp/consul/api"
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
@@ -194,37 +193,18 @@ func TestListHandler(t *testing.T) {
 			},
 		},
 		{
-			label:        "Get result from DB non-records",
-			expectedCode: http.StatusNotFound,
-			mockStore:    &db.MockDB{},
-		},
-		{
 			label:            "Get empty list",
 			expectedCode:     http.StatusOK,
 			expectedResponse: []string{""},
-			mockStore: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key:   "",
-						Value: []byte("{}"),
-					},
-				},
-			},
+			mockStore:        &db.MockDB{},
 		},
 		{
 			label:            "Succesful get a list of VNF",
 			expectedCode:     http.StatusOK,
-			expectedResponse: []string{"uid1", "uid2"},
+			expectedResponse: []string{"uid1"},
 			mockStore: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key:   "uuid1",
-						Value: []byte("{}"),
-					},
-					&api.KVPair{
-						Key:   "uuid2",
-						Value: []byte("{}"),
-					},
+				Items: map[string][]byte{
+					"uuid1": []byte("{}"),
 				},
 			},
 		},
@@ -275,20 +255,17 @@ func TestDeleteHandler(t *testing.T) {
 		},
 		{
 			label:        "Fail to find VNF record be deleted",
-			expectedCode: http.StatusNotFound,
+			expectedCode: http.StatusInternalServerError,
 			mockStore: &db.MockDB{
-				Items: api.KVPairs{},
+				Items: map[string][]byte{},
 			},
 		},
 		{
 			label:        "Fail to unmarshal the DB record",
 			expectedCode: http.StatusInternalServerError,
 			mockStore: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key:   "cloudregion1-testnamespace-uuid1",
-						Value: []byte("{invalid format}"),
-					},
+				Items: map[string][]byte{
+					"cloudregion1-testnamespace-uuid1": []byte("{invalid format}"),
 				},
 			},
 		},
@@ -297,14 +274,10 @@ func TestDeleteHandler(t *testing.T) {
 			expectedCode:        http.StatusInternalServerError,
 			mockGetVNFClientErr: pkgerrors.New("Get VNF client error"),
 			mockStore: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "cloudregion1-testnamespace-uuid1",
-						Value: []byte("{" +
-							"\"deployment\": [\"deploy1\", \"deploy2\"]," +
-							"\"service\": [\"svc1\", \"svc2\"]" +
-							"}"),
-					},
+				Items: map[string][]byte{
+					"cloudregion1-testnamespace-uuid1": []byte(
+						"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
+							"\"service\": [\"svc1\", \"svc2\"]}"),
 				},
 			},
 		},
@@ -312,14 +285,10 @@ func TestDeleteHandler(t *testing.T) {
 			label:        "Fail to destroy VNF",
 			expectedCode: http.StatusInternalServerError,
 			mockStore: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "cloudregion1-testnamespace-uuid1",
-						Value: []byte("{" +
-							"\"deployment\": [\"deploy1\", \"deploy2\"]," +
-							"\"service\": [\"svc1\", \"svc2\"]" +
-							"}"),
-					},
+				Items: map[string][]byte{
+					"cloudregion1-testnamespace-uuid1": []byte(
+						"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
+							"\"service\": [\"svc1\", \"svc2\"]}"),
 				},
 			},
 			mockDeleteVNF: &mockCSAR{
@@ -330,14 +299,10 @@ func TestDeleteHandler(t *testing.T) {
 			label:        "Succesful delete a VNF",
 			expectedCode: http.StatusAccepted,
 			mockStore: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "cloudregion1-testnamespace-uuid1",
-						Value: []byte("{" +
-							"\"deployment\": [\"deploy1\", \"deploy2\"]," +
-							"\"service\": [\"svc1\", \"svc2\"]" +
-							"}"),
-					},
+				Items: map[string][]byte{
+					"cloudregion1-testnamespace-uuid1": []byte(
+						"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
+							"\"service\": [\"svc1\", \"svc2\"]}"),
 				},
 			},
 			mockDeleteVNF: &mockCSAR{},
@@ -440,18 +405,15 @@ func TestGetHandler(t *testing.T) {
 		},
 		{
 			label:        "Not found DB record",
-			expectedCode: http.StatusNotFound,
+			expectedCode: http.StatusInternalServerError,
 			mockStore:    &db.MockDB{},
 		},
 		{
 			label:        "Fail to unmarshal the DB record",
 			expectedCode: http.StatusInternalServerError,
 			mockStore: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key:   "cloud1-default-1",
-						Value: []byte("{invalid-format}"),
-					},
+				Items: map[string][]byte{
+					"cloud1-default-1": []byte("{invalid-format}"),
 				},
 			},
 		},
@@ -468,18 +430,11 @@ func TestGetHandler(t *testing.T) {
 				},
 			},
 			mockStore: &db.MockDB{
-				Items: api.KVPairs{
-					&api.KVPair{
-						Key: "cloud1-default-1",
-						Value: []byte("{" +
-							"\"deployment\": [\"deploy1\", \"deploy2\"]," +
-							"\"service\": [\"svc1\", \"svc2\"]" +
-							"}"),
-					},
-					&api.KVPair{
-						Key:   "cloud1-default-2",
-						Value: []byte("{}"),
-					},
+				Items: map[string][]byte{
+					"cloud1-default-1": []byte(
+						"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
+							"\"service\": [\"svc1\", \"svc2\"]}"),
+					"cloud1-default-2": []byte("{}"),
 				},
 			},
 		},

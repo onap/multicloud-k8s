@@ -30,6 +30,10 @@ import (
 	"k8splugin/krd"
 )
 
+//TODO: Separate the http handler code and backend code out
+var storeName = "rbinst"
+var tagData = "data"
+
 // GetVNFClient retrieves the client used to communicate with a Kubernetes Cluster
 var GetVNFClient = func(kubeConfigPath string) (kubernetes.Clientset, error) {
 	client, err := krd.GetKubeClient(kubeConfigPath)
@@ -117,17 +121,9 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: Uncomment when annotations are done
 	// krd.AddNetworkAnnotationsToPod(kubeData, resource.Networks)
 
-	// "{"deployment":<>,"service":<>}"
-	serializedResourceNameMap, err := db.Serialize(resourceNameMap)
-	if err != nil {
-		werr := pkgerrors.Wrap(err, "Create VNF deployment JSON Marshalling error")
-		http.Error(w, werr.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	err = db.DBconn.Create(internalVNFID, serializedResourceNameMap)
+	err = db.DBconn.Create(storeName, internalVNFID, tagData, resourceNameMap)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Create VNF deployment DB error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
@@ -154,15 +150,10 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 	namespace := vars["namespace"]
 	prefix := cloudRegionID + "-" + namespace
 
-	internalVNFIDs, err := db.DBconn.ReadAll(prefix)
+	res, err := db.DBconn.ReadAll(storeName, tagData)
 	if err != nil {
 		http.Error(w, pkgerrors.Wrap(err, "Get VNF list error").Error(),
 			http.StatusInternalServerError)
-		return
-	}
-
-	if len(internalVNFIDs) == 0 {
-		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -172,9 +163,9 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 
 	var editedList []string
 
-	for _, id := range internalVNFIDs {
-		if len(id) > 0 {
-			editedList = append(editedList, strings.TrimPrefix(id, prefix)[1:])
+	for key, value := range res {
+		if len(value) > 0 {
+			editedList = append(editedList, strings.TrimPrefix(key, prefix)[1:])
 		}
 	}
 
@@ -204,14 +195,9 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	serializedResourceNameMap, err := db.DBconn.Read(internalVNFID)
+	res, err := db.DBconn.Read(storeName, internalVNFID, tagData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if serializedResourceNameMap == "" {
-		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -221,8 +207,8 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 			"service": ["cloud1-default-uuid-sisesvc1", "cloud1-default-uuid-sisesvc2", ... ]
 		},
 	*/
-	deserializedResourceNameMap := make(map[string][]string)
-	err = db.DeSerialize(serializedResourceNameMap, &deserializedResourceNameMap)
+	data := make(map[string][]string)
+	err = db.DBconn.Unmarshal(res, &data)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Unmarshal VNF error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
@@ -237,14 +223,14 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = csar.DestroyVNF(deserializedResourceNameMap, namespace, &kubeclient)
+	err = csar.DestroyVNF(data, namespace, &kubeclient)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Delete VNF error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = db.DBconn.Delete(internalVNFID)
+	err = db.DBconn.Delete(storeName, internalVNFID, tagData)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Delete VNF db record error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
@@ -337,14 +323,9 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	serializedResourceNameMap, err := db.DBconn.Read(internalVNFID)
+	res, err := db.DBconn.Read(storeName, internalVNFID, tagData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if serializedResourceNameMap == "" {
-		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -354,8 +335,8 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 			"service": ["cloud1-default-uuid-sisesvc1", "cloud1-default-uuid-sisesvc2", ... ]
 		},
 	*/
-	deserializedResourceNameMap := make(map[string][]string)
-	err = db.DeSerialize(serializedResourceNameMap, &deserializedResourceNameMap)
+	data := make(map[string][]string)
+	err = db.DBconn.Unmarshal(res, &data)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Unmarshal VNF error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
@@ -366,7 +347,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		VNFID:         externalVNFID,
 		CloudRegionID: cloudRegionID,
 		Namespace:     namespace,
-		VNFComponents: deserializedResourceNameMap,
+		VNFComponents: data,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

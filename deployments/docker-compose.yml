@@ -28,33 +28,28 @@ services:
     environment:
       - CSAR_DIR=/opt/csar
       - KUBE_CONFIG_DIR=/opt/kubeconfig
-      - DATABASE_TYPE=consul
+      - DATABASE_TYPE=mongo
       - DATABASE_IP=172.19.0.2
       - PLUGINS_DIR=/opt/multicloud/k8s
       - HTTP_PROXY=$HTTP_PROXY
       - HTTPS_PROXY=$HTTPS_PROXY
       - NO_PROXY=$NO_PROXY,172.19.0.2
     depends_on:
-      - consul
+      - mongo
     links:
-      - consul
+      - mongo
     volumes:
       - /opt/csar:/opt/csar
       - /opt/kubeconfig:/opt/kubeconfig
-  consul:
-    image: consul
+  mongo:
+    image: mongo
     networks:
       multicloud_net:
         ipv4_address: 172.19.0.2
     environment:
-      CONSUL_CLIENT_INTERFACE: 'eth0'
-      CONSUL_BIND_INTERFACE: 'eth0'
       HTTP_PROXY: $HTTP_PROXY
       HTTPS_PROXY: $HTTPS_PROXY
       NO_PROXY: $NO_PROXY
-    command: ["agent", "-server", "-bootstrap-expect=1"]
-    volumes:
-      - /opt/consul/config:/consul/config
 
 networks:
   multicloud_net:

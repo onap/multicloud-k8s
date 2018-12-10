@@ -19,13 +19,13 @@ export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 
 export CSAR_DIR=/opt/csar
 export KUBE_CONFIG_DIR=/opt/kubeconfig
-export DATABASE_TYPE=consul
+export DATABASE_TYPE=mongo
 export PLUGINS_DIR=$k8s_path/src/k8splugin/plugins
 
-echo "Starting consul services"
+echo "Starting mongo services"
 docker-compose kill
-docker-compose up -d consul
-export DATABASE_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aqf "name=consul"))
+docker-compose up -d mongo
+export DATABASE_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aqf "name=mongo"))
 export no_proxy=$no_proxy,$DATABASE_IP
 export NO_PROXY=$NO_PROXY,$DATABASE_IP
 

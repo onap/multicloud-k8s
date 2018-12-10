@@ -23,9 +23,9 @@ import (
 
 func TestCreateDBClient(t *testing.T) {
 	t.Run("Successfully create DB client", func(t *testing.T) {
-		expected := &ConsulStore{}
+		expected := &MongoStore{}
 
-		err := CreateDBClient("consul")
+		err := CreateDBClient("mongo")
 		if err != nil {
 			t.Fatalf("CreateDBClient returned an error (%s)", err)
 		}

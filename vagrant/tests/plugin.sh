@@ -88,7 +88,7 @@ echo "VNF details $vnf_details"
 
 echo "Deleting $vnf_id VNF Instance"
 curl -X DELETE "${base_url}${cloud_region_id}/${namespace}/${vnf_id}"
-if [[ -n $(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}/${vnf_id}") ]]; then
+if [[ 200 -eq $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}${cloud_region_id}/${namespace}/${vnf_id}") ]]; then
     echo "VNF Instance not deleted"
     exit 1
 fi

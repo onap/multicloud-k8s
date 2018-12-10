@@ -54,50 +54,64 @@ func NewConsulStore(store ConsulKVStore) (Store, error) {
 
 // HealthCheck verifies if the database is up and running
 func (c *ConsulStore) HealthCheck() error {
-	_, err := c.Read("test")
+	_, err := c.Read("test", "test", "test")
 	if err != nil {
 		return pkgerrors.New("[ERROR] Cannot talk to Datastore. Check if it is running/reachable.")
 	}
 	return nil
 }
 
+// Unmarshal implements any unmarshaling that is needed when using consul
+func (c *ConsulStore) Unmarshal(inp []byte, out interface{}) error {
+	return nil
+}
+
 // Create is used to create a DB entry
-func (c *ConsulStore) Create(key, value string) error {
+func (c *ConsulStore) Create(root, key, tag string, data interface{}) error {
+
+	value, err := Serialize(data)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Serializing input data")
+	}
+
 	p := &api.KVPair{
 		Key:   key,
 		Value: []byte(value),
 	}
-	_, err := c.client.Put(p, nil)
+	_, err = c.client.Put(p, nil)
 	return err
 }
 
 // Read method returns the internalID for a particular externalID
-func (c *ConsulStore) Read(key string) (string, error) {
+func (c *ConsulStore) Read(root, key, tag string) ([]byte, error) {
+	key = root + "/" + key + "/" + tag
 	pair, _, err := c.client.Get(key, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if pair == nil {
-		return "", nil
+		return nil, nil
 	}
-	return string(pair.Value), nil
+	return pair.Value, nil
 }
 
 // Delete method removes an internalID from the Database
-func (c *ConsulStore) Delete(key string) error {
+func (c *ConsulStore) Delete(root, key, tag string) error {
 	_, err := c.client.Delete(key, nil)
 	return err
 }
 
 // ReadAll is used to get all ExternalIDs in a namespace
-func (c *ConsulStore) ReadAll(prefix string) ([]string, error) {
-	pairs, _, err := c.client.List(prefix, nil)
+func (c *ConsulStore) ReadAll(root, tag string) (map[string][]byte, error) {
+	pairs, _, err := c.client.List(root, nil)
 	if err != nil {
 		return nil, err
 	}
-	var result []string
+
+	//TODO: Filter results by tag and return it
+	result := make(map[string][]byte)
 	for _, keypair := range pairs {
-		result = append(result, keypair.Key)
+		result[keypair.Key] = keypair.Value
 	}
 
 	return result, nil

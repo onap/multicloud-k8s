@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_538e94d1",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-12T05:34:30Z",
+      "side": 1,
+      "message": "Delete master table if this removes the last tag in it.",
+      "revId": "de765521787c039cb53c4171b1c8e90116bcb109",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

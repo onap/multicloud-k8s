@@ -1,0 +1,446 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_6b5ddc14",
+        "filename": "src/k8splugin/api/handler.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "nit: s/Seperate/Separate",
+      "range": {
+        "startLine": 33,
+        "startChar": 8,
+        "endLine": 33,
+        "endChar": 16
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_cbb2c805",
+        "filename": "src/k8splugin/api/handler.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "These variables seems to be close related to MongoDB client, shouldn\u0027t be better to declare them as fields of that client and keep the Store interface as it is, it that way we can support MongoDB and Consul",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 20
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_ab6744e8",
+        "filename": "src/k8splugin/db/consul.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "I prefer to keep this file even when it\u0027s not used anymore",
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4b6018cf",
+        "filename": "src/k8splugin/db/consul_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "The same applies to this one",
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_2ba35402",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "Basically this describes the singleton design pattern, isn\u0027t it?",
+      "range": {
+        "startLine": 64,
+        "startChar": 2,
+        "endLine": 65,
+        "endChar": 59
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_8bb12049",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "What about to use serverStatus function instead of creating and deleting a document?\n\n  https://docs.mongodb.com/manual/reference/method/db.serverStatus/",
+      "range": {
+        "startLine": 92,
+        "startChar": 1,
+        "endLine": 100,
+        "endChar": 2
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4be57836",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "Given that several methods are doing this validation shouldn\u0027t be better to create a private function that checks every field and return a specific error message, e.g. \"key fiel is empty\"?",
+      "range": {
+        "startLine": 154,
+        "startChar": 1,
+        "endLine": 156,
+        "endChar": 2
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4b8ed87a",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "This validation is already made by the Delete function",
+      "range": {
+        "startLine": 187,
+        "startChar": 1,
+        "endLine": 189,
+        "endChar": 2
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4bbc9806",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "s/Create/HealthCheck",
+      "range": {
+        "startLine": 150,
+        "startChar": 15,
+        "endLine": 150,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_6bb95c14",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "ditto line 150",
+      "range": {
+        "startLine": 153,
+        "startChar": 15,
+        "endLine": 153,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_2b3fd489",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "The output of the Read method shouldn\u0027t be ignored, this can also helps to validate the unmarshal method",
+      "range": {
+        "startLine": 333,
+        "startChar": 3,
+        "endLine": 333,
+        "endChar": 4
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_eb446c1c",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "s/Create/Read",
+      "range": {
+        "startLine": 337,
+        "startChar": 15,
+        "endLine": 337,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_8b4da040",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "ditto: line 340",
+      "range": {
+        "startLine": 340,
+        "startChar": 15,
+        "endLine": 340,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_cb3f2886",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "s/Create/Delete",
+      "range": {
+        "startLine": 447,
+        "startChar": 15,
+        "endLine": 447,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_cbdba84d",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "ditto line 447",
+      "range": {
+        "startLine": 450,
+        "startChar": 15,
+        "endLine": 450,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_ebe0ecfb",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "nit: s/Readall of entry/Read all entries",
+      "range": {
+        "startLine": 467,
+        "startChar": 23,
+        "endLine": 467,
+        "endChar": 30
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_6becfcf3",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "ditto line 467",
+      "range": {
+        "startLine": 499,
+        "startChar": 25,
+        "endLine": 499,
+        "endChar": 41
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_abe66413",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "s/Create/ReadAll",
+      "range": {
+        "startLine": 568,
+        "startChar": 15,
+        "endLine": 568,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4befb8e9",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "ditto line 568",
+      "range": {
+        "startLine": 571,
+        "startChar": 15,
+        "endLine": 571,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0bbd30d8",
+        "filename": "src/k8splugin/db/store.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-13T19:57:58Z",
+      "side": 1,
+      "message": "I prefer to increase this switch adding more cases",
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_eb86acda",
+        "filename": "src/k8splugin/api/handler.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T22:25:20Z",
+      "side": 1,
+      "message": "These are values specific to each module in our microservice. Similar to the keyprefix we used to isolate the data when we were using consul. If we want to make these fields of the client, we will need a way to provide these fields to DBconn at creation time or something like that.",
+      "parentUuid": "9adffdf1_cbb2c805",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 20
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_ab6744e8",
         "filename": "src/k8splugin/db/consul.go",
         "patchSetId": 11
@@ -182,6 +206,30 @@
       "side": 1,
       "message": "Will look into it.",
       "parentUuid": "9adffdf1_8bb12049",
+      "range": {
+        "startLine": 92,
+        "startChar": 1,
+        "endLine": 100,
+        "endChar": 2
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_cb8168c4",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T22:25:20Z",
+      "side": 1,
+      "message": "serverStatus returns a ton of information without any partcular key that indicates that it is in a healthy state for writes and reads. Do you have any suggestions for what to check for other than the error.",
+      "parentUuid": "9adffdf1_cb33a860",
       "range": {
         "startLine": 92,
         "startChar": 1,

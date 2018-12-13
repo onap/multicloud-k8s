@@ -65,6 +65,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_8bfa8073",
+        "filename": "src/k8splugin/db/consul.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "It will require modifications to the NewConsulStore function as this no longer implements the store interface.",
+      "parentUuid": "9adffdf1_ab6744e8",
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_4b6018cf",
         "filename": "src/k8splugin/db/consul_test.go",
         "patchSetId": 11
@@ -105,6 +123,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_0b2e90fb",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Single client connection to database. Yes.\nI have kept it same as it was before with the consul client.",
+      "parentUuid": "9adffdf1_2ba35402",
+      "range": {
+        "startLine": 64,
+        "startChar": 2,
+        "endLine": 65,
+        "endChar": 59
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_8bb12049",
         "filename": "src/k8splugin/db/mongo.go",
         "patchSetId": 11
@@ -116,6 +158,30 @@
       "writtenOn": "2018-12-13T19:57:58Z",
       "side": 1,
       "message": "What about to use serverStatus function instead of creating and deleting a document?\n\n  https://docs.mongodb.com/manual/reference/method/db.serverStatus/",
+      "range": {
+        "startLine": 92,
+        "startChar": 1,
+        "endLine": 100,
+        "endChar": 2
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_cb33a860",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Will look into it.",
+      "parentUuid": "9adffdf1_8bb12049",
       "range": {
         "startLine": 92,
         "startChar": 1,
@@ -151,6 +217,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_eb38ec3e",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_4be57836",
+      "range": {
+        "startLine": 154,
+        "startChar": 1,
+        "endLine": 156,
+        "endChar": 2
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_4b8ed87a",
         "filename": "src/k8splugin/db/mongo.go",
         "patchSetId": 11
@@ -162,6 +252,30 @@
       "writtenOn": "2018-12-13T19:57:58Z",
       "side": 1,
       "message": "This validation is already made by the Delete function",
+      "range": {
+        "startLine": 187,
+        "startChar": 1,
+        "endLine": 189,
+        "endChar": 2
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_8b4120ab",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_4b8ed87a",
       "range": {
         "startLine": 187,
         "startChar": 1,
@@ -197,6 +311,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_4b47b8bc",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_4bbc9806",
+      "range": {
+        "startLine": 150,
+        "startChar": 15,
+        "endLine": 150,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_6bb95c14",
         "filename": "src/k8splugin/db/mongo_test.go",
         "patchSetId": 11
@@ -208,6 +346,30 @@
       "writtenOn": "2018-12-13T19:57:58Z",
       "side": 1,
       "message": "ditto line 150",
+      "range": {
+        "startLine": 153,
+        "startChar": 15,
+        "endLine": 153,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_6b44fcb6",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_6bb95c14",
       "range": {
         "startLine": 153,
         "startChar": 15,
@@ -243,6 +405,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_cb0ac878",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_2b3fd489",
+      "range": {
+        "startLine": 333,
+        "startChar": 3,
+        "endLine": 333,
+        "endChar": 4
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_eb446c1c",
         "filename": "src/k8splugin/db/mongo_test.go",
         "patchSetId": 11
@@ -254,6 +440,30 @@
       "writtenOn": "2018-12-13T19:57:58Z",
       "side": 1,
       "message": "s/Create/Read",
+      "range": {
+        "startLine": 337,
+        "startChar": 15,
+        "endLine": 337,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0b15309b",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_eb446c1c",
       "range": {
         "startLine": 337,
         "startChar": 15,
@@ -289,6 +499,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_2b1a74cc",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_8b4da040",
+      "range": {
+        "startLine": 340,
+        "startChar": 15,
+        "endLine": 340,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_cb3f2886",
         "filename": "src/k8splugin/db/mongo_test.go",
         "patchSetId": 11
@@ -300,6 +534,30 @@
       "writtenOn": "2018-12-13T19:57:58Z",
       "side": 1,
       "message": "s/Create/Delete",
+      "range": {
+        "startLine": 447,
+        "startChar": 15,
+        "endLine": 447,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_eb0f8c86",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_cb3f2886",
       "range": {
         "startLine": 447,
         "startChar": 15,
@@ -335,6 +593,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_8b2840e3",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_cbdba84d",
+      "range": {
+        "startLine": 450,
+        "startChar": 15,
+        "endLine": 450,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_ebe0ecfb",
         "filename": "src/k8splugin/db/mongo_test.go",
         "patchSetId": 11
@@ -346,6 +628,30 @@
       "writtenOn": "2018-12-13T19:57:58Z",
       "side": 1,
       "message": "nit: s/Readall of entry/Read all entries",
+      "range": {
+        "startLine": 467,
+        "startChar": 23,
+        "endLine": 467,
+        "endChar": 30
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_ab25040a",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_ebe0ecfb",
       "range": {
         "startLine": 467,
         "startChar": 23,
@@ -381,6 +687,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_4b1ed8bc",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_6becfcf3",
+      "range": {
+        "startLine": 499,
+        "startChar": 25,
+        "endLine": 499,
+        "endChar": 41
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_abe66413",
         "filename": "src/k8splugin/db/mongo_test.go",
         "patchSetId": 11
@@ -404,6 +734,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_6b1b9cca",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_abe66413",
+      "range": {
+        "startLine": 568,
+        "startChar": 15,
+        "endLine": 568,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_4befb8e9",
         "filename": "src/k8splugin/db/mongo_test.go",
         "patchSetId": 11
@@ -415,6 +769,30 @@
       "writtenOn": "2018-12-13T19:57:58Z",
       "side": 1,
       "message": "ditto line 568",
+      "range": {
+        "startLine": 571,
+        "startChar": 15,
+        "endLine": 571,
+        "endChar": 21
+      },
+      "revId": "8accac20b6ab34dc09e0bd551b0d8dea9ea63253",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0b7c50eb",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-13T21:51:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_4befb8e9",
       "range": {
         "startLine": 571,
         "startChar": 15,

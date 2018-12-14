@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_e1b32de7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-14T19:37:14Z",
+      "side": 1,
+      "message": "IMHO I\u0027m not sure if this description explains the reason behind this change.",
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_81a581a3",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-14T19:37:14Z",
+      "side": 1,
+      "message": "Usually, string empty checkers use isEmpty...() prefix so a name for this can be isEmptyParams(params ...string)",
+      "range": {
+        "startLine": 97,
+        "startChar": 21,
+        "endLine": 97,
+        "endChar": 35
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_e19c8d5f",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-14T19:37:14Z",
+      "side": 1,
+      "message": "I\u0027d prefer to raise an error where the message specifies which  parameter is invalid and it\u0027s reason, e.g \"The key value is empty\", \"The tag value contains invalid characters\", etc.",
+      "range": {
+        "startLine": 98,
+        "startChar": 1,
+        "endLine": 104,
+        "endChar": 12
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_61a89d77",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-14T19:37:14Z",
+      "side": 1,
+      "message": "nit: ! m.validateParams(coll, key, tag)",
+      "range": {
+        "startLine": 109,
+        "startChar": 19,
+        "endLine": 109,
+        "endChar": 60
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_a1a20597",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-14T19:37:14Z",
+      "side": 1,
+      "message": "Isn\u0027t much better to use reflect.DeepEqual?\n\nhttps://github.com/onap/multicloud-k8s/blob/master/src/k8splugin/db/consul_test.go#L291",
+      "range": {
+        "startLine": 282,
+        "startChar": 7,
+        "endLine": 282,
+        "endChar": 57
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_01b991cb",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-14T19:37:14Z",
+      "side": 1,
+      "message": "This UT is ignoring the output of the method",
+      "range": {
+        "startLine": 509,
+        "startChar": 3,
+        "endLine": 509,
+        "endChar": 5
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_21be15b5",
+        "filename": "src/k8splugin/db/store.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-14T19:37:14Z",
+      "side": 1,
+      "message": "Don\u0027t replace this option just add a new use case.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 47
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

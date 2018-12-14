@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_c1ae2981",
+        "filename": "src/k8splugin/rb/definition_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2018-12-14T19:37:14Z",
+      "side": 0,
+      "message": "Any reason for removing this item for the use case?",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 6
+      },
+      "revId": "aa56022e0fba3c358e46e8671d9a0cd36094ebaa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

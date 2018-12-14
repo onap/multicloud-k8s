@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_e1380d3f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-14T21:39:41Z",
+      "side": 1,
+      "message": "I will add some more details from the jira here.",
+      "parentUuid": "9adffdf1_e1b32de7",
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_81a581a3",
         "filename": "src/k8splugin/db/mongo.go",
         "patchSetId": 13
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_61441db7",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-14T21:39:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_81a581a3",
+      "range": {
+        "startLine": 97,
+        "startChar": 21,
+        "endLine": 97,
+        "endChar": 35
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_e19c8d5f",
         "filename": "src/k8splugin/db/mongo.go",
         "patchSetId": 13
@@ -53,6 +95,30 @@
       "writtenOn": "2018-12-14T19:37:14Z",
       "side": 1,
       "message": "I\u0027d prefer to raise an error where the message specifies which  parameter is invalid and it\u0027s reason, e.g \"The key value is empty\", \"The tag value contains invalid characters\", etc.",
+      "range": {
+        "startLine": 98,
+        "startChar": 1,
+        "endLine": 104,
+        "endChar": 12
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_414799bc",
+        "filename": "src/k8splugin/db/mongo.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-14T21:39:41Z",
+      "side": 1,
+      "message": "Yeah. I thought about that, but, since we are using a variadic function here, we don\u0027t know the order in which params were passed. Some functions only check for coll and tag. Maybe we need to pass a map with the arg name instead of a variadic.",
+      "parentUuid": "9adffdf1_e19c8d5f",
       "range": {
         "startLine": 98,
         "startChar": 1,
@@ -111,6 +177,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_0115119b",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-14T21:39:41Z",
+      "side": 1,
+      "message": "DeepEqual is too heavy for a simple bytearray comparison here.",
+      "parentUuid": "9adffdf1_a1a20597",
+      "range": {
+        "startLine": 282,
+        "startChar": 7,
+        "endLine": 282,
+        "endChar": 57
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_01b991cb",
         "filename": "src/k8splugin/db/mongo_test.go",
         "patchSetId": 13
@@ -134,6 +224,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_211a95cc",
+        "filename": "src/k8splugin/db/mongo_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-14T21:39:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_01b991cb",
+      "range": {
+        "startLine": 509,
+        "startChar": 3,
+        "endLine": 509,
+        "endChar": 5
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_21be15b5",
         "filename": "src/k8splugin/db/store.go",
         "patchSetId": 13
@@ -145,6 +259,30 @@
       "writtenOn": "2018-12-14T19:37:14Z",
       "side": 1,
       "message": "Don\u0027t replace this option just add a new use case.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 47
+      },
+      "revId": "878f3c84783e1eda255a93fb452843e7b68b17e9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_814101ab",
+        "filename": "src/k8splugin/db/store.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-14T21:39:41Z",
+      "side": 1,
+      "message": "Oh yeah. Forgot to add it back. I will add the case.",
+      "parentUuid": "9adffdf1_21be15b5",
       "range": {
         "startLine": 55,
         "startChar": 0,

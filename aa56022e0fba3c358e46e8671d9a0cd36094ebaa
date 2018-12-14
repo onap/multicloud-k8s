@@ -22,6 +22,30 @@
       "revId": "aa56022e0fba3c358e46e8671d9a0cd36094ebaa",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_a13e8526",
+        "filename": "src/k8splugin/rb/definition_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2018-12-14T21:39:41Z",
+      "side": 0,
+      "message": "Error during testing. Had removed it for some test. Will add it back.",
+      "parentUuid": "9adffdf1_c1ae2981",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 6
+      },
+      "revId": "aa56022e0fba3c358e46e8671d9a0cd36094ebaa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

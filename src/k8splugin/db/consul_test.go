@@ -107,12 +107,14 @@ func TestConsulCreate(t *testing.T) {
 	}{
 		{
 			label: "Sucessful register a record to Consul Database",
-			input: map[string]string{"key": "test-key", "value": "test-value"},
-			mock:  &mockConsulKVStore{},
+			input: map[string]string{"root": "rbinst", "key": "test-key",
+				"tag": "data", "value": "test-value"},
+			mock: &mockConsulKVStore{},
 		},
 		{
 			label: "Fail to create a new record in Consul Database",
-			input: map[string]string{"key": "test-key", "value": "test-value"},
+			input: map[string]string{"root": "rbinst", "key": "test-key",
+				"tag": "data", "value": "test-value"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
 			},
@@ -123,7 +125,8 @@ func TestConsulCreate(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			err := client.Create(testCase.input["key"], testCase.input["value"])
+			err := client.Create(testCase.input["root"], testCase.input["key"],
+				testCase.input["tag"], testCase.input["value"])
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create method return an un-expected (%s)", err)
@@ -139,18 +142,19 @@ func TestConsulCreate(t *testing.T) {
 func TestConsulRead(t *testing.T) {
 	testCases := []struct {
 		label          string
-		input          string
+		input          map[string]string
 		mock           *mockConsulKVStore
 		expectedError  string
 		expectedResult string
 	}{
 		{
 			label: "Sucessful retrieve a record from Consul Database",
-			input: "test",
+			input: map[string]string{"root": "rbinst", "key": "test",
+				"tag": "data"},
 			mock: &mockConsulKVStore{
 				Items: api.KVPairs{
 					&api.KVPair{
-						Key:   "test",
+						Key:   "rbinst/test/data",
 						Value: []byte("test-value"),
 					},
 				},
@@ -159,12 +163,14 @@ func TestConsulRead(t *testing.T) {
 		},
 		{
 			label: "Fail retrieve a non-existing record from Consul Database",
-			input: "test",
-			mock:  &mockConsulKVStore{},
+			input: map[string]string{"root": "rbinst", "key": "test-key",
+				"tag": "data"},
+			mock: &mockConsulKVStore{},
 		},
 		{
 			label: "Fail retrieve a record from Consul Database",
-			input: "test",
+			input: map[string]string{"root": "rbinst", "key": "test-key",
+				"tag": "data"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
 			},
@@ -175,7 +181,8 @@ func TestConsulRead(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			result, err := client.Read(testCase.input)
+			result, err := client.Read(testCase.input["root"], testCase.input["key"],
+				testCase.input["tag"])
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Read method return an un-expected (%s)", err)
@@ -187,7 +194,7 @@ func TestConsulRead(t *testing.T) {
 				if testCase.expectedError != "" && testCase.expectedResult == "" {
 					t.Fatalf("Read method was expecting \"%s\" error message", testCase.expectedError)
 				}
-				if !reflect.DeepEqual(testCase.expectedResult, result) {
+				if !reflect.DeepEqual(testCase.expectedResult, string(result)) {
 
 					t.Fatalf("Read method returned: \n%v\n and it was expected: \n%v", result, testCase.expectedResult)
 				}
@@ -199,14 +206,15 @@ func TestConsulRead(t *testing.T) {
 func TestConsulDelete(t *testing.T) {
 	testCases := []struct {
 		label         string
-		input         string
+		input         map[string]string
 		mock          *mockConsulKVStore
 		expectedError string
 	}{
 		{
 			label: "Sucessful delete a record to Consul Database",
-			input: "test",
-			mock:  &mockConsulKVStore{},
+			input: map[string]string{"root": "rbinst", "key": "test-key",
+				"tag": "data"},
+			mock: &mockConsulKVStore{},
 		},
 		{
 			label: "Fail to delete a record in Consul Database",
@@ -220,7 +228,8 @@ func TestConsulDelete(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			err := client.Delete(testCase.input)
+			err := client.Delete(testCase.input["root"], testCase.input["key"],
+				testCase.input["tag"])
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Delete method return an un-expected (%s)", err)
@@ -236,14 +245,15 @@ func TestConsulDelete(t *testing.T) {
 func TestConsulReadAll(t *testing.T) {
 	testCases := []struct {
 		label          string
-		input          string
+		input          map[string]string
 		mock           *mockConsulKVStore
 		expectedError  string
-		expectedResult []string
+		expectedResult map[string][]byte
 	}{
 		{
 			label: "Sucessful retrieve a list from Consul Database",
-			input: "test",
+			input: map[string]string{"root": "rbinst", "key": "test-key",
+				"tag": "data"},
 			mock: &mockConsulKVStore{
 				Items: api.KVPairs{
 					&api.KVPair{
@@ -256,16 +266,20 @@ func TestConsulReadAll(t *testing.T) {
 					},
 				},
 			},
-			expectedResult: []string{"test", "test2"},
+			expectedResult: map[string][]byte{"test": []byte("test-value"),
+				"test2": []byte("test-value2")},
 		},
 		{
 			label: "Sucessful retrieve an empty list from Consul Database",
-			input: "test",
-			mock:  &mockConsulKVStore{},
+			input: map[string]string{"root": "rbinst", "key": "test-key",
+				"tag": "data"},
+			mock:           &mockConsulKVStore{},
+			expectedResult: map[string][]byte{},
 		},
 		{
 			label: "Fail retrieve a record from Consul Database",
-			input: "test",
+			input: map[string]string{"root": "rbinst", "key": "test-key",
+				"tag": "data"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
 			},
@@ -276,7 +290,8 @@ func TestConsulReadAll(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			result, err := client.ReadAll(testCase.input)
+			result, err := client.ReadAll(testCase.input["root"],
+				testCase.input["tag"])
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("ReadAll method return an un-expected (%s)", err)

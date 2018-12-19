@@ -26,8 +26,8 @@ setup $virtlet_deployment_name
 
 # Test
 deployment_pod=$(kubectl get pods | grep $virtlet_deployment_name | awk '{print $1}')
-vm_name=$(kubectl plugin virt virsh list | grep "virtlet-.*-$virtlet_deployment_name" | awk '{print $2}')
-vm_status=$(kubectl plugin virt virsh list | grep "virtlet-.*-$virtlet_deployment_name" | awk '{print $3}')
+vm_name=$(kubectl virt virsh list | grep "virtlet-.*-$virtlet_deployment_name" | awk '{print $2}')
+vm_status=$(kubectl virt virsh list | grep "virtlet-.*-$virtlet_deployment_name" | awk '{print $3}')
 if [[ "$vm_status" != "running" ]]; then
     echo "There is no Virtual Machine running by $deployment_pod pod"
     exit 1
@@ -36,7 +36,7 @@ echo "Pod name: $deployment_pod Virsh domain: $vm_name"
 echo "ssh testuser@$(kubectl get pods $deployment_pod -o jsonpath="{.status.podIP}")"
 echo "kubectl attach -it $deployment_pod"
 echo "=== Virtlet details ===="
-echo "$(kubectl plugin virt virsh dumpxml $vm_name | grep VIRTLET_)\n"
+echo "$(kubectl virt virsh dumpxml $vm_name | grep VIRTLET_)\n"
 popd
 
 # Teardown

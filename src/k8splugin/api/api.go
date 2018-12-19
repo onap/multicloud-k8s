@@ -29,7 +29,8 @@ import (
 
 // CheckEnvVariables checks for required Environment variables
 func CheckEnvVariables() error {
-	envList := []string{"CSAR_DIR", "KUBE_CONFIG_DIR", "PLUGINS_DIR", "DATABASE_TYPE", "DATABASE_IP"}
+	envList := []string{"CSAR_DIR", "KUBE_CONFIG_DIR", "PLUGINS_DIR",
+		"DATABASE_TYPE", "DATABASE_IP", "OVN_CENTRAL_ADDRESS"}
 	for _, env := range envList {
 		if _, ok := os.LookupEnv(env); !ok {
 			return pkgerrors.New("environment variable " + env + " not set")
@@ -64,7 +65,6 @@ func LoadPlugins() error {
 				if err != nil {
 					return pkgerrors.Cause(err)
 				}
-
 				krd.LoadedPlugins[info.Name()[:len(info.Name())-3]] = p
 			}
 			return err

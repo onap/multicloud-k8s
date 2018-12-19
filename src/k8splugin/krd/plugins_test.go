@@ -70,7 +70,7 @@ func TestDecodeYAML(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			result, err := DecodeYAML(testCase.input)
+			result, err := DecodeYAML(testCase.input, nil)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Decode YAML method return an un-expected (%s)", err)

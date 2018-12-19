@@ -7,7 +7,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-FROM debian:jessie
+FROM ubuntu:16.04
 
 ARG HTTP_PROXY=${HTTP_PROXY}
 ARG HTTPS_PROXY=${HTTPS_PROXY}
@@ -20,8 +20,14 @@ ENV CSAR_DIR "/opt/csar"
 ENV KUBE_CONFIG_DIR "/opt/kubeconfig"
 ENV DATABASE_TYPE "consul"
 ENV DATABASE_IP "127.0.0.1"
+ENV OVN_CENTRAL_ADDRESS "127.0.0.1:6641"
 
 EXPOSE 8081
+
+RUN apt-get update && apt-get install -y -qq apt-transport-https curl \
+ && echo "deb https://packages.wand.net.nz xenial main" > /etc/apt/sources.list.d/wand.list \
+ && curl https://packages.wand.net.nz/keyring.gpg -o /etc/apt/trusted.gpg.d/wand.gpg \
+ && apt-get update && apt install -y -qq ovn-common
 
 WORKDIR /opt/multicloud/k8s
 ADD ./k8plugin ./

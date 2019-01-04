@@ -32,12 +32,12 @@ setup $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
 # Test
 for deployment_name in $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name; do
     pod_name=$(kubectl get pods | grep  $deployment_name | awk '{print $1}')
-    vm=$(kubectl plugin virt virsh list | grep ".*$deployment_name"  | awk '{print $2}')
+    vm=$(kubectl virt virsh list | grep ".*$deployment_name"  | awk '{print $2}')
     echo "Pod name: $pod_name Virsh domain: $vm"
     echo "ssh -i ~/.ssh/id_rsa.pub admin@$(kubectl get pods $pod_name -o jsonpath="{.status.podIP}")"
     echo "kubectl attach -it $pod_name"
     echo "=== Virtlet details ===="
-    echo "$(kubectl plugin virt virsh dumpxml $vm | grep VIRTLET_)\n"
+    echo "$(kubectl virt virsh dumpxml $vm | grep VIRTLET_)\n"
 done
 popd
 

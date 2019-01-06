@@ -85,6 +85,16 @@ function _install_docker {
     sleep 10
 }
 
+function _set_environment_file {
+    ansible_ifconfig=$(ansible ovn-central[0] -i $krd_inventory -m shell -a "ifconfig eth1 |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'")
+    if [[ $ansible_ifconfig != *CHANGED* ]]; then
+        echo "Fail to get the OVN central IP address from eth1 nic"
+        exit
+    fi
+    echo "export OVN_CENTRAL_ADDRESS=$(echo ${ansible_ifconfig#*>>} | tr '\n' ':')6641" | sudo tee --append /etc/environment
+    echo "export KUBE_CONFIG_DIR=/opt/kubeconfig" | sudo tee --append /etc/environment
+}
+
 # install_k8s() - Install Kubernetes using kubespray tool
 function install_k8s {
     echo "Deploying kubernetes"
@@ -151,8 +161,8 @@ function install_plugin {
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
     sudo cp $HOME/.kube/config /opt/kubeconfig/krd
-    export KUBE_CONFIG_DIR=/opt/kubeconfig
-    echo "export KUBE_CONFIG_DIR=${KUBE_CONFIG_DIR}" | sudo tee --append /etc/environment
+    _set_environment_file
+    source /etc/environment
 
     pushd $krd_folder/../deployments
     sudo ./build.sh
@@ -213,8 +223,7 @@ testing_enabled=${KRD_ENABLE_TESTS:-false}
 sudo mkdir -p $log_folder
 sudo mkdir -p /opt/csar
 sudo chown -R $USER /opt/csar
-export CSAR_DIR=/opt/csar
-echo "export CSAR_DIR=${CSAR_DIR}" | sudo tee --append /etc/environment
+echo "export CSAR_DIR=/opt/csar" | sudo tee --append /etc/environment
 
 # Install dependencies
 # Setup proxy variables

@@ -15,10 +15,7 @@ source /etc/environment
 
 k8s_path="$(git rev-parse --show-toplevel)"
 export GOPATH=$k8s_path
-export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 
-export CSAR_DIR=/opt/csar
-export KUBE_CONFIG_DIR=/opt/kubeconfig
 export DATABASE_TYPE=mongo
 export PLUGINS_DIR=$k8s_path/src/k8splugin/plugins
 

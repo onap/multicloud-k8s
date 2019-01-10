@@ -11,7 +11,7 @@
 set -o nounset
 set -o pipefail
 
-vagrant_version=2.2.2
+vagrant_version=2.2.3
 if ! $(vagrant version &>/dev/null); then
     enable_vagrant_install=true
 else

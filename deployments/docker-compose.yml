@@ -16,24 +16,24 @@ services:
     image: ${IMAGE_NAME}
     networks:
       multicloud_net:
-        ipv4_address: 172.19.0.3
+        ipv4_address: ${PLUGIN_IP}
     build:
       context: ./
       args:
-        - HTTP_PROXY=$HTTP_PROXY
-        - HTTPS_PROXY=$HTTPS_PROXY
-        - NO_PROXY=$NO_PROXY
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
     ports:
       - "8081:8081"
     environment:
-      - CSAR_DIR=/opt/csar
-      - KUBE_CONFIG_DIR=/opt/kubeconfig
-      - DATABASE_TYPE=mongo
-      - DATABASE_IP=172.19.0.2
-      - PLUGINS_DIR=/opt/multicloud/k8s
-      - HTTP_PROXY=$HTTP_PROXY
-      - HTTPS_PROXY=$HTTPS_PROXY
-      - NO_PROXY=$NO_PROXY,172.19.0.2
+      - CSAR_DIR=${CSAR_DIR}
+      - KUBE_CONFIG_DIR=${KUBE_CONFIG_DIR}
+      - DATABASE_TYPE=${DATABASE_TYPE}
+      - DATABASE_IP=${DATABASE_IP}
+      - PLUGINS_DIR=${PLUGINS_DIR}
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY},${DATABASE_IP}
     depends_on:
       - mongo
     links:
@@ -45,11 +45,11 @@ services:
     image: mongo
     networks:
       multicloud_net:
-        ipv4_address: 172.19.0.2
+        ipv4_address: ${DATABASE_IP}
     environment:
-      HTTP_PROXY: $HTTP_PROXY
-      HTTPS_PROXY: $HTTPS_PROXY
-      NO_PROXY: $NO_PROXY
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY}
 
 networks:
   multicloud_net:

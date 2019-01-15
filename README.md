@@ -30,7 +30,7 @@ Steps:
 * Compile to build Binary:
     * `make deploy`
 
-# Archietecture
+# Architecture
 
 Create Virtual Network Function
 

@@ -123,7 +123,7 @@ case ${ID,,} in
     ;;
 
     rhel|centos|fedora)
-    PKG_MANAGER=$(which dnf || which yum)
+    PKG_MANAGER=$(command -v dnf || command -v yum)
     sudo $PKG_MANAGER updateinfo
     INSTALLER_CMD="sudo -H -E ${PKG_MANAGER} -q -y install"
     packages+=(python-devel)

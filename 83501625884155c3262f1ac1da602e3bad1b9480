@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_9b2e1842",
+        "filename": "src/k8splugin/rb/profile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-01-16T22:26:08Z",
+      "side": 1,
+      "message": "Why is the input parameter being returned from the function?",
+      "range": {
+        "startLine": 95,
+        "startChar": 7,
+        "endLine": 95,
+        "endChar": 10
+      },
+      "revId": "83501625884155c3262f1ac1da602e3bad1b9480",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

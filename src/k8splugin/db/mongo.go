@@ -224,6 +224,11 @@ func (m *MongoStore) Delete(coll, key, tag string) error {
 	keydata, err := decodeBytes(c.FindOneAndUpdate(ctx, filter, update,
 		options.FindOneAndUpdate().SetReturnDocument(options.Before)))
 	if err != nil {
+		//No document was found. Return nil.
+		if err == mongo.ErrNoDocuments {
+			return nil
+		}
+		//Return any other error that was found.
 		return pkgerrors.Errorf("Error decoding master table after update: %s",
 			err.Error())
 	}

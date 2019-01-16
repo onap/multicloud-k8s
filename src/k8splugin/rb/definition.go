@@ -146,7 +146,7 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, id, encodedStr, v.tagContent)
+	err = db.DBconn.Create(v.storeName, id, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
 	}

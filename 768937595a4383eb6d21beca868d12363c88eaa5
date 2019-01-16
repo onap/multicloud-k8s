@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_9b9db8be",
+        "filename": "src/k8splugin/api/profilehandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-16T22:04:43Z",
+      "side": 1,
+      "message": "It\u0027s not already implemented?",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 54
+      },
+      "revId": "768937595a4383eb6d21beca868d12363c88eaa5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_bba2fcfa",
+        "filename": "src/k8splugin/mock_files/mock_json/create_rbprofile.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-16T22:04:43Z",
+      "side": 1,
+      "message": "nit: IMHO it\u0027s better to provide different uuid for better understanding of the relationships",
+      "range": {
+        "startLine": 5,
+        "startChar": 13,
+        "endLine": 5,
+        "endChar": 49
+      },
+      "revId": "768937595a4383eb6d21beca868d12363c88eaa5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_bb899c76",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-16T22:04:43Z",
+      "side": 1,
+      "message": "is this a change required for this change or it\u0027s a fix of another patch? If this is a fix I recommend a separated patch",
+      "range": {
+        "startLine": 151,
+        "startChar": 1,
+        "endLine": 151,
+        "endChar": 66
+      },
+      "revId": "768937595a4383eb6d21beca868d12363c88eaa5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -27,7 +27,7 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-func TestCreate(t *testing.T) {
+func TestCreateDefinition(t *testing.T) {
 	testCases := []struct {
 		label         string
 		inp           Definition
@@ -83,7 +83,7 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestList(t *testing.T) {
+func TestListDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
@@ -154,7 +154,7 @@ func TestList(t *testing.T) {
 	}
 }
 
-func TestGet(t *testing.T) {
+func TestGetDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
@@ -214,7 +214,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestDeleteDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
@@ -253,7 +253,7 @@ func TestDelete(t *testing.T) {
 	}
 }
 
-func TestUpload(t *testing.T) {
+func TestUploadDefinition(t *testing.T) {
 	testCases := []struct {
 		label         string
 		inp           string
@@ -325,7 +325,7 @@ func TestUpload(t *testing.T) {
 					"123e4567-e89b-12d3-a456-426655441111": []byte(
 						"{\"name\":\"testresourcebundle\"," +
 							"\"description\":\"testresourcebundle\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+							"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
 							"\"service-type\":\"firewall\"}"),
 				},
 			},

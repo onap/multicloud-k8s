@@ -116,7 +116,7 @@ func TestRBDefCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("POST", "/v1/resource/definition", testCase.reader)
+			req, err := http.NewRequest("POST", "/v1/rb/definition", testCase.reader)
 
 			if err != nil {
 				t.Fatal(err)
@@ -193,7 +193,7 @@ func TestRBDefListHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/resource/definition", nil)
+			req, err := http.NewRequest("GET", "/v1/rb/definition", nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -212,7 +212,16 @@ func TestRBDefListHandler(t *testing.T) {
 				got := []rb.Definition{}
 				json.NewDecoder(rr.Body).Decode(&got)
 
-				if reflect.DeepEqual(testCase.expected, got) == false {
+				// Since the order of returned slice is not guaranteed
+				// Check both and return error if both don't match
+				if reflect.DeepEqual(testCase.expected[0], got[0]) == false &&
+					reflect.DeepEqual(testCase.expected[0], got[1]) == false {
+					t.Errorf("listHandler returned unexpected body: got %v;"+
+						" expected %v", got, testCase.expected)
+				}
+
+				if reflect.DeepEqual(testCase.expected[1], got[1]) == false &&
+					reflect.DeepEqual(testCase.expected[1], got[0]) == false {
 					t.Errorf("listHandler returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
@@ -267,7 +276,7 @@ func TestRBDefGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/resource/definition/"+testCase.inpUUID, nil)
+			req, err := http.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -322,7 +331,7 @@ func TestRBDefDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/resource/definition/"+testCase.inpUUID, nil)
+			req, err := http.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -382,7 +391,7 @@ func TestRBDefUploadHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
 			req, err := http.NewRequest("POST",
-				"/v1/resource/definition/"+testCase.inpUUID+"/content", testCase.body)
+				"/v1/rb/definition/"+testCase.inpUUID+"/content", testCase.body)
 
 			if err != nil {
 				t.Fatal(err)

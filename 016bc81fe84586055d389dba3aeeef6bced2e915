@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_fd37174b",
+        "filename": "src/k8splugin/api/defhandler_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-17T20:17:27Z",
+      "side": 1,
+      "message": "I\u0027d prefer to sort the testCase.expected and got arrays values instead of compare one by one. This won\u0027t work if the number of items change in the future.",
+      "range": {
+        "startLine": 217,
+        "startChar": 4,
+        "endLine": 221,
+        "endChar": 5
+      },
+      "revId": "016bc81fe84586055d389dba3aeeef6bced2e915",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

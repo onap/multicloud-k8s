@@ -22,6 +22,30 @@
       "revId": "6daca38a2cd150ee4316ab489df0f6b52a8e9779",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_1d2f7bf8",
+        "filename": "src/k8splugin/rb/definition_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-17T20:17:08Z",
+      "side": 1,
+      "message": "Yeah. I ran into this issue with the list handler test.",
+      "parentUuid": "9adffdf1_fd007767",
+      "range": {
+        "startLine": 148,
+        "startChar": 7,
+        "endLine": 148,
+        "endChar": 57
+      },
+      "revId": "6daca38a2cd150ee4316ab489df0f6b52a8e9779",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

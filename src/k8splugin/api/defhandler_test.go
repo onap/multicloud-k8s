@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"sort"
 	"testing"
 
 	pkgerrors "github.com/pkg/errors"
@@ -116,7 +117,7 @@ func TestRBDefCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("POST", "/v1/resource/definition", testCase.reader)
+			req, err := http.NewRequest("POST", "/v1/rb/definition", testCase.reader)
 
 			if err != nil {
 				t.Fatal(err)
@@ -193,7 +194,7 @@ func TestRBDefListHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/resource/definition", nil)
+			req, err := http.NewRequest("GET", "/v1/rb/definition", nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -211,6 +212,17 @@ func TestRBDefListHandler(t *testing.T) {
 			if rr.Code == http.StatusOK {
 				got := []rb.Definition{}
 				json.NewDecoder(rr.Body).Decode(&got)
+
+				// Since the order of returned slice is not guaranteed
+				// Check both and return error if both don't match
+				sort.Slice(got, func(i, j int) bool {
+					return got[i].UUID < got[i].UUID
+				})
+				// Sort both as it is not expected that testCase.expected
+				// is sorted
+				sort.Slice(testCase.expected, func(i, j int) bool {
+					return testCase.expected[i].UUID < testCase.expected[i].UUID
+				})
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
 					t.Errorf("listHandler returned unexpected body: got %v;"+
@@ -267,7 +279,7 @@ func TestRBDefGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/resource/definition/"+testCase.inpUUID, nil)
+			req, err := http.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -322,7 +334,7 @@ func TestRBDefDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/resource/definition/"+testCase.inpUUID, nil)
+			req, err := http.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -382,7 +394,7 @@ func TestRBDefUploadHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
 			req, err := http.NewRequest("POST",
-				"/v1/resource/definition/"+testCase.inpUUID+"/content", testCase.body)
+				"/v1/rb/definition/"+testCase.inpUUID+"/content", testCase.body)
 
 			if err != nil {
 				t.Fatal(err)

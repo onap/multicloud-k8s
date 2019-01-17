@@ -21,13 +21,14 @@ package rb
 import (
 	"k8splugin/db"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 
 	pkgerrors "github.com/pkg/errors"
 )
 
-func TestCreate(t *testing.T) {
+func TestCreateDefinition(t *testing.T) {
 	testCases := []struct {
 		label         string
 		inp           Definition
@@ -83,7 +84,7 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestList(t *testing.T) {
+func TestListDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
@@ -145,6 +146,17 @@ func TestList(t *testing.T) {
 					t.Fatalf("List returned an unexpected error %s", err)
 				}
 			} else {
+				// Since the order of returned slice is not guaranteed
+				// Check both and return error if both don't match
+				sort.Slice(got, func(i, j int) bool {
+					return got[i].UUID < got[i].UUID
+				})
+				// Sort both as it is not expected that testCase.expected
+				// is sorted
+				sort.Slice(testCase.expected, func(i, j int) bool {
+					return testCase.expected[i].UUID < testCase.expected[i].UUID
+				})
+
 				if reflect.DeepEqual(testCase.expected, got) == false {
 					t.Errorf("List Resource Bundle returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
@@ -154,7 +166,7 @@ func TestList(t *testing.T) {
 	}
 }
 
-func TestGet(t *testing.T) {
+func TestGetDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
@@ -214,7 +226,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestDeleteDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
@@ -253,7 +265,7 @@ func TestDelete(t *testing.T) {
 	}
 }
 
-func TestUpload(t *testing.T) {
+func TestUploadDefinition(t *testing.T) {
 	testCases := []struct {
 		label         string
 		inp           string
@@ -325,7 +337,7 @@ func TestUpload(t *testing.T) {
 					"123e4567-e89b-12d3-a456-426655441111": []byte(
 						"{\"name\":\"testresourcebundle\"," +
 							"\"description\":\"testresourcebundle\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+							"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
 							"\"service-type\":\"firewall\"}"),
 				},
 			},

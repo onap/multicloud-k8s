@@ -129,6 +129,12 @@ func (v *DefinitionClient) Delete(id string) error {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition")
 	}
 
+	//Delete the content when the delete operation happens
+	err = db.DBconn.Delete(v.storeName, id, v.tagContent)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition Content")
+	}
+
 	return nil
 }
 

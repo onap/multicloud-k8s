@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_6605d812",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-18T21:49:09Z",
+      "side": 1,
+      "message": "Enable cascade deletions for Definition objects",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 43
+      },
+      "revId": "c7663579777402df36ad5cb071d32df18d5471ee",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_f108a029",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-18T21:49:09Z",
+      "side": 1,
+      "message": "IMHO, the description has to express the potential problem if this change is not applied.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 41
+      },
+      "revId": "c7663579777402df36ad5cb071d32df18d5471ee",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_a60f4036",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-18T21:49:09Z",
+      "side": 1,
+      "message": "Is there a way to guarantee the atomicity of these two actions. I\u0027m not sure if it\u0027s possible to add a transaction here or in the database.",
+      "range": {
+        "startLine": 127,
+        "startChar": 1,
+        "endLine": 136,
+        "endChar": 2
+      },
+      "revId": "c7663579777402df36ad5cb071d32df18d5471ee",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

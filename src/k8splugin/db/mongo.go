@@ -183,7 +183,13 @@ func (m *MongoStore) Read(coll, key, tag string) ([]byte, error) {
 	}
 
 	//Return the data as a byte array
-	return tagdata.Lookup(tag).Value, nil
+	//Convert string data to byte array using the built-in functions
+	switch tagdata.Lookup(tag).Type {
+	case bson.TypeString:
+		return []byte(tagdata.Lookup(tag).StringValue()), nil
+	default:
+		return tagdata.Lookup(tag).Value, nil
+	}
 }
 
 // Helper function that deletes an object by its ID

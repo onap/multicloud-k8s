@@ -185,3 +185,34 @@ func (v *ProfileClient) Upload(id string, inp []byte) error {
 
 	return nil
 }
+
+// Download the contents of the resource bundle profile from DB
+// Returns a byte array of the contents which is used by the
+// ExtractTarBall code to create the folder structure on disk
+func (v *ProfileClient) Download(id string) ([]byte, error) {
+
+	//ignore the returned data here
+	//Check if id is valid
+	_, err := v.Get(id)
+	if err != nil {
+		return nil, pkgerrors.Errorf("Invalid Profile ID provided: %s", err.Error())
+	}
+
+	value, err := db.DBconn.Read(v.storeName, id, v.tagContent)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Get Resource Bundle Profile content")
+	}
+
+	if value != nil {
+		//Decode the string from base64
+		out, err := base64.StdEncoding.DecodeString(string(value))
+		if err != nil {
+			return nil, pkgerrors.Wrap(err, "Decode base64 string")
+		}
+
+		if out != nil && len(out) != 0 {
+			return out, nil
+		}
+	}
+	return nil, pkgerrors.New("Error downloading Profile content")
+}

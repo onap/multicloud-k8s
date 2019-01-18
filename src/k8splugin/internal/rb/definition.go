@@ -162,3 +162,34 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 
 	return nil
 }
+
+// Download the contents of the resource bundle definition from DB
+// Returns a byte array of the contents which is used by the
+// ExtractTarBall code to create the folder structure on disk
+func (v *DefinitionClient) Download(id string) ([]byte, error) {
+
+	//ignore the returned data here
+	//Check if id is valid
+	_, err := v.Get(id)
+	if err != nil {
+		return nil, pkgerrors.Errorf("Invalid Definition ID provided: %s", err.Error())
+	}
+
+	value, err := db.DBconn.Read(v.storeName, id, v.tagContent)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Get Resource Bundle definition content")
+	}
+
+	if value != nil {
+		//Decode the string from base64
+		out, err := base64.StdEncoding.DecodeString(string(value))
+		if err != nil {
+			return nil, pkgerrors.Wrap(err, "Decode base64 string")
+		}
+
+		if out != nil && len(out) != 0 {
+			return out, nil
+		}
+	}
+	return nil, pkgerrors.New("Error downloading Definition content")
+}

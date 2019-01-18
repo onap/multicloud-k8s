@@ -21,6 +21,9 @@ import (
 	"compress/gzip"
 	pkgerrors "github.com/pkg/errors"
 	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 func isTarGz(r io.Reader) error {
@@ -62,4 +65,68 @@ func isTarGz(r io.Reader) error {
 	}
 
 	return nil
+}
+
+//ExtractTarGz provides functionality to extract a tar.gz file
+//into a temporary location for later use.
+//It returns the path to the new location
+func ExtractTarGz(r io.Reader) (string, error) {
+	//Check if it is a valid gz
+	gzf, err := gzip.NewReader(r)
+	if err != nil {
+		return "", pkgerrors.Errorf("Invalid gz format %s", err.Error())
+	}
+
+	//Check if it is a valid tar file
+	//Unfortunately this can only be done by inspecting all the tar contents
+	tarR := tar.NewReader(gzf)
+	first := true
+
+	outDir, _ := ioutil.TempDir("", "k8s-ext-")
+
+	for true {
+		header, err := tarR.Next()
+
+		if err == io.EOF {
+			//Check if we have just a gzip file without a tar archive inside
+			if first {
+				return "", pkgerrors.New("Empty or non-existant Tar file found")
+			}
+			//End of archive
+			break
+		}
+
+		if err != nil {
+			return "", pkgerrors.Errorf("Error reading tar file %s", err.Error())
+		}
+
+		target := filepath.Join(outDir, header.Name)
+
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if _, err := os.Stat(target); err != nil {
+				if err := os.MkdirAll(target, 0755); err != nil {
+					return "", pkgerrors.Wrap(err, "Creating directory")
+				}
+			}
+		case tar.TypeReg:
+			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			if err != nil {
+				return "", pkgerrors.Wrap(err, "Creating file")
+			}
+
+			// copy over contents
+			if _, err := io.Copy(f, tarR); err != nil {
+				return "", pkgerrors.Wrap(err, "Copying file content")
+			}
+
+			// close for each file instead of a defer for all
+			// at the end of the function
+			f.Close()
+		}
+
+		first = false
+	}
+
+	return outDir, nil
 }

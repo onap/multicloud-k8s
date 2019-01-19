@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_918a7462",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-19T00:36:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_f108a029",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 41
+      },
+      "revId": "c7663579777402df36ad5cb071d32df18d5471ee",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_a60f4036",
         "filename": "src/k8splugin/rb/definition.go",
         "patchSetId": 1
@@ -59,6 +83,30 @@
       "writtenOn": "2019-01-18T21:49:09Z",
       "side": 1,
       "message": "Is there a way to guarantee the atomicity of these two actions. I\u0027m not sure if it\u0027s possible to add a transaction here or in the database.",
+      "range": {
+        "startLine": 127,
+        "startChar": 1,
+        "endLine": 136,
+        "endChar": 2
+      },
+      "revId": "c7663579777402df36ad5cb071d32df18d5471ee",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_718fd075",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-19T00:36:18Z",
+      "side": 1,
+      "message": "I think the driver does serialization at it\u0027s end when sending the rest commands to the mongodb. Maybe we need to create a jira to do some multi-thread testing later on.",
+      "parentUuid": "9adffdf1_a60f4036",
       "range": {
         "startLine": 127,
         "startChar": 1,

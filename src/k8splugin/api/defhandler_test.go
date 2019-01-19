@@ -216,12 +216,12 @@ func TestRBDefListHandler(t *testing.T) {
 				// Since the order of returned slice is not guaranteed
 				// Check both and return error if both don't match
 				sort.Slice(got, func(i, j int) bool {
-					return got[i].UUID < got[i].UUID
+					return got[i].UUID < got[j].UUID
 				})
 				// Sort both as it is not expected that testCase.expected
 				// is sorted
 				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].UUID < testCase.expected[i].UUID
+					return testCase.expected[i].UUID < testCase.expected[j].UUID
 				})
 
 				if reflect.DeepEqual(testCase.expected, got) == false {

@@ -188,5 +188,10 @@ if [ $VAGRANT_DEFAULT_PROVIDER == libvirt ]; then
     vagrant plugin install vagrant-libvirt
     sudo usermod -a -G $libvirt_group $USER # This might require to reload user's group assigments
     sudo systemctl restart libvirtd
+
+    # Start statd service to prevent NFS lock errors
+    sudo systemctl enable rpc-statd
+    sudo systemctl start rpc-statd
+
     kvm-ok
 fi

@@ -1,0 +1,9 @@
+# Default values for subchart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# subchart1
+service:
+  name: nginx
+  type: ClusterIP
+  externalPort: 8080
+  internalPort: 8080

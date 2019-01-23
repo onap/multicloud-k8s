@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_65e4e5e0",
+        "filename": "src/k8splugin/rb/archive.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-23T19:07:39Z",
+      "side": 1,
+      "message": "It will be invoked later on by a different function. That is not part of this patch\u0027s scope.",
+      "parentUuid": "9adffdf1_25857d06",
+      "range": {
+        "startLine": 73,
+        "startChar": 5,
+        "endLine": 73,
+        "endChar": 17
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_858f8974",
         "filename": "src/k8splugin/rb/archive.go",
         "patchSetId": 1
@@ -163,6 +187,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_25ea5dac",
+        "filename": "src/k8splugin/rb/archive.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-23T19:07:39Z",
+      "side": 1,
+      "message": "This value is an auto generated temporary folder which is unique.",
+      "parentUuid": "9adffdf1_a5708d40",
+      "range": {
+        "startLine": 131,
+        "startChar": 8,
+        "endLine": 131,
+        "endChar": 14
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_4593e14f",
         "filename": "src/k8splugin/rb/definition.go",
         "patchSetId": 1
@@ -174,6 +222,30 @@
       "writtenOn": "2019-01-23T18:47:42Z",
       "side": 1,
       "message": "Where is the extraction happening?",
+      "range": {
+        "startLine": 160,
+        "startChar": 37,
+        "endLine": 160,
+        "endChar": 58
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_c5d4b1ed",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-23T19:07:39Z",
+      "side": 1,
+      "message": "It will happen at instantiation time and the code for that is not part of this patch.",
+      "parentUuid": "9adffdf1_4593e14f",
       "range": {
         "startLine": 160,
         "startChar": 37,

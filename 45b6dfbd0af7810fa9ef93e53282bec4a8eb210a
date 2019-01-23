@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_451681a9",
+        "filename": "src/k8splugin/rb/archive.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-23T19:29:03Z",
+      "side": 1,
+      "message": "That code will be part of the instantiation flow. These are just helper functions that will be used to accomplish the construction of a fully resolved helm chart.",
+      "parentUuid": "9adffdf1_650b858e",
+      "range": {
+        "startLine": 73,
+        "startChar": 5,
+        "endLine": 73,
+        "endChar": 17
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_858f8974",
         "filename": "src/k8splugin/rb/archive.go",
         "patchSetId": 1
@@ -294,6 +318,30 @@
       "side": 1,
       "message": "The name of the function and the comment doesn\u0027t match with what the function is doing.",
       "parentUuid": "9adffdf1_c5d4b1ed",
+      "range": {
+        "startLine": 160,
+        "startChar": 37,
+        "endLine": 160,
+        "endChar": 58
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_250fbd89",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-23T19:29:03Z",
+      "side": 1,
+      "message": "Ah. Yes. I will fix it.",
+      "parentUuid": "9adffdf1_0535d944",
       "range": {
         "startLine": 160,
         "startChar": 37,

@@ -72,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_650b858e",
+        "filename": "src/k8splugin/rb/archive.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-01-23T19:27:19Z",
+      "side": 1,
+      "message": "Is there a reason the patch is divided this way? Could this function be part of that patch?",
+      "parentUuid": "9adffdf1_65e4e5e0",
+      "range": {
+        "startLine": 73,
+        "startChar": 5,
+        "endLine": 73,
+        "endChar": 17
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_858f8974",
         "filename": "src/k8splugin/rb/archive.go",
         "patchSetId": 1
@@ -246,6 +270,30 @@
       "side": 1,
       "message": "It will happen at instantiation time and the code for that is not part of this patch.",
       "parentUuid": "9adffdf1_4593e14f",
+      "range": {
+        "startLine": 160,
+        "startChar": 37,
+        "endLine": 160,
+        "endChar": 58
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0535d944",
+        "filename": "src/k8splugin/rb/definition.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-01-23T19:27:19Z",
+      "side": 1,
+      "message": "The name of the function and the comment doesn\u0027t match with what the function is doing.",
+      "parentUuid": "9adffdf1_c5d4b1ed",
       "range": {
         "startLine": 160,
         "startChar": 37,

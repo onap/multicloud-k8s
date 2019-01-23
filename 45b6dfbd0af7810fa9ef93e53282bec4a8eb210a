@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_c59911c5",
+        "filename": "src/k8splugin/rb/archive.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-23T17:33:14Z",
+      "side": 1,
+      "message": "nit: s/ExtractTarGz/ExtractTarball",
+      "range": {
+        "startLine": 70,
+        "startChar": 2,
+        "endLine": 70,
+        "endChar": 14
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_858f8974",
+        "filename": "src/k8splugin/rb/archive.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-23T17:33:14Z",
+      "side": 1,
+      "message": "You can use the Wrap method provided by pkgerrors",
+      "range": {
+        "startLine": 77,
+        "startChar": 13,
+        "endLine": 77,
+        "endChar": 66
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_45ed2125",
+        "filename": "src/k8splugin/rb/archive.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-23T17:33:14Z",
+      "side": 1,
+      "message": "ditto: line 77",
+      "range": {
+        "startLine": 100,
+        "startChar": 14,
+        "endLine": 100,
+        "endChar": 72
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_e5dbf579",
+        "filename": "src/k8splugin/rb/archive.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-23T17:33:14Z",
+      "side": 1,
+      "message": "IMHO, it should be nice to provide an explanation about the reasoning of this value.",
+      "range": {
+        "startLine": 108,
+        "startChar": 34,
+        "endLine": 108,
+        "endChar": 38
+      },
+      "revId": "45b6dfbd0af7810fa9ef93e53282bec4a8eb210a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

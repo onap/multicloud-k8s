@@ -51,6 +51,7 @@ type ProfileManager interface {
 type ProfileClient struct {
 	storeName           string
 	tagMeta, tagContent string
+	manifestName        string
 }
 
 // NewProfileClient returns an instance of the ProfileClient
@@ -58,9 +59,10 @@ type ProfileClient struct {
 // Uses rb/def prefix
 func NewProfileClient() *ProfileClient {
 	return &ProfileClient{
-		storeName:  "rbprofile",
-		tagMeta:    "metadata",
-		tagContent: "content",
+		storeName:    "rbprofile",
+		tagMeta:      "metadata",
+		tagContent:   "content",
+		manifestName: "manifest.yaml",
 	}
 }
 

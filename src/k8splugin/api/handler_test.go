@@ -203,8 +203,10 @@ func TestListHandler(t *testing.T) {
 			expectedCode:     http.StatusOK,
 			expectedResponse: []string{"uid1"},
 			mockStore: &db.MockDB{
-				Items: map[string][]byte{
-					"uuid1": []byte("{}"),
+				Items: map[string]map[string][]byte{
+					"uuid1": {
+						"data": []byte("{}"),
+					},
 				},
 			},
 		},
@@ -257,15 +259,17 @@ func TestDeleteHandler(t *testing.T) {
 			label:        "Fail to find VNF record be deleted",
 			expectedCode: http.StatusInternalServerError,
 			mockStore: &db.MockDB{
-				Items: map[string][]byte{},
+				Items: map[string]map[string][]byte{},
 			},
 		},
 		{
 			label:        "Fail to unmarshal the DB record",
 			expectedCode: http.StatusInternalServerError,
 			mockStore: &db.MockDB{
-				Items: map[string][]byte{
-					"cloudregion1-testnamespace-uuid1": []byte("{invalid format}"),
+				Items: map[string]map[string][]byte{
+					"cloudregion1-testnamespace-uuid1": {
+						"data": []byte("{invalid format}"),
+					},
 				},
 			},
 		},
@@ -274,10 +278,12 @@ func TestDeleteHandler(t *testing.T) {
 			expectedCode:        http.StatusInternalServerError,
 			mockGetVNFClientErr: pkgerrors.New("Get VNF client error"),
 			mockStore: &db.MockDB{
-				Items: map[string][]byte{
-					"cloudregion1-testnamespace-uuid1": []byte(
-						"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
-							"\"service\": [\"svc1\", \"svc2\"]}"),
+				Items: map[string]map[string][]byte{
+					"cloudregion1-testnamespace-uuid1": {
+						"data": []byte(
+							"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
+								"\"service\": [\"svc1\", \"svc2\"]}"),
+					},
 				},
 			},
 		},
@@ -285,10 +291,12 @@ func TestDeleteHandler(t *testing.T) {
 			label:        "Fail to destroy VNF",
 			expectedCode: http.StatusInternalServerError,
 			mockStore: &db.MockDB{
-				Items: map[string][]byte{
-					"cloudregion1-testnamespace-uuid1": []byte(
-						"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
-							"\"service\": [\"svc1\", \"svc2\"]}"),
+				Items: map[string]map[string][]byte{
+					"cloudregion1-testnamespace-uuid1": {
+						"data": []byte(
+							"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
+								"\"service\": [\"svc1\", \"svc2\"]}"),
+					},
 				},
 			},
 			mockDeleteVNF: &mockCSAR{
@@ -299,10 +307,12 @@ func TestDeleteHandler(t *testing.T) {
 			label:        "Succesful delete a VNF",
 			expectedCode: http.StatusAccepted,
 			mockStore: &db.MockDB{
-				Items: map[string][]byte{
-					"cloudregion1-testnamespace-uuid1": []byte(
-						"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
-							"\"service\": [\"svc1\", \"svc2\"]}"),
+				Items: map[string]map[string][]byte{
+					"cloudregion1-testnamespace-uuid1": {
+						"data": []byte(
+							"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
+								"\"service\": [\"svc1\", \"svc2\"]}"),
+					},
 				},
 			},
 			mockDeleteVNF: &mockCSAR{},
@@ -412,8 +422,10 @@ func TestGetHandler(t *testing.T) {
 			label:        "Fail to unmarshal the DB record",
 			expectedCode: http.StatusInternalServerError,
 			mockStore: &db.MockDB{
-				Items: map[string][]byte{
-					"cloud1-default-1": []byte("{invalid-format}"),
+				Items: map[string]map[string][]byte{
+					"cloud1-default-1": {
+						"data": []byte("{invalid-format}"),
+					},
 				},
 			},
 		},
@@ -430,11 +442,13 @@ func TestGetHandler(t *testing.T) {
 				},
 			},
 			mockStore: &db.MockDB{
-				Items: map[string][]byte{
-					"cloud1-default-1": []byte(
-						"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
-							"\"service\": [\"svc1\", \"svc2\"]}"),
-					"cloud1-default-2": []byte("{}"),
+				Items: map[string]map[string][]byte{
+					"cloud1-default-1": {
+						"data": []byte(
+							"{\"deployment\": [\"deploy1\", \"deploy2\"]," +
+								"\"service\": [\"svc1\", \"svc2\"]}"),
+						"cloud1-default-2": []byte("{}"),
+					},
 				},
 			},
 		},

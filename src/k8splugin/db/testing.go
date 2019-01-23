@@ -25,7 +25,7 @@ import (
 //interface even if we are not implementing all the methods in it
 type MockDB struct {
 	Store
-	Items map[string][]byte
+	Items map[string]map[string][]byte
 	Err   error
 }
 
@@ -49,7 +49,7 @@ func (m *MockDB) Read(table, key, tag string) ([]byte, error) {
 
 	for k, v := range m.Items {
 		if k == key {
-			return v, nil
+			return v[tag], nil
 		}
 	}
 
@@ -65,5 +65,15 @@ func (m *MockDB) ReadAll(table, tag string) (map[string][]byte, error) {
 		return nil, m.Err
 	}
 
-	return m.Items, nil
+	ret := make(map[string][]byte)
+
+	for k, v := range m.Items {
+		for k1, v1 := range v {
+			if k1 == tag {
+				ret[k] = v1
+			}
+		}
+	}
+
+	return ret, nil
 }

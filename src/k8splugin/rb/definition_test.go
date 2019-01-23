@@ -110,17 +110,21 @@ func TestListDefinition(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"description\":\"testresourcebundle\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"service-type\":\"firewall\"}"),
-					"123e4567-e89b-12d3-a456-426655441111": []byte(
-						"{\"name\":\"testresourcebundle2\"," +
-							"\"description\":\"testresourcebundle2\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
-							"\"service-type\":\"dns\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"description\":\"testresourcebundle\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"service-type\":\"firewall\"}"),
+					},
+					"123e4567-e89b-12d3-a456-426655441111": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle2\"," +
+								"\"description\":\"testresourcebundle2\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
+								"\"service-type\":\"dns\"}"),
+					},
 				},
 			},
 		},
@@ -186,12 +190,14 @@ func TestGetDefinition(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"description\":\"testresourcebundle\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"service-type\":\"firewall\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"description\":\"testresourcebundle\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"service-type\":\"firewall\"}"),
+					},
 				},
 			},
 		},
@@ -298,12 +304,14 @@ func TestUploadDefinition(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"description\":\"testresourcebundle\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"service-type\":\"firewall\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"description\":\"testresourcebundle\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"service-type\":\"firewall\"}"),
+					},
 				},
 			},
 		},
@@ -333,12 +341,14 @@ func TestUploadDefinition(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655441111": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"description\":\"testresourcebundle\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
-							"\"service-type\":\"firewall\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655441111": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"description\":\"testresourcebundle\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
+								"\"service-type\":\"firewall\"}"),
+					},
 				},
 			},
 		},
@@ -351,12 +361,14 @@ func TestUploadDefinition(t *testing.T) {
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"description\":\"testresourcebundle\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"service-type\":\"firewall\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"description\":\"testresourcebundle\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"service-type\":\"firewall\"}"),
+					},
 				},
 			},
 		},

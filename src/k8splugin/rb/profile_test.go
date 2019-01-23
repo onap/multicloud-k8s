@@ -54,12 +54,14 @@ func TestCreateProfile(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"abcde123-e89b-8888-a456-986655447236": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"namespace\":\"default\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"kubernetesversion\":\"1.12.3\"}"),
+				Items: map[string]map[string][]byte{
+					"abcde123-e89b-8888-a456-986655447236": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"namespace\":\"default\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"kubernetesversion\":\"1.12.3\"}"),
+					},
 				},
 			},
 		},
@@ -115,13 +117,15 @@ func TestListProfiles(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"namespace\":\"default\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
-							"\"kubernetesversion\":\"1.12.3\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"namespace\":\"default\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
+								"\"kubernetesversion\":\"1.12.3\"}"),
+					},
 				},
 			},
 		},
@@ -188,13 +192,15 @@ func TestGetProfile(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"namespace\":\"default\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
-							"\"kubernetesversion\":\"1.12.3\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"namespace\":\"default\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
+								"\"kubernetesversion\":\"1.12.3\"}"),
+					},
 				},
 			},
 		},
@@ -301,13 +307,15 @@ func TestUploadProfile(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"namespace\":\"default\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
-							"\"kubernetesversion\":\"1.12.3\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"namespace\":\"default\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
+								"\"kubernetesversion\":\"1.12.3\"}"),
+					},
 				},
 			},
 		},
@@ -337,13 +345,15 @@ func TestUploadProfile(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655441111": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"namespace\":\"default\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
-							"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
-							"\"kubernetesversion\":\"1.12.3\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655441111": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"namespace\":\"default\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
+								"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
+								"\"kubernetesversion\":\"1.12.3\"}"),
+					},
 				},
 			},
 		},
@@ -356,13 +366,15 @@ func TestUploadProfile(t *testing.T) {
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"namespace\":\"default\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
-							"\"kubernetesversion\":\"1.12.3\"}"),
+				Items: map[string]map[string][]byte{
+					"123e4567-e89b-12d3-a456-426655440000": {
+						"metadata": []byte(
+							"{\"name\":\"testresourcebundle\"," +
+								"\"namespace\":\"default\"," +
+								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
+								"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
+								"\"kubernetesversion\":\"1.12.3\"}"),
+					},
 				},
 			},
 		},

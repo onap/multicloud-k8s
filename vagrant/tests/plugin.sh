@@ -114,7 +114,7 @@ print_msg "Instantiate Profile"
 payload_raw="
 {
     \"cloud_region_id\": \"$cloud_region_id\",
-    \"namespace\": \"$namespace\",
+    \"rb_profile_id\":\"$profile_id\",
     \"csar_id\": \"$csar_id\"
 }
 "
@@ -122,8 +122,8 @@ payload=$(echo $payload_raw | tr '\n' ' ')
 vnf_id=$(curl -s -d "$payload" "${base_url}/v1/vnf_instances/" | jq -r '.vnf_id')
 
 print_msg "Validating Kubernetes"
-kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-${plugin_deployment_name}
-kubectl get --no-headers=true --namespace=${namespace} service ${cloud_region_id}-${namespace}-${vnf_id}-${plugin_service_name}
+kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-test-rbprofile-vault-consul-dev
+kubectl get --no-headers=true --namespace=${namespace} service ${cloud_region_id}-${namespace}-${vnf_id}-override-vault-consul
 echo "VNF Instance created succesfully with id: $vnf_id"
 
 print_msg "Listing VNF Instances"

@@ -1,7 +1,6 @@
 module k8splugin
 
 require (
-<<<<<<< HEAD
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/MakeNowJust/heredoc v0.0.0-20171113091838-e9091a26100e // indirect
 	github.com/Masterminds/semver v1.4.2 // indirect
@@ -18,12 +17,8 @@ require (
 	github.com/evanphx/json-patch v4.1.0+incompatible // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
-	github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680
-	github.com/go-openapi/spec v0.18.0 // indirect
-=======
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ghodss/yaml v1.0.0
->>>>>>> 498faed... Add support for parsing profile yaml files
+	github.com/go-openapi/spec v0.18.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gogo/protobuf v1.0.0 // indirect

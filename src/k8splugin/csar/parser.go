@@ -19,6 +19,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 
 	"k8s.io/client-go/kubernetes"
 
@@ -26,6 +27,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"k8splugin/krd"
+	"k8splugin/rb"
 )
 
 func generateExternalVNFID() string {
@@ -71,40 +73,46 @@ func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
 }
 
 // CreateVNF reads the CSAR files from the files system and creates them one by one
-var CreateVNF = func(csarID string, cloudRegionID string, namespace string, kubeclient *kubernetes.Clientset) (string, map[string][]string, error) {
-	if err := ensuresNamespace(namespace, kubeclient); err != nil {
-		return "", nil, pkgerrors.Wrap(err, "Error while ensuring namespace: "+namespace)
+var CreateVNF = func(csarID string, cloudRegionID string, rbProfileID string, kubeclient *kubernetes.Clientset) (string, map[string][]string, error) {
+
+	overrideValues := []string{}
+	rbProfileClient := rb.NewProfileClient()
+	rbProfile, err := rbProfileClient.Get(rbProfileID)
+	if err != nil {
+		return "", nil, pkgerrors.Wrap(err, "Error getting profile info")
+	}
+
+	//Make sure that the namespace exists before trying to create any resources
+	if err := ensuresNamespace(rbProfile.Namespace, kubeclient); err != nil {
+		return "", nil, pkgerrors.Wrap(err, "Error while ensuring namespace: "+rbProfile.Namespace)
 	}
 	externalVNFID := generateExternalVNFID()
-	internalVNFID := cloudRegionID + "-" + namespace + "-" + externalVNFID
+	internalVNFID := cloudRegionID + "-" + rbProfile.Namespace + "-" + externalVNFID
 
-	csarDirPath := os.Getenv("CSAR_DIR") + "/" + csarID
-	metadataYAMLPath := csarDirPath + "/metadata.yaml"
-
-	log.Println("Reading " + metadataYAMLPath + " file")
-	metadataFile, err := ReadMetadataFile(metadataYAMLPath)
+	metaMap, err := rb.NewProfileClient().Resolve(rbProfileID, overrideValues)
 	if err != nil {
-		return "", nil, pkgerrors.Wrap(err, "Error while reading Metadata File: "+metadataYAMLPath)
+		return "", nil, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
 
-	var path string
 	resourceYAMLNameMap := make(map[string][]string)
-	// Iterates over the resources defined in the metadata file to create kubernetes resources
-	log.Println(string(len(metadataFile.ResourceTypePathMap)) + " resource(s) type(s) to be processed")
-	for resource, fileNames := range metadataFile.ResourceTypePathMap {
+	// Iterates over the resources defined in the metadata map to create kubernetes resources
+	log.Printf("%d resource(s) type(s) to be processed", len(metaMap))
+	for res, filePaths := range metaMap {
+		//Convert resource to lower case as the map index is lowercase
+		resource := strings.ToLower(res)
 		log.Println("Processing items of " + string(resource) + " resource")
 		var resourcesCreated []string
-		for _, filename := range fileNames {
-			path = csarDirPath + "/" + filename
+		for _, filepath := range filePaths {
 
-			if _, err := os.Stat(path); os.IsNotExist(err) {
-				return "", nil, pkgerrors.New("File " + path + "does not exists")
+			if _, err := os.Stat(filepath); os.IsNotExist(err) {
+				return "", nil, pkgerrors.New("File " + filepath + "does not exists")
 			}
-			log.Println("Processing file: " + path)
+			log.Println("Processing file: " + filepath)
 
+			//Populate the namespace from profile instead of instance body
 			genericKubeData := &krd.ResourceData{
-				YamlFilePath: path,
-				Namespace:    namespace,
+				YamlFilePath: filepath,
+				Namespace:    rbProfile.Namespace,
 				VnfId:        internalVNFID,
 			}
 

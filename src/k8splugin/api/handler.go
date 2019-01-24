@@ -28,6 +28,7 @@ import (
 	"k8splugin/csar"
 	"k8splugin/db"
 	"k8splugin/krd"
+	"k8splugin/rb"
 )
 
 //TODO: Separate the http handler code and backend code out
@@ -54,7 +55,11 @@ func validateBody(body interface{}) error {
 			werr := pkgerrors.Wrap(errors.New("Invalid/Missing CsarID in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
-		if strings.Contains(b.CloudRegionID, "|") || strings.Contains(b.Namespace, "|") {
+		if b.RBProfileID == "" {
+			werr := pkgerrors.Wrap(errors.New("Invalid/Missing RB ProfileID in POST request"), "CreateVnfRequest bad request")
+			return werr
+		}
+		if strings.Contains(b.CloudRegionID, "|") {
 			werr := pkgerrors.Wrap(errors.New("Character \"|\" not allowed in CSAR ID"), "CreateVnfRequest bad request")
 			return werr
 		}
@@ -105,18 +110,21 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 		},
 		nil
 	*/
-	externalVNFID, resourceNameMap, err := csar.CreateVNF(resource.CsarID, resource.CloudRegionID, resource.Namespace, &kubeclient)
+	externalVNFID, resourceNameMap, err := csar.CreateVNF(resource.CsarID, resource.CloudRegionID,
+		resource.RBProfileID, &kubeclient)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Read Kubernetes Data information error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	rbProfile, _ := rb.NewProfileClient().Get(resource.RBProfileID)
+	namespace := rbProfile.Namespace
 	// cloud1-default-uuid
-	internalVNFID := resource.CloudRegionID + "-" + resource.Namespace + "-" + externalVNFID
+	internalVNFID := resource.CloudRegionID + "-" + namespace + "-" + externalVNFID
 
 	// Persist in AAI database.
-	log.Printf("Cloud Region ID: %s, Namespace: %s, VNF ID: %s ", resource.CloudRegionID, resource.Namespace, externalVNFID)
+	log.Printf("Cloud Region ID: %s, Namespace: %s, VNF ID: %s ", resource.CloudRegionID, namespace, externalVNFID)
 
 	// TODO: Uncomment when annotations are done
 	// krd.AddNetworkAnnotationsToPod(kubeData, resource.Networks)
@@ -133,7 +141,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	resp := CreateVnfResponse{
 		VNFID:         externalVNFID,
 		CloudRegionID: resource.CloudRegionID,
-		Namespace:     resource.Namespace,
+		Namespace:     namespace,
 		VNFComponents: resourceNameMap,
 	}
 

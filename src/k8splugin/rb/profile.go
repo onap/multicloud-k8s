@@ -24,6 +24,8 @@ import (
 
 	uuid "github.com/hashicorp/go-uuid"
 	pkgerrors "github.com/pkg/errors"
+
+	"k8splugin/krd"
 )
 
 // Profile contains the parameters needed for resource bundle (rb) profiles
@@ -215,4 +217,63 @@ func (v *ProfileClient) Download(id string) ([]byte, error) {
 		}
 	}
 	return nil, pkgerrors.New("Error downloading Profile content")
+}
+
+//Resolve returns the path where the helm chart merged with
+//configuration overrides resides.
+func (v *ProfileClient) Resolve(id string, values []string) (map[string][]string, error) {
+
+	var retMap map[string][]string
+
+	//Download and process the profile first
+	//If everything seems okay, then download the definition
+	prData, err := v.Download(id)
+	if err != nil {
+		return retMap, pkgerrors.Wrap(err, "Downloading Profile")
+	}
+
+	prPath, err := ExtractTarBall(bytes.NewBuffer(prData))
+	if err != nil {
+		return retMap, pkgerrors.Wrap(err, "Extracting Profile Content")
+	}
+
+	prYamlClient, err := ProcessProfileYaml(prPath, v.manifestName)
+	if err != nil {
+		return retMap, pkgerrors.Wrap(err, "Processing Profile Manifest")
+	}
+
+	//Get the definition ID and download its contents
+	profile, err := v.Get(id)
+	if err != nil {
+		return retMap, pkgerrors.Wrap(err, "Getting Profile")
+	}
+
+	defData, err := NewDefinitionClient().Download(profile.RBDID)
+	if err != nil {
+		return retMap, pkgerrors.Wrap(err, "Downloading Definition")
+	}
+
+	chartPath, err := ExtractTarBall(bytes.NewBuffer(defData))
+	if err != nil {
+		return retMap, pkgerrors.Wrap(err, "Extracting Definition Charts")
+	}
+
+	//Apply the profile configresources to the chart
+	err = prYamlClient.CopyConfigurationOverrides(chartPath)
+	if err != nil {
+		return retMap, pkgerrors.Wrap(err, "Copying configresources to chart")
+	}
+
+	helmClient := krd.NewHelmTemplateClient(profile.KubernetesVersion,
+		profile.Namespace,
+		profile.Name)
+
+	retMap, err = helmClient.GenerateKubernetesArtifacts(chartPath,
+		[]string{prYamlClient.GetValues()},
+		values)
+	if err != nil {
+		return retMap, pkgerrors.Wrap(err, "Generate final k8s yaml")
+	}
+
+	return retMap, nil
 }

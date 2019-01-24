@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_2919d721",
+        "filename": "src/k8splugin/rb/archive_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-24T00:07:40Z",
+      "side": 1,
+      "message": "As an empty byte array? Let me see if I can quickly add that.",
+      "parentUuid": "9adffdf1_290237b4",
+      "revId": "4dd534afa4d6f0e367706be7d22e4cb1012ead61",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_c9112b05",
         "filename": "src/k8splugin/rb/archive_test.go",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_c9284b35",
+        "filename": "src/k8splugin/rb/archive_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-24T00:07:40Z",
+      "side": 1,
+      "message": "Yeah. True. I thought about that, but the simplicity of the test itself made me write it like this. Maybe, we will revisit at a later point.",
+      "parentUuid": "9adffdf1_c9112b05",
+      "revId": "4dd534afa4d6f0e367706be7d22e4cb1012ead61",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_49fd3bb0",
         "filename": "src/k8splugin/rb/profile.go",
         "patchSetId": 2
@@ -47,6 +83,30 @@
       "writtenOn": "2019-01-24T00:03:55Z",
       "side": 1,
       "message": "It seems like this function is not covered by Unit tests",
+      "range": {
+        "startLine": 190,
+        "startChar": 24,
+        "endLine": 190,
+        "endChar": 32
+      },
+      "revId": "4dd534afa4d6f0e367706be7d22e4cb1012ead61",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_891ec30a",
+        "filename": "src/k8splugin/rb/profile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-24T00:07:40Z",
+      "side": 1,
+      "message": "See commit note\nI will add the download test in a seperate patch that requires some mockdb changes (76232)",
+      "parentUuid": "9adffdf1_49fd3bb0",
       "range": {
         "startLine": 190,
         "startChar": 24,

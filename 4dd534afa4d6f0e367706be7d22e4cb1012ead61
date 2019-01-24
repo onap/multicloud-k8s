@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_290237b4",
+        "filename": "src/k8splugin/rb/archive_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-24T00:03:55Z",
+      "side": 1,
+      "message": "Are you covering the test case where the content of the file is empty? and I\u0027m sure if should be nice to also cover the use case where the user doesn\u0027t have enough permissions.",
+      "revId": "4dd534afa4d6f0e367706be7d22e4cb1012ead61",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_c9112b05",
+        "filename": "src/k8splugin/rb/archive_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-24T00:03:55Z",
+      "side": 1,
+      "message": "Shouldn\u0027t be nice to use the same Unit test format here, where a dictionary with the scenarios is provided. I know that it\u0027s a trade off between simplicity and scalability.",
+      "revId": "4dd534afa4d6f0e367706be7d22e4cb1012ead61",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_49fd3bb0",
+        "filename": "src/k8splugin/rb/profile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-24T00:03:55Z",
+      "side": 1,
+      "message": "It seems like this function is not covered by Unit tests",
+      "range": {
+        "startLine": 190,
+        "startChar": 24,
+        "endLine": 190,
+        "endChar": 32
+      },
+      "revId": "4dd534afa4d6f0e367706be7d22e4cb1012ead61",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

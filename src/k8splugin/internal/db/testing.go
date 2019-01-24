@@ -1,4 +1,4 @@
-// +build unit
+// +build unit integration
 
 /*
 Copyright 2018 Intel Corporation.

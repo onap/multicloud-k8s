@@ -114,7 +114,7 @@ print_msg "Instantiate Profile"
 payload_raw="
 {
     \"cloud_region_id\": \"$cloud_region_id\",
-    \"namespace\": \"$namespace\",
+    \"rb_profile_id\":\"$profile_id\",
     \"csar_id\": \"$csar_id\"
 }
 "

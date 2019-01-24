@@ -98,7 +98,7 @@ func TestCreateHandler(t *testing.T) {
 			label: "Fail to get the VNF client",
 			input: bytes.NewBuffer([]byte(`{
 				"cloud_region_id": "region1",
-				"namespace": "test",
+				"rb_profile_id": "123e4567-e89b-12d3-a456-426655440000",
 				"csar_id": "UUID-1"
 			}`)),
 			expectedCode:        http.StatusInternalServerError,
@@ -108,7 +108,7 @@ func TestCreateHandler(t *testing.T) {
 			label: "Fail to create the VNF instance",
 			input: bytes.NewBuffer([]byte(`{
 				"cloud_region_id": "region1",
-				"namespace": "test",
+				"rb_profile_id": "123e4567-e89b-12d3-a456-426655440000",
 				"csar_id": "UUID-1"
 			}`)),
 			expectedCode: http.StatusInternalServerError,
@@ -120,7 +120,7 @@ func TestCreateHandler(t *testing.T) {
 			label: "Fail to create a VNF DB record",
 			input: bytes.NewBuffer([]byte(`{
 				"cloud_region_id": "region1",
-				"namespace": "test",
+				"rb_profile_id": "123e4567-e89b-12d3-a456-426655440000",
 				"csar_id": "UUID-1"
 			}`)),
 			expectedCode: http.StatusInternalServerError,
@@ -135,7 +135,7 @@ func TestCreateHandler(t *testing.T) {
 			label: "Succesful create a VNF",
 			input: bytes.NewBuffer([]byte(`{
 				"cloud_region_id": "region1",
-				"namespace": "test",
+				"rb_profile_id": "123e4567-e89b-12d3-a456-426655440000",
 				"csar_id": "UUID-1"
 			}`)),
 			expectedCode: http.StatusCreated,

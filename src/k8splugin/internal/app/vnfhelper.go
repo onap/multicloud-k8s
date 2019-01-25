@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package csar
+package app
 
 import (
 	"encoding/hex"
@@ -25,7 +25,7 @@ import (
 	pkgerrors "github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 
-	"k8splugin/krd"
+	utils "k8splugin/internal"
 )
 
 func generateExternalVNFID() string {
@@ -35,7 +35,7 @@ func generateExternalVNFID() string {
 }
 
 func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
-	namespacePlugin, ok := krd.LoadedPlugins["namespace"]
+	namespacePlugin, ok := utils.LoadedPlugins["namespace"]
 	if !ok {
 		return pkgerrors.New("No plugin for namespace resource found")
 	}
@@ -57,11 +57,11 @@ func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error fetching create namespace plugin")
 		}
-		namespaceResource := &krd.ResourceData{
+		namespaceResource := &utils.ResourceData{
 			Namespace: namespace,
 		}
 
-		_, err = symGetNamespaceFunc.(func(*krd.ResourceData, kubernetes.Interface) (string, error))(
+		_, err = symGetNamespaceFunc.(func(*utils.ResourceData, kubernetes.Interface) (string, error))(
 			namespaceResource, kubeclient)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating "+namespace+" namespace")
@@ -102,13 +102,13 @@ var CreateVNF = func(csarID string, cloudRegionID string, namespace string, kube
 			}
 			log.Println("Processing file: " + path)
 
-			genericKubeData := &krd.ResourceData{
+			genericKubeData := &utils.ResourceData{
 				YamlFilePath: path,
 				Namespace:    namespace,
 				VnfId:        internalVNFID,
 			}
 
-			typePlugin, ok := krd.LoadedPlugins[resource]
+			typePlugin, ok := utils.LoadedPlugins[resource]
 			if !ok {
 				return "", nil, pkgerrors.New("No plugin for resource " + resource + " found")
 			}
@@ -118,7 +118,7 @@ var CreateVNF = func(csarID string, cloudRegionID string, namespace string, kube
 				return "", nil, pkgerrors.Wrap(err, "Error fetching "+resource+" plugin")
 			}
 
-			internalResourceName, err := symCreateResourceFunc.(func(*krd.ResourceData, kubernetes.Interface) (string, error))(
+			internalResourceName, err := symCreateResourceFunc.(func(*utils.ResourceData, kubernetes.Interface) (string, error))(
 				genericKubeData, kubeclient)
 			if err != nil {
 				return "", nil, pkgerrors.Wrap(err, "Error in plugin "+resource+" plugin")
@@ -142,7 +142,7 @@ var DestroyVNF = func(data map[string][]string, namespace string, kubeclient *ku
 	*/
 
 	for resourceName, resourceList := range data {
-		typePlugin, ok := krd.LoadedPlugins[resourceName]
+		typePlugin, ok := utils.LoadedPlugins[resourceName]
 		if !ok {
 			return pkgerrors.New("No plugin for resource " + resourceName + " found")
 		}

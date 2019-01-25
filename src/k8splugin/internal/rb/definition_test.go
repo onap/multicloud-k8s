@@ -19,7 +19,7 @@
 package rb
 
 import (
-	"k8splugin/db"
+	"k8splugin/internal/db"
 	"reflect"
 	"sort"
 	"strings"

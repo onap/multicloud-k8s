@@ -19,7 +19,7 @@ package api
 import (
 	"encoding/json"
 	"io/ioutil"
-	"k8splugin/rb"
+	"k8splugin/internal/rb"
 	"net/http"
 
 	"github.com/gorilla/mux"

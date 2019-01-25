@@ -26,6 +26,7 @@ import (
 	"k8s.io/client-go/util/homedir"
 
 	"k8splugin/api"
+	utils "k8splugin/internal"
 )
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 	}
 	flag.Parse()
 
-	err := api.CheckInitialSettings()
+	err := utils.CheckInitialSettings()
 	if err != nil {
 		log.Fatal(err)
 	}

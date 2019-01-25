@@ -12,6 +12,14 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+function print_msg {
+    local msg=$1
+    local RED='\033[0;31m'
+    local NC='\033[0m'
+
+    echo -e "${RED} $msg ---------------------------------------${NC}"
+}
+
 function _get_ovn_central_address {
     ansible_ifconfig=$(ansible ovn-central[0] -i $test_folder/../inventory/hosts.ini -m shell -a "ifconfig eth1 |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'")
     if [[ $ansible_ifconfig != *CHANGED* ]]; then

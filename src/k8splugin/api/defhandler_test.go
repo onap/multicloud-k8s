@@ -91,12 +91,14 @@ func TestRBDefCreateHandler(t *testing.T) {
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
 				"name":"testdomain",
+                "chart-name":"testchart",
 				"description":"test description",
 				"service-type":"firewall"
 				}`)),
 			expected: rb.Definition{
 				UUID:        "123e4567-e89b-12d3-a456-426655440000",
 				Name:        "testresourcebundle",
+				ChartName:   "testchart",
 				Description: "test description",
 				ServiceType: "firewall",
 			},
@@ -106,6 +108,7 @@ func TestRBDefCreateHandler(t *testing.T) {
 					{
 						UUID:        "123e4567-e89b-12d3-a456-426655440000",
 						Name:        "testresourcebundle",
+						ChartName:   "testchart",
 						Description: "test description",
 						ServiceType: "firewall",
 					},

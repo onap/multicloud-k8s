@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_23a9f023",
+        "filename": "src/k8splugin/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-01-25T23:46:01Z",
+      "side": 0,
+      "message": "Consider adding this change in a separate patch. Not related to changing the layout of the directory structure",
+      "revId": "5c4e91705457dc4bdb5526e6f5210fa879ab659d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

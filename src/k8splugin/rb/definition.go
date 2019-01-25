@@ -31,6 +31,7 @@ import (
 type Definition struct {
 	UUID        string `json:"uuid,omitempty"`
 	Name        string `json:"name"`
+	ChartName   string `json:"chart-name"`
 	Description string `json:"description"`
 	ServiceType string `json:"service-type"`
 }

@@ -1,0 +1,7 @@
+service:
+  type: NodePort
+  name: aaf-sms-db
+  portName: aaf-sms-db
+  internalPort: 8222
+  nodePort: 44
+

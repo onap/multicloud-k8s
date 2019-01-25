@@ -14,7 +14,7 @@ limitations under the License.
 package api
 
 import (
-	"k8splugin/rb"
+	"k8splugin/internal/rb"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -23,8 +23,8 @@ import (
 	"github.com/gorilla/mux"
 	pkgerrors "github.com/pkg/errors"
 
-	"k8splugin/db"
-	"k8splugin/krd"
+	krd "k8splugin/internal"
+	"k8splugin/internal/db"
 )
 
 // CheckEnvVariables checks for required Environment variables

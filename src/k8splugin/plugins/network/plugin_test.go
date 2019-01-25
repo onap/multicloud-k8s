@@ -16,13 +16,14 @@ limitations under the License.
 package main
 
 import (
-	pkgerrors "github.com/pkg/errors"
-	"k8splugin/krd"
+	utils "k8splugin/internal"
 	"os"
 	"plugin"
 	"reflect"
 	"strings"
 	"testing"
+
+	pkgerrors "github.com/pkg/errors"
 )
 
 func LoadMockNetworkPlugins(krdLoadedPlugins *map[string]*plugin.Plugin, networkName, errMsg string) error {
@@ -53,15 +54,15 @@ func LoadMockNetworkPlugins(krdLoadedPlugins *map[string]*plugin.Plugin, network
 
 func TestCreateNetwork(t *testing.T) {
 	internalVNFID := "1"
-	oldkrdPluginData := krd.LoadedPlugins
+	oldkrdPluginData := utils.LoadedPlugins
 
 	defer func() {
-		krd.LoadedPlugins = oldkrdPluginData
+		utils.LoadedPlugins = oldkrdPluginData
 	}()
 
 	testCases := []struct {
 		label          string
-		input          *krd.ResourceData
+		input          *utils.ResourceData
 		mockError      string
 		mockOutput     string
 		expectedResult string
@@ -69,14 +70,14 @@ func TestCreateNetwork(t *testing.T) {
 	}{
 		{
 			label: "Fail to decode a network object",
-			input: &krd.ResourceData{
+			input: &utils.ResourceData{
 				YamlFilePath: "../../mock_files/mock_yamls/service.yaml",
 			},
 			expectedError: "Fail to decode network's configuration: Invalid configuration value",
 		},
 		{
 			label: "Fail to create a network",
-			input: &krd.ResourceData{
+			input: &utils.ResourceData{
 				YamlFilePath: "../../mock_files/mock_yamls/ovn4nfvk8s.yaml",
 			},
 			mockError:     "Internal error",
@@ -84,7 +85,7 @@ func TestCreateNetwork(t *testing.T) {
 		},
 		{
 			label: "Successfully create a ovn4nfv network",
-			input: &krd.ResourceData{
+			input: &utils.ResourceData{
 				VnfId:        internalVNFID,
 				YamlFilePath: "../../mock_files/mock_yamls/ovn4nfvk8s.yaml",
 			},
@@ -95,7 +96,7 @@ func TestCreateNetwork(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			err := LoadMockNetworkPlugins(&krd.LoadedPlugins, testCase.mockOutput, testCase.mockError)
+			err := LoadMockNetworkPlugins(&utils.LoadedPlugins, testCase.mockOutput, testCase.mockError)
 			if err != nil {
 				t.Fatalf("TestCreateNetwork returned an error (%s)", err)
 			}
@@ -121,10 +122,10 @@ func TestCreateNetwork(t *testing.T) {
 }
 
 func TestDeleteNetwork(t *testing.T) {
-	oldkrdPluginData := krd.LoadedPlugins
+	oldkrdPluginData := utils.LoadedPlugins
 
 	defer func() {
-		krd.LoadedPlugins = oldkrdPluginData
+		utils.LoadedPlugins = oldkrdPluginData
 	}()
 
 	testCases := []struct {
@@ -154,7 +155,7 @@ func TestDeleteNetwork(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			err := LoadMockNetworkPlugins(&krd.LoadedPlugins, testCase.mockOutput, testCase.mockError)
+			err := LoadMockNetworkPlugins(&utils.LoadedPlugins, testCase.mockOutput, testCase.mockError)
 			if err != nil {
 				t.Fatalf("TestDeleteNetwork returned an error (%s)", err)
 			}

@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package krd
+package utils
 
 import (
 	"strings"
@@ -39,7 +39,7 @@ func TestDecodeYAML(t *testing.T) {
 		},
 		{
 			label:         "Fail to read invalid YAML format",
-			input:         "./plugins_test.go",
+			input:         "./utils_test.go",
 			expectedError: "mapping values are not allowed in this contex",
 		},
 		{

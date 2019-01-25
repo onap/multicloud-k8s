@@ -27,8 +27,8 @@ import (
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
-	"k8splugin/csar"
-	"k8splugin/db"
+	helper "k8splugin/internal/app"
+	"k8splugin/internal/db"
 )
 
 type mockCSAR struct {
@@ -155,7 +155,7 @@ func TestCreateHandler(t *testing.T) {
 				return kubernetes.Clientset{}, testCase.mockGetVNFClientErr
 			}
 			if testCase.mockCreateVNF != nil {
-				csar.CreateVNF = testCase.mockCreateVNF.CreateVNF
+				helper.CreateVNF = testCase.mockCreateVNF.CreateVNF
 			}
 			if testCase.mockStore != nil {
 				db.DBconn = testCase.mockStore
@@ -328,7 +328,7 @@ func TestDeleteHandler(t *testing.T) {
 				db.DBconn = testCase.mockStore
 			}
 			if testCase.mockDeleteVNF != nil {
-				csar.DestroyVNF = testCase.mockDeleteVNF.DestroyVNF
+				helper.DestroyVNF = testCase.mockDeleteVNF.DestroyVNF
 			}
 
 			request, _ := http.NewRequest("DELETE", "/v1/vnf_instances/cloudregion1/testnamespace/uuid1", nil)

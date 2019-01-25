@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package krd
+package app
 
 import (
 	"reflect"
@@ -23,7 +23,7 @@ import (
 func TestGetKubeClient(t *testing.T) {
 	t.Run("Successfully create Kube Client", func(t *testing.T) {
 
-		clientset, err := GetKubeClient("../mock_files/mock_configs/mock_config")
+		clientset, err := GetKubeClient("../../mock_files/mock_configs/mock_config")
 		if err != nil {
 			t.Fatalf("TestGetKubeClient returned an error (%s)", err)
 		}

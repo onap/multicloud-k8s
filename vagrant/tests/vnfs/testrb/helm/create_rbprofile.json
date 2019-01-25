@@ -1,0 +1,7 @@
+{
+    "name": "test-rbprofile",
+    "namespace": "testnamespace1",
+    "rbdid": "7eb09e38-4363-9942-1234-3beb2e95fd85",
+    "uuid": "12345678-8888-4578-3344-987654398731",
+    "kubernetesversion": "1.12.3"
+}

@@ -16,6 +16,24 @@
       "revId": "bf10ee4741957df3986bbc01acc7557bb1dc7933",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_833f7cb3",
+        "filename": "src/k8splugin/api/defhandler_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-25T18:48:50Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "9adffdf1_c3590436",
+      "revId": "bf10ee4741957df3986bbc01acc7557bb1dc7933",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

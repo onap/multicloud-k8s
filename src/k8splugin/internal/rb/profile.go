@@ -19,7 +19,7 @@ package rb
 import (
 	"bytes"
 	"encoding/base64"
-	"k8splugin/db"
+	"k8splugin/internal/db"
 	"log"
 
 	uuid "github.com/hashicorp/go-uuid"

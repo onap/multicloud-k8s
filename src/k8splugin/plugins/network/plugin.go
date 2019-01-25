@@ -14,11 +14,13 @@ limitations under the License.
 package main
 
 import (
-	pkgerrors "github.com/pkg/errors"
-	"k8s.io/client-go/kubernetes"
-	"k8splugin/krd"
 	"k8splugin/plugins/network/v1"
 	"regexp"
+
+	utils "k8splugin/internal"
+
+	pkgerrors "github.com/pkg/errors"
+	"k8s.io/client-go/kubernetes"
 )
 
 func extractData(data string) (vnfID, cniType, networkName string) {
@@ -34,9 +36,9 @@ func extractData(data string) (vnfID, cniType, networkName string) {
 }
 
 // Create an ONAP Network object
-func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error) {
+func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
 	network := &v1.OnapNetwork{}
-	if _, err := krd.DecodeYAML(data.YamlFilePath, network); err != nil {
+	if _, err := utils.DecodeYAML(data.YamlFilePath, network); err != nil {
 		return "", pkgerrors.Wrap(err, "Decode network object error")
 	}
 
@@ -46,7 +48,7 @@ func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error)
 	}
 
 	cniType := config["cnitype"].(string)
-	typePlugin, ok := krd.LoadedPlugins[cniType+"-network"]
+	typePlugin, ok := utils.LoadedPlugins[cniType+"-network"]
 	if !ok {
 		return "", pkgerrors.New("No plugin for resource " + cniType + " found")
 	}
@@ -72,7 +74,7 @@ func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
 // Delete an existing Network
 func Delete(name string, namespace string, kubeclient kubernetes.Interface) error {
 	_, cniType, networkName := extractData(name)
-	typePlugin, ok := krd.LoadedPlugins[cniType+"-network"]
+	typePlugin, ok := utils.LoadedPlugins[cniType+"-network"]
 	if !ok {
 		return pkgerrors.New("No plugin for resource " + cniType + " found")
 	}

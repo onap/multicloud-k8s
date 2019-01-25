@@ -20,7 +20,7 @@ import (
 	"strings"
 	"testing"
 
-	"k8splugin/krd"
+	utils "k8splugin/internal"
 
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,14 +31,14 @@ func TestCreateNamespace(t *testing.T) {
 	namespace := "test1"
 	testCases := []struct {
 		label          string
-		input          *krd.ResourceData
+		input          *utils.ResourceData
 		clientOutput   *coreV1.Namespace
 		expectedResult string
 		expectedError  string
 	}{
 		{
 			label: "Successfully create a namespace",
-			input: &krd.ResourceData{
+			input: &utils.ResourceData{
 				Namespace: namespace,
 			},
 			clientOutput:   &coreV1.Namespace{},

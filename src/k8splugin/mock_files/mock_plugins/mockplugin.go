@@ -16,13 +16,13 @@ package main
 import (
 	"k8s.io/client-go/kubernetes"
 
-	"k8splugin/krd"
+	utils "k8splugin/internal"
 )
 
 func main() {}
 
 // Create object in a specific Kubernetes resource
-func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error) {
+func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
 	return "externalUUID", nil
 }
 

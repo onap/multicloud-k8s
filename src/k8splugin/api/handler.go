@@ -25,9 +25,8 @@ import (
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
-	"k8splugin/csar"
-	"k8splugin/db"
-	"k8splugin/krd"
+	helper "k8splugin/internal/app"
+	"k8splugin/internal/db"
 )
 
 //TODO: Separate the http handler code and backend code out
@@ -36,7 +35,7 @@ var tagData = "data"
 
 // GetVNFClient retrieves the client used to communicate with a Kubernetes Cluster
 var GetVNFClient = func(kubeConfigPath string) (kubernetes.Clientset, error) {
-	client, err := krd.GetKubeClient(kubeConfigPath)
+	client, err := helper.GetKubeClient(kubeConfigPath)
 	if err != nil {
 		return client, err
 	}
@@ -105,7 +104,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 		},
 		nil
 	*/
-	externalVNFID, resourceNameMap, err := csar.CreateVNF(resource.CsarID, resource.CloudRegionID, resource.Namespace, &kubeclient)
+	externalVNFID, resourceNameMap, err := helper.CreateVNF(resource.CsarID, resource.CloudRegionID, resource.Namespace, &kubeclient)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Read Kubernetes Data information error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
@@ -223,7 +222,7 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = csar.DestroyVNF(data, namespace, &kubeclient)
+	err = helper.DestroyVNF(data, namespace, &kubeclient)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Delete VNF error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)

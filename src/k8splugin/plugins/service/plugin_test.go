@@ -20,7 +20,7 @@ import (
 	"strings"
 	"testing"
 
-	"k8splugin/krd"
+	utils "k8splugin/internal"
 
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,14 +33,14 @@ func TestCreateService(t *testing.T) {
 	internalVNFID := "1"
 	testCases := []struct {
 		label          string
-		input          *krd.ResourceData
+		input          *utils.ResourceData
 		clientOutput   *coreV1.Service
 		expectedResult string
 		expectedError  string
 	}{
 		{
 			label: "Fail to create a service with invalid type",
-			input: &krd.ResourceData{
+			input: &utils.ResourceData{
 				YamlFilePath: "../../mock_files/mock_yamls/deployment.yaml",
 			},
 			clientOutput:  &coreV1.Service{},
@@ -48,7 +48,7 @@ func TestCreateService(t *testing.T) {
 		},
 		{
 			label: "Successfully create a service",
-			input: &krd.ResourceData{
+			input: &utils.ResourceData{
 				VnfId:        internalVNFID,
 				YamlFilePath: "../../mock_files/mock_yamls/service.yaml",
 			},

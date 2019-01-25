@@ -22,16 +22,16 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"k8splugin/krd"
+	utils "k8splugin/internal"
 )
 
 // Create deployment object in a specific Kubernetes cluster
-func Create(data *krd.ResourceData, client kubernetes.Interface) (string, error) {
+func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
 	namespace := data.Namespace
 	if namespace == "" {
 		namespace = "default"
 	}
-	obj, err := krd.DecodeYAML(data.YamlFilePath, nil)
+	obj, err := utils.DecodeYAML(data.YamlFilePath, nil)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Decode deployment object error")
 	}
@@ -58,7 +58,7 @@ func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
 	}
 
 	opts := metaV1.ListOptions{
-		Limit: krd.ResourcesListLimit,
+		Limit: utils.ResourcesListLimit,
 	}
 	opts.APIVersion = "apps/v1"
 	opts.Kind = "Deployment"
@@ -68,7 +68,7 @@ func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
 		return nil, pkgerrors.Wrap(err, "Get Deployment list error")
 	}
 
-	result := make([]string, 0, krd.ResourcesListLimit)
+	result := make([]string, 0, utils.ResourcesListLimit)
 	if list != nil {
 		for _, deployment := range list.Items {
 			log.Printf("%v", deployment.Name)

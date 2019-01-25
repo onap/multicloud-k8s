@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package csar
+package app
 
 import (
 	"io/ioutil"
@@ -22,20 +22,20 @@ import (
 	"plugin"
 	"testing"
 
+	yaml "gopkg.in/yaml.v2"
 	"k8s.io/client-go/kubernetes"
 
 	pkgerrors "github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
 
-	"k8splugin/krd"
+	utils "k8splugin/internal"
 )
 
 func LoadMockPlugins(krdLoadedPlugins *map[string]*plugin.Plugin) error {
-	if _, err := os.Stat("../mock_files/mock_plugins/mockplugin.so"); os.IsNotExist(err) {
+	if _, err := os.Stat("../../mock_files/mock_plugins/mockplugin.so"); os.IsNotExist(err) {
 		return pkgerrors.New("mockplugin.so does not exist. Please compile mockplugin.go to generate")
 	}
 
-	mockPlugin, err := plugin.Open("../mock_files/mock_plugins/mockplugin.so")
+	mockPlugin, err := plugin.Open("../../mock_files/mock_plugins/mockplugin.so")
 	if err != nil {
 		return pkgerrors.Cause(err)
 	}
@@ -48,15 +48,15 @@ func LoadMockPlugins(krdLoadedPlugins *map[string]*plugin.Plugin) error {
 }
 
 func TestCreateVNF(t *testing.T) {
-	oldkrdPluginData := krd.LoadedPlugins
+	oldkrdPluginData := utils.LoadedPlugins
 	oldReadMetadataFile := ReadMetadataFile
 
 	defer func() {
-		krd.LoadedPlugins = oldkrdPluginData
+		utils.LoadedPlugins = oldkrdPluginData
 		ReadMetadataFile = oldReadMetadataFile
 	}()
 
-	err := LoadMockPlugins(&krd.LoadedPlugins)
+	err := LoadMockPlugins(&utils.LoadedPlugins)
 	if err != nil {
 		t.Fatalf("TestCreateVNF returned an error (%s)", err)
 	}
@@ -65,7 +65,7 @@ func TestCreateVNF(t *testing.T) {
 		var seqFile MetadataFile
 
 		if _, err := os.Stat(yamlFilePath); err == nil {
-			rawBytes, err := ioutil.ReadFile("../mock_files/mock_yamls/metadata.yaml")
+			rawBytes, err := ioutil.ReadFile("../../mock_files/mock_yamls/metadata.yaml")
 			if err != nil {
 				return seqFile, pkgerrors.Wrap(err, "Metadata YAML file read error")
 			}
@@ -97,13 +97,13 @@ func TestCreateVNF(t *testing.T) {
 }
 
 func TestDeleteVNF(t *testing.T) {
-	oldkrdPluginData := krd.LoadedPlugins
+	oldkrdPluginData := utils.LoadedPlugins
 
 	defer func() {
-		krd.LoadedPlugins = oldkrdPluginData
+		utils.LoadedPlugins = oldkrdPluginData
 	}()
 
-	err := LoadMockPlugins(&krd.LoadedPlugins)
+	err := LoadMockPlugins(&utils.LoadedPlugins)
 	if err != nil {
 		t.Fatalf("TestCreateVNF returned an error (%s)", err)
 	}
@@ -125,7 +125,7 @@ func TestDeleteVNF(t *testing.T) {
 
 func TestReadMetadataFile(t *testing.T) {
 	t.Run("Successfully read Metadata YAML file", func(t *testing.T) {
-		_, err := ReadMetadataFile("../mock_files//mock_yamls/metadata.yaml")
+		_, err := ReadMetadataFile("../../mock_files//mock_yamls/metadata.yaml")
 		if err != nil {
 			t.Fatalf("TestReadMetadataFile returned an error (%s)", err)
 		}

@@ -15,9 +15,8 @@ export GO111MODULE=on
 .PHONY: plugins
 
 
-all: clean
+all: clean plugins
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64
-	@find plugins -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -a -tags netgo -o $(basename {}).so" \;
 	@go build -a -tags netgo -o ./k8plugin ./cmd/main.go
 
 # The following is done this way as each patch on CI runs build and each merge runs deploy. So for build we don't need to build binary and hence
@@ -47,7 +46,7 @@ plugins:
 	@find plugins -maxdepth 1 -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -o $(basename {}).so" \;
 
 clean:
-	find . -name "*so" -delete
+	@find . -name "*so" -delete
 	@rm -f k8plugin
 
 .PHONY: cover

@@ -1,0 +1,7 @@
+{
+    "name": "test-rbdef",
+    "chart-name": "vault-consul-dev",
+    "description": "testing resource bundle definition api",
+    "uuid": "7eb09e38-4363-9942-1234-3beb2e95fd85",
+    "service-type": "firewall"
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_c3590436",
+        "filename": "src/k8splugin/api/defhandler_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-25T18:47:48Z",
+      "side": 1,
+      "message": "Can you create a test case which validates the missing ChartName parameter?",
+      "revId": "bf10ee4741957df3986bbc01acc7557bb1dc7933",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

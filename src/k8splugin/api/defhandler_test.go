@@ -90,13 +90,15 @@ func TestRBDefCreateHandler(t *testing.T) {
 			label:        "Create without UUID",
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
-				"name":"testdomain",
+				"name":"testresourcebundle",
+				"chart-name":"testchart",
 				"description":"test description",
 				"service-type":"firewall"
 				}`)),
 			expected: rb.Definition{
 				UUID:        "123e4567-e89b-12d3-a456-426655440000",
 				Name:        "testresourcebundle",
+				ChartName:   "testchart",
 				Description: "test description",
 				ServiceType: "firewall",
 			},
@@ -106,11 +108,32 @@ func TestRBDefCreateHandler(t *testing.T) {
 					{
 						UUID:        "123e4567-e89b-12d3-a456-426655440000",
 						Name:        "testresourcebundle",
+						ChartName:   "testchart",
 						Description: "test description",
 						ServiceType: "firewall",
 					},
 				},
 			},
+		},
+		{
+			label: "Missing Name in Request Body",
+			reader: bytes.NewBuffer([]byte(`{
+				"chart-name":"testchart",
+				"description":"test description",
+				"service-type":"firewall"
+				}`)),
+			expectedCode: http.StatusBadRequest,
+			rbDefClient:  &mockRBDefinition{},
+		},
+		{
+			label: "Missing Chart Name in Request Body",
+			reader: bytes.NewBuffer([]byte(`{
+				"name":"testresourcebundle",
+				"description":"test description",
+				"service-type":"firewall"
+				}`)),
+			expectedCode: http.StatusBadRequest,
+			rbDefClient:  &mockRBDefinition{},
 		},
 	}
 

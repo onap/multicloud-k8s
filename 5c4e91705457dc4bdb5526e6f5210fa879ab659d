@@ -16,6 +16,24 @@
       "revId": "5c4e91705457dc4bdb5526e6f5210fa879ab659d",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_de85575a",
+        "filename": "src/k8splugin/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-01-26T00:06:54Z",
+      "side": 0,
+      "message": "Makes sense, let me split this change in two different patchsets. Thanks Ritu",
+      "parentUuid": "9adffdf1_23a9f023",
+      "revId": "5c4e91705457dc4bdb5526e6f5210fa879ab659d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

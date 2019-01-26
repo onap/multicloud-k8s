@@ -15,9 +15,12 @@ package utils
 
 import (
 	"io/ioutil"
+	"k8splugin/internal/db"
 	"log"
 	"os"
+	"path/filepath"
 	"plugin"
+	"strings"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -60,4 +63,73 @@ var DecodeYAML = func(path string, into runtime.Object) (runtime.Object, error) 
 	}
 
 	return obj, nil
+}
+
+// CheckEnvVariables checks for required Environment variables
+func CheckEnvVariables() error {
+	envList := []string{"CSAR_DIR", "KUBE_CONFIG_DIR", "PLUGINS_DIR",
+		"DATABASE_TYPE", "DATABASE_IP", "OVN_CENTRAL_ADDRESS"}
+	for _, env := range envList {
+		if _, ok := os.LookupEnv(env); !ok {
+			return pkgerrors.New("environment variable " + env + " not set")
+		}
+	}
+
+	return nil
+}
+
+// CheckDatabaseConnection checks if the database is up and running and
+// plugin can talk to it
+func CheckDatabaseConnection() error {
+	err := db.CreateDBClient(os.Getenv("DATABASE_TYPE"))
+	if err != nil {
+		return pkgerrors.Cause(err)
+	}
+
+	err = db.DBconn.HealthCheck()
+	if err != nil {
+		return pkgerrors.Cause(err)
+	}
+	return nil
+}
+
+// LoadPlugins loads all the compiled .so plugins
+func LoadPlugins() error {
+	pluginsDir := os.Getenv("PLUGINS_DIR")
+	err := filepath.Walk(pluginsDir,
+		func(path string, info os.FileInfo, err error) error {
+			if strings.Contains(path, ".so") {
+				p, err := plugin.Open(path)
+				if err != nil {
+					return pkgerrors.Cause(err)
+				}
+				LoadedPlugins[info.Name()[:len(info.Name())-3]] = p
+			}
+			return err
+		})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// CheckInitialSettings is used to check initial settings required to start api
+func CheckInitialSettings() error {
+	err := CheckEnvVariables()
+	if err != nil {
+		return pkgerrors.Cause(err)
+	}
+
+	err = CheckDatabaseConnection()
+	if err != nil {
+		return pkgerrors.Cause(err)
+	}
+
+	err = LoadPlugins()
+	if err != nil {
+		return pkgerrors.Cause(err)
+	}
+
+	return nil
 }

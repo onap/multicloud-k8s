@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_dc379a4b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-28T23:23:00Z",
+      "side": 1,
+      "message": "Lol. Yes. I will remove.",
+      "parentUuid": "9adffdf1_1c32025f",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 19
+      },
+      "revId": "9d8b034da181688403767eaca5e4357240f00e52",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_5cec0abb",
         "filename": "src/k8splugin/internal/rb/profile.go",
         "patchSetId": 11
@@ -36,6 +60,24 @@
       "writtenOn": "2019-01-28T23:19:16Z",
       "side": 1,
       "message": "what is the difference between the this Download function and the another one defined in definition objects[1]? is it possible to reuse something?\n\n[1] https://gerrit.onap.org/r/#/c/76148/11/src/k8splugin/internal/rb/definition.go@169",
+      "revId": "9d8b034da181688403767eaca5e4357240f00e52",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_7c422eaf",
+        "filename": "src/k8splugin/internal/rb/profile.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-01-28T23:23:00Z",
+      "side": 1,
+      "message": "The difference is just the storeName that they both use. Maybe I will refactor this when I do the same for instance handler code later on.",
+      "parentUuid": "9adffdf1_5cec0abb",
       "revId": "9d8b034da181688403767eaca5e4357240f00e52",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

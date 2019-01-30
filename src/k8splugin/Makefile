@@ -43,7 +43,7 @@ format:
 	@go fmt ./...
 
 plugins:
-	@find plugins -maxdepth 1 -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -o $(basename {}).so" \;
+	@find plugins -maxdepth 1 -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -a -tags netgo -o $(basename {}).so" \;
 
 clean:
 	@find . -name "*so" -delete

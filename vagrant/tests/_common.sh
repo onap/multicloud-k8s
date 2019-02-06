@@ -371,7 +371,7 @@ spec:
           $proxy
           runcmd:
           $cloud_init_proxy
-            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$packetgen_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$packetgen_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
@@ -439,7 +439,7 @@ spec:
           $proxy
           runcmd:
             $cloud_init_proxy
-            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$firewall_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$firewall_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
@@ -647,7 +647,7 @@ spec:
           $proxy
           runcmd:
           $cloud_init_proxy
-            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$packetgen_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$packetgen_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
@@ -714,7 +714,7 @@ spec:
           $proxy
           runcmd:
             $cloud_init_proxy
-            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$firewall_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$firewall_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
@@ -780,7 +780,7 @@ spec:
           $proxy
           runcmd:
             $cloud_init_proxy
-            - wget -O - https://raw.githubusercontent.com/electrocucaracha/vFW-demo/master/$sink_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$sink_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi

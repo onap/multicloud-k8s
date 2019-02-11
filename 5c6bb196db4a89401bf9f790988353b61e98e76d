@@ -69,6 +69,30 @@
       "revId": "5c6bb196db4a89401bf9f790988353b61e98e76d",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e874e403_bed5de9c",
+        "filename": "vagrant/config/samples/pdf.yml.mini",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-02-11T21:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4019e7f4_e66ab853",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 22
+      },
+      "revId": "5c6bb196db4a89401bf9f790988353b61e98e76d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

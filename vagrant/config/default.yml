@@ -9,7 +9,10 @@
 ##############################################################################
 
 - name: "controller01"
-  ip: "10.10.10.3"
+  networks:
+    - name: krd
+      mode: "route"
+      ip: "10.10.10.3"
   memory: 8192
   cpus: 2
   roles:
@@ -17,7 +20,10 @@
     - etcd
     - ovn-central
 - name: "controller02"
-  ip: "10.10.10.4"
+  networks:
+    - name: krd
+      mode: "route"
+      ip: "10.10.10.4"
   memory: 8192
   cpus: 2
   roles:
@@ -25,7 +31,10 @@
     - etcd
     - ovn-controller
 - name: "controller03"
-  ip: "10.10.10.5"
+  networks:
+    - name: krd
+      mode: "route"
+      ip: "10.10.10.5"
   memory: 8192
   cpus: 2
   roles:
@@ -33,7 +42,10 @@
     - etcd
     - ovn-controller
 - name: "compute01"
-  ip: "10.10.10.6"
+  networks:
+    - name: krd
+      mode: "route"
+      ip: "10.10.10.6"
   memory: 32768
   cpus: 16
   volumes:
@@ -45,7 +57,10 @@
     - ovn-controller
     - virtlet
 - name: "compute02"
-  ip: "10.10.10.7"
+  networks:
+    - name: krd
+      mode: "route"
+      ip: "10.10.10.7"
   memory: 8192
   cpus: 4
   roles:

@@ -25,12 +25,16 @@ nodes = YAML.load_file(pdf)
 File.open(File.dirname(__FILE__) + "/inventory/hosts.ini", "w") do |inventory_file|
   inventory_file.puts("[all]")
   nodes.each do |node|
-    inventory_file.puts("#{node['name']}\tansible_ssh_host=#{node['ip']} ansible_ssh_port=22")
+    node['networks'].each do |network|
+      if network.has_key? "name" and network['name'] == "krd"
+        inventory_file.puts("#{node['name']}\tansible_ssh_host=#{network['ip']} ansible_ssh_port=22")
+      end
+    end
   end
   ['kube-master', 'kube-node', 'etcd', 'ovn-central', 'ovn-controller', 'virtlet'].each do|group|
     inventory_file.puts("\n[#{group}]")
     nodes.each do |node|
-      if node['roles'].include?("#{group}")
+      if node.has_key? "roles" and node['roles'].include?("#{group}")
         inventory_file.puts(node['name'])
       end
     end
@@ -44,7 +48,9 @@ puts "[INFO] Provider: #{provider} "
 if ENV['no_proxy'] != nil or ENV['NO_PROXY']
   $no_proxy = ENV['NO_PROXY'] || ENV['no_proxy'] || "127.0.0.1,localhost"
   nodes.each do |node|
-    $no_proxy += "," + node['ip']
+    node['networks'].each do |network|
+      $no_proxy += "," + network['ip']
+    end
   end
   $subnet = "192.168.121"
   if provider == :virtualbox
@@ -73,7 +79,13 @@ Vagrant.configure("2") do |config|
   nodes.each do |node|
     config.vm.define node['name'] do |nodeconfig|
       nodeconfig.vm.hostname = node['name']
-      nodeconfig.vm.network :private_network, :ip => node['ip'], :type => :static
+      node['networks'].each do |network|
+        if network.has_key? "mode" and network.has_key? "name"
+          nodeconfig.vm.network :private_network, :ip => network['ip'], :type => :static, :libvirt__forward_mode => network['mode'], :libvirt__network_name => network['name']
+        else
+          nodeconfig.vm.network :private_network, :ip => network['ip'], :type => :static
+        end
+      end
       nodeconfig.vm.provider 'virtualbox' do |v|
         v.customize ["modifyvm", :id, "--memory", node['memory']]
         v.customize ["modifyvm", :id, "--cpus", node['cpus']]

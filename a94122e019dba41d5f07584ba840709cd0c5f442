@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37671bb6_8e40866d",
+        "filename": "vagrant/config/samples/pdf.yml.mini",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-02-13T17:28:51Z",
+      "side": 1,
+      "message": "Ritu, \n\nIf I use this configuration and I got the following error:\n\n$ vagrant up master\n[INFO] Provider: libvirt\nBringing machine \u0027master\u0027 up with \u0027libvirt\u0027 provider...\n\u003d\u003d\u003e master: Checking if box \u0027elastic/ubuntu-16.04-x86_64\u0027 version \u002720180210.0.0\u0027 is up to date...\n\u003d\u003d\u003e master: Creating image (snapshot of base box volume).\n....\n\u003d\u003d\u003e master:  -- TPM Path:          \n\u003d\u003d\u003e master:  -- INPUT:             type\u003dmouse, bus\u003dps2\n\u003d\u003d\u003e master: Creating shared folders metadata...\nAddress 10.10.10.3 does not match with network name krd.\nPlease fix your configuration and run vagrant again.\n\nThe validation[1] needs to check if there is no krd in the list of networks:\n\n[1] https://gerrit.onap.org/r/#/c/78246/3/vagrant/Vagrantfile@35",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 22
+      },
+      "revId": "a94122e019dba41d5f07584ba840709cd0c5f442",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

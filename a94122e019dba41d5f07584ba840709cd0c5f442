@@ -22,6 +22,30 @@
       "revId": "a94122e019dba41d5f07584ba840709cd0c5f442",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "990628a1_77e76136",
+        "filename": "vagrant/config/samples/pdf.yml.mini",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-02-13T18:36:09Z",
+      "side": 1,
+      "message": "Can you try cleaning up the others networks on your system and try again. Since the current code is not using name for networks those networks are not getting cleaned up by default.",
+      "parentUuid": "37671bb6_8e40866d",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 22
+      },
+      "revId": "a94122e019dba41d5f07584ba840709cd0c5f442",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

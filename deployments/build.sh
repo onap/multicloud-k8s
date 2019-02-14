@@ -14,7 +14,7 @@ set -o pipefail
 k8s_path="$(git rev-parse --show-toplevel)"
 export GOPATH=$k8s_path
 
-VERSION="0.1.0"
+VERSION="0.1.0-SNAPSHOT"
 export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 
 function _compile_src {

@@ -58,6 +58,6 @@ ovn4nfv_version: 5026d1d89b05eac5e004279b742df6745a73d93a
 ovn4nfv_url: "https://git.opnfv.org/ovn4nfv-k8s-plugin/"
 
 go_version: '1.11'
-kubespray_version: 2.8.0
+kubespray_version: 2.8.2
 kubectl_version: 1.12.2
 helm_client_version: 2.9.1

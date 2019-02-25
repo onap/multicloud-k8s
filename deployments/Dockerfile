@@ -24,6 +24,7 @@ ENV OVN_CENTRAL_ADDRESS "127.0.0.1:6641"
 
 EXPOSE 8081
 
+RUN groupadd -r onap && useradd -r -g onap onap
 RUN apt-get update && apt-get install -y -qq apt-transport-https curl \
  && echo "deb https://packages.wand.net.nz xenial main" > /etc/apt/sources.list.d/wand.list \
  && curl https://packages.wand.net.nz/keyring.gpg -o /etc/apt/trusted.gpg.d/wand.gpg \
@@ -32,5 +33,8 @@ RUN apt-get update && apt-get install -y -qq apt-transport-https curl \
 WORKDIR /opt/multicloud/k8s
 ADD ./k8plugin ./
 ADD ./*.so ./
+RUN chown onap:onap /opt/multicloud/k8s -R
+
+USER onap
 
 CMD ["./k8plugin"]

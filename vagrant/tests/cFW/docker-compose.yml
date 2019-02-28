@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  packetgen:
+    privileged: true
+    network_mode: "host"
+    image: electrocucaracha/packetgen
+    build:
+      context: ./packetgen
+      args:
+        HTTP_PROXY: $HTTP_PROXY
+        HTTPS_PROXY: $HTTPS_PROXY
+  firewall:
+    privileged: true
+    network_mode: "host"
+    image: electrocucaracha/firewall
+    build:
+      context: ./firewall
+      args:
+        HTTP_PROXY: $HTTP_PROXY
+        HTTPS_PROXY: $HTTPS_PROXY
+  sink:
+    privileged: true
+    network_mode: "host"
+    image: electrocucaracha/sink
+    build:
+      context: ./sink
+      args:
+        HTTP_PROXY: $HTTP_PROXY
+        HTTPS_PROXY: $HTTPS_PROXY
+  darkstat:
+    network_mode: "host"
+    image: electrocucaracha/darkstat
+    build:
+      context: ./darkstat
+      args:
+        HTTP_PROXY: $HTTP_PROXY
+        HTTPS_PROXY: $HTTPS_PROXY

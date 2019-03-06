@@ -1,0 +1,27 @@
+resources:
+  deployment:
+    - deployments/command-deployment.yaml
+    - deployments/consul-deployment.yaml
+    - deployments/data-deployment.yaml
+    - deployments/device-bluetooth-deployment.yaml
+    - deployments/export-client-deployment.yaml
+    - deployments/export-distro-deployment.yaml
+    - deployments/logging-deployment.yaml
+    - deployments/metadata-deployment.yaml
+    - deployments/mongo-deployment.yaml
+    - deployments/notifications-deployment.yaml
+    - deployments/rulesengine-deployment.yaml
+    - deployments/scheduler-deployment.yaml
+  service:
+    - services/command-service.yaml
+    - services/consul-service.yaml
+    - services/data-service.yaml
+    - services/device-bluetooth-service.yaml
+    - services/export-client-service.yaml
+    - services/export-distro-service.yaml
+    - services/logging-service.yaml
+    - services/metadata-service.yaml
+    - services/mongo-service.yaml
+    - services/notifications-service.yaml
+    - services/rulesengine-service.yaml
+    - services/scheduler-service.yaml

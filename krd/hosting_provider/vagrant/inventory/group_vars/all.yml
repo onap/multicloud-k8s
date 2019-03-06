@@ -1,0 +1,4 @@
+kube_log_level: 2
+kubeadm_enabled: true
+http_proxy: "http://proxy-us.intel.com:911"
+https_proxy: "http://proxy-us.intel.com:912"

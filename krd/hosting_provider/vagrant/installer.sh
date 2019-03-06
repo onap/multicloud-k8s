@@ -138,7 +138,7 @@ function install_k8s {
 function install_addons {
     echo "Installing Kubernetes AddOns"
     _install_ansible
-    sudo ansible-galaxy install $verbose -r $krd_folder/galaxy-requirements.yml --ignore-errors
+    sudo ansible-galaxy install $verbose -r $infra_folder/galaxy-requirements.yml --ignore-errors
 
     ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-krd.yml | sudo tee $log_folder/setup-krd.log
     for addon in ${KRD_ADDONS:-virtlet ovn4nfv}; do
@@ -213,9 +213,10 @@ fi
 # Configuration values
 log_folder=/var/log/krd
 krd_folder=$(pwd)
+infra_folder=~/k8s/krd/krd_deployment_infra
 export krd_inventory_folder=$krd_folder/inventory
 krd_inventory=$krd_inventory_folder/hosts.ini
-krd_playbooks=$krd_folder/playbooks
+krd_playbooks=$infra_folder/playbooks
 krd_tests=$krd_folder/tests
 k8s_info_file=$krd_folder/k8s_info.log
 testing_enabled=${KRD_ENABLE_TESTS:-false}

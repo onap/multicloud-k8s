@@ -1,5 +1,3 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
 # Copyright (c) 2018
@@ -115,7 +113,7 @@ Vagrant.configure("2") do |config|
   config.vm.define :installer, primary: true, autostart: false do |installer|
     installer.vm.hostname = "multicloud"
     installer.vm.network :private_network, :ip => "10.10.10.2", :type => :static
-    installer.vm.synced_folder '../', '/home/vagrant/multicloud-k8s/', type: sync_type
+    installer.vm.synced_folder '../../../', '/home/vagrant/multicloud-k8s/', type: sync_type
     installer.vm.provision 'shell', privileged: false do |sh|
       sh.env = {'KRD_PLUGIN_ENABLED': 'true'}
       sh.inline = <<-SHELL
@@ -123,7 +121,7 @@ Vagrant.configure("2") do |config|
         cp /vagrant/insecure_keys/key /home/vagrant/.ssh/id_rsa
         chown vagrant /home/vagrant/.ssh/id_rsa
         chmod 400 /home/vagrant/.ssh/id_rsa
-        cd /home/vagrant/multicloud-k8s/vagrant/ && ./installer.sh | tee krd_installer.log
+        cd /home/vagrant/multicloud-k8s/krd/hosting_provider/vagrant/ && ./installer.sh | tee krd_installer.log
       SHELL
     end
   end

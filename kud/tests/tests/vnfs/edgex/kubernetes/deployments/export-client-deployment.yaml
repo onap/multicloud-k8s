@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-export-client
+  name: edgex-export-client
+spec:
+  selector:
+    matchLabels:
+      io.kompose.service: edgex-export-client
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-export-client
+    spec:
+      containers:
+      - image: edgexfoundry/docker-export-client:0.2.1
+        name: edgex-export-client
+        ports:
+        - containerPort: 48071
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        hostPath:
+          path: /data/db
+      - name: edgex-logs
+        hostPath:
+          path: /edgex/logs
+      - name: consul-config
+        hostPath:
+          path: /consul/config
+      - name: consul-data
+        hostPath:
+          path: /consul/data
+status: {}

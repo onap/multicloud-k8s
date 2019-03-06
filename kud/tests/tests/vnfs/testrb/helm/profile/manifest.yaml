@@ -1,0 +1,7 @@
+---
+version: v1
+type:
+  values: "override_values.yaml"
+  configresource:
+    - filepath: testfol/subdir/deployment.yaml
+      chartpath: vault-consul-dev/templates/deployment.yaml

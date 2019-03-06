@@ -30,10 +30,10 @@ src/k8splugin/plugins/**/*.so
 
 # KRD
 .vagrant/
-vagrant/inventory/hosts.ini
-vagrant/inventory/artifacts
-vagrant/inventory/group_vars/all.yml
-vagrant/config/pdf.yml
-vagrant/sources.list
+kud/hosting_providers/vagrant/inventory/hosts.ini
+kud/hosting_providers/vagrant/inventory/artifacts
+kud/hosting_providers/vagrant/inventory/group_vars/all.yml
+kud/hosting_providers/vagrant/config/pdf.yml
+kud/hosting_providers/vagrant/sources.list
 *.retry
 *.vdi

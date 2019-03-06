@@ -12,5 +12,5 @@
   tasks:
     - name: copy admin.conf file to kube-nodes
       copy:
-        src: "{{ lookup('env','krd_inventory_folder') }}/artifacts/admin.conf"
+        src: "{{ lookup('env','kud_inventory_folder') }}/artifacts/admin.conf"
         dest: "/etc/kubernetes/admin.conf"

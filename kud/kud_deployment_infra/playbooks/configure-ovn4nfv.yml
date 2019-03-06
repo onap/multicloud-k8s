@@ -16,9 +16,9 @@
   roles:
     - role: andrewrothstein.go
   tasks:
-    - name: Load krd variables
+    - name: Load kud variables
       include_vars:
-        file: krd-vars.yml
+        file: kud-vars.yml
     - name: clone ovn4nfv-k8s-plugin repo
       git:
         repo: "{{ ovn4nfv_url }}"
@@ -66,9 +66,9 @@
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin/"
   become: yes
   tasks:
-    - name: Load krd variables
+    - name: Load kud variables
       include_vars:
-        file: krd-vars.yml
+        file: kud-vars.yml
     - name: build ovn4nfvk8s
       make:
         chdir: "{{ ovn4nfv_dest }}"

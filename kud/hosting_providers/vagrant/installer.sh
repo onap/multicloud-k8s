@@ -1,5 +1,5 @@
 #!/bin/bash
-# SPDX-license-identifier: Apache-2.0
+#SPDX-license-identifier: Apache-2.0
 ##############################################################################
 # Copyright (c) 2018
 # All rights reserved. This program and the accompanying materials
@@ -13,7 +13,7 @@ set -o pipefail
 
 # _install_go() - Install GoLang package
 function _install_go {
-    version=$(grep "go_version" ${krd_playbooks}/krd-vars.yml | awk -F "'" '{print $2}')
+    version=$(grep "go_version" ${kud_playbooks}/kud-vars.yml | awk -F "'" '{print $2}')
     local tarball=go$version.linux-amd64.tar.gz
 
     if $(go version &>/dev/null); then
@@ -86,7 +86,7 @@ function _install_docker {
 }
 
 function _set_environment_file {
-    ansible_ifconfig=$(ansible ovn-central[0] -i $krd_inventory -m shell -a "ifconfig eth1 |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'")
+    ansible_ifconfig=$(ansible ovn-central[0] -i $kud_inventory -m shell -a "ifconfig eth1 |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'")
     if [[ $ansible_ifconfig != *CHANGED* ]]; then
         echo "Fail to get the OVN central IP address from eth1 nic"
         exit
@@ -99,10 +99,9 @@ function _set_environment_file {
 function install_k8s {
     echo "Deploying kubernetes"
     local dest_folder=/opt
-    version=$(grep "kubespray_version" ${krd_playbooks}/krd-vars.yml | awk -F ': ' '{print $2}')
-    local_release_dir=$(grep "local_release_dir" $krd_inventory_folder/group_vars/k8s-cluster.yml | awk -F "\"" '{print $2}')
+    version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
+    local_release_dir=$(grep "local_release_dir" $kud_inventory_folder/group_vars/k8s-cluster.yml | awk -F "\"" '{print $2}')
     local tarball=v$version.tar.gz
-
     sudo apt-get install -y sshpass
     _install_docker
     _install_ansible
@@ -114,38 +113,38 @@ function install_k8s {
     rm $tarball
 
     sudo -E pip install -r $dest_folder/kubespray-$version/requirements.txt
-    rm -f $krd_inventory_folder/group_vars/all.yml 2> /dev/null
+    rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
     if [[ -n "${verbose}" ]]; then
-        echo "kube_log_level: 5" | tee $krd_inventory_folder/group_vars/all.yml
+        echo "kube_log_level: 5" | tee $kud_inventory_folder/group_vars/all.yml
     else
-        echo "kube_log_level: 2" | tee $krd_inventory_folder/group_vars/all.yml
+        echo "kube_log_level: 2" | tee $kud_inventory_folder/group_vars/all.yml
     fi
-    echo "kubeadm_enabled: true" | tee --append $krd_inventory_folder/group_vars/all.yml
+    echo "kubeadm_enabled: true" | tee --append $kud_inventory_folder/group_vars/all.yml
     if [[ -n "${http_proxy}" ]]; then
-        echo "http_proxy: \"$http_proxy\"" | tee --append $krd_inventory_folder/group_vars/all.yml
+        echo "http_proxy: \"$http_proxy\"" | tee --append $kud_inventory_folder/group_vars/all.yml
     fi
     if [[ -n "${https_proxy}" ]]; then
-        echo "https_proxy: \"$https_proxy\"" | tee --append $krd_inventory_folder/group_vars/all.yml
+        echo "https_proxy: \"$https_proxy\"" | tee --append $kud_inventory_folder/group_vars/all.yml
     fi
-    ansible-playbook $verbose -i $krd_inventory $dest_folder/kubespray-$version/cluster.yml --become --become-user=root | sudo tee $log_folder/setup-kubernetes.log
+    ansible-playbook $verbose -i $kud_inventory $dest_folder/kubespray-$version/cluster.yml --become --become-user=root | sudo tee $log_folder/setup-kubernetes.log
 
     # Configure environment
     mkdir -p $HOME/.kube
-    cp $krd_inventory_folder/artifacts/admin.conf $HOME/.kube/config
+    cp $kud_inventory_folder/artifacts/admin.conf $HOME/.kube/config
 }
 
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
     echo "Installing Kubernetes AddOns"
     _install_ansible
-    sudo ansible-galaxy install $verbose -r $krd_folder/galaxy-requirements.yml --ignore-errors
+    sudo ansible-galaxy install $verbose -r $kud_infra_folder/galaxy-requirements.yml --ignore-errors
 
-    ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-krd.yml | sudo tee $log_folder/setup-krd.log
+    ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
     for addon in ${KRD_ADDONS:-virtlet ovn4nfv}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
-        ansible-playbook $verbose -i $krd_inventory $krd_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
+        ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
         if [[ "${testing_enabled}" == "true" ]]; then
-            pushd $krd_tests
+            pushd $kud_tests
             bash ${addon}.sh
             popd
         fi
@@ -160,15 +159,15 @@ function install_plugin {
     sudo -E pip install docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
-    sudo cp $HOME/.kube/config /opt/kubeconfig/krd
+    sudo cp $HOME/.kube/config /opt/kubeconfig/kud
     _set_environment_file
     source /etc/environment
 
-    pushd $krd_folder/../deployments
+    pushd $kud_folder/../../../deployments
     sudo ./build.sh
     if [[ "${testing_enabled}" == "true" ]]; then
         docker-compose up -d
-        pushd $krd_tests
+        pushd $kud_tests
         for functional_test in plugin plugin_edgex; do
             bash ${functional_test}.sh
         done
@@ -205,20 +204,21 @@ if ! sudo -n "true"; then
     exit 1
 fi
 
-if [[ -n "${KRD_DEBUG}" ]]; then
+if [[ -n "${KUD_DEBUG}" ]]; then
     set -o xtrace
     verbose="-vvv"
 fi
 
 # Configuration values
-log_folder=/var/log/krd
-krd_folder=$(pwd)
-export krd_inventory_folder=$krd_folder/inventory
-krd_inventory=$krd_inventory_folder/hosts.ini
-krd_playbooks=$krd_folder/playbooks
-krd_tests=$krd_folder/tests
-k8s_info_file=$krd_folder/k8s_info.log
-testing_enabled=${KRD_ENABLE_TESTS:-false}
+log_folder=/var/log/kud
+kud_folder=$(pwd)
+kud_infra_folder=$kud_folder/../../kud_deployment_infra
+export kud_inventory_folder=$kud_folder/inventory
+kud_inventory=$kud_inventory_folder/hosts.ini
+kud_playbooks=$kud_infra_folder/playbooks
+kud_tests=$kud_folder/tests
+k8s_info_file=$kud_folder/k8s_info.log
+testing_enabled=${KUD_ENABLE_TESTS:-false}
 
 sudo mkdir -p $log_folder
 sudo mkdir -p /opt/csar
@@ -227,14 +227,14 @@ echo "export CSAR_DIR=/opt/csar" | sudo tee --append /etc/environment
 
 # Install dependencies
 # Setup proxy variables
-if [ -f $krd_folder/sources.list ]; then
+if [ -f $kud_folder/sources.list ]; then
     sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup
-    sudo cp $krd_folder/sources.list /etc/apt/sources.list
+    sudo cp $kud_folder/sources.list /etc/apt/sources.list
 fi
 sudo apt-get update
 install_k8s
 install_addons
-if [[ "${KRD_PLUGIN_ENABLED:-false}" ]]; then
+if [[ "${KUD_PLUGIN_ENABLED:-false}" ]]; then
     install_plugin
 fi
 _print_kubernetes_info

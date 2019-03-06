@@ -10,9 +10,9 @@
 
 - hosts: kube-node
   tasks:
-    - name: Load krd variables
+    - name: Load kud variables
       include_vars:
-        file: krd-vars.yml
+        file: kud-vars.yml
     - name: clone NFD repo
       git:
         repo: "{{ nfd_url }}"
@@ -47,9 +47,9 @@
 
 - hosts: localhost
   pre_tasks:
-    - name: Load krd variables
+    - name: Load kud variables
       include_vars:
-        file: krd-vars.yml
+        file: kud-vars.yml
   roles:
     - role: andrewrothstein.kubectl
       kubectl_ver: "v{{ kubectl_version }}"

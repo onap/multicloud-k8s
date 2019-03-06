@@ -17,7 +17,7 @@ source _common.sh
 source _functions.sh
 
 base_url="http://localhost:8081"
-cloud_region_id="krd"
+cloud_region_id="kud"
 namespace="default"
 csar_id="94e414f6-9ca4-11e8-bb6a-52540067263b"
 rbd_csar_id="7eb09e38-4363-9942-1234-3beb2e95fd85"

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: edgex-support-rulesengine
+  name: edgex-support-rulesengine
+spec:
+  ports:
+  - name: "48075"
+    port: 48075
+    targetPort: 48075
+  selector:
+    io.kompose.service: edgex-support-rulesengine
+status:
+  loadBalancer: {}

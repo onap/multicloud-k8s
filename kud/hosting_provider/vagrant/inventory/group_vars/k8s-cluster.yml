@@ -1,0 +1,82 @@
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+## For some things, kubelet needs to load kernel modules.  For example, dynamic kernel services are needed
+## for mounting persistent volumes into containers.  These may not be loaded by preinstall kubernetes
+## processes.  For example, ceph and rbd backed volumes.  Set to true to allow kubelet to load kernel
+## modules.
+kubelet_load_modules: true
+
+# Kubernetes configuration dirs and system namespace.
+# Those are where all the additional config stuff goes
+# kubernetes normally puts in /srv/kubernetes.
+# This puts them in a sane location and namespace.
+# Editing those values will almost surely break something.
+system_namespace: kube-system
+
+# Logging directory (sysvinit systems)
+kube_log_dir: "/var/log/kubernetes"
+
+kube_api_anonymous_auth: true
+
+# Users to create for basic auth in Kubernetes API via HTTP
+# Optionally add groups for user
+kube_api_pwd: "secret"
+kube_users:
+  kube:
+    pass: "{{kube_api_pwd}}"
+    role: admin
+    groups:
+      - system:masters
+
+## It is possible to activate / deactivate selected authentication methods (basic auth, static token auth)
+#kube_oidc_auth: false
+kube_basic_auth: true
+kube_token_auth: true
+
+# Choose network plugin (calico, contiv, weave or flannel)
+# Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
+kube_network_plugin: flannel
+
+# Settings for containerized control plane
+kubelet_deployment_type: host
+
+# NGINX Ingress Controller
+ingress_nginx_enabled: true
+
+# Make a copy of kubeconfig on the host that runs Ansible in GITDIR/artifacts
+kubeconfig_localhost: true
+
+# Enable MountPropagation gate feature
+local_volumes_enabled: true
+
+## Change this to use another Kubernetes version, e.g. a current beta release
+kube_version: v1.12.3
+
+# Helm deployment
+helm_enabled: true
+
+# Kube-proxy proxyMode configuration.
+# NOTE: Ipvs is based on netfilter hook function, but uses hash table as the underlying data structure and
+# works in the kernel space
+# https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-ipvs
+#kube_proxy_mode: ipvs
+
+# Download container images only once then push to cluster nodes in batches
+download_run_once: true
+
+# Where the binaries will be downloaded.
+# Note: ensure that you've enough disk space (about 1G)
+local_release_dir: "/tmp/releases"
+
+# Makes the installer node a delegate for pushing images while running
+# the deployment with ansible. This maybe the case if cluster nodes
+# cannot access each over via ssh or you want to use local docker
+# images as a cache for multiple clusters.
+download_localhost: true

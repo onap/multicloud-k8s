@@ -1,0 +1,7 @@
+service:
+  type: NodePort
+  name: override-vault-consul
+  portName: override-port-vault-consul
+  internalPort: 8222
+  nodePort: 44
+

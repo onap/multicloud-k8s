@@ -1,0 +1,98 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+- import_playbook: configure-ovn.yml
+- import_playbook: configure-multus.yml
+
+- hosts: kube-master:kube-node
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin/"
+  roles:
+    - role: andrewrothstein.go
+  tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+    - name: clone ovn4nfv-k8s-plugin repo
+      git:
+        repo: "{{ ovn4nfv_url }}"
+        dest: "{{ ovn4nfv_dest }}"
+        version: "{{ ovn4nfv_version }}"
+        force: yes
+      when: ovn4nfv_source_type == "source"
+    - name: clean ovn4nfvk8s left over files
+      make:
+        chdir: "{{ ovn4nfv_dest }}"
+        target: clean
+    - name: build ovn4nfvk8s-cni
+      make:
+        chdir: "{{ ovn4nfv_dest }}"
+        target: ovn4nfvk8s-cni
+      become: yes
+      environment:
+        GOPATH: "{{ go_path }}"
+    - name: copy ovn4nfvk8s-cni to cni folder
+      command: "mv {{ ovn4nfv_dest }}/ovn4nfvk8s-cni /opt/cni/bin/ovn4nfvk8s-cni"
+      become: yes
+    - name: create ovn4k8s config file
+      become: yes
+      blockinfile:
+        path: /etc/openvswitch/ovn4nfv_k8s.conf
+        create: yes
+        block: |
+          [logging]
+          loglevel=5
+          logfile=/var/log/openvswitch/ovn4k8s.log
+
+          [cni]
+          conf-dir=/etc/cni/net.d
+          plugin=ovn4nfvk8s-cni
+
+          [kubernetes]
+          kubeconfig=/etc/kubernetes/admin.conf
+    - name: create ovnkube logging directory
+      file:
+        path: /var/log/openvswitch
+        state: directory
+
+- hosts: kube-master
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin/"
+  become: yes
+  tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+    - name: build ovn4nfvk8s
+      make:
+        chdir: "{{ ovn4nfv_dest }}"
+        target: ovn4nfvk8s
+      environment:
+        GOPATH: "{{ go_path }}"
+    - name: copy ovn4nfvk8s to /usr/bin folder
+      command: "mv {{ ovn4nfv_dest }}/ovn4nfvk8s /usr/bin/ovn4nfvk8s"
+    - name: create ovn4nfvk8s systemd service
+      blockinfile:
+        path: /etc/systemd/system/ovn4nfvk8s.service
+        create: yes
+        block: |
+          [Unit]
+          Description=OVN4NFV Kubernetes Daemon
+
+          [Service]
+          ExecStart=/usr/bin/ovn4nfvk8s \
+                -k8s-kubeconfig=/etc/kubernetes/admin.conf
+
+          [Install]
+          WantedBy=multi-user.target
+    - name: start ovn4nfvk8s systemd service
+      service:
+        name: ovn4nfvk8s
+        state: started
+        enabled: yes

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: edgex-support-logging
+  name: edgex-support-logging
+spec:
+  ports:
+  - name: "48061"
+    port: 48061
+    targetPort: 48061
+  selector:
+    io.kompose.service: edgex-support-logging
+status:
+  loadBalancer: {}

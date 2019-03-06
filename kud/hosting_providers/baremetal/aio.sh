@@ -19,8 +19,8 @@ fi
 
 echo "Cloning and configuring KRD project..."
 git clone https://git.onap.org/multicloud/k8s/
-cd k8s/vagrant/
-cat <<EOL > inventory/hosts.ini
+cd k8s/kud/hosting_providers/baremetal/
+cat <<EOL > ../vagrant/inventory/hosts.ini
 [all]
 localhost
 
@@ -46,13 +46,13 @@ localhost
 kube-node
 kube-master
 EOL
-sed -i '/andrewrothstein.kubectl/d' playbooks/configure-*.yml
+sed -i '/andrewrothstein.kubectl/d' ../../kud_deployment_infra/playbooks/configure-*.yml
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 chmod og-wx ~/.ssh/authorized_keys
 
 echo "Enabling nested-virtualization"
-./node.sh
+../vagrant/./node.sh
 
 echo "Deploying KRD project"
-./installer.sh | tee krd_installer.log
+../vagrant/./installer.sh | tee kud_installer.log

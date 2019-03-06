@@ -115,15 +115,15 @@ Vagrant.configure("2") do |config|
   config.vm.define :installer, primary: true, autostart: false do |installer|
     installer.vm.hostname = "multicloud"
     installer.vm.network :private_network, :ip => "10.10.10.2", :type => :static
-    installer.vm.synced_folder '../', '/home/vagrant/multicloud-k8s/', type: sync_type
+    installer.vm.synced_folder '../../../', '/home/vagrant/multicloud-k8s/', type: sync_type
     installer.vm.provision 'shell', privileged: false do |sh|
       sh.env = {'KRD_PLUGIN_ENABLED': 'true'}
       sh.inline = <<-SHELL
-        cp /vagrant/insecure_keys/key.pub /home/vagrant/.ssh/id_rsa.pub
-        cp /vagrant/insecure_keys/key /home/vagrant/.ssh/id_rsa
-        chown vagrant /home/vagrant/.ssh/id_rsa
-        chmod 400 /home/vagrant/.ssh/id_rsa
-        cd /home/vagrant/multicloud-k8s/vagrant/ && ./installer.sh | tee krd_installer.log
+        sudo cp /vagrant/insecure_keys/key.pub /home/vagrant/.ssh/id_rsa.pub
+        sudo cp /vagrant/insecure_keys/key /home/vagrant/.ssh/id_rsa
+        sudo chown vagrant /home/vagrant/.ssh/id_rsa
+        sudo chmod 400 /home/vagrant/.ssh/id_rsa
+        cd /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/ && ./installer.sh | tee kud_installer.log
       SHELL
     end
   end

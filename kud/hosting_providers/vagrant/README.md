@@ -1,20 +1,20 @@
-# Kubernetes Reference Deployment
+# Kubernetes Deployment
 
 ## Summary
 
-This project offers a reference for deploying a Kubernetes cluster
+This project offers a means for deploying a Kubernetes cluster
 that satisfies the requirements of [ONAP multicloud/k8s plugin][1]. Its
 ansible playbooks allow to provision a deployment on Bare-metal or
 Virtual Machines.
 
-![Diagram](../doc/img/diagram.png)
+![Diagram](../../../docs/img/diagram.png)
 
 # Components
 
 | Name           | Description                                   | Source                            | Status |
 |:--------------:|:----------------------------------------------|:----------------------------------|:------:|
 | Kubernetes     | Base Kubernetes deployment                    | [kubespray][2]                    | Done   |
-| ovn-kubernetes | Integrates Opensource Virtual Networking      | [configure-ovn-kubernetes.yml][3] | Tested |
+| ovn4nfv        | Integrates Opensource Virtual Networking      | [configure-ovn4nfv.yml][3] | Tested |
 | Virtlet        | Allows to run VMs                             | [configure-virtlet.yml][4]        | Tested |
 | Multus         | Provides Multiple Network support in a pod    | [configure-multus.yml][5]         | Tested |
 | NFD            | Node feature discovery                        | [configure-nfd.yml][7]            | Tested |

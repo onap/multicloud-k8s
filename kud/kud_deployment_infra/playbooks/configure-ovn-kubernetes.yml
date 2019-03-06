@@ -15,16 +15,16 @@
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin/"
   pre_tasks:
-    - name: Load krd variables
+    - name: Load kud variables
       include_vars:
-        file: krd-vars.yml
+        file: kud-vars.yml
   roles:
     - role: andrewrothstein.go
       go_ver: "{{ go_version }}"
   tasks:
-    - name: Load krd variables
+    - name: Load kud variables
       include_vars:
-        file: krd-vars.yml
+        file: kud-vars.yml
     - name: clone ovn-kubernetes repo
       git:
         repo: "{{ ovn_kubernetes_url }}"

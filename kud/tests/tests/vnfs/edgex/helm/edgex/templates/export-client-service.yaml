@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.service.exportClient.name }}
+    release: {{ .Release.Name }}
+  name:  {{ .Values.service.exportClient.name }}
+spec:
+  ports:
+  - name: {{ .Values.service.exportClient.portName }}
+    port: {{ .Values.service.exportClient.port }}
+    targetPort: {{ .Values.service.exportClient.port }}
+  selector:
+    app: edgex-export-client
+    release: {{ .Release.Name }}

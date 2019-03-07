@@ -11,8 +11,8 @@
 set -o nounset
 set -o pipefail
 
-vagrant_version=2.2.3
-if ! $(vagrant version &>/dev/null); then
+vagrant_version=2.2.4
+if ! vagrant version &>/dev/null; then
     enable_vagrant_install=true
 else
     if [[ "$vagrant_version" != "$(vagrant version | awk 'NR==1{print $3}')" ]]; then
@@ -78,7 +78,7 @@ case ${ID,,} in
 
     case $VAGRANT_DEFAULT_PROVIDER in
         virtualbox)
-        wget -q http://download.virtualbox.org/virtualbox/rpm/opensuse/$VERSION/virtualbox.repo -P /etc/zypp/repos.d/
+        wget -q "http://download.virtualbox.org/virtualbox/rpm/opensuse/$VERSION/virtualbox.repo" -P /etc/zypp/repos.d/
         $INSTALLER_CMD --enablerepo=epel dkms
         wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | rpm --import -
         packages+=(VirtualBox-5.1)
@@ -124,7 +124,7 @@ case ${ID,,} in
 
     rhel|centos|fedora)
     PKG_MANAGER=$(which dnf || which yum)
-    sudo $PKG_MANAGER updateinfo
+    sudo "$PKG_MANAGER" updateinfo
     INSTALLER_CMD="sudo -H -E ${PKG_MANAGER} -q -y install"
     packages+=(python-devel)
 
@@ -174,7 +174,7 @@ else
 fi
 sudo modprobe vhost_net
 
-${INSTALLER_CMD} ${packages[@]}
+${INSTALLER_CMD} "${packages[@]}"
 if ! which pip; then
     curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
 else
@@ -184,9 +184,9 @@ sudo -H -E pip install tox
 if [[ ${http_proxy+x} ]]; then
     vagrant plugin install vagrant-proxyconf
 fi
-if [ $VAGRANT_DEFAULT_PROVIDER == libvirt ]; then
+if [ "$VAGRANT_DEFAULT_PROVIDER" == libvirt ]; then
     vagrant plugin install vagrant-libvirt
-    sudo usermod -a -G $libvirt_group $USER # This might require to reload user's group assigments
+    sudo usermod -a -G $libvirt_group "$USER" # This might require to reload user's group assigments
     sudo systemctl restart libvirtd
 
     # Start statd service to prevent NFS lock errors

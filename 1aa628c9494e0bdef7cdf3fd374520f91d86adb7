@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c6aed28_b9aa3d51",
+        "filename": "vagrant/tests/plugin.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-08T18:12:38Z",
+      "side": 1,
+      "message": "This won\u0027t work. The rb_profile_id is needed for instantiation. This patch needs to be tried on top of 76324",
+      "range": {
+        "startLine": 117,
+        "startChar": 22,
+        "endLine": 117,
+        "endChar": 32
+      },
+      "revId": "1aa628c9494e0bdef7cdf3fd374520f91d86adb7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4fe6154_f7168513",
+        "filename": "vagrant/tests/plugin.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-08T18:12:38Z",
+      "side": 1,
+      "message": "This is not the name of the deployment. The name is different and is based on the helm chart release name.",
+      "range": {
+        "startLine": 125,
+        "startChar": 108,
+        "endLine": 125,
+        "endChar": 133
+      },
+      "revId": "1aa628c9494e0bdef7cdf3fd374520f91d86adb7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c0bd5f9_f2c4c8ba",
+        "filename": "vagrant/tests/plugin.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-08T18:12:38Z",
+      "side": 1,
+      "message": "Same as above.",
+      "range": {
+        "startLine": 126,
+        "startChar": 105,
+        "endLine": 126,
+        "endChar": 127
+      },
+      "revId": "1aa628c9494e0bdef7cdf3fd374520f91d86adb7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

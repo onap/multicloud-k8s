@@ -26,6 +26,11 @@ onap_private_net=onap-private-net
 unprotected_private_net=unprotected-private-net
 protected_private_net=protected-private-net
 ovn_multus_network_name=ovn-networkobj
+rbd_metadata=rbd_metatada.json
+rbd_content_tarball=vault-consul-dev.tar
+rbp_metadata=rbp_metatada.json
+rbp_instance=rbp_instance.json
+rbp_content_tarball=profile.tar
 
 # vFirewall vars
 demo_artifacts_version=1.3.0
@@ -1092,5 +1097,22 @@ spec:
         stdin: true
         tty: true
 DEPLOYMENT
+    popd
+}
+
+# populate_CSAR_rbdefinition() - Function that populates CSAR folder
+# for testing resource bundle definition
+function populate_CSAR_rbdefinition {
+    local csar_id=$1
+
+    _checks_args $csar_id
+    pushd ${CSAR_DIR}/${csar_id}
+    print_msg "Create Helm Chart Archives"
+    rm -f ${rbd_content_tarball}.gz
+    rm -f ${rbp_content_tarball}.gz
+    tar -cf $rbd_content_tarball -C $test_folder/vnfs/testrb/helm vault-consul-dev
+    tar -cf $rbp_content_tarball -C $test_folder/vnfs/testrb/helm/profile .
+    gzip $rbp_content_tarball
+    gzip $rbd_content_tarball
     popd
 }

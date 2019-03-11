@@ -125,16 +125,6 @@ func TestRBDefCreateHandler(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 			rbDefClient:  &mockRBDefinition{},
 		},
-		{
-			label: "Missing Chart Name in Request Body",
-			reader: bytes.NewBuffer([]byte(`{
-				"name":"testresourcebundle",
-				"description":"test description",
-				"service-type":"firewall"
-				}`)),
-			expectedCode: http.StatusBadRequest,
-			rbDefClient:  &mockRBDefinition{},
-		},
 	}
 
 	for _, testCase := range testCases {

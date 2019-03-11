@@ -22,6 +22,30 @@
       "revId": "83f6ecfe933d3ccaa934352300175504ec075cb7",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9055a9c5_757e59c1",
+        "filename": "src/k8splugin/internal/rb/profile_yaml_test.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-11T18:38:56Z",
+      "side": 1,
+      "message": "I thought so, but it requires the creation of a seperate testcase folder and some of the steps from this testcase. That\u0027s why I just thought I would re-use it here in a separate t.run command",
+      "parentUuid": "849e8e2c_821f97a7",
+      "range": {
+        "startLine": 131,
+        "startChar": 1,
+        "endLine": 162,
+        "endChar": 2
+      },
+      "revId": "83f6ecfe933d3ccaa934352300175504ec075cb7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

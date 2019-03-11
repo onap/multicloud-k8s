@@ -54,12 +54,6 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// Chart Name is required
-	if v.ChartName == "" {
-		http.Error(w, "Missing chart name in POST request", http.StatusBadRequest)
-		return
-	}
-
 	ret, err := h.client.Create(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

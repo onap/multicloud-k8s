@@ -19,8 +19,12 @@ package rb
 import (
 	"bytes"
 	"encoding/base64"
-	"k8splugin/internal/db"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
+
+	"k8splugin/internal/db"
 
 	uuid "github.com/hashicorp/go-uuid"
 	pkgerrors "github.com/pkg/errors"
@@ -142,8 +146,8 @@ func (v *DefinitionClient) Delete(id string) error {
 // Upload the contents of resource bundle into database
 func (v *DefinitionClient) Upload(id string, inp []byte) error {
 
-	//ignore the returned data here
-	_, err := v.Get(id)
+	//Check if definition metadata exists
+	def, err := v.Get(id)
 	if err != nil {
 		return pkgerrors.Errorf("Invalid Definition ID provided: %s", err.Error())
 	}
@@ -151,6 +155,39 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 	err = isTarGz(bytes.NewBuffer(inp))
 	if err != nil {
 		return pkgerrors.Errorf("Error in file format: %s", err.Error())
+	}
+
+	//Detect chart name from data if it was not provided originally
+	if def.ChartName == "" {
+		path, err := ExtractTarBall(bytes.NewBuffer(inp))
+		if err != nil {
+			return pkgerrors.Wrap(err, "Detecting chart name")
+		}
+
+		finfo, err := ioutil.ReadDir(path)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Detecting chart name")
+		}
+
+		//Store the first directory with Chart.yaml found as the chart name
+		for _, f := range finfo {
+			if f.IsDir() {
+				//Check if Chart.yaml exists
+				if _, err = os.Stat(filepath.Join(path, f.Name(), "Chart.yaml")); err == nil {
+					def.ChartName = f.Name()
+					break
+				}
+			}
+		}
+
+		if def.ChartName == "" {
+			return pkgerrors.New("Unable to detect chart name")
+		}
+
+		_, err = v.Create(def)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Storing updated chart metadata")
+		}
 	}
 
 	//Encode given byte stream to text for storage

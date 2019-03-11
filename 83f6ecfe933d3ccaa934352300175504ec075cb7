@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "849e8e2c_821f97a7",
+        "filename": "src/k8splugin/internal/rb/profile_yaml_test.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-11T18:33:59Z",
+      "side": 1,
+      "message": "Should this consider another test case?",
+      "range": {
+        "startLine": 131,
+        "startChar": 1,
+        "endLine": 162,
+        "endChar": 2
+      },
+      "revId": "83f6ecfe933d3ccaa934352300175504ec075cb7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

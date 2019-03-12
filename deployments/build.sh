@@ -50,6 +50,7 @@ function _push_image {
     local tag_name=${IMAGE_NAME}:${1:-latest}
 
     echo "Start push {$tag_name}"
+    docker push ${IMAGE_NAME}:latest
     docker tag ${IMAGE_NAME}:latest ${tag_name}
     docker push ${tag_name}
 }

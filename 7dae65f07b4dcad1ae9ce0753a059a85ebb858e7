@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8a3eb2f_c75d6719",
+        "filename": "krd/hosting_provider/vagrant/README.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-03-14T22:18:41Z",
+      "side": 1,
+      "message": "Change it to ovn4nfv as that is what we have tested",
+      "range": {
+        "startLine": 17,
+        "startChar": 1,
+        "endLine": 17,
+        "endChar": 111
+      },
+      "revId": "7dae65f07b4dcad1ae9ce0753a059a85ebb858e7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0302732_68558677",
+        "filename": "krd/hosting_provider/vagrant/inventory/group_vars/all.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-03-14T22:18:41Z",
+      "side": 1,
+      "message": "This is an auto-generated file and should not be checked in",
+      "revId": "7dae65f07b4dcad1ae9ce0753a059a85ebb858e7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -18,6 +18,7 @@ package api
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"k8splugin/internal/rb"
 	"net/http"
@@ -37,13 +38,12 @@ type rbProfileHandler struct {
 func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	var v rb.Profile
 
-	if r.Body == nil {
+	err := json.NewDecoder(r.Body).Decode(&v)
+	switch {
+	case err == io.EOF:
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&v)
-	if err != nil {
+	case err != nil:
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -80,14 +80,14 @@ func (h rbProfileHandler) uploadHandler(w http.ResponseWriter, r *http.Request) 
 	vars := mux.Vars(r)
 	uuid := vars["rbpID"]
 
-	if r.Body == nil {
-		http.Error(w, "Empty Body", http.StatusBadRequest)
-		return
-	}
-
 	inpBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Unable to read body", http.StatusBadRequest)
+		return
+	}
+
+	if len(inpBytes) == 0 {
+		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	}
 

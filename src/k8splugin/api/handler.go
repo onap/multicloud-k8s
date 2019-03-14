@@ -16,6 +16,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -75,13 +76,12 @@ func validateBody(body interface{}) error {
 func CreateHandler(w http.ResponseWriter, r *http.Request) {
 	var resource CreateVnfRequest
 
-	if r.Body == nil {
+	err := json.NewDecoder(r.Body).Decode(&resource)
+	switch {
+	case err == io.EOF:
 		http.Error(w, "Body empty", http.StatusBadRequest)
 		return
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&resource)
-	if err != nil {
+	case err != nil:
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}

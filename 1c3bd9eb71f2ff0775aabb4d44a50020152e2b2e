@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c9711b1_2708f6f4",
+        "filename": "deployments/Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-14T18:57:48Z",
+      "side": 1,
+      "message": "18 is Bionic",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 14
+      },
+      "revId": "1c3bd9eb71f2ff0775aabb4d44a50020152e2b2e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

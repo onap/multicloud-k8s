@@ -47,12 +47,12 @@ func (c *mockCSAR) DestroyVNF(data map[string][]string, namespace string,
 	return c.err
 }
 
-func executeRequest(req *http.Request) *httptest.ResponseRecorder {
+func executeRequest(req *http.Request) *http.Response {
 	router := NewRouter("")
 	recorder := httptest.NewRecorder()
 	router.ServeHTTP(recorder, req)
 
-	return recorder
+	return recorder.Result()
 }
 
 func checkResponseCode(t *testing.T, expected, actual int) {
@@ -161,13 +161,13 @@ func TestCreateHandler(t *testing.T) {
 				db.DBconn = testCase.mockStore
 			}
 
-			request, _ := http.NewRequest("POST", "/v1/vnf_instances/", testCase.input)
+			request := httptest.NewRequest("POST", "/v1/vnf_instances/", testCase.input)
 			result := executeRequest(request)
 
-			if testCase.expectedCode != result.Code {
-				t.Fatalf("Request method returned: \n%v\n and it was expected: \n%v", result.Code, testCase.expectedCode)
+			if testCase.expectedCode != result.StatusCode {
+				t.Fatalf("Request method returned: \n%v\n and it was expected: \n%v", result.StatusCode, testCase.expectedCode)
 			}
-			if result.Code == http.StatusCreated {
+			if result.StatusCode == http.StatusCreated {
 				var response CreateVnfResponse
 				err := json.NewDecoder(result.Body).Decode(&response)
 				if err != nil {
@@ -218,14 +218,14 @@ func TestListHandler(t *testing.T) {
 				db.DBconn = testCase.mockStore
 			}
 
-			request, _ := http.NewRequest("GET", "/v1/vnf_instances/cloud1/default", nil)
+			request := httptest.NewRequest("GET", "/v1/vnf_instances/cloud1/default", nil)
 			result := executeRequest(request)
 
-			if testCase.expectedCode != result.Code {
+			if testCase.expectedCode != result.StatusCode {
 				t.Fatalf("Request method returned: \n%v\n and it was expected: \n%v",
-					result.Code, testCase.expectedCode)
+					result.StatusCode, testCase.expectedCode)
 			}
-			if result.Code == http.StatusOK {
+			if result.StatusCode == http.StatusOK {
 				var response ListVnfsResponse
 				err := json.NewDecoder(result.Body).Decode(&response)
 				if err != nil {
@@ -331,11 +331,11 @@ func TestDeleteHandler(t *testing.T) {
 				helper.DestroyVNF = testCase.mockDeleteVNF.DestroyVNF
 			}
 
-			request, _ := http.NewRequest("DELETE", "/v1/vnf_instances/cloudregion1/testnamespace/uuid1", nil)
+			request := httptest.NewRequest("DELETE", "/v1/vnf_instances/cloudregion1/testnamespace/uuid1", nil)
 			result := executeRequest(request)
 
-			if testCase.expectedCode != result.Code {
-				t.Fatalf("Request method returned: %v and it was expected: %v", result.Code, testCase.expectedCode)
+			if testCase.expectedCode != result.StatusCode {
+				t.Fatalf("Request method returned: %v and it was expected: %v", result.StatusCode, testCase.expectedCode)
 			}
 		})
 	}
@@ -367,7 +367,7 @@ func TestVNFInstanceUpdate(t *testing.T) {
 
 		var result UpdateVnfResponse
 
-		req, _ := http.NewRequest("PUT", "/v1/vnf_instances/1", bytes.NewBuffer(payload))
+		req := httptest.NewRequest("PUT", "/v1/vnf_instances/1", bytes.NewBuffer(payload))
 
 		GetVNFClient = func(configPath string) (krd.VNFInstanceClientInterface, error) {
 			return &mockClient{
@@ -457,14 +457,14 @@ func TestGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockStore
-			request, _ := http.NewRequest("GET", "/v1/vnf_instances/cloud1/default/1", nil)
+			request := httptest.NewRequest("GET", "/v1/vnf_instances/cloud1/default/1", nil)
 			result := executeRequest(request)
 
-			if testCase.expectedCode != result.Code {
+			if testCase.expectedCode != result.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v",
-					result.Code, testCase.expectedCode)
+					result.StatusCode, testCase.expectedCode)
 			}
-			if result.Code == http.StatusOK {
+			if result.StatusCode == http.StatusOK {
 				var response GetVnfResponse
 				err := json.NewDecoder(result.Body).Decode(&response)
 				if err != nil {

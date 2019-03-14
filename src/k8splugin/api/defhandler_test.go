@@ -130,25 +130,20 @@ func TestRBDefCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("POST", "/v1/rb/definition", testCase.reader)
-
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			req := httptest.NewRequest("POST", "/v1/rb/definition", testCase.reader)
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.createHandler)
-			hr.ServeHTTP(rr, req)
+			vh.createHandler(rr, req)
+			resp := rr.Result()
 
 			//Check returned code
-			if rr.Code != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, rr.Code)
+			if resp.StatusCode != testCase.expectedCode {
+				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 			}
 
 			//Check returned body only if statusCreated
-			if rr.Code == http.StatusCreated {
+			if resp.StatusCode == http.StatusCreated {
 				got := rb.Definition{}
-				json.NewDecoder(rr.Body).Decode(&got)
+				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
 					t.Errorf("createHandler returned unexpected body: got %v;"+
@@ -207,24 +202,20 @@ func TestRBDefListHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/rb/definition", nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			req := httptest.NewRequest("GET", "/v1/rb/definition", nil)
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.listHandler)
+			vh.listHandler(rr, req)
+			resp := rr.Result()
 
-			hr.ServeHTTP(rr, req)
 			//Check returned code
-			if rr.Code != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, rr.Code)
+			if resp.StatusCode != testCase.expectedCode {
+				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 			}
 
 			//Check returned body only if statusOK
-			if rr.Code == http.StatusOK {
+			if resp.StatusCode == http.StatusOK {
 				got := []rb.Definition{}
-				json.NewDecoder(rr.Body).Decode(&got)
+				json.NewDecoder(resp.Body).Decode(&got)
 
 				// Since the order of returned slice is not guaranteed
 				// Check both and return error if both don't match
@@ -292,24 +283,19 @@ func TestRBDefGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			req := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.getHandler)
-
-			hr.ServeHTTP(rr, req)
+			vh.getHandler(rr, req)
+			resp := rr.Result()
 			//Check returned code
-			if rr.Code != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, rr.Code)
+			if resp.StatusCode != testCase.expectedCode {
+				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 			}
 
 			//Check returned body only if statusOK
-			if rr.Code == http.StatusOK {
+			if resp.StatusCode == http.StatusOK {
 				got := rb.Definition{}
-				json.NewDecoder(rr.Body).Decode(&got)
+				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
 					t.Errorf("listHandler returned unexpected body: got %v;"+
@@ -347,18 +333,13 @@ func TestRBDefDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			req := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.deleteHandler)
-
-			hr.ServeHTTP(rr, req)
+			vh.deleteHandler(rr, req)
+			resp := rr.Result()
 			//Check returned code
-			if rr.Code != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, rr.Code)
+			if resp.StatusCode != testCase.expectedCode {
+				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 			}
 		})
 	}
@@ -406,20 +387,14 @@ func TestRBDefUploadHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req, err := http.NewRequest("POST",
+			req := httptest.NewRequest("POST",
 				"/v1/rb/definition/"+testCase.inpUUID+"/content", testCase.body)
-
-			if err != nil {
-				t.Fatal(err)
-			}
-
 			rr := httptest.NewRecorder()
-			hr := http.HandlerFunc(vh.uploadHandler)
-
-			hr.ServeHTTP(rr, req)
+			vh.uploadHandler(rr, req)
+			resp := rr.Result()
 			//Check returned code
-			if rr.Code != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, rr.Code)
+			if resp.StatusCode != testCase.expectedCode {
+				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 			}
 		})
 	}

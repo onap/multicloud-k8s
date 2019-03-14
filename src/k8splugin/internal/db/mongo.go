@@ -17,14 +17,15 @@
 package db
 
 import (
-	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/bson/primitive"
-	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/mongodb/mongo-go-driver/mongo/options"
-	pkgerrors "github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"log"
 	"os"
+
+	pkgerrors "github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // MongoCollection defines the a subset of MongoDB operations
@@ -39,7 +40,7 @@ type MongoCollection interface {
 	DeleteOne(ctx context.Context, filter interface{},
 		opts ...*options.DeleteOptions) (*mongo.DeleteResult, error)
 	Find(ctx context.Context, filter interface{},
-		opts ...*options.FindOptions) (mongo.Cursor, error)
+		opts ...*options.FindOptions) (*mongo.Cursor, error)
 }
 
 // MongoStore is an implementation of the db.Store interface
@@ -60,12 +61,25 @@ var decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
 	return sr.DecodeBytes()
 }
 
+// These exists only for allowing us to mock the cursor.Next function
+// Mainly because we cannot construct a mongo.Cursor struct from our
+// tests. All fields in that struct are private and there is no public
+// constructor method.
+var cursorNext = func(ctx context.Context, cursor *mongo.Cursor) bool {
+	return cursor.Next(ctx)
+}
+var cursorClose = func(ctx context.Context, cursor *mongo.Cursor) error {
+	return cursor.Close(ctx)
+}
+
 // NewMongoStore initializes a Mongo Database with the name provided
 // If a database with that name exists, it will be returned
 func NewMongoStore(name string, store *mongo.Database) (Store, error) {
 	if store == nil {
 		ip := "mongodb://" + os.Getenv("DATABASE_IP") + ":27017"
-		mongoClient, err := mongo.NewClient(ip)
+		clientOptions := options.Client()
+		clientOptions.ApplyURI(ip)
+		mongoClient, err := mongo.NewClient(clientOptions)
 		if err != nil {
 			return nil, err
 		}
@@ -292,16 +306,12 @@ func (m *MongoStore) ReadAll(coll, tag string) (map[string][]byte, error) {
 	if err != nil {
 		return nil, pkgerrors.Errorf("Error reading from database: %s", err.Error())
 	}
-	defer cursor.Close(ctx)
+	defer cursorClose(ctx, cursor)
 
 	//Iterate over all the master tables
 	result := make(map[string][]byte)
-	for cursor.Next(ctx) {
-		d, err := cursor.DecodeBytes()
-		if err != nil {
-			log.Printf("Unable to decode data in Readall: %s", err.Error())
-			continue
-		}
+	for cursorNext(ctx, cursor) {
+		d := cursor.Current
 
 		//Read key of each master table
 		key, ok := d.Lookup("key").StringValueOK()

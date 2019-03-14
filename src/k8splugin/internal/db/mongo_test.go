@@ -21,43 +21,21 @@ package db
 import (
 	"bytes"
 	"context"
-	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/mongodb/mongo-go-driver/mongo/options"
-	pkgerrors "github.com/pkg/errors"
 	"reflect"
 	"strings"
 	"testing"
+
+	pkgerrors "github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-// Implements the mongo.Cursor interface
-type mockCursor struct {
-	mongo.Cursor
-	err   error
-	bson  bson.Raw
-	count int
-}
-
-func (mc *mockCursor) Next(ctx context.Context) bool {
-	if mc.count > 0 {
-		mc.count = mc.count - 1
-		return true
-	}
-	return false
-}
-
-func (mc *mockCursor) DecodeBytes() (bson.Raw, error) {
-	return mc.bson, mc.err
-}
-
-func (mc *mockCursor) Close(ctx context.Context) error {
-	return nil
-}
 
 //Implements the functions used currently in mongo.go
 type mockCollection struct {
-	Err     error
-	mCursor mongo.Cursor
+	Err          error
+	mCursor      *mongo.Cursor
+	mCursorCount int
 }
 
 func (c *mockCollection) InsertOne(ctx context.Context, document interface{},
@@ -89,7 +67,7 @@ func (c *mockCollection) DeleteOne(ctx context.Context, filter interface{},
 }
 
 func (c *mockCollection) Find(ctx context.Context, filter interface{},
-	opts ...*options.FindOptions) (mongo.Cursor, error) {
+	opts ...*options.FindOptions) (*mongo.Cursor, error) {
 
 	return c.mCursor, c.Err
 }
@@ -415,14 +393,14 @@ func TestReadAll(t *testing.T) {
 				"tag":  "metadata",
 			},
 			mockColl: &mockCollection{
-				mCursor: &mockCursor{
+				mCursor: &mongo.Cursor{
 					// Binary form of
 					// {
 					//	"_id" : ObjectId("5c115156777ff85654248ae1"),
 					//  "key" : "b82c4bb1-09ff-6093-4d58-8327b94e1e20",
 					//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
 					// }
-					bson: bson.Raw{
+					Current: bson.Raw{
 						'\x5a', '\x00', '\x00', '\x00', '\x07', '\x5f', '\x69', '\x64',
 						'\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f', '\xf8',
 						'\x56', '\x54', '\x24', '\x8a', '\xe1', '\x02', '\x6b', '\x65',
@@ -436,8 +414,8 @@ func TestReadAll(t *testing.T) {
 						'\x56', '\xc9', '\x75', '\x50', '\x47', '\xe3', '\x18', '\xbb',
 						'\xfd', '\x00',
 					},
-					count: 1,
 				},
+				mCursorCount: 1,
 			},
 			expected: map[string][]byte{
 				"b82c4bb1-09ff-6093-4d58-8327b94e1e20": []byte{
@@ -462,14 +440,14 @@ func TestReadAll(t *testing.T) {
 				"tag":  "tagName",
 			},
 			mockColl: &mockCollection{
-				mCursor: &mockCursor{
+				mCursor: &mongo.Cursor{
 					// Binary form of
 					// {
 					//	"_id" : ObjectId("5c115156777ff85654248ae1"),
 					//  "key" : "b82c4bb1-09ff-6093-4d58-8327b94e1e20",
 					//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
 					// }
-					bson: bson.Raw{
+					Current: bson.Raw{
 						'\x5a', '\x00', '\x00', '\x00', '\x07', '\x5f', '\x69', '\x64',
 						'\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f', '\xf8',
 						'\x56', '\x54', '\x24', '\x8a', '\xe1', '\x02', '\x6b', '\x65',
@@ -483,8 +461,8 @@ func TestReadAll(t *testing.T) {
 						'\x56', '\xc9', '\x75', '\x50', '\x47', '\xe3', '\x18', '\xbb',
 						'\xfd', '\x00',
 					},
-					count: 1,
 				},
+				mCursorCount: 1,
 			},
 			expectedError: "Did not find any objects with tag",
 		},
@@ -508,7 +486,19 @@ func TestReadAll(t *testing.T) {
 			}
 
 			decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
-				return testCase.mockColl.mCursor.DecodeBytes()
+				return testCase.mockColl.mCursor.Current, testCase.mockColl.Err
+			}
+
+			cursorNext = func(ctx context.Context, cursor *mongo.Cursor) bool {
+				if testCase.mockColl.mCursorCount > 0 {
+					testCase.mockColl.mCursorCount -= 1
+					return true
+				}
+				return false
+			}
+
+			cursorClose = func(ctx context.Context, cursor *mongo.Cursor) error {
+				return nil
 			}
 
 			got, err := m.ReadAll(testCase.input["coll"].(string), testCase.input["tag"].(string))

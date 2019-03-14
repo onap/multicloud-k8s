@@ -51,7 +51,7 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180228065516-1df9eeb2bb81 // indirect
-	github.com/mongodb/mongo-go-driver v0.2.0
+	github.com/mongodb/mongo-go-driver v1.0.0
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
@@ -66,6 +66,7 @@ require (
 	github.com/tidwall/pretty v0.0.0-20180105212114-65a9db5fad51 // indirect
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
+	go.mongodb.org/mongo-driver v1.0.0
 	golang.org/x/net v0.0.0-20181201002055-351d144fa1fc
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890 // indirect
 	golang.org/x/time v0.0.0-20180412165947-fbb02b2291d2 // indirect

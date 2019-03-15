@@ -24,7 +24,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"sort"
 	"testing"
 
 	pkgerrors "github.com/pkg/errors"
@@ -49,15 +48,7 @@ func (m *mockRBProfile) Create(inp rb.Profile) (rb.Profile, error) {
 	return m.Items[0], nil
 }
 
-func (m *mockRBProfile) List() ([]rb.Profile, error) {
-	if m.Err != nil {
-		return []rb.Profile{}, m.Err
-	}
-
-	return m.Items, nil
-}
-
-func (m *mockRBProfile) Get(id string) (rb.Profile, error) {
+func (m *mockRBProfile) Get(rbname, rbversion, prname string) (rb.Profile, error) {
 	if m.Err != nil {
 		return rb.Profile{}, m.Err
 	}
@@ -65,11 +56,11 @@ func (m *mockRBProfile) Get(id string) (rb.Profile, error) {
 	return m.Items[0], nil
 }
 
-func (m *mockRBProfile) Delete(id string) error {
+func (m *mockRBProfile) Delete(rbname, rbversion, prname string) error {
 	return m.Err
 }
 
-func (m *mockRBProfile) Upload(id string, inp []byte) error {
+func (m *mockRBProfile) Upload(rbname, rbversion, prname string, inp []byte) error {
 	return m.Err
 }
 
@@ -85,20 +76,24 @@ func TestRBProfileCreateHandler(t *testing.T) {
 			label:        "Missing Body Failure",
 			expectedCode: http.StatusBadRequest,
 			rbDefClient:  &mockRBProfile{},
+			reader:       nil,
 		},
 		{
-			label:        "Create without UUID",
+			label:        "Create New Profile for Definition",
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
-				"rbdid":"abcde123-e89b-8888-a456-986655447236",
-				"name":"testdomain",
+				"rb-name":"testresource_bundle_definition",
+				"rb-version":"v1",
+				"profile-name":"profile1",
+				"release-name":"testprofilereleasename",
 				"namespace":"default",
-				"kubernetesversion":"1.12.3"
+				"kubernetes-version":"1.12.3"
 				}`)),
 			expected: rb.Profile{
-				UUID:              "123e4567-e89b-12d3-a456-426655440000",
-				RBDID:             "abcde123-e89b-8888-a456-986655447236",
-				Name:              "testresourcebundle",
+				RBName:            "testresource_bundle_definition",
+				RBVersion:         "v1",
+				Name:              "profile1",
+				ReleaseName:       "testprofilereleasename",
 				Namespace:         "default",
 				KubernetesVersion: "1.12.3",
 			},
@@ -106,9 +101,10 @@ func TestRBProfileCreateHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				Items: []rb.Profile{
 					{
-						UUID:              "123e4567-e89b-12d3-a456-426655440000",
-						RBDID:             "abcde123-e89b-8888-a456-986655447236",
-						Name:              "testresourcebundle",
+						RBName:            "testresource_bundle_definition",
+						RBVersion:         "v1",
+						Name:              "profile1",
+						ReleaseName:       "testprofilereleasename",
 						Namespace:         "default",
 						KubernetesVersion: "1.12.3",
 					},
@@ -120,7 +116,8 @@ func TestRBProfileCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbProfileHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("POST", "/v1/rb/profile", testCase.reader)
+			req := httptest.NewRequest("POST", "/v1/rb/profile/testresource_bundle_definition/v1/profile",
+				testCase.reader)
 			rr := httptest.NewRecorder()
 			vh.createHandler(rr, req)
 			resp := rr.Result()
@@ -144,93 +141,6 @@ func TestRBProfileCreateHandler(t *testing.T) {
 	}
 }
 
-func TestRBProfileListHandler(t *testing.T) {
-
-	testCases := []struct {
-		label        string
-		expected     []rb.Profile
-		expectedCode int
-		rbDefClient  *mockRBProfile
-	}{
-		{
-			label:        "List Bundle Profiles",
-			expectedCode: http.StatusOK,
-			expected: []rb.Profile{
-				{
-					UUID:              "123e4567-e89b-12d3-a456-426655440000",
-					RBDID:             "abcde123-e89b-8888-a456-986655447236",
-					Name:              "testresourcebundle",
-					Namespace:         "default",
-					KubernetesVersion: "1.12.3",
-				},
-				{
-					UUID:              "123e4567-e89b-12d3-a456-426655441111",
-					RBDID:             "abcde123-e89b-8888-a456-986655441111",
-					Name:              "testresourcebundle2",
-					Namespace:         "default",
-					KubernetesVersion: "1.12.3",
-				},
-			},
-			rbDefClient: &mockRBProfile{
-				// list of Profiles that will be returned by the mockclient
-				Items: []rb.Profile{
-					{
-						UUID:              "123e4567-e89b-12d3-a456-426655440000",
-						RBDID:             "abcde123-e89b-8888-a456-986655447236",
-						Name:              "testresourcebundle",
-						Namespace:         "default",
-						KubernetesVersion: "1.12.3",
-					},
-					{
-						UUID:              "123e4567-e89b-12d3-a456-426655441111",
-						RBDID:             "abcde123-e89b-8888-a456-986655441111",
-						Name:              "testresourcebundle2",
-						Namespace:         "default",
-						KubernetesVersion: "1.12.3",
-					},
-				},
-			},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbProfileHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("GET", "/v1/rb/profile", nil)
-			rr := httptest.NewRecorder()
-			vh.listHandler(rr, req)
-
-			resp := rr.Result()
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-
-			//Check returned body only if statusOK
-			if resp.StatusCode == http.StatusOK {
-				got := []rb.Profile{}
-				json.NewDecoder(resp.Body).Decode(&got)
-
-				// Since the order of returned slice is not guaranteed
-				// Check both and return error if both don't match
-				sort.Slice(got, func(i, j int) bool {
-					return got[i].UUID < got[j].UUID
-				})
-				// Sort both as it is not expected that testCase.expected
-				// is sorted
-				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].UUID < testCase.expected[j].UUID
-				})
-
-				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("listHandler returned unexpected body: got %v;"+
-						" expected %v", got, testCase.expected)
-				}
-			}
-		})
-	}
-}
-
 func TestRBProfileGetHandler(t *testing.T) {
 
 	testCases := []struct {
@@ -244,20 +154,22 @@ func TestRBProfileGetHandler(t *testing.T) {
 			label:        "Get Bundle Profile",
 			expectedCode: http.StatusOK,
 			expected: rb.Profile{
-				UUID:              "123e4567-e89b-12d3-a456-426655441111",
-				RBDID:             "abcde123-e89b-8888-a456-986655447236",
-				Name:              "testresourcebundle2",
+				RBName:            "testresource_bundle_definition",
+				RBVersion:         "v1",
+				Name:              "profile1",
+				ReleaseName:       "testprofilereleasename",
 				Namespace:         "default",
 				KubernetesVersion: "1.12.3",
 			},
 			inpUUID: "123e4567-e89b-12d3-a456-426655441111",
 			rbDefClient: &mockRBProfile{
-				// list of Profiles that will be returned by the mockclient
+				// Profile that will be returned by the mockclient
 				Items: []rb.Profile{
 					{
-						UUID:              "123e4567-e89b-12d3-a456-426655441111",
-						RBDID:             "abcde123-e89b-8888-a456-986655447236",
-						Name:              "testresourcebundle2",
+						RBName:            "testresource_bundle_definition",
+						RBVersion:         "v1",
+						Name:              "profile1",
+						ReleaseName:       "testprofilereleasename",
 						Namespace:         "default",
 						KubernetesVersion: "1.12.3",
 					},

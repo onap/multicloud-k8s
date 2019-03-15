@@ -20,9 +20,10 @@ base_url="http://localhost:8081"
 cloud_region_id="kud"
 namespace="default"
 csar_id="94e414f6-9ca4-11e8-bb6a-52540067263b"
-rbd_csar_id="7eb09e38-4363-9942-1234-3beb2e95fd85"
-definition_id="9d117af8-30b8-11e9-af94-525400277b3d"
-profile_id="ebe353d2-30b7-11e9-9515-525400277b3d"
+rb_name="test-rbdef"
+rb_version="v1"
+profile_name="profile1"
+vnf_customization_uuid="ebe353d2-30b7-11e9-9515-525400277b3d"
 
 # _build_generic_sim() - Creates a generic simulator image in case that doesn't exist
 function _build_generic_sim {
@@ -58,29 +59,31 @@ destroy_deployment $plugin_deployment_name
 
 #start_aai_service
 populate_CSAR_plugin $csar_id
-populate_CSAR_rbdefinition $rbd_csar_id
+populate_CSAR_rbdefinition $csar_id
 
 # Test
 print_msg "Create Resource Bundle Definition Metadata"
 payload_raw="
 {
-    \"name\": \"test-rbdef\",
+    \"rb-name\": \"${rb_name}\",
+    \"rb-version\": \"${rb_version}\",
     \"chart-name\": \"vault-consul-dev\",
     \"description\": \"testing resource bundle definition api\",
-    \"uuid\": \"$definition_id\",
-    \"service-type\": \"firewall\"
+    \"labels\": {
+        \"vnf_customization_uuid\": \"${vnf_customization_uuid}\"
+    }
 }
 "
 payload=$(echo $payload_raw | tr '\n' ' ')
-rbd_id=$(curl -s -d "$payload" -X POST "${base_url}/v1/rb/definition" | jq -r '.uuid')
+rb_ret_name=$(curl -s -d "$payload" -X POST "${base_url}/v1/rb/definition" | jq -r '."rb-name"')
 
 print_msg "Upload Resource Bundle Definition Content"
-curl -s --data-binary @${CSAR_DIR}/${rbd_csar_id}/${rbd_content_tarball}.gz -X POST "${base_url}/v1/rb/definition/$rbd_id/content"
+curl -s --data-binary @${CSAR_DIR}/${csar_id}/${rbd_content_tarball}.gz -X POST "${base_url}/v1/rb/definition/$rb_name/$rb_version/content"
 
 print_msg "Listing Resource Bundle Definitions"
-rbd_id_list=$(curl -s -X GET "${base_url}/v1/rb/definition")
-if [[ "$rbd_id_list" != *"${rbd_id}"* ]]; then
-    echo $rbd_id_list
+rb_list=$(curl -s -X GET "${base_url}/v1/rb/definition/$rb_name")
+if [[ "$rb_list" != *"${rb_name}"* ]]; then
+    echo $rb_list
     echo "Resource Bundle Definition not stored"
     exit 1
 fi
@@ -89,23 +92,27 @@ print_msg "Create Resource Bundle Profile Metadata"
 kubeversion=$(kubectl version | grep 'Server Version' | awk -F '"' '{print $6}')
 payload_raw="
 {
-    \"name\": \"test-rbprofile\",
+    \"profile-name\": \"${profile_name}\",
+    \"rb-name\": \"${rb_name}\",
+    \"rb-version\": \"${rb_version}\",
+    \"release-name\": \"testrelease\",
     \"namespace\": \"$namespace\",
-    \"rbdid\": \"$definition_id\",
-    \"uuid\": \"$profile_id\",
-    \"kubernetesversion\": \"$kubeversion\"
+    \"kubernetesversion\": \"$kubeversion\",
+    \"labels\": {
+        \"vnf_customization_uuid\": \"${vnf_customization_uuid}\"
+    }
 }
 "
 payload=$(echo $payload_raw | tr '\n' ' ')
-rbp_id=$(curl -s -d "$payload" -X POST "${base_url}/v1/rb/profile" | jq -r '.uuid')
+rbp_ret_name=$(curl -s -d "$payload" -X POST "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile" | jq -r '."profile-name"')
 
 print_msg "Upload Resource Bundle Profile Content"
-curl -s --data-binary @${CSAR_DIR}/${rbd_csar_id}/${rbp_content_tarball}.gz -X POST "${base_url}/v1/rb/profile/$rbp_id/content"
+curl -s --data-binary @${CSAR_DIR}/${csar_id}/${rbp_content_tarball}.gz -X POST "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile/$profile_name/content"
 
-print_msg "Listing Resource Bundle Profiles"
-rbp_id_list=$(curl -s -X GET "${base_url}/v1/rb/profile")
-if [[ "$rbp_id_list" != *"${rbp_id}"* ]]; then
-    echo $rbd_id_list
+print_msg "Getting Resource Bundle Profile"
+rbp_ret=$(curl -s -X GET "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile/$profile_name")
+if [[ "$rbp_ret" != *"${profile_name}"* ]]; then
+    echo $rbp_ret
     echo "Resource Bundle Profile not stored"
     exit 1
 fi
@@ -114,7 +121,9 @@ print_msg "Instantiate Profile"
 payload_raw="
 {
     \"cloud_region_id\": \"$cloud_region_id\",
-    \"rb_profile_id\":\"$profile_id\",
+    \"rb-name\":\"$rb_name\",
+    \"rb-version\":\"$rb_version\",
+    \"profile-name\":\"$profile_name\",
     \"csar_id\": \"$csar_id\"
 }
 "
@@ -122,7 +131,7 @@ payload=$(echo $payload_raw | tr '\n' ' ')
 vnf_id=$(curl -s -d "$payload" "${base_url}/v1/vnf_instances/" | jq -r '.vnf_id')
 
 print_msg "Validating Kubernetes"
-kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-test-rbprofile-vault-consul-dev
+kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-testrelease-vault-consul-dev
 kubectl get --no-headers=true --namespace=${namespace} service ${cloud_region_id}-${namespace}-${vnf_id}-override-vault-consul
 echo "VNF Instance created succesfully with id: $vnf_id"
 
@@ -142,9 +151,9 @@ if [[ -z "$vnf_details" ]]; then
 fi
 echo "VNF details $vnf_details"
 
-print_msg "Deleting $rbd_id Resource Bundle Definition"
-curl -X DELETE "${base_url}/v1/rb/definition/$rbd_id"
-if [[ 500 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/v1/rb/definition/$rbd_id") ]]; then
+print_msg "Deleting $rb_name/$rb_version Resource Bundle Definition"
+curl -X DELETE "${base_url}/v1/rb/definition/$rb_name/$rb_version"
+if [[ 500 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/v1/rb/definition/$rb_name/$rb_version") ]]; then
     echo "Resource Bundle Definition not deleted"
 # TODO: Change the HTTP code for 404 when the resource is not found in the API
     exit 1

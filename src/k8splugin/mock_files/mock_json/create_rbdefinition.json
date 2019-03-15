@@ -1,7 +1,9 @@
 {
-    "uuid": "7eb09e38-4363-9942-1234-3beb2e95fd85",
-    "name": "test-rbdef",
+    "rb-name": "test-rbdef",
+    "rb-version": "v1",
     "chart-name": "testchart",
     "description": "testing resource bundle definition api",
-    "service-type": "firewall"
+    "labels": {
+        "vnf_customization_module_uuid": "7eb09e38-4363-9942-1234-3beb2e95fd85"
+    }
 }

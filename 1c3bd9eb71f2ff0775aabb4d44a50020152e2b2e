@@ -22,6 +22,30 @@
       "revId": "1c3bd9eb71f2ff0775aabb4d44a50020152e2b2e",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d864036e_2613a460",
+        "filename": "deployments/Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-15T00:18:52Z",
+      "side": 1,
+      "message": "you\u0027re right! The only think that I\u0027m not sure about this change is the line 29 which uses the xenial WAND packages. When I tested that works but let me tried with bionic which should be more appropriated.",
+      "parentUuid": "2c9711b1_2708f6f4",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 14
+      },
+      "revId": "1c3bd9eb71f2ff0775aabb4d44a50020152e2b2e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

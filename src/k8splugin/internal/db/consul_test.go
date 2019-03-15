@@ -108,13 +108,13 @@ func TestConsulCreate(t *testing.T) {
 	}{
 		{
 			label: "Sucessful register a record to Consul Database",
-			key:   mockKey{Key: "test-key"},
+			key:   MockKey{Key: "test-key"},
 			input: map[string]string{"root": "rbinst", "tag": "data", "value": "test-value"},
 			mock:  &mockConsulKVStore{},
 		},
 		{
 			label: "Fail to create a new record in Consul Database",
-			key:   mockKey{Key: "test-key"},
+			key:   MockKey{Key: "test-key"},
 			input: map[string]string{"root": "rbinst", "tag": "data", "value": "test-value"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
@@ -151,7 +151,7 @@ func TestConsulRead(t *testing.T) {
 	}{
 		{
 			label: "Sucessful retrieve a record from Consul Database",
-			key:   mockKey{Key: "test"},
+			key:   MockKey{Key: "test"},
 			input: map[string]string{"root": "rbinst", "tag": "data"},
 			mock: &mockConsulKVStore{
 				Items: api.KVPairs{
@@ -165,13 +165,13 @@ func TestConsulRead(t *testing.T) {
 		},
 		{
 			label: "Fail retrieve a non-existing record from Consul Database",
-			key:   mockKey{Key: "test-key"},
+			key:   MockKey{Key: "test-key"},
 			input: map[string]string{"root": "rbinst", "tag": "data"},
 			mock:  &mockConsulKVStore{},
 		},
 		{
 			label: "Fail retrieve a record from Consul Database",
-			key:   mockKey{Key: "test-key"},
+			key:   MockKey{Key: "test-key"},
 			input: map[string]string{"root": "rbinst", "tag": "data"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
@@ -215,13 +215,13 @@ func TestConsulDelete(t *testing.T) {
 	}{
 		{
 			label: "Sucessful delete a record to Consul Database",
-			key:   mockKey{Key: "test-key"},
+			key:   MockKey{Key: "test-key"},
 			input: map[string]string{"root": "rbinst", "tag": "data"},
 			mock:  &mockConsulKVStore{},
 		},
 		{
 			label: "Fail to delete a record in Consul Database",
-			key:   mockKey{Key: "test-key"},
+			key:   MockKey{Key: "test-key"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
 			},

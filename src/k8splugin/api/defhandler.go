@@ -54,6 +54,12 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// Version is required.
+	if v.Version == "" {
+		http.Error(w, "Missing version in POST request", http.StatusBadRequest)
+		return
+	}
+
 	ret, err := h.client.Create(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -72,7 +78,8 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 // uploadHandler handles upload of the bundle tar file into the database
 func (h rbDefinitionHandler) uploadHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["rbdID"]
+	name := vars["rbname"]
+	version := vars["rbversion"]
 
 	if r.Body == nil {
 		http.Error(w, "Empty Body", http.StatusBadRequest)
@@ -85,7 +92,7 @@ func (h rbDefinitionHandler) uploadHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = h.client.Upload(uuid, inpBytes)
+	err = h.client.Upload(name, version, inpBytes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -94,10 +101,13 @@ func (h rbDefinitionHandler) uploadHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 }
 
-// listHandler handles GET (list) operations on the endpoint
+// listVersionsHandler handles GET (list) operations on the endpoint
 // Returns a list of rb.Definitions
-func (h rbDefinitionHandler) listHandler(w http.ResponseWriter, r *http.Request) {
-	ret, err := h.client.List()
+func (h rbDefinitionHandler) listVersionsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["rbname"]
+
+	ret, err := h.client.List(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -116,9 +126,10 @@ func (h rbDefinitionHandler) listHandler(w http.ResponseWriter, r *http.Request)
 // Returns a rb.Definition
 func (h rbDefinitionHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["rbdID"]
+	name := vars["rbname"]
+	version := vars["rbversion"]
 
-	ret, err := h.client.Get(id)
+	ret, err := h.client.Get(name, version)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -136,9 +147,10 @@ func (h rbDefinitionHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 // deleteHandler handles DELETE operations on a particular bundle definition id
 func (h rbDefinitionHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["rbdID"]
+	name := vars["rbname"]
+	version := vars["rbversion"]
 
-	err := h.client.Delete(id)
+	err := h.client.Delete(name, version)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

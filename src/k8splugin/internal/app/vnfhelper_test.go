@@ -28,6 +28,7 @@ import (
 
 	utils "k8splugin/internal"
 	"k8splugin/internal/db"
+	"k8splugin/internal/rb"
 )
 
 func LoadMockPlugins(krdLoadedPlugins *map[string]*plugin.Plugin) error {
@@ -84,12 +85,14 @@ func TestCreateVNF(t *testing.T) {
 	t.Run("Successfully create VNF", func(t *testing.T) {
 		db.DBconn = &db.MockDB{
 			Items: map[string]map[string][]byte{
-				"123e4567-e89b-12d3-a456-426655440000": {
+				rb.ProfileKey{RBName: "test-rbdef", RBVersion: "v1",
+					Name: "profile1"}.String(): {
 					"metadata": []byte(
-						"{\"name\":\"testresourcebundle\"," +
-							"\"namespace\":\"default\"," +
-							"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-							"\"rbdid\":\"abcde123-e89b-8888-a456-986655447236\"," +
+						"{\"profile-name\":\"profile1\"," +
+							"\"release-name\":\"testprofilereleasename\"," +
+							"\"namespace\":\"testnamespace\"," +
+							"\"rb-name\":\"test-rbdef\"," +
+							"\"rb-version\":\"v1\"," +
 							"\"kubernetesversion\":\"1.12.3\"}"),
 					// base64 encoding of vagrant/tests/vnfs/testrb/helm/profile
 					"content": []byte("H4sICLmjT1wAA3Byb2ZpbGUudGFyAO1Y32/bNhD2s/6Kg/KyYZZsy" +
@@ -116,13 +119,12 @@ func TestCreateVNF(t *testing.T) {
 						"YkDi6mRXNk/V1pUxy0uYsI1S+meU+XsPo2kJLnMOKZGy4J6Xt3XgZuHTayEKv3XZLjy+" +
 						"yJ66WPQwcHBwcHBwcHBwcHBwcHBwcHhm8Q/mTHqWgAoAAA="),
 				},
-				"abcde123-e89b-8888-a456-986655447236": {
+				rb.DefinitionKey{Name: "test-rbdef", Version: "v1"}.String(): {
 					"metadata": []byte(
-						"{\"name\":\"testresourcebundle\"," +
+						"{\"rb-name\":\"test-rbdef\"," +
+							"\"rb-version\":\"v1\"," +
 							"\"chart-name\":\"vault-consul-dev\"," +
-							"\"description\":\"testresourcebundle\"," +
-							"\"uuid\":\"abcde123-e89b-8888-a456-986655447236\"," +
-							"\"service-type\":\"firewall\"}"),
+							"\"description\":\"testresourcebundle\"}"),
 					// base64 encoding of vagrant/tests/vnfs/testrb/helm/vault-consul-dev
 					"content": []byte("H4sICEetS1wAA3ZhdWx0LWNvbnN1bC1kZXYudGFyAO0c7XLbNjK/+R" +
 						"QYujdJehatb+V4czPnOmnPk9bO2Gk7nbaTgUhIxpgiGAK0o3P9QPca92S3C5AU9GXZiax" +
@@ -191,7 +193,14 @@ func TestCreateVNF(t *testing.T) {
 			},
 		}
 		externaluuid, data, err := CreateVNF("uuid", "cloudregion1",
-			"123e4567-e89b-12d3-a456-426655440000", &kubeclient)
+			rb.Profile{
+				RBName:            "test-rbdef",
+				RBVersion:         "v1",
+				Name:              "profile1",
+				ReleaseName:       "testprofilereleasename",
+				Namespace:         "testnamespace",
+				KubernetesVersion: "1.12.3",
+			}, &kubeclient)
 		if err != nil {
 			t.Fatalf("TestCreateVNF returned an error (%s)", err)
 		}

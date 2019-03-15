@@ -17,7 +17,9 @@ package api
 type CreateVnfRequest struct {
 	CloudRegionID string                   `json:"cloud_region_id"`
 	CsarID        string                   `json:"csar_id"`
-	RBProfileID   string                   `json:"rb_profile_id"`
+	RBName        string                   `json:"rb-name"`
+	RBVersion     string                   `json:"rb-version"`
+	ProfileName   string                   `json:"profile-name"`
 	OOFParams     []map[string]interface{} `json:"oof_parameters"`
 	NetworkParams NetworkParameters        `json:"network_parameters"`
 	Name          string                   `json:"vnf_instance_name"`

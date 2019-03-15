@@ -20,11 +20,11 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-type mockKey struct {
+type MockKey struct {
 	Key string
 }
 
-func (m mockKey) String() string {
+func (m MockKey) String() string {
 	return m.Key
 }
 

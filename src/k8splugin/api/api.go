@@ -33,19 +33,17 @@ func NewRouter(kubeconfig string) *mux.Router {
 	resRouter := router.PathPrefix("/v1/rb").Subrouter()
 	rbdef := rbDefinitionHandler{client: rb.NewDefinitionClient()}
 	resRouter.HandleFunc("/definition", rbdef.createHandler).Methods("POST")
-	resRouter.HandleFunc("/definition/{rbdID}/content", rbdef.uploadHandler).Methods("POST")
-	resRouter.HandleFunc("/definition", rbdef.listHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbdID}", rbdef.getHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbdID}", rbdef.deleteHandler).Methods("DELETE")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/content", rbdef.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}", rbdef.listVersionsHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", rbdef.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", rbdef.deleteHandler).Methods("DELETE")
 
 	//rbp is resource bundle profile
 	rbprofile := rbProfileHandler{client: rb.NewProfileClient()}
-	resRouter.HandleFunc("/profile", rbprofile.createHandler).Methods("POST")
-	resRouter.HandleFunc("/profile/{rbpID}/content", rbprofile.uploadHandler).Methods("POST")
-	resRouter.HandleFunc("/profile/help", rbprofile.helpHandler).Methods("GET")
-	resRouter.HandleFunc("/profile", rbprofile.listHandler).Methods("GET")
-	resRouter.HandleFunc("/profile/{rbpID}", rbprofile.getHandler).Methods("GET")
-	resRouter.HandleFunc("/profile/{rbpID}", rbprofile.deleteHandler).Methods("DELETE")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile", rbprofile.createHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/content", rbprofile.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", rbprofile.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", rbprofile.deleteHandler).Methods("DELETE")
 
 	// (TODO): Fix update method
 	// vnfInstanceHandler.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

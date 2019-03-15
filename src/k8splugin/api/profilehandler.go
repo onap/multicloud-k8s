@@ -36,9 +36,9 @@ type rbProfileHandler struct {
 
 // createHandler handles creation of the definition entry in the database
 func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var v rb.Profile
+	var p rb.Profile
 
-	err := json.NewDecoder(r.Body).Decode(&v)
+	err := json.NewDecoder(r.Body).Decode(&p)
 	switch {
 	case err == io.EOF:
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -49,18 +49,12 @@ func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Name is required.
-	if v.Name == "" {
+	if p.Name == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
-	// Definition ID is required
-	if v.RBDID == "" {
-		http.Error(w, "Missing Resource Bundle Definition ID in POST request", http.StatusBadRequest)
-		return
-	}
-
-	ret, err := h.client.Create(v)
+	ret, err := h.client.Create(p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -78,7 +72,9 @@ func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) 
 // uploadHandler handles upload of the bundle tar file into the database
 func (h rbProfileHandler) uploadHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["rbpID"]
+	rbName := vars["rbname"]
+	rbVersion := vars["rbversion"]
+	prName := vars["prname"]
 
 	inpBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -91,37 +87,12 @@ func (h rbProfileHandler) uploadHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.client.Upload(uuid, inpBytes)
+	err = h.client.Upload(rbName, rbVersion, prName, inpBytes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-}
-
-// listHandler handles GET (list) operations on the endpoint
-// Returns a list of rb.Definitions
-func (h rbProfileHandler) listHandler(w http.ResponseWriter, r *http.Request) {
-	ret, err := h.client.List()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(ret)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-// helpHandler handles GET (list) operations on the endpoint
-// Returns a list of rb.Definitions
-func (h rbProfileHandler) helpHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -129,9 +100,11 @@ func (h rbProfileHandler) helpHandler(w http.ResponseWriter, r *http.Request) {
 // Returns a rb.Definition
 func (h rbProfileHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["rbpID"]
+	rbName := vars["rbname"]
+	rbVersion := vars["rbversion"]
+	prName := vars["prname"]
 
-	ret, err := h.client.Get(id)
+	ret, err := h.client.Get(rbName, rbVersion, prName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -149,9 +122,11 @@ func (h rbProfileHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 // deleteHandler handles DELETE operations on a particular bundle definition id
 func (h rbProfileHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["rbpID"]
+	rbName := vars["rbname"]
+	rbVersion := vars["rbversion"]
+	prName := vars["prname"]
 
-	err := h.client.Delete(id)
+	err := h.client.Delete(rbName, rbVersion, prName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

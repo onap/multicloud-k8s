@@ -84,7 +84,7 @@ func TestCreate(t *testing.T) {
 			label: "Successfull creation of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 				"data": "Data In String Format",
 			},
@@ -95,7 +95,7 @@ func TestCreate(t *testing.T) {
 			label: "UnSuccessfull creation of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 				"data": "Data In String Format",
 			},
@@ -108,7 +108,7 @@ func TestCreate(t *testing.T) {
 			label: "Missing input fields",
 			input: map[string]interface{}{
 				"coll": "",
-				"key":  mockKey{Key: ""},
+				"key":  MockKey{Key: ""},
 				"tag":  "",
 				"data": "",
 			},
@@ -156,7 +156,7 @@ func TestRead(t *testing.T) {
 			label: "Successfull Read of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "metadata",
 			},
 			// Binary form of
@@ -186,7 +186,7 @@ func TestRead(t *testing.T) {
 			label: "UnSuccessfull Read of entry: object not found",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "badtag",
 			},
 			// Binary form of
@@ -215,7 +215,7 @@ func TestRead(t *testing.T) {
 			label: "UnSuccessfull Read of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 			},
 			mockColl: &mockCollection{
@@ -227,7 +227,7 @@ func TestRead(t *testing.T) {
 			label: "Missing input fields",
 			input: map[string]interface{}{
 				"coll": "",
-				"key":  mockKey{Key: ""},
+				"key":  MockKey{Key: ""},
 				"tag":  "",
 			},
 			expectedError: "Mandatory fields are missing",
@@ -277,7 +277,7 @@ func TestDelete(t *testing.T) {
 			label: "Successfull Delete of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "metadata",
 			},
 			// Binary form of
@@ -305,7 +305,7 @@ func TestDelete(t *testing.T) {
 			label: "UnSuccessfull Delete of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 			},
 			mockColl: &mockCollection{
@@ -317,7 +317,7 @@ func TestDelete(t *testing.T) {
 			label: "UnSuccessfull Delete, key not found",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 			},
 			// Binary form of
@@ -346,7 +346,7 @@ func TestDelete(t *testing.T) {
 			label: "Missing input fields",
 			input: map[string]interface{}{
 				"coll": "",
-				"key":  mockKey{Key: ""},
+				"key":  MockKey{Key: ""},
 				"tag":  "",
 			},
 			expectedError: "Mandatory fields are missing",

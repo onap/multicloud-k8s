@@ -84,7 +84,7 @@ func TestCreate(t *testing.T) {
 			label: "Successfull creation of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  "keyvalue",
+				"key":  mockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 				"data": "Data In String Format",
 			},
@@ -95,7 +95,7 @@ func TestCreate(t *testing.T) {
 			label: "UnSuccessfull creation of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  "keyvalue",
+				"key":  mockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 				"data": "Data In String Format",
 			},
@@ -108,7 +108,7 @@ func TestCreate(t *testing.T) {
 			label: "Missing input fields",
 			input: map[string]interface{}{
 				"coll": "",
-				"key":  "",
+				"key":  mockKey{Key: ""},
 				"tag":  "",
 				"data": "",
 			},
@@ -129,7 +129,7 @@ func TestCreate(t *testing.T) {
 				return testCase.bson, testCase.mockColl.Err
 			}
 
-			err := m.Create(testCase.input["coll"].(string), testCase.input["key"].(string),
+			err := m.Create(testCase.input["coll"].(string), testCase.input["key"].(DBKey),
 				testCase.input["tag"].(string), testCase.input["data"])
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -156,59 +156,57 @@ func TestRead(t *testing.T) {
 			label: "Successfull Read of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  "keyvalue",
+				"key":  mockKey{Key: "keyvalue"},
 				"tag":  "metadata",
 			},
 			// Binary form of
 			// {
 			//	"_id" : ObjectId("5c115156777ff85654248ae1"),
-			//  "key" : "b82c4bb1-09ff-6093-4d58-8327b94e1e20",
+			//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
 			//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
 			// }
 			bson: bson.Raw{
-				'\x5a', '\x00', '\x00', '\x00', '\x07', '\x5f', '\x69', '\x64',
-				'\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f', '\xf8',
-				'\x56', '\x54', '\x24', '\x8a', '\xe1', '\x02', '\x6b', '\x65',
-				'\x79', '\x00', '\x25', '\x00', '\x00', '\x00', '\x62', '\x38',
-				'\x32', '\x63', '\x34', '\x62', '\x62', '\x31', '\x2d', '\x30',
-				'\x39', '\x66', '\x66', '\x2d', '\x36', '\x30', '\x39', '\x33',
-				'\x2d', '\x34', '\x64', '\x35', '\x38', '\x2d', '\x38', '\x33',
-				'\x32', '\x37', '\x62', '\x39', '\x34', '\x65', '\x31', '\x65',
-				'\x32', '\x30', '\x00', '\x07', '\x6d', '\x65', '\x74', '\x61',
-				'\x64', '\x61', '\x74', '\x61', '\x00', '\x5c', '\x11', '\x51',
-				'\x56', '\xc9', '\x75', '\x50', '\x47', '\xe3', '\x18', '\xbb',
-				'\xfd', '\x00',
+				'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
+				'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
+				'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
+				'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
+				'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
+				'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
+				'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
+				'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
+				'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
+				'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
+				'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
 			},
 			mockColl: &mockCollection{},
 			// This is not the document because we are mocking decodeBytes
-			expected: []byte{92, 17, 81, 86, 201, 117, 80, 71, 227, 24, 187, 253},
+			expected: []byte{92, 17, 81, 86, 119, 127, 248, 86, 84, 36, 138, 225},
 		},
 		{
 			label: "UnSuccessfull Read of entry: object not found",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  "keyvalue",
+				"key":  mockKey{Key: "keyvalue"},
 				"tag":  "badtag",
 			},
 			// Binary form of
 			// {
 			//	"_id" : ObjectId("5c115156777ff85654248ae1"),
-			//  "key" : "b82c4bb1-09ff-6093-4d58-8327b94e1e20",
+			//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
 			//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
 			// }
 			bson: bson.Raw{
-				'\x5a', '\x00', '\x00', '\x00', '\x07', '\x5f', '\x69', '\x64',
-				'\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f', '\xf8',
-				'\x56', '\x54', '\x24', '\x8a', '\xe1', '\x02', '\x6b', '\x65',
-				'\x79', '\x00', '\x25', '\x00', '\x00', '\x00', '\x62', '\x38',
-				'\x32', '\x63', '\x34', '\x62', '\x62', '\x31', '\x2d', '\x30',
-				'\x39', '\x66', '\x66', '\x2d', '\x36', '\x30', '\x39', '\x33',
-				'\x2d', '\x34', '\x64', '\x35', '\x38', '\x2d', '\x38', '\x33',
-				'\x32', '\x37', '\x62', '\x39', '\x34', '\x65', '\x31', '\x65',
-				'\x32', '\x30', '\x00', '\x07', '\x6d', '\x65', '\x74', '\x61',
-				'\x64', '\x61', '\x74', '\x61', '\x00', '\x5c', '\x11', '\x51',
-				'\x56', '\xc9', '\x75', '\x50', '\x47', '\xe3', '\x18', '\xbb',
-				'\xfd', '\x00',
+				'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
+				'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
+				'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
+				'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
+				'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
+				'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
+				'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
+				'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
+				'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
+				'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
+				'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
 			},
 			mockColl:      &mockCollection{},
 			expectedError: "Error finding objectID",
@@ -217,7 +215,7 @@ func TestRead(t *testing.T) {
 			label: "UnSuccessfull Read of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  "keyvalue",
+				"key":  mockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 			},
 			mockColl: &mockCollection{
@@ -229,7 +227,7 @@ func TestRead(t *testing.T) {
 			label: "Missing input fields",
 			input: map[string]interface{}{
 				"coll": "",
-				"key":  "",
+				"key":  mockKey{Key: ""},
 				"tag":  "",
 			},
 			expectedError: "Mandatory fields are missing",
@@ -248,7 +246,7 @@ func TestRead(t *testing.T) {
 			decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
 				return testCase.bson, testCase.mockColl.Err
 			}
-			got, err := m.Read(testCase.input["coll"].(string), testCase.input["key"].(string),
+			got, err := m.Read(testCase.input["coll"].(string), testCase.input["key"].(DBKey),
 				testCase.input["tag"].(string))
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -259,7 +257,7 @@ func TestRead(t *testing.T) {
 				}
 			} else {
 				if bytes.Compare(got, testCase.expected) != 0 {
-					t.Fatalf("Read returned unexpected data: %s, expected: %s",
+					t.Fatalf("Read returned unexpected data: %v, expected: %v",
 						string(got), testCase.expected)
 				}
 			}
@@ -279,28 +277,27 @@ func TestDelete(t *testing.T) {
 			label: "Successfull Delete of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  "keyvalue",
+				"key":  mockKey{Key: "keyvalue"},
 				"tag":  "metadata",
 			},
 			// Binary form of
 			// {
 			//	"_id" : ObjectId("5c115156777ff85654248ae1"),
-			//  "key" : "b82c4bb1-09ff-6093-4d58-8327b94e1e20",
+			//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
 			//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
 			// }
 			bson: bson.Raw{
-				'\x5a', '\x00', '\x00', '\x00', '\x07', '\x5f', '\x69', '\x64',
-				'\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f', '\xf8',
-				'\x56', '\x54', '\x24', '\x8a', '\xe1', '\x02', '\x6b', '\x65',
-				'\x79', '\x00', '\x25', '\x00', '\x00', '\x00', '\x62', '\x38',
-				'\x32', '\x63', '\x34', '\x62', '\x62', '\x31', '\x2d', '\x30',
-				'\x39', '\x66', '\x66', '\x2d', '\x36', '\x30', '\x39', '\x33',
-				'\x2d', '\x34', '\x64', '\x35', '\x38', '\x2d', '\x38', '\x33',
-				'\x32', '\x37', '\x62', '\x39', '\x34', '\x65', '\x31', '\x65',
-				'\x32', '\x30', '\x00', '\x07', '\x6d', '\x65', '\x74', '\x61',
-				'\x64', '\x61', '\x74', '\x61', '\x00', '\x5c', '\x11', '\x51',
-				'\x56', '\xc9', '\x75', '\x50', '\x47', '\xe3', '\x18', '\xbb',
-				'\xfd', '\x00',
+				'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
+				'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
+				'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
+				'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
+				'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
+				'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
+				'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
+				'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
+				'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
+				'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
+				'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
 			},
 			mockColl: &mockCollection{},
 		},
@@ -308,7 +305,7 @@ func TestDelete(t *testing.T) {
 			label: "UnSuccessfull Delete of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  "keyvalue",
+				"key":  mockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 			},
 			mockColl: &mockCollection{
@@ -320,22 +317,27 @@ func TestDelete(t *testing.T) {
 			label: "UnSuccessfull Delete, key not found",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  "keyvalue",
+				"key":  mockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 			},
+			// Binary form of
+			// {
+			//	"_id" : ObjectId("5c115156777ff85654248ae1"),
+			//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
+			//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
+			// }
 			bson: bson.Raw{
-				'\x5a', '\x00', '\x00', '\x00', '\x07', '\x5f', '\x69', '\x64',
-				'\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f', '\xf8',
-				'\x56', '\x54', '\x24', '\x8a', '\xe1', '\x02', '\x6b', '\x65',
-				'\x79', '\x00', '\x25', '\x00', '\x00', '\x00', '\x62', '\x38',
-				'\x32', '\x63', '\x34', '\x62', '\x62', '\x31', '\x2d', '\x30',
-				'\x39', '\x66', '\x66', '\x2d', '\x36', '\x30', '\x39', '\x33',
-				'\x2d', '\x34', '\x64', '\x35', '\x38', '\x2d', '\x38', '\x33',
-				'\x32', '\x37', '\x62', '\x39', '\x34', '\x65', '\x31', '\x65',
-				'\x32', '\x30', '\x00', '\x07', '\x6d', '\x65', '\x74', '\x61',
-				'\x64', '\x61', '\x74', '\x61', '\x00', '\x5c', '\x11', '\x51',
-				'\x56', '\xc9', '\x75', '\x50', '\x47', '\xe3', '\x18', '\xbb',
-				'\xfd', '\x00',
+				'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
+				'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
+				'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
+				'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
+				'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
+				'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
+				'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
+				'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
+				'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
+				'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
+				'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
 			},
 			mockColl:      &mockCollection{},
 			expectedError: "Error finding objectID",
@@ -344,7 +346,7 @@ func TestDelete(t *testing.T) {
 			label: "Missing input fields",
 			input: map[string]interface{}{
 				"coll": "",
-				"key":  "",
+				"key":  mockKey{Key: ""},
 				"tag":  "",
 			},
 			expectedError: "Mandatory fields are missing",
@@ -363,7 +365,7 @@ func TestDelete(t *testing.T) {
 			decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
 				return testCase.bson, testCase.mockColl.Err
 			}
-			err := m.Delete(testCase.input["coll"].(string), testCase.input["key"].(string),
+			err := m.Delete(testCase.input["coll"].(string), testCase.input["key"].(DBKey),
 				testCase.input["tag"].(string))
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -397,29 +399,29 @@ func TestReadAll(t *testing.T) {
 					// Binary form of
 					// {
 					//	"_id" : ObjectId("5c115156777ff85654248ae1"),
-					//  "key" : "b82c4bb1-09ff-6093-4d58-8327b94e1e20",
+					//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
 					//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
 					// }
+
 					Current: bson.Raw{
-						'\x5a', '\x00', '\x00', '\x00', '\x07', '\x5f', '\x69', '\x64',
-						'\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f', '\xf8',
-						'\x56', '\x54', '\x24', '\x8a', '\xe1', '\x02', '\x6b', '\x65',
-						'\x79', '\x00', '\x25', '\x00', '\x00', '\x00', '\x62', '\x38',
-						'\x32', '\x63', '\x34', '\x62', '\x62', '\x31', '\x2d', '\x30',
-						'\x39', '\x66', '\x66', '\x2d', '\x36', '\x30', '\x39', '\x33',
-						'\x2d', '\x34', '\x64', '\x35', '\x38', '\x2d', '\x38', '\x33',
-						'\x32', '\x37', '\x62', '\x39', '\x34', '\x65', '\x31', '\x65',
-						'\x32', '\x30', '\x00', '\x07', '\x6d', '\x65', '\x74', '\x61',
-						'\x64', '\x61', '\x74', '\x61', '\x00', '\x5c', '\x11', '\x51',
-						'\x56', '\xc9', '\x75', '\x50', '\x47', '\xe3', '\x18', '\xbb',
-						'\xfd', '\x00',
+						'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
+						'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
+						'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
+						'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
+						'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
+						'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
+						'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
+						'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
+						'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
+						'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
+						'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
 					},
 				},
 				mCursorCount: 1,
 			},
 			expected: map[string][]byte{
-				"b82c4bb1-09ff-6093-4d58-8327b94e1e20": []byte{
-					92, 17, 81, 86, 201, 117, 80, 71, 227, 24, 187, 253},
+				`{"name": "testdef","version": "v1"}`: []byte{
+					92, 17, 81, 86, 119, 127, 248, 86, 84, 36, 138, 225},
 			},
 		},
 		{
@@ -444,22 +446,21 @@ func TestReadAll(t *testing.T) {
 					// Binary form of
 					// {
 					//	"_id" : ObjectId("5c115156777ff85654248ae1"),
-					//  "key" : "b82c4bb1-09ff-6093-4d58-8327b94e1e20",
+					//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
 					//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
 					// }
 					Current: bson.Raw{
-						'\x5a', '\x00', '\x00', '\x00', '\x07', '\x5f', '\x69', '\x64',
-						'\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f', '\xf8',
-						'\x56', '\x54', '\x24', '\x8a', '\xe1', '\x02', '\x6b', '\x65',
-						'\x79', '\x00', '\x25', '\x00', '\x00', '\x00', '\x62', '\x38',
-						'\x32', '\x63', '\x34', '\x62', '\x62', '\x31', '\x2d', '\x30',
-						'\x39', '\x66', '\x66', '\x2d', '\x36', '\x30', '\x39', '\x33',
-						'\x2d', '\x34', '\x64', '\x35', '\x38', '\x2d', '\x38', '\x33',
-						'\x32', '\x37', '\x62', '\x39', '\x34', '\x65', '\x31', '\x65',
-						'\x32', '\x30', '\x00', '\x07', '\x6d', '\x65', '\x74', '\x61',
-						'\x64', '\x61', '\x74', '\x61', '\x00', '\x5c', '\x11', '\x51',
-						'\x56', '\xc9', '\x75', '\x50', '\x47', '\xe3', '\x18', '\xbb',
-						'\xfd', '\x00',
+						'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
+						'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
+						'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
+						'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
+						'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
+						'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
+						'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
+						'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
+						'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
+						'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
+						'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
 					},
 				},
 				mCursorCount: 1,

@@ -47,11 +47,8 @@ func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
 		return pkgerrors.Wrap(err, "Error fetching get namespace function")
 	}
 
-	ns, err := symGetNamespaceFunc.(func(string, string, kubernetes.Interface) (string, error))(
+	ns, _  := symGetNamespaceFunc.(func(string, string, kubernetes.Interface) (string, error))(
 		namespace, namespace, kubeclient)
-	if err != nil {
-		return pkgerrors.Wrap(err, "An error ocurred during the get namespace execution")
-	}
 
 	if ns == "" {
 		log.Println("Creating " + namespace + " namespace")

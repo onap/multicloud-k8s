@@ -23,6 +23,13 @@ import (
 // DBconn interface used to talk a concrete Database connection
 var DBconn Store
 
+// DBKey is an interface that will be implemented by anypackage
+// that wants to use the Store interface. This allows various
+// db backends and key types.
+type DBKey interface {
+	String() string
+}
+
 // Store is an interface for accessing a database
 type Store interface {
 	// Returns nil if db health is good
@@ -33,19 +40,19 @@ type Store interface {
 
 	// Creates a new master table with key and links data with tag and
 	// creates a pointer to the newly added data in the master table
-	Create(table, key, tag string, data interface{}) error
+	Create(table string, key DBKey, tag string, data interface{}) error
 
 	// Reads data for a particular key with specific tag.
-	Read(table, key, tag string) ([]byte, error)
+	Read(table string, key DBKey, tag string) ([]byte, error)
 
 	//TODO: Update(context.Context, string, interface{}) error
 
 	// Deletes a specific tag data for key.
 	// TODO: If tag is empty, it will delete all tags under key.
-	Delete(table, key, tag string) error
+	Delete(table string, key DBKey, tag string) error
 
 	// Reads all master tables and data from the specified tag in table
-	ReadAll(table, tag string) (map[string][]byte, error)
+	ReadAll(table string, tag string) (map[string][]byte, error)
 }
 
 // CreateDBClient creates the DB client

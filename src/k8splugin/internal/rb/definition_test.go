@@ -40,16 +40,16 @@ func TestCreateDefinition(t *testing.T) {
 		{
 			label: "Create Resource Bundle Definition",
 			inp: Definition{
-				UUID:        "123e4567-e89b-12d3-a456-426655440000",
 				Name:        "testresourcebundle",
+				Version:     "v1",
 				Description: "testresourcebundle",
-				ServiceType: "firewall",
+				ChartName:   "",
 			},
 			expected: Definition{
-				UUID:        "123e4567-e89b-12d3-a456-426655440000",
 				Name:        "testresourcebundle",
+				Version:     "v1",
 				Description: "testresourcebundle",
-				ServiceType: "firewall",
+				ChartName:   "",
 			},
 			expectedError: "",
 			mockdb:        &db.MockDB{},
@@ -89,42 +89,44 @@ func TestListDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
+		name          string
 		expectedError string
 		mockdb        *db.MockDB
 		expected      []Definition
 	}{
 		{
 			label: "List Resource Bundle Definition",
+			name:  "testresourcebundle",
 			expected: []Definition{
 				{
-					UUID:        "123e4567-e89b-12d3-a456-426655440000",
 					Name:        "testresourcebundle",
+					Version:     "v1",
 					Description: "testresourcebundle",
-					ServiceType: "firewall",
+					ChartName:   "testchart",
 				},
 				{
-					UUID:        "123e4567-e89b-12d3-a456-426655441111",
-					Name:        "testresourcebundle2",
-					Description: "testresourcebundle2",
-					ServiceType: "dns",
+					Name:        "testresourcebundle",
+					Version:     "v2",
+					Description: "testresourcebundle_version2",
+					ChartName:   "testchart",
 				},
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"," +
+								"\"chart-name\":\"testchart\"}"),
 					},
-					"123e4567-e89b-12d3-a456-426655441111": {
+					definitionKey{Name: "testresourcebundle", Version: "v2"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle2\"," +
-								"\"description\":\"testresourcebundle2\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
-								"\"service-type\":\"dns\"}"),
+							"{\"rb-name\":\"testresourcebundle\"," +
+								"\"description\":\"testresourcebundle_version2\"," +
+								"\"rb-version\":\"v2\"," +
+								"\"chart-name\":\"testchart\"}"),
 					},
 				},
 			},
@@ -142,7 +144,7 @@ func TestListDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			got, err := impl.List()
+			got, err := impl.List(testCase.name)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("List returned an unexpected error %s", err)
@@ -154,12 +156,12 @@ func TestListDefinition(t *testing.T) {
 				// Since the order of returned slice is not guaranteed
 				// Check both and return error if both don't match
 				sort.Slice(got, func(i, j int) bool {
-					return got[i].UUID < got[j].UUID
+					return got[i].Version < got[j].Version
 				})
 				// Sort both as it is not expected that testCase.expected
 				// is sorted
 				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].UUID < testCase.expected[j].UUID
+					return testCase.expected[i].Version < testCase.expected[j].Version
 				})
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -175,29 +177,32 @@ func TestGetDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
+		name          string
+		version       string
 		expectedError string
 		mockdb        *db.MockDB
 		inp           string
 		expected      Definition
 	}{
 		{
-			label: "Get Resource Bundle Definition",
-			inp:   "123e4567-e89b-12d3-a456-426655440000",
+			label:   "Get Resource Bundle Definition",
+			name:    "testresourcebundle",
+			version: "v1",
 			expected: Definition{
-				UUID:        "123e4567-e89b-12d3-a456-426655440000",
 				Name:        "testresourcebundle",
+				Version:     "v1",
 				Description: "testresourcebundle",
-				ServiceType: "firewall",
+				ChartName:   "testchart",
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"," +
+								"\"chart-name\":\"testchart\"}"),
 					},
 				},
 			},
@@ -215,7 +220,7 @@ func TestGetDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			got, err := impl.Get(testCase.inp)
+			got, err := impl.Get(testCase.name, testCase.version)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get returned an unexpected error %s", err)
@@ -237,14 +242,16 @@ func TestDeleteDefinition(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		inp           string
+		name          string
+		version       string
 		expectedError string
 		mockdb        *db.MockDB
 	}{
 		{
-			label:  "Delete Resource Bundle Definition",
-			inp:    "123e4567-e89b-12d3-a456-426655440000",
-			mockdb: &db.MockDB{},
+			label:   "Delete Resource Bundle Definition",
+			name:    "testresourcebundle",
+			version: "v1",
+			mockdb:  &db.MockDB{},
 		},
 		{
 			label:         "Delete Error",
@@ -259,7 +266,7 @@ func TestDeleteDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			err := impl.Delete(testCase.inp)
+			err := impl.Delete(testCase.name, testCase.version)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Delete returned an unexpected error %s", err)
@@ -275,14 +282,15 @@ func TestDeleteDefinition(t *testing.T) {
 func TestUploadDefinition(t *testing.T) {
 	testCases := []struct {
 		label         string
-		inp           string
+		name, version string
 		content       []byte
 		expectedError string
 		mockdb        *db.MockDB
 	}{
 		{
-			label: "Upload With Chart Name Detection",
-			inp:   "123e4567-e89b-12d3-a456-426655440000",
+			label:   "Upload With Chart Name Detection",
+			name:    "testresourcebundle",
+			version: "v1",
 			//Binary format for testchart/Chart.yaml
 			content: []byte{
 				0x1f, 0x8b, 0x08, 0x08, 0xb3, 0xeb, 0x86, 0x5c,
@@ -318,20 +326,20 @@ func TestUploadDefinition(t *testing.T) {
 				0x48, 0xfe, 0xe8, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"}"),
 					},
 				},
 			},
 		},
 		{
-			label: "Upload With Chart Name",
-			inp:   "123e4567-e89b-12d3-a456-426655440000",
+			label:   "Upload With Chart Name",
+			name:    "testresourcebundle",
+			version: "v1",
 			content: []byte{
 				0x1f, 0x8b, 0x08, 0x08, 0xb0, 0x6b, 0xf4, 0x5b,
 				0x00, 0x03, 0x74, 0x65, 0x73, 0x74, 0x2e, 0x74,
@@ -354,21 +362,21 @@ func TestUploadDefinition(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"chart-name\":\"testchart\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"," +
+								"\"chart-name\":\"firewall\"}"),
 					},
 				},
 			},
 		},
 		{
 			label:         "Upload Without Chart.yaml",
-			inp:           "123e4567-e89b-12d3-a456-426655440000",
+			name:          "testresourcebundle",
+			version:       "v1",
 			expectedError: "Unable to detect chart name",
 			content: []byte{
 				0x1f, 0x8b, 0x08, 0x08, 0xb0, 0x6b, 0xf4, 0x5b,
@@ -392,20 +400,21 @@ func TestUploadDefinition(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"," +
+								"\"chart-name\":\"firewall\"}"),
 					},
 				},
 			},
 		},
 		{
 			label:         "Upload with an Invalid Resource Bundle Definition",
-			inp:           "123e4567-e89b-12d3-a456-426655440000",
+			name:          "testresourcebundle",
+			version:       "v1",
 			expectedError: "Invalid Definition ID provided",
 			content: []byte{
 				0x1f, 0x8b, 0x08, 0x08, 0xb0, 0x6b, 0xf4, 0x5b,
@@ -429,33 +438,34 @@ func TestUploadDefinition(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655441111": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"," +
+								"\"chart-name\":\"firewall\"}"),
 					},
 				},
 			},
 		},
 		{
 			label:         "Invalid File Format Error",
-			inp:           "123e4567-e89b-12d3-a456-426655440000",
+			name:          "testresourcebundle",
+			version:       "v1",
 			expectedError: "Error in file format",
 			content: []byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"," +
+								"\"chart-name\":\"firewall\"}"),
 					},
 				},
 			},
@@ -494,7 +504,7 @@ func TestUploadDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			err := impl.Upload(testCase.inp, testCase.content)
+			err := impl.Upload(testCase.name, testCase.version, testCase.content)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Errorf("Upload returned an unexpected error %s", err)
@@ -510,14 +520,15 @@ func TestUploadDefinition(t *testing.T) {
 func TestDownloadDefinition(t *testing.T) {
 	testCases := []struct {
 		label         string
-		inp           string
+		name, version string
 		expected      []byte
 		expectedError string
 		mockdb        *db.MockDB
 	}{
 		{
-			label: "Download Resource Bundle Definition",
-			inp:   "123e4567-e89b-12d3-a456-426655440000",
+			label:   "Download Resource Bundle Definition",
+			name:    "testresourcebundle",
+			version: "v1",
 			expected: []byte{
 				0x1f, 0x8b, 0x08, 0x08, 0xb0, 0x6b, 0xf4, 0x5b,
 				0x00, 0x03, 0x74, 0x65, 0x73, 0x74, 0x2e, 0x74,
@@ -540,13 +551,13 @@ func TestDownloadDefinition(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"," +
+								"\"chart-name\":\"firewall\"}"),
 						"content": []byte("H4sICLBr9FsAA3Rlc3QudGFyAO3OQQrCMBCF4aw9RU5" +
 							"QEtLE40igAUtSC+2IHt9IEVwIpYtShP/bvGFmFk/SLI08Re3IVCG077Rn" +
 							"b75zYZ2yztVV8N7XP9vWSWmzZ6mP+yxx0lrF7pJzjkN/Sz//1u5/6ppKG" +
@@ -557,16 +568,17 @@ func TestDownloadDefinition(t *testing.T) {
 		},
 		{
 			label:         "Download with an Invalid Resource Bundle Definition",
-			inp:           "123e4567-e89b-12d3-a456-426655440000",
+			name:          "testresourcebundle",
+			version:       "v2",
 			expectedError: "Invalid Definition ID provided",
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655441111": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Name: "testresourcebundle", Version: "v1"}: {
 						"metadata": []byte(
-							"{\"name\":\"testresourcebundle\"," +
+							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
-								"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +
-								"\"service-type\":\"firewall\"}"),
+								"\"rb-version\":\"v1\"," +
+								"\"chart-name\":\"firewall\"}"),
 					},
 				},
 			},
@@ -574,7 +586,6 @@ func TestDownloadDefinition(t *testing.T) {
 		{
 			label:         "Download Error",
 			expectedError: "DB Error",
-			inp:           "123e4567-e89b-12d3-a456-426655440000",
 			mockdb: &db.MockDB{
 				Err: pkgerrors.New("DB Error"),
 			},
@@ -585,7 +596,7 @@ func TestDownloadDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			data, err := impl.Download(testCase.inp)
+			data, err := impl.Download(testCase.name, testCase.version)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Errorf("Download returned an unexpected error %s", err)

@@ -19,6 +19,7 @@ package rb
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"k8splugin/internal/db"
 	"log"
 
@@ -29,11 +30,12 @@ import (
 // Profile contains the parameters needed for resource bundle (rb) profiles
 // It implements the interface for managing the profiles
 type Profile struct {
-	UUID              string `json:"uuid,omitempty"`
-	RBDID             string `json:"rbdid"`
 	Name              string `json:"name"`
+	ReleaseName       string `json:"release-name"`
+	RBName            string `json:"rb-name"`
+	RBVersion         string `json:"rb-version"`
 	Namespace         string `json:"namespace"`
-	KubernetesVersion string `json:"kubernetesversion"`
+	KubernetesVersion string `json:"kubernetes-version"`
 }
 
 // ProfileManager is an interface exposes the resource bundle profile functionality
@@ -47,11 +49,20 @@ type ProfileManager interface {
 }
 
 type profileKey struct {
-	Key string
+	Name      string `json:"name"`
+	RBName    string `json:"rb-name"`
+	RBVersion string `json:"rb-version"`
 }
 
+// We will use json marshalling to convert to string to
+// preserve the underlying structure.
 func (dk profileKey) String() string {
-	return dk.Key
+	out, err := json.Marshal(dk)
+	if err != nil {
+		return ""
+	}
+
+	return string(out)
 }
 
 // ProfileClient implements the ProfileManager
@@ -86,7 +97,7 @@ func (v *ProfileClient) Help() map[string]string {
 func (v *ProfileClient) Create(p Profile) (Profile, error) {
 
 	//Check if provided RBID is a valid resource bundle
-	_, err := NewDefinitionClient().Get(p.RBDID)
+	_, err := NewDefinitionClient().Get(p.RBName, p.RBVersion)
 	if err != nil {
 		return Profile{}, pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}

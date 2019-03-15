@@ -55,8 +55,8 @@ func TestCreateProfile(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"abcde123-e89b-8888-a456-986655447236": {
+				Items: map[db.DBKey]map[string][]byte{
+					definitionKey{Key: "abcde123-e89b-8888-a456-986655447236"}: {
 						"metadata": []byte(
 							"{\"name\":\"testresourcebundle\"," +
 								"\"namespace\":\"default\"," +
@@ -118,8 +118,8 @@ func TestListProfiles(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					profileKey{Key: "123e4567-e89b-12d3-a456-426655440000"}: {
 						"metadata": []byte(
 							"{\"name\":\"testresourcebundle\"," +
 								"\"namespace\":\"default\"," +
@@ -193,8 +193,8 @@ func TestGetProfile(t *testing.T) {
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					profileKey{Key: "123e4567-e89b-12d3-a456-426655440000"}: {
 						"metadata": []byte(
 							"{\"name\":\"testresourcebundle\"," +
 								"\"namespace\":\"default\"," +
@@ -308,8 +308,8 @@ func TestUploadProfile(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					profileKey{Key: "123e4567-e89b-12d3-a456-426655440000"}: {
 						"metadata": []byte(
 							"{\"name\":\"testresourcebundle\"," +
 								"\"namespace\":\"default\"," +
@@ -346,8 +346,8 @@ func TestUploadProfile(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655441111": {
+				Items: map[db.DBKey]map[string][]byte{
+					profileKey{Key: "123e4567-e89b-12d3-a456-426655441111"}: {
 						"metadata": []byte(
 							"{\"name\":\"testresourcebundle\"," +
 								"\"namespace\":\"default\"," +
@@ -367,8 +367,8 @@ func TestUploadProfile(t *testing.T) {
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					profileKey{Key: "123e4567-e89b-12d3-a456-426655440000"}: {
 						"metadata": []byte(
 							"{\"name\":\"testresourcebundle\"," +
 								"\"namespace\":\"default\"," +
@@ -459,8 +459,8 @@ func TestDownloadProfile(t *testing.T) {
 				0x4a, 0xf9, 0x00, 0x28, 0x00, 0x00,
 			},
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655440000": {
+				Items: map[db.DBKey]map[string][]byte{
+					profileKey{Key: "123e4567-e89b-12d3-a456-426655440000"}: {
 						"metadata": []byte(
 							"{\"name\":\"testresourcebundle\"," +
 								"\"namespace\":\"default\"," +
@@ -480,8 +480,8 @@ func TestDownloadProfile(t *testing.T) {
 			inp:           "123e4567-e89b-12d3-a456-426655440000",
 			expectedError: "Invalid Profile ID provided",
 			mockdb: &db.MockDB{
-				Items: map[string]map[string][]byte{
-					"123e4567-e89b-12d3-a456-426655441111": {
+				Items: map[db.DBKey]map[string][]byte{
+					profileKey{Key: "123e4567-e89b-12d3-a456-426655441111"}: {
 						"metadata": []byte(
 							"{\"name\":\"testresourcebundle\"," +
 								"\"uuid\":\"123e4567-e89b-12d3-a456-426655441111\"," +

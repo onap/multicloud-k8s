@@ -33,10 +33,10 @@ func NewRouter(kubeconfig string) *mux.Router {
 	resRouter := router.PathPrefix("/v1/rb").Subrouter()
 	rbdef := rbDefinitionHandler{client: rb.NewDefinitionClient()}
 	resRouter.HandleFunc("/definition", rbdef.createHandler).Methods("POST")
-	resRouter.HandleFunc("/definition/{rbdID}/content", rbdef.uploadHandler).Methods("POST")
-	resRouter.HandleFunc("/definition", rbdef.listHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbdID}", rbdef.getHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbdID}", rbdef.deleteHandler).Methods("DELETE")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/content", rbdef.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}", rbdef.listVersionsHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", rbdef.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", rbdef.deleteHandler).Methods("DELETE")
 
 	//rbp is resource bundle profile
 	rbprofile := rbProfileHandler{client: rb.NewProfileClient()}

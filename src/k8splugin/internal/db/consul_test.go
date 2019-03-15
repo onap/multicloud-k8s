@@ -196,7 +196,7 @@ func TestConsulRead(t *testing.T) {
 				}
 				if !reflect.DeepEqual(testCase.expectedResult, string(result)) {
 
-					t.Fatalf("Read method returned: \n%v\n and it was expected: \n%v", result, testCase.expectedResult)
+					t.Fatalf("Read method returned: \n%v\n while expected value was: \n%v", result, testCase.expectedResult)
 				}
 			}
 		})

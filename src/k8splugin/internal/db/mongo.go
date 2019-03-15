@@ -108,10 +108,17 @@ func (m *MongoStore) HealthCheck() error {
 }
 
 // validateParams checks to see if any parameters are empty
-func (m *MongoStore) validateParams(args ...string) bool {
+func (m *MongoStore) validateParams(args ...interface{}) bool {
 	for _, v := range args {
-		if v == "" {
-			return false
+		val, ok := v.(string)
+		if ok {
+			if val == "" {
+				return false
+			}
+		} else {
+			if v == nil {
+				return false
+			}
 		}
 	}
 
@@ -119,7 +126,7 @@ func (m *MongoStore) validateParams(args ...string) bool {
 }
 
 // Create is used to create a DB entry
-func (m *MongoStore) Create(coll, key, tag string, data interface{}) error {
+func (m *MongoStore) Create(coll string, key interface{}, tag string, data interface{}) error {
 	if data == nil || !m.validateParams(coll, key, tag) {
 		return pkgerrors.New("No Data to store")
 	}
@@ -168,7 +175,7 @@ func (m *MongoStore) Unmarshal(inp []byte, out interface{}) error {
 }
 
 // Read method returns the data stored for this key and for this particular tag
-func (m *MongoStore) Read(coll, key, tag string) ([]byte, error) {
+func (m *MongoStore) Read(coll string, key interface{}, tag string) ([]byte, error) {
 	if !m.validateParams(coll, key, tag) {
 		return nil, pkgerrors.New("Mandatory fields are missing")
 	}
@@ -223,7 +230,7 @@ func (m *MongoStore) deleteObjectByID(coll string, objID primitive.ObjectID) err
 
 // Delete method removes a document from the Database that matches key
 // TODO: delete all referenced docs if tag is empty string
-func (m *MongoStore) Delete(coll, key, tag string) error {
+func (m *MongoStore) Delete(coll string, key interface{}, tag string) error {
 	if !m.validateParams(coll, key, tag) {
 		return pkgerrors.New("Mandatory fields are missing")
 	}

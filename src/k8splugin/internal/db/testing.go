@@ -29,7 +29,7 @@ type MockDB struct {
 	Err   error
 }
 
-func (m *MockDB) Create(table, key, tag string, data interface{}) error {
+func (m *MockDB) Create(table string, key interface{}, tag string, data interface{}) error {
 	return m.Err
 }
 
@@ -42,7 +42,7 @@ func (m *MockDB) Unmarshal(inp []byte, out interface{}) error {
 	return nil
 }
 
-func (m *MockDB) Read(table, key, tag string) ([]byte, error) {
+func (m *MockDB) Read(table string, key interface{}, tag string) ([]byte, error) {
 	if m.Err != nil {
 		return nil, m.Err
 	}
@@ -56,11 +56,11 @@ func (m *MockDB) Read(table, key, tag string) ([]byte, error) {
 	return nil, m.Err
 }
 
-func (m *MockDB) Delete(table, key, tag string) error {
+func (m *MockDB) Delete(table string, key interface{}, tag string) error {
 	return m.Err
 }
 
-func (m *MockDB) ReadAll(table, tag string) (map[string][]byte, error) {
+func (m *MockDB) ReadAll(table string, tag string) (map[string][]byte, error) {
 	if m.Err != nil {
 		return nil, m.Err
 	}

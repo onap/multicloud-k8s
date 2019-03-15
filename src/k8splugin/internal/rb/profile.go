@@ -19,11 +19,10 @@ package rb
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"k8splugin/internal/db"
-	"log"
 	"path/filepath"
 
-	uuid "github.com/hashicorp/go-uuid"
 	pkgerrors "github.com/pkg/errors"
 
 	"k8splugin/internal/helm"
@@ -32,29 +31,38 @@ import (
 // Profile contains the parameters needed for resource bundle (rb) profiles
 // It implements the interface for managing the profiles
 type Profile struct {
-	UUID              string `json:"uuid,omitempty"`
-	RBDID             string `json:"rbdid"`
-	Name              string `json:"name"`
-	Namespace         string `json:"namespace"`
-	KubernetesVersion string `json:"kubernetesversion"`
+	RBName            string            `json:"rb-name"`
+	RBVersion         string            `json:"rb-version"`
+	Name              string            `json:"profile-name"`
+	ReleaseName       string            `json:"release-name"`
+	Namespace         string            `json:"namespace"`
+	KubernetesVersion string            `json:"kubernetes-version"`
+	Labels            map[string]string `json:"labels"`
 }
 
 // ProfileManager is an interface exposes the resource bundle profile functionality
 type ProfileManager interface {
 	Create(def Profile) (Profile, error)
-	List() ([]Profile, error)
-	Get(resID string) (Profile, error)
-	Help() map[string]string
-	Delete(resID string) error
-	Upload(resID string, inp []byte) error
+	Get(rbName, rbVersion, prName string) (Profile, error)
+	Delete(rbName, rbVersion, prName string) error
+	Upload(rbName, rbVersion, prName string, inp []byte) error
 }
 
 type profileKey struct {
-	Key string
+	RBName    string `json:"rb-name"`
+	RBVersion string `json:"rb-version"`
+	Name      string `json:"profile-name"`
 }
 
+// We will use json marshalling to convert to string to
+// preserve the underlying structure.
 func (dk profileKey) String() string {
-	return dk.Key
+	out, err := json.Marshal(dk)
+	if err != nil {
+		return ""
+	}
+
+	return string(out)
 }
 
 // ProfileClient implements the ProfileManager
@@ -67,29 +75,20 @@ type ProfileClient struct {
 
 // NewProfileClient returns an instance of the ProfileClient
 // which implements the ProfileManager
-// Uses rb/def prefix
 func NewProfileClient() *ProfileClient {
 	return &ProfileClient{
-		storeName:    "rbprofile",
+		storeName:    "rbdef",
 		tagMeta:      "metadata",
 		tagContent:   "content",
 		manifestName: "manifest.yaml",
 	}
 }
 
-// Help returns some information on how to create the content
-// for the profile in the form of html formatted page
-func (v *ProfileClient) Help() map[string]string {
-	ret := make(map[string]string)
-
-	return ret
-}
-
 // Create an entry for the resource bundle profile in the database
 func (v *ProfileClient) Create(p Profile) (Profile, error) {
 
-	//Check if provided RBID is a valid resource bundle
-	_, err := NewDefinitionClient().Get(p.RBDID)
+	//Check if provided resource bundle information is valid
+	_, err := NewDefinitionClient().Get(p.RBName, p.RBVersion)
 	if err != nil {
 		return Profile{}, pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}
@@ -99,11 +98,11 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 		return Profile{}, pkgerrors.New("Name is required for Resource Bundle Profile")
 	}
 
-	// If UUID is empty, we will generate one
-	if p.UUID == "" {
-		p.UUID, _ = uuid.GenerateUUID()
+	key := profileKey{
+		RBName:    p.RBName,
+		RBVersion: p.RBVersion,
+		Name:      p.Name,
 	}
-	key := profileKey{Key: p.UUID}
 
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
 	if err != nil {
@@ -113,34 +112,13 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 	return p, nil
 }
 
-// List all resource entries in the database
-func (v *ProfileClient) List() ([]Profile, error) {
-	res, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
-	if err != nil || len(res) == 0 {
-		return []Profile{}, pkgerrors.Wrap(err, "Listing Resource Bundle Profiles")
-	}
-
-	var retData []Profile
-
-	for key, value := range res {
-		//value is a byte array
-		if len(value) > 0 {
-			pr := Profile{}
-			err = db.DBconn.Unmarshal(value, &pr)
-			if err != nil {
-				log.Printf("[Profile] Error Unmarshaling value for: %s", key)
-				continue
-			}
-			retData = append(retData, pr)
-		}
-	}
-
-	return retData, nil
-}
-
 // Get returns the Resource Bundle Profile for corresponding ID
-func (v *ProfileClient) Get(id string) (Profile, error) {
-	key := profileKey{Key: id}
+func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
+	key := profileKey{
+		RBName:    rbName,
+		RBVersion: rbVersion,
+		Name:      prName,
+	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Profile{}, pkgerrors.Wrap(err, "Get Resource Bundle Profile")
@@ -160,8 +138,12 @@ func (v *ProfileClient) Get(id string) (Profile, error) {
 }
 
 // Delete the Resource Bundle Profile from database
-func (v *ProfileClient) Delete(id string) error {
-	key := profileKey{Key: id}
+func (v *ProfileClient) Delete(rbName, rbVersion, prName string) error {
+	key := profileKey{
+		RBName:    rbName,
+		RBVersion: rbVersion,
+		Name:      prName,
+	}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile")
@@ -176,13 +158,12 @@ func (v *ProfileClient) Delete(id string) error {
 }
 
 // Upload the contents of resource bundle into database
-func (v *ProfileClient) Upload(id string, inp []byte) error {
+func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) error {
 
-	key := profileKey{Key: id}
 	//ignore the returned data here.
-	_, err := v.Get(id)
+	_, err := v.Get(rbName, rbVersion, prName)
 	if err != nil {
-		return pkgerrors.Errorf("Invalid Profile ID provided %s", err.Error())
+		return pkgerrors.Errorf("Invalid Profile Name provided %s", err.Error())
 	}
 
 	err = isTarGz(bytes.NewBuffer(inp))
@@ -190,6 +171,11 @@ func (v *ProfileClient) Upload(id string, inp []byte) error {
 		return pkgerrors.Errorf("Error in file format %s", err.Error())
 	}
 
+	key := profileKey{
+		RBName:    rbName,
+		RBVersion: rbVersion,
+		Name:      prName,
+	}
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
 	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
@@ -203,16 +189,20 @@ func (v *ProfileClient) Upload(id string, inp []byte) error {
 // Download the contents of the resource bundle profile from DB
 // Returns a byte array of the contents which is used by the
 // ExtractTarBall code to create the folder structure on disk
-func (v *ProfileClient) Download(id string) ([]byte, error) {
+func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, error) {
 
-	key := profileKey{Key: id}
 	//ignore the returned data here
 	//Check if id is valid
-	_, err := v.Get(id)
+	_, err := v.Get(rbName, rbVersion, prName)
 	if err != nil {
-		return nil, pkgerrors.Errorf("Invalid Profile ID provided: %s", err.Error())
+		return nil, pkgerrors.Errorf("Invalid Profile Name provided: %s", err.Error())
 	}
 
+	key := profileKey{
+		RBName:    rbName,
+		RBVersion: rbVersion,
+		Name:      prName,
+	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle Profile content")

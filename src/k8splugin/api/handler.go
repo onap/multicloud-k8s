@@ -62,8 +62,12 @@ func validateBody(body interface{}) error {
 			werr := pkgerrors.Wrap(errors.New("Invalid/Missing CsarID in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
-		if b.RBProfileID == "" {
-			werr := pkgerrors.Wrap(errors.New("Invalid/Missing RB ProfileID in POST request"), "CreateVnfRequest bad request")
+		if b.RBName == "" || b.RBVersion == "" {
+			werr := pkgerrors.Wrap(errors.New("Invalid/Missing resource bundle parameters in POST request"), "CreateVnfRequest bad request")
+			return werr
+		}
+		if b.ProfileName == "" {
+			werr := pkgerrors.Wrap(errors.New("Invalid/Missing profile name in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
 		if strings.Contains(b.CloudRegionID, "|") {
@@ -117,16 +121,20 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 		},
 		nil
 	*/
+	profile, err := rb.NewProfileClient().Get(resource.RBName, resource.RBVersion, resource.ProfileName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	externalVNFID, resourceNameMap, err := helper.CreateVNF(resource.CsarID, resource.CloudRegionID,
-		resource.RBProfileID, &kubeclient)
+		profile, &kubeclient)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Read Kubernetes Data information error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	rbProfile, _ := rb.NewProfileClient().Get(resource.RBProfileID)
-	namespace := rbProfile.Namespace
+	namespace := profile.Namespace
 	// cloud1-default-uuid
 	internalVNFID := resource.CloudRegionID + "-" + namespace + "-" + externalVNFID
 

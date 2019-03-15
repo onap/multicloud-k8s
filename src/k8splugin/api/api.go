@@ -30,29 +30,27 @@ func NewRouter(kubeconfig string, defClient rb.DefinitionManager,
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", DeleteHandler).Methods("DELETE")
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", GetHandler).Methods("GET")
 
-	//rbd is resource bundle definition
+	//Setup resource bundle definition routes
 	if defClient == nil {
 		defClient = rb.NewDefinitionClient()
 	}
 	defHandler := rbDefinitionHandler{client: defClient}
 	resRouter := router.PathPrefix("/v1/rb").Subrouter()
 	resRouter.HandleFunc("/definition", defHandler.createHandler).Methods("POST")
-	resRouter.HandleFunc("/definition/{rbdID}/content", defHandler.uploadHandler).Methods("POST")
-	resRouter.HandleFunc("/definition", defHandler.listHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbdID}", defHandler.getHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbdID}", defHandler.deleteHandler).Methods("DELETE")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/content", defHandler.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}", defHandler.listVersionsHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", defHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", defHandler.deleteHandler).Methods("DELETE")
 
-	//rbp is resource bundle profile
+	//Setup resource bundle profile routes
 	if profileClient == nil {
 		profileClient = rb.NewProfileClient()
 	}
 	profileHandler := rbProfileHandler{client: profileClient}
-	resRouter.HandleFunc("/profile", profileHandler.createHandler).Methods("POST")
-	resRouter.HandleFunc("/profile/{rbpID}/content", profileHandler.uploadHandler).Methods("POST")
-	resRouter.HandleFunc("/profile/help", profileHandler.helpHandler).Methods("GET")
-	resRouter.HandleFunc("/profile", profileHandler.listHandler).Methods("GET")
-	resRouter.HandleFunc("/profile/{rbpID}", profileHandler.getHandler).Methods("GET")
-	resRouter.HandleFunc("/profile/{rbpID}", profileHandler.deleteHandler).Methods("DELETE")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile", profileHandler.createHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/content", profileHandler.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.deleteHandler).Methods("DELETE")
 
 	// (TODO): Fix update method
 	// vnfInstanceHandler.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

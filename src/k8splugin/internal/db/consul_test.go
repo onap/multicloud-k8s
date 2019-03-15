@@ -102,19 +102,20 @@ func TestConsulCreate(t *testing.T) {
 	testCases := []struct {
 		label         string
 		input         map[string]string
+		key           DBKey
 		mock          *mockConsulKVStore
 		expectedError string
 	}{
 		{
 			label: "Sucessful register a record to Consul Database",
-			input: map[string]string{"root": "rbinst", "key": "test-key",
-				"tag": "data", "value": "test-value"},
-			mock: &mockConsulKVStore{},
+			key:   mockKey{Key: "test-key"},
+			input: map[string]string{"root": "rbinst", "tag": "data", "value": "test-value"},
+			mock:  &mockConsulKVStore{},
 		},
 		{
 			label: "Fail to create a new record in Consul Database",
-			input: map[string]string{"root": "rbinst", "key": "test-key",
-				"tag": "data", "value": "test-value"},
+			key:   mockKey{Key: "test-key"},
+			input: map[string]string{"root": "rbinst", "tag": "data", "value": "test-value"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
 			},
@@ -125,7 +126,7 @@ func TestConsulCreate(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			err := client.Create(testCase.input["root"], testCase.input["key"],
+			err := client.Create(testCase.input["root"], testCase.key,
 				testCase.input["tag"], testCase.input["value"])
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -143,14 +144,15 @@ func TestConsulRead(t *testing.T) {
 	testCases := []struct {
 		label          string
 		input          map[string]string
+		key            DBKey
 		mock           *mockConsulKVStore
 		expectedError  string
 		expectedResult string
 	}{
 		{
 			label: "Sucessful retrieve a record from Consul Database",
-			input: map[string]string{"root": "rbinst", "key": "test",
-				"tag": "data"},
+			key:   mockKey{Key: "test"},
+			input: map[string]string{"root": "rbinst", "tag": "data"},
 			mock: &mockConsulKVStore{
 				Items: api.KVPairs{
 					&api.KVPair{
@@ -163,14 +165,14 @@ func TestConsulRead(t *testing.T) {
 		},
 		{
 			label: "Fail retrieve a non-existing record from Consul Database",
-			input: map[string]string{"root": "rbinst", "key": "test-key",
-				"tag": "data"},
-			mock: &mockConsulKVStore{},
+			key:   mockKey{Key: "test-key"},
+			input: map[string]string{"root": "rbinst", "tag": "data"},
+			mock:  &mockConsulKVStore{},
 		},
 		{
 			label: "Fail retrieve a record from Consul Database",
-			input: map[string]string{"root": "rbinst", "key": "test-key",
-				"tag": "data"},
+			key:   mockKey{Key: "test-key"},
+			input: map[string]string{"root": "rbinst", "tag": "data"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
 			},
@@ -181,7 +183,7 @@ func TestConsulRead(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			result, err := client.Read(testCase.input["root"], testCase.input["key"],
+			result, err := client.Read(testCase.input["root"], testCase.key,
 				testCase.input["tag"])
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -196,7 +198,7 @@ func TestConsulRead(t *testing.T) {
 				}
 				if !reflect.DeepEqual(testCase.expectedResult, string(result)) {
 
-					t.Fatalf("Read method returned: \n%v\n and it was expected: \n%v", result, testCase.expectedResult)
+					t.Fatalf("Read method returned: \n%v\n while expected value was: \n%v", result, testCase.expectedResult)
 				}
 			}
 		})
@@ -207,17 +209,19 @@ func TestConsulDelete(t *testing.T) {
 	testCases := []struct {
 		label         string
 		input         map[string]string
+		key           DBKey
 		mock          *mockConsulKVStore
 		expectedError string
 	}{
 		{
 			label: "Sucessful delete a record to Consul Database",
-			input: map[string]string{"root": "rbinst", "key": "test-key",
-				"tag": "data"},
-			mock: &mockConsulKVStore{},
+			key:   mockKey{Key: "test-key"},
+			input: map[string]string{"root": "rbinst", "tag": "data"},
+			mock:  &mockConsulKVStore{},
 		},
 		{
 			label: "Fail to delete a record in Consul Database",
+			key:   mockKey{Key: "test-key"},
 			mock: &mockConsulKVStore{
 				Err: pkgerrors.New("DB error"),
 			},
@@ -228,7 +232,7 @@ func TestConsulDelete(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			err := client.Delete(testCase.input["root"], testCase.input["key"],
+			err := client.Delete(testCase.input["root"], testCase.key,
 				testCase.input["tag"])
 			if err != nil {
 				if testCase.expectedError == "" {

@@ -20,6 +20,14 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
+type mockKey struct {
+	Key string
+}
+
+func (m mockKey) String() string {
+	return m.Key
+}
+
 //Creating an embedded interface via anonymous variable
 //This allows us to make mockDB satisfy the DatabaseConnection
 //interface even if we are not implementing all the methods in it
@@ -29,7 +37,7 @@ type MockDB struct {
 	Err   error
 }
 
-func (m *MockDB) Create(table, key, tag string, data interface{}) error {
+func (m *MockDB) Create(table string, key DBKey, tag string, data interface{}) error {
 	return m.Err
 }
 
@@ -42,13 +50,13 @@ func (m *MockDB) Unmarshal(inp []byte, out interface{}) error {
 	return nil
 }
 
-func (m *MockDB) Read(table, key, tag string) ([]byte, error) {
+func (m *MockDB) Read(table string, key DBKey, tag string) ([]byte, error) {
 	if m.Err != nil {
 		return nil, m.Err
 	}
 
 	for k, v := range m.Items {
-		if k == key {
+		if k == key.String() {
 			return v[tag], nil
 		}
 	}
@@ -56,11 +64,11 @@ func (m *MockDB) Read(table, key, tag string) ([]byte, error) {
 	return nil, m.Err
 }
 
-func (m *MockDB) Delete(table, key, tag string) error {
+func (m *MockDB) Delete(table string, key DBKey, tag string) error {
 	return m.Err
 }
 
-func (m *MockDB) ReadAll(table, tag string) (map[string][]byte, error) {
+func (m *MockDB) ReadAll(table string, tag string) (map[string][]byte, error) {
 	if m.Err != nil {
 		return nil, m.Err
 	}

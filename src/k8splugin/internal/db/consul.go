@@ -54,7 +54,7 @@ func NewConsulStore(store ConsulKVStore) (Store, error) {
 
 // HealthCheck verifies if the database is up and running
 func (c *ConsulStore) HealthCheck() error {
-	_, err := c.Read("test", "test", "test")
+	_, _, err := c.client.Get("test", nil)
 	if err != nil {
 		return pkgerrors.New("[ERROR] Cannot talk to Datastore. Check if it is running/reachable.")
 	}
@@ -67,7 +67,13 @@ func (c *ConsulStore) Unmarshal(inp []byte, out interface{}) error {
 }
 
 // Create is used to create a DB entry
-func (c *ConsulStore) Create(root, key, tag string, data interface{}) error {
+func (c *ConsulStore) Create(root string, key DBKey, tag string, data interface{}) error {
+
+	//Convert to string as Consul only supports string based keys
+	k := key.String()
+	if k == "" {
+		return pkgerrors.New("DBKey.String() returned an empty string")
+	}
 
 	value, err := Serialize(data)
 	if err != nil {
@@ -75,7 +81,7 @@ func (c *ConsulStore) Create(root, key, tag string, data interface{}) error {
 	}
 
 	p := &api.KVPair{
-		Key:   key,
+		Key:   k,
 		Value: []byte(value),
 	}
 	_, err = c.client.Put(p, nil)
@@ -83,9 +89,16 @@ func (c *ConsulStore) Create(root, key, tag string, data interface{}) error {
 }
 
 // Read method returns the internalID for a particular externalID
-func (c *ConsulStore) Read(root, key, tag string) ([]byte, error) {
-	key = root + "/" + key + "/" + tag
-	pair, _, err := c.client.Get(key, nil)
+func (c *ConsulStore) Read(root string, key DBKey, tag string) ([]byte, error) {
+
+	//Convert to string as Consul only supports string based keys
+	k := key.String()
+	if k == "" {
+		return nil, pkgerrors.New("DBKey.String() returned an empty string")
+	}
+
+	k = root + "/" + k + "/" + tag
+	pair, _, err := c.client.Get(k, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -96,13 +109,19 @@ func (c *ConsulStore) Read(root, key, tag string) ([]byte, error) {
 }
 
 // Delete method removes an internalID from the Database
-func (c *ConsulStore) Delete(root, key, tag string) error {
-	_, err := c.client.Delete(key, nil)
+func (c *ConsulStore) Delete(root string, key DBKey, tag string) error {
+
+	//Convert to string as Consul only supports string based keys
+	k := key.String()
+	if k == "" {
+		return pkgerrors.New("DBKey.String() returned an empty string")
+	}
+	_, err := c.client.Delete(k, nil)
 	return err
 }
 
 // ReadAll is used to get all ExternalIDs in a namespace
-func (c *ConsulStore) ReadAll(root, tag string) (map[string][]byte, error) {
+func (c *ConsulStore) ReadAll(root string, tag string) (map[string][]byte, error) {
 	pairs, _, err := c.client.List(root, nil)
 	if err != nil {
 		return nil, err

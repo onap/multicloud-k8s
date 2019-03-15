@@ -49,7 +49,7 @@ func (m *mockRBDefinition) Create(inp rb.Definition) (rb.Definition, error) {
 	return m.Items[0], nil
 }
 
-func (m *mockRBDefinition) List() ([]rb.Definition, error) {
+func (m *mockRBDefinition) List(name string) ([]rb.Definition, error) {
 	if m.Err != nil {
 		return []rb.Definition{}, m.Err
 	}
@@ -57,7 +57,7 @@ func (m *mockRBDefinition) List() ([]rb.Definition, error) {
 	return m.Items, nil
 }
 
-func (m *mockRBDefinition) Get(id string) (rb.Definition, error) {
+func (m *mockRBDefinition) Get(name, version string) (rb.Definition, error) {
 	if m.Err != nil {
 		return rb.Definition{}, m.Err
 	}
@@ -65,11 +65,11 @@ func (m *mockRBDefinition) Get(id string) (rb.Definition, error) {
 	return m.Items[0], nil
 }
 
-func (m *mockRBDefinition) Delete(id string) error {
+func (m *mockRBDefinition) Delete(name, version string) error {
 	return m.Err
 }
 
-func (m *mockRBDefinition) Upload(id string, inp []byte) error {
+func (m *mockRBDefinition) Upload(name, version string, inp []byte) error {
 	return m.Err
 }
 
@@ -87,30 +87,28 @@ func TestRBDefCreateHandler(t *testing.T) {
 			rbDefClient:  &mockRBDefinition{},
 		},
 		{
-			label:        "Create without UUID",
+			label:        "Create Definition",
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
-				"name":"testresourcebundle",
+				"rb-name":"testresourcebundle",
+				"rb-version":"v1",
 				"chart-name":"testchart",
-				"description":"test description",
-				"service-type":"firewall"
+				"description":"test description"
 				}`)),
 			expected: rb.Definition{
-				UUID:        "123e4567-e89b-12d3-a456-426655440000",
 				Name:        "testresourcebundle",
+				Version:     "v1",
 				ChartName:   "testchart",
 				Description: "test description",
-				ServiceType: "firewall",
 			},
 			rbDefClient: &mockRBDefinition{
 				//Items that will be returned by the mocked Client
 				Items: []rb.Definition{
 					{
-						UUID:        "123e4567-e89b-12d3-a456-426655440000",
 						Name:        "testresourcebundle",
+						Version:     "v1",
 						ChartName:   "testchart",
 						Description: "test description",
-						ServiceType: "firewall",
 					},
 				},
 			},
@@ -118,9 +116,19 @@ func TestRBDefCreateHandler(t *testing.T) {
 		{
 			label: "Missing Name in Request Body",
 			reader: bytes.NewBuffer([]byte(`{
+				"rb-version":"v1",
 				"chart-name":"testchart",
-				"description":"test description",
-				"service-type":"firewall"
+				"description":"test description"
+				}`)),
+			expectedCode: http.StatusBadRequest,
+			rbDefClient:  &mockRBDefinition{},
+		},
+		{
+			label: "Missing Version in Request Body",
+			reader: bytes.NewBuffer([]byte(`{
+				"rb-name":"testresourcebundle",
+				"chart-name":"testchart",
+				"description":"test description"
 				}`)),
 			expectedCode: http.StatusBadRequest,
 			rbDefClient:  &mockRBDefinition{},
@@ -154,7 +162,7 @@ func TestRBDefCreateHandler(t *testing.T) {
 	}
 }
 
-func TestRBDefListHandler(t *testing.T) {
+func TestRBDefListVersionsHandler(t *testing.T) {
 
 	testCases := []struct {
 		label        string
@@ -167,32 +175,32 @@ func TestRBDefListHandler(t *testing.T) {
 			expectedCode: http.StatusOK,
 			expected: []rb.Definition{
 				{
-					UUID:        "123e4567-e89b-12d3-a456-426655440000",
 					Name:        "testresourcebundle",
+					Version:     "v1",
+					ChartName:   "testchart",
 					Description: "test description",
-					ServiceType: "firewall",
 				},
 				{
-					UUID:        "123e4567-e89b-12d3-a456-426655441111",
-					Name:        "testresourcebundle2",
+					Name:        "testresourcebundle",
+					Version:     "v2",
+					ChartName:   "testchart",
 					Description: "test description",
-					ServiceType: "dns",
 				},
 			},
 			rbDefClient: &mockRBDefinition{
 				// list of definitions that will be returned by the mockclient
 				Items: []rb.Definition{
 					{
-						UUID:        "123e4567-e89b-12d3-a456-426655440000",
 						Name:        "testresourcebundle",
+						Version:     "v1",
+						ChartName:   "testchart",
 						Description: "test description",
-						ServiceType: "firewall",
 					},
 					{
-						UUID:        "123e4567-e89b-12d3-a456-426655441111",
-						Name:        "testresourcebundle2",
+						Name:        "testresourcebundle",
+						Version:     "v2",
+						ChartName:   "testchart",
 						Description: "test description",
-						ServiceType: "dns",
 					},
 				},
 			},
@@ -202,9 +210,9 @@ func TestRBDefListHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("GET", "/v1/rb/definition", nil)
+			req := httptest.NewRequest("GET", "/v1/rb/definition/testresourcebundle", nil)
 			rr := httptest.NewRecorder()
-			vh.listHandler(rr, req)
+			vh.listVersionsHandler(rr, req)
 			resp := rr.Result()
 
 			//Check returned code
@@ -220,12 +228,12 @@ func TestRBDefListHandler(t *testing.T) {
 				// Since the order of returned slice is not guaranteed
 				// Check both and return error if both don't match
 				sort.Slice(got, func(i, j int) bool {
-					return got[i].UUID < got[j].UUID
+					return got[i].Version < got[j].Version
 				})
 				// Sort both as it is not expected that testCase.expected
 				// is sorted
 				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].UUID < testCase.expected[j].UUID
+					return testCase.expected[i].Version < testCase.expected[j].Version
 				})
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -240,30 +248,31 @@ func TestRBDefListHandler(t *testing.T) {
 func TestRBDefGetHandler(t *testing.T) {
 
 	testCases := []struct {
-		label        string
-		expected     rb.Definition
-		inpUUID      string
-		expectedCode int
-		rbDefClient  *mockRBDefinition
+		label         string
+		expected      rb.Definition
+		name, version string
+		expectedCode  int
+		rbDefClient   *mockRBDefinition
 	}{
 		{
 			label:        "Get Bundle Definition",
 			expectedCode: http.StatusOK,
 			expected: rb.Definition{
-				UUID:        "123e4567-e89b-12d3-a456-426655441111",
-				Name:        "testresourcebundle2",
+				Name:        "testresourcebundle",
+				Version:     "v1",
+				ChartName:   "testchart",
 				Description: "test description",
-				ServiceType: "dns",
 			},
-			inpUUID: "123e4567-e89b-12d3-a456-426655441111",
+			name:    "testresourcebundle",
+			version: "v1",
 			rbDefClient: &mockRBDefinition{
 				// list of definitions that will be returned by the mockclient
 				Items: []rb.Definition{
 					{
-						UUID:        "123e4567-e89b-12d3-a456-426655441111",
-						Name:        "testresourcebundle2",
+						Name:        "testresourcebundle",
+						Version:     "v1",
+						ChartName:   "testchart",
 						Description: "test description",
-						ServiceType: "dns",
 					},
 				},
 			},
@@ -271,7 +280,8 @@ func TestRBDefGetHandler(t *testing.T) {
 		{
 			label:        "Get Non-Exiting Bundle Definition",
 			expectedCode: http.StatusInternalServerError,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
+			name:         "nonexistingbundle",
+			version:      "v1",
 			rbDefClient: &mockRBDefinition{
 				// list of definitions that will be returned by the mockclient
 				Items: []rb.Definition{},
@@ -283,7 +293,7 @@ func TestRBDefGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
+			req := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.name+"/"+testCase.version, nil)
 			rr := httptest.NewRecorder()
 			vh.getHandler(rr, req)
 			resp := rr.Result()

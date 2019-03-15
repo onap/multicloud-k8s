@@ -22,6 +22,30 @@
       "revId": "f379cb8c8a5d8cf4290fd6e105f66e4fd4cdabe6",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "57fbbc26_e096144e",
+        "filename": "src/k8splugin/internal/db/mongo.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-15T15:55:53Z",
+      "side": 0,
+      "message": "No. That function is no longer present in the api. cursor.Current gives us the required data.",
+      "parentUuid": "42f726db_1ae4304d",
+      "range": {
+        "startLine": 300,
+        "startChar": 0,
+        "endLine": 304,
+        "endChar": 3
+      },
+      "revId": "f379cb8c8a5d8cf4290fd6e105f66e4fd4cdabe6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

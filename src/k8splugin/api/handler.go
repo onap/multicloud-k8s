@@ -34,6 +34,14 @@ import (
 var storeName = "rbinst"
 var tagData = "data"
 
+type instanceKey struct {
+	Key string
+}
+
+func (dk instanceKey) String() string {
+	return dk.Key
+}
+
 // GetVNFClient retrieves the client used to communicate with a Kubernetes Cluster
 var GetVNFClient = func(kubeConfigPath string) (kubernetes.Clientset, error) {
 	client, err := helper.GetKubeClient(kubeConfigPath)
@@ -130,7 +138,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	err = db.DBconn.Create(storeName, internalVNFID, tagData, resourceNameMap)
+	err = db.DBconn.Create(storeName, instanceKey{Key: internalVNFID}, tagData, resourceNameMap)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Create VNF deployment DB error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
@@ -202,7 +210,7 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	res, err := db.DBconn.Read(storeName, internalVNFID, tagData)
+	res, err := db.DBconn.Read(storeName, instanceKey{Key: internalVNFID}, tagData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -237,7 +245,7 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.DBconn.Delete(storeName, internalVNFID, tagData)
+	err = db.DBconn.Delete(storeName, instanceKey{Key: internalVNFID}, tagData)
 	if err != nil {
 		werr := pkgerrors.Wrap(err, "Delete VNF db record error")
 		http.Error(w, werr.Error(), http.StatusInternalServerError)
@@ -330,7 +338,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// key: cloud1-default-uuid
 	// value: "{"deployment":<>,"service":<>}"
-	res, err := db.DBconn.Read(storeName, internalVNFID, tagData)
+	res, err := db.DBconn.Read(storeName, instanceKey{Key: internalVNFID}, tagData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

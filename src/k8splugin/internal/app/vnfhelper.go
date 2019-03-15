@@ -73,23 +73,17 @@ func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
 }
 
 // CreateVNF reads the CSAR files from the files system and creates them one by one
-var CreateVNF = func(csarID string, cloudRegionID string, rbProfileID string, kubeclient *kubernetes.Clientset) (string, map[string][]string, error) {
+var CreateVNF = func(csarID string, cloudRegionID string, profile rb.Profile, kubeclient *kubernetes.Clientset) (string, map[string][]string, error) {
 
 	overrideValues := []string{}
-	rbProfileClient := rb.NewProfileClient()
-	rbProfile, err := rbProfileClient.Get(rbProfileID)
-	if err != nil {
-		return "", nil, pkgerrors.Wrap(err, "Error getting profile info")
-	}
-
 	//Make sure that the namespace exists before trying to create any resources
-	if err := ensuresNamespace(rbProfile.Namespace, kubeclient); err != nil {
-		return "", nil, pkgerrors.Wrap(err, "Error while ensuring namespace: "+rbProfile.Namespace)
+	if err := ensuresNamespace(profile.Namespace, kubeclient); err != nil {
+		return "", nil, pkgerrors.Wrap(err, "Error while ensuring namespace: "+profile.Namespace)
 	}
 	externalVNFID := generateExternalVNFID()
-	internalVNFID := cloudRegionID + "-" + rbProfile.Namespace + "-" + externalVNFID
+	internalVNFID := cloudRegionID + "-" + profile.Namespace + "-" + externalVNFID
 
-	metaMap, err := rb.NewProfileClient().Resolve(rbProfileID, overrideValues)
+	metaMap, err := rb.NewProfileClient().Resolve(profile.RBName, profile.RBVersion, profile.Name, overrideValues)
 	if err != nil {
 		return "", nil, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
@@ -112,7 +106,7 @@ var CreateVNF = func(csarID string, cloudRegionID string, rbProfileID string, ku
 			//Populate the namespace from profile instead of instance body
 			genericKubeData := &utils.ResourceData{
 				YamlFilePath: filepath,
-				Namespace:    rbProfile.Namespace,
+				Namespace:    profile.Namespace,
 				VnfId:        internalVNFID,
 			}
 

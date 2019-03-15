@@ -49,6 +49,14 @@ type DefinitionManager interface {
 	Upload(resID string, inp []byte) error
 }
 
+type definitionKey struct {
+	Key string
+}
+
+func (dk definitionKey) String() string {
+	return dk.Key
+}
+
 // DefinitionClient implements the DefinitionManager
 // It will also be used to maintain some localized state
 type DefinitionClient struct {
@@ -73,7 +81,7 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 	if def.UUID == "" {
 		def.UUID, _ = uuid.GenerateUUID()
 	}
-	key := def.UUID
+	key := definitionKey{Key: def.UUID}
 
 	err := db.DBconn.Create(v.storeName, key, v.tagMeta, def)
 	if err != nil {
@@ -109,7 +117,8 @@ func (v *DefinitionClient) List() ([]Definition, error) {
 
 // Get returns the Resource Bundle Definition for corresponding ID
 func (v *DefinitionClient) Get(id string) (Definition, error) {
-	value, err := db.DBconn.Read(v.storeName, id, v.tagMeta)
+	key := definitionKey{Key: id}
+	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Get Resource Bundle definition")
 	}
@@ -129,13 +138,14 @@ func (v *DefinitionClient) Get(id string) (Definition, error) {
 
 // Delete the Resource Bundle definition from database
 func (v *DefinitionClient) Delete(id string) error {
-	err := db.DBconn.Delete(v.storeName, id, v.tagMeta)
+	key := definitionKey{Key: id}
+	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition")
 	}
 
 	//Delete the content when the delete operation happens
-	err = db.DBconn.Delete(v.storeName, id, v.tagContent)
+	err = db.DBconn.Delete(v.storeName, key, v.tagContent)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition Content")
 	}
@@ -146,6 +156,7 @@ func (v *DefinitionClient) Delete(id string) error {
 // Upload the contents of resource bundle into database
 func (v *DefinitionClient) Upload(id string, inp []byte) error {
 
+	key := definitionKey{Key: id}
 	//Check if definition metadata exists
 	def, err := v.Get(id)
 	if err != nil {
@@ -192,7 +203,7 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, id, v.tagContent, encodedStr)
+	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
 	}
@@ -205,6 +216,7 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 // ExtractTarBall code to create the folder structure on disk
 func (v *DefinitionClient) Download(id string) ([]byte, error) {
 
+	key := definitionKey{Key: id}
 	//ignore the returned data here
 	//Check if id is valid
 	_, err := v.Get(id)
@@ -212,7 +224,7 @@ func (v *DefinitionClient) Download(id string) ([]byte, error) {
 		return nil, pkgerrors.Errorf("Invalid Definition ID provided: %s", err.Error())
 	}
 
-	value, err := db.DBconn.Read(v.storeName, id, v.tagContent)
+	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle definition content")
 	}

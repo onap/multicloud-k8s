@@ -19,6 +19,7 @@ package rb
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"os"
@@ -26,35 +27,42 @@ import (
 
 	"k8splugin/internal/db"
 
-	uuid "github.com/hashicorp/go-uuid"
 	pkgerrors "github.com/pkg/errors"
 )
 
 // Definition contains the parameters needed for resource bundle (rb) definitions
 // It implements the interface for managing the definitions
 type Definition struct {
-	UUID        string `json:"uuid,omitempty"`
-	Name        string `json:"name"`
-	ChartName   string `json:"chart-name"`
-	Description string `json:"description"`
-	ServiceType string `json:"service-type"`
+	Name        string            `json:"rb-name"`
+	Version     string            `json:"rb-version"`
+	ChartName   string            `json:"chart-name"`
+	Description string            `json:"description"`
+	Labels      map[string]string `json:"labels"`
+}
+
+type DefinitionKey struct {
+	Name    string `json:"rb-name"`
+	Version string `json:"rb-version"`
+}
+
+// We will use json marshalling to convert to string to
+// preserve the underlying structure.
+func (dk DefinitionKey) String() string {
+	out, err := json.Marshal(dk)
+	if err != nil {
+		return ""
+	}
+
+	return string(out)
 }
 
 // DefinitionManager is an interface exposes the resource bundle definition functionality
 type DefinitionManager interface {
 	Create(def Definition) (Definition, error)
-	List() ([]Definition, error)
-	Get(resID string) (Definition, error)
-	Delete(resID string) error
-	Upload(resID string, inp []byte) error
-}
-
-type definitionKey struct {
-	Key string
-}
-
-func (dk definitionKey) String() string {
-	return dk.Key
+	List(name string) ([]Definition, error)
+	Get(name string, version string) (Definition, error)
+	Delete(name string, version string) error
+	Upload(name string, version string, inp []byte) error
 }
 
 // DefinitionClient implements the DefinitionManager
@@ -77,13 +85,17 @@ func NewDefinitionClient() *DefinitionClient {
 
 // Create an entry for the resource in the database
 func (v *DefinitionClient) Create(def Definition) (Definition, error) {
-	// If UUID is empty, we will generate one
-	if def.UUID == "" {
-		def.UUID, _ = uuid.GenerateUUID()
-	}
-	key := definitionKey{Key: def.UUID}
 
-	err := db.DBconn.Create(v.storeName, key, v.tagMeta, def)
+	//Construct composite key consisting of name and version
+	key := DefinitionKey{Name: def.Name, Version: def.Version}
+
+	//Check if this definition already exists
+	_, err := v.Get(def.Name, def.Version)
+	if err == nil {
+		return Definition{}, pkgerrors.New("Definition already exists")
+	}
+
+	err = db.DBconn.Create(v.storeName, key, v.tagMeta, def)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -91,8 +103,8 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 	return def, nil
 }
 
-// List all resource entries in the database
-func (v *DefinitionClient) List() ([]Definition, error) {
+// List all resource entry's versions in the database
+func (v *DefinitionClient) List(name string) ([]Definition, error) {
 	res, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
 	if err != nil || len(res) == 0 {
 		return []Definition{}, pkgerrors.Wrap(err, "Listing Resource Bundle Definitions")
@@ -108,7 +120,10 @@ func (v *DefinitionClient) List() ([]Definition, error) {
 				log.Printf("[Definition] Error Unmarshaling value for: %s", key)
 				continue
 			}
-			results = append(results, def)
+			//Select only the definitions that match name provided
+			if def.Name == name {
+				results = append(results, def)
+			}
 		}
 	}
 
@@ -116,8 +131,10 @@ func (v *DefinitionClient) List() ([]Definition, error) {
 }
 
 // Get returns the Resource Bundle Definition for corresponding ID
-func (v *DefinitionClient) Get(id string) (Definition, error) {
-	key := definitionKey{Key: id}
+func (v *DefinitionClient) Get(name string, version string) (Definition, error) {
+
+	//Construct the composite key to select the entry
+	key := DefinitionKey{Name: name, Version: version}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Get Resource Bundle definition")
@@ -137,8 +154,10 @@ func (v *DefinitionClient) Get(id string) (Definition, error) {
 }
 
 // Delete the Resource Bundle definition from database
-func (v *DefinitionClient) Delete(id string) error {
-	key := definitionKey{Key: id}
+func (v *DefinitionClient) Delete(name string, version string) error {
+
+	//Construct the composite key to select the entry
+	key := DefinitionKey{Name: name, Version: version}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition")
@@ -154,11 +173,10 @@ func (v *DefinitionClient) Delete(id string) error {
 }
 
 // Upload the contents of resource bundle into database
-func (v *DefinitionClient) Upload(id string, inp []byte) error {
+func (v *DefinitionClient) Upload(name string, version string, inp []byte) error {
 
-	key := definitionKey{Key: id}
 	//Check if definition metadata exists
-	def, err := v.Get(id)
+	def, err := v.Get(name, version)
 	if err != nil {
 		return pkgerrors.Errorf("Invalid Definition ID provided: %s", err.Error())
 	}
@@ -201,6 +219,9 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 		}
 	}
 
+	//Construct the composite key to select the entry
+	key := DefinitionKey{Name: name, Version: version}
+
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
 	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
@@ -214,16 +235,17 @@ func (v *DefinitionClient) Upload(id string, inp []byte) error {
 // Download the contents of the resource bundle definition from DB
 // Returns a byte array of the contents which is used by the
 // ExtractTarBall code to create the folder structure on disk
-func (v *DefinitionClient) Download(id string) ([]byte, error) {
+func (v *DefinitionClient) Download(name string, version string) ([]byte, error) {
 
-	key := definitionKey{Key: id}
 	//ignore the returned data here
 	//Check if id is valid
-	_, err := v.Get(id)
+	_, err := v.Get(name, version)
 	if err != nil {
 		return nil, pkgerrors.Errorf("Invalid Definition ID provided: %s", err.Error())
 	}
 
+	//Construct the composite key to select the entry
+	key := DefinitionKey{Name: name, Version: version}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle definition content")

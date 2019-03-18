@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fc1da428_c4cdc845",
+        "filename": "src/k8splugin/api/model.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-18T23:32:52Z",
+      "side": 1,
+      "message": "Yes. I intend to push the plugin.sh change in a separate patch.",
+      "parentUuid": "824e6474_4307a43e",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 12
+      },
+      "revId": "face877fe23409a465014461eff4071dce0873b5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36a0a778_12fc6c2c",
         "filename": "src/k8splugin/internal/db/testing.go",
         "patchSetId": 11
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "ec4a9a0c_7fc195d9",
+        "filename": "src/k8splugin/internal/db/testing.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-18T23:32:52Z",
+      "side": 1,
+      "message": "This is not a test in itself. It contains some code that is used for testing. However, it is needed by both unit and integration tests.",
+      "parentUuid": "36a0a778_12fc6c2c",
+      "range": {
+        "startLine": 1,
+        "startChar": 15,
+        "endLine": 1,
+        "endChar": 26
+      },
+      "revId": "face877fe23409a465014461eff4071dce0873b5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8afd6e21_f818e024",
         "filename": "src/k8splugin/internal/rb/profile_test.go",
         "patchSetId": 11
@@ -59,6 +107,24 @@
       "writtenOn": "2019-03-18T21:09:01Z",
       "side": 1,
       "message": "IMHO, these test cases are not covering all the possible scenarios. Like the case where Downloading fails, getting an error during the extraction of the tarball, processing an invalid profile yaml file, etc.",
+      "revId": "face877fe23409a465014461eff4071dce0873b5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df533548_8cbeb701",
+        "filename": "src/k8splugin/internal/rb/profile_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-18T23:32:52Z",
+      "side": 1,
+      "message": "You are right. This is sort of an integration test in reality. I just wanted to have at least one test that would cover the full function end to end. I also felt that those cases that you mention are covered in the corresponding unit tests of the functions being called in this test.",
+      "parentUuid": "8afd6e21_f818e024",
       "revId": "face877fe23409a465014461eff4071dce0873b5",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

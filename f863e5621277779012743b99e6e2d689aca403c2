@@ -1,0 +1,297 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "13e00e31_bb73ee78",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "Shouldn\u0027t be better to split this change in multiple sequential changes for easier code reviews?",
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86f02e36_1dca06d1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "These lines should need to be at the bottom",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 56
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c33c544d_3f0ddf55",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "Are those part of the benefits of doing that restruct?",
+      "range": {
+        "startLine": 12,
+        "startChar": 51,
+        "endLine": 14,
+        "endChar": 41
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9102e176_bbef0db3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "P7?",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 2
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "40649a6a_c16b8f4f",
+        "filename": "kud/hosting_provider/vagrant/README.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "This title and content needs to be updated as well.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 17
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a92b776_b1d1003f",
+        "filename": "kud/hosting_provider/vagrant/README.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "Can you fix this reference?",
+      "range": {
+        "startLine": 10,
+        "startChar": 11,
+        "endLine": 10,
+        "endChar": 34
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed1e21d_11fcd968",
+        "filename": "kud/hosting_provider/vagrant/installer",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "This file is just a symbolic link, is this fine?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 12
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "218ec53e_7a72aa4b",
+        "filename": "kud/hosting_provider/vagrant/installer.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "this is not deploying the plugin... this deploys kubernetes cluster thru kubespray",
+      "range": {
+        "startLine": 100,
+        "startChar": 20,
+        "endLine": 100,
+        "endChar": 33
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3119045d_694d338d",
+        "filename": "kud/hosting_provider/vagrant/installer.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "is this is a leftover?",
+      "range": {
+        "startLine": 102,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 37
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3175932c_9d7b952b",
+        "filename": "kud/hosting_provider/vagrant/installer.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "ditto: line 102",
+      "range": {
+        "startLine": 104,
+        "startChar": 4,
+        "endLine": 104,
+        "endChar": 34
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "29a7b785_d1c2bafa",
+        "filename": "kud/hosting_provider/vagrant/installer.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "Remove this line, this function can or can\u0027t be at the end of the deployment.",
+      "range": {
+        "startLine": 197,
+        "startChar": 4,
+        "endLine": 197,
+        "endChar": 29
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "33847e54_f9905e3e",
+        "filename": "kud/hosting_provider/vagrant/installer.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "those lines seems to be added for debugging purposes which it\u0027s offered by KUD_DEBUG",
+      "range": {
+        "startLine": 234,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 34
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "be7dffb3_daa2ccef",
+        "filename": "kud/hosting_provider/vagrant/installer.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T18:06:00Z",
+      "side": 1,
+      "message": "ditto: line 236",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 34
+      },
+      "revId": "f863e5621277779012743b99e6e2d689aca403c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

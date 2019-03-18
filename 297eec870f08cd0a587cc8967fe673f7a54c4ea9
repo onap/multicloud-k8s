@@ -22,6 +22,30 @@
       "revId": "297eec870f08cd0a587cc8967fe673f7a54c4ea9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c4c50149_62e61dca",
+        "filename": "src/k8splugin/internal/db/consul.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-18T19:15:52Z",
+      "side": 1,
+      "message": "A string is guaranteed to be returned by key.String(). Added a check for empty strings.",
+      "parentUuid": "b233d59e_c3c5fc66",
+      "range": {
+        "startLine": 73,
+        "startChar": 1,
+        "endLine": 73,
+        "endChar": 18
+      },
+      "revId": "297eec870f08cd0a587cc8967fe673f7a54c4ea9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

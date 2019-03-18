@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "737615d5_8b31f127",
+        "filename": "src/k8splugin/internal/db/consul.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T16:13:05Z",
+      "side": 1,
+      "message": "is this change needed?",
+      "range": {
+        "startLine": 123,
+        "startChar": 35,
+        "endLine": 123,
+        "endChar": 41
+      },
+      "revId": "4310810bdc92da7787c94c775839b98a338803dc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cafcb6f_b99d3d87",
+        "filename": "src/k8splugin/internal/db/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-18T16:13:05Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 48,
+        "startChar": 14,
+        "endLine": 48,
+        "endChar": 23
+      },
+      "revId": "4310810bdc92da7787c94c775839b98a338803dc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

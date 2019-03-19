@@ -97,6 +97,30 @@
     },
     {
       "key": {
+        "uuid": "9128a5db_927826ee",
+        "filename": "src/k8splugin/api/model.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-19T17:37:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edbcf75e_860049db",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 12
+      },
+      "revId": "face877fe23409a465014461eff4071dce0873b5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36a0a778_12fc6c2c",
         "filename": "src/k8splugin/internal/db/testing.go",
         "patchSetId": 11

@@ -22,6 +22,30 @@
       "revId": "5664aadfb7fcc675dcdf72bd30f0e6c43036c443",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f5a00f07_5fd21bf3",
+        "filename": "vagrant/Vagrantfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T18:55:23Z",
+      "side": 1,
+      "message": "Ritu, you\u0027re right... this config value is scoped to the nodes and needs to be applied at top level. Regarding the nodes defined on the config file, there are not affected this only creates a random domain name.",
+      "parentUuid": "a7c9dd8f_e5863e93",
+      "range": {
+        "startLine": 96,
+        "startChar": 10,
+        "endLine": 96,
+        "endChar": 25
+      },
+      "revId": "5664aadfb7fcc675dcdf72bd30f0e6c43036c443",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a7c9dd8f_e5863e93",
+        "filename": "vagrant/Vagrantfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-03-19T18:40:23Z",
+      "side": 1,
+      "message": "Does this also have same effect on installer VM? What about the names that are on the config file?",
+      "range": {
+        "startLine": 96,
+        "startChar": 10,
+        "endLine": 96,
+        "endChar": 25
+      },
+      "revId": "5664aadfb7fcc675dcdf72bd30f0e6c43036c443",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

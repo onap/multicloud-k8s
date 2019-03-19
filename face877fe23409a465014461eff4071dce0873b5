@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "edbcf75e_860049db",
+        "filename": "src/k8splugin/api/model.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-19T17:08:31Z",
+      "side": 1,
+      "message": "The final API looks significantly different after recent discussions. The profileID is itself going away along a lot of the instance API because of which there will be a few more patches in flight (82620) before we can have a testable state. In light of that, I feel it is not worth the time to fix the plugin.sh only to throw away those changes once the new API comes in.",
+      "parentUuid": "5c253b15_2e71e9eb",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 12
+      },
+      "revId": "face877fe23409a465014461eff4071dce0873b5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36a0a778_12fc6c2c",
         "filename": "src/k8splugin/internal/db/testing.go",
         "patchSetId": 11
@@ -132,6 +156,30 @@
       "side": 1,
       "message": "I just wondering if removing all the flags, we can get the similar effect.",
       "parentUuid": "ec4a9a0c_7fc195d9",
+      "range": {
+        "startLine": 1,
+        "startChar": 15,
+        "endLine": 1,
+        "endChar": 26
+      },
+      "revId": "face877fe23409a465014461eff4071dce0873b5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a8b59569_2b332027",
+        "filename": "src/k8splugin/internal/db/testing.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-19T17:08:31Z",
+      "side": 1,
+      "message": "Maybe we should revisit the tags at a later point. Removing is not a bad idea.",
+      "parentUuid": "4ee83023_72fe31dd",
       "range": {
         "startLine": 1,
         "startChar": 15,

@@ -1,0 +1,176 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "56007a97_b0b8630a",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:22:57Z",
+      "side": 1,
+      "message": "Does this work?",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 20
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4cb7469_debe6791",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:22:57Z",
+      "side": 1,
+      "message": "ditto: line 55",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 24
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "657cee35_ea3d1e9d",
+        "filename": "kud/hosting_providers/vagrant/README.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:22:57Z",
+      "side": 1,
+      "message": "What I meant was to re-phrase the all paragraph given that this folder will only targe VMs",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 17
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc35b739_fdb027e1",
+        "filename": "kud/hosting_providers/vagrant/README.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:22:57Z",
+      "side": 1,
+      "message": "This reference is listed in line 49 of this README.md, please update the reference as well",
+      "range": {
+        "startLine": 17,
+        "startChar": 67,
+        "endLine": 17,
+        "endChar": 93
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "26acba38_cf1a4de0",
+        "filename": "kud/hosting_providers/vagrant/Vagrantfile",
+        "patchSetId": 12
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:22:57Z",
+      "side": 1,
+      "message": "s/KRD_PLUGIN_ENABLED/KUD_PLUGIN_ENABLED",
+      "range": {
+        "startLine": 120,
+        "startChar": 17,
+        "endLine": 120,
+        "endChar": 35
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5082884_ff6e40b8",
+        "filename": "kud/hosting_providers/vagrant/Vagrantfile",
+        "patchSetId": 12
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:22:57Z",
+      "side": 1,
+      "message": "those instructions doesn\u0027t need to be executed with sudo, the line 119 was created to run them without privilege permissions",
+      "range": {
+        "startLine": 122,
+        "startChar": 4,
+        "endLine": 125,
+        "endChar": 15
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f9501ef6_c63c0b85",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:22:57Z",
+      "side": 1,
+      "message": "This change is not required",
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c67ac6b0_15ab2872",
+        "filename": "kud/hosting_providers/vagrant/inventory/group_vars/all.yml",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:22:57Z",
+      "side": 1,
+      "message": "This file doesn\u0027t have to be included, update the .gitignore  file",
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

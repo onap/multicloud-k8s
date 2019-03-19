@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "b1635817_af980825",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-19T16:58:15Z",
+      "side": 1,
+      "message": "Ok, so if this proposed change is temporal and doesn\u0027t work, why are you including it in this commit? Shouldn\u0027t be better to fix it now?",
+      "parentUuid": "14bda330_50a79fe6",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 20
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4cb7469_debe6791",
         "filename": "kud/hosting_providers/baremetal/aio.sh",
         "patchSetId": 12

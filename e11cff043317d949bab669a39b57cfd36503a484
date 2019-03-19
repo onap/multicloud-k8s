@@ -213,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "8afe2756_38732da6",
+        "filename": "kud/hosting_providers/vagrant/Vagrantfile",
+        "patchSetId": 12
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-03-19T16:45:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26acba38_cf1a4de0",
+      "range": {
+        "startLine": 120,
+        "startChar": 17,
+        "endLine": 120,
+        "endChar": 35
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5082884_ff6e40b8",
         "filename": "kud/hosting_providers/vagrant/Vagrantfile",
         "patchSetId": 12
@@ -224,6 +248,30 @@
       "writtenOn": "2019-03-19T16:22:57Z",
       "side": 1,
       "message": "those instructions doesn\u0027t need to be executed with sudo, the line 119 was created to run them without privilege permissions",
+      "range": {
+        "startLine": 122,
+        "startChar": 4,
+        "endLine": 125,
+        "endChar": 15
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0554477_9835b451",
+        "filename": "kud/hosting_providers/vagrant/Vagrantfile",
+        "patchSetId": 12
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-03-19T16:45:11Z",
+      "side": 1,
+      "message": "They don\u0027t get executed without sudo permissions even with the existing setup.",
+      "parentUuid": "e5082884_ff6e40b8",
       "range": {
         "startLine": 122,
         "startChar": 4,

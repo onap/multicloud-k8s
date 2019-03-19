@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14bda330_50a79fe6",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-03-19T16:42:54Z",
+      "side": 1,
+      "message": "This is not going to be permanent. The proposed change to completely restructure the repo and have the scripts be placed that would be independent of any hosting provider. We are only halfway there. The idea is to have the initial folder structure first. The next step is to decouple the installer script. What I\u0027ve done here is just pointed it to the location on where the node.sh is currently housed which will change again. I\u0027m open to suggestions if there\u0027s a better approach.",
+      "parentUuid": "56007a97_b0b8630a",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 20
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4cb7469_debe6791",
         "filename": "kud/hosting_providers/baremetal/aio.sh",
         "patchSetId": 12
@@ -36,6 +60,30 @@
       "writtenOn": "2019-03-19T16:22:57Z",
       "side": 1,
       "message": "ditto: line 55",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 24
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ac6bcc35_6af54996",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-03-19T16:42:54Z",
+      "side": 1,
+      "message": "I have done the same. Before the installer.sh was housed in the same dir, not it has been moved into /hosting_providers/vagrant",
+      "parentUuid": "b4cb7469_debe6791",
       "range": {
         "startLine": 58,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "d02a8b35_311c5bbd",
+        "filename": "kud/hosting_providers/vagrant/README.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-03-19T16:42:54Z",
+      "side": 1,
+      "message": "ok, but since there\u0027s just a single readme file should I just move it into the parent folder?",
+      "parentUuid": "657cee35_ea3d1e9d",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 17
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc35b739_fdb027e1",
         "filename": "kud/hosting_providers/vagrant/README.md",
         "patchSetId": 12
@@ -82,6 +154,30 @@
       "writtenOn": "2019-03-19T16:22:57Z",
       "side": 1,
       "message": "This reference is listed in line 49 of this README.md, please update the reference as well",
+      "range": {
+        "startLine": 17,
+        "startChar": 67,
+        "endLine": 17,
+        "endChar": 93
+      },
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44652940_152b4ba3",
+        "filename": "kud/hosting_providers/vagrant/README.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-03-19T16:42:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc35b739_fdb027e1",
       "range": {
         "startLine": 17,
         "startChar": 67,
@@ -157,6 +253,24 @@
     },
     {
       "key": {
+        "uuid": "1c605aa7_bea679e3",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-03-19T16:42:54Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "f9501ef6_c63c0b85",
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c67ac6b0_15ab2872",
         "filename": "kud/hosting_providers/vagrant/inventory/group_vars/all.yml",
         "patchSetId": 12
@@ -168,6 +282,24 @@
       "writtenOn": "2019-03-19T16:22:57Z",
       "side": 1,
       "message": "This file doesn\u0027t have to be included, update the .gitignore  file",
+      "revId": "e11cff043317d949bab669a39b57cfd36503a484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "11b74951_a7b87e1e",
+        "filename": "kud/hosting_providers/vagrant/inventory/group_vars/all.yml",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-03-19T16:42:54Z",
+      "side": 1,
+      "message": "I have already added it. It keeps coming up for some reason. I\u0027ll take a look at that",
+      "parentUuid": "c67ac6b0_15ab2872",
       "revId": "e11cff043317d949bab669a39b57cfd36503a484",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

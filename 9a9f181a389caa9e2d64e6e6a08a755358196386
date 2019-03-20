@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fd90a963_5e548a24",
+        "filename": "src/k8splugin/internal/rb/profile.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-03-20T17:16:55Z",
+      "side": 1,
+      "message": "These fields are not in the API Spec. Is it required to update API documentation?",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 64
+      },
+      "revId": "9a9f181a389caa9e2d64e6e6a08a755358196386",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

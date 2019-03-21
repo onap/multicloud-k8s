@@ -17,7 +17,7 @@ export GO111MODULE=on
 
 all: clean plugins
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64
-	@go build -a -tags netgo -o ./k8plugin ./cmd/main.go
+	@go build -tags netgo -o ./k8plugin ./cmd/main.go
 
 # The following is done this way as each patch on CI runs build and each merge runs deploy. So for build we don't need to build binary and hence
 # no need to create a static binary with additional flags. However, for generating binary, additional build flags are necessary. This if used with
@@ -43,7 +43,7 @@ format:
 	@go fmt ./...
 
 plugins:
-	@find plugins -maxdepth 1 -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -a -tags netgo -o $(basename {}).so" \;
+	@find plugins -maxdepth 1 -type d -not -path plugins -exec sh -c "ls {}/plugin.go | xargs go build -buildmode=plugin -tags netgo -o $(basename {}).so" \;
 
 clean:
 	@find . -name "*so" -delete

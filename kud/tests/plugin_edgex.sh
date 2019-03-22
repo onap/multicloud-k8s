@@ -16,7 +16,7 @@ set -o pipefail
 source _functions.sh
 
 base_url="http://localhost:8081/v1/vnf_instances/"
-cloud_region_id="krd"
+cloud_region_id="kud"
 namespace="default"
 csar_id=cb009bfe-bbee-11e8-9766-525400435678
 

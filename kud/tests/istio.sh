@@ -16,9 +16,9 @@ source _functions.sh
 
 csar_id=ac39959e-e82c-11e8-9133-525400912638
 
-base_dest=$(grep "base_dest:" $test_folder/../playbooks/krd-vars.yml | awk -F ': ' '{print $2}')
-istio_dest=$(grep "istio_dest:" $test_folder/../playbooks/krd-vars.yml | awk -F ': ' '{print $2}' | sed "s|{{ base_dest }}|$base_dest|g;s|\"||g")
-istio_version=$(grep "istio_version:" $test_folder/../playbooks/krd-vars.yml | awk -F ': ' '{print $2}')
+base_dest=$(grep "base_dest:" $test_folder/../deployment_infra/playbooks/kud-vars.yml | awk -F ': ' '{print $2}')
+istio_dest=$(grep "istio_dest:" $test_folder/../deployment_infra/playbooks/kud-vars.yml | awk -F ': ' '{print $2}' | sed "s|{{ base_dest }}|$base_dest|g;s|\"||g")
+istio_version=$(grep "istio_version:" $test_folder/../deployment_infra/playbooks/kud-vars.yml | awk -F ': ' '{print $2}')
 
 if ! $(istioctl version &>/dev/null); then
     echo "This funtional test requires istioctl client"

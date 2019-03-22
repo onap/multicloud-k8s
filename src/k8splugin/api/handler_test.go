@@ -48,7 +48,7 @@ func (c *mockCSAR) DestroyVNF(data map[string][]string, namespace string,
 }
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
-	router := NewRouter("")
+	router := NewRouter("", nil, nil)
 	recorder := httptest.NewRecorder()
 	router.ServeHTTP(recorder, req)
 

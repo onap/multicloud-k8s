@@ -20,7 +20,8 @@ import (
 )
 
 // NewRouter creates a router instance that serves the VNFInstance web methods
-func NewRouter(kubeconfig string) *mux.Router {
+func NewRouter(kubeconfig string, defClient rb.DefinitionManager,
+	profileClient rb.ProfileManager) *mux.Router {
 	router := mux.NewRouter()
 
 	vnfInstanceHandler := router.PathPrefix("/v1/vnf_instances").Subrouter()
@@ -30,22 +31,28 @@ func NewRouter(kubeconfig string) *mux.Router {
 	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", GetHandler).Methods("GET")
 
 	//rbd is resource bundle definition
+	if defClient == nil {
+		defClient = rb.NewDefinitionClient()
+	}
+	defHandler := rbDefinitionHandler{client: defClient}
 	resRouter := router.PathPrefix("/v1/rb").Subrouter()
-	rbdef := rbDefinitionHandler{client: rb.NewDefinitionClient()}
-	resRouter.HandleFunc("/definition", rbdef.createHandler).Methods("POST")
-	resRouter.HandleFunc("/definition/{rbdID}/content", rbdef.uploadHandler).Methods("POST")
-	resRouter.HandleFunc("/definition", rbdef.listHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbdID}", rbdef.getHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbdID}", rbdef.deleteHandler).Methods("DELETE")
+	resRouter.HandleFunc("/definition", defHandler.createHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbdID}/content", defHandler.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition", defHandler.listHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbdID}", defHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbdID}", defHandler.deleteHandler).Methods("DELETE")
 
 	//rbp is resource bundle profile
-	rbprofile := rbProfileHandler{client: rb.NewProfileClient()}
-	resRouter.HandleFunc("/profile", rbprofile.createHandler).Methods("POST")
-	resRouter.HandleFunc("/profile/{rbpID}/content", rbprofile.uploadHandler).Methods("POST")
-	resRouter.HandleFunc("/profile/help", rbprofile.helpHandler).Methods("GET")
-	resRouter.HandleFunc("/profile", rbprofile.listHandler).Methods("GET")
-	resRouter.HandleFunc("/profile/{rbpID}", rbprofile.getHandler).Methods("GET")
-	resRouter.HandleFunc("/profile/{rbpID}", rbprofile.deleteHandler).Methods("DELETE")
+	if profileClient == nil {
+		profileClient = rb.NewProfileClient()
+	}
+	profileHandler := rbProfileHandler{client: profileClient}
+	resRouter.HandleFunc("/profile", profileHandler.createHandler).Methods("POST")
+	resRouter.HandleFunc("/profile/{rbpID}/content", profileHandler.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/profile/help", profileHandler.helpHandler).Methods("GET")
+	resRouter.HandleFunc("/profile", profileHandler.listHandler).Methods("GET")
+	resRouter.HandleFunc("/profile/{rbpID}", profileHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/profile/{rbpID}", profileHandler.deleteHandler).Methods("DELETE")
 
 	// (TODO): Fix update method
 	// vnfInstanceHandler.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

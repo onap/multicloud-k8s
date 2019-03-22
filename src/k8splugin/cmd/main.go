@@ -43,7 +43,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	httpRouter := api.NewRouter(kubeconfig)
+	httpRouter := api.NewRouter(kubeconfig, nil, nil)
 	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
 	log.Println("Starting Kubernetes Multicloud API")
 

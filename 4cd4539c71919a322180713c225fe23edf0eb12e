@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "18a8097e_15c8ea7a",
+        "filename": "src/k8splugin/api/handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-03-22T23:31:55Z",
+      "side": 1,
+      "message": "I like these improvements, it makes the code more readable",
+      "range": {
+        "startLine": 80,
+        "startChar": 1,
+        "endLine": 80,
+        "endChar": 7
+      },
+      "revId": "4cd4539c71919a322180713c225fe23edf0eb12e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

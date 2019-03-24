@@ -6,7 +6,7 @@ This project offers a means for deploying a Kubernetes cluster
 that satisfies the requirements of [ONAP multicloud/k8s plugin][1]. Its
 ansible playbooks allow to provision a deployment on Virtual Machines and on Baremetal.
 
-![Diagram](../../../docs/img/diagram.png)
+![Diagram](../docs/img/diagram.png)
 
 # Components
 

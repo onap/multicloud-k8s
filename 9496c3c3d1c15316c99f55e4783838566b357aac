@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c57d24b_36acc340",
+        "filename": "src/k8splugin/internal/app/vnfhelper.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-25T23:27:27Z",
+      "side": 1,
+      "message": "convert this to _ since we are going to ignore it.",
+      "range": {
+        "startLine": 50,
+        "startChar": 5,
+        "endLine": 50,
+        "endChar": 8
+      },
+      "revId": "9496c3c3d1c15316c99f55e4783838566b357aac",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e62bf60a_7a342bd7",
+        "filename": "src/k8splugin/internal/rb/definition.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-03-26T22:35:20Z",
+      "side": 1,
+      "message": "Add check to see if the Definition already exists before creating new Definition and this will create multiple copies in the database",
+      "revId": "c2b348b178d170f7eb47e6d8621eb61be0a80ebb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

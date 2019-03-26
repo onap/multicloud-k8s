@@ -16,6 +16,24 @@
       "revId": "c2b348b178d170f7eb47e6d8621eb61be0a80ebb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f06aa5a_7e1e5863",
+        "filename": "src/k8splugin/internal/rb/definition.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-03-26T23:47:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e62bf60a_7a342bd7",
+      "revId": "c2b348b178d170f7eb47e6d8621eb61be0a80ebb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

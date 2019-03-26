@@ -49,6 +49,14 @@ type ProfileManager interface {
 	Upload(resID string, inp []byte) error
 }
 
+type profileKey struct {
+	Key string
+}
+
+func (dk profileKey) String() string {
+	return dk.Key
+}
+
 // ProfileClient implements the ProfileManager
 // It will also be used to maintain some localized state
 type ProfileClient struct {
@@ -95,7 +103,7 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 	if p.UUID == "" {
 		p.UUID, _ = uuid.GenerateUUID()
 	}
-	key := p.UUID
+	key := profileKey{Key: p.UUID}
 
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
 	if err != nil {
@@ -132,7 +140,8 @@ func (v *ProfileClient) List() ([]Profile, error) {
 
 // Get returns the Resource Bundle Profile for corresponding ID
 func (v *ProfileClient) Get(id string) (Profile, error) {
-	value, err := db.DBconn.Read(v.storeName, id, v.tagMeta)
+	key := profileKey{Key: id}
+	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Profile{}, pkgerrors.Wrap(err, "Get Resource Bundle Profile")
 	}
@@ -152,12 +161,13 @@ func (v *ProfileClient) Get(id string) (Profile, error) {
 
 // Delete the Resource Bundle Profile from database
 func (v *ProfileClient) Delete(id string) error {
-	err := db.DBconn.Delete(v.storeName, id, v.tagMeta)
+	key := profileKey{Key: id}
+	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile")
 	}
 
-	err = db.DBconn.Delete(v.storeName, id, v.tagContent)
+	err = db.DBconn.Delete(v.storeName, key, v.tagContent)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile Content")
 	}
@@ -168,6 +178,7 @@ func (v *ProfileClient) Delete(id string) error {
 // Upload the contents of resource bundle into database
 func (v *ProfileClient) Upload(id string, inp []byte) error {
 
+	key := profileKey{Key: id}
 	//ignore the returned data here.
 	_, err := v.Get(id)
 	if err != nil {
@@ -181,7 +192,7 @@ func (v *ProfileClient) Upload(id string, inp []byte) error {
 
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, id, v.tagContent, encodedStr)
+	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
 	}
@@ -194,6 +205,7 @@ func (v *ProfileClient) Upload(id string, inp []byte) error {
 // ExtractTarBall code to create the folder structure on disk
 func (v *ProfileClient) Download(id string) ([]byte, error) {
 
+	key := profileKey{Key: id}
 	//ignore the returned data here
 	//Check if id is valid
 	_, err := v.Get(id)
@@ -201,7 +213,7 @@ func (v *ProfileClient) Download(id string) ([]byte, error) {
 		return nil, pkgerrors.Errorf("Invalid Profile ID provided: %s", err.Error())
 	}
 
-	value, err := db.DBconn.Read(v.storeName, id, v.tagContent)
+	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle Profile content")
 	}

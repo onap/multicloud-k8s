@@ -143,6 +143,84 @@ func TestCreate(t *testing.T) {
 	}
 }
 
+func TestUpdate(t *testing.T) {
+	testCases := []struct {
+		label         string
+		input         map[string]interface{}
+		mockColl      *mockCollection
+		bson          bson.Raw
+		expectedError string
+	}{
+		{
+			label: "Successfull update of entry",
+			input: map[string]interface{}{
+				"coll": "collname",
+				"key":  mockKey{Key: "keyvalue"},
+				"tag":  "tagName",
+				"data": "Data In String Format",
+			},
+			// Binary form of
+			// {
+			//	"_id" : ObjectId("5c115156777ff85654248ae1"),
+			//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
+			//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
+			// }
+			bson: bson.Raw{
+				'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
+				'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
+				'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
+				'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
+				'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
+				'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
+				'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
+				'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
+				'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
+				'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
+				'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
+			},
+			mockColl: &mockCollection{},
+		},
+		{
+			label: "Entry does not exist",
+			input: map[string]interface{}{
+				"coll": "collname",
+				"key":  mockKey{Key: "keyvalue"},
+				"tag":  "tagName",
+				"data": "Data In String Format",
+			},
+			mockColl: &mockCollection{
+				Err: pkgerrors.New("DB Error"),
+			},
+			expectedError: "DB Error",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			m, _ := NewMongoStore("name", &mongo.Database{})
+			// Override the getCollection function with our mocked version
+			getCollection = func(coll string, m *MongoStore) MongoCollection {
+				return testCase.mockColl
+			}
+
+			decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
+				return testCase.bson, testCase.mockColl.Err
+			}
+
+			err := m.Create(testCase.input["coll"].(string), testCase.input["key"].(Key),
+				testCase.input["tag"].(string), testCase.input["data"])
+			if err != nil {
+				if testCase.expectedError == "" {
+					t.Fatalf("Create method returned an un-expected (%s)", err)
+				}
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Create method returned an error (%s)", err)
+				}
+			}
+		})
+	}
+}
+
 func TestRead(t *testing.T) {
 	testCases := []struct {
 		label         string

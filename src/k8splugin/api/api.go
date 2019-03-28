@@ -14,21 +14,30 @@ limitations under the License.
 package api
 
 import (
+	"k8splugin/internal/app"
 	"k8splugin/internal/rb"
 
 	"github.com/gorilla/mux"
 )
 
-// NewRouter creates a router instance that serves the VNFInstance web methods
-func NewRouter(kubeconfig string, defClient rb.DefinitionManager,
-	profileClient rb.ProfileManager) *mux.Router {
+// NewRouter creates a router that registers the various urls that are supported
+func NewRouter(defClient rb.DefinitionManager,
+	profileClient rb.ProfileManager,
+	instClient app.InstanceManager) *mux.Router {
+
 	router := mux.NewRouter()
 
-	vnfInstanceHandler := router.PathPrefix("/v1/vnf_instances").Subrouter()
-	vnfInstanceHandler.HandleFunc("/", CreateHandler).Methods("POST").Name("VNFCreation")
-	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}", ListHandler).Methods("GET")
-	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", DeleteHandler).Methods("DELETE")
-	vnfInstanceHandler.HandleFunc("/{cloudRegionID}/{namespace}/{externalVNFID}", GetHandler).Methods("GET")
+	// Setup Instance handler routes
+	if instClient == nil {
+		instClient = app.NewInstanceClient()
+	}
+	instHandler := instanceHandler{client: instClient}
+	instRouter := router.PathPrefix("/v1").Subrouter()
+	instRouter.HandleFunc("/instance", instHandler.createHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}", instHandler.getHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}", instHandler.deleteHandler).Methods("DELETE")
+	// (TODO): Fix update method
+	// instRouter.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")
 
 	//Setup resource bundle definition routes
 	if defClient == nil {
@@ -51,9 +60,6 @@ func NewRouter(kubeconfig string, defClient rb.DefinitionManager,
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/content", profileHandler.uploadHandler).Methods("POST")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.getHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.deleteHandler).Methods("DELETE")
-
-	// (TODO): Fix update method
-	// vnfInstanceHandler.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")
 
 	return router
 }

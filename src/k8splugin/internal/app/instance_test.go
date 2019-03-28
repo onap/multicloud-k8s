@@ -14,73 +14,27 @@ limitations under the License.
 package app
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
-	"plugin"
+	"reflect"
 	"testing"
-
-	pkgerrors "github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
-	"k8s.io/client-go/kubernetes"
 
 	utils "k8splugin/internal"
 	"k8splugin/internal/db"
 	"k8splugin/internal/rb"
 )
 
-func LoadMockPlugins(krdLoadedPlugins *map[string]*plugin.Plugin) error {
-	if _, err := os.Stat("../../mock_files/mock_plugins/mockplugin.so"); os.IsNotExist(err) {
-		return pkgerrors.New("mockplugin.so does not exist. Please compile mockplugin.go to generate")
-	}
-
-	mockPlugin, err := plugin.Open("../../mock_files/mock_plugins/mockplugin.so")
-	if err != nil {
-		return pkgerrors.Cause(err)
-	}
-
-	(*krdLoadedPlugins)["namespace"] = mockPlugin
-	(*krdLoadedPlugins)["deployment"] = mockPlugin
-	(*krdLoadedPlugins)["service"] = mockPlugin
-
-	return nil
-}
-
-func TestCreateVNF(t *testing.T) {
+func TestInstanceCreate(t *testing.T) {
 	oldkrdPluginData := utils.LoadedPlugins
-	oldReadMetadataFile := ReadMetadataFile
-
 	defer func() {
 		utils.LoadedPlugins = oldkrdPluginData
-		ReadMetadataFile = oldReadMetadataFile
 	}()
-
-	err := LoadMockPlugins(&utils.LoadedPlugins)
+	err := LoadMockPlugins(utils.LoadedPlugins)
 	if err != nil {
-		t.Fatalf("TestCreateVNF returned an error (%s)", err)
+		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
 	}
 
-	ReadMetadataFile = func(yamlFilePath string) (MetadataFile, error) {
-		var seqFile MetadataFile
-
-		if _, err := os.Stat(yamlFilePath); err == nil {
-			rawBytes, err := ioutil.ReadFile("../../mock_files/mock_yamls/metadata.yaml")
-			if err != nil {
-				return seqFile, pkgerrors.Wrap(err, "Metadata YAML file read error")
-			}
-
-			err = yaml.Unmarshal(rawBytes, &seqFile)
-			if err != nil {
-				return seqFile, pkgerrors.Wrap(err, "Metadata YAML file unmarshall error")
-			}
-		}
-
-		return seqFile, nil
-	}
-
-	kubeclient := kubernetes.Clientset{}
-
-	t.Run("Successfully create VNF", func(t *testing.T) {
+	t.Run("Successfully create Instance", func(t *testing.T) {
 		db.DBconn = &db.MockDB{
 			Items: map[string]map[string][]byte{
 				rb.ProfileKey{RBName: "test-rbdef", RBVersion: "v1",
@@ -190,60 +144,180 @@ func TestCreateVNF(t *testing.T) {
 				},
 			},
 		}
-		externaluuid, data, err := CreateVNF("uuid", "cloudregion1",
-			rb.Profile{
-				RBName:            "test-rbdef",
-				RBVersion:         "v1",
-				ProfileName:       "profile1",
-				ReleaseName:       "testprofilereleasename",
-				Namespace:         "testnamespace",
-				KubernetesVersion: "1.12.3",
-			}, &kubeclient)
-		if err != nil {
-			t.Fatalf("TestCreateVNF returned an error (%s)", err)
+
+		ic := NewInstanceClient()
+		input := InstanceRequest{
+			RBName:      "test-rbdef",
+			RBVersion:   "v1",
+			ProfileName: "profile1",
+			CloudRegion: "mock_config",
 		}
 
-		log.Println(externaluuid)
+		err := os.Setenv("KUBE_CONFIG_DIR", "../../mock_files/mock_configs")
+		if err != nil {
+			t.Fatalf("TestInstanceCreate returned an error (%s)", err)
+		}
 
-		if data == nil {
-			t.Fatalf("TestCreateVNF returned empty data (%s)", data)
+		ir, err := ic.Create(input)
+		if err != nil {
+			t.Fatalf("TestInstanceCreate returned an error (%s)", err)
+		}
+
+		log.Println(ir)
+
+		if len(ir.Resources) == 0 {
+			t.Fatalf("TestInstanceCreate returned empty data (%s)", ir)
 		}
 	})
 
 }
 
-func TestDeleteVNF(t *testing.T) {
+func TestInstanceGet(t *testing.T) {
 	oldkrdPluginData := utils.LoadedPlugins
 
 	defer func() {
 		utils.LoadedPlugins = oldkrdPluginData
 	}()
 
-	err := LoadMockPlugins(&utils.LoadedPlugins)
+	err := LoadMockPlugins(utils.LoadedPlugins)
 	if err != nil {
-		t.Fatalf("TestCreateVNF returned an error (%s)", err)
+		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
 	}
 
-	kubeclient := kubernetes.Clientset{}
-
-	t.Run("Successfully delete VNF", func(t *testing.T) {
-		data := map[string][]string{
-			"deployment": []string{"cloud1-default-uuid-sisedeploy"},
-			"service":    []string{"cloud1-default-uuid-sisesvc"},
+	t.Run("Successfully Get Instance", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: map[string]map[string][]byte{
+				InstanceKey{ID: "HaKpys8e"}.String(): {
+					"instance": []byte(
+						"{\"profile-name\":\"profile1\"," +
+							"\"id\":\"HaKpys8e\"," +
+							"\"namespace\":\"testnamespace\"," +
+							"\"rb-name\":\"test-rbdef\"," +
+							"\"rb-version\":\"v1\"," +
+							"\"cloud-region\":\"region1\"," +
+							"\"resources\": {" +
+							"\"deployment\": [\"test-deployment\"]," +
+							"\"service\": [\"test-service\"]" +
+							"}}"),
+				},
+			},
 		}
 
-		err := DestroyVNF(data, "test", &kubeclient)
+		expected := InstanceResponse{
+			ID:          "HaKpys8e",
+			RBName:      "test-rbdef",
+			RBVersion:   "v1",
+			ProfileName: "profile1",
+			CloudRegion: "region1",
+			Namespace:   "testnamespace",
+			Resources: map[string][]string{
+				"deployment": []string{"test-deployment"},
+				"service":    []string{"test-service"},
+			},
+		}
+		ic := NewInstanceClient()
+		id := "HaKpys8e"
+		data, err := ic.Get(id)
 		if err != nil {
-			t.Fatalf("TestCreateVNF returned an error (%s)", err)
+			t.Fatalf("TestInstanceDelete returned an error (%s)", err)
+		}
+		if !reflect.DeepEqual(expected, data) {
+			t.Fatalf("TestInstanceGet returned:\n result=%v\n expected=%v",
+				data, expected)
+		}
+	})
+
+	t.Run("Get non-existing Instance", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: map[string]map[string][]byte{
+				InstanceKey{ID: "HaKpys8e"}.String(): {
+					"instance": []byte(
+						"{\"profile-name\":\"profile1\"," +
+							"\"id\":\"HaKpys8e\"," +
+							"\"namespace\":\"testnamespace\"," +
+							"\"rb-name\":\"test-rbdef\"," +
+							"\"rb-version\":\"v1\"," +
+							"\"cloud-region\":\"mock_config\"," +
+							"\"resources\": {" +
+							"\"deployment\": [\"deployment-1\",\"deployment-2\"]," +
+							"\"service\": [\"service-1\",\"service-2\"]" +
+							"}}"),
+				},
+			},
+		}
+
+		ic := NewInstanceClient()
+		id := "non-existing"
+		_, err := ic.Get(id)
+		if err == nil {
+			t.Fatal("Expected error, got pass", err)
 		}
 	})
 }
 
-func TestReadMetadataFile(t *testing.T) {
-	t.Run("Successfully read Metadata YAML file", func(t *testing.T) {
-		_, err := ReadMetadataFile("../../mock_files//mock_yamls/metadata.yaml")
+func TestInstanceDelete(t *testing.T) {
+	oldkrdPluginData := utils.LoadedPlugins
+
+	defer func() {
+		utils.LoadedPlugins = oldkrdPluginData
+	}()
+
+	err := LoadMockPlugins(utils.LoadedPlugins)
+	if err != nil {
+		t.Fatalf("TestInstanceDelete returned an error (%s)", err)
+	}
+
+	t.Run("Successfully delete Instance", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: map[string]map[string][]byte{
+				InstanceKey{ID: "HaKpys8e"}.String(): {
+					"instance": []byte(
+						"{\"profile-name\":\"profile1\"," +
+							"\"id\":\"HaKpys8e\"," +
+							"\"namespace\":\"testnamespace\"," +
+							"\"rb-name\":\"test-rbdef\"," +
+							"\"rb-version\":\"v1\"," +
+							"\"cloud-region\":\"mock_config\"," +
+							"\"resources\": {" +
+							"\"deployment\": [\"deployment-1\",\"deployment-2\"]," +
+							"\"service\": [\"service-1\",\"service-2\"]" +
+							"}}"),
+				},
+			},
+		}
+
+		ic := NewInstanceClient()
+		id := "HaKpys8e"
+		err := ic.Delete(id)
 		if err != nil {
-			t.Fatalf("TestReadMetadataFile returned an error (%s)", err)
+			t.Fatalf("TestInstanceDelete returned an error (%s)", err)
+		}
+	})
+
+	t.Run("Delete non-existing Instance", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: map[string]map[string][]byte{
+				InstanceKey{ID: "HaKpys8e"}.String(): {
+					"instance": []byte(
+						"{\"profile-name\":\"profile1\"," +
+							"\"id\":\"HaKpys8e\"," +
+							"\"namespace\":\"testnamespace\"," +
+							"\"rb-name\":\"test-rbdef\"," +
+							"\"rb-version\":\"v1\"," +
+							"\"cloud-region\":\"mock_config\"," +
+							"\"resources\": {" +
+							"\"deployment\": [\"deployment-1\",\"deployment-2\"]," +
+							"\"service\": [\"service-1\",\"service-2\"]" +
+							"}}"),
+				},
+			},
+		}
+
+		ic := NewInstanceClient()
+		id := "non-existing"
+		err := ic.Delete(id)
+		if err == nil {
+			t.Fatal("Expected error, got pass", err)
 		}
 	})
 }

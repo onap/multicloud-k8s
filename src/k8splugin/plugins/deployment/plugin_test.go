@@ -28,7 +28,6 @@ import (
 func TestCreateDeployment(t *testing.T) {
 	namespace := "test1"
 	name := "mock-deployment"
-	internalVNFID := "1"
 	testCases := []struct {
 		label          string
 		input          *utils.ResourceData
@@ -47,7 +46,6 @@ func TestCreateDeployment(t *testing.T) {
 		{
 			label: "Successfully create a deployment",
 			input: &utils.ResourceData{
-				VnfId:        internalVNFID,
 				YamlFilePath: "../../mock_files/mock_yamls/deployment.yaml",
 			},
 			clientOutput: &appsV1.Deployment{
@@ -56,7 +54,7 @@ func TestCreateDeployment(t *testing.T) {
 					Namespace: namespace,
 				},
 			},
-			expectedResult: internalVNFID + "-" + name,
+			expectedResult: name,
 		},
 	}
 

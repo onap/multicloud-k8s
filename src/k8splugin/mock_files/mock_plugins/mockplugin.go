@@ -23,12 +23,12 @@ func main() {}
 
 // Create object in a specific Kubernetes resource
 func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
-	return "externalUUID", nil
+	return "resource-name", nil
 }
 
 // List of existing resources
 func List(namespace string, client kubernetes.Interface) ([]string, error) {
-	returnVal := []string{"cloud1-default-uuid1", "cloud1-default-uuid2"}
+	returnVal := []string{"resource-name-1", "resource-name-2"}
 	return returnVal, nil
 }
 

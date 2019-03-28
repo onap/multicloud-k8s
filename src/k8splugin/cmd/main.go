@@ -15,35 +15,29 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
-
-	"github.com/gorilla/handlers"
-	"k8s.io/client-go/util/homedir"
+	"time"
 
 	"k8splugin/api"
 	utils "k8splugin/internal"
+
+	"github.com/gorilla/handlers"
 )
 
 func main() {
-	var kubeconfig string
-
-	home := homedir.HomeDir()
-	if home != "" {
-		kubeconfig = *flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	}
-	flag.Parse()
 
 	err := utils.CheckInitialSettings()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	httpRouter := api.NewRouter(kubeconfig, nil, nil)
+	rand.Seed(time.Now().UnixNano())
+
+	httpRouter := api.NewRouter(nil, nil, nil)
 	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
 	log.Println("Starting Kubernetes Multicloud API")
 

@@ -41,8 +41,6 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 		return "", pkgerrors.New("Decoded object contains another resource different than Deployment")
 	}
 	deployment.Namespace = namespace
-	deployment.Name = data.VnfId + "-" + deployment.Name
-
 	result, err := client.AppsV1().Deployments(namespace).Create(deployment)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Deployment error")

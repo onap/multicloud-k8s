@@ -42,7 +42,6 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 		return "", pkgerrors.New("Decoded object contains another resource different than Service")
 	}
 	service.Namespace = namespace
-	service.Name = data.VnfId + "-" + service.Name
 
 	result, err := client.CoreV1().Services(namespace).Create(service)
 	if err != nil {

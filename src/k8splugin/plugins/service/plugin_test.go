@@ -28,7 +28,6 @@ import (
 func TestCreateService(t *testing.T) {
 	namespace := "test1"
 	name := "mock-service"
-	internalVNFID := "1"
 	testCases := []struct {
 		label          string
 		input          *utils.ResourceData
@@ -47,7 +46,6 @@ func TestCreateService(t *testing.T) {
 		{
 			label: "Successfully create a service",
 			input: &utils.ResourceData{
-				VnfId:        internalVNFID,
 				YamlFilePath: "../../mock_files/mock_yamls/service.yaml",
 			},
 			clientOutput: &coreV1.Service{
@@ -56,7 +54,7 @@ func TestCreateService(t *testing.T) {
 					Namespace: namespace,
 				},
 			},
-			expectedResult: internalVNFID + "-" + name,
+			expectedResult: name,
 		},
 	}
 

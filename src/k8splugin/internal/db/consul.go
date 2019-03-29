@@ -88,6 +88,11 @@ func (c *ConsulStore) Create(root string, key Key, tag string, data interface{})
 	return err
 }
 
+// Update is used to update a DB entry
+func (c *ConsulStore) Update(root string, key Key, tag string, data interface{}) error {
+	return c.Create(root, key, tag, data)
+}
+
 // Read method returns the internalID for a particular externalID
 func (c *ConsulStore) Read(root string, key Key, tag string) ([]byte, error) {
 

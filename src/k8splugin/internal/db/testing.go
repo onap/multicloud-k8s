@@ -41,6 +41,10 @@ func (m *MockDB) Create(table string, key Key, tag string, data interface{}) err
 	return m.Err
 }
 
+func (m *MockDB) Update(table string, key Key, tag string, data interface{}) error {
+	return m.Err
+}
+
 // MockDB uses simple JSON and not BSON
 func (m *MockDB) Unmarshal(inp []byte, out interface{}) error {
 	err := json.Unmarshal(inp, out)

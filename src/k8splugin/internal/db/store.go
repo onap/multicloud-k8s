@@ -45,7 +45,8 @@ type Store interface {
 	// Reads data for a particular key with specific tag.
 	Read(table string, key Key, tag string) ([]byte, error)
 
-	//TODO: Update(context.Context, string, interface{}) error
+	// Update data for particular key with specific tag
+	Update(table string, key Key, tag string, data interface{}) error
 
 	// Deletes a specific tag data for key.
 	// TODO: If tag is empty, it will delete all tags under key.

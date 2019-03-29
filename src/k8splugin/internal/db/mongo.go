@@ -164,6 +164,49 @@ func (m *MongoStore) Create(coll string, key Key, tag string, data interface{}) 
 	return nil
 }
 
+// Update is used to update a DB entry
+func (m *MongoStore) Update(coll string, key Key, tag string, data interface{}) error {
+	if data == nil || !m.validateParams(coll, key, tag) {
+		return pkgerrors.New("No Data to update")
+	}
+
+	c := getCollection(coll, m)
+	ctx := context.Background()
+
+	//Get the masterkey document based on given key
+	filter := bson.D{{"key", key}}
+	keydata, err := decodeBytes(c.FindOne(context.Background(), filter))
+	if err != nil {
+		return pkgerrors.Errorf("Error finding master table: %s", err.Error())
+	}
+
+	//Read the tag objectID from document
+	tagoid, ok := keydata.Lookup(tag).ObjectIDOK()
+	if !ok {
+		return pkgerrors.Errorf("Error finding objectID for tag %s", tag)
+	}
+
+	//Update the document with new data
+	filter = bson.D{{"_id", tagoid}}
+
+	_, err = decodeBytes(
+		c.FindOneAndUpdate(
+			ctx,
+			filter,
+			bson.D{
+				{"$set", bson.D{
+					{tag, data},
+				}},
+			},
+			options.FindOneAndUpdate().SetReturnDocument(options.After)))
+
+	if err != nil {
+		return pkgerrors.Errorf("Error updating record: %s", err.Error())
+	}
+
+	return nil
+}
+
 // Unmarshal implements an unmarshaler for bson data that
 // is produced from the mongo database
 func (m *MongoStore) Unmarshal(inp []byte, out interface{}) error {

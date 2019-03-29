@@ -155,7 +155,7 @@ func TestUpdate(t *testing.T) {
 			label: "Successfull update of entry",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "metadata",
 				"data": "Data In String Format",
 			},
@@ -184,7 +184,7 @@ func TestUpdate(t *testing.T) {
 			label: "Entry does not exist",
 			input: map[string]interface{}{
 				"coll": "collname",
-				"key":  mockKey{Key: "keyvalue"},
+				"key":  MockKey{Key: "keyvalue"},
 				"tag":  "tagName",
 				"data": "Data In String Format",
 			},

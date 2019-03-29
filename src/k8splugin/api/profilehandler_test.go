@@ -92,7 +92,7 @@ func TestRBProfileCreateHandler(t *testing.T) {
 			expected: rb.Profile{
 				RBName:            "testresource_bundle_definition",
 				RBVersion:         "v1",
-				Name:              "profile1",
+				ProfileName:       "profile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "default",
 				KubernetesVersion: "1.12.3",
@@ -103,7 +103,7 @@ func TestRBProfileCreateHandler(t *testing.T) {
 					{
 						RBName:            "testresource_bundle_definition",
 						RBVersion:         "v1",
-						Name:              "profile1",
+						ProfileName:       "profile1",
 						ReleaseName:       "testprofilereleasename",
 						Namespace:         "default",
 						KubernetesVersion: "1.12.3",
@@ -156,7 +156,7 @@ func TestRBProfileGetHandler(t *testing.T) {
 			expected: rb.Profile{
 				RBName:            "testresource_bundle_definition",
 				RBVersion:         "v1",
-				Name:              "profile1",
+				ProfileName:       "profile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "default",
 				KubernetesVersion: "1.12.3",
@@ -168,7 +168,7 @@ func TestRBProfileGetHandler(t *testing.T) {
 					{
 						RBName:            "testresource_bundle_definition",
 						RBVersion:         "v1",
-						Name:              "profile1",
+						ProfileName:       "profile1",
 						ReleaseName:       "testprofilereleasename",
 						Namespace:         "default",
 						KubernetesVersion: "1.12.3",

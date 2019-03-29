@@ -33,7 +33,7 @@ import (
 type Profile struct {
 	RBName            string            `json:"rb-name"`
 	RBVersion         string            `json:"rb-version"`
-	Name              string            `json:"profile-name"`
+	ProfileName       string            `json:"profile-name"`
 	ReleaseName       string            `json:"release-name"`
 	Namespace         string            `json:"namespace"`
 	KubernetesVersion string            `json:"kubernetes-version"`
@@ -49,9 +49,9 @@ type ProfileManager interface {
 }
 
 type ProfileKey struct {
-	RBName    string `json:"rb-name"`
-	RBVersion string `json:"rb-version"`
-	Name      string `json:"profile-name"`
+	RBName      string `json:"rb-name"`
+	RBVersion   string `json:"rb-version"`
+	ProfileName string `json:"profile-name"`
 }
 
 // We will use json marshalling to convert to string to
@@ -88,12 +88,12 @@ func NewProfileClient() *ProfileClient {
 func (v *ProfileClient) Create(p Profile) (Profile, error) {
 
 	// Name is required
-	if p.Name == "" {
+	if p.ProfileName == "" {
 		return Profile{}, pkgerrors.New("Name is required for Resource Bundle Profile")
 	}
 
 	//Check if profile already exists
-	_, err := v.Get(p.RBName, p.RBVersion, p.Name)
+	_, err := v.Get(p.RBName, p.RBVersion, p.ProfileName)
 	if err == nil {
 		return Profile{}, pkgerrors.New("Profile already exists for this Definition")
 	}
@@ -106,13 +106,13 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 
 	//If release-name is not provided, we store name instead
 	if p.ReleaseName == "" {
-		p.ReleaseName = p.Name
+		p.ReleaseName = p.ProfileName
 	}
 
 	key := ProfileKey{
-		RBName:    p.RBName,
-		RBVersion: p.RBVersion,
-		Name:      p.Name,
+		RBName:      p.RBName,
+		RBVersion:   p.RBVersion,
+		ProfileName: p.ProfileName,
 	}
 
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
@@ -126,9 +126,9 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 // Get returns the Resource Bundle Profile for corresponding ID
 func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
 	key := ProfileKey{
-		RBName:    rbName,
-		RBVersion: rbVersion,
-		Name:      prName,
+		RBName:      rbName,
+		RBVersion:   rbVersion,
+		ProfileName: prName,
 	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
@@ -151,9 +151,9 @@ func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
 // Delete the Resource Bundle Profile from database
 func (v *ProfileClient) Delete(rbName, rbVersion, prName string) error {
 	key := ProfileKey{
-		RBName:    rbName,
-		RBVersion: rbVersion,
-		Name:      prName,
+		RBName:      rbName,
+		RBVersion:   rbVersion,
+		ProfileName: prName,
 	}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
@@ -183,9 +183,9 @@ func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) err
 	}
 
 	key := ProfileKey{
-		RBName:    rbName,
-		RBVersion: rbVersion,
-		Name:      prName,
+		RBName:      rbName,
+		RBVersion:   rbVersion,
+		ProfileName: prName,
 	}
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
@@ -210,9 +210,9 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 	}
 
 	key := ProfileKey{
-		RBName:    rbName,
-		RBVersion: rbVersion,
-		Name:      prName,
+		RBName:      rbName,
+		RBVersion:   rbVersion,
+		ProfileName: prName,
 	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {

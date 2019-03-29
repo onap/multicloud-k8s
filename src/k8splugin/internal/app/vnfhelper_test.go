@@ -86,7 +86,7 @@ func TestCreateVNF(t *testing.T) {
 		db.DBconn = &db.MockDB{
 			Items: map[string]map[string][]byte{
 				rb.ProfileKey{RBName: "test-rbdef", RBVersion: "v1",
-					Name: "profile1"}.String(): {
+					ProfileName: "profile1"}.String(): {
 					"metadata": []byte(
 						"{\"profile-name\":\"profile1\"," +
 							"\"release-name\":\"testprofilereleasename\"," +
@@ -196,7 +196,7 @@ func TestCreateVNF(t *testing.T) {
 			rb.Profile{
 				RBName:            "test-rbdef",
 				RBVersion:         "v1",
-				Name:              "profile1",
+				ProfileName:       "profile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "testnamespace",
 				KubernetesVersion: "1.12.3",

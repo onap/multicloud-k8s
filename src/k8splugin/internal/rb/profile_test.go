@@ -39,7 +39,7 @@ func TestCreateProfile(t *testing.T) {
 		{
 			label: "Create Resource Bundle Profile",
 			inp: Profile{
-				Name:              "testprofile1",
+				ProfileName:       "testprofile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "testnamespace",
 				KubernetesVersion: "1.12.3",
@@ -47,7 +47,7 @@ func TestCreateProfile(t *testing.T) {
 				RBVersion:         "v1",
 			},
 			expected: Profile{
-				Name:              "testprofile1",
+				ProfileName:       "testprofile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "testnamespace",
 				KubernetesVersion: "1.12.3",
@@ -70,7 +70,7 @@ func TestCreateProfile(t *testing.T) {
 		{
 			label: "Create Resource Bundle Profile With Non-Existing Definition",
 			inp: Profile{
-				Name:              "testprofile1",
+				ProfileName:       "testprofile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "testnamespace",
 				KubernetesVersion: "1.12.3",
@@ -136,7 +136,7 @@ func TestGetProfile(t *testing.T) {
 			rbversion: "v1",
 			prname:    "testprofile1",
 			expected: Profile{
-				Name:              "testprofile1",
+				ProfileName:       "testprofile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "testnamespace",
 				KubernetesVersion: "1.12.3",
@@ -146,7 +146,7 @@ func TestGetProfile(t *testing.T) {
 			expectedError: "",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", Name: "testprofile1"}.String(): {
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
@@ -266,7 +266,7 @@ func TestUploadProfile(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", Name: "testprofile1"}.String(): {
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
@@ -307,7 +307,7 @@ func TestUploadProfile(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", Name: "testprofile2"}.String(): {
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile2"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
@@ -331,7 +331,7 @@ func TestUploadProfile(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", Name: "testprofile1"}.String(): {
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
@@ -426,7 +426,7 @@ func TestDownloadProfile(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", Name: "testprofile1"}.String(): {
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
@@ -450,7 +450,7 @@ func TestDownloadProfile(t *testing.T) {
 			expectedError: "Invalid Profile Name provided",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", Name: "testprofile2"}.String(): {
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile2"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
@@ -513,7 +513,7 @@ func TestResolveProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1",
-						Name: "profile1"}.String(): {
+						ProfileName: "profile1"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"profile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +

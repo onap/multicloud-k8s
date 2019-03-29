@@ -9,15 +9,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. -->
 
-# MultiCloud-k8-plugin
+# MultiCloud-k8s-plugin
 
 MultiCloud Kubernetes plugin for ONAP multicloud.
 
 # Installation
 
 Requirements:
-* Go 1.10
-* Dep
+* Go 1.11
 
 Steps:
 
@@ -30,7 +29,7 @@ Steps:
 * Compile to build Binary:
     * `make deploy`
 
-# Archietecture
+# Architecture
 
 Create Virtual Network Function
 

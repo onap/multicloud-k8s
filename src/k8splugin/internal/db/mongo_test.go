@@ -1,5 +1,3 @@
-// +build unit
-
 /*
  * Copyright 2018 Intel Corporation, Inc
  *

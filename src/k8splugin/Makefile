@@ -27,17 +27,10 @@ build: clean plugins test cover
 deploy: build
 
 .PHONY: test
-test: unit integration
-
-.PHONY: unit
-unit:
-	@go test -v -tags 'unit' ./...
-
-.PHONY: integration
-integration: clean
-	@go build -tags 'integration' -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
-	@go build -tags 'integration' -buildmode=plugin -o ./mock_files/mock_plugins/mocknetworkplugin.so ./mock_files/mock_plugins/mocknetworkplugin.go
-	@go test -v -tags 'integration' ./...
+test: clean
+	@go build -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
+	@go build -buildmode=plugin -o ./mock_files/mock_plugins/mocknetworkplugin.so ./mock_files/mock_plugins/mocknetworkplugin.go
+	@go test -v ./...
 
 format:
 	@go fmt ./...
@@ -51,5 +44,5 @@ clean:
 
 .PHONY: cover
 cover:
-	@go test -tags 'unit' ./... -coverprofile=coverage.out
+	@go test ./... -coverprofile=coverage.out
 	@go tool cover -html=coverage.out -o coverage.html

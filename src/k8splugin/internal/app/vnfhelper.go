@@ -47,7 +47,7 @@ func ensuresNamespace(namespace string, kubeclient kubernetes.Interface) error {
 		return pkgerrors.Wrap(err, "Error fetching get namespace function")
 	}
 
-	ns, _  := symGetNamespaceFunc.(func(string, string, kubernetes.Interface) (string, error))(
+	ns, _ := symGetNamespaceFunc.(func(string, string, kubernetes.Interface) (string, error))(
 		namespace, namespace, kubeclient)
 
 	if ns == "" {
@@ -80,7 +80,7 @@ var CreateVNF = func(csarID string, cloudRegionID string, profile rb.Profile, ku
 	externalVNFID := generateExternalVNFID()
 	internalVNFID := cloudRegionID + "-" + profile.Namespace + "-" + externalVNFID
 
-	metaMap, err := rb.NewProfileClient().Resolve(profile.RBName, profile.RBVersion, profile.Name, overrideValues)
+	metaMap, err := rb.NewProfileClient().Resolve(profile.RBName, profile.RBVersion, profile.ProfileName, overrideValues)
 	if err != nil {
 		return "", nil, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}

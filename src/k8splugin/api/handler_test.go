@@ -125,7 +125,7 @@ func TestCreateHandler(t *testing.T) {
 			mockStore: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					rb.ProfileKey{RBName: "testresourcebundle", RBVersion: "v1",
-						Name: "profile1"}.String(): {
+						ProfileName: "profile1"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"profile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
@@ -270,7 +270,7 @@ func TestCreateHandler(t *testing.T) {
 			mockStore: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					rb.ProfileKey{RBName: "test-rbdef", RBVersion: "v1",
-						Name: "profile1"}.String(): {
+						ProfileName: "profile1"}.String(): {
 						"metadata": []byte(
 							"{\"profile-name\":\"profile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +

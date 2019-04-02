@@ -49,7 +49,7 @@ func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Name is required.
-	if p.Name == "" {
+	if p.ProfileName == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}

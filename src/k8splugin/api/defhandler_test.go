@@ -137,11 +137,10 @@ func TestRBDefCreateHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("POST", "/v1/rb/definition", testCase.reader)
-			rr := httptest.NewRecorder()
-			vh.createHandler(rr, req)
-			resp := rr.Result()
+			request := httptest.NewRequest("POST", "/v1/rb/definition", testCase.reader)
+			recorder := httptest.NewRecorder()
+			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
+			resp := recorder.Result()
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -209,11 +208,10 @@ func TestRBDefListVersionsHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("GET", "/v1/rb/definition/testresourcebundle", nil)
-			rr := httptest.NewRecorder()
-			vh.listVersionsHandler(rr, req)
-			resp := rr.Result()
+			request := httptest.NewRequest("GET", "/v1/rb/definition/testresourcebundle", nil)
+			recorder := httptest.NewRecorder()
+			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
+			resp := recorder.Result()
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -292,11 +290,11 @@ func TestRBDefGetHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.name+"/"+testCase.version, nil)
-			rr := httptest.NewRecorder()
-			vh.getHandler(rr, req)
-			resp := rr.Result()
+			request := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.name+"/"+testCase.version, nil)
+			recorder := httptest.NewRecorder()
+			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
+			resp := recorder.Result()
+
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
 				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
@@ -320,20 +318,23 @@ func TestRBDefDeleteHandler(t *testing.T) {
 
 	testCases := []struct {
 		label        string
-		inpUUID      string
+		name         string
+		version      string
 		expectedCode int
 		rbDefClient  *mockRBDefinition
 	}{
 		{
 			label:        "Delete Bundle Definition",
 			expectedCode: http.StatusNoContent,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655441111",
+			name:         "test-rbdef",
+			version:      "v1",
 			rbDefClient:  &mockRBDefinition{},
 		},
 		{
 			label:        "Delete Non-Exiting Bundle Definition",
 			expectedCode: http.StatusInternalServerError,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
+			name:         "test-rbdef",
+			version:      "v2",
 			rbDefClient: &mockRBDefinition{
 				Err: pkgerrors.New("Internal Error"),
 			},
@@ -342,11 +343,11 @@ func TestRBDefDeleteHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.inpUUID, nil)
-			rr := httptest.NewRecorder()
-			vh.deleteHandler(rr, req)
-			resp := rr.Result()
+			request := httptest.NewRequest("DELETE", "/v1/rb/definition/"+testCase.name+"/"+testCase.version, nil)
+			recorder := httptest.NewRecorder()
+			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
+			resp := recorder.Result()
+
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
 				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
@@ -359,7 +360,8 @@ func TestRBDefUploadHandler(t *testing.T) {
 
 	testCases := []struct {
 		label        string
-		inpUUID      string
+		name         string
+		version      string
 		body         io.Reader
 		expectedCode int
 		rbDefClient  *mockRBDefinition
@@ -367,7 +369,8 @@ func TestRBDefUploadHandler(t *testing.T) {
 		{
 			label:        "Upload Bundle Definition Content",
 			expectedCode: http.StatusOK,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655441111",
+			name:         "test-rbdef",
+			version:      "v2",
 			body: bytes.NewBuffer([]byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
@@ -377,7 +380,8 @@ func TestRBDefUploadHandler(t *testing.T) {
 		{
 			label:        "Upload Invalid Bundle Definition Content",
 			expectedCode: http.StatusInternalServerError,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
+			name:         "test-rbdef",
+			version:      "v2",
 			body: bytes.NewBuffer([]byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
@@ -389,19 +393,20 @@ func TestRBDefUploadHandler(t *testing.T) {
 		{
 			label:        "Upload Empty Body Content",
 			expectedCode: http.StatusBadRequest,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
+			name:         "test-rbdef",
+			version:      "v2",
 			rbDefClient:  &mockRBDefinition{},
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbDefinitionHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("POST",
-				"/v1/rb/definition/"+testCase.inpUUID+"/content", testCase.body)
-			rr := httptest.NewRecorder()
-			vh.uploadHandler(rr, req)
-			resp := rr.Result()
+			request := httptest.NewRequest("POST",
+				"/v1/rb/definition/"+testCase.name+"/"+testCase.version+"/content", testCase.body)
+			recorder := httptest.NewRecorder()
+			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
+			resp := recorder.Result()
+
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
 				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)

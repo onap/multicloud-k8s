@@ -17,12 +17,14 @@ source _common.sh
 source _functions.sh
 
 base_url="http://localhost:8081"
+#Will resolve to file $KUBE_CONFIG_DIR/kud
 cloud_region_id="kud"
 namespace="testns"
 csar_id="94e414f6-9ca4-11e8-bb6a-52540067263b"
 rb_name="test-rbdef"
 rb_version="v1"
 profile_name="profile1"
+release_name="testrelease"
 vnf_customization_uuid="ebe353d2-30b7-11e9-9515-525400277b3d"
 
 # _build_generic_sim() - Creates a generic simulator image in case that doesn't exist
@@ -95,7 +97,7 @@ payload_raw="
     \"profile-name\": \"${profile_name}\",
     \"rb-name\": \"${rb_name}\",
     \"rb-version\": \"${rb_version}\",
-    \"release-name\": \"testrelease\",
+    \"release-name\": \"${release_name}\",
     \"namespace\": \"$namespace\",
     \"kubernetesversion\": \"$kubeversion\",
     \"labels\": {
@@ -120,31 +122,22 @@ fi
 print_msg "Instantiate Profile"
 payload_raw="
 {
-    \"cloud_region_id\": \"$cloud_region_id\",
+    \"cloud-region\": \"$cloud_region_id\",
     \"rb-name\":\"$rb_name\",
     \"rb-version\":\"$rb_version\",
-    \"profile-name\":\"$profile_name\",
-    \"csar_id\": \"$csar_id\"
+    \"profile-name\":\"$profile_name\"
 }
 "
 payload=$(echo $payload_raw | tr '\n' ' ')
-vnf_id=$(curl -s -d "$payload" "${base_url}/v1/vnf_instances/" | jq -r '.vnf_id')
+inst_id=$(curl -s -d "$payload" "${base_url}/v1/instance" | jq -r '.id')
 
 print_msg "Validating Kubernetes"
-kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-testrelease-vault-consul-dev
-kubectl get --no-headers=true --namespace=${namespace} service ${cloud_region_id}-${namespace}-${vnf_id}-override-vault-consul
-echo "VNF Instance created succesfully with id: $vnf_id"
+kubectl get --no-headers=true --namespace=${namespace} deployment ${release_name}-vault-consul-dev
+kubectl get --no-headers=true --namespace=${namespace} service override-vault-consul
+echo "VNF Instance created succesfully with id: $inst_id"
 
-print_msg "Listing VNF Instances"
-vnf_id_list=$(curl -s -X GET "${base_url}/v1/vnf_instances/${cloud_region_id}/${namespace}" | jq -r '.vnf_id_list')
-if [[ "$vnf_id_list" != *"${vnf_id}"* ]]; then
-    echo $vnf_id_list
-    echo "VNF Instance not stored"
-    exit 1
-fi
-
-print_msg "Getting $vnf_id VNF Instance information"
-vnf_details=$(curl -s -X GET "${base_url}/v1/vnf_instances/${cloud_region_id}/${namespace}/${vnf_id}")
+print_msg "Getting $inst_id VNF Instance information"
+vnf_details=$(curl -s -X GET "${base_url}/v1/instance/${inst_id}")
 if [[ -z "$vnf_details" ]]; then
     echo "Cannot retrieved VNF Instance details"
     exit 1
@@ -159,9 +152,17 @@ if [[ 500 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/v1/rb/d
     exit 1
 fi
 
-print_msg "Deleting $vnf_id VNF Instance"
-curl -X DELETE "${base_url}/v1/vnf_instances/${cloud_region_id}/${namespace}/${vnf_id}"
-if [[ 404 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}${cloud_region_id}/${namespace}/${vnf_id}") ]]; then
+print_msg "Deleting $profile_name Resource Bundle Profile"
+curl -X DELETE "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile/$profile_name"
+if [[ 500 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile/$profile_name") ]]; then
+    echo "Resource Bundle Profile not deleted"
+# TODO: Change the HTTP code for 404 when the resource is not found in the API
+    exit 1
+fi
+
+print_msg "Deleting $inst_id VNF Instance"
+curl -X DELETE "${base_url}/v1/instance/${inst_id}"
+if [[ 404 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/${inst_id}") ]]; then
     echo "VNF Instance not deleted"
     exit 1
 fi

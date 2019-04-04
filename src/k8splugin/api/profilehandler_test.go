@@ -70,19 +70,19 @@ func TestRBProfileCreateHandler(t *testing.T) {
 		reader       io.Reader
 		expected     rb.Profile
 		expectedCode int
-		rbDefClient  *mockRBProfile
+		rbProClient  *mockRBProfile
 	}{
 		{
 			label:        "Missing Body Failure",
 			expectedCode: http.StatusBadRequest,
-			rbDefClient:  &mockRBProfile{},
+			rbProClient:  &mockRBProfile{},
 			reader:       nil,
 		},
 		{
 			label:        "Create New Profile for Definition",
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
-				"rb-name":"testresource_bundle_definition",
+				"rb-name":"test-rbdef",
 				"rb-version":"v1",
 				"profile-name":"profile1",
 				"release-name":"testprofilereleasename",
@@ -90,18 +90,18 @@ func TestRBProfileCreateHandler(t *testing.T) {
 				"kubernetes-version":"1.12.3"
 				}`)),
 			expected: rb.Profile{
-				RBName:            "testresource_bundle_definition",
+				RBName:            "test-rbdef",
 				RBVersion:         "v1",
 				ProfileName:       "profile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "default",
 				KubernetesVersion: "1.12.3",
 			},
-			rbDefClient: &mockRBProfile{
+			rbProClient: &mockRBProfile{
 				//Items that will be returned by the mocked Client
 				Items: []rb.Profile{
 					{
-						RBName:            "testresource_bundle_definition",
+						RBName:            "test-rbdef",
 						RBVersion:         "v1",
 						ProfileName:       "profile1",
 						ReleaseName:       "testprofilereleasename",
@@ -115,12 +115,11 @@ func TestRBProfileCreateHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbProfileHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("POST", "/v1/rb/profile/testresource_bundle_definition/v1/profile",
+			request := httptest.NewRequest("POST", "/v1/rb/definition/test-rbdef/v1/profile",
 				testCase.reader)
-			rr := httptest.NewRecorder()
-			vh.createHandler(rr, req)
-			resp := rr.Result()
+			recorder := httptest.NewRecorder()
+			NewRouter("", nil, testCase.rbProClient).ServeHTTP(recorder, request)
+			resp := recorder.Result()
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -146,27 +145,27 @@ func TestRBProfileGetHandler(t *testing.T) {
 	testCases := []struct {
 		label        string
 		expected     rb.Profile
-		inpUUID      string
+		prname       string
 		expectedCode int
-		rbDefClient  *mockRBProfile
+		rbProClient  *mockRBProfile
 	}{
 		{
 			label:        "Get Bundle Profile",
 			expectedCode: http.StatusOK,
 			expected: rb.Profile{
-				RBName:            "testresource_bundle_definition",
+				RBName:            "test-rbdef",
 				RBVersion:         "v1",
 				ProfileName:       "profile1",
 				ReleaseName:       "testprofilereleasename",
 				Namespace:         "default",
 				KubernetesVersion: "1.12.3",
 			},
-			inpUUID: "123e4567-e89b-12d3-a456-426655441111",
-			rbDefClient: &mockRBProfile{
+			prname: "profile1",
+			rbProClient: &mockRBProfile{
 				// Profile that will be returned by the mockclient
 				Items: []rb.Profile{
 					{
-						RBName:            "testresource_bundle_definition",
+						RBName:            "test-rbdef",
 						RBVersion:         "v1",
 						ProfileName:       "profile1",
 						ReleaseName:       "testprofilereleasename",
@@ -179,8 +178,8 @@ func TestRBProfileGetHandler(t *testing.T) {
 		{
 			label:        "Get Non-Exiting Bundle Profile",
 			expectedCode: http.StatusInternalServerError,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
-			rbDefClient: &mockRBProfile{
+			prname:       "non-existing-profile",
+			rbProClient: &mockRBProfile{
 				// list of Profiles that will be returned by the mockclient
 				Items: []rb.Profile{},
 				Err:   pkgerrors.New("Internal Error"),
@@ -190,12 +189,11 @@ func TestRBProfileGetHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbProfileHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("GET", "/v1/rb/profile/"+testCase.inpUUID, nil)
-			rr := httptest.NewRecorder()
-			vh.getHandler(rr, req)
+			request := httptest.NewRequest("GET", "/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
+			recorder := httptest.NewRecorder()
+			NewRouter("", nil, testCase.rbProClient).ServeHTTP(recorder, request)
+			resp := recorder.Result()
 
-			resp := rr.Result()
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
 				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
@@ -219,21 +217,21 @@ func TestRBProfileDeleteHandler(t *testing.T) {
 
 	testCases := []struct {
 		label        string
-		inpUUID      string
+		prname       string
 		expectedCode int
-		rbDefClient  *mockRBProfile
+		rbProClient  *mockRBProfile
 	}{
 		{
 			label:        "Delete Bundle Profile",
 			expectedCode: http.StatusNoContent,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655441111",
-			rbDefClient:  &mockRBProfile{},
+			prname:       "profile1",
+			rbProClient:  &mockRBProfile{},
 		},
 		{
 			label:        "Delete Non-Exiting Bundle Profile",
 			expectedCode: http.StatusInternalServerError,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
-			rbDefClient: &mockRBProfile{
+			prname:       "non-existing",
+			rbProClient: &mockRBProfile{
 				Err: pkgerrors.New("Internal Error"),
 			},
 		},
@@ -241,12 +239,11 @@ func TestRBProfileDeleteHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbProfileHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("GET", "/v1/rb/profile/"+testCase.inpUUID, nil)
-			rr := httptest.NewRecorder()
-			vh.deleteHandler(rr, req)
+			request := httptest.NewRequest("DELETE", "/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
+			recorder := httptest.NewRecorder()
+			NewRouter("", nil, testCase.rbProClient).ServeHTTP(recorder, request)
+			resp := recorder.Result()
 
-			resp := rr.Result()
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
 				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
@@ -259,50 +256,49 @@ func TestRBProfileUploadHandler(t *testing.T) {
 
 	testCases := []struct {
 		label        string
-		inpUUID      string
+		prname       string
 		body         io.Reader
 		expectedCode int
-		rbDefClient  *mockRBProfile
+		rbProClient  *mockRBProfile
 	}{
 		{
 			label:        "Upload Bundle Profile Content",
 			expectedCode: http.StatusOK,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655441111",
+			prname:       "profile1",
 			body: bytes.NewBuffer([]byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
 			}),
-			rbDefClient: &mockRBProfile{},
+			rbProClient: &mockRBProfile{},
 		},
 		{
 			label:        "Upload Invalid Bundle Profile Content",
 			expectedCode: http.StatusInternalServerError,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
+			prname:       "profile1",
 			body: bytes.NewBuffer([]byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
 			}),
-			rbDefClient: &mockRBProfile{
+			rbProClient: &mockRBProfile{
 				Err: pkgerrors.New("Internal Error"),
 			},
 		},
 		{
 			label:        "Upload Empty Body Content",
 			expectedCode: http.StatusBadRequest,
-			inpUUID:      "123e4567-e89b-12d3-a456-426655440000",
-			rbDefClient:  &mockRBProfile{},
+			prname:       "profile1",
+			rbProClient:  &mockRBProfile{},
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			vh := rbProfileHandler{client: testCase.rbDefClient}
-			req := httptest.NewRequest("POST",
-				"/v1/rb/profile/"+testCase.inpUUID+"/content", testCase.body)
-			rr := httptest.NewRecorder()
-			vh.uploadHandler(rr, req)
+			request := httptest.NewRequest("POST",
+				"/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname+"/content", testCase.body)
+			recorder := httptest.NewRecorder()
+			NewRouter("", nil, testCase.rbProClient).ServeHTTP(recorder, request)
+			resp := recorder.Result()
 
-			resp := rr.Result()
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
 				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)

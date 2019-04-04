@@ -55,7 +55,7 @@ func TestCreateProfile(t *testing.T) {
 			expectedError: "",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -78,7 +78,7 @@ func TestCreateProfile(t *testing.T) {
 			expectedError: "Error getting Resource Bundle Definition",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v2"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v2"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -544,7 +544,7 @@ func TestResolveProfile(t *testing.T) {
 							"YkDi6mRXNk/V1pUxy0uYsI1S+meU+XsPo2kJLnMOKZGy4J6Xt3XgZuHTayEKv3XZLjy+" +
 							"yJ66WPQwcHBwcHBwcHBwcHBwcHBwcHhm8Q/mTHqWgAoAAA="),
 					},
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +

@@ -71,7 +71,7 @@ func TestInstanceCreate(t *testing.T) {
 						"YkDi6mRXNk/V1pUxy0uYsI1S+meU+XsPo2kJLnMOKZGy4J6Xt3XgZuHTayEKv3XZLjy+" +
 						"yJ66WPQwcHBwcHBwcHBwcHBwcHBwcHhm8Q/mTHqWgAoAAA="),
 				},
-				rb.DefinitionKey{Name: "test-rbdef", Version: "v1"}.String(): {
+				rb.DefinitionKey{RBName: "test-rbdef", RBVersion: "v1"}.String(): {
 					"metadata": []byte(
 						"{\"rb-name\":\"test-rbdef\"," +
 							"\"rb-version\":\"v1\"," +

@@ -96,8 +96,8 @@ func TestRBDefCreateHandler(t *testing.T) {
 				"description":"test description"
 				}`)),
 			expected: rb.Definition{
-				Name:        "testresourcebundle",
-				Version:     "v1",
+				RBName:      "testresourcebundle",
+				RBVersion:   "v1",
 				ChartName:   "testchart",
 				Description: "test description",
 			},
@@ -105,8 +105,8 @@ func TestRBDefCreateHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				Items: []rb.Definition{
 					{
-						Name:        "testresourcebundle",
-						Version:     "v1",
+						RBName:      "testresourcebundle",
+						RBVersion:   "v1",
 						ChartName:   "testchart",
 						Description: "test description",
 					},
@@ -172,14 +172,14 @@ func TestRBDefListVersionsHandler(t *testing.T) {
 			expectedCode: http.StatusOK,
 			expected: []rb.Definition{
 				{
-					Name:        "testresourcebundle",
-					Version:     "v1",
+					RBName:      "testresourcebundle",
+					RBVersion:   "v1",
 					ChartName:   "testchart",
 					Description: "test description",
 				},
 				{
-					Name:        "testresourcebundle",
-					Version:     "v2",
+					RBName:      "testresourcebundle",
+					RBVersion:   "v2",
 					ChartName:   "testchart",
 					Description: "test description",
 				},
@@ -188,14 +188,14 @@ func TestRBDefListVersionsHandler(t *testing.T) {
 				// list of definitions that will be returned by the mockclient
 				Items: []rb.Definition{
 					{
-						Name:        "testresourcebundle",
-						Version:     "v1",
+						RBName:      "testresourcebundle",
+						RBVersion:   "v1",
 						ChartName:   "testchart",
 						Description: "test description",
 					},
 					{
-						Name:        "testresourcebundle",
-						Version:     "v2",
+						RBName:      "testresourcebundle",
+						RBVersion:   "v2",
 						ChartName:   "testchart",
 						Description: "test description",
 					},
@@ -222,12 +222,12 @@ func TestRBDefListVersionsHandler(t *testing.T) {
 				// Since the order of returned slice is not guaranteed
 				// Check both and return error if both don't match
 				sort.Slice(got, func(i, j int) bool {
-					return got[i].Version < got[j].Version
+					return got[i].RBVersion < got[j].RBVersion
 				})
 				// Sort both as it is not expected that testCase.expected
 				// is sorted
 				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].Version < testCase.expected[j].Version
+					return testCase.expected[i].RBVersion < testCase.expected[j].RBVersion
 				})
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -252,8 +252,8 @@ func TestRBDefGetHandler(t *testing.T) {
 			label:        "Get Bundle Definition",
 			expectedCode: http.StatusOK,
 			expected: rb.Definition{
-				Name:        "testresourcebundle",
-				Version:     "v1",
+				RBName:      "testresourcebundle",
+				RBVersion:   "v1",
 				ChartName:   "testchart",
 				Description: "test description",
 			},
@@ -263,8 +263,8 @@ func TestRBDefGetHandler(t *testing.T) {
 				// list of definitions that will be returned by the mockclient
 				Items: []rb.Definition{
 					{
-						Name:        "testresourcebundle",
-						Version:     "v1",
+						RBName:      "testresourcebundle",
+						RBVersion:   "v1",
 						ChartName:   "testchart",
 						Description: "test description",
 					},

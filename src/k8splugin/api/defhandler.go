@@ -49,13 +49,13 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	// Name is required.
-	if v.Name == "" {
+	if v.RBName == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	// Version is required.
-	if v.Version == "" {
+	if v.RBVersion == "" {
 		http.Error(w, "Missing version in POST request", http.StatusBadRequest)
 		return
 	}

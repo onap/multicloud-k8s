@@ -38,14 +38,14 @@ func TestCreateDefinition(t *testing.T) {
 		{
 			label: "Create Resource Bundle Definition",
 			inp: Definition{
-				Name:        "testresourcebundle",
-				Version:     "v1",
+				RBName:      "testresourcebundle",
+				RBVersion:   "v1",
 				Description: "testresourcebundle",
 				ChartName:   "",
 			},
 			expected: Definition{
-				Name:        "testresourcebundle",
-				Version:     "v1",
+				RBName:      "testresourcebundle",
+				RBVersion:   "v1",
 				Description: "testresourcebundle",
 				ChartName:   "",
 			},
@@ -97,14 +97,14 @@ func TestListDefinition(t *testing.T) {
 			name:  "testresourcebundle",
 			expected: []Definition{
 				{
-					Name:        "testresourcebundle",
-					Version:     "v1",
+					RBName:      "testresourcebundle",
+					RBVersion:   "v1",
 					Description: "testresourcebundle",
 					ChartName:   "testchart",
 				},
 				{
-					Name:        "testresourcebundle",
-					Version:     "v2",
+					RBName:      "testresourcebundle",
+					RBVersion:   "v2",
 					Description: "testresourcebundle_version2",
 					ChartName:   "testchart",
 				},
@@ -112,14 +112,14 @@ func TestListDefinition(t *testing.T) {
 			expectedError: "",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
 								"\"chart-name\":\"testchart\"}"),
 					},
-					DefinitionKey{Name: "testresourcebundle", Version: "v2"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v2"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle_version2\"," +
@@ -154,12 +154,12 @@ func TestListDefinition(t *testing.T) {
 				// Since the order of returned slice is not guaranteed
 				// Check both and return error if both don't match
 				sort.Slice(got, func(i, j int) bool {
-					return got[i].Version < got[j].Version
+					return got[i].RBVersion < got[j].RBVersion
 				})
 				// Sort both as it is not expected that testCase.expected
 				// is sorted
 				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].Version < testCase.expected[j].Version
+					return testCase.expected[i].RBVersion < testCase.expected[j].RBVersion
 				})
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -187,15 +187,15 @@ func TestGetDefinition(t *testing.T) {
 			name:    "testresourcebundle",
 			version: "v1",
 			expected: Definition{
-				Name:        "testresourcebundle",
-				Version:     "v1",
+				RBName:      "testresourcebundle",
+				RBVersion:   "v1",
 				Description: "testresourcebundle",
 				ChartName:   "testchart",
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -325,7 +325,7 @@ func TestUploadDefinition(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -361,7 +361,7 @@ func TestUploadDefinition(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -399,7 +399,7 @@ func TestUploadDefinition(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -437,7 +437,7 @@ func TestUploadDefinition(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -458,7 +458,7 @@ func TestUploadDefinition(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -550,7 +550,7 @@ func TestDownloadDefinition(t *testing.T) {
 			},
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
@@ -571,7 +571,7 @@ func TestDownloadDefinition(t *testing.T) {
 			expectedError: "Invalid Definition ID provided",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					DefinitionKey{Name: "testresourcebundle", Version: "v1"}.String(): {
+					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
 						"metadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +

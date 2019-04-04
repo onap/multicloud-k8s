@@ -33,16 +33,17 @@ import (
 // Definition contains the parameters needed for resource bundle (rb) definitions
 // It implements the interface for managing the definitions
 type Definition struct {
-	Name        string            `json:"rb-name"`
-	Version     string            `json:"rb-version"`
+	RBName      string            `json:"rb-name"`
+	RBVersion   string            `json:"rb-version"`
 	ChartName   string            `json:"chart-name"`
 	Description string            `json:"description"`
 	Labels      map[string]string `json:"labels"`
 }
 
+// DefinitionKey is the key structure that is used in the database
 type DefinitionKey struct {
-	Name    string `json:"rb-name"`
-	Version string `json:"rb-version"`
+	RBName    string `json:"rb-name"`
+	RBVersion string `json:"rb-version"`
 }
 
 // We will use json marshalling to convert to string to
@@ -83,14 +84,14 @@ func NewDefinitionClient() *DefinitionClient {
 	}
 }
 
-// Create an entry for the resource in the database
+// Create an entry for the resource in the database`
 func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 
 	//Construct composite key consisting of name and version
-	key := DefinitionKey{Name: def.Name, Version: def.Version}
+	key := DefinitionKey{RBName: def.RBName, RBVersion: def.RBVersion}
 
 	//Check if this definition already exists
-	_, err := v.Get(def.Name, def.Version)
+	_, err := v.Get(def.RBName, def.RBVersion)
 	if err == nil {
 		return Definition{}, pkgerrors.New("Definition already exists")
 	}
@@ -121,7 +122,7 @@ func (v *DefinitionClient) List(name string) ([]Definition, error) {
 				continue
 			}
 			//Select only the definitions that match name provided
-			if def.Name == name {
+			if def.RBName == name {
 				results = append(results, def)
 			}
 		}
@@ -134,7 +135,7 @@ func (v *DefinitionClient) List(name string) ([]Definition, error) {
 func (v *DefinitionClient) Get(name string, version string) (Definition, error) {
 
 	//Construct the composite key to select the entry
-	key := DefinitionKey{Name: name, Version: version}
+	key := DefinitionKey{RBName: name, RBVersion: version}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Get Resource Bundle definition")
@@ -157,7 +158,7 @@ func (v *DefinitionClient) Get(name string, version string) (Definition, error) 
 func (v *DefinitionClient) Delete(name string, version string) error {
 
 	//Construct the composite key to select the entry
-	key := DefinitionKey{Name: name, Version: version}
+	key := DefinitionKey{RBName: name, RBVersion: version}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition")
@@ -187,7 +188,7 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 	}
 
 	//Construct the composite key to select the entry
-	key := DefinitionKey{Name: name, Version: version}
+	key := DefinitionKey{RBName: name, RBVersion: version}
 
 	//Detect chart name from data if it was not provided originally
 	if def.ChartName == "" {
@@ -246,7 +247,7 @@ func (v *DefinitionClient) Download(name string, version string) ([]byte, error)
 	}
 
 	//Construct the composite key to select the entry
-	key := DefinitionKey{Name: name, Version: version}
+	key := DefinitionKey{RBName: name, RBVersion: version}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle definition content")

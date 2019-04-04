@@ -138,9 +138,7 @@ func TestRBDefCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v1/rb/definition", testCase.reader)
-			recorder := httptest.NewRecorder()
-			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -209,9 +207,7 @@ func TestRBDefListVersionsHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v1/rb/definition/testresourcebundle", nil)
-			recorder := httptest.NewRecorder()
-			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -291,9 +287,7 @@ func TestRBDefGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.name+"/"+testCase.version, nil)
-			recorder := httptest.NewRecorder()
-			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -344,9 +338,7 @@ func TestRBDefDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v1/rb/definition/"+testCase.name+"/"+testCase.version, nil)
-			recorder := httptest.NewRecorder()
-			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -403,9 +395,7 @@ func TestRBDefUploadHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST",
 				"/v1/rb/definition/"+testCase.name+"/"+testCase.version+"/content", testCase.body)
-			recorder := httptest.NewRecorder()
-			NewRouter("", testCase.rbDefClient, nil).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

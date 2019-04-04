@@ -117,9 +117,7 @@ func TestRBProfileCreateHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v1/rb/definition/test-rbdef/v1/profile",
 				testCase.reader)
-			recorder := httptest.NewRecorder()
-			NewRouter("", nil, testCase.rbProClient).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -190,9 +188,7 @@ func TestRBProfileGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
-			recorder := httptest.NewRecorder()
-			NewRouter("", nil, testCase.rbProClient).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -240,9 +236,7 @@ func TestRBProfileDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
-			recorder := httptest.NewRecorder()
-			NewRouter("", nil, testCase.rbProClient).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -295,9 +289,7 @@ func TestRBProfileUploadHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST",
 				"/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname+"/content", testCase.body)
-			recorder := httptest.NewRecorder()
-			NewRouter("", nil, testCase.rbProClient).ServeHTTP(recorder, request)
-			resp := recorder.Result()
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

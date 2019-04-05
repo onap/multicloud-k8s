@@ -70,6 +70,30 @@
       "revId": "99928f9cef81b627c2b22fcf6d7c0ca7ebe2cb0e",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ddf5b8e_a9fc2851",
+        "filename": "kud/tests/plugin.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-05T21:17:53Z",
+      "side": 0,
+      "message": "Yes. We want to do listing based on query parameters like namespace, rbdef, etc",
+      "parentUuid": "bd79aa5a_5e4e66b8",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 2
+      },
+      "revId": "99928f9cef81b627c2b22fcf6d7c0ca7ebe2cb0e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

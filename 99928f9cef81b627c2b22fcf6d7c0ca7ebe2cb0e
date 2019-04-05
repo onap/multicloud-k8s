@@ -46,6 +46,30 @@
       "revId": "99928f9cef81b627c2b22fcf6d7c0ca7ebe2cb0e",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd79aa5a_5e4e66b8",
+        "filename": "kud/tests/plugin.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-04-05T21:15:21Z",
+      "side": 0,
+      "message": "Mmmm the ListHandler was removed during the refactoring patch(https://gerrit.onap.org/r/#/c/83996/2/src/k8splugin/api/handler.go). In other words this is another fix of that refactoring change.",
+      "parentUuid": "36520e5d_3b8cdcbd",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 2
+      },
+      "revId": "99928f9cef81b627c2b22fcf6d7c0ca7ebe2cb0e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -75,7 +75,7 @@ require (
 	gopkg.in/square/go-jose.v2 v2.2.2 // indirect
 	gopkg.in/yaml.v2 v2.2.1
 	k8s.io/api v0.0.0-20181126151915-b503174bad59
-	k8s.io/apiextensions-apiserver v0.0.0-20181126155829-0cd23ebeb688 // indirect
+	k8s.io/apiextensions-apiserver v0.0.0-20181126155829-0cd23ebeb688
 	k8s.io/apimachinery v0.0.0-20181126123746-eddba98df674
 	k8s.io/apiserver v0.0.0-20181126153457-92fdef3a232a // indirect
 	k8s.io/cli-runtime v0.0.0-20190107235426-31214e12222d // indirect

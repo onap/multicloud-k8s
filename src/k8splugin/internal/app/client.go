@@ -21,13 +21,25 @@ import (
 	utils "k8splugin/internal"
 
 	pkgerrors "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/helm/pkg/tiller"
 )
 
+// KubernetesResource is the interface that is implemented
+type KubernetesResource interface {
+	Create(yamlFilePath string, namespace string, client *KubernetesClient) (string, error)
+	Delete(yamlFilePath string, namespace string, client *KubernetesClient) error
+}
+
 type KubernetesClient struct {
-	clientSet *kubernetes.Clientset
+	clientSet     *kubernetes.Clientset
+	dynamicClient dynamic.Interface
+	restMapper    meta.RESTMapper
 }
 
 // GetKubeClient loads the Kubernetes configuation values stored into the local configuration file
@@ -45,6 +57,23 @@ func (k *KubernetesClient) init(configPath string) error {
 	if err != nil {
 		return err
 	}
+
+	k.dynamicClient, err = dynamic.NewForConfig(config)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Creating dynamic client")
+	}
+
+	discover, err := discovery.NewDiscoveryClientForConfig(config)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Creating discovery client")
+	}
+
+	groupResources, err := restmapper.GetAPIGroupResources(discover)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Get GroupResources")
+	}
+
+	k.restMapper = restmapper.NewDiscoveryRESTMapper(groupResources)
 
 	return nil
 }
@@ -82,6 +111,44 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 	return nil
 }
 
+func (k *KubernetesClient) createGeneric(kind string, files []string, namespace string) ([]string, error) {
+
+	log.Println("Processing items of Kind: " + kind)
+
+	//Iterate over each file of a particular kind here
+	var resourcesCreated []string
+	for _, f := range files {
+		if _, err := os.Stat(f); os.IsNotExist(err) {
+			return nil, pkgerrors.New("File " + f + "does not exists")
+		}
+
+		log.Println("Processing file: " + f)
+
+		pluginObject, ok := utils.LoadedPlugins["generic"]
+		if !ok {
+			return nil, pkgerrors.New("No generic plugin found")
+		}
+
+		symbol, err := pluginObject.Lookup("ExportedVariable")
+		if err != nil {
+			return nil, pkgerrors.Wrap(err, "No ExportedVariable symbol found")
+		}
+
+		genericPlugin, ok := symbol.(KubernetesResource)
+		if !ok {
+			return nil, pkgerrors.New("ExportedVariable is not KubernetesResource type")
+		}
+
+		name, err := genericPlugin.Create(f, namespace, k)
+		if err != nil {
+			return nil, pkgerrors.Wrap(err, "Error in generic plugin")
+		}
+
+		resourcesCreated = append(resourcesCreated, name)
+	}
+	return resourcesCreated, nil
+}
+
 func (k *KubernetesClient) createKind(kind string, files []string, namespace string) ([]string, error) {
 
 	log.Println("Processing items of Kind: " + kind)
@@ -103,7 +170,8 @@ func (k *KubernetesClient) createKind(kind string, files []string, namespace str
 
 		typePlugin, ok := utils.LoadedPlugins[strings.ToLower(kind)]
 		if !ok {
-			return nil, pkgerrors.New("No plugin for kind " + kind + " found")
+			log.Println("No plugin for kind " + kind + " found. Using generic Plugin")
+			return k.createGeneric(kind, files, namespace)
 		}
 
 		symCreateResourceFunc, err := typePlugin.Lookup("Create")
@@ -197,4 +265,15 @@ func (k *KubernetesClient) deleteResources(resMap map[string][]string, namespace
 	}
 
 	return nil
+}
+
+//GetMapper returns the RESTMapper that was created for this client
+func (k *KubernetesClient) GetMapper() meta.RESTMapper {
+	return k.restMapper
+}
+
+//GetDynamicClient returns the dynamic client that is needed for
+//unstructured REST calls to the apiserver
+func (k *KubernetesClient) GetDynamicClient() dynamic.Interface {
+	return k.dynamicClient
 }

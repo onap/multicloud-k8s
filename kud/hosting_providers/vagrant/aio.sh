@@ -47,7 +47,6 @@ localhost
 kube-node
 kube-master
 EOL
-sed -i '/andrewrothstein.kubectl/d' ../../deployment_infra/playbooks/configure-*.yml
 rm -f ~/.ssh/id_rsa
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys

@@ -19,7 +19,7 @@ fi
 
 echo "Cloning and configuring KUD project..."
 git clone https://git.onap.org/multicloud/k8s/
-cd k8s/kud/hosting_providers/baremetal/
+#cd k8s/kud/hosting_providers/baremetal/
 cat <<EOL > inventory/hosts.ini
 [all]
 localhost
@@ -46,7 +46,6 @@ localhost
 kube-node
 kube-master
 EOL
-sed -i '/andrewrothstein.kubectl/d' ../../deployment_infra/playbooks/configure-*.yml
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 chmod og-wx ~/.ssh/authorized_keys

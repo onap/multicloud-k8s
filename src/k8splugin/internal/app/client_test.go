@@ -45,7 +45,7 @@ func LoadMockPlugins(krdLoadedPlugins map[string]*plugin.Plugin) error {
 func TestInit(t *testing.T) {
 	t.Run("Successfully create Kube Client", func(t *testing.T) {
 
-		kubeClient := kubernetesClient{}
+		kubeClient := KubernetesClient{}
 		err := kubeClient.init("../../mock_files/mock_configs/mock_config")
 		if err != nil {
 			t.Fatalf("TestGetKubeClient returned an error (%s)", err)
@@ -71,7 +71,7 @@ func TestCreateResources(t *testing.T) {
 		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
 	}
 
-	k8 := kubernetesClient{
+	k8 := KubernetesClient{
 		clientSet: &kubernetes.Clientset{},
 	}
 
@@ -100,7 +100,7 @@ func TestDeleteResources(t *testing.T) {
 		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
 	}
 
-	k8 := kubernetesClient{
+	k8 := KubernetesClient{
 		clientSet: &kubernetes.Clientset{},
 	}
 

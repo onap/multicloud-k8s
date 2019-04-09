@@ -26,12 +26,12 @@ import (
 	"k8s.io/helm/pkg/tiller"
 )
 
-type kubernetesClient struct {
+type KubernetesClient struct {
 	clientSet *kubernetes.Clientset
 }
 
 // GetKubeClient loads the Kubernetes configuation values stored into the local configuration file
-func (k *kubernetesClient) init(configPath string) error {
+func (k *KubernetesClient) init(configPath string) error {
 	if configPath == "" {
 		return pkgerrors.New("config not passed and is not found in ~/.kube. ")
 	}
@@ -49,7 +49,7 @@ func (k *kubernetesClient) init(configPath string) error {
 	return nil
 }
 
-func (k *kubernetesClient) ensureNamespace(namespace string) error {
+func (k *KubernetesClient) ensureNamespace(namespace string) error {
 	namespacePlugin, ok := utils.LoadedPlugins["namespace"]
 	if !ok {
 		return pkgerrors.New("No plugin for namespace resource found")
@@ -82,7 +82,7 @@ func (k *kubernetesClient) ensureNamespace(namespace string) error {
 	return nil
 }
 
-func (k *kubernetesClient) createKind(kind string, files []string, namespace string) ([]string, error) {
+func (k *KubernetesClient) createKind(kind string, files []string, namespace string) ([]string, error) {
 
 	log.Println("Processing items of Kind: " + kind)
 
@@ -123,7 +123,7 @@ func (k *kubernetesClient) createKind(kind string, files []string, namespace str
 	return resourcesCreated, nil
 }
 
-func (k *kubernetesClient) createResources(resMap map[string][]string,
+func (k *KubernetesClient) createResources(resMap map[string][]string,
 	namespace string) (map[string][]string, error) {
 
 	err := k.ensureNamespace(namespace)
@@ -163,7 +163,7 @@ func (k *kubernetesClient) createResources(resMap map[string][]string,
 	return createdResourceMap, nil
 }
 
-func (k *kubernetesClient) deleteKind(kind string, resources []string, namespace string) error {
+func (k *KubernetesClient) deleteKind(kind string, resources []string, namespace string) error {
 	log.Println("Deleting items of Kind: " + kind)
 
 	typePlugin, ok := utils.LoadedPlugins[strings.ToLower(kind)]
@@ -187,7 +187,7 @@ func (k *kubernetesClient) deleteKind(kind string, resources []string, namespace
 	return nil
 }
 
-func (k *kubernetesClient) deleteResources(resMap map[string][]string, namespace string) error {
+func (k *KubernetesClient) deleteResources(resMap map[string][]string, namespace string) error {
 	//TODO: Investigate if deletion should be in a particular order
 	for kind, resourceNames := range resMap {
 		err := k.deleteKind(kind, resourceNames, namespace)

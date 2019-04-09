@@ -118,7 +118,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
 
-	k8sClient := kubernetesClient{}
+	k8sClient := KubernetesClient{}
 	err = k8sClient.init(os.Getenv("KUBE_CONFIG_DIR") + "/" + i.CloudRegion)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
@@ -183,7 +183,7 @@ func (v *InstanceClient) Delete(id string) error {
 		return pkgerrors.Wrap(err, "Error getting Instance")
 	}
 
-	k8sClient := kubernetesClient{}
+	k8sClient := KubernetesClient{}
 	err = k8sClient.init(os.Getenv("KUBE_CONFIG_DIR") + "/" + inst.CloudRegion)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")

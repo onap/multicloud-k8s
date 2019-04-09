@@ -19,10 +19,11 @@ fi
 
 echo "Cloning and configuring KUD project..."
 git clone https://git.onap.org/multicloud/k8s/
-cd k8s/kud/hosting_providers/baremetal/
+cd k8s/kud/hosting_providers/vagrant/
 cat <<EOL > inventory/hosts.ini
 [all]
-localhost
+localhost ansible_ssh_host=10.10.110.21 ansible_ssh_port=22
+# The ansible_ssh_host IP is an example here. Please update the ansible_ssh_host IP accordingly.
 
 [kube-master]
 localhost
@@ -46,7 +47,6 @@ localhost
 kube-node
 kube-master
 EOL
-sed -i '/andrewrothstein.kubectl/d' ../../deployment_infra/playbooks/configure-*.yml
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 chmod og-wx ~/.ssh/authorized_keys
@@ -54,5 +54,5 @@ chmod og-wx ~/.ssh/authorized_keys
 echo "Enabling nested-virtualization"
 ./node.sh
 
-echo "Deploying KRD project"
+echo "Deploying KUD project"
 ./installer.sh | tee kud_installer.log

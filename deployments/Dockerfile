@@ -31,9 +31,10 @@ RUN apt-get update && apt-get install -y -qq apt-transport-https curl \
  && apt-get update && apt install -y -qq ovn-common
 
 WORKDIR /opt/multicloud/k8s
-ADD ./k8plugin ./
-ADD ./*.so ./
 RUN chown onap:onap /opt/multicloud/k8s -R
+
+ADD --chown=onap ./k8plugin ./
+ADD --chown=onap ./bin/*.so ./
 
 USER onap
 

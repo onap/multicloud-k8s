@@ -23,7 +23,9 @@ import (
 // NewRouter creates a router that registers the various urls that are supported
 func NewRouter(defClient rb.DefinitionManager,
 	profileClient rb.ProfileManager,
-	instClient app.InstanceManager) *mux.Router {
+	instClient app.InstanceManager,
+	configClient rb.ConfigManager,
+	templateClient rb.ConfigTemplateManager) *mux.Router {
 
 	router := mux.NewRouter()
 
@@ -60,6 +62,28 @@ func NewRouter(defClient rb.DefinitionManager,
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/content", profileHandler.uploadHandler).Methods("POST")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.getHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.deleteHandler).Methods("DELETE")
+
+	// Config Template
+	if templateClient == nil {
+		templateClient = rb.NewConfigTemplateClient()
+	}
+	templateHandler := rbTemplateHandler{client: templateClient}
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template", templateHandler.createHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}/content", templateHandler.uploadHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}", templateHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}", templateHandler.deleteHandler).Methods("DELETE")
+
+	// Config value
+	if configClient == nil {
+		configClient = rb.NewConfigClient()
+	}
+	configHandler := rbConfigHandler{client: configClient}
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config", configHandler.createHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/{cfgname}", configHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/{cfgname}", configHandler.updateHandler).Methods("PUT")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/{cfgname}", configHandler.deleteHandler).Methods("DELETE")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/rollback", configHandler.rollbackHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/tagit", configHandler.tagitHandler).Methods("POST")
 
 	return router
 }

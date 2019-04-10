@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "405256f6_1766cf24",
+        "filename": "src/k8splugin/internal/rb/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-10T05:53:53Z",
+      "side": 1,
+      "message": "Consider using RBName and RBVersion as member names to maintain naming consistency across the rb package.",
+      "range": {
+        "startLine": 36,
+        "startChar": 1,
+        "endLine": 37,
+        "endChar": 18
+      },
+      "revId": "9c7ba69d27fcbd76004b959e41dfa650a66ba882",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8121423e_8b0faf8e",
+        "filename": "src/k8splugin/internal/rb/config_backend.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-10T05:53:53Z",
+      "side": 1,
+      "message": "Make it an anonymous variable.\nThis way, you can just do profileDataManager.Lock() without the explicit lock variable.",
+      "range": {
+        "startLine": 68,
+        "startChar": 1,
+        "endLine": 68,
+        "endChar": 27
+      },
+      "revId": "9c7ba69d27fcbd76004b959e41dfa650a66ba882",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "33da2a98_a3aedd43",
+        "filename": "src/k8splugin/internal/rb/config_backend.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-10T05:53:53Z",
+      "side": 1,
+      "message": "Maybe implement this as a stringer interface on a key object?",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 1
+      },
+      "revId": "9c7ba69d27fcbd76004b959e41dfa650a66ba882",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "35432ca9_945acd21",
+        "filename": "src/k8splugin/internal/rb/config_backend.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-10T05:53:53Z",
+      "side": 1,
+      "message": "This should look for \"Key doesn\u0027t exist\" and return 0, nil.\nFor all other error messages, it should return the error along with 0.",
+      "range": {
+        "startLine": 257,
+        "startChar": 1,
+        "endLine": 261,
+        "endChar": 2
+      },
+      "revId": "9c7ba69d27fcbd76004b959e41dfa650a66ba882",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8cdcaf59_95485575",
+        "filename": "src/k8splugin/internal/utils.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-10T05:53:53Z",
+      "side": 1,
+      "message": "Add a TODO maybe to convert these to configuration files instead of environment variables.",
+      "range": {
+        "startLine": 94,
+        "startChar": 2,
+        "endLine": 97,
+        "endChar": 46
+      },
+      "revId": "9c7ba69d27fcbd76004b959e41dfa650a66ba882",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "430232ee_dc2e0e46",
+        "filename": "src/k8splugin/internal/rb/config_backend.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-04-10T21:27:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8121423e_8b0faf8e",
+      "range": {
+        "startLine": 68,
+        "startChar": 1,
+        "endLine": 68,
+        "endChar": 27
+      },
+      "revId": "9c7ba69d27fcbd76004b959e41dfa650a66ba882",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "33da2a98_a3aedd43",
         "filename": "src/k8splugin/internal/rb/config_backend.go",
         "patchSetId": 3
@@ -94,6 +118,30 @@
     },
     {
       "key": {
+        "uuid": "2b6d7fac_ca9f352c",
+        "filename": "src/k8splugin/internal/rb/config_backend.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-04-10T21:27:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35432ca9_945acd21",
+      "range": {
+        "startLine": 257,
+        "startChar": 1,
+        "endLine": 261,
+        "endChar": 2
+      },
+      "revId": "9c7ba69d27fcbd76004b959e41dfa650a66ba882",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8cdcaf59_95485575",
         "filename": "src/k8splugin/internal/utils.go",
         "patchSetId": 3
@@ -105,6 +153,30 @@
       "writtenOn": "2019-04-10T05:53:53Z",
       "side": 1,
       "message": "Add a TODO maybe to convert these to configuration files instead of environment variables.",
+      "range": {
+        "startLine": 94,
+        "startChar": 2,
+        "endLine": 97,
+        "endChar": 46
+      },
+      "revId": "9c7ba69d27fcbd76004b959e41dfa650a66ba882",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6ac6b611_28d79426",
+        "filename": "src/k8splugin/internal/utils.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-04-10T21:27:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8cdcaf59_95485575",
       "range": {
         "startLine": 94,
         "startChar": 2,

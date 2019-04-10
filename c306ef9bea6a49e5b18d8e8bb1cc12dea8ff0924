@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "a52e6d8c_2f18fe94",
+        "filename": "src/k8splugin/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-04-10T21:27:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edd1c230_8d86aa68",
+      "range": {
+        "startLine": 85,
+        "startChar": 72,
+        "endLine": 86,
+        "endChar": 80
+      },
+      "revId": "c306ef9bea6a49e5b18d8e8bb1cc12dea8ff0924",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8d6c863c_7ea41a76",
         "filename": "src/k8splugin/internal/rb/config_backend.go",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2019-04-09T23:26:01Z",
       "side": 1,
       "message": "Chart detection can be done at template upload.",
+      "range": {
+        "startLine": 375,
+        "startChar": 1,
+        "endLine": 394,
+        "endChar": 2
+      },
+      "revId": "c306ef9bea6a49e5b18d8e8bb1cc12dea8ff0924",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6c3c9fb7_11301a9d",
+        "filename": "src/k8splugin/internal/rb/config_backend.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-04-10T21:27:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d6c863c_7ea41a76",
       "range": {
         "startLine": 375,
         "startChar": 1,

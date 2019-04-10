@@ -90,6 +90,16 @@ func CheckDatabaseConnection() error {
 	if err != nil {
 		return pkgerrors.Cause(err)
 	}
+	c := db.EtcdConfig{
+		Endpoint: os.Getenv("ETCD_ENDPOINT_IP"),
+		CertFile: os.Getenv("ETCD_CERT_FILE"),
+		KeyFile:  os.Getenv("ETCD_KEY_FILE"),
+		CAFile:   os.Getenv("ETCD_TRUSTED_CA_FILE"),
+	}
+	err = db.NewEtcdClient(nil, c)
+	if err != nil {
+		log.Printf("Etcd Client Initialization failed")
+	}
 	return nil
 }
 

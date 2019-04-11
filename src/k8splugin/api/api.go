@@ -39,6 +39,13 @@ func NewRouter(defClient rb.DefinitionManager,
 	// (TODO): Fix update method
 	// instRouter.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")
 
+	brokerHandler := brokerInstanceHandler{client: instClient}
+	instRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload", brokerHandler.createHandler).Methods("POST")
+	instRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}",
+		brokerHandler.getHandler).Methods("GET")
+	instRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}",
+		brokerHandler.deleteHandler).Methods("DELETE")
+
 	//Setup resource bundle definition routes
 	if defClient == nil {
 		defClient = rb.NewDefinitionClient()

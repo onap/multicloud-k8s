@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06712a52_a2fc43ee",
+        "filename": "src/k8splugin/internal/rb/config_template.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-11T07:26:34Z",
+      "side": 1,
+      "message": "It is better to add the json tag chart-name. It will get converted to chartname by default otherwise.",
+      "range": {
+        "startLine": 37,
+        "startChar": 1,
+        "endLine": 37,
+        "endChar": 20
+      },
+      "revId": "10337dd73e55ecf6327515e70a60aef4325af589",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

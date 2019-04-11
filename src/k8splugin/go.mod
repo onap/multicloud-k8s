@@ -67,6 +67,7 @@ require (
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.0.0
+	golang.org/x/crypto v0.0.0-20180904163835-0709b304e793
 	golang.org/x/net v0.0.0-20181201002055-351d144fa1fc
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890 // indirect
 	golang.org/x/time v0.0.0-20180412165947-fbb02b2291d2 // indirect
@@ -75,7 +76,7 @@ require (
 	gopkg.in/square/go-jose.v2 v2.2.2 // indirect
 	gopkg.in/yaml.v2 v2.2.1
 	k8s.io/api v0.0.0-20181126151915-b503174bad59
-	k8s.io/apiextensions-apiserver v0.0.0-20181126155829-0cd23ebeb688 // indirect
+	k8s.io/apiextensions-apiserver v0.0.0-20181126155829-0cd23ebeb688
 	k8s.io/apimachinery v0.0.0-20181126123746-eddba98df674
 	k8s.io/apiserver v0.0.0-20181126153457-92fdef3a232a // indirect
 	k8s.io/cli-runtime v0.0.0-20190107235426-31214e12222d // indirect

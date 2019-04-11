@@ -24,6 +24,7 @@ import (
 
 	"k8splugin/api"
 	utils "k8splugin/internal"
+	"k8splugin/internal/auth"
 
 	"github.com/gorilla/handlers"
 )
@@ -55,5 +56,13 @@ func main() {
 		close(connectionsClose)
 	}()
 
-	log.Fatal(httpServer.ListenAndServe())
+	tlsConfig, err := auth.GetTLSConfig("ca.cert", "server.cert", "server.key")
+	if err != nil {
+		log.Println("Error Getting TLS Configuration. Starting without TLS...")
+		log.Fatal(httpServer.ListenAndServe())
+	} else {
+		httpServer.TLSConfig = tlsConfig
+		// empty strings because tlsconfig already has this information
+		err = httpServer.ListenAndServeTLS("", "")
+	}
 }

@@ -15,6 +15,7 @@ package api
 
 import (
 	"k8splugin/internal/app"
+	"k8splugin/internal/connectivity"
 	"k8splugin/internal/rb"
 
 	"github.com/gorilla/mux"
@@ -39,12 +40,20 @@ func NewRouter(defClient rb.DefinitionManager,
 	// (TODO): Fix update method
 	// instRouter.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")
 
+	//Setup the broker handler here
 	brokerHandler := brokerInstanceHandler{client: instClient}
 	instRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload", brokerHandler.createHandler).Methods("POST")
 	instRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}",
 		brokerHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}",
 		brokerHandler.deleteHandler).Methods("DELETE")
+
+	//Setup the connectivity api handler here
+	connectivityClient := connectivity.NewConnectivityClient()
+	connectivityHandler := connectivity.ConnectivityHandler{Client: connectivityClient}
+	instRouter.HandleFunc("/connectivity-info", connectivityHandler.CreateHandler).Methods("POST")
+	instRouter.HandleFunc("/connectivity-info/{name}", connectivityHandler.GetHandler).Methods("GET")
+	instRouter.HandleFunc("/connectivity-info/{name}", connectivityHandler.DeleteHandler).Methods("DELETE")
 
 	//Setup resource bundle definition routes
 	if defClient == nil {

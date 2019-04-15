@@ -97,7 +97,7 @@ func TestBrokerCreateHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 
 			request := httptest.NewRequest("POST", "/v1/cloudowner/cloudregion/infra_workload", testCase.input)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				body, _ := ioutil.ReadAll(resp.Body)
@@ -167,7 +167,7 @@ func TestBrokerGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v1/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v",
@@ -214,7 +214,7 @@ func TestBrokerDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v1/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)

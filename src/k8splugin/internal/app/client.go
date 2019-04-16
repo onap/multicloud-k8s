@@ -30,8 +30,8 @@ import (
 	"k8s.io/helm/pkg/tiller"
 )
 
-// KubernetesResource is the interface that is implemented
-type KubernetesResource interface {
+// PluginReference is the interface that is implemented
+type PluginReference interface {
 	Create(yamlFilePath string, namespace string, client *KubernetesClient) (string, error)
 	Delete(kind string, name string, namespace string, client *KubernetesClient) error
 }
@@ -125,9 +125,10 @@ func (k *KubernetesClient) createGeneric(kind string, files []string, namespace 
 		return nil, pkgerrors.Wrap(err, "No ExportedVariable symbol found")
 	}
 
-	genericPlugin, ok := symbol.(KubernetesResource)
+	//Assert if it implements the PluginReference interface
+	genericPlugin, ok := symbol.(PluginReference)
 	if !ok {
-		return nil, pkgerrors.New("ExportedVariable is not KubernetesResource type")
+		return nil, pkgerrors.New("ExportedVariable is not PluginReference type")
 	}
 
 	//Iterate over each file of a particular kind here
@@ -244,10 +245,10 @@ func (k *KubernetesClient) deleteGeneric(kind string, resources []string, namesp
 		return pkgerrors.Wrap(err, "No ExportedVariable symbol found")
 	}
 
-	//Assert that it implements the KubernetesResource
-	genericPlugin, ok := symbol.(KubernetesResource)
+	//Assert that it implements the PluginReference interface
+	genericPlugin, ok := symbol.(PluginReference)
 	if !ok {
-		return pkgerrors.New("ExportedVariable is not KubernetesResource type")
+		return pkgerrors.New("ExportedVariable is not PluginReference type")
 	}
 
 	for _, res := range resources {

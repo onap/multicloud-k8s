@@ -21,7 +21,10 @@ import (
 
 	utils "k8splugin/internal"
 	"k8splugin/internal/db"
+	"k8splugin/internal/helm"
 	"k8splugin/internal/rb"
+
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func TestInstanceCreate(t *testing.T) {
@@ -189,16 +192,32 @@ func TestInstanceGet(t *testing.T) {
 			Items: map[string]map[string][]byte{
 				InstanceKey{ID: "HaKpys8e"}.String(): {
 					"instance": []byte(
-						"{\"profile-name\":\"profile1\"," +
-							"\"id\":\"HaKpys8e\"," +
-							"\"namespace\":\"testnamespace\"," +
-							"\"rb-name\":\"test-rbdef\"," +
-							"\"rb-version\":\"v1\"," +
-							"\"cloud-region\":\"region1\"," +
-							"\"resources\": {" +
-							"\"deployment\": [\"test-deployment\"]," +
-							"\"service\": [\"test-service\"]" +
-							"}}"),
+						`{
+							"profile-name":"profile1",
+						  	"id":"HaKpys8e",
+							"namespace":"testnamespace",
+							"rb-name":"test-rbdef",
+							"rb-version":"v1",
+							"cloud-region":"region1",
+							"resources": [
+								{
+									"GVK": {
+										"Group":"apps",
+										"Version":"v1",
+										"Kind":"Deployment"
+									},
+									"Name": "deployment-1"
+								},
+								{
+									"GVK": {
+										"Group":"",
+										"Version":"v1",
+										"Kind":"Service"
+									},
+									"Name": "service-1"
+								}
+							]
+						}`),
 				},
 			},
 		}
@@ -210,16 +229,29 @@ func TestInstanceGet(t *testing.T) {
 			ProfileName: "profile1",
 			CloudRegion: "region1",
 			Namespace:   "testnamespace",
-			Resources: map[string][]string{
-				"deployment": []string{"test-deployment"},
-				"service":    []string{"test-service"},
+
+			Resources: []helm.KubernetesResource{
+				{
+					GVK: schema.GroupVersionKind{
+						Group:   "apps",
+						Version: "v1",
+						Kind:    "Deployment"},
+					Name: "deployment-1",
+				},
+				{
+					GVK: schema.GroupVersionKind{
+						Group:   "",
+						Version: "v1",
+						Kind:    "Service"},
+					Name: "service-1",
+				},
 			},
 		}
 		ic := NewInstanceClient()
 		id := "HaKpys8e"
 		data, err := ic.Get(id)
 		if err != nil {
-			t.Fatalf("TestInstanceDelete returned an error (%s)", err)
+			t.Fatalf("TestInstanceGet returned an error (%s)", err)
 		}
 		if !reflect.DeepEqual(expected, data) {
 			t.Fatalf("TestInstanceGet returned:\n result=%v\n expected=%v",
@@ -232,16 +264,32 @@ func TestInstanceGet(t *testing.T) {
 			Items: map[string]map[string][]byte{
 				InstanceKey{ID: "HaKpys8e"}.String(): {
 					"instance": []byte(
-						"{\"profile-name\":\"profile1\"," +
-							"\"id\":\"HaKpys8e\"," +
-							"\"namespace\":\"testnamespace\"," +
-							"\"rb-name\":\"test-rbdef\"," +
-							"\"rb-version\":\"v1\"," +
-							"\"cloud-region\":\"mock_config\"," +
-							"\"resources\": {" +
-							"\"deployment\": [\"deployment-1\",\"deployment-2\"]," +
-							"\"service\": [\"service-1\",\"service-2\"]" +
-							"}}"),
+						`{
+							"profile-name":"profile1",
+						  	"id":"HaKpys8e",
+							"namespace":"testnamespace",
+							"rb-name":"test-rbdef",
+							"rb-version":"v1",
+							"cloud-region":"region1",
+							"resources": [
+								{
+									"GVK": {
+										"Group":"apps",
+										"Version":"v1",
+										"Kind":"Deployment"
+									},
+									"Name": "deployment-1"
+								},
+								{
+									"GVK": {
+										"Group":"",
+										"Version":"v1",
+										"Kind":"Service"
+									},
+									"Name": "service-1"
+								}
+							]
+						}`),
 				},
 			},
 		}
@@ -272,16 +320,32 @@ func TestInstanceDelete(t *testing.T) {
 			Items: map[string]map[string][]byte{
 				InstanceKey{ID: "HaKpys8e"}.String(): {
 					"instance": []byte(
-						"{\"profile-name\":\"profile1\"," +
-							"\"id\":\"HaKpys8e\"," +
-							"\"namespace\":\"testnamespace\"," +
-							"\"rb-name\":\"test-rbdef\"," +
-							"\"rb-version\":\"v1\"," +
-							"\"cloud-region\":\"mock_config\"," +
-							"\"resources\": {" +
-							"\"deployment\": [\"deployment-1\",\"deployment-2\"]," +
-							"\"service\": [\"service-1\",\"service-2\"]" +
-							"}}"),
+						`{
+							"profile-name":"profile1",
+						  	"id":"HaKpys8e",
+							"namespace":"testnamespace",
+							"rb-name":"test-rbdef",
+							"rb-version":"v1",
+							"cloud-region":"mock_config",
+							"resources": [
+								{
+									"GVK": {
+										"Group":"apps",
+										"Version":"v1",
+										"Kind":"Deployment"
+									},
+									"Name": "deployment-1"
+								},
+								{
+									"GVK": {
+										"Group":"",
+										"Version":"v1",
+										"Kind":"Service"
+									},
+									"Name": "service-1"
+								}
+							]
+						}`),
 				},
 			},
 		}
@@ -299,16 +363,32 @@ func TestInstanceDelete(t *testing.T) {
 			Items: map[string]map[string][]byte{
 				InstanceKey{ID: "HaKpys8e"}.String(): {
 					"instance": []byte(
-						"{\"profile-name\":\"profile1\"," +
-							"\"id\":\"HaKpys8e\"," +
-							"\"namespace\":\"testnamespace\"," +
-							"\"rb-name\":\"test-rbdef\"," +
-							"\"rb-version\":\"v1\"," +
-							"\"cloud-region\":\"mock_config\"," +
-							"\"resources\": {" +
-							"\"deployment\": [\"deployment-1\",\"deployment-2\"]," +
-							"\"service\": [\"service-1\",\"service-2\"]" +
-							"}}"),
+						`{
+							"profile-name":"profile1",
+						  	"id":"HaKpys8e",
+							"namespace":"testnamespace",
+							"rb-name":"test-rbdef",
+							"rb-version":"v1",
+							"cloud-region":"mock_config",
+							"resources": [
+								{
+									"GVK": {
+										"Group":"apps",
+										"Version":"v1",
+										"Kind":"Deployment"
+									},
+									"Name": "deployment-1"
+								},
+								{
+									"GVK": {
+										"Group":"",
+										"Version":"v1",
+										"Kind":"Service"
+									},
+									"Name": "service-1"
+								}
+							]
+						}`),
 				},
 			},
 		}

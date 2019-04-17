@@ -23,6 +23,7 @@ import (
 	"os"
 
 	"k8splugin/internal/db"
+	"k8splugin/internal/helm"
 	"k8splugin/internal/rb"
 
 	pkgerrors "github.com/pkg/errors"
@@ -40,13 +41,13 @@ type InstanceRequest struct {
 
 // InstanceResponse contains the response from instantiation
 type InstanceResponse struct {
-	ID          string              `json:"id"`
-	RBName      string              `json:"rb-name"`
-	RBVersion   string              `json:"rb-version"`
-	ProfileName string              `json:"profile-name"`
-	CloudRegion string              `json:"cloud-region"`
-	Namespace   string              `json:"namespace"`
-	Resources   map[string][]string `json:"resources"`
+	ID          string                    `json:"id"`
+	RBName      string                    `json:"rb-name"`
+	RBVersion   string                    `json:"rb-version"`
+	ProfileName string                    `json:"profile-name"`
+	CloudRegion string                    `json:"cloud-region"`
+	Namespace   string                    `json:"namespace"`
+	Resources   []helm.KubernetesResource `json:"resources"`
 }
 
 // InstanceManager is an interface exposes the instantiation functionality
@@ -113,7 +114,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	overrideValues := []string{}
 
 	//Execute the kubernetes create command
-	resMap, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues)
+	sortedTemplates, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
@@ -124,7 +125,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
 
-	createdResources, err := k8sClient.createResources(resMap, profile.Namespace)
+	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
 	}

@@ -20,8 +20,10 @@ import (
 	"testing"
 
 	utils "k8splugin/internal"
+	"k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -76,9 +78,21 @@ func TestCreateResources(t *testing.T) {
 	}
 
 	t.Run("Successfully delete resources", func(t *testing.T) {
-		data := map[string][]string{
-			"Deployment": []string{"../../mock_files/mock_yamls/deployment.yaml"},
-			"Service":    []string{"../../mock_files/mock_yamls/service.yaml"},
+		data := []helm.KubernetesResourceTemplate{
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "apps",
+					Version: "v1",
+					Kind:    "Deployment"},
+				FilePath: "../../mock_files/mock_yamls/deployment.yaml",
+			},
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "",
+					Version: "v1",
+					Kind:    "Service"},
+				FilePath: "../../mock_files/mock_yamls/service.yaml",
+			},
 		}
 
 		_, err := k8.createResources(data, "testnamespace")
@@ -105,9 +119,35 @@ func TestDeleteResources(t *testing.T) {
 	}
 
 	t.Run("Successfully delete resources", func(t *testing.T) {
-		data := map[string][]string{
-			"Deployment": []string{"deployment-1", "deployment-2"},
-			"Service":    []string{"service-1", "service-2"},
+		data := []helm.KubernetesResource{
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "apps",
+					Version: "v1",
+					Kind:    "Deployment"},
+				Name: "deployment-1",
+			},
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "apps",
+					Version: "v1",
+					Kind:    "Deployment"},
+				Name: "deployment-2",
+			},
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "",
+					Version: "v1",
+					Kind:    "Service"},
+				Name: "service-1",
+			},
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "",
+					Version: "v1",
+					Kind:    "Service"},
+				Name: "service-2",
+			},
 		}
 
 		err := k8.deleteResources(data, "test")

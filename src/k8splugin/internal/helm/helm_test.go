@@ -165,26 +165,25 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 			} else {
 				//Compute the hash of returned data and compare
 				for _, v := range out {
-					for _, f := range v {
-						data, err := ioutil.ReadFile(f)
-						if err != nil {
-							t.Errorf("Unable to read file %s", v)
-						}
-						h.Write(data)
-						gotHash := fmt.Sprintf("%x", h.Sum(nil))
-						h.Reset()
+					f := v.FilePath
+					data, err := ioutil.ReadFile(f)
+					if err != nil {
+						t.Errorf("Unable to read file %s", v)
+					}
+					h.Write(data)
+					gotHash := fmt.Sprintf("%x", h.Sum(nil))
+					h.Reset()
 
-						//Find the right hash from expectedHashMap
-						expectedHash := ""
-						for k1, v1 := range testCase.expectedHashMap {
-							if strings.Contains(f, k1) == true {
-								expectedHash = v1
-								break
-							}
+					//Find the right hash from expectedHashMap
+					expectedHash := ""
+					for k1, v1 := range testCase.expectedHashMap {
+						if strings.Contains(f, k1) == true {
+							expectedHash = v1
+							break
 						}
-						if gotHash != expectedHash {
-							t.Fatalf("Got unexpected hash for %s", f)
-						}
+					}
+					if gotHash != expectedHash {
+						t.Fatalf("Got unexpected hash for %s", f)
 					}
 				}
 			}

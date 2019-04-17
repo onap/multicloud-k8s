@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	utils "k8splugin/internal"
+	"k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -27,13 +28,12 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/helm/pkg/tiller"
 )
 
 // PluginReference is the interface that is implemented
 type PluginReference interface {
 	Create(yamlFilePath string, namespace string, client *KubernetesClient) (string, error)
-	Delete(kind string, name string, namespace string, client *KubernetesClient) error
+	Delete(resource helm.KubernetesResource, namespace string, client *KubernetesClient) error
 }
 
 type KubernetesClient struct {
@@ -105,139 +105,122 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 	return nil
 }
 
-func (k *KubernetesClient) createGeneric(kind string, files []string, namespace string) ([]string, error) {
+func (k *KubernetesClient) createGeneric(resTempl helm.KubernetesResourceTemplate,
+	namespace string) (helm.KubernetesResource, error) {
 
-	log.Println("Processing items of Kind: " + kind)
+	log.Println("Processing Kind: " + resTempl.GVK.Kind)
 
 	//Check if have the mapper before loading the plugin
 	err := k.updateMapper()
 	if err != nil {
-		return nil, pkgerrors.Wrap(err, "Unable to create RESTMapper")
+		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Unable to create RESTMapper")
 	}
 
 	pluginObject, ok := utils.LoadedPlugins["generic"]
 	if !ok {
-		return nil, pkgerrors.New("No generic plugin found")
+		return helm.KubernetesResource{}, pkgerrors.New("No generic plugin found")
 	}
 
 	symbol, err := pluginObject.Lookup("ExportedVariable")
 	if err != nil {
-		return nil, pkgerrors.Wrap(err, "No ExportedVariable symbol found")
+		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "No ExportedVariable symbol found")
 	}
 
 	//Assert if it implements the PluginReference interface
 	genericPlugin, ok := symbol.(PluginReference)
 	if !ok {
-		return nil, pkgerrors.New("ExportedVariable is not PluginReference type")
+		return helm.KubernetesResource{}, pkgerrors.New("ExportedVariable is not PluginReference type")
 	}
 
-	//Iterate over each file of a particular kind here
-	var resourcesCreated []string
-	for _, f := range files {
-		if _, err := os.Stat(f); os.IsNotExist(err) {
-			return nil, pkgerrors.New("File " + f + "does not exists")
-		}
-
-		log.Println("Processing file: " + f)
-
-		name, err := genericPlugin.Create(f, namespace, k)
-		if err != nil {
-			return nil, pkgerrors.Wrap(err, "Error in generic plugin")
-		}
-
-		resourcesCreated = append(resourcesCreated, name)
+	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
+		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
 	}
-	return resourcesCreated, nil
+
+	log.Println("Processing file: " + resTempl.FilePath)
+
+	name, err := genericPlugin.Create(resTempl.FilePath, namespace, k)
+	if err != nil {
+		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in generic plugin")
+	}
+
+	return helm.KubernetesResource{
+		GVK:  resTempl.GVK,
+		Name: name,
+	}, nil
 }
 
-func (k *KubernetesClient) createKind(kind string, files []string, namespace string) ([]string, error) {
+func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
+	namespace string) (helm.KubernetesResource, error) {
 
-	log.Println("Processing items of Kind: " + kind)
+	log.Println("Processing Kind: " + resTempl.GVK.Kind)
 
-	//Iterate over each file of a particular kind here
-	var resourcesCreated []string
-	for _, f := range files {
-		if _, err := os.Stat(f); os.IsNotExist(err) {
-			return nil, pkgerrors.New("File " + f + "does not exists")
-		}
-
-		log.Println("Processing file: " + f)
-
-		//Populate the namespace from profile instead of instance body
-		genericKubeData := &utils.ResourceData{
-			YamlFilePath: f,
-			Namespace:    namespace,
-		}
-
-		typePlugin, ok := utils.LoadedPlugins[strings.ToLower(kind)]
-		if !ok {
-			log.Println("No plugin for kind " + kind + " found. Using generic Plugin")
-			return k.createGeneric(kind, files, namespace)
-		}
-
-		symCreateResourceFunc, err := typePlugin.Lookup("Create")
-		if err != nil {
-			return nil, pkgerrors.Wrap(err, "Error fetching "+kind+" plugin")
-		}
-
-		createdResourceName, err := symCreateResourceFunc.(func(*utils.ResourceData, kubernetes.Interface) (string, error))(
-			genericKubeData, k.clientSet)
-		if err != nil {
-			return nil, pkgerrors.Wrap(err, "Error in plugin "+kind+" plugin")
-		}
-		log.Print(createdResourceName + " created")
-		resourcesCreated = append(resourcesCreated, createdResourceName)
+	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
+		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
 	}
 
-	return resourcesCreated, nil
+	log.Println("Processing file: " + resTempl.FilePath)
+
+	//Populate the namespace from profile instead of instance body
+	genericKubeData := &utils.ResourceData{
+		YamlFilePath: resTempl.FilePath,
+		Namespace:    namespace,
+	}
+
+	typePlugin, ok := utils.LoadedPlugins[strings.ToLower(resTempl.GVK.Kind)]
+	if !ok {
+		log.Println("No plugin for kind " + resTempl.GVK.Kind + " found. Using generic Plugin")
+		return k.createGeneric(resTempl, namespace)
+	}
+
+	symCreateResourceFunc, err := typePlugin.Lookup("Create")
+	if err != nil {
+		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error fetching "+resTempl.GVK.Kind+" plugin")
+	}
+
+	createdResourceName, err := symCreateResourceFunc.(func(*utils.ResourceData, kubernetes.Interface) (string, error))(
+		genericKubeData, k.clientSet)
+	if err != nil {
+		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
+	}
+	log.Print(createdResourceName + " created")
+	return helm.KubernetesResource{
+		GVK:  resTempl.GVK,
+		Name: createdResourceName,
+	}, nil
 }
 
-func (k *KubernetesClient) createResources(resMap map[string][]string,
-	namespace string) (map[string][]string, error) {
+func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesResourceTemplate,
+	namespace string) ([]helm.KubernetesResource, error) {
 
 	err := k.ensureNamespace(namespace)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
-	createdResourceMap := make(map[string][]string)
-	// Create all the known kinds in the InstallOrder
-	for _, kind := range tiller.InstallOrder {
-		files, ok := resMap[kind]
-		if !ok {
-			log.Println("Kind " + kind + " not found. Skipping...")
-			continue
-		}
-
-		resourcesCreated, err := k.createKind(kind, files, namespace)
+	var createdResources []helm.KubernetesResource
+	for _, resTempl := range sortedTemplates {
+		resCreated, err := k.createKind(resTempl, namespace)
 		if err != nil {
-			return nil, pkgerrors.Wrap(err, "Error creating kind: "+kind)
+			return nil, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
 		}
-
-		createdResourceMap[kind] = resourcesCreated
-		delete(resMap, kind)
+		createdResources = append(createdResources, resCreated)
 	}
 
-	//Create the remaining kinds from the resMap
-	for kind, files := range resMap {
-		resourcesCreated, err := k.createKind(kind, files, namespace)
-		if err != nil {
-			return nil, pkgerrors.Wrap(err, "Error creating kind: "+kind)
-		}
-
-		createdResourceMap[kind] = resourcesCreated
-		delete(resMap, kind)
-	}
-
-	return createdResourceMap, nil
+	return createdResources, nil
 }
 
-func (k *KubernetesClient) deleteGeneric(kind string, resources []string, namespace string) error {
-	log.Println("Deleting items of Kind: " + kind)
+func (k *KubernetesClient) deleteGeneric(resource helm.KubernetesResource, namespace string) error {
+	log.Println("Deleting Kind: " + resource.GVK.Kind)
 
 	pluginObject, ok := utils.LoadedPlugins["generic"]
 	if !ok {
 		return pkgerrors.New("No generic plugin found")
+	}
+
+	//Check if have the mapper before loading the plugin
+	err := k.updateMapper()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Unable to create RESTMapper")
 	}
 
 	symbol, err := pluginObject.Lookup("ExportedVariable")
@@ -251,45 +234,42 @@ func (k *KubernetesClient) deleteGeneric(kind string, resources []string, namesp
 		return pkgerrors.New("ExportedVariable is not PluginReference type")
 	}
 
-	for _, res := range resources {
-		err = genericPlugin.Delete(kind, res, namespace, k)
-		if err != nil {
-			return pkgerrors.Wrap(err, "Error in generic plugin")
-		}
+	err = genericPlugin.Delete(resource, namespace, k)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error in generic plugin")
 	}
 
 	return nil
 }
 
-func (k *KubernetesClient) deleteKind(kind string, resources []string, namespace string) error {
-	log.Println("Deleting items of Kind: " + kind)
+func (k *KubernetesClient) deleteKind(resource helm.KubernetesResource, namespace string) error {
+	log.Println("Deleting Kind: " + resource.GVK.Kind)
 
-	typePlugin, ok := utils.LoadedPlugins[strings.ToLower(kind)]
+	typePlugin, ok := utils.LoadedPlugins[strings.ToLower(resource.GVK.Kind)]
 	if !ok {
-		log.Println("No plugin for kind " + kind + " found. Using generic Plugin")
-		return k.deleteGeneric(kind, resources, namespace)
+		log.Println("No plugin for kind " + resource.GVK.Kind + " found. Using generic Plugin")
+		return k.deleteGeneric(resource, namespace)
 	}
 
 	symDeleteResourceFunc, err := typePlugin.Lookup("Delete")
 	if err != nil {
-		return pkgerrors.Wrap(err, "Error findinf Delete symbol in plugin")
+		return pkgerrors.Wrap(err, "Error finding Delete symbol in plugin")
 	}
 
-	for _, res := range resources {
-		log.Println("Deleting resource: " + res)
-		err = symDeleteResourceFunc.(func(string, string, kubernetes.Interface) error)(
-			res, namespace, k.clientSet)
-		if err != nil {
-			return pkgerrors.Wrap(err, "Error destroying "+res)
-		}
+	log.Println("Deleting resource: " + resource.Name)
+	err = symDeleteResourceFunc.(func(string, string, kubernetes.Interface) error)(
+		resource.Name, namespace, k.clientSet)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error destroying "+resource.Name)
 	}
+
 	return nil
 }
 
-func (k *KubernetesClient) deleteResources(resMap map[string][]string, namespace string) error {
+func (k *KubernetesClient) deleteResources(resources []helm.KubernetesResource, namespace string) error {
 	//TODO: Investigate if deletion should be in a particular order
-	for kind, resourceNames := range resMap {
-		err := k.deleteKind(kind, resourceNames, namespace)
+	for _, res := range resources {
+		err := k.deleteKind(res, namespace)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Deleting resources")
 		}

@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"k8splugin/internal/app"
+	"k8splugin/internal/helm"
 
 	"github.com/gorilla/mux"
 )
@@ -44,9 +45,9 @@ type brokerRequest struct {
 }
 
 type brokerPOSTResponse struct {
-	TemplateType     string              `json:"template_type"`
-	WorkloadID       string              `json:"workload_id"`
-	TemplateResponse map[string][]string `json:"template_response"`
+	TemplateType     string                    `json:"template_type"`
+	WorkloadID       string                    `json:"workload_id"`
+	TemplateResponse []helm.KubernetesResource `json:"template_response"`
 }
 
 type brokerGETResponse struct {

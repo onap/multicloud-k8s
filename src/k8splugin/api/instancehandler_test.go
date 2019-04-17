@@ -24,9 +24,11 @@ import (
 	"testing"
 
 	"k8splugin/internal/app"
+	"k8splugin/internal/helm"
 
 	"github.com/gorilla/mux"
 	pkgerrors "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 //Creating an embedded interface via anonymous variable
@@ -108,9 +110,21 @@ func TestInstanceCreateHandler(t *testing.T) {
 				ProfileName: "profile1",
 				CloudRegion: "region1",
 				Namespace:   "testnamespace",
-				Resources: map[string][]string{
-					"deployment": []string{"test-deployment"},
-					"service":    []string{"test-service"},
+				Resources: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "test-deployment",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "test-service",
+					},
 				},
 			},
 			expectedCode: http.StatusCreated,
@@ -123,9 +137,21 @@ func TestInstanceCreateHandler(t *testing.T) {
 						ProfileName: "profile1",
 						CloudRegion: "region1",
 						Namespace:   "testnamespace",
-						Resources: map[string][]string{
-							"deployment": []string{"test-deployment"},
-							"service":    []string{"test-service"},
+						Resources: []helm.KubernetesResource{
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "apps",
+									Version: "v1",
+									Kind:    "Deployment"},
+								Name: "test-deployment",
+							},
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "",
+									Version: "v1",
+									Kind:    "Service"},
+								Name: "test-service",
+							},
 						},
 					},
 				},
@@ -183,9 +209,21 @@ func TestInstanceGetHandler(t *testing.T) {
 				ProfileName: "profile1",
 				CloudRegion: "region1",
 				Namespace:   "testnamespace",
-				Resources: map[string][]string{
-					"deployment": []string{"test-deployment"},
-					"service":    []string{"test-service"},
+				Resources: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "test-deployment",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "test-service",
+					},
 				},
 			},
 			instClient: &mockInstanceClient{
@@ -197,9 +235,21 @@ func TestInstanceGetHandler(t *testing.T) {
 						ProfileName: "profile1",
 						CloudRegion: "region1",
 						Namespace:   "testnamespace",
-						Resources: map[string][]string{
-							"deployment": []string{"test-deployment"},
-							"service":    []string{"test-service"},
+						Resources: []helm.KubernetesResource{
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "apps",
+									Version: "v1",
+									Kind:    "Deployment"},
+								Name: "test-deployment",
+							},
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "",
+									Version: "v1",
+									Kind:    "Service"},
+								Name: "test-service",
+							},
 						},
 					},
 				},

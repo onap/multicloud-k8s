@@ -19,15 +19,15 @@ package rb
 import (
 	"bytes"
 	"encoding/json"
-	"k8splugin/internal/db"
-	"k8splugin/internal/helm"
+	"io/ioutil"
 	"log"
+	"path/filepath"
 	"strconv"
 	"strings"
-
-	"io/ioutil"
-	"path/filepath"
 	"sync"
+
+	"k8splugin/internal/db"
+	"k8splugin/internal/helm"
 
 	"github.com/ghodss/yaml"
 	pkgerrors "github.com/pkg/errors"
@@ -56,9 +56,9 @@ type ConfigVersionStore struct {
 }
 
 type configResourceList struct {
-	retmap  map[string][]string
-	profile Profile
-	action  string
+	resourceTemplates []helm.KubernetesResourceTemplate
+	profile           Profile
+	action            string
 }
 
 type profileDataManager struct {
@@ -341,13 +341,13 @@ func scheduleResources(c chan configResourceList) {
 		//TODO: ADD Check to see if Application running
 		switch {
 		case data.action == "POST":
-			log.Printf("[scheduleResources]: POST %v %v", data.profile, data.retmap)
+			log.Printf("[scheduleResources]: POST %v %v", data.profile, data.resourceTemplates)
 			//TODO: Needs to add code to call Kubectl create
 		case data.action == "PUT":
-			log.Printf("[scheduleResources]: PUT %v %v", data.profile, data.retmap)
+			log.Printf("[scheduleResources]: PUT %v %v", data.profile, data.resourceTemplates)
 			//TODO: Needs to add code to call Kubectl apply
 		case data.action == "DELETE":
-			log.Printf("[scheduleResources]: DELETE %v %v", data.profile, data.retmap)
+			log.Printf("[scheduleResources]: DELETE %v %v", data.profile, data.resourceTemplates)
 			//TODO: Needs to add code to call Kubectl delete
 
 		}
@@ -358,7 +358,7 @@ func scheduleResources(c chan configResourceList) {
 //configuration overrides resides.
 var resolve = func(rbName, rbVersion, profileName string, p Config) (configResourceList, error) {
 
-	var retMap map[string][]string
+	var resTemplates []helm.KubernetesResourceTemplate
 
 	profile, err := NewProfileClient().Get(rbName, rbVersion, profileName)
 	if err != nil {
@@ -408,15 +408,15 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 		profile.ReleaseName)
 
 	chartPath := filepath.Join(chartBasePath, t.ChartName)
-	retMap, err = helmClient.GenerateKubernetesArtifacts(chartPath,
+	resTemplates, err = helmClient.GenerateKubernetesArtifacts(chartPath,
 		[]string{outputfile.Name()},
 		nil)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Generate final k8s yaml")
 	}
 	crl := configResourceList{
-		retmap:  retMap,
-		profile: profile,
+		resourceTemplates: resTemplates,
+		profile:           profile,
 	}
 
 	return crl, nil

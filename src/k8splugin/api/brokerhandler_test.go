@@ -24,8 +24,10 @@ import (
 	"testing"
 
 	"k8splugin/internal/app"
+	"k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func TestBrokerCreateHandler(t *testing.T) {
@@ -68,9 +70,21 @@ func TestBrokerCreateHandler(t *testing.T) {
 			expected: brokerPOSTResponse{
 				WorkloadID:   "HaKpys8e",
 				TemplateType: "heat",
-				TemplateResponse: map[string][]string{
-					"deployment": []string{"test-deployment"},
-					"service":    []string{"test-service"},
+				TemplateResponse: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "test-deployment",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "test-service",
+					},
 				},
 			},
 			expectedCode: http.StatusCreated,
@@ -83,9 +97,21 @@ func TestBrokerCreateHandler(t *testing.T) {
 						ProfileName: "profile1",
 						CloudRegion: "region1",
 						Namespace:   "testnamespace",
-						Resources: map[string][]string{
-							"deployment": []string{"test-deployment"},
-							"service":    []string{"test-service"},
+						Resources: []helm.KubernetesResource{
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "apps",
+									Version: "v1",
+									Kind:    "Deployment"},
+								Name: "test-deployment",
+							},
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "",
+									Version: "v1",
+									Kind:    "Service"},
+								Name: "test-service",
+							},
 						},
 					},
 				},
@@ -154,9 +180,21 @@ func TestBrokerGetHandler(t *testing.T) {
 						ProfileName: "profile1",
 						CloudRegion: "region1",
 						Namespace:   "testnamespace",
-						Resources: map[string][]string{
-							"deployment": []string{"test-deployment"},
-							"service":    []string{"test-service"},
+						Resources: []helm.KubernetesResource{
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "apps",
+									Version: "v1",
+									Kind:    "Deployment"},
+								Name: "test-deployment",
+							},
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "",
+									Version: "v1",
+									Kind:    "Service"},
+								Name: "test-service",
+							},
 						},
 					},
 				},

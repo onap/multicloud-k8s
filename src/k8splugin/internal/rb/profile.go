@@ -20,12 +20,12 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"k8splugin/internal/db"
 	"path/filepath"
 
-	pkgerrors "github.com/pkg/errors"
-
+	"k8splugin/internal/db"
 	"k8splugin/internal/helm"
+
+	pkgerrors "github.com/pkg/errors"
 )
 
 // Profile contains the parameters needed for resource bundle (rb) profiles
@@ -236,48 +236,48 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 //Resolve returns the path where the helm chart merged with
 //configuration overrides resides.
 func (v *ProfileClient) Resolve(rbName string, rbVersion string,
-	profileName string, values []string) (map[string][]string, error) {
+	profileName string, values []string) ([]helm.KubernetesResourceTemplate, error) {
 
-	var retMap map[string][]string
+	var sortedTemplates []helm.KubernetesResourceTemplate
 
 	//Download and process the profile first
 	//If everything seems okay, then download the definition
 	prData, err := v.Download(rbName, rbVersion, profileName)
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Downloading Profile")
+		return sortedTemplates, pkgerrors.Wrap(err, "Downloading Profile")
 	}
 
 	prPath, err := ExtractTarBall(bytes.NewBuffer(prData))
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Extracting Profile Content")
+		return sortedTemplates, pkgerrors.Wrap(err, "Extracting Profile Content")
 	}
 
 	prYamlClient, err := ProcessProfileYaml(prPath, v.manifestName)
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Processing Profile Manifest")
+		return sortedTemplates, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}
 
 	definitionClient := NewDefinitionClient()
 
 	definition, err := definitionClient.Get(rbName, rbVersion)
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Getting Definition Metadata")
+		return sortedTemplates, pkgerrors.Wrap(err, "Getting Definition Metadata")
 	}
 
 	defData, err := definitionClient.Download(rbName, rbVersion)
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Downloading Definition")
+		return sortedTemplates, pkgerrors.Wrap(err, "Downloading Definition")
 	}
 
 	chartBasePath, err := ExtractTarBall(bytes.NewBuffer(defData))
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Extracting Definition Charts")
+		return sortedTemplates, pkgerrors.Wrap(err, "Extracting Definition Charts")
 	}
 
 	//Get the definition ID and download its contents
 	profile, err := v.Get(rbName, rbVersion, profileName)
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Getting Profile")
+		return sortedTemplates, pkgerrors.Wrap(err, "Getting Profile")
 	}
 
 	//Copy the profile configresources to the chart locations
@@ -287,7 +287,7 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 	//   chartpath: chart/config/resources/config.yaml
 	err = prYamlClient.CopyConfigurationOverrides(chartBasePath)
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Copying configresources to chart")
+		return sortedTemplates, pkgerrors.Wrap(err, "Copying configresources to chart")
 	}
 
 	helmClient := helm.NewTemplateClient(profile.KubernetesVersion,
@@ -295,12 +295,12 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 		profile.ReleaseName)
 
 	chartPath := filepath.Join(chartBasePath, definition.ChartName)
-	retMap, err = helmClient.GenerateKubernetesArtifacts(chartPath,
+	sortedTemplates, err = helmClient.GenerateKubernetesArtifacts(chartPath,
 		[]string{prYamlClient.GetValues()},
 		values)
 	if err != nil {
-		return retMap, pkgerrors.Wrap(err, "Generate final k8s yaml")
+		return sortedTemplates, pkgerrors.Wrap(err, "Generate final k8s yaml")
 	}
 
-	return retMap, nil
+	return sortedTemplates, nil
 }

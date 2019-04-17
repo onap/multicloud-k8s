@@ -28,8 +28,10 @@ import (
 
 	"github.com/ghodss/yaml"
 	pkgerrors "github.com/pkg/errors"
-
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/apimachinery/pkg/util/validation"
+	k8syaml "k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/helm/pkg/chartutil"
 	"k8s.io/helm/pkg/manifest"
 	"k8s.io/helm/pkg/proto/hapi/chart"
@@ -143,10 +145,11 @@ func (h *TemplateClient) ensureDirectory(f string) error {
 }
 
 // GenerateKubernetesArtifacts a mapping of type to fully evaluated helm template
-func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFiles []string, values []string) (map[string][]string, error) {
+func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFiles []string,
+	values []string) ([]KubernetesResourceTemplate, error) {
 
 	var outputDir, chartPath, namespace, releaseName string
-	var retData map[string][]string
+	var retData []KubernetesResourceTemplate
 
 	releaseName = h.releaseName
 	namespace = h.kubeNameSpace
@@ -226,7 +229,6 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	var manifestsToRender []manifest.Manifest
 	//render all manifests in the chart
 	manifestsToRender = listManifests
-	retData = make(map[string][]string)
 	for _, m := range tiller.SortByKind(manifestsToRender) {
 		data := m.Content
 		b := filepath.Base(m.Name)
@@ -249,11 +251,31 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 			return retData, err
 		}
 
-		if val, ok := retData[m.Head.Kind]; ok {
-			retData[m.Head.Kind] = append(val, mfilePath)
-		} else {
-			retData[m.Head.Kind] = []string{mfilePath}
+		gvk, err := getGroupVersionKind(data)
+		if err != nil {
+			return retData, err
 		}
+
+		kres := KubernetesResourceTemplate{
+			GVK:      gvk,
+			FilePath: mfilePath,
+		}
+		retData = append(retData, kres)
 	}
 	return retData, nil
+}
+
+func getGroupVersionKind(data string) (schema.GroupVersionKind, error) {
+	out, err := k8syaml.ToJSON([]byte(data))
+	if err != nil {
+		return schema.GroupVersionKind{}, pkgerrors.Wrap(err, "Converting yaml to json")
+	}
+
+	simpleMeta := json.SimpleMetaFactory{}
+	gvk, err := simpleMeta.Interpret(out)
+	if err != nil {
+		return schema.GroupVersionKind{}, pkgerrors.Wrap(err, "Parsing apiversion and kind")
+	}
+
+	return *gvk, nil
 }

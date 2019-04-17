@@ -24,20 +24,10 @@ import (
 
 	utils "k8splugin/internal"
 	"k8splugin/internal/app"
+	"k8splugin/internal/helm"
 )
 
 type genericPlugin struct {
-}
-
-var kindToGVRMap = map[string]schema.GroupVersionResource{
-	"ConfigMap":   schema.GroupVersionResource{Group: "", Version: "v1", Resource: "configmaps"},
-	"StatefulSet": schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "statefulsets"},
-	"Job":         schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "jobs"},
-	"Pod":         schema.GroupVersionResource{Group: "", Version: "v1", Resource: "pods"},
-	"DaemonSet":   schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "daemonsets"},
-	"CustomResourceDefinition": schema.GroupVersionResource{
-		Group: "apiextensions.k8s.io", Version: "v1beta1", Resource: "customresourcedefinitions",
-	},
 }
 
 // Create deployment object in a specific Kubernetes cluster
@@ -79,7 +69,7 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client *app
 }
 
 // Delete an existing deployment hosted in a specific Kubernetes cluster
-func (g genericPlugin) Delete(kind string, name string, namespace string, client *app.KubernetesClient) error {
+func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string, client *app.KubernetesClient) error {
 	if namespace == "" {
 		namespace = "default"
 	}
@@ -90,14 +80,20 @@ func (g genericPlugin) Delete(kind string, name string, namespace string, client
 	}
 
 	dynClient := client.GetDynamicClient()
-	gvr, ok := kindToGVRMap[kind]
-	if !ok {
-		return pkgerrors.New("GVR not found for: " + kind)
+	mapper := client.GetMapper()
+
+	mapping, err := mapper.RESTMapping(schema.GroupKind{
+		Group: resource.GVK.Group,
+		Kind:  resource.GVK.Kind,
+	}, resource.GVK.Version)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Mapping kind to resource error")
 	}
 
+	gvr := mapping.Resource
 	log.Printf("Using gvr: %s, %s, %s", gvr.Group, gvr.Version, gvr.Resource)
 
-	err := dynClient.Resource(gvr).Namespace(namespace).Delete(name, opts)
+	err = dynClient.Resource(gvr).Namespace(namespace).Delete(resource.Name, opts)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete object error")
 	}

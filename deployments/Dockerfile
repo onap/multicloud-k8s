@@ -34,7 +34,7 @@ WORKDIR /opt/multicloud/k8s
 RUN chown onap:onap /opt/multicloud/k8s -R
 
 ADD --chown=onap ./k8plugin ./
-ADD --chown=onap ./bin/*.so ./
+ADD --chown=onap ./*.so ./
 
 USER onap
 

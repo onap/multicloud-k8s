@@ -948,7 +948,7 @@ spec:
         # This specifies the image to use.
         # virtlet.cloud/ prefix is used by CRI proxy, the remaining part
         # of the image name is prepended with https:// and used to download the image
-        image: $virtlet_image
+        image: $image_name
         imagePullPolicy: IfNotPresent
         # tty and stdin required for "kubectl attach -t" to work
         tty: true

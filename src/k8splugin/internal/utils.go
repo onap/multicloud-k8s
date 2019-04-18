@@ -15,12 +15,14 @@ package utils
 
 import (
 	"io/ioutil"
-	"k8splugin/internal/db"
 	"log"
 	"os"
 	"path/filepath"
 	"plugin"
 	"strings"
+
+	"k8splugin/internal/config"
+	"k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -65,23 +67,10 @@ var DecodeYAML = func(path string, into runtime.Object) (runtime.Object, error) 
 	return obj, nil
 }
 
-// CheckEnvVariables checks for required Environment variables
-func CheckEnvVariables() error {
-	envList := []string{"CSAR_DIR", "KUBE_CONFIG_DIR", "PLUGINS_DIR",
-		"DATABASE_TYPE", "DATABASE_IP", "OVN_CENTRAL_ADDRESS"}
-	for _, env := range envList {
-		if _, ok := os.LookupEnv(env); !ok {
-			return pkgerrors.New("environment variable " + env + " not set")
-		}
-	}
-
-	return nil
-}
-
 // CheckDatabaseConnection checks if the database is up and running and
 // plugin can talk to it
 func CheckDatabaseConnection() error {
-	err := db.CreateDBClient(os.Getenv("DATABASE_TYPE"))
+	err := db.CreateDBClient(config.GetConfiguration().DatabaseType)
 	if err != nil {
 		return pkgerrors.Cause(err)
 	}
@@ -92,10 +81,10 @@ func CheckDatabaseConnection() error {
 	}
 	// TODO Convert these to configuration files instead of environment variables.
 	c := db.EtcdConfig{
-		Endpoint: os.Getenv("ETCD_ENDPOINT_IP"),
-		CertFile: os.Getenv("ETCD_CERT_FILE"),
-		KeyFile:  os.Getenv("ETCD_KEY_FILE"),
-		CAFile:   os.Getenv("ETCD_TRUSTED_CA_FILE"),
+		Endpoint: config.GetConfiguration().EtcdIP,
+		CertFile: config.GetConfiguration().EtcdCert,
+		KeyFile:  config.GetConfiguration().EtcdKey,
+		CAFile:   config.GetConfiguration().EtcdCAFile,
 	}
 	err = db.NewEtcdClient(nil, c)
 	if err != nil {
@@ -106,7 +95,7 @@ func CheckDatabaseConnection() error {
 
 // LoadPlugins loads all the compiled .so plugins
 func LoadPlugins() error {
-	pluginsDir := os.Getenv("PLUGINS_DIR")
+	pluginsDir := config.GetConfiguration().PluginDir
 	err := filepath.Walk(pluginsDir,
 		func(path string, info os.FileInfo, err error) error {
 			if strings.Contains(path, ".so") {
@@ -127,12 +116,7 @@ func LoadPlugins() error {
 
 // CheckInitialSettings is used to check initial settings required to start api
 func CheckInitialSettings() error {
-	err := CheckEnvVariables()
-	if err != nil {
-		return pkgerrors.Cause(err)
-	}
-
-	err = CheckDatabaseConnection()
+	err := CheckDatabaseConnection()
 	if err != nil {
 		return pkgerrors.Cause(err)
 	}

@@ -15,11 +15,11 @@ package app
 
 import (
 	"log"
-	"os"
 	"reflect"
 	"testing"
 
 	utils "k8splugin/internal"
+	"k8splugin/internal/config"
 	"k8splugin/internal/db"
 	"k8splugin/internal/helm"
 	"k8splugin/internal/rb"
@@ -153,14 +153,10 @@ func TestInstanceCreate(t *testing.T) {
 			RBName:      "test-rbdef",
 			RBVersion:   "v1",
 			ProfileName: "profile1",
-			CloudRegion: "mock_config",
+			CloudRegion: "mock_kube_config",
 		}
 
-		err := os.Setenv("KUBE_CONFIG_DIR", "../../mock_files/mock_configs")
-		if err != nil {
-			t.Fatalf("TestInstanceCreate returned an error (%s)", err)
-		}
-
+		config.SetConfigValue("KubeConfigDir", "../../mock_files/mock_configs")
 		ir, err := ic.Create(input)
 		if err != nil {
 			t.Fatalf("TestInstanceCreate returned an error (%s)", err)
@@ -326,7 +322,7 @@ func TestInstanceDelete(t *testing.T) {
 							"namespace":"testnamespace",
 							"rb-name":"test-rbdef",
 							"rb-version":"v1",
-							"cloud-region":"mock_config",
+							"cloud-region":"mock_kube_config",
 							"resources": [
 								{
 									"GVK": {
@@ -369,7 +365,7 @@ func TestInstanceDelete(t *testing.T) {
 							"namespace":"testnamespace",
 							"rb-name":"test-rbdef",
 							"rb-version":"v1",
-							"cloud-region":"mock_config",
+							"cloud-region":"mock_kube_config",
 							"resources": [
 								{
 									"GVK": {

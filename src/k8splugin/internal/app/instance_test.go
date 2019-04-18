@@ -153,7 +153,7 @@ func TestInstanceCreate(t *testing.T) {
 			RBName:      "test-rbdef",
 			RBVersion:   "v1",
 			ProfileName: "profile1",
-			CloudRegion: "mock_config",
+			CloudRegion: "mock_kube_config",
 		}
 
 		err := os.Setenv("KUBE_CONFIG_DIR", "../../mock_files/mock_configs")
@@ -326,7 +326,7 @@ func TestInstanceDelete(t *testing.T) {
 							"namespace":"testnamespace",
 							"rb-name":"test-rbdef",
 							"rb-version":"v1",
-							"cloud-region":"mock_config",
+							"cloud-region":"mock_kube_config",
 							"resources": [
 								{
 									"GVK": {
@@ -369,7 +369,7 @@ func TestInstanceDelete(t *testing.T) {
 							"namespace":"testnamespace",
 							"rb-name":"test-rbdef",
 							"rb-version":"v1",
-							"cloud-region":"mock_config",
+							"cloud-region":"mock_kube_config",
 							"resources": [
 								{
 									"GVK": {

@@ -14,7 +14,7 @@ limitations under the License.
 package db
 
 import (
-	"os"
+	k8sconfig "k8splugin/internal/config"
 
 	"github.com/hashicorp/consul/api"
 	pkgerrors "github.com/pkg/errors"
@@ -38,7 +38,7 @@ type ConsulStore struct {
 func NewConsulStore(store ConsulKVStore) (Store, error) {
 	if store == nil {
 		config := api.DefaultConfig()
-		config.Address = os.Getenv("DATABASE_IP") + ":8500"
+		config.Address = k8sconfig.GetConfiguration().DatabaseAddress + ":8500"
 
 		consulClient, err := api.NewClient(config)
 		if err != nil {

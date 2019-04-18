@@ -15,19 +15,26 @@ source /etc/environment
 
 k8s_path="$(git rev-parse --show-toplevel)"
 export GOPATH=$k8s_path
-
-export DATABASE_TYPE=mongo
-export PLUGINS_DIR=$k8s_path/src/k8splugin/plugins
+export GO111MODULE=on
+CONFIG_FILE=$(pwd)/config/smsconfig.json
 
 echo "Starting mongo services"
 docker-compose kill
 docker-compose up -d mongo
 export DATABASE_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aqf "name=mongo"))
-export no_proxy=$no_proxy,$DATABASE_IP
-export NO_PROXY=$NO_PROXY,$DATABASE_IP
+export no_proxy=${no_proxy:-},$DATABASE_IP
+export NO_PROXY=${NO_PROXY:-},$DATABASE_IP
 
 echo "Compiling source code"
 pushd $k8s_path/src/k8splugin/
-make plugins
-env GO111MODULE=on go run cmd/main.go
+cat << EOF > k8sconfig.json
+{
+    "database-address":     "$DATABASE_IP",
+    "database-type": "mongo",
+    "plugin-dir": "$(pwd)/plugins",
+    "kube-config-dir": "$(pwd)/kubeconfigs"
+}
+EOF
+make all
+./k8plugin
 popd

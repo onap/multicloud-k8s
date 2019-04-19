@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "cb7027e9_578cad91",
+        "filename": "deployments/start.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-19T22:50:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3f17a6e_fe98421b",
+      "range": {
+        "startLine": 19,
+        "startChar": 26,
+        "endLine": 19,
+        "endChar": 35
+      },
+      "revId": "c8d364557015e17f2778cf3eea80ee183b1778b1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d99976d4_2dec272e",
         "filename": "src/k8splugin/internal/config/config.go",
         "patchSetId": 1
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "47b4fbd4_a6533c3e",
+        "filename": "src/k8splugin/internal/config/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-19T22:50:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d99976d4_2dec272e",
+      "revId": "c8d364557015e17f2778cf3eea80ee183b1778b1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b930e05b_d9dd52f7",
         "filename": "src/k8splugin/internal/config/config.go",
         "patchSetId": 1
@@ -53,6 +95,30 @@
       "writtenOn": "2019-04-19T22:09:09Z",
       "side": 1,
       "message": "Is this file assumed to be always in the same directory as the k8splugin?  k8splugin will be copied in /usr/bin or other system directories. This file should be in some other directory",
+      "range": {
+        "startLine": 97,
+        "startChar": 31,
+        "endLine": 97,
+        "endChar": 40
+      },
+      "revId": "c8d364557015e17f2778cf3eea80ee183b1778b1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3b94d0eb_3e196074",
+        "filename": "src/k8splugin/internal/config/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-04-19T22:50:08Z",
+      "side": 1,
+      "message": "Right now. That is the assumption.",
+      "parentUuid": "b930e05b_d9dd52f7",
       "range": {
         "startLine": 97,
         "startChar": 31,

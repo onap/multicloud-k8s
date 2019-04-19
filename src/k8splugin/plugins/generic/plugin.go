@@ -17,6 +17,7 @@ import (
 	"log"
 
 	pkgerrors "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -59,8 +60,17 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client *app
 	}
 
 	gvr := mapping.Resource
+	var createdObj *unstructured.Unstructured
 
-	createdObj, err := dynClient.Resource(gvr).Namespace(namespace).Create(unstruct, metav1.CreateOptions{})
+	switch mapping.Scope.Name() {
+	case meta.RESTScopeNameNamespace:
+		createdObj, err = dynClient.Resource(gvr).Namespace(namespace).Create(unstruct, metav1.CreateOptions{})
+	case meta.RESTScopeNameRoot:
+		createdObj, err = dynClient.Resource(gvr).Create(unstruct, metav1.CreateOptions{})
+	default:
+		return "", pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + gvk.String())
+	}
+
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create object error")
 	}
@@ -93,11 +103,18 @@ func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string
 	gvr := mapping.Resource
 	log.Printf("Using gvr: %s, %s, %s", gvr.Group, gvr.Version, gvr.Resource)
 
-	err = dynClient.Resource(gvr).Namespace(namespace).Delete(resource.Name, opts)
+	switch mapping.Scope.Name() {
+	case meta.RESTScopeNameNamespace:
+		err = dynClient.Resource(gvr).Namespace(namespace).Delete(resource.Name, opts)
+	case meta.RESTScopeNameRoot:
+		err = dynClient.Resource(gvr).Delete(resource.Name, opts)
+	default:
+		return pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + resource.GVK.String())
+	}
+
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete object error")
 	}
-
 	return nil
 }
 

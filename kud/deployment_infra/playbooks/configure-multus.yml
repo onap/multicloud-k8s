@@ -54,7 +54,12 @@
           dest: "{{ multus_dest }}"
           remote_src: yes
       - name: copy multus binary to opt folder
-        command: "mv {{ multus_dest }}/multus-cni_v{{ multus_version }}_linux_amd64/multus-cni /opt/cni/bin/multus"
+        command: "mv {{ multus_dest }}/multus-cni_{{ multus_version }}_linux_amd64/multus-cni /opt/cni/bin/multus"
+      - file:
+          path: /opt/cni/bin/multus
+          owner: root
+          group: root
+          mode: 0755
       when: multus_source_type == "tarball"
     - name: create multus configuration file
       blockinfile:

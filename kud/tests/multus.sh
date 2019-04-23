@@ -29,12 +29,14 @@ setup $multus_deployment_name
 deployment_pod=$(kubectl get pods | grep  $multus_deployment_name | awk '{print $1}')
 echo "===== $deployment_pod details ====="
 kubectl exec -it $deployment_pod -- ip a
-multus_nic=$(kubectl exec -it $deployment_pod -- ifconfig | grep "eth1")
-if [ -z "$multus_nic" ]; then
-    echo "The $deployment_pod pod doesn't contain the eth1 nic"
+multus_nic=$(kubectl exec -it $deployment_pod -- ip a)
+if [[ $multus_nic != *"net1"* ]]; then
+    echo "The $deployment_pod pod doesn't contain the net1 nic"
     exit 1
+else
+    echo "Test Completed!"
 fi
-popd
 
 # Teardown
 teardown $multus_deployment_name
+popd

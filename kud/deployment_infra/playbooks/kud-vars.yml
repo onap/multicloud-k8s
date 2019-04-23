@@ -54,7 +54,7 @@ istio_url: "https://github.com/istio/istio/releases/download/{{ istio_version }}
 go_path: "{{ base_dest }}/go"
 ovn4nfv_dest: "{{ go_path }}/src/ovn4nfv-k8s-plugin"
 ovn4nfv_source_type: "source"
-ovn4nfv_version: 5026d1d89b05eac5e004279b742df6745a73d93a
+ovn4nfv_version: aa14577f6bc672bc8622edada8a487825fdebce1
 ovn4nfv_url: "https://git.opnfv.org/ovn4nfv-k8s-plugin/"
 
 go_version: '1.11'

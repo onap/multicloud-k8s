@@ -48,7 +48,7 @@ func TestInit(t *testing.T) {
 	t.Run("Successfully create Kube Client", func(t *testing.T) {
 
 		kubeClient := KubernetesClient{}
-		err := kubeClient.init("../../mock_files/mock_configs/mock_config")
+		err := kubeClient.init("../../mock_files/mock_configs/mock_kube_config")
 		if err != nil {
 			t.Fatalf("TestGetKubeClient returned an error (%s)", err)
 		}

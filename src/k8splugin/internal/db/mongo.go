@@ -19,7 +19,8 @@ package db
 import (
 	"golang.org/x/net/context"
 	"log"
-	"os"
+
+	"k8splugin/internal/config"
 
 	pkgerrors "github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
@@ -76,7 +77,7 @@ var cursorClose = func(ctx context.Context, cursor *mongo.Cursor) error {
 // If a database with that name exists, it will be returned
 func NewMongoStore(name string, store *mongo.Database) (Store, error) {
 	if store == nil {
-		ip := "mongodb://" + os.Getenv("DATABASE_IP") + ":27017"
+		ip := "mongodb://" + config.GetConfiguration().DatabaseAddress + ":27017"
 		clientOptions := options.Client()
 		clientOptions.ApplyURI(ip)
 		mongoClient, err := mongo.NewClient(clientOptions)

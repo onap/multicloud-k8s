@@ -30,11 +30,11 @@ RUN apt-get update && apt-get install -y -qq apt-transport-https curl \
  && curl https://packages.wand.net.nz/keyring.gpg -o /etc/apt/trusted.gpg.d/wand.gpg \
  && apt-get update && apt install -y -qq ovn-common
 
-WORKDIR /opt/multicloud/k8s
-RUN chown onap:onap /opt/multicloud/k8s -R
+WORKDIR /opt/multicloud/k8splugin
+RUN chown onap:onap /opt/multicloud/k8splugin -R
 
 ADD --chown=onap ./k8plugin ./
-ADD --chown=onap ./*.so ./
+ADD --chown=onap ./*.so ./plugins/
 
 USER onap
 

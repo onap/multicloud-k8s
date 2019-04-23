@@ -16,12 +16,6 @@ ENV http_proxy $HTTP_PROXY
 ENV https_proxy $HTTPS_PROXY
 ENV no_proxy $NO_PROXY
 
-ENV CSAR_DIR "/opt/csar"
-ENV KUBE_CONFIG_DIR "/opt/kubeconfig"
-ENV DATABASE_TYPE "consul"
-ENV DATABASE_IP "127.0.0.1"
-ENV OVN_CENTRAL_ADDRESS "127.0.0.1:6641"
-
 EXPOSE 8081
 
 RUN groupadd -r onap && useradd -r -g onap onap

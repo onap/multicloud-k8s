@@ -21,7 +21,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/kubernetes/scheme"
 
 	utils "k8splugin/internal"
 	"k8splugin/internal/app"
@@ -38,16 +37,11 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client *app
 	}
 
 	//Decode the yaml file to create a runtime.Object
-	obj, err := utils.DecodeYAML(yamlFilePath, nil)
+	unstruct := &unstructured.Unstructured{}
+	//Ignore the returned obj as we expect the data in unstruct
+	_, err := utils.DecodeYAML(yamlFilePath, unstruct)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Decode deployment object error")
-	}
-
-	//Convert the runtime.Object to an unstructured Object
-	unstruct := &unstructured.Unstructured{}
-	err = scheme.Scheme.Convert(obj, unstruct, nil)
-	if err != nil {
-		return "", pkgerrors.Wrap(err, "Converting to unstructured object")
 	}
 
 	dynClient := client.GetDynamicClient()

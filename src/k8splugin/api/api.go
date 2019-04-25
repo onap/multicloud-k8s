@@ -101,5 +101,8 @@ func NewRouter(defClient rb.DefinitionManager,
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/rollback", configHandler.rollbackHandler).Methods("POST")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/tagit", configHandler.tagitHandler).Methods("POST")
 
+	// Add healthcheck path
+	instRouter.HandleFunc("/healthcheck", healthCheckHandler).Methods("GET")
+
 	return router
 }

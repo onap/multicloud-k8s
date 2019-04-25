@@ -35,6 +35,10 @@ type MockDB struct {
 	Err   error
 }
 
+func (m *MockDB) HealthCheck() error {
+	return m.Err
+}
+
 func (m *MockDB) Create(table string, key Key, tag string, data interface{}) error {
 	return m.Err
 }

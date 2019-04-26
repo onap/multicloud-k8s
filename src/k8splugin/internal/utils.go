@@ -42,7 +42,7 @@ type ResourceData struct {
 }
 
 // DecodeYAML reads a YAMl file to extract the Kubernetes object definition
-var DecodeYAML = func(path string, into runtime.Object) (runtime.Object, error) {
+func DecodeYAML(path string, into runtime.Object) (runtime.Object, error) {
 	if _, err := os.Stat(path); err != nil {
 		if os.IsNotExist(err) {
 			return nil, pkgerrors.New("File " + path + " not found")

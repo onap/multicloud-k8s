@@ -33,10 +33,13 @@ setup $ovn4nfv_deployment_name
 deployment_pod=$(kubectl get pods | grep  $ovn4nfv_deployment_name | awk '{print $1}')
 echo "===== $deployment_pod details ====="
 kubectl exec -it $deployment_pod -- ip a
-multus_nic=$(kubectl exec -it $deployment_pod -- ifconfig | grep "net1")
-if [ -z "$multus_nic" ]; then
+
+ovn_nic=$(kubectl exec -it $deployment_pod -- ip a )
+if [[ $ovn_nic != *"net1"* ]]; then
     echo "The $deployment_pod pod doesn't contain the net1 nic"
     exit 1
+else
+    echo "Test Completed!"
 fi
 
 # Teardown

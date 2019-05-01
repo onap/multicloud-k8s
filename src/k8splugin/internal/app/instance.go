@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"math/rand"
 
-	"k8splugin/internal/config"
 	"k8splugin/internal/db"
 	"k8splugin/internal/helm"
 	"k8splugin/internal/rb"
@@ -120,7 +119,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.init(config.GetConfiguration().KubeConfigDir + "/" + i.CloudRegion)
+	err = k8sClient.init(i.CloudRegion)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
@@ -185,7 +184,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.init(config.GetConfiguration().KubeConfigDir + "/" + inst.CloudRegion)
+	err = k8sClient.init(inst.CloudRegion)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}

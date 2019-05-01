@@ -19,6 +19,8 @@ import (
 	"strings"
 
 	utils "k8splugin/internal"
+	"k8splugin/internal/config"
+	"k8splugin/internal/connection"
 	"k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
@@ -43,11 +45,31 @@ type KubernetesClient struct {
 	restMapper     meta.RESTMapper
 }
 
-// GetKubeClient loads the Kubernetes configuation values stored into the local configuration file
-func (k *KubernetesClient) init(configPath string) error {
-	if configPath == "" {
-		return pkgerrors.New("config not passed and is not found in ~/.kube. ")
+// getKubeConfig uses the connectivity client to get the kubeconfig based on the name
+// of the cloudregion. This is written out to a file.
+func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
+	conn := connection.NewConnectionClient()
+	kubeConfigPath, err := conn.Download(cloudregion, config.GetConfiguration().KubeConfigDir)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Downloading kubeconfig")
 	}
+
+	return kubeConfigPath, nil
+}
+
+// init loads the Kubernetes configuation values stored into the local configuration file
+func (k *KubernetesClient) init(cloudregion string) error {
+	if cloudregion == "" {
+		return pkgerrors.New("Cloudregion is empty")
+	}
+
+	configPath, err := k.getKubeConfig(cloudregion)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Get kubeconfig file")
+	}
+
+	//Remove kubeconfigfile after the clients are created
+	defer os.Remove(configPath)
 
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
 	if err != nil {

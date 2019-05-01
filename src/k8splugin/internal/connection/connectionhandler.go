@@ -17,8 +17,11 @@
 package connection
 
 import (
+	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -32,11 +35,25 @@ type ConnectionHandler struct {
 	Client ConnectionManager
 }
 
-// createHandler handles creation of the connectivity entry in the database
+// CreateHandler handles creation of the connectivity entry in the database
+// This is a multipart handler. See following example curl request
+// curl -i -F "metadata={\"cloud-region\":\"kud\",\"cloud-owner\":\"me\"};type=application/json" \
+//         -F file=@/home/user/.kube/config \
+//         -X POST http://localhost:8081/v1/connectivity-info
 func (h ConnectionHandler) CreateHandler(w http.ResponseWriter, r *http.Request) {
 	var v Connection
 
-	err := json.NewDecoder(r.Body).Decode(&v)
+	// Implemenation using multipart form
+	// Review and enable/remove at a later date
+	// Set Max size to 16mb here
+	err := r.ParseMultipartForm(16777216)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	jsn := bytes.NewBuffer([]byte(r.FormValue("metadata")))
+	err = json.NewDecoder(jsn).Decode(&v)
 	switch {
 	case err == io.EOF:
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -58,11 +75,24 @@ func (h ConnectionHandler) CreateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Kubeconfig is required.
-	if v.Kubeconfig == nil {
-		http.Error(w, "Missing Kubeconfig in POST request", http.StatusBadRequest)
+	//Read the file section and ignore the header
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "Unable to process file", http.StatusUnprocessableEntity)
 		return
 	}
+
+	defer file.Close()
+
+	//Convert the file content to base64 for storage
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		http.Error(w, "Unable to read file", http.StatusUnprocessableEntity)
+		return
+	}
+
+	v.Kubeconfig = base64.StdEncoding.EncodeToString(content)
+
 	ret, err := h.Client.Create(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

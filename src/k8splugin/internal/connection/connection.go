@@ -17,7 +17,11 @@
 package connection
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
+
 	"k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
@@ -27,7 +31,7 @@ import (
 type Connection struct {
 	CloudRegion           string                 `json:"cloud-region"`
 	CloudOwner            string                 `json:"cloud-owner"`
-	Kubeconfig            map[string]interface{} `json:"kubeconfig"`
+	Kubeconfig            string                 `json:"kubeconfig"`
 	OtherConnectivityList map[string]interface{} `json:"other-connectivity-list"`
 }
 
@@ -47,14 +51,14 @@ func (dk ConnectionKey) String() string {
 	return string(out)
 }
 
-//  ConnectionManager is an interface exposes the Connection functionality
+// ConnectionManager is an interface exposes the Connection functionality
 type ConnectionManager interface {
 	Create(c Connection) (Connection, error)
 	Get(name string) (Connection, error)
 	Delete(name string) error
 }
 
-//  ConnectionClient implements the  ConnectionManager
+// ConnectionClient implements the  ConnectionManager
 // It will also be used to maintain some localized state
 type ConnectionClient struct {
 	storeName string
@@ -113,7 +117,7 @@ func (v *ConnectionClient) Get(name string) (Connection, error) {
 	return Connection{}, pkgerrors.New("Error getting Connection")
 }
 
-// Delete the  Connection from database
+// Delete the Connection from database
 func (v *ConnectionClient) Delete(name string) error {
 
 	//Construct the composite key to select the entry
@@ -123,4 +127,29 @@ func (v *ConnectionClient) Delete(name string) error {
 		return pkgerrors.Wrap(err, "Delete Connection")
 	}
 	return nil
+}
+
+// Download the connection information onto a kubeconfig file
+// The file is named after the name of the connection and will
+// be placed in the provided parent directory
+func (v *ConnectionClient) Download(name string, parentdir string) (string, error) {
+
+	conn, err := v.Get(name)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Getting Connection info")
+	}
+
+	//Decode the kubeconfig from base64 to string
+	kubeContent, err := base64.StdEncoding.DecodeString(conn.Kubeconfig)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Converting from base64")
+	}
+
+	target := filepath.Join(parentdir, conn.CloudRegion)
+	err = ioutil.WriteFile(target, kubeContent, 0644)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Writing kubeconfig to file")
+	}
+
+	return target, nil
 }

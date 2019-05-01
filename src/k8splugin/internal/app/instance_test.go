@@ -14,12 +14,14 @@ limitations under the License.
 package app
 
 import (
+	"encoding/base64"
+	"io/ioutil"
 	"log"
 	"reflect"
 	"testing"
 
 	utils "k8splugin/internal"
-	"k8splugin/internal/config"
+	"k8splugin/internal/connection"
 	"k8splugin/internal/db"
 	"k8splugin/internal/helm"
 	"k8splugin/internal/rb"
@@ -35,6 +37,12 @@ func TestInstanceCreate(t *testing.T) {
 	err := LoadMockPlugins(utils.LoadedPlugins)
 	if err != nil {
 		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
+	}
+
+	// Load the mock kube config file into memory
+	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+	if err != nil {
+		t.Fatal("Unable to read mock_kube_config")
 	}
 
 	t.Run("Successfully create Instance", func(t *testing.T) {
@@ -145,6 +153,12 @@ func TestInstanceCreate(t *testing.T) {
 						"RZQl9kOgrk+XoOzX68tJ3wYJb0N/RJ0NzPUr5y4YEDBw4cOHDgwIEDBw4cOHDgwIEDBw4" +
 						"cOHDgwIEDB18K/AcxEDJDAHgAAA=="),
 				},
+				connection.ConnectionKey{CloudRegion: "mock_connection"}.String(): {
+					"metadata": []byte(
+						"{\"cloud-region\":\"mock_connection\"," +
+							"\"cloud-owner\":\"mock_owner\"," +
+							"\"kubeconfig\": \"" + base64.StdEncoding.EncodeToString(fd) + "\"}"),
+				},
 			},
 		}
 
@@ -153,10 +167,9 @@ func TestInstanceCreate(t *testing.T) {
 			RBName:      "test-rbdef",
 			RBVersion:   "v1",
 			ProfileName: "profile1",
-			CloudRegion: "mock_kube_config",
+			CloudRegion: "mock_connection",
 		}
 
-		config.SetConfigValue("KubeConfigDir", "../../mock_files/mock_configs")
 		ir, err := ic.Create(input)
 		if err != nil {
 			t.Fatalf("TestInstanceCreate returned an error (%s)", err)
@@ -311,6 +324,12 @@ func TestInstanceDelete(t *testing.T) {
 		t.Fatalf("TestInstanceDelete returned an error (%s)", err)
 	}
 
+	// Load the mock kube config file into memory
+	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+	if err != nil {
+		t.Fatal("Unable to read mock_kube_config")
+	}
+
 	t.Run("Successfully delete Instance", func(t *testing.T) {
 		db.DBconn = &db.MockDB{
 			Items: map[string]map[string][]byte{
@@ -322,7 +341,7 @@ func TestInstanceDelete(t *testing.T) {
 							"namespace":"testnamespace",
 							"rb-name":"test-rbdef",
 							"rb-version":"v1",
-							"cloud-region":"mock_kube_config",
+							"cloud-region":"mock_connection",
 							"resources": [
 								{
 									"GVK": {
@@ -342,6 +361,12 @@ func TestInstanceDelete(t *testing.T) {
 								}
 							]
 						}`),
+				},
+				connection.ConnectionKey{CloudRegion: "mock_connection"}.String(): {
+					"metadata": []byte(
+						"{\"cloud-region\":\"mock_connection\"," +
+							"\"cloud-owner\":\"mock_owner\"," +
+							"\"kubeconfig\": \"" + base64.StdEncoding.EncodeToString(fd) + "\"}"),
 				},
 			},
 		}

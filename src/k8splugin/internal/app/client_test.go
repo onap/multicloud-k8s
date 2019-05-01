@@ -14,12 +14,16 @@ limitations under the License.
 package app
 
 import (
+	"encoding/base64"
+	"io/ioutil"
 	"os"
 	"plugin"
 	"reflect"
 	"testing"
 
 	utils "k8splugin/internal"
+	"k8splugin/internal/connection"
+	"k8splugin/internal/db"
 	"k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
@@ -46,9 +50,29 @@ func LoadMockPlugins(krdLoadedPlugins map[string]*plugin.Plugin) error {
 
 func TestInit(t *testing.T) {
 	t.Run("Successfully create Kube Client", func(t *testing.T) {
+		// Load the mock kube config file into memory
+		fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+		if err != nil {
+			t.Fatal("Unable to read mock_kube_config")
+		}
+
+		fdbase64 := base64.StdEncoding.EncodeToString(fd)
+
+		// Create mock db with connectivity information in it
+		db.DBconn = &db.MockDB{
+			Items: map[string]map[string][]byte{
+				connection.ConnectionKey{CloudRegion: "mock_connection"}.String(): {
+					"metadata": []byte(
+						"{\"cloud-region\":\"mock_connection\"," +
+							"\"cloud-owner\":\"mock_owner\"," +
+							"\"kubeconfig\": \"" + fdbase64 + "\"}"),
+				},
+			},
+		}
 
 		kubeClient := KubernetesClient{}
-		err := kubeClient.init("../../mock_files/mock_configs/mock_kube_config")
+		// Refer to the connection via its name
+		err = kubeClient.init("mock_connection")
 		if err != nil {
 			t.Fatalf("TestGetKubeClient returned an error (%s)", err)
 		}

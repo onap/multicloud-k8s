@@ -47,7 +47,7 @@ func (h ConnectionHandler) CreateHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Name is required.
-	if v.ConnectionName == "" {
+	if v.CloudRegion == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
@@ -58,13 +58,7 @@ func (h ConnectionHandler) CreateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// CloudRegionID is required.
-	if v.CloudRegionID == "" {
-		http.Error(w, "Missing CloudRegionID in POST request", http.StatusBadRequest)
-		return
-	}
-
-	// CloudRegionID is required.
+	// Kubeconfig is required.
 	if v.Kubeconfig == nil {
 		http.Error(w, "Missing Kubeconfig in POST request", http.StatusBadRequest)
 		return

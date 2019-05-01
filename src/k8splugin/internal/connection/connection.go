@@ -25,16 +25,15 @@ import (
 
 // Connection contains the parameters needed for Connection information for a Cloud region
 type Connection struct {
-	ConnectionName        string                 `json:"name"`
+	CloudRegion           string                 `json:"cloud-region"`
 	CloudOwner            string                 `json:"cloud-owner"`
-	CloudRegionID         string                 `json:"cloud-region-id"`
 	Kubeconfig            map[string]interface{} `json:"kubeconfig"`
 	OtherConnectivityList map[string]interface{} `json:"other-connectivity-list"`
 }
 
 // ConnectionKey is the key structure that is used in the database
 type ConnectionKey struct {
-	ConnectionName string `json:"connection-name"`
+	CloudRegion string `json:"cloud-region"`
 }
 
 // We will use json marshalling to convert to string to
@@ -75,10 +74,10 @@ func NewConnectionClient() *ConnectionClient {
 func (v *ConnectionClient) Create(c Connection) (Connection, error) {
 
 	//Construct composite key consisting of name
-	key := ConnectionKey{ConnectionName: c.ConnectionName}
+	key := ConnectionKey{CloudRegion: c.CloudRegion}
 
 	//Check if this Connection already exists
-	_, err := v.Get(c.ConnectionName)
+	_, err := v.Get(c.CloudRegion)
 	if err == nil {
 		return Connection{}, pkgerrors.New("Connection already exists")
 	}
@@ -95,7 +94,7 @@ func (v *ConnectionClient) Create(c Connection) (Connection, error) {
 func (v *ConnectionClient) Get(name string) (Connection, error) {
 
 	//Construct the composite key to select the entry
-	key := ConnectionKey{ConnectionName: name}
+	key := ConnectionKey{CloudRegion: name}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Connection{}, pkgerrors.Wrap(err, "Get Connection")
@@ -118,7 +117,7 @@ func (v *ConnectionClient) Get(name string) (Connection, error) {
 func (v *ConnectionClient) Delete(name string) error {
 
 	//Construct the composite key to select the entry
-	key := ConnectionKey{ConnectionName: name}
+	key := ConnectionKey{CloudRegion: name}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Connection")

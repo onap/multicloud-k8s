@@ -70,6 +70,30 @@
       "revId": "6878dc653b5208e726289f58c884922dec0d96e1",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99b2112f_2a27b1b8",
+        "filename": "kud/hosting_providers/vagrant/aio.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-06T12:53:29Z",
+      "side": 1,
+      "message": "ok, but hardcoding ip here prevents user to just run the aio.sh script after cloning the repo. This should be given as a parameter and document it somewhere.\nI.e. what is this ip needed here. In case of aio.sh is it localhost ip, right? But for what interface\u0027s ip?\n\nCan this be combined with the fact that installer.sh seems to hardcode eth1 interface? Maybe this is needed only for ov-central group and not to all host groups?",
+      "parentUuid": "2330b724_f4d2521e",
+      "range": {
+        "startLine": 25,
+        "startChar": 27,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "6878dc653b5208e726289f58c884922dec0d96e1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

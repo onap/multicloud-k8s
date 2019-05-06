@@ -16,7 +16,7 @@ ENV http_proxy $HTTP_PROXY
 ENV https_proxy $HTTPS_PROXY
 ENV no_proxy $NO_PROXY
 
-EXPOSE 8081
+EXPOSE 9015
 
 RUN groupadd -r onap && useradd -r -g onap onap
 RUN apt-get update && apt-get install -y -qq apt-transport-https curl \

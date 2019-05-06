@@ -39,6 +39,7 @@ type Configuration struct {
 	EtcdCAFile        string `json:"etcd-ca-file"`
 	KubeConfigDir     string `json:"kube-config-dir"`
 	OVNCentralAddress string `json:"ovn-central-address"`
+	ServicePort       string `json:"service-port"`
 }
 
 // Config is the structure that stores the configuration
@@ -87,6 +88,7 @@ func defaultConfiguration() *Configuration {
 		EtcdCAFile:        "etcd-ca.cert",
 		KubeConfigDir:     cwd,
 		OVNCentralAddress: "127.0.0.1",
+		ServicePort:       "9015",
 	}
 }
 

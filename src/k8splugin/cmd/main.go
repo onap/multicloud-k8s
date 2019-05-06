@@ -25,6 +25,7 @@ import (
 	"k8splugin/api"
 	utils "k8splugin/internal"
 	"k8splugin/internal/auth"
+	"k8splugin/internal/config"
 
 	"github.com/gorilla/handlers"
 )
@@ -44,7 +45,7 @@ func main() {
 
 	httpServer := &http.Server{
 		Handler: loggedRouter,
-		Addr:    ":8081", // Remove hardcoded port number
+		Addr:    ":" + config.GetConfiguration().ServicePort,
 	}
 
 	connectionsClose := make(chan struct{})

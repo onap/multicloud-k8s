@@ -31,6 +31,7 @@ cat << EOF > k8sconfig.json
     "database-address":     "$DATABASE_IP",
     "database-type": "mongo",
     "plugin-dir": "$(pwd)/plugins",
+    "service-port": "9015",
     "kube-config-dir": "$(pwd)/kubeconfigs"
 }
 EOF

@@ -46,6 +46,30 @@
       "revId": "6878dc653b5208e726289f58c884922dec0d96e1",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2330b724_f4d2521e",
+        "filename": "kud/hosting_providers/vagrant/aio.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-06T07:21:21Z",
+      "side": 1,
+      "message": "This is required by ovn playbook. Without this OVN doesn\u0027t get configured properly. Try running kud/tests to verify specifically ovn4nfv.sh",
+      "parentUuid": "f47edde3_d3d1e3e7",
+      "range": {
+        "startLine": 25,
+        "startChar": 27,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "6878dc653b5208e726289f58c884922dec0d96e1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

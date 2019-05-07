@@ -31,10 +31,10 @@ function _install_go {
 # _install_pip() - Install Python Package Manager
 function _install_pip {
     if $(pip --version &>/dev/null); then
+        sudo -E pip install --upgrade pip
+    else
         sudo apt-get install -y python-dev
         curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
-    else
-        sudo -E pip install --upgrade pip
     fi
 }
 

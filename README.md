@@ -16,18 +16,24 @@ MultiCloud Kubernetes plugin for ONAP multicloud.
 # Installation
 
 Requirements:
-* Go 1.11
+* Go 1.12.4
 
 Steps:
 
-* Clone repo in GOPATH src:
-    * `cd $GOPATH/src && git clone https://git.onap.org/multicloud/k8s`
+* Clone repo:
+    * `git clone https://git.onap.org/multicloud/k8s`
 
-* Run unit tests:
-    *  `make build`
+* Build everything:
+    *  `cd k8s/src/k8splugin && make all`
 
-* Compile to build Binary:
-    * `make deploy`
+* Run Tests:
+    *  `cd k8s/src/k8splugin && make test`
+
+* Generate Coverage Report:
+    * `cd k8s/src/k8splugin && make cover`
+
+* Run the plugin:
+    * `cd k8s/deployments && ./start.sh`
 
 # Architecture
 

@@ -234,7 +234,7 @@ fi
 sudo apt-get update
 install_k8s
 install_addons
-if [[ "${KUD_PLUGIN_ENABLED:-false}" ]]; then
+if ${KUD_PLUGIN_ENABLED:-false}; then
     install_plugin
 fi
 _print_kubernetes_info

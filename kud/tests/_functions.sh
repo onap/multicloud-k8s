@@ -12,6 +12,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+source /etc/environment
+
 function print_msg {
     local msg=$1
     local RED='\033[0;31m'

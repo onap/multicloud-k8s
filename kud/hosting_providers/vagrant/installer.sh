@@ -156,6 +156,7 @@ function install_plugin {
     echo "Installing multicloud/k8s plugin"
     _install_go
     _install_docker
+    sudo apt-get install -y jq
     sudo -E pip install docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}

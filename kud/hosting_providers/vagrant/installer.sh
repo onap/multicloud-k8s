@@ -138,6 +138,7 @@ function install_addons {
     echo "Installing Kubernetes AddOns"
     _install_ansible
     sudo ansible-galaxy install $verbose -r $kud_infra_folder/galaxy-requirements.yml --ignore-errors
+    sudo apt-get install -y jq
 
     ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
     for addon in ${KUD_ADDONS:-virtlet ovn4nfv}; do

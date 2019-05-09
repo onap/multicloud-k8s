@@ -216,7 +216,7 @@ kud_infra_folder=$kud_folder/../../deployment_infra
 export kud_inventory_folder=$kud_folder/inventory
 kud_inventory=$kud_inventory_folder/hosts.ini
 kud_playbooks=$kud_infra_folder/playbooks
-kud_tests=$kud_folder/tests
+kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
 
@@ -233,6 +233,7 @@ if [ -f $kud_folder/sources.list ]; then
 fi
 sudo apt-get update
 install_k8s
+bash ${kud_tests}/_common_test.sh
 install_addons
 if ${KUD_PLUGIN_ENABLED:-false}; then
     install_plugin

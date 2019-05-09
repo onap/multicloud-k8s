@@ -13,6 +13,7 @@ set -o nounset
 set -o pipefail
 #set -o xtrace
 
+source _common_test.sh
 source _functions.sh
 
 base_url="http://localhost:8081/v1/vnf_instances/"
@@ -21,6 +22,7 @@ namespace="default"
 csar_id=cb009bfe-bbee-11e8-9766-525400435678
 
 # Setup
+install_deps
 _checks_args ${csar_id}
 cp -R ./edgex/* ${CSAR_DIR}/${csar_id}/
 

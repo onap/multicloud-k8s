@@ -14,6 +14,7 @@ set -o pipefail
 #set -o xtrace
 
 source _common.sh
+source _common_test.sh
 source _functions.sh
 
 base_url="http://localhost:8081"
@@ -57,6 +58,7 @@ function start_aai_service {
 }
 
 # Setup
+install_deps
 destroy_deployment $plugin_deployment_name
 
 #start_aai_service

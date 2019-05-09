@@ -22,6 +22,30 @@
       "revId": "2fd7150dab36cfad252005a042833f5898f118f9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "49141cf0_0ca43380",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-09T18:39:34Z",
+      "side": 1,
+      "message": "jq is used in plugin.sh and plugin_edgex.sh functional test scripts which are testing k8s plugin so it\u0027s somehow related.",
+      "parentUuid": "e4551b87_94d9d9eb",
+      "range": {
+        "startLine": 159,
+        "startChar": 4,
+        "endLine": 159,
+        "endChar": 30
+      },
+      "revId": "2fd7150dab36cfad252005a042833f5898f118f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

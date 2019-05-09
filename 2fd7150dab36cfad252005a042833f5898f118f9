@@ -46,6 +46,30 @@
       "revId": "2fd7150dab36cfad252005a042833f5898f118f9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f61cccd_90e52e63",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-09T18:52:40Z",
+      "side": 1,
+      "message": "I agree with Ritu. https://gerrit.onap.org/r/#/c/87369/1/kud/hosting_providers/vagrant/Vagrantfile\n\nthe plugin is going to be disabled in VM deployment. I think it should be under addons",
+      "parentUuid": "e4551b87_94d9d9eb",
+      "range": {
+        "startLine": 159,
+        "startChar": 4,
+        "endLine": 159,
+        "endChar": 30
+      },
+      "revId": "2fd7150dab36cfad252005a042833f5898f118f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

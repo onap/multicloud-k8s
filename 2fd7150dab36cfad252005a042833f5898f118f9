@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e4551b87_94d9d9eb",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-09T17:47:28Z",
+      "side": 1,
+      "message": "Does this need to be part of install_plugin. This is independent of the plugin",
+      "range": {
+        "startLine": 159,
+        "startChar": 4,
+        "endLine": 159,
+        "endChar": 30
+      },
+      "revId": "2fd7150dab36cfad252005a042833f5898f118f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

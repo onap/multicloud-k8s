@@ -70,6 +70,30 @@
       "revId": "2fd7150dab36cfad252005a042833f5898f118f9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb71f89f_a0edc611",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-10T05:52:42Z",
+      "side": 1,
+      "message": "ok, install_addons is called before install_plugin so it will be available for functional test here also. And it will be then available for test in install_addons too (even by default none using it now). I will move it there.",
+      "parentUuid": "9f61cccd_90e52e63",
+      "range": {
+        "startLine": 159,
+        "startChar": 4,
+        "endLine": 159,
+        "endChar": 30
+      },
+      "revId": "2fd7150dab36cfad252005a042833f5898f118f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

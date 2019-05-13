@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "88bd7773_5c88f528",
+        "filename": "kud/hosting_providers/vagrant/aio.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-05-13T16:58:08Z",
+      "side": 1,
+      "message": "Shouldn\u0027t be better to move this to the place where it\u0027s used? Like:\n\nhttps://gerrit.onap.org/r/#/c/87523/2/kud/tests/_functions.sh@30",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c82cc5cd_baaaad13",
+        "filename": "kud/hosting_providers/vagrant/aio.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-05-13T16:58:08Z",
+      "side": 1,
+      "message": "I don\u0027t understand the point to define the OVN_CENTRAL_IP_ADDRESS if the line 31 is the only place where it\u0027s going to be used. BTW xargs is not required\n\n    hostname -I | cut -d \u0027 \u0027 -f 1",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "36d2e8aa_e458afa7",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-05-13T16:58:08Z",
+      "side": 1,
+      "message": "Shouldn\u0027t be better to move these instructions in the declaration in line 216",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "84d6fbbe_361f42d2",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-05-13T16:58:08Z",
+      "side": 1,
+      "message": "IMHO I prefer defining the function here and consume it from the tests that defining there.",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "18115551_161467f4",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2019-05-13T16:58:08Z",
+      "side": 1,
+      "message": "This change won\u0027t be required if the import is happening in the way that I was suggesting in https://gerrit.onap.org/r/#/c/87523/2/kud/hosting_providers/vagrant/installer.sh@17",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

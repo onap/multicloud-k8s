@@ -9,7 +9,12 @@
 ##############################################################################
 
 set -o errexit
+set -o nounset
 set -o pipefail
+
+INSTALLER_DIR=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
+
+source ${INSTALLER_DIR}/../../tests/_functions.sh
 
 # _install_go() - Install GoLang package
 function _install_go {
@@ -63,15 +68,15 @@ function _install_docker {
     sudo apt-get install -y docker-ce
 
     sudo mkdir -p /etc/systemd/system/docker.service.d
-    if [ $http_proxy ]; then
+    if [ ${http_proxy:-} ]; then
         echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
         echo "Environment=\"HTTP_PROXY=$http_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/http-proxy.conf
     fi
-    if [ $https_proxy ]; then
+    if [ ${https_proxy:-} ]; then
         echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/https-proxy.conf
         echo "Environment=\"HTTPS_PROXY=$https_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/https-proxy.conf
     fi
-    if [ $no_proxy ]; then
+    if [ ${no_proxy:-} ]; then
         echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/no-proxy.conf
         echo "Environment=\"NO_PROXY=$no_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/no-proxy.conf
     fi
@@ -86,13 +91,12 @@ function _install_docker {
 }
 
 function _set_environment_file {
-    ansible_ifconfig=$(ansible ovn-central[0] -i $kud_inventory -m shell -a "ifconfig eth1 |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'")
-    if [[ $ansible_ifconfig != *CHANGED* ]]; then
-        echo "Fail to get the OVN central IP address from eth1 nic"
-        exit
-    fi
-    echo "export OVN_CENTRAL_ADDRESS=$(echo ${ansible_ifconfig#*>>} | tr '\n' ':')6641" | sudo tee --append /etc/environment
+    # By default ovn central interface is the first active network interface on localhost. If other wanted, need to export this variable in aio.sh or Vagrant file.
+    OVN_CENTRAL_INTERFACE=${OVN_CENTRAL_INTERFACE:-$(ip addr show | awk '/inet.*brd/{print $NF; exit}')}
+    echo "export OVN_CENTRAL_INTERFACE=${OVN_CENTRAL_INTERFACE}" | sudo tee --append /etc/environment
+    echo "export OVN_CENTRAL_ADDRESS=$(get_ovn_central_address)" | sudo tee --append /etc/environment
     echo "export KUBE_CONFIG_DIR=/opt/kubeconfig" | sudo tee --append /etc/environment
+    echo "export CSAR_DIR=/opt/csar" | sudo tee --append /etc/environment
 }
 
 # install_k8s() - Install Kubernetes using kubespray tool
@@ -114,16 +118,16 @@ function install_k8s {
 
     sudo -E pip install -r $dest_folder/kubespray-$version/requirements.txt
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
-    if [[ -n "${verbose}" ]]; then
+    if [[ -n "${verbose:-}" ]]; then
         echo "kube_log_level: 5" | tee $kud_inventory_folder/group_vars/all.yml
     else
         echo "kube_log_level: 2" | tee $kud_inventory_folder/group_vars/all.yml
     fi
     echo "kubeadm_enabled: true" | tee --append $kud_inventory_folder/group_vars/all.yml
-    if [[ -n "${http_proxy}" ]]; then
+    if [[ -n "${http_proxy:-}" ]]; then
         echo "http_proxy: \"$http_proxy\"" | tee --append $kud_inventory_folder/group_vars/all.yml
     fi
-    if [[ -n "${https_proxy}" ]]; then
+    if [[ -n "${https_proxy:-}" ]]; then
         echo "https_proxy: \"$https_proxy\"" | tee --append $kud_inventory_folder/group_vars/all.yml
     fi
     ansible-playbook $verbose -i $kud_inventory $dest_folder/kubespray-$version/cluster.yml --become --become-user=root | sudo tee $log_folder/setup-kubernetes.log
@@ -162,7 +166,6 @@ function install_plugin {
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
     sudo cp $HOME/.kube/config /opt/kubeconfig/kud
-    _set_environment_file
     source /etc/environment
 
     pushd $kud_folder/../../../deployments
@@ -207,14 +210,15 @@ if ! sudo -n "true"; then
     exit 1
 fi
 
-if [[ -n "${KUD_DEBUG}" ]]; then
+verbose=""
+if [[ -n "${KUD_DEBUG:-}" ]]; then
     set -o xtrace
     verbose="-vvv"
 fi
 
 # Configuration values
 log_folder=/var/log/kud
-kud_folder=$(pwd)
+kud_folder=${INSTALLER_DIR}
 kud_infra_folder=$kud_folder/../../deployment_infra
 export kud_inventory_folder=$kud_folder/inventory
 kud_inventory=$kud_inventory_folder/hosts.ini
@@ -226,7 +230,6 @@ testing_enabled=${KUD_ENABLE_TESTS:-false}
 sudo mkdir -p $log_folder
 sudo mkdir -p /opt/csar
 sudo chown -R $USER /opt/csar
-echo "export CSAR_DIR=/opt/csar" | sudo tee --append /etc/environment
 
 # Install dependencies
 # Setup proxy variables
@@ -237,6 +240,7 @@ fi
 sudo apt-get update
 install_k8s
 install_addons
+_set_environment_file
 if ${KUD_PLUGIN_ENABLED:-false}; then
     install_plugin
 fi

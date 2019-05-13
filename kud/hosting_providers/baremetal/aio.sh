@@ -15,9 +15,13 @@ set -o pipefail
 aio_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
 cd ${aio_dir}/../vagrant
 
+# For aio inventory by default get ovn central ip from local host default interface.
+# This variable used only in this file, but env variable defined to enable user to override it prior calling aio.sh.
+OVN_CENTRAL_IP_ADDRESS=${OVN_CENTRAL_IP_ADDRESS:-$(hostname -I | cut -d ' ' -f 1)}
+
 cat <<EOL > inventory/hosts.ini
 [all]
-localhost
+localhost ansible_ssh_host=${OVN_CENTRAL_IP_ADDRESS} ansible_ssh_port=22
 
 [kube-master]
 localhost

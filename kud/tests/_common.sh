@@ -33,7 +33,7 @@ rbp_instance=rbp_instance.json
 rbp_content_tarball=profile.tar
 
 # vFirewall vars
-demo_artifacts_version=1.3.0
+demo_artifacts_version=1.3.1
 vfw_private_ip_0='192.168.10.3'
 vfw_private_ip_1='192.168.20.2'
 vfw_private_ip_2='10.10.100.3'
@@ -376,7 +376,7 @@ spec:
           $proxy
           runcmd:
           $cloud_init_proxy
-            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$packetgen_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/$packetgen_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
@@ -444,7 +444,7 @@ spec:
           $proxy
           runcmd:
             $cloud_init_proxy
-            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$firewall_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/$firewall_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
@@ -652,7 +652,7 @@ spec:
           $proxy
           runcmd:
           $cloud_init_proxy
-            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$packetgen_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/$packetgen_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
@@ -719,7 +719,7 @@ spec:
           $proxy
           runcmd:
             $cloud_init_proxy
-            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$firewall_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/$firewall_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi
@@ -785,7 +785,7 @@ spec:
           $proxy
           runcmd:
             $cloud_init_proxy
-            - wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/tests/vFW/$sink_deployment_name | sudo -E bash
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/$sink_deployment_name | sudo -E bash
         VirtletSSHKeys: |
           $ssh_key
         VirtletRootVolumeSize: 5Gi

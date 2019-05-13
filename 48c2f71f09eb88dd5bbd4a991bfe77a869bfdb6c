@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8bff6928_82cc4981",
+        "filename": "kud/hosting_providers/vagrant/aio.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-13T17:25:02Z",
+      "side": 1,
+      "message": "It\u0027s used before that in https://gerrit.onap.org/r/#/c/87523/2/kud/hosting_providers/vagrant/installer.sh@94\nDefining it here is for aio way as for Vagrant it\u0027s defined in Vagrantfile. And user can override this default value before calling aio.sh.",
+      "parentUuid": "88bd7773_5c88f528",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c82cc5cd_baaaad13",
         "filename": "kud/hosting_providers/vagrant/aio.sh",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2019-05-13T16:58:08Z",
       "side": 1,
       "message": "I don\u0027t understand the point to define the OVN_CENTRAL_IP_ADDRESS if the line 31 is the only place where it\u0027s going to be used. BTW xargs is not required\n\n    hostname -I | cut -d \u0027 \u0027 -f 1",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cd5ea15e_2eaa3ccb",
+        "filename": "kud/hosting_providers/vagrant/aio.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-13T17:25:02Z",
+      "side": 1,
+      "message": "the point is setting a variable with default value (hostname -I) if it\u0027s not already set i.e. user can set variable to different value before calling aio.sh.\n\nOk will remove xargs.",
+      "parentUuid": "c82cc5cd_baaaad13",
       "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7d5903e9_7c714951",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-13T17:25:02Z",
+      "side": 1,
+      "message": "this var is used in 2 places in this file. But depends on the outcome of the next comment.",
+      "parentUuid": "36d2e8aa_e458afa7",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84d6fbbe_361f42d2",
         "filename": "kud/hosting_providers/vagrant/installer.sh",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "b3d0e849_6737355f",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-13T17:25:02Z",
+      "side": 1,
+      "message": "So test script would be dependent on the script calling them.. Even if it sounds strange, can be surely done. \nAnd if so then INSTALLER_DIR not needed in this line and line 15 can be moved to place it\u0027s used.",
+      "parentUuid": "84d6fbbe_361f42d2",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "18115551_161467f4",
         "filename": "kud/tests/_functions.sh",
         "patchSetId": 2
@@ -81,6 +153,24 @@
       "writtenOn": "2019-05-13T16:58:08Z",
       "side": 1,
       "message": "This change won\u0027t be required if the import is happening in the way that I was suggesting in https://gerrit.onap.org/r/#/c/87523/2/kud/hosting_providers/vagrant/installer.sh@17",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "437dced6_d9083979",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-13T17:25:02Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "18115551_161467f4",
       "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

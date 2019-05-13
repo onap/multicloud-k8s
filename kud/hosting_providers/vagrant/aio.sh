@@ -17,12 +17,18 @@ if [[ $(whoami) != 'root' ]];then
     exit 1
 fi
 
+# For aio by default ovn central interface is the first active network interface on localhost
+export OVN_CENTRAL_INTERFACE=${OVN_CENTRAL_INTERFACE:-$(ip addr show | awk '/inet.*brd/{print $NF; exit}')}
+# For aio inventory by default get ovn central ip from local host default interface
+OVN_CENTRAL_IP_ADDRESS=${OVN_CENTRAL_IP_ADDRESS:-$(hostname -I | cut -d ' ' -f 1 | xargs)}
+
 echo "Cloning and configuring KUD project..."
 git clone https://git.onap.org/multicloud/k8s/
+
 cd k8s/kud/hosting_providers/baremetal/
 cat <<EOL > inventory/hosts.ini
 [all]
-localhost
+localhost ansible_ssh_host=${OVN_CENTRAL_IP_ADDRESS} ansible_ssh_port=22
 
 [kube-master]
 localhost

@@ -43,7 +43,7 @@ func TestCreateOVN4NFVK8SNetwork(t *testing.T) {
 		{
 			label:         "Fail to decode a network",
 			input:         &v1.OnapNetwork{},
-			expectedError: "Invalid configuration value",
+			expectedError: "Invalid Network Name",
 		},
 		{
 			label: "Fail to create a network",
@@ -52,7 +52,7 @@ func TestCreateOVN4NFVK8SNetwork(t *testing.T) {
 					Name: "test",
 				},
 				Spec: v1.OnapNetworkSpec{
-					Config: "{\"cnitype\": \"ovn4nfvk8s\",\"name\": \"mynet\",\"subnet\": \"172.16.33.0/24\",\"gateway\": \"172.16.33.1\",\"routes\": [{\"dst\": \"172.16.29.1/24\",\"gw\": \"100.64.1.1\"}]}",
+					CniType: "ovn4nfvk8s", Name: "mynet", Subnet: "172.16.33.0/24", Gateway: "172.16.33.1/24",
 				},
 			},
 			expectedError: "Failed to get logical router",
@@ -67,7 +67,7 @@ func TestCreateOVN4NFVK8SNetwork(t *testing.T) {
 					Name: "test",
 				},
 				Spec: v1.OnapNetworkSpec{
-					Config: "{\"cnitype\": \"ovn4nfvk8s\",\"name\": \"mynet\",\"subnet\": \"172.16.33.0/24\",\"gateway\": \"172.16.33.1\",\"routes\": [{\"dst\": \"172.16.29.1/24\",\"gw\": \"100.64.1.1\"}]}",
+					CniType: "ovn4nfvk8s", Name: "mynet", Subnet: "172.16.33.0/24", Gateway: "172.16.33.1/24",
 				},
 			},
 			expectedResult: "mynet",

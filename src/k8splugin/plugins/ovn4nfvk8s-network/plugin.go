@@ -76,25 +76,21 @@ func init() {
 
 // CreateNetwork in OVN controller
 func CreateNetwork(network *v1.OnapNetwork) (string, error) {
-	config, err := network.DecodeConfig()
-	if err != nil {
-		return "", err
-	}
 
-	name := config["name"].(string)
-	if name == "" {
-		return "", pkgerrors.New("Empty Name value")
-	}
+        name := network.Spec.Name
+        if name == "" {
+                return "", pkgerrors.New("Invalid Network Name")
+        }
 
-	subnet := config["subnet"].(string)
-	if subnet == "" {
-		return "", pkgerrors.New("Empty Subnet value")
-	}
+        subnet := network.Spec.Subnet
+        if subnet == "" {
+                return "", pkgerrors.New("Invalid Subnet Address")
+        }
 
-	gatewayIPMask := config["gateway"].(string)
-	if gatewayIPMask == "" {
-		return "", pkgerrors.New("Empty Gateway IP Mask")
-	}
+        gatewayIPMask := network.Spec.Gateway
+        if gatewayIPMask == "" {
+                return "", pkgerrors.New("Invalid Gateway Address")
+        }
 
 	routerMac, stderr, err := ovnCmd.Run(getAuthStr(), "--if-exist", "-v", "get", "logical_router_port", "rtos-"+name, "mac")
 	if err != nil {

@@ -27,7 +27,8 @@ function install_dependencies {
 # install_vfw_scripts() -
 function install_vfw_scripts {
     pushd /opt
-    wget -q https://git.onap.org/demo/plain/vnfs/vFW/scripts/{v_sink_init,vsink}.sh
+    wget -q "https://nexus.onap.org/content/repositories/staging/org/onap/demo/vnf/vfw/vfw-scripts/${version}/vfw-scripts-${version}.zip"
+    unzip "vfw-scripts-${version}.zip"
     chmod +x *.sh
 
     mv vsink.sh /etc/init.d

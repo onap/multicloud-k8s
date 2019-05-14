@@ -49,7 +49,8 @@ function install_vfw_scripts {
     local version=$(cat /opt/config/demo_artifacts_version.txt)
 
     pushd /opt
-    wget -q https://git.onap.org/demo/plain/vnfs/vFW/scripts/{v_packetgen_init,vpacketgen,run_traffic_fw_demo}.sh
+    wget -q "https://nexus.onap.org/content/repositories/staging/org/onap/demo/vnf/vfw/vfw-scripts/${version}/vfw-scripts-${version}.zip"
+    unzip "vfw-scripts-${version}.zip"
     chmod +x *.sh
 
     _untar_url "sample-distribution/${version}/sample-distribution-${version}-hc.tar.gz"

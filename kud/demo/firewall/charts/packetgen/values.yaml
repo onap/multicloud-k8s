@@ -1,0 +1,38 @@
+# Default values for packetgen.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: virtlet.cloud/ubuntu/16.04
+  tag: latest
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+resources:
+  limits:
+    memory: 4Gi
+
+#packetgen variables
+network:
+  demoArtifactsVersion: 1.5.0
+  vfwPrivateIp0: 192.168.10.3
+  dcaeCollectorIp: 10.0.4.1
+  vsnPrivateIp0: 192.168.20.3
+  vpgPrivateIp0: 192.168.10.2
+  vpgPrivateIp1: 10.0.100.2
+  dcaeCollectorIp: 10.0.4.1
+  dcaeCollectorPort: 8081
+  protectedNetGw: 192.168.20.100
+  protectedNetCidr: 192.168.20.0/24
+  protectedPrivateNetCidr: 192.168.10.0/24
+  onapPrivateNetCidr: 10.10.0.0/16
+  protectedNetGw: 192.168.20.100
+  ovnMultusNetworkName: ovn-networkobj
+  protectedNetworkName: protected-network-net
+  unprotectedNetworkName: unprotected-private-net
+  onapPrivateNetworkName: onap-private-net
+  gatewayVariable: 24

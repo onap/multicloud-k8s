@@ -1,0 +1,42 @@
+# Default values for firewall.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: virtlet.cloud/ubuntu/16.04
+  tag: latest
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+resources:
+  memory: 4Gi
+
+#vFirewall vars
+network:
+  demoArtifactsVersion: 1.5.0
+  vfwPrivateIp0: 192.168.10.3
+  vfwPrivateIp1: 192.168.20.2
+  vfwPrivateIp2: 10.10.100.3
+  dcaeCollectorIp: 10.0.4.1
+  vpgPrivateIp0: 192.168.10.2
+  vpgPrivateIp1: 10.0.100.2
+  vsnPrivateIp0: 192.168.20.3
+  vsnPrivateIp1: 10.10.100.4
+  dcaeCollectorIp: 10.0.4.1
+  dcaeCollectorPort: 8081
+  protectedNetGw: 192.168.20.100
+  protectedNetCidr: 192.168.20.0/24
+  protectedPrivateNetCidr: 192.168.10.0/24
+  onapPrivateNetCidr: 10.10.0.0/16
+  protectedNetGw: 192.168.20.100
+  protectedNetworkName: protected-private-net
+  unprotectedNetworkName: unprotected-private-net
+  ovnMultusNetworkName: ovn-networkobj
+  onapPrivateNetworkName: onap-private-net
+  protectedPrivateGateway: 10.10.0.1/16
+  gatewayVariable: 24
+

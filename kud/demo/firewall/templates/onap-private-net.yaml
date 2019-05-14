@@ -1,0 +1,13 @@
+{{- /*
+This is a comment.
+apiVersion: v1
+kind: Network
+metadata:
+  name: {{ .Values.network.onapPrivateNetworkName }}
+spec:
+  cnitype : ovn4nfvk8s
+  name: {{ .Values.network.onapPrivateNetworkName }} 
+  subnet: {{ .Values.network.onapPrivateNetCidr }}
+  gateway: {{ .Values.network.protectedPrivateGateway }}
+*/ -}}
+

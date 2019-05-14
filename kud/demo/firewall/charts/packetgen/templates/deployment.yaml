@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "packetgen.fullname" . }}
+  labels:
+    app: vFirewall
+    app.kubernetes.io/name: {{ include "packetgen.name" . }}
+    helm.sh/chart: {{ include "packetgen.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: vFirewall
+      app.kubernetes.io/name: {{ include "packetgen.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: vFirewall
+        app.kubernetes.io/name: {{ include "packetgen.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
+        VirtletCloudInitUserData: |
+          ssh_pwauth: True
+          users:
+          - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            lock_passwd: false
+            passwd: "$6$rounds=4096$QA5OCKHTE41$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
+          runcmd:
+            - export demo_artifacts_version={{ .Values.network.demoArtifactsVersion }}
+            - export vfw_private_ip_0={{ .Values.network.vfwPrivateIp0 }}
+            - export vsn_private_ip_0={{ .Values.network.vsnPrivateIp0 }}
+            - export protected_net_cidr={{ .Values.network.protectedNetCidr }}
+            - export dcae_collector_ip={{ .Values.network.dcaeCollectorIp }}
+            - export dcae_collector_port={{ .Values.network.dcaeCollectorPort }}
+            - export protected_net_gw={{ .Values.network.protectedNetGw }}
+            - export protected_private_net_cidr={{ .Values.network.protectedPrivateNetCidr }}
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/packetgen | sudo -E bash
+        VirtletRootVolumeSize: 5Gi
+        k8s.v1.cni.cncf.io/networks: '[{"name": {{ .Values.network.ovnMultusNetworkName | quote }}}]'
+        ovnNetwork: '[
+            { "name": {{ .Values.network.unprotectedNetworkName | quote }}, "ipAddress": {{ .Values.network.vpgPrivateIp0 | quote  }}, "interface": "eth1" , "defaultGateway": "false"},
+            { "name": {{ .Values.network.onapPrivateNetworkName | quote }}, "ipAddress": {{ .Values.network.vpgPrivateIp1 | quote }}, "interface": "eth2" , "defaultGateway": "false"}
+        ]'
+        kubernetes.io/target-runtime: virtlet.cloud
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: extraRuntime
+                operator: In
+                values:
+                - virtlet
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        tty: true
+        stdin: true
+        ports:
+          - containerPort: {{ .Values.service.ports.containerPort }}
+        resources:
+          limits: 
+            memory: {{ .Values.resources.limits.memory }}

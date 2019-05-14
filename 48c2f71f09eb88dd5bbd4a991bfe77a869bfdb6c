@@ -142,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "8e12621e_7f50454f",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-14T08:05:25Z",
+      "side": 1,
+      "message": "get_ovn_central_address function is used mainly in _functions.sh (2 usages) and I added usage to this file to remove copy-paste code and to be able to utilize new OVN_CENTRAL_INTERFACE variable in that function.\nMoving function to installer.sh and adding dependency from tests towards installer.sh does not sound right.\nCan you describe more detailed what was your idea if I have misunderstood it?",
+      "parentUuid": "b3d0e849_6737355f",
+      "revId": "48c2f71f09eb88dd5bbd4a991bfe77a869bfdb6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "18115551_161467f4",
         "filename": "kud/tests/_functions.sh",
         "patchSetId": 2

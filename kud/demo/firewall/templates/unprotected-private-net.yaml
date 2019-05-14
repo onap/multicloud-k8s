@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: onapNetwork
+metadata:
+  name: {{ .Values.network.unprotectedNetworkName }}
+  cnitype : ovn4nfvk8s
+spec:
+  name: {{ .Values.network.unprotectedNetworkName }} 
+  subnet: {{ .Values.network.protectedNetCidr }}
+  gateway: 192.168.10.1/24

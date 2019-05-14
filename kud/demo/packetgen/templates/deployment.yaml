@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "packetgen.fullname" . }}
+  labels:
+    app: vFirewall
+    app.kubernetes.io/name: {{ include "packetgen.name" . }}
+    helm.sh/chart: {{ include "packetgen.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: vFirewall
+      app.kubernetes.io/name: {{ include "packetgen.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: vFirewall
+        app.kubernetes.io/name: {{ include "packetgen.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
+        VirtletCloudInitUserData: |
+          ssh_pwauth: True
+          users:
+          - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            lock_passwd: false
+            # the password is "admin"
+            passwd: "\$6\$rounds=4096\$QA5OCKHTE41\$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
+            ssh_authorized_keys:
+              $ssh_key
+          $proxy
+          runcmd:
+          $cloud_init_proxy
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/packetgen | sudo -E bash
+        VirtletSSHKeys: |
+          $ssh_key
+        VirtletRootVolumeSize: 5Gi
+        k8s.v1.cni.cncf.io/networks: '[{ "name": {{.Values.network.ovnMultusNetworkName | quote }} }]'
+        ovnNetwork: '[
+            { "name": {{ .Values.network.unprotectedNetworkName | quote }}, "ipAddress": {{ .Values.network.vpgPrivateIp0 | quote  }}, "interface": "eth1" , "defaultGateway": "false"},
+            { "name": {{ .Values.network.onapPrivateNetworkName | quote }}, "ipAddress": {{ .Values.network.vpgPrivateIp1 | quote }}, "interface": "eth2" , "defaultGateway": "false"}
+        ]'
+        kubernetes.io/target-runtime: virtlet.cloud
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: extraRuntime
+                operator: In
+                values:
+                - virtlet
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          tty: true
+          stdin: true
+          ports:
+            - containerPort: {{ .Values.service.ports.containerPort }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

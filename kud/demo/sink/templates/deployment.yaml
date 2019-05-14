@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sink.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "sink.name" . }}
+    helm.sh/chart: {{ include "sink.chart" . }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app: vfirewall
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "sink.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app: vFirewall
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "sink.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app: vFirewall
+        context: darkstat
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[{ "name": {{ .Values.network.ovnMultusNetworkName | quote }}}]'
+        ovnNetwork: '[
+            { "name": {{ .Values.network.protectedNetworkName | quote }}, "ipAddress": {{ .Values.network.vsnPrivateIp0 | quote }}, "interface": "eth1", "defaultGateway": "false" },
+            { "name": {{ .Values.network.onapPrivateNetworkName | quote }}, "ipAddress": {{ .Values.network.vsnPrivateIp1 | quote }}, "interface": "eth2" , "defaultGateway": "false"}
+        ]'
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          tty: true
+          stdin: true
+          securityContext:
+            privileged: true
+        - name: darkstat
+          image:  "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          tty: true
+          stdin: true
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          resources:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

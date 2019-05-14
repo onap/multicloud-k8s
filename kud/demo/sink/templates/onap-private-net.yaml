@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: onapNetwork
+metadata:
+  name: {{ .Values.network.onapPrivateNetworkName }}
+  cnitype : ovn4nfvk8s
+spec:
+  name: {{ .Values.network.onapPrivateNetworkName }}} 
+  subnet: {{ .Values.network.onapPrivateNetCidr }}
+  gateway: 10.10.0.1/16

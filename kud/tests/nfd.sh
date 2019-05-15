@@ -12,10 +12,13 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+source _common_test.sh
+
 rm -f $HOME/*.yaml
 
 pod_name=nfd-pod
 
+install_deps
 cat << POD > $HOME/$pod_name.yaml
 apiVersion:
  v1

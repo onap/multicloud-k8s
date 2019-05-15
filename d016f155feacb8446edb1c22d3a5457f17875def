@@ -19,6 +19,52 @@
     },
     {
       "key": {
+        "uuid": "7f01a1e9_ad6dd18e",
+        "filename": "kud/demo/firewall/templates/onap-private-net.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T21:56:18Z",
+      "side": 1,
+      "message": "Change the name to Network",
+      "range": {
+        "startLine": 2,
+        "startChar": 6,
+        "endLine": 2,
+        "endChar": 17
+      },
+      "revId": "d016f155feacb8446edb1c22d3a5457f17875def",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbf1094c_5dcbe354",
+        "filename": "kud/demo/firewall/templates/onap-private-net.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T21:56:18Z",
+      "side": 1,
+      "message": "Move this to the cnitype to spec section",
+      "range": {
+        "startLine": 5,
+        "startChar": 2,
+        "endLine": 5,
+        "endChar": 9
+      },
+      "revId": "d016f155feacb8446edb1c22d3a5457f17875def",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9997c36a_22f28532",
         "filename": "kud/demo/firewall/templates/onap-private-net.yaml",
         "patchSetId": 1

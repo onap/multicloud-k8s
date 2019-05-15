@@ -17,10 +17,9 @@ if [[ $(whoami) != 'root' ]];then
     exit 1
 fi
 
-echo "Cloning and configuring KUD project..."
-rm -rf k8s
-git clone https://git.onap.org/multicloud/k8s/
-cd k8s/kud/hosting_providers/baremetal/
+aio_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
+cd ${aio_dir}/../vagrant
+
 cat <<EOL > inventory/hosts.ini
 [all]
 localhost

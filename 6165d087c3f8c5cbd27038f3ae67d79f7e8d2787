@@ -1,0 +1,176 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a42c692f_4f83a4e3",
+        "filename": "kud/demo/firewall/charts/packetgen/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T23:35:17Z",
+      "side": 1,
+      "message": "Packetgen?",
+      "range": {
+        "startLine": 41,
+        "startChar": 1,
+        "endLine": 41,
+        "endChar": 10
+      },
+      "revId": "6165d087c3f8c5cbd27038f3ae67d79f7e8d2787",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aca09412_a3d45988",
+        "filename": "kud/demo/firewall/charts/packetgen/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T23:35:17Z",
+      "side": 1,
+      "message": "Is this for firewall or packetgen?",
+      "range": {
+        "startLine": 44,
+        "startChar": 2,
+        "endLine": 44,
+        "endChar": 15
+      },
+      "revId": "6165d087c3f8c5cbd27038f3ae67d79f7e8d2787",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4290998_dc640b4d",
+        "filename": "kud/demo/firewall/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T23:35:17Z",
+      "side": 1,
+      "message": "This is showing managed by Tiller. Is that the intent?",
+      "range": {
+        "startLine": 9,
+        "startChar": 22,
+        "endLine": 9,
+        "endChar": 29
+      },
+      "revId": "6165d087c3f8c5cbd27038f3ae67d79f7e8d2787",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0c58ab26_2a8ec89c",
+        "filename": "kud/demo/firewall/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T23:35:17Z",
+      "side": 1,
+      "message": "Remove the comment",
+      "range": {
+        "startLine": 39,
+        "startChar": 16,
+        "endLine": 39,
+        "endChar": 23
+      },
+      "revId": "6165d087c3f8c5cbd27038f3ae67d79f7e8d2787",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "34b6d5cd_b329e1db",
+        "filename": "kud/demo/firewall/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T23:35:17Z",
+      "side": 1,
+      "message": "Is this needed here?",
+      "revId": "6165d087c3f8c5cbd27038f3ae67d79f7e8d2787",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d491b498_894c7c78",
+        "filename": "kud/demo/firewall/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T23:35:17Z",
+      "side": 1,
+      "message": "Remove #",
+      "revId": "6165d087c3f8c5cbd27038f3ae67d79f7e8d2787",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "87aede43_0e7ab425",
+        "filename": "kud/demo/firewall/templates/onap-private-net.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T23:35:17Z",
+      "side": 1,
+      "message": "Redundant can be removed",
+      "range": {
+        "startLine": 5,
+        "startChar": 2,
+        "endLine": 5,
+        "endChar": 22
+      },
+      "revId": "6165d087c3f8c5cbd27038f3ae67d79f7e8d2787",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "23af8019_70d3dbb2",
+        "filename": "kud/demo/firewall/templates/protected-private-net.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T23:35:17Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 5,
+        "startChar": 12,
+        "endLine": 5,
+        "endChar": 22
+      },
+      "revId": "6165d087c3f8c5cbd27038f3ae67d79f7e8d2787",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

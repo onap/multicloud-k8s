@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b89efc61_7b81d9c3",
+        "filename": "kud/demo/firewall/templates/onap-ovn4nfvk8s-network.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T16:58:14Z",
+      "side": 1,
+      "message": "This is a one time action. Should not be part of the Helm charts",
+      "revId": "d016f155feacb8446edb1c22d3a5457f17875def",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9997c36a_22f28532",
+        "filename": "kud/demo/firewall/templates/onap-private-net.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T16:58:14Z",
+      "side": 1,
+      "message": "Move to values.yaml",
+      "range": {
+        "startLine": 9,
+        "startChar": 11,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "d016f155feacb8446edb1c22d3a5457f17875def",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "39aec86a_4b5f08d9",
+        "filename": "kud/demo/packetgen/templates/onap-ovn4nfvk8s-network.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T16:58:14Z",
+      "side": 1,
+      "message": "Ditto",
+      "revId": "d016f155feacb8446edb1c22d3a5457f17875def",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2aebaf78_57aac0d9",
+        "filename": "kud/demo/packetgen/templates/onap-private-net.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-15T16:58:14Z",
+      "side": 1,
+      "message": "Value should be in values.yaml",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "d016f155feacb8446edb1c22d3a5457f17875def",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

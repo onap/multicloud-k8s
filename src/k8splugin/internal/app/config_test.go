@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package rb
+package app
 
 import (
 	"k8splugin/internal/db"

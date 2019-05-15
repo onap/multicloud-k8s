@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package rb
+package app
 
 import (
 	"bytes"
@@ -25,9 +25,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"k8splugin/internal/db"
 	"k8splugin/internal/helm"
+	"k8splugin/internal/rb"
 
 	"github.com/ghodss/yaml"
 	pkgerrors "github.com/pkg/errors"
@@ -57,7 +59,8 @@ type ConfigVersionStore struct {
 
 type configResourceList struct {
 	resourceTemplates []helm.KubernetesResourceTemplate
-	profile           Profile
+	createdResources  []helm.KubernetesResource
+	profile           rb.Profile
 	action            string
 }
 
@@ -339,17 +342,50 @@ func scheduleResources(c chan configResourceList) {
 	for {
 		data := <-c
 		//TODO: ADD Check to see if Application running
+		ic := NewInstanceClient()
+		resp, err := ic.Find(data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName)
+		if err != nil || len(resp) == 0 {
+			log.Println("Error finding a running instance. Retrying later...")
+			time.Sleep(time.Second * 10)
+			continue
+		}
 		switch {
 		case data.action == "POST":
 			log.Printf("[scheduleResources]: POST %v %v", data.profile, data.resourceTemplates)
+			for _, inst := range resp {
+				k8sClient := KubernetesClient{}
+				err = k8sClient.init(inst.CloudRegion)
+				if err != nil {
+					log.Printf("Getting CloudRegion Information: %s", err.Error())
+					//Move onto the next cloud region
+					continue
+				}
+				data.createdResources, err = k8sClient.createResources(data.resourceTemplates, inst.Namespace)
+				if err != nil {
+					log.Printf("Error Creating resources: %s", err.Error())
+					continue
+				}
+			}
 			//TODO: Needs to add code to call Kubectl create
 		case data.action == "PUT":
 			log.Printf("[scheduleResources]: PUT %v %v", data.profile, data.resourceTemplates)
 			//TODO: Needs to add code to call Kubectl apply
 		case data.action == "DELETE":
 			log.Printf("[scheduleResources]: DELETE %v %v", data.profile, data.resourceTemplates)
-			//TODO: Needs to add code to call Kubectl delete
-
+			for _, inst := range resp {
+				k8sClient := KubernetesClient{}
+				err = k8sClient.init(inst.CloudRegion)
+				if err != nil {
+					log.Printf("Getting CloudRegion Information: %s", err.Error())
+					//Move onto the next cloud region
+					continue
+				}
+				err = k8sClient.deleteResources(data.createdResources, inst.Namespace)
+				if err != nil {
+					log.Printf("Error Deleting resources: %s", err.Error())
+					continue
+				}
+			}
 		}
 	}
 }
@@ -360,12 +396,12 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 
 	var resTemplates []helm.KubernetesResourceTemplate
 
-	profile, err := NewProfileClient().Get(rbName, rbVersion, profileName)
+	profile, err := rb.NewProfileClient().Get(rbName, rbVersion, profileName)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Reading  Profile Data")
 	}
 
-	t, err := NewConfigTemplateClient().Get(rbName, rbVersion, p.TemplateName)
+	t, err := rb.NewConfigTemplateClient().Get(rbName, rbVersion, p.TemplateName)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Getting Template")
 	}
@@ -373,7 +409,7 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 		return configResourceList{}, pkgerrors.New("Invalid template no Chart.yaml file found")
 	}
 
-	def, err := NewConfigTemplateClient().Download(rbName, rbVersion, p.TemplateName)
+	def, err := rb.NewConfigTemplateClient().Download(rbName, rbVersion, p.TemplateName)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Downloading Template")
 	}
@@ -398,7 +434,7 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 	}
 	defer outputfile.Close()
 
-	chartBasePath, err := ExtractTarBall(bytes.NewBuffer(def))
+	chartBasePath, err := rb.ExtractTarBall(bytes.NewBuffer(def))
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Extracting Template")
 	}

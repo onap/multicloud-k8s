@@ -25,7 +25,7 @@ import (
 func NewRouter(defClient rb.DefinitionManager,
 	profileClient rb.ProfileManager,
 	instClient app.InstanceManager,
-	configClient rb.ConfigManager,
+	configClient app.ConfigManager,
 	templateClient rb.ConfigTemplateManager) *mux.Router {
 
 	router := mux.NewRouter()
@@ -91,7 +91,7 @@ func NewRouter(defClient rb.DefinitionManager,
 
 	// Config value
 	if configClient == nil {
-		configClient = rb.NewConfigClient()
+		configClient = app.NewConfigClient()
 	}
 	configHandler := rbConfigHandler{client: configClient}
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config", configHandler.createHandler).Methods("POST")

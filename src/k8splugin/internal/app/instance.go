@@ -53,6 +53,7 @@ type InstanceResponse struct {
 type InstanceManager interface {
 	Create(i InstanceRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
+	Find(rbName string, ver string, profile string) ([]InstanceResponse, error)
 	Delete(id string) error
 }
 
@@ -174,6 +175,48 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 	}
 
 	return InstanceResponse{}, pkgerrors.New("Error getting Instance")
+}
+
+// Find returns the instances that match the given criteria
+// If version is empty, it will return all instances for a given rbName
+// If profile is empty, it will return all instances for a given rbName+version
+func (v *InstanceClient) Find(rbName string, version string, profile string) ([]InstanceResponse, error) {
+	if rbName == "" {
+		return []InstanceResponse{}, pkgerrors.New("rbName is required and cannot be empty")
+	}
+
+	values, err := db.DBconn.ReadAll(v.storeName, v.tagInst)
+	if err != nil || len(values) == 0 {
+		return []InstanceResponse{}, pkgerrors.Wrap(err, "Find Instance")
+	}
+
+	response := []InstanceResponse{}
+	//values is a map[string][]byte
+	for _, value := range values {
+		resp := InstanceResponse{}
+		db.DBconn.Unmarshal(value, &resp)
+		if err != nil {
+			return []InstanceResponse{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
+		}
+
+		if resp.RBName == rbName {
+
+			//Check if a version is provided and if it matches
+			if version != "" {
+				if resp.RBVersion == version {
+					//Check if a profilename matches or if it is not provided
+					if profile == "" || resp.ProfileName == profile {
+						response = append(response, resp)
+					}
+				}
+			} else {
+				//Append all versions as version is not provided
+				response = append(response, resp)
+			}
+		}
+	}
+
+	return response, nil
 }
 
 // Delete the Instance from database

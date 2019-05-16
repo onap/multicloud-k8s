@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c257fca_6c868b29",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/service.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-16T03:10:04Z",
+      "side": 1,
+      "message": "This is a service for sink. Should be in the sink sub-chart",
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9eacac50_0db55373",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-16T06:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6a45df4_7300ff38",
+      "range": {
+        "startLine": 39,
+        "startChar": 15,
+        "endLine": 39,
+        "endChar": 22
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f4252deb_b95d21de",
         "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2019-05-16T03:47:39Z",
       "side": 1,
       "message": "Ditto",
+      "range": {
+        "startLine": 40,
+        "startChar": 11,
+        "endLine": 40,
+        "endChar": 16
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b95c0616_c6f6ea33",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-16T06:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4252deb_b95d21de",
       "range": {
         "startLine": 40,
         "startChar": 11,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "1f17193e_c74bcc96",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-16T06:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92701455_5aa8b8ed",
+      "range": {
+        "startLine": 42,
+        "startChar": 11,
+        "endLine": 42,
+        "endChar": 27
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2c257fca_6c868b29",
         "filename": "kud/demo/firewall/charts/packetgen/templates/service.yaml",
         "patchSetId": 4
@@ -82,6 +154,24 @@
       "writtenOn": "2019-05-16T03:10:04Z",
       "side": 1,
       "message": "This is a service for sink. Should be in the sink sub-chart",
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "256ef11f_de86f979",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/service.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-16T06:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c257fca_6c868b29",
       "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -134,6 +224,30 @@
     },
     {
       "key": {
+        "uuid": "c1e28c98_00bdf291",
+        "filename": "kud/demo/firewall/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-16T06:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b152462f_b67d173c",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 29
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89893fc5_d1ab1b40",
         "filename": "kud/demo/firewall/values.yaml",
         "patchSetId": 4
@@ -145,6 +259,30 @@
       "writtenOn": "2019-05-16T03:39:10Z",
       "side": 1,
       "message": "This image needs to be virtlet.cloud/ubuntu/16.04",
+      "range": {
+        "startLine": 8,
+        "startChar": 14,
+        "endLine": 8,
+        "endChar": 30
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf797ef4_6f33ac35",
+        "filename": "kud/demo/firewall/values.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-16T06:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89893fc5_d1ab1b40",
       "range": {
         "startLine": 8,
         "startChar": 14,

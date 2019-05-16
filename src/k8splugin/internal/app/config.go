@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package rb
+package app
 
 import (
-	pkgerrors "github.com/pkg/errors"
-	"k8splugin/internal/db"
 	"strconv"
 	"strings"
+
+	"k8splugin/internal/db"
+
+	pkgerrors "github.com/pkg/errors"
 )
 
 // Config contains the parameters needed for configuration

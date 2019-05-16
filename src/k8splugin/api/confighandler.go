@@ -18,8 +18,9 @@ package api
 
 import (
 	"encoding/json"
-	"k8splugin/internal/rb"
 	"net/http"
+
+	"k8splugin/internal/app"
 
 	"github.com/gorilla/mux"
 )
@@ -29,12 +30,12 @@ import (
 type rbConfigHandler struct {
 	// Interface that implements bundle Definition operations
 	// We will set this variable with a mock interface for testing
-	client rb.ConfigManager
+	client app.ConfigManager
 }
 
 // createHandler handles creation of the definition entry in the database
 func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var p rb.Config
+	var p app.Config
 	vars := mux.Vars(r)
 	rbName := vars["rbname"]
 	rbVersion := vars["rbversion"]
@@ -73,7 +74,7 @@ func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // getHandler handles GET operations on a particular config
-// Returns a rb.Definition
+// Returns a app.Definition
 func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	rbName := vars["rbname"]
@@ -128,7 +129,7 @@ func (h rbConfigHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	prName := vars["prname"]
 	cfgName := vars["cfgname"]
 
-	var p rb.Config
+	var p app.Config
 
 	if r.Body == nil {
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -168,7 +169,7 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	var p rb.ConfigRollback
+	var p app.ConfigRollback
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
@@ -194,7 +195,7 @@ func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var p rb.ConfigTagit
+	var p app.ConfigTagit
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)

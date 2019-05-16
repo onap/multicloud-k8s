@@ -2,6 +2,75 @@
   "comments": [
     {
       "key": {
+        "uuid": "c6a45df4_7300ff38",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-16T03:47:39Z",
+      "side": 1,
+      "message": "This is undefined",
+      "range": {
+        "startLine": 39,
+        "startChar": 15,
+        "endLine": 39,
+        "endChar": 22
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f4252deb_b95d21de",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-16T03:47:39Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 40,
+        "startChar": 11,
+        "endLine": 40,
+        "endChar": 16
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "92701455_5aa8b8ed",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-16T03:47:39Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 42,
+        "startChar": 11,
+        "endLine": 42,
+        "endChar": 27
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2c257fca_6c868b29",
         "filename": "kud/demo/firewall/charts/packetgen/templates/service.yaml",
         "patchSetId": 4
@@ -35,6 +104,29 @@
         "startChar": 14,
         "endLine": 8,
         "endChar": 31
+      },
+      "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b152462f_b67d173c",
+        "filename": "kud/demo/firewall/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-16T03:47:39Z",
+      "side": 1,
+      "message": "This is not defined.",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 29
       },
       "revId": "1c7e6d682410942bc0764f09ce1d3f94e91a9113",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",

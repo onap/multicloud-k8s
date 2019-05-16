@@ -42,12 +42,7 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 		return "", pkgerrors.Wrap(err, "Decode network object error")
 	}
 
-	config, err := network.DecodeConfig()
-	if err != nil {
-		return "", pkgerrors.Wrap(err, "Fail to decode network's configuration")
-	}
-
-	cniType := config["cnitype"].(string)
+	cniType := network.Spec.CniType
 	typePlugin, ok := utils.LoadedPlugins[cniType+"-network"]
 	if !ok {
 		return "", pkgerrors.New("No plugin for resource " + cniType + " found")

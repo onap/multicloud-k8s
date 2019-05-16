@@ -71,7 +71,7 @@ func TestCreateNetwork(t *testing.T) {
 			input: &utils.ResourceData{
 				YamlFilePath: "../../mock_files/mock_yamls/service.yaml",
 			},
-			expectedError: "Fail to decode network's configuration: Invalid configuration value",
+			expectedError: "No plugin for resource",
 		},
 		{
 			label: "Fail to create a network",

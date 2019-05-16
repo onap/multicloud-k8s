@@ -14,9 +14,7 @@ limitations under the License.
 package v1
 
 import (
-	"encoding/json"
 
-	pkgerrors "github.com/pkg/errors"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -33,7 +31,11 @@ type OnapNetwork struct {
 
 // OnapNetworkSpec is the spec for OnapNetwork resource
 type OnapNetworkSpec struct {
-	Config string `json:"config"`
+        CniType     string `json:"cnitype"`
+        Name        string `json:"name"`
+        Subnet      string `json:"subnet"`
+        Gateway     string `json:"gateway"`
+
 }
 
 // DeepCopyObject returns a generically typed copy of an object
@@ -49,19 +51,4 @@ func (in OnapNetwork) DeepCopyObject() runtime.Object {
 // GetObjectKind
 func (in OnapNetwork) GetObjectKind() schema.ObjectKind {
 	return &in.TypeMeta
-}
-
-// DecodeConfig content
-func (in OnapNetwork) DecodeConfig() (map[string]interface{}, error) {
-	var raw map[string]interface{}
-
-	if in.Spec.Config == "" {
-		return nil, pkgerrors.New("Invalid configuration value")
-	}
-
-	if err := json.Unmarshal([]byte(in.Spec.Config), &raw); err != nil {
-		return nil, pkgerrors.Wrap(err, "JSON unmarshalling error")
-	}
-
-	return raw, nil
 }

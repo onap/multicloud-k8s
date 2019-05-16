@@ -18,6 +18,7 @@ import (
 	"io/ioutil"
 	"log"
 	"reflect"
+	"sort"
 	"testing"
 
 	utils "k8splugin/internal"
@@ -308,6 +309,395 @@ func TestInstanceGet(t *testing.T) {
 		_, err := ic.Get(id)
 		if err == nil {
 			t.Fatal("Expected error, got pass", err)
+		}
+	})
+}
+
+func TestInstanceFind(t *testing.T) {
+	oldkrdPluginData := utils.LoadedPlugins
+
+	defer func() {
+		utils.LoadedPlugins = oldkrdPluginData
+	}()
+
+	err := LoadMockPlugins(utils.LoadedPlugins)
+	if err != nil {
+		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
+	}
+
+	items := map[string]map[string][]byte{
+		InstanceKey{ID: "HaKpys8e"}.String(): {
+			"instance": []byte(
+				`{
+					"profile-name":"profile1",
+					  "id":"HaKpys8e",
+					"namespace":"testnamespace",
+					"rb-name":"test-rbdef",
+					"rb-version":"v1",
+					"cloud-region":"region1",
+					"resources": [
+						{
+							"GVK": {
+								"Group":"apps",
+								"Version":"v1",
+								"Kind":"Deployment"
+							},
+							"Name": "deployment-1"
+						},
+						{
+							"GVK": {
+								"Group":"",
+								"Version":"v1",
+								"Kind":"Service"
+							},
+							"Name": "service-1"
+						}
+					]
+				}`),
+		},
+		InstanceKey{ID: "HaKpys8f"}.String(): {
+			"instance": []byte(
+				`{
+					"profile-name":"profile2",
+					  "id":"HaKpys8f",
+					"namespace":"testnamespace",
+					"rb-name":"test-rbdef",
+					"rb-version":"v1",
+					"cloud-region":"region1",
+					"resources": [
+						{
+							"GVK": {
+								"Group":"apps",
+								"Version":"v1",
+								"Kind":"Deployment"
+							},
+							"Name": "deployment-1"
+						},
+						{
+							"GVK": {
+								"Group":"",
+								"Version":"v1",
+								"Kind":"Service"
+							},
+							"Name": "service-1"
+						}
+					]
+				}`),
+		},
+		InstanceKey{ID: "HaKpys8g"}.String(): {
+			"instance": []byte(
+				`{
+					"profile-name":"profile1",
+					  "id":"HaKpys8g",
+					"namespace":"testnamespace",
+					"rb-name":"test-rbdef",
+					"rb-version":"v2",
+					"cloud-region":"region1",
+					"resources": [
+						{
+							"GVK": {
+								"Group":"apps",
+								"Version":"v1",
+								"Kind":"Deployment"
+							},
+							"Name": "deployment-1"
+						},
+						{
+							"GVK": {
+								"Group":"",
+								"Version":"v1",
+								"Kind":"Service"
+							},
+							"Name": "service-1"
+						}
+					]
+				}`),
+		},
+	}
+
+	t.Run("Successfully Find Instance By Name", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: items,
+		}
+
+		expected := []InstanceResponse{
+			{
+				ID:          "HaKpys8e",
+				RBName:      "test-rbdef",
+				RBVersion:   "v1",
+				ProfileName: "profile1",
+				CloudRegion: "region1",
+				Namespace:   "testnamespace",
+
+				Resources: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "deployment-1",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "service-1",
+					},
+				},
+			},
+			{
+				ID:          "HaKpys8f",
+				RBName:      "test-rbdef",
+				RBVersion:   "v1",
+				ProfileName: "profile2",
+				CloudRegion: "region1",
+				Namespace:   "testnamespace",
+
+				Resources: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "deployment-1",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "service-1",
+					},
+				},
+			},
+			{
+				ID:          "HaKpys8g",
+				RBName:      "test-rbdef",
+				RBVersion:   "v2",
+				ProfileName: "profile1",
+				CloudRegion: "region1",
+				Namespace:   "testnamespace",
+
+				Resources: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "deployment-1",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "service-1",
+					},
+				},
+			},
+		}
+		ic := NewInstanceClient()
+		name := "test-rbdef"
+		data, err := ic.Find(name, "", "")
+		if err != nil {
+			t.Fatalf("TestInstanceFind returned an error (%s)", err)
+		}
+
+		// Since the order of returned slice is not guaranteed
+		// Check both and return error if both don't match
+		sort.Slice(data, func(i, j int) bool {
+			return data[i].ID < data[j].ID
+		})
+		// Sort both as it is not expected that testCase.expected
+		// is sorted
+		sort.Slice(expected, func(i, j int) bool {
+			return expected[i].ID < expected[j].ID
+		})
+
+		if !reflect.DeepEqual(expected, data) {
+			t.Fatalf("TestInstanceFind returned:\n result=%v\n expected=%v",
+				data, expected)
+		}
+	})
+
+	t.Run("Successfully Find Instance By Name Version", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: items,
+		}
+
+		expected := []InstanceResponse{
+			{
+				ID:          "HaKpys8e",
+				RBName:      "test-rbdef",
+				RBVersion:   "v1",
+				ProfileName: "profile1",
+				CloudRegion: "region1",
+				Namespace:   "testnamespace",
+
+				Resources: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "deployment-1",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "service-1",
+					},
+				},
+			},
+			{
+				ID:          "HaKpys8f",
+				RBName:      "test-rbdef",
+				RBVersion:   "v1",
+				ProfileName: "profile2",
+				CloudRegion: "region1",
+				Namespace:   "testnamespace",
+
+				Resources: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "deployment-1",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "service-1",
+					},
+				},
+			},
+		}
+		ic := NewInstanceClient()
+		name := "test-rbdef"
+		data, err := ic.Find(name, "v1", "")
+		if err != nil {
+			t.Fatalf("TestInstanceFind returned an error (%s)", err)
+		}
+
+		// Since the order of returned slice is not guaranteed
+		// Check both and return error if both don't match
+		sort.Slice(data, func(i, j int) bool {
+			return data[i].ID < data[j].ID
+		})
+		// Sort both as it is not expected that testCase.expected
+		// is sorted
+		sort.Slice(expected, func(i, j int) bool {
+			return expected[i].ID < expected[j].ID
+		})
+
+		if !reflect.DeepEqual(expected, data) {
+			t.Fatalf("TestInstanceFind returned:\n result=%v\n expected=%v",
+				data, expected)
+		}
+	})
+
+	t.Run("Successfully Find Instance By Name Version Profile", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: items,
+		}
+
+		expected := []InstanceResponse{
+			{
+				ID:          "HaKpys8e",
+				RBName:      "test-rbdef",
+				RBVersion:   "v1",
+				ProfileName: "profile1",
+				CloudRegion: "region1",
+				Namespace:   "testnamespace",
+
+				Resources: []helm.KubernetesResource{
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "apps",
+							Version: "v1",
+							Kind:    "Deployment"},
+						Name: "deployment-1",
+					},
+					{
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Service"},
+						Name: "service-1",
+					},
+				},
+			},
+		}
+		ic := NewInstanceClient()
+		name := "test-rbdef"
+		data, err := ic.Find(name, "v1", "profile1")
+		if err != nil {
+			t.Fatalf("TestInstanceFind returned an error (%s)", err)
+		}
+
+		// Since the order of returned slice is not guaranteed
+		// Check both and return error if both don't match
+		sort.Slice(data, func(i, j int) bool {
+			return data[i].ID < data[j].ID
+		})
+		// Sort both as it is not expected that testCase.expected
+		// is sorted
+		sort.Slice(expected, func(i, j int) bool {
+			return expected[i].ID < expected[j].ID
+		})
+
+		if !reflect.DeepEqual(expected, data) {
+			t.Fatalf("TestInstanceFind returned:\n result=%v\n expected=%v",
+				data, expected)
+		}
+	})
+
+	t.Run("Find non-existing Instance", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: map[string]map[string][]byte{
+				InstanceKey{ID: "HaKpys8e"}.String(): {
+					"instance": []byte(
+						`{
+							"profile-name":"profile1",
+						  	"id":"HaKpys8e",
+							"namespace":"testnamespace",
+							"rb-name":"test-rbdef",
+							"rb-version":"v1",
+							"cloud-region":"region1",
+							"resources": [
+								{
+									"GVK": {
+										"Group":"apps",
+										"Version":"v1",
+										"Kind":"Deployment"
+									},
+									"Name": "deployment-1"
+								},
+								{
+									"GVK": {
+										"Group":"",
+										"Version":"v1",
+										"Kind":"Service"
+									},
+									"Name": "service-1"
+								}
+							]
+						}`),
+				},
+			},
+		}
+
+		ic := NewInstanceClient()
+		name := "non-existing"
+		resp, _ := ic.Find(name, "", "")
+		if len(resp) != 0 {
+			t.Fatalf("Expected 0 responses, but got %d", len(resp))
 		}
 	})
 }

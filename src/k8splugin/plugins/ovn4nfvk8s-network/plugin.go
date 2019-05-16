@@ -46,15 +46,15 @@ type OVNNbctl struct {
 
 // Run a command via ovn-nbctl
 func (ctl *OVNNbctl) Run(args ...string) (string, string, error) {
+	if ctl.exec == nil {
+		ctl.exec = kexec.New()
+	}
 	if ctl.path == "" {
 		nbctlPath, err := ctl.exec.LookPath(ovnNbctlCommand)
 		if err != nil {
 			return "", "", pkgerrors.Wrap(err, "Look nbctl path error")
 		}
 		ctl.path = nbctlPath
-	}
-	if ctl.exec == nil {
-		ctl.exec = kexec.New()
 	}
 
 	stdout := &bytes.Buffer{}

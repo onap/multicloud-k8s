@@ -30,7 +30,7 @@ for net in $unprotected_private_net $protected_private_net $onap_private_net; do
     echo "Create OVN Network $net network"
     init_network $net.yaml
 done
-for resource in onap-ovn4nfvk8s-network sink-service; do
+for resource in onap-ovn4nfvk8s-network sink-service sink_configmap; do
     kubectl apply -f $resource.yaml
 done
 setup $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "affd345d_121f601b",
+        "filename": "docs/bare_metal_provisioning.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4009
+      },
+      "writtenOn": "2019-05-17T14:23:44Z",
+      "side": 1,
+      "message": "Why KUD if it\u0027s \"Kubernetes Reference Deployment\" ? Can you share some source why proposed name is better ? At first look it\u0027s not more working as acronym",
+      "revId": "bf8e9d6dcc820bcf1e1413a4c46fe1acb7af89d4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

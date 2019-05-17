@@ -33,7 +33,7 @@ rbp_instance=rbp_instance.json
 rbp_content_tarball=profile.tar
 
 # vFirewall vars
-demo_artifacts_version=1.3.1
+demo_artifacts_version=1.5.0
 vfw_private_ip_0='192.168.10.3'
 vfw_private_ip_1='192.168.20.2'
 vfw_private_ip_2='10.10.100.3'
@@ -47,6 +47,7 @@ protected_net_gw='192.168.20.100'
 protected_net_cidr='192.168.20.0/24'
 protected_private_net_cidr='192.168.10.0/24'
 onap_private_net_cidr='10.10.0.0/16'
+sink_ipaddr='192.168.20.250'
 
 # populate_CSAR_containers_vFW() - This function creates the content of CSAR file
 # required for vFirewal using only containers
@@ -323,6 +324,7 @@ NET
             - export dcae_collector_port=$dcae_collector_port
             - export protected_net_gw=$protected_net_gw
             - export protected_private_net_cidr=$protected_private_net_cidr
+            - export sink_ipaddr=$sink_ipaddr
 "
     if [[ -n "${http_proxy+x}" ]]; then
         proxy+="
@@ -503,12 +505,20 @@ spec:
     spec:
       containers:
       - name: $sink_deployment_name
-        image: electrocucaracha/sink
+        image: rtsood/onap-vfw-demo-sink
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
         securityContext:
           privileged: true
+        command: ["/bin/sh", "-c"]
+        args:
+          - mkdir -p /opt/config/;
+            echo "$protected_net_gw"           > /opt/config/protected_net_gw.txt;
+            echo "$protected_private_net_cidr" > /opt/config/unprotected_net.txt;
+            ./v_sink_init.sh;
+            sleep infinity;
+
       - name: darkstat
         image: electrocucaracha/darkstat
         imagePullPolicy: IfNotPresent

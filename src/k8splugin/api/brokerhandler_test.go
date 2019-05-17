@@ -52,8 +52,17 @@ func TestBrokerCreateHandler(t *testing.T) {
 			input: bytes.NewBuffer([]byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
 				"user_directives": {
-					"definition-name": "test-rbdef",
-					"definition-version": "v1"				}
+					"attributes": [
+						{
+							"attribute_name": "definition-name",
+							"attribute_value": "test-rbdef"
+						},
+						{
+							"attribute_name": "definition-version",
+							"attribute_value": "v1"
+						}
+					]
+				}
 			}`)),
 			expectedCode: http.StatusBadRequest,
 		},
@@ -62,9 +71,20 @@ func TestBrokerCreateHandler(t *testing.T) {
 			input: bytes.NewBuffer([]byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
 				"user_directives": {
-					"definition-name": "test-rbdef",
-					"definition-version": "v1",
-					"profile-name": "profile1"
+					"attributes": [
+						{
+							"attribute_name": "definition-name",
+							"attribute_value": "test-rbdef"
+						},
+						{
+							"attribute_name": "definition-version",
+							"attribute_value": "v1"
+						},
+						{
+							"attribute_name": "profile-name",
+							"attribute_value": "profile1"
+						}
+					]
 				}
 			}`)),
 			expected: brokerPOSTResponse{

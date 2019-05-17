@@ -16,6 +16,24 @@
       "revId": "bf8e9d6dcc820bcf1e1413a4c46fe1acb7af89d4",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "65adcd57_3d5c72d4",
+        "filename": "docs/bare_metal_provisioning.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-17T16:34:56Z",
+      "side": 1,
+      "message": "don\u0027t know the history. But it\u0027s now KUD not KRD anymore. It\u0027s changed already everywhere.\nAs a spelled out I think it\u0027s \"Kubernetes Deployment\" not \"Kubernetes Reference Deployment\", so I should change the first part the line.",
+      "parentUuid": "affd345d_121f601b",
+      "revId": "bf8e9d6dcc820bcf1e1413a4c46fe1acb7af89d4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

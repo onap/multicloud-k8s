@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "933659b0_ebb0f561",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-17T19:07:53Z",
+      "side": 1,
+      "message": "Hi Michal. Thank you for reporting this bug. There is a slight problem with this change. It will throw an error on line number 111. Works with changing the name to ansible_version",
+      "range": {
+        "startLine": 43,
+        "startChar": 4,
+        "endLine": 43,
+        "endChar": 11
+      },
+      "revId": "de807d4a786e62b7b56b622731d9f4ff52053a67",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ccbc9665_0a7da7e2",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-17T19:07:53Z",
+      "side": 1,
+      "message": "looks for kubespray-2.7.10 as opposed 2.8.2.",
+      "revId": "de807d4a786e62b7b56b622731d9f4ff52053a67",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

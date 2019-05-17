@@ -16,6 +16,7 @@ packetgen_deployment_name=packetgen
 sink_deployment_name=sink
 firewall_deployment_name=firewall
 image_name=virtlet.cloud/ubuntu/16.04
+ubuntu_image=ubuntu:16.04
 multus_deployment_name=multus-deployment
 virtlet_image=virtlet.cloud/fedora
 virtlet_deployment_name=virtlet-deployment
@@ -33,7 +34,7 @@ rbp_instance=rbp_instance.json
 rbp_content_tarball=profile.tar
 
 # vFirewall vars
-demo_artifacts_version=1.3.1
+demo_artifacts_version=1.5.0
 vfw_private_ip_0='192.168.10.3'
 vfw_private_ip_1='192.168.20.2'
 vfw_private_ip_2='10.10.100.3'
@@ -47,6 +48,7 @@ protected_net_gw='192.168.20.100'
 protected_net_cidr='192.168.20.0/24'
 protected_private_net_cidr='192.168.10.0/24'
 onap_private_net_cidr='10.10.0.0/16'
+sink_ipaddr='192.168.20.250'
 
 # populate_CSAR_containers_vFW() - This function creates the content of CSAR file
 # required for vFirewal using only containers
@@ -323,6 +325,7 @@ NET
             - export dcae_collector_port=$dcae_collector_port
             - export protected_net_gw=$protected_net_gw
             - export protected_private_net_cidr=$protected_private_net_cidr
+            - export sink_ipaddr=$sink_ipaddr
 "
     if [[ -n "${http_proxy+x}" ]]; then
         proxy+="
@@ -340,6 +343,20 @@ NET
         cloud_init_proxy+="
             - export no_proxy=$no_proxy"
     fi
+
+    if [[ -n "${http_proxy+x}" ]]; then
+        pod_init+="
+              export http_proxy=$http_proxy;"
+    fi
+    if [[ -n "${https_proxy+x}" ]]; then
+        pod_init+="
+              export https_proxy=$https_proxy;"
+    fi
+    if [[ -n "${no_proxy+x}" ]]; then
+        pod_init+="
+              export no_proxy=$no_proxy;"
+    fi
+
 
     cat << DEPLOYMENT > $packetgen_deployment_name.yaml
 apiVersion: apps/v1
@@ -503,19 +520,43 @@ spec:
     spec:
       containers:
       - name: $sink_deployment_name
-        image: electrocucaracha/sink
+        image: $ubuntu_image
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
         securityContext:
           privileged: true
+        command: ["/bin/sh", "-c"]
+        args:
+          - $pod_init
+            apt-get update;
+            apt install -y wget net-tools unzip;
+            mkdir -p /opt/config/;
+            echo "$protected_net_gw"           > /opt/config/protected_net_gw.txt;
+            echo "$protected_private_net_cidr" > /opt/config/unprotected_net.txt;
+            wget -q "https://nexus.onap.org/content/repositories/staging/org/onap/demo/vnf/vfw/vfw-scripts/${demo_artifacts_version}/vfw-scripts-${demo_artifacts_version}.zip";
+            unzip "vfw-scripts-${demo_artifacts_version}.zip";
+            chmod +x *.sh;
+            ./v_sink_init.sh;
+            sleep infinity;
+
       - name: darkstat
-        image: electrocucaracha/darkstat
+        image: $ubuntu_image
         imagePullPolicy: IfNotPresent
         tty: true
         stdin: true
+        command: ["/bin/sh", "-c"]
+        args:
+          - $pod_init
+            apt-get update;
+            apt-get install -y -qq darkstat;
+            sed -i "s/START_DARKSTAT=.*/START_DARKSTAT=yes/g" /etc/darkstat/init.cfg;
+            sed -i "s/INTERFACE=.*/INTERFACE=\"-i eth1\"/g" /etc/darkstat/init.cfg;
+            /etc/init.d/darkstat start;
+            sleep infinity;
         ports:
           - containerPort: 667
+
 DEPLOYMENT
     popd
 }

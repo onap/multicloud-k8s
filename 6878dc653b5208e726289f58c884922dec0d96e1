@@ -94,6 +94,30 @@
       "revId": "6878dc653b5208e726289f58c884922dec0d96e1",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9d751325_67887dd8",
+        "filename": "kud/hosting_providers/vagrant/aio.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4009
+      },
+      "writtenOn": "2019-05-17T14:28:21Z",
+      "side": 1,
+      "message": "I agree with Samuli, this can\u0027t be hardcoded unless this is the only IP which is working for all of us. so it can be fixed in later commit :-)",
+      "parentUuid": "99b2112f_2a27b1b8",
+      "range": {
+        "startLine": 25,
+        "startChar": 27,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "6878dc653b5208e726289f58c884922dec0d96e1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

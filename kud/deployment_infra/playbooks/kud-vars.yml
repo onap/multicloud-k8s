@@ -61,3 +61,5 @@ go_version: '1.12.4'
 kubespray_version: 2.8.2
 kubectl_version: 1.12.2
 helm_client_version: 2.9.1
+# kud playbooks not compatible with 2.8.0 - see MULTICLOUD-634
+ansible_version: 2.7.10

@@ -40,12 +40,13 @@ function _install_pip {
 
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
+    version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
     sudo mkdir -p /etc/ansible/
     if $(ansible --version &>/dev/null); then
         return
     fi
     _install_pip
-    sudo -E pip install ansible
+    sudo -E pip install ansible==$version
 }
 
 # _install_docker() - Download and install docker-engine
@@ -238,3 +239,4 @@ if ${KUD_PLUGIN_ENABLED:-false}; then
     install_plugin
 fi
 _print_kubernetes_info
+

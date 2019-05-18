@@ -118,6 +118,30 @@
       "revId": "6878dc653b5208e726289f58c884922dec0d96e1",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3330e64b_93955a3d",
+        "filename": "kud/hosting_providers/vagrant/aio.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-18T07:37:39Z",
+      "side": 1,
+      "message": "it\u0027s already fixed in later commit. And I have proposed to remove this file from this commit.",
+      "parentUuid": "9d751325_67887dd8",
+      "range": {
+        "startLine": 25,
+        "startChar": 27,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "6878dc653b5208e726289f58c884922dec0d96e1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

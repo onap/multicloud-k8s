@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "37e2b3c4_f12e5914",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4009
+      },
+      "writtenOn": "2019-05-20T07:13:05Z",
+      "side": 1,
+      "message": "thanks for checking that, my fault, I hit that as well but wrongly not uploaded latest patch. I think cleaner approach would be in using those variables in local context. I see that similarly wrongly version is used also on row 16 so we can theoretically hit similar problem later .... maybe we can improve also other places but due this timing I wanted to keep the change as small as possible",
+      "parentUuid": "933659b0_ebb0f561",
+      "range": {
+        "startLine": 43,
+        "startChar": 4,
+        "endLine": 43,
+        "endChar": 11
+      },
+      "revId": "de807d4a786e62b7b56b622731d9f4ff52053a67",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ccbc9665_0a7da7e2",
         "filename": "kud/hosting_providers/vagrant/installer.sh",
         "patchSetId": 2
@@ -36,6 +60,24 @@
       "writtenOn": "2019-05-17T19:07:53Z",
       "side": 1,
       "message": "looks for kubespray-2.7.10 as opposed 2.8.2.",
+      "revId": "de807d4a786e62b7b56b622731d9f4ff52053a67",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "915ecb33_da7a0a17",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4009
+      },
+      "writtenOn": "2019-05-20T07:13:05Z",
+      "side": 1,
+      "message": "this should match with ansible version ? I didn\u0027t hit the problem with that but let me check it in more details",
+      "parentUuid": "ccbc9665_0a7da7e2",
       "revId": "de807d4a786e62b7b56b622731d9f4ff52053a67",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

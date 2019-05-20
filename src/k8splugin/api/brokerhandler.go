@@ -16,6 +16,7 @@ package api
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 
 	"k8splugin/internal/app"
@@ -56,6 +57,52 @@ type brokerGETResponse struct {
 	WorkloadStatus string `json:"workload_status"`
 }
 
+// getUserDirectiveValue parses the following kind of json
+// "user_attributes": {
+// 		"attributes": [
+// 		{
+// 			"attribute_value": "foo",
+// 			"attribute_name": "bar"
+// 		},
+// 		{
+// 			"attribute_value": "value2",
+// 			"attribute_name": "name2"
+// 		}
+// 		]
+// }
+func (b brokerRequest) getUserDirectiveValue(inp string) string {
+	attributes, ok := b.UserDirectives["attributes"].([]interface{})
+	if !ok {
+		log.Println("Unable to cast attributes to []interface{}")
+		return ""
+	}
+
+	for _, value := range attributes {
+
+		attribute, ok := value.(map[string]interface{})
+		if !ok {
+			log.Println("Unable to cast attribute to map[string]interface{}")
+			return ""
+		}
+
+		attributename, ok := attribute["attribute_name"].(string)
+		if !ok {
+			log.Println("Unable to cast attribute_name to string")
+			return ""
+		}
+		if attributename == inp {
+			attributevalue, ok := attribute["attribute_value"].(string)
+			if !ok {
+				log.Println("Unable to cast attribute_value to string")
+				return ""
+			}
+
+			return attributevalue
+		}
+	}
+	return ""
+}
+
 func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cloudRegion := vars["cloud-region"]
@@ -77,29 +124,29 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	rbName, ok := req.UserDirectives["definition-name"]
-	if !ok {
+	rbName := req.getUserDirectiveValue("definition-name")
+	if rbName == "" {
 		http.Error(w, "definition-name is missing from user-directives", http.StatusBadRequest)
 		return
 	}
 
-	rbVersion, ok := req.UserDirectives["definition-version"]
-	if !ok {
+	rbVersion := req.getUserDirectiveValue("definition-version")
+	if rbVersion == "" {
 		http.Error(w, "definition-version is missing from user-directives", http.StatusBadRequest)
 		return
 	}
 
-	profileName, ok := req.UserDirectives["profile-name"]
-	if !ok {
+	profileName := req.getUserDirectiveValue("profile-name")
+	if profileName == "" {
 		http.Error(w, "profile-name is missing from user-directives", http.StatusBadRequest)
 		return
 	}
 
 	// Setup the resource parameters for making the request
 	var instReq app.InstanceRequest
-	instReq.RBName = rbName.(string)
-	instReq.RBVersion = rbVersion.(string)
-	instReq.ProfileName = profileName.(string)
+	instReq.RBName = rbName
+	instReq.RBVersion = rbVersion
+	instReq.ProfileName = profileName
 	instReq.CloudRegion = cloudRegion
 
 	resp, err := b.client.Create(instReq)

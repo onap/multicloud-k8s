@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ee83abb3_3e6a4192",
+        "filename": "docs/bare_metal_provisioning.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 4009
+      },
+      "writtenOn": "2019-05-20T07:53:35Z",
+      "side": 0,
+      "message": "I don\u0027t understand why this was removed, can you elaborate ?   w/o this change playbooks still contains conflicting kubectl role",
+      "revId": "c8d038951d41978bb00005e23081e6562c0ab754",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

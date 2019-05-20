@@ -16,7 +16,7 @@ set -o errexit
 # install_dependencies() - Install required dependencies
 function install_dependencies {
     apt-get update
-    apt install -y wget darkstat net-tools
+    apt install -y wget darkstat net-tools unzip
 
     # Configure and run Darkstat
     sed -i "s/START_DARKSTAT=.*/START_DARKSTAT=yes/g;s/INTERFACE=.*/INTERFACE=\"-i eth1\"/g" /etc/darkstat/init.cfg

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6eb68953_6ed11f88",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-20T21:33:15Z",
+      "side": 1,
+      "message": "Why is this check removed?",
+      "revId": "1709eed2410d39dc3801efb37372f089cf4e8e9e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c4385962_160cedd8",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-20T21:33:15Z",
+      "side": 1,
+      "message": "This function has hard coded eth1",
+      "range": {
+        "startLine": 94,
+        "startChar": 39,
+        "endLine": 94,
+        "endChar": 62
+      },
+      "revId": "1709eed2410d39dc3801efb37372f089cf4e8e9e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

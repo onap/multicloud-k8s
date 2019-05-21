@@ -105,6 +105,75 @@
     },
     {
       "key": {
+        "uuid": "da1e40c4_c7e38219",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-21T21:28:09Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 70,
+        "startChar": 7,
+        "endLine": 71,
+        "endChar": 68
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8cda7678_eecdd99e",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-21T21:28:09Z",
+      "side": 1,
+      "message": "nit: remove white space",
+      "range": {
+        "startLine": 73,
+        "startChar": 17,
+        "endLine": 73,
+        "endChar": 18
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db1c4347_2614d3e2",
+        "filename": "kud/demo/firewall/charts/packetgen/values.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-21T21:28:09Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 15,
+        "startChar": 1,
+        "endLine": 18,
+        "endChar": 23
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "71972c63_348c9fa5",
         "filename": "kud/demo/firewall/charts/packetgen/values.yaml",
         "patchSetId": 10
@@ -125,6 +194,121 @@
       "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e39d9710_226dd172",
+        "filename": "kud/demo/firewall/charts/sink/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-21T21:28:09Z",
+      "side": 1,
+      "message": "match service",
+      "range": {
+        "startLine": 14,
+        "startChar": 4,
+        "endLine": 16,
+        "endChar": 20
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ec49ac85_ce7feb5e",
+        "filename": "kud/demo/firewall/charts/sink/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-21T21:28:09Z",
+      "side": 1,
+      "message": "refer to service",
+      "range": {
+        "startLine": 45,
+        "startChar": 38,
+        "endLine": 45,
+        "endChar": 49
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4b43276_b2de821f",
+        "filename": "kud/demo/firewall/charts/sink/templates/service.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-21T21:28:09Z",
+      "side": 1,
+      "message": "replace with;\napp: {{ include \"sink.name\" . }}\nrelease: {{ .Release.Name }}",
+      "range": {
+        "startLine": 16,
+        "startChar": 4,
+        "endLine": 19,
+        "endChar": 21
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5661a053_58da252d",
+        "filename": "kud/demo/firewall/charts/sink/values.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-21T21:28:09Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 11
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b7e77945_490b4458",
+        "filename": "kud/demo/firewall/values.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-21T21:28:09Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 15,
+        "startChar": 1,
+        "endLine": 17,
+        "endChar": 10
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     },
     {
       "key": {

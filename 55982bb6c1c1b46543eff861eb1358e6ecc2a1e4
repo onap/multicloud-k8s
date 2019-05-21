@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22fdb709_e9f08abd",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/NOTES.txt",
+        "patchSetId": 10
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-21T00:29:37Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem not relevant",
+      "range": {
+        "startLine": 2,
+        "startChar": 8,
+        "endLine": 6,
+        "endChar": 12
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "323de8fe_4cabca78",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/NOTES.txt",
+        "patchSetId": 10
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-21T00:29:37Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 18,
+        "startChar": 2,
+        "endLine": 21,
+        "endChar": 10
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "71972c63_348c9fa5",
+        "filename": "kud/demo/firewall/charts/packetgen/values.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-21T00:29:37Z",
+      "side": 1,
+      "message": "Change to 1.5.0. 1.3.1 doesn\u0027t exist anymore",
+      "range": {
+        "startLine": 40,
+        "startChar": 23,
+        "endLine": 40,
+        "endChar": 29
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0247838_4cfc8263",
+        "filename": "kud/demo/firewall/values.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-21T00:29:37Z",
+      "side": 1,
+      "message": "Is this section needed?",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 30
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

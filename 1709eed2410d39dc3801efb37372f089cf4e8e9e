@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8684a429_5993e687",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-21T05:20:42Z",
+      "side": 1,
+      "message": "this line is added, not removed.",
+      "parentUuid": "6eb68953_6ed11f88",
+      "revId": "1709eed2410d39dc3801efb37372f089cf4e8e9e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c4385962_160cedd8",
         "filename": "kud/hosting_providers/vagrant/installer.sh",
         "patchSetId": 7
@@ -30,6 +48,30 @@
       "writtenOn": "2019-05-20T21:33:15Z",
       "side": 1,
       "message": "This function has hard coded eth1",
+      "range": {
+        "startLine": 94,
+        "startChar": 39,
+        "endLine": 94,
+        "endChar": 62
+      },
+      "revId": "1709eed2410d39dc3801efb37372f089cf4e8e9e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbc84127_cc9c9266",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-21T05:20:42Z",
+      "side": 1,
+      "message": "This patch removes that hardcoding from that function, see _functions.sh in this same patch.",
+      "parentUuid": "c4385962_160cedd8",
       "range": {
         "startLine": 94,
         "startChar": 39,

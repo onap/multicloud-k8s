@@ -9,53 +9,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: '2'
+version: '3'
 
 services:
   multicloud-k8s:
     image: ${IMAGE_NAME}
-    networks:
-      multicloud_net:
-        ipv4_address: ${PLUGIN_IP}
     build:
       context: ./
       args:
         - HTTP_PROXY=${HTTP_PROXY}
         - HTTPS_PROXY=${HTTPS_PROXY}
         - NO_PROXY=${NO_PROXY}
-    ports:
-      - "8081:8081"
     environment:
-      - CSAR_DIR=${CSAR_DIR}
-      - KUBE_CONFIG_DIR=${KUBE_CONFIG_DIR}
-      - DATABASE_TYPE=${DATABASE_TYPE}
-      - DATABASE_IP=${DATABASE_IP}
-      - PLUGINS_DIR=${PLUGINS_DIR}
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY},${DATABASE_IP}
+      - NO_PROXY=${NO_PROXY},mongo
     depends_on:
       - mongo
-    links:
-      - mongo
+    network_mode: host
     volumes:
       - /opt/csar:/opt/csar
-      - /opt/kubeconfig:/opt/kubeconfig
+      - ${PWD}/k8sconfig.json:/opt/multicloud/k8splugin/k8sconfig.json:ro
   mongo:
     image: mongo
-    networks:
-      multicloud_net:
-        ipv4_address: ${DATABASE_IP}
     environment:
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
       - NO_PROXY=${NO_PROXY}
-
-networks:
-  multicloud_net:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-      -
-        subnet: 172.19.0.0/27

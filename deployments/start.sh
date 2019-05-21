@@ -11,30 +11,21 @@
 set -o nounset
 set -o pipefail
 
-source /etc/environment
-
-k8s_path="$(git rev-parse --show-toplevel)"
-export GOPATH=$k8s_path
-export GO111MODULE=on
-
-echo "Starting mongo services"
 docker-compose kill
+docker-compose down
 docker-compose up -d mongo
 export DATABASE_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aqf "name=mongo"))
-export no_proxy=${no_proxy:-},$DATABASE_IP
-export NO_PROXY=${NO_PROXY:-},$DATABASE_IP
+export no_proxy=${no_proxy:-},${DATABASE_IP}
+export NO_PROXY=${NO_PROXY:-},${DATABASE_IP}
 
-echo "Compiling source code"
-pushd $k8s_path/src/k8splugin/
 cat << EOF > k8sconfig.json
 {
-    "database-address":     "$DATABASE_IP",
+    "database-address":     "${DATABASE_IP}",
     "database-type": "mongo",
-    "plugin-dir": "$(pwd)/plugins",
+    "plugin-dir": "plugins",
     "service-port": "9015",
-    "kube-config-dir": "$(pwd)/kubeconfigs"
+    "kube-config-dir": "/opt/kubeconfig"
 }
 EOF
-make all
-./k8plugin
-popd
+
+docker-compose up -d

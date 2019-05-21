@@ -48,6 +48,63 @@
     },
     {
       "key": {
+        "uuid": "1dbb943e_8cdcf0d3",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-21T20:54:33Z",
+      "side": 1,
+      "message": "Use line 7 value in 6 and remove line 7",
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4bd7c04d_59439041",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-21T20:54:33Z",
+      "side": 1,
+      "message": "Remove this",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 56
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "db18d9bd_10cedfe8",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-21T20:54:33Z",
+      "side": 1,
+      "message": "Remove 23 merge 21 and 22",
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "71972c63_348c9fa5",
         "filename": "kud/demo/firewall/charts/packetgen/values.yaml",
         "patchSetId": 10

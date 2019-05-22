@@ -88,7 +88,7 @@ func CheckDatabaseConnection() error {
 	}
 	err = db.NewEtcdClient(nil, c)
 	if err != nil {
-		log.Printf("Etcd Client Initialization failed")
+		log.Printf("Etcd Client Initialization failed with error: %s", err.Error())
 	}
 	return nil
 }

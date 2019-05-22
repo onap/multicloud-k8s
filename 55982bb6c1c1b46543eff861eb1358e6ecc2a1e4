@@ -65,6 +65,23 @@
     },
     {
       "key": {
+        "uuid": "3225e9bc_ca618deb",
+        "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-22T02:34:20Z",
+      "side": 1,
+      "message": "Remove this also",
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4bd7c04d_59439041",
         "filename": "kud/demo/firewall/charts/packetgen/templates/deployment.yaml",
         "patchSetId": 10
@@ -171,6 +188,29 @@
       "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5a6e4ea6_cc4cad59",
+        "filename": "kud/demo/firewall/charts/packetgen/values.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-22T02:34:20Z",
+      "side": 1,
+      "message": "Not needed",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 30
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     },
     {
       "key": {
@@ -286,6 +326,46 @@
       "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d1ee4473_304daacb",
+        "filename": "kud/demo/firewall/charts/sink/values.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-22T02:34:20Z",
+      "side": 1,
+      "message": "Make them global",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 39
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4be09bc3_4358e66d",
+        "filename": "kud/demo/firewall/templates/unprotected-private-net.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-05-22T02:34:20Z",
+      "side": 1,
+      "message": "Remove hard coding. Use from the Values",
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     },
     {
       "key": {

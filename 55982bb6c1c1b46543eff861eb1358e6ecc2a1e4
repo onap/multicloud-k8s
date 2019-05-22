@@ -623,6 +623,30 @@
     },
     {
       "key": {
+        "uuid": "514ce742_de06a962",
+        "filename": "kud/demo/firewall/charts/sink/templates/service.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-22T19:43:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9b50af4_88261eeb",
+      "range": {
+        "startLine": 6,
+        "startChar": 3,
+        "endLine": 9,
+        "endChar": 56
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f4b43276_b2de821f",
         "filename": "kud/demo/firewall/charts/sink/templates/service.yaml",
         "patchSetId": 10
@@ -728,6 +752,30 @@
       "writtenOn": "2019-05-22T02:34:20Z",
       "side": 1,
       "message": "Make them global",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 39
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "947c0251_a6b140d2",
+        "filename": "kud/demo/firewall/charts/sink/values.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-22T19:43:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1ee4473_304daacb",
       "range": {
         "startLine": 55,
         "startChar": 0,

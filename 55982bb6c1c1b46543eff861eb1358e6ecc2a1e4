@@ -283,6 +283,29 @@
     },
     {
       "key": {
+        "uuid": "f9b50af4_88261eeb",
+        "filename": "kud/demo/firewall/charts/sink/templates/service.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-22T02:44:53Z",
+      "side": 1,
+      "message": "Replace this to replicate below?",
+      "range": {
+        "startLine": 6,
+        "startChar": 3,
+        "endLine": 9,
+        "endChar": 56
+      },
+      "revId": "55982bb6c1c1b46543eff861eb1358e6ecc2a1e4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f4b43276_b2de821f",
         "filename": "kud/demo/firewall/charts/sink/templates/service.yaml",
         "patchSetId": 10

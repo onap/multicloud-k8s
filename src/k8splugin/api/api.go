@@ -47,6 +47,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	brokerHandler := brokerInstanceHandler{client: instClient}
 	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload", brokerHandler.createHandler).Methods("POST")
 	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}", brokerHandler.getHandler).Methods("GET")
+	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload", brokerHandler.findHandler).Queries("name", "{name}").Methods("GET")
 	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}", brokerHandler.deleteHandler).Methods("DELETE")
 
 	//Setup the connectivity api handler here

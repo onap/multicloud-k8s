@@ -39,22 +39,32 @@ type brokerRequest struct {
 	VFModuleModelVersionID       string                 `json:"vf-module-model-version-id"`
 	VFModuleModelCustomizationID string                 `json:"vf-module-model-customization-id"`
 	OOFDirectives                map[string]interface{} `json:"oof_directives"`
-	SDNCDirections               map[string]interface{} `json:"sdnc_directives"`
+	SDNCDirectives               map[string]interface{} `json:"sdnc_directives"`
 	UserDirectives               map[string]interface{} `json:"user_directives"`
 	TemplateType                 string                 `json:"template_type"`
 	TemplateData                 map[string]interface{} `json:"template_data"`
 }
 
 type brokerPOSTResponse struct {
-	TemplateType     string                    `json:"template_type"`
-	WorkloadID       string                    `json:"workload_id"`
-	TemplateResponse []helm.KubernetesResource `json:"template_response"`
+	TemplateType         string                    `json:"template_type"`
+	WorkloadID           string                    `json:"workload_id"`
+	TemplateResponse     []helm.KubernetesResource `json:"template_response"`
+	WorkloadStatus       string                    `json:"workload_status"`
+	WorkloadStatusReason map[string]interface{}    `json:"workload_status_reason"`
 }
 
 type brokerGETResponse struct {
-	TemplateType   string `json:"template_type"`
-	WorkloadID     string `json:"workload_id"`
-	WorkloadStatus string `json:"workload_status"`
+	TemplateType         string                 `json:"template_type"`
+	WorkloadID           string                 `json:"workload_id"`
+	WorkloadStatus       string                 `json:"workload_status"`
+	WorkloadStatusReason map[string]interface{} `json:"workload_status_reason"`
+}
+
+type brokerDELETEResponse struct {
+	TemplateType         string                 `json:"template_type"`
+	WorkloadID           string                 `json:"workload_id"`
+	WorkloadStatus       string                 `json:"workload_status"`
+	WorkloadStatusReason map[string]interface{} `json:"workload_status_reason"`
 }
 
 // getUserDirectiveValue parses the following kind of json
@@ -70,8 +80,8 @@ type brokerGETResponse struct {
 // 		}
 // 		]
 // }
-func (b brokerRequest) getUserDirectiveValue(inp string) string {
-	attributes, ok := b.UserDirectives["attributes"].([]interface{})
+func (b brokerRequest) getAttributeValue(directives map[string]interface{}, inp string) string {
+	attributes, ok := directives["attributes"].([]interface{})
 	if !ok {
 		log.Println("Unable to cast attributes to []interface{}")
 		return ""
@@ -85,12 +95,12 @@ func (b brokerRequest) getUserDirectiveValue(inp string) string {
 			return ""
 		}
 
-		attributename, ok := attribute["attribute_name"].(string)
+		attributeName, ok := attribute["attribute_name"].(string)
 		if !ok {
 			log.Println("Unable to cast attribute_name to string")
 			return ""
 		}
-		if attributename == inp {
+		if attributeName == inp {
 			attributevalue, ok := attribute["attribute_value"].(string)
 			if !ok {
 				log.Println("Unable to cast attribute_value to string")
@@ -124,21 +134,27 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	rbName := req.getUserDirectiveValue("definition-name")
+	rbName := req.getAttributeValue(req.UserDirectives, "definition-name")
 	if rbName == "" {
 		http.Error(w, "definition-name is missing from user-directives", http.StatusBadRequest)
 		return
 	}
 
-	rbVersion := req.getUserDirectiveValue("definition-version")
+	rbVersion := req.getAttributeValue(req.UserDirectives, "definition-version")
 	if rbVersion == "" {
 		http.Error(w, "definition-version is missing from user-directives", http.StatusBadRequest)
 		return
 	}
 
-	profileName := req.getUserDirectiveValue("profile-name")
+	profileName := req.getAttributeValue(req.UserDirectives, "profile-name")
 	if profileName == "" {
 		http.Error(w, "profile-name is missing from user-directives", http.StatusBadRequest)
+		return
+	}
+
+	vfModuleName := req.getAttributeValue(req.SDNCDirectives, "vf_module_name")
+	if vfModuleName == "" {
+		http.Error(w, "vf_module_name is missing from sdnc-directives", http.StatusBadRequest)
 		return
 	}
 
@@ -148,6 +164,9 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	instReq.RBVersion = rbVersion
 	instReq.ProfileName = profileName
 	instReq.CloudRegion = cloudRegion
+	instReq.Labels = map[string]string{
+		"vf_module_name": vfModuleName,
+	}
 
 	resp, err := b.client.Create(instReq)
 	if err != nil {
@@ -159,6 +178,7 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		TemplateType:     "heat",
 		WorkloadID:       resp.ID,
 		TemplateResponse: resp.Resources,
+		WorkloadStatus:   "CREATE_COMPLETE",
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -184,7 +204,51 @@ func (b brokerInstanceHandler) getHandler(w http.ResponseWriter, r *http.Request
 	brokerResp := brokerGETResponse{
 		TemplateType:   "heat",
 		WorkloadID:     resp.ID,
-		WorkloadStatus: "CREATED",
+		WorkloadStatus: "CREATE_COMPLETE",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(brokerResp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// getHandler retrieves information about an instance via the ID
+func (b brokerInstanceHandler) findHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	//name is an alias for vf_module_name from the so adapter
+	name := vars["name"]
+
+	responses, err := b.client.Find("", "", "", map[string]string{"vf_module_name": name})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	brokerResp := brokerGETResponse{
+		TemplateType:   "heat",
+		WorkloadID:     "",
+		WorkloadStatus: "GET_COMPLETE",
+		WorkloadStatusReason: map[string]interface{}{
+			//treating stacks as an array of map[string]interface{} types
+			"stacks": []map[string]interface{}{},
+		},
+	}
+
+	if len(responses) != 0 {
+		//Return the first object that matches.
+		resp := responses[0]
+		brokerResp.WorkloadID = resp.ID
+		brokerResp.WorkloadStatus = "CREATE_COMPLETE"
+		brokerResp.WorkloadStatusReason["stacks"] = []map[string]interface{}{
+			{
+				"stack_status": "CREATE_COMPLETE",
+				"id":           resp.ID,
+			},
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -207,6 +271,17 @@ func (b brokerInstanceHandler) deleteHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	brokerResp := brokerDELETEResponse{
+		TemplateType:   "heat",
+		WorkloadID:     instanceID,
+		WorkloadStatus: "DELETE_COMPLETE",
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
+	err = json.NewEncoder(w).Encode(brokerResp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

@@ -50,7 +50,7 @@ type InstanceResponse struct {
 type InstanceManager interface {
 	Create(i InstanceRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
-	Find(rbName string, ver string, profile string) ([]InstanceResponse, error)
+	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceResponse, error)
 	Delete(id string) error
 }
 
@@ -179,9 +179,11 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 // Find returns the instances that match the given criteria
 // If version is empty, it will return all instances for a given rbName
 // If profile is empty, it will return all instances for a given rbName+version
-func (v *InstanceClient) Find(rbName string, version string, profile string) ([]InstanceResponse, error) {
-	if rbName == "" {
-		return []InstanceResponse{}, pkgerrors.New("rbName is required and cannot be empty")
+// If labelKeys are provided, the results are filtered based on that.
+// It is an AND operation for labelkeys.
+func (v *InstanceClient) Find(rbName string, version string, profile string, labelKeys map[string]string) ([]InstanceResponse, error) {
+	if rbName == "" && len(labelKeys) == 0 {
+		return []InstanceResponse{}, pkgerrors.New("rbName or labelkeys is required and cannot be empty")
 	}
 
 	values, err := db.DBconn.ReadAll(v.storeName, v.tagInst)
@@ -191,6 +193,7 @@ func (v *InstanceClient) Find(rbName string, version string, profile string) ([]
 
 	response := []InstanceResponse{}
 	//values is a map[string][]byte
+InstanceResponseLoop:
 	for _, value := range values {
 		resp := InstanceResponse{}
 		db.DBconn.Unmarshal(value, &resp)
@@ -198,19 +201,43 @@ func (v *InstanceClient) Find(rbName string, version string, profile string) ([]
 			return []InstanceResponse{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
 		}
 
-		if resp.Request.RBName == rbName {
-
-			//Check if a version is provided and if it matches
-			if version != "" {
-				if resp.Request.RBVersion == version {
-					//Check if a profilename matches or if it is not provided
-					if profile == "" || resp.Request.ProfileName == profile {
-						response = append(response, resp)
+		// Filter by labels provided
+		if len(labelKeys) != 0 {
+			for lkey, lvalue := range labelKeys {
+				//Check if label key exists and get its value
+				if val, ok := resp.Request.Labels[lkey]; ok {
+					if lvalue != val {
+						continue InstanceResponseLoop
 					}
 				}
-			} else {
-				//Append all versions as version is not provided
-				response = append(response, resp)
+			}
+		}
+
+		if rbName != "" {
+			if resp.Request.RBName == rbName {
+
+				//Check if a version is provided and if it matches
+				if version != "" {
+					if resp.Request.RBVersion == version {
+						//Check if a profilename matches or if it is not provided
+						if profile == "" || resp.Request.ProfileName == profile {
+							response = append(response, resp)
+						}
+					}
+				} else {
+					//Append all versions as version is not provided
+					response = append(response, resp)
+				}
+			}
+		} else {
+			response = append(response, resp)
+		}
+	}
+
+	//filter the list by labelKeys now
+	for _, value := range response {
+		for _, label := range labelKeys {
+			if _, ok := value.Request.Labels[label]; ok {
 			}
 		}
 	}

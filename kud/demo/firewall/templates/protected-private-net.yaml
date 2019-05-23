@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Network
+metadata:
+  name: {{ .Values.global.protectedNetworkName }}
+spec:
+  cnitype : ovn4nfvk8s
+  name: {{ .Values.global.protectedNetworkName }}
+  subnet: {{ .Values.global.protectedNetCidr }}
+  gateway: {{ .Values.global.protectedNetGw }}/{{ .Values.global.gatewayVariable }}

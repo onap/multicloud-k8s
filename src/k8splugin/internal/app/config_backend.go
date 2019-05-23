@@ -354,7 +354,7 @@ func scheduleResources(c chan configResourceList) {
 			log.Printf("[scheduleResources]: POST %v %v", data.profile, data.resourceTemplates)
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
-				err = k8sClient.init(inst.CloudRegion)
+				err = k8sClient.init(inst.Request.CloudRegion)
 				if err != nil {
 					log.Printf("Getting CloudRegion Information: %s", err.Error())
 					//Move onto the next cloud region
@@ -374,7 +374,7 @@ func scheduleResources(c chan configResourceList) {
 			log.Printf("[scheduleResources]: DELETE %v %v", data.profile, data.resourceTemplates)
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
-				err = k8sClient.init(inst.CloudRegion)
+				err = k8sClient.init(inst.Request.CloudRegion)
 				if err != nil {
 					log.Printf("Getting CloudRegion Information: %s", err.Error())
 					//Move onto the next cloud region

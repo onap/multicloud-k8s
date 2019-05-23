@@ -40,13 +40,10 @@ type InstanceRequest struct {
 
 // InstanceResponse contains the response from instantiation
 type InstanceResponse struct {
-	ID          string                    `json:"id"`
-	RBName      string                    `json:"rb-name"`
-	RBVersion   string                    `json:"rb-version"`
-	ProfileName string                    `json:"profile-name"`
-	CloudRegion string                    `json:"cloud-region"`
-	Namespace   string                    `json:"namespace"`
-	Resources   []helm.KubernetesResource `json:"resources"`
+	ID        string                    `json:"id"`
+	Request   InstanceRequest           `json:"request"`
+	Namespace string                    `json:"namespace"`
+	Resources []helm.KubernetesResource `json:"resources"`
 }
 
 // InstanceManager is an interface exposes the instantiation functionality
@@ -134,13 +131,15 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 
 	//Compose the return response
 	resp := InstanceResponse{
-		ID:          id,
-		RBName:      i.RBName,
-		RBVersion:   i.RBVersion,
-		ProfileName: i.ProfileName,
-		CloudRegion: i.CloudRegion,
-		Namespace:   profile.Namespace,
-		Resources:   createdResources,
+		ID: id,
+		Request: InstanceRequest{
+			RBName:      i.RBName,
+			RBVersion:   i.RBVersion,
+			ProfileName: i.ProfileName,
+			CloudRegion: i.CloudRegion,
+		},
+		Namespace: profile.Namespace,
+		Resources: createdResources,
 	}
 
 	key := InstanceKey{
@@ -199,13 +198,13 @@ func (v *InstanceClient) Find(rbName string, version string, profile string) ([]
 			return []InstanceResponse{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
 		}
 
-		if resp.RBName == rbName {
+		if resp.Request.RBName == rbName {
 
 			//Check if a version is provided and if it matches
 			if version != "" {
-				if resp.RBVersion == version {
+				if resp.Request.RBVersion == version {
 					//Check if a profilename matches or if it is not provided
-					if profile == "" || resp.ProfileName == profile {
+					if profile == "" || resp.Request.ProfileName == profile {
 						response = append(response, resp)
 					}
 				}
@@ -227,7 +226,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.init(inst.CloudRegion)
+	err = k8sClient.init(inst.Request.CloudRegion)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}

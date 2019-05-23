@@ -112,10 +112,12 @@ func TestBrokerCreateHandler(t *testing.T) {
 				items: []app.InstanceResponse{
 					{
 						ID:          "HaKpys8e",
-						RBName:      "test-rbdef",
-						RBVersion:   "v1",
-						ProfileName: "profile1",
-						CloudRegion: "region1",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
 						Namespace:   "testnamespace",
 						Resources: []helm.KubernetesResource{
 							{
@@ -195,10 +197,12 @@ func TestBrokerGetHandler(t *testing.T) {
 				items: []app.InstanceResponse{
 					{
 						ID:          "HaKpys8e",
-						RBName:      "test-rbdef",
-						RBVersion:   "v1",
-						ProfileName: "profile1",
-						CloudRegion: "region1",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
 						Namespace:   "testnamespace",
 						Resources: []helm.KubernetesResource{
 							{

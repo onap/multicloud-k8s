@@ -105,10 +105,12 @@ func TestInstanceCreateHandler(t *testing.T) {
 			}`)),
 			expected: app.InstanceResponse{
 				ID:          "HaKpys8e",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile1",
-				CloudRegion: "region1",
+				Request: app.InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+				},
 				Namespace:   "testnamespace",
 				Resources: []helm.KubernetesResource{
 					{
@@ -132,10 +134,12 @@ func TestInstanceCreateHandler(t *testing.T) {
 				items: []app.InstanceResponse{
 					{
 						ID:          "HaKpys8e",
-						RBName:      "test-rbdef",
-						RBVersion:   "v1",
-						ProfileName: "profile1",
-						CloudRegion: "region1",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
 						Namespace:   "testnamespace",
 						Resources: []helm.KubernetesResource{
 							{
@@ -204,10 +208,12 @@ func TestInstanceGetHandler(t *testing.T) {
 			expectedCode: http.StatusOK,
 			expectedResponse: &app.InstanceResponse{
 				ID:          "HaKpys8e",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile1",
-				CloudRegion: "region1",
+				Request: app.InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+				},
 				Namespace:   "testnamespace",
 				Resources: []helm.KubernetesResource{
 					{
@@ -230,10 +236,12 @@ func TestInstanceGetHandler(t *testing.T) {
 				items: []app.InstanceResponse{
 					{
 						ID:          "HaKpys8e",
-						RBName:      "test-rbdef",
-						RBVersion:   "v1",
-						ProfileName: "profile1",
-						CloudRegion: "region1",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
 						Namespace:   "testnamespace",
 						Resources: []helm.KubernetesResource{
 							{

@@ -22,6 +22,30 @@
       "revId": "5f3db3438e9de6b232797ab5e2cfe9d529533a09",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7963f121_8a62688b",
+        "filename": "kud/ci/ci-kud-installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4009
+      },
+      "writtenOn": "2019-05-23T13:58:18Z",
+      "side": 1,
+      "message": "ok, it\u0027s shorter",
+      "parentUuid": "370d9dca_3a85167a",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 39
+      },
+      "revId": "5f3db3438e9de6b232797ab5e2cfe9d529533a09",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

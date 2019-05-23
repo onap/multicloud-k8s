@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a6bad871_c4e4968f",
+        "filename": "kud/tests/_common_test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-05-23T20:32:22Z",
+      "side": 1,
+      "message": "Have you moved this here because we want to put all the dependencies for test cases in the same script?",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 79
+      },
+      "revId": "bc83f936c1b369fc6291898ec88b6c6c17b2aa5d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

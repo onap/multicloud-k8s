@@ -31,29 +31,6 @@ function _get_ovn_central_address {
     echo "$(echo ${ansible_ifconfig#*>>} | tr '\n' ':')6641"
 }
 
-# install_ovn_deps() - Install dependencies required for tests that require OVN
-function install_ovn_deps {
-    if ! $(yq --version &>/dev/null); then
-        sudo -E pip install yq
-    fi
-    if ! $(ovn-nbctl --version &>/dev/null); then
-        source /etc/os-release || source /usr/lib/os-release
-        case ${ID,,} in
-            *suse)
-            ;;
-            ubuntu|debian)
-                sudo apt-get install -y apt-transport-https
-                echo "deb https://packages.wand.net.nz $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/wand.list
-                sudo curl https://packages.wand.net.nz/keyring.gpg -o /etc/apt/trusted.gpg.d/wand.gpg
-                sudo apt-get update
-                sudo apt install -y ovn-common
-            ;;
-            rhel|centos|fedora)
-            ;;
-        esac
-    fi
-}
-
 # init_network() - This function creates the OVN resouces required by the test
 function init_network {
     local fname=$1

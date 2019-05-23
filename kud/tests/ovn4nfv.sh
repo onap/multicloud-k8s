@@ -12,6 +12,7 @@ set -o nounset
 set -o pipefail
 
 source _common.sh
+source _common_test.sh
 source _functions.sh
 
 csar_id=a1c5b53e-d7ab-11e8-85b7-525400e8c29a

@@ -339,7 +339,10 @@ func TestInstanceFind(t *testing.T) {
 						"profile-name":"profile1",
 						"rb-name":"test-rbdef",
 						"rb-version":"v1",
-						"cloud-region":"region1"
+						"cloud-region":"region1",
+						"labels":{
+							"vf_module_id": "test-vf-module-id"
+						}
 					},
 					"namespace":"testnamespace",
 					"resources": [
@@ -439,6 +442,9 @@ func TestInstanceFind(t *testing.T) {
 					RBVersion:   "v1",
 					ProfileName: "profile1",
 					CloudRegion: "region1",
+					Labels: map[string]string{
+						"vf_module_id": "test-vf-module-id",
+					},
 				},
 				Namespace: "testnamespace",
 				Resources: []helm.KubernetesResource{
@@ -513,7 +519,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "", "")
+		data, err := ic.Find(name, "", "", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -548,6 +554,9 @@ func TestInstanceFind(t *testing.T) {
 					RBVersion:   "v1",
 					ProfileName: "profile1",
 					CloudRegion: "region1",
+					Labels: map[string]string{
+						"vf_module_id": "test-vf-module-id",
+					},
 				},
 				Namespace: "testnamespace",
 
@@ -598,7 +607,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "v1", "")
+		data, err := ic.Find(name, "v1", "", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -633,6 +642,9 @@ func TestInstanceFind(t *testing.T) {
 					RBVersion:   "v1",
 					ProfileName: "profile1",
 					CloudRegion: "region1",
+					Labels: map[string]string{
+						"vf_module_id": "test-vf-module-id",
+					},
 				},
 				Namespace: "testnamespace",
 
@@ -656,7 +668,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "v1", "profile1")
+		data, err := ic.Find(name, "v1", "profile1", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -715,7 +727,7 @@ func TestInstanceFind(t *testing.T) {
 
 		ic := NewInstanceClient()
 		name := "non-existing"
-		resp, _ := ic.Find(name, "", "")
+		resp, _ := ic.Find(name, "", "", nil)
 		if len(resp) != 0 {
 			t.Fatalf("Expected 0 responses, but got %d", len(resp))
 		}

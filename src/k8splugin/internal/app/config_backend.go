@@ -343,7 +343,7 @@ func scheduleResources(c chan configResourceList) {
 		data := <-c
 		//TODO: ADD Check to see if Application running
 		ic := NewInstanceClient()
-		resp, err := ic.Find(data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName)
+		resp, err := ic.Find(data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
 		if err != nil || len(resp) == 0 {
 			log.Println("Error finding a running instance. Retrying later...")
 			time.Sleep(time.Second * 10)

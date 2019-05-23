@@ -70,6 +70,14 @@ func TestBrokerCreateHandler(t *testing.T) {
 			label: "Succesfully create an Instance",
 			input: bytes.NewBuffer([]byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
+				"sdnc_directives": {
+					"attributes": [
+						{
+							"attribute_name": "vf_module_name",
+							"attribute_value": "test-vf-module-name"
+						}
+					]
+				},
 				"user_directives": {
 					"attributes": [
 						{
@@ -88,8 +96,9 @@ func TestBrokerCreateHandler(t *testing.T) {
 				}
 			}`)),
 			expected: brokerPOSTResponse{
-				WorkloadID:   "HaKpys8e",
-				TemplateType: "heat",
+				WorkloadID:     "HaKpys8e",
+				TemplateType:   "heat",
+				WorkloadStatus: "CREATE_COMPLETE",
 				TemplateResponse: []helm.KubernetesResource{
 					{
 						GVK: schema.GroupVersionKind{
@@ -111,14 +120,14 @@ func TestBrokerCreateHandler(t *testing.T) {
 			instClient: &mockInstanceClient{
 				items: []app.InstanceResponse{
 					{
-						ID:          "HaKpys8e",
+						ID: "HaKpys8e",
 						Request: app.InstanceRequest{
 							RBName:      "test-rbdef",
 							RBVersion:   "v1",
 							ProfileName: "profile1",
 							CloudRegion: "region1",
 						},
-						Namespace:   "testnamespace",
+						Namespace: "testnamespace",
 						Resources: []helm.KubernetesResource{
 							{
 								GVK: schema.GroupVersionKind{
@@ -191,19 +200,19 @@ func TestBrokerGetHandler(t *testing.T) {
 			expectedResponse: brokerGETResponse{
 				TemplateType:   "heat",
 				WorkloadID:     "HaKpys8e",
-				WorkloadStatus: "CREATED",
+				WorkloadStatus: "CREATE_COMPLETE",
 			},
 			instClient: &mockInstanceClient{
 				items: []app.InstanceResponse{
 					{
-						ID:          "HaKpys8e",
+						ID: "HaKpys8e",
 						Request: app.InstanceRequest{
 							RBName:      "test-rbdef",
 							RBVersion:   "v1",
 							ProfileName: "profile1",
 							CloudRegion: "region1",
 						},
-						Namespace:   "testnamespace",
+						Namespace: "testnamespace",
 						Resources: []helm.KubernetesResource{
 							{
 								GVK: schema.GroupVersionKind{
@@ -250,12 +259,126 @@ func TestBrokerGetHandler(t *testing.T) {
 	}
 }
 
+func TestBrokerFindHandler(t *testing.T) {
+	testCases := []struct {
+		label            string
+		input            string
+		expectedCode     int
+		expectedResponse brokerGETResponse
+		instClient       *mockInstanceClient
+	}{
+		{
+			label:        "Fail to retrieve Instance",
+			input:        "HaKpys8e",
+			expectedCode: http.StatusInternalServerError,
+			instClient: &mockInstanceClient{
+				err: pkgerrors.New("Internal error"),
+			},
+		},
+		{
+			label:        "Successful find an Instance",
+			input:        "test-vf-module-name",
+			expectedCode: http.StatusOK,
+			expectedResponse: brokerGETResponse{
+				TemplateType:   "heat",
+				WorkloadID:     "HaKpys8e",
+				WorkloadStatus: "CREATE_COMPLETE",
+				WorkloadStatusReason: map[string]interface{}{
+					"stacks": []map[string]interface{}{
+						{
+							"stack_status": "CREATE_COMPLETE",
+							"id":           "HaKpys8e",
+						},
+					},
+				},
+			},
+			instClient: &mockInstanceClient{
+				items: []app.InstanceResponse{
+					{
+						ID: "HaKpys8e",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
+						Namespace: "testnamespace",
+						Resources: []helm.KubernetesResource{
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "apps",
+									Version: "v1",
+									Kind:    "Deployment"},
+								Name: "test-deployment",
+							},
+							{
+								GVK: schema.GroupVersionKind{
+									Group:   "",
+									Version: "v1",
+									Kind:    "Service"},
+								Name: "test-service",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			label:        "Fail to find an Instance",
+			input:        "test-vf-module-name-1",
+			expectedCode: http.StatusOK,
+			expectedResponse: brokerGETResponse{
+				TemplateType:   "heat",
+				WorkloadID:     "",
+				WorkloadStatus: "GET_COMPLETE",
+				WorkloadStatusReason: map[string]interface{}{
+					"stacks": []map[string]interface{}{},
+				},
+			},
+			instClient: &mockInstanceClient{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			request := httptest.NewRequest("GET", "/cloudowner/cloudregion/infra_workload?name="+testCase.input, nil)
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil))
+
+			if testCase.expectedCode != resp.StatusCode {
+				t.Fatalf("Request method returned: %v and it was expected: %v",
+					resp.StatusCode, testCase.expectedCode)
+			}
+			if resp.StatusCode == http.StatusOK {
+				var response brokerGETResponse
+				err := json.NewDecoder(resp.Body).Decode(&response)
+				if err != nil {
+					t.Fatalf("Parsing the returned response got an error (%s)", err)
+				}
+				if testCase.expectedResponse.WorkloadID != response.WorkloadID {
+					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+						response.WorkloadID, testCase.expectedResponse.WorkloadID)
+				}
+				tcStacks := testCase.expectedResponse.WorkloadStatusReason["stacks"].([]map[string]interface{})
+				if len(tcStacks) != 0 {
+					//We expect only one response in this testcase.
+					resStacks := response.WorkloadStatusReason["stacks"].([]interface{})[0].(map[string]interface{})
+					if !reflect.DeepEqual(tcStacks[0], resStacks) {
+						t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+							resStacks, tcStacks)
+					}
+				}
+			}
+		})
+	}
+}
+
 func TestBrokerDeleteHandler(t *testing.T) {
 	testCases := []struct {
-		label        string
-		input        string
-		expectedCode int
-		instClient   *mockInstanceClient
+		label            string
+		input            string
+		expectedCode     int
+		expectedResponse brokerDELETEResponse
+		instClient       *mockInstanceClient
 	}{
 		{
 			label:        "Fail to destroy VNF",
@@ -269,7 +392,12 @@ func TestBrokerDeleteHandler(t *testing.T) {
 			label:        "Succesful delete a VNF",
 			input:        "HaKpys8e",
 			expectedCode: http.StatusAccepted,
-			instClient:   &mockInstanceClient{},
+			expectedResponse: brokerDELETEResponse{
+				TemplateType:   "heat",
+				WorkloadID:     "HaKpys8e",
+				WorkloadStatus: "DELETE_COMPLETE",
+			},
+			instClient: &mockInstanceClient{},
 		},
 	}
 
@@ -280,6 +408,17 @@ func TestBrokerDeleteHandler(t *testing.T) {
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)
+			}
+			if resp.StatusCode == http.StatusOK {
+				var response brokerGETResponse
+				err := json.NewDecoder(resp.Body).Decode(&response)
+				if err != nil {
+					t.Fatalf("Parsing the returned response got an error (%s)", err)
+				}
+				if !reflect.DeepEqual(testCase.expectedResponse, response) {
+					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+						response, testCase.expectedResponse)
+				}
 			}
 		})
 	}

@@ -203,12 +203,14 @@ func TestInstanceGet(t *testing.T) {
 				InstanceKey{ID: "HaKpys8e"}.String(): {
 					"instance": []byte(
 						`{
-							"profile-name":"profile1",
-						  	"id":"HaKpys8e",
+							"id":"HaKpys8e",
+							"request": {
+								"profile-name":"profile1",
+								"rb-name":"test-rbdef",
+								"rb-version":"v1",
+								"cloud-region":"region1"
+							},
 							"namespace":"testnamespace",
-							"rb-name":"test-rbdef",
-							"rb-version":"v1",
-							"cloud-region":"region1",
 							"resources": [
 								{
 									"GVK": {
@@ -233,13 +235,14 @@ func TestInstanceGet(t *testing.T) {
 		}
 
 		expected := InstanceResponse{
-			ID:          "HaKpys8e",
-			RBName:      "test-rbdef",
-			RBVersion:   "v1",
-			ProfileName: "profile1",
-			CloudRegion: "region1",
-			Namespace:   "testnamespace",
-
+			ID: "HaKpys8e",
+			Request: InstanceRequest{
+				RBName:      "test-rbdef",
+				RBVersion:   "v1",
+				ProfileName: "profile1",
+				CloudRegion: "region1",
+			},
+			Namespace: "testnamespace",
 			Resources: []helm.KubernetesResource{
 				{
 					GVK: schema.GroupVersionKind{
@@ -275,12 +278,14 @@ func TestInstanceGet(t *testing.T) {
 				InstanceKey{ID: "HaKpys8e"}.String(): {
 					"instance": []byte(
 						`{
-							"profile-name":"profile1",
-						  	"id":"HaKpys8e",
+							"id":"HaKpys8e",
+							"request": {
+								"profile-name":"profile1",
+								"rb-name":"test-rbdef",
+								"rb-version":"v1",
+								"cloud-region":"region1"
+							},
 							"namespace":"testnamespace",
-							"rb-name":"test-rbdef",
-							"rb-version":"v1",
-							"cloud-region":"region1",
 							"resources": [
 								{
 									"GVK": {
@@ -329,12 +334,17 @@ func TestInstanceFind(t *testing.T) {
 		InstanceKey{ID: "HaKpys8e"}.String(): {
 			"instance": []byte(
 				`{
-					"profile-name":"profile1",
-					  "id":"HaKpys8e",
+					"id":"HaKpys8e",
+					"request": {
+						"profile-name":"profile1",
+						"rb-name":"test-rbdef",
+						"rb-version":"v1",
+						"cloud-region":"region1",
+						"labels":{
+							"vf_module_id": "test-vf-module-id"
+						}
+					},
 					"namespace":"testnamespace",
-					"rb-name":"test-rbdef",
-					"rb-version":"v1",
-					"cloud-region":"region1",
 					"resources": [
 						{
 							"GVK": {
@@ -358,12 +368,14 @@ func TestInstanceFind(t *testing.T) {
 		InstanceKey{ID: "HaKpys8f"}.String(): {
 			"instance": []byte(
 				`{
-					"profile-name":"profile2",
-					  "id":"HaKpys8f",
+					"id":"HaKpys8f",
+					"request": {
+						"profile-name":"profile2",
+						"rb-name":"test-rbdef",
+						"rb-version":"v1",
+						"cloud-region":"region1"
+					},
 					"namespace":"testnamespace",
-					"rb-name":"test-rbdef",
-					"rb-version":"v1",
-					"cloud-region":"region1",
 					"resources": [
 						{
 							"GVK": {
@@ -387,12 +399,14 @@ func TestInstanceFind(t *testing.T) {
 		InstanceKey{ID: "HaKpys8g"}.String(): {
 			"instance": []byte(
 				`{
-					"profile-name":"profile1",
-					  "id":"HaKpys8g",
+					"id":"HaKpys8g",
+					"request": {
+						"profile-name":"profile1",
+						"rb-name":"test-rbdef",
+						"rb-version":"v2",
+						"cloud-region":"region1"
+					},
 					"namespace":"testnamespace",
-					"rb-name":"test-rbdef",
-					"rb-version":"v2",
-					"cloud-region":"region1",
 					"resources": [
 						{
 							"GVK": {
@@ -422,13 +436,17 @@ func TestInstanceFind(t *testing.T) {
 
 		expected := []InstanceResponse{
 			{
-				ID:          "HaKpys8e",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile1",
-				CloudRegion: "region1",
-				Namespace:   "testnamespace",
-
+				ID: "HaKpys8e",
+				Request: InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+					Labels: map[string]string{
+						"vf_module_id": "test-vf-module-id",
+					},
+				},
+				Namespace: "testnamespace",
 				Resources: []helm.KubernetesResource{
 					{
 						GVK: schema.GroupVersionKind{
@@ -447,13 +465,14 @@ func TestInstanceFind(t *testing.T) {
 				},
 			},
 			{
-				ID:          "HaKpys8f",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile2",
-				CloudRegion: "region1",
-				Namespace:   "testnamespace",
-
+				ID: "HaKpys8f",
+				Request: InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile2",
+					CloudRegion: "region1",
+				},
+				Namespace: "testnamespace",
 				Resources: []helm.KubernetesResource{
 					{
 						GVK: schema.GroupVersionKind{
@@ -472,13 +491,14 @@ func TestInstanceFind(t *testing.T) {
 				},
 			},
 			{
-				ID:          "HaKpys8g",
-				RBName:      "test-rbdef",
-				RBVersion:   "v2",
-				ProfileName: "profile1",
-				CloudRegion: "region1",
-				Namespace:   "testnamespace",
-
+				ID: "HaKpys8g",
+				Request: InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v2",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+				},
+				Namespace: "testnamespace",
 				Resources: []helm.KubernetesResource{
 					{
 						GVK: schema.GroupVersionKind{
@@ -499,7 +519,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "", "")
+		data, err := ic.Find(name, "", "", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -528,12 +548,17 @@ func TestInstanceFind(t *testing.T) {
 
 		expected := []InstanceResponse{
 			{
-				ID:          "HaKpys8e",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile1",
-				CloudRegion: "region1",
-				Namespace:   "testnamespace",
+				ID: "HaKpys8e",
+				Request: InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+					Labels: map[string]string{
+						"vf_module_id": "test-vf-module-id",
+					},
+				},
+				Namespace: "testnamespace",
 
 				Resources: []helm.KubernetesResource{
 					{
@@ -553,12 +578,14 @@ func TestInstanceFind(t *testing.T) {
 				},
 			},
 			{
-				ID:          "HaKpys8f",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile2",
-				CloudRegion: "region1",
-				Namespace:   "testnamespace",
+				ID: "HaKpys8f",
+				Request: InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile2",
+					CloudRegion: "region1",
+				},
+				Namespace: "testnamespace",
 
 				Resources: []helm.KubernetesResource{
 					{
@@ -580,7 +607,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "v1", "")
+		data, err := ic.Find(name, "v1", "", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -609,12 +636,17 @@ func TestInstanceFind(t *testing.T) {
 
 		expected := []InstanceResponse{
 			{
-				ID:          "HaKpys8e",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile1",
-				CloudRegion: "region1",
-				Namespace:   "testnamespace",
+				ID: "HaKpys8e",
+				Request: InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+					Labels: map[string]string{
+						"vf_module_id": "test-vf-module-id",
+					},
+				},
+				Namespace: "testnamespace",
 
 				Resources: []helm.KubernetesResource{
 					{
@@ -636,7 +668,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "v1", "profile1")
+		data, err := ic.Find(name, "v1", "profile1", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -695,7 +727,7 @@ func TestInstanceFind(t *testing.T) {
 
 		ic := NewInstanceClient()
 		name := "non-existing"
-		resp, _ := ic.Find(name, "", "")
+		resp, _ := ic.Find(name, "", "", nil)
 		if len(resp) != 0 {
 			t.Fatalf("Expected 0 responses, but got %d", len(resp))
 		}
@@ -726,12 +758,14 @@ func TestInstanceDelete(t *testing.T) {
 				InstanceKey{ID: "HaKpys8e"}.String(): {
 					"instance": []byte(
 						`{
-							"profile-name":"profile1",
-						  	"id":"HaKpys8e",
+							"id":"HaKpys8e",
+							"request": {
+								"profile-name":"profile1",
+								"rb-name":"test-rbdef",
+								"rb-version":"v1",
+								"cloud-region":"mock_connection"
+							},
 							"namespace":"testnamespace",
-							"rb-name":"test-rbdef",
-							"rb-version":"v1",
-							"cloud-region":"mock_connection",
 							"resources": [
 								{
 									"GVK": {

@@ -58,6 +58,14 @@ func (m *mockInstanceClient) Get(id string) (app.InstanceResponse, error) {
 	return m.items[0], nil
 }
 
+func (m *mockInstanceClient) Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]app.InstanceResponse, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+
+	return m.items, nil
+}
+
 func (m *mockInstanceClient) Delete(id string) error {
 	return m.err
 }
@@ -104,12 +112,14 @@ func TestInstanceCreateHandler(t *testing.T) {
 				"profile-name": "profile1"
 			}`)),
 			expected: app.InstanceResponse{
-				ID:          "HaKpys8e",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile1",
-				CloudRegion: "region1",
-				Namespace:   "testnamespace",
+				ID: "HaKpys8e",
+				Request: app.InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+				},
+				Namespace: "testnamespace",
 				Resources: []helm.KubernetesResource{
 					{
 						GVK: schema.GroupVersionKind{
@@ -131,12 +141,14 @@ func TestInstanceCreateHandler(t *testing.T) {
 			instClient: &mockInstanceClient{
 				items: []app.InstanceResponse{
 					{
-						ID:          "HaKpys8e",
-						RBName:      "test-rbdef",
-						RBVersion:   "v1",
-						ProfileName: "profile1",
-						CloudRegion: "region1",
-						Namespace:   "testnamespace",
+						ID: "HaKpys8e",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
+						Namespace: "testnamespace",
 						Resources: []helm.KubernetesResource{
 							{
 								GVK: schema.GroupVersionKind{
@@ -203,12 +215,14 @@ func TestInstanceGetHandler(t *testing.T) {
 			input:        "HaKpys8e",
 			expectedCode: http.StatusOK,
 			expectedResponse: &app.InstanceResponse{
-				ID:          "HaKpys8e",
-				RBName:      "test-rbdef",
-				RBVersion:   "v1",
-				ProfileName: "profile1",
-				CloudRegion: "region1",
-				Namespace:   "testnamespace",
+				ID: "HaKpys8e",
+				Request: app.InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+				},
+				Namespace: "testnamespace",
 				Resources: []helm.KubernetesResource{
 					{
 						GVK: schema.GroupVersionKind{
@@ -229,12 +243,14 @@ func TestInstanceGetHandler(t *testing.T) {
 			instClient: &mockInstanceClient{
 				items: []app.InstanceResponse{
 					{
-						ID:          "HaKpys8e",
-						RBName:      "test-rbdef",
-						RBVersion:   "v1",
-						ProfileName: "profile1",
-						CloudRegion: "region1",
-						Namespace:   "testnamespace",
+						ID: "HaKpys8e",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
+						Namespace: "testnamespace",
 						Resources: []helm.KubernetesResource{
 							{
 								GVK: schema.GroupVersionKind{

@@ -22,6 +22,30 @@
       "revId": "bc83f936c1b369fc6291898ec88b6c6c17b2aa5d",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9acd23d8_8dbcdd3a",
+        "filename": "kud/tests/_common_test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-24T05:59:20Z",
+      "side": 1,
+      "message": "Not really but that can be a reason too.\nI moved it here because installing yq and jq depends on each other and install_ovn_deps shared the same code with install_deps function and I removed that duplication here.",
+      "parentUuid": "a6bad871_c4e4968f",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 79
+      },
+      "revId": "bc83f936c1b369fc6291898ec88b6c6c17b2aa5d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

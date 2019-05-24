@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb0cc659_70c9f89d",
+        "filename": "deployments/_functions.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-24T20:52:33Z",
+      "side": 1,
+      "message": "See comment below",
+      "range": {
+        "startLine": 24,
+        "startChar": 1,
+        "endLine": 24,
+        "endChar": 28
+      },
+      "revId": "ed4ca27457257a37712f75e2579bfd42c5da53ed",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2764ffd1_44e5f66f",
+        "filename": "deployments/_functions.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-24T20:52:33Z",
+      "side": 1,
+      "message": "Can be removed as this is just a folder within the container to store the configs.\nI am planning to remove this option anyway.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 43
+      },
+      "revId": "ed4ca27457257a37712f75e2579bfd42c5da53ed",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cfbfca1d_d9aa89ff",
+        "filename": "deployments/start.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-24T20:52:33Z",
+      "side": 1,
+      "message": "Doesn\u0027t need this. The k8sconfig is needed to configure the application.\nKubeconfigs are uploaded via rest api",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 34
+      },
+      "revId": "ed4ca27457257a37712f75e2579bfd42c5da53ed",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

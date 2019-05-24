@@ -5,12 +5,12 @@
 replicaCount: 1
 
 image:
-  repository: akhilak/sink
-  tag: latest
-  pullPolicy: IfNotPresent
-  repo: akhilak/darkstat
-  tag: latest
-  pullPolicy: IfNotPresent
+  sinkrepo: rtsood/onap-vfw-demo-sink
+  sinktag: 0.2.0
+  pullPolicy: Always
+  darkstatrepo: electrocucaracha/darkstat
+  darkstattag: latest
+  pullPolicy: Always
 
 nameOverride: ""
 fullnameOverride: ""

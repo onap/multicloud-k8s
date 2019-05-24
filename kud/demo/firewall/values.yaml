@@ -17,25 +17,34 @@ resources:
 
 #global vars for parent and subcharts.
 global:
-  demoArtifactsVersion: 1.5.0
+
+  #Networks
+  protectedNetworkName: protected-private-net
+  protectedNetCidr: 192.168.20.0/24
+  protectedNetGw: 192.168.20.100/24
+
+  unprotectedNetworkName: unprotected-private-net
+  protectedPrivateNetCidr: 192.168.10.0/24
+  protectedPrivateNetGw: 192.168.10.1/24
+
+  onapPrivateNetworkName: onap-private-net
+  onapPrivateNetCidr: 10.10.0.0/16
+  onapPrivateNetGw: 10.10.0.1/16
+
+  #vFirewall container
   vfwPrivateIp0: 192.168.10.3
   vfwPrivateIp1: 192.168.20.2
   vfwPrivateIp2: 10.10.100.3
+  #Packetgen container
   vpgPrivateIp0: 192.168.10.2
   vpgPrivateIp1: 10.0.100.2
+  #Sink container
   vsnPrivateIp0: 192.168.20.3
   vsnPrivateIp1: 10.10.100.4
+
+  #########
+  ovnMultusNetworkName: ovn-networkobj
+  demoArtifactsVersion: 1.5.0
   dcaeCollectorIp: 10.0.4.1
   dcaeCollectorPort: 8081
-  protectedNetGw: 192.168.20.100
-  protectedNetCidr: 192.168.20.0/24
-  protectedPrivateNetCidr: 192.168.10.0/24
-  onapPrivateNetCidr: 10.10.0.0/16
-  protectedNetGw: 192.168.20.100
-  protectedNetworkName: protected-private-net
-  unprotectedNetworkName: unprotected-private-net
-  ovnMultusNetworkName: ovn-networkobj
-  onapPrivateNetworkName: onap-private-net
-  protectedPrivateGateway: 10.10.0.1/16
-  gatewayVariable: 24
 

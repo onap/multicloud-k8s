@@ -1,0 +1,7 @@
+piVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sink.name" .}}-configmap
+data:
+  protected_net_gw:  {{ .Values.global.protectedNetGw }}
+  protected_private_net_cidr: {{ .Values.global.protectedPrivateNetCidr }}

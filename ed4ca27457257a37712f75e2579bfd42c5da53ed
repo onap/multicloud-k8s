@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "ab33f61e_addf92d4",
+        "filename": "deployments/_functions.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-27T06:34:21Z",
+      "side": 1,
+      "message": "good as I was also really confused about this as did not see where it\u0027s used and how.",
+      "parentUuid": "2764ffd1_44e5f66f",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 43
+      },
+      "revId": "ed4ca27457257a37712f75e2579bfd42c5da53ed",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "cfbfca1d_d9aa89ff",
         "filename": "deployments/start.sh",
         "patchSetId": 2
@@ -68,6 +92,30 @@
       "revId": "ed4ca27457257a37712f75e2579bfd42c5da53ed",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ac5c1447_d0e15053",
+        "filename": "deployments/start.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-05-27T06:34:21Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "cfbfca1d_d9aa89ff",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 34
+      },
+      "revId": "ed4ca27457257a37712f75e2579bfd42c5da53ed",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

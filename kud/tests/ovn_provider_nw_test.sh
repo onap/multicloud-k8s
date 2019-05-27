@@ -13,6 +13,7 @@ set -o nounset
 set -o pipefail
 
 source _common.sh
+source _common_test.sh
 source _functions.sh
 
 # populate_CSAR_ovn4nfv() - Create content used for OVN4NFV functional test

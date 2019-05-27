@@ -43,6 +43,7 @@ type KubernetesClient struct {
 	dynamicClient  dynamic.Interface
 	discoverClient *discovery.DiscoveryClient
 	restMapper     meta.RESTMapper
+        cloudRegion    string
 }
 
 // getKubeConfig uses the connectivity client to get the kubeconfig based on the name
@@ -90,7 +91,7 @@ func (k *KubernetesClient) init(cloudregion string) error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Creating discovery client")
 	}
-
+	k.cloudRegion = cloudregion
 	return nil
 }
 
@@ -105,8 +106,8 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 		return pkgerrors.Wrap(err, "Error fetching get namespace function")
 	}
 
-	ns, _ := symGetNamespaceFunc.(func(string, string, kubernetes.Interface) (string, error))(
-		namespace, namespace, k.clientSet)
+	ns, _ := symGetNamespaceFunc.(func(string, string, *KubernetesClient) (string, error))(
+		namespace, namespace, k)
 
 	if ns == "" {
 		log.Println("Creating " + namespace + " namespace")
@@ -118,8 +119,8 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 			Namespace: namespace,
 		}
 
-		_, err = symGetNamespaceFunc.(func(*utils.ResourceData, kubernetes.Interface) (string, error))(
-			namespaceResource, k.clientSet)
+		_, err = symGetNamespaceFunc.(func(*utils.ResourceData, *KubernetesClient) (string, error))(
+			namespaceResource, k)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating "+namespace+" namespace")
 		}
@@ -199,8 +200,8 @@ func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
 		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error fetching "+resTempl.GVK.Kind+" plugin")
 	}
 
-	createdResourceName, err := symCreateResourceFunc.(func(*utils.ResourceData, kubernetes.Interface) (string, error))(
-		genericKubeData, k.clientSet)
+	createdResourceName, err := symCreateResourceFunc.(func(*utils.ResourceData, *KubernetesClient) (string, error))(
+		genericKubeData, k)
 	if err != nil {
 		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
 	}
@@ -279,8 +280,8 @@ func (k *KubernetesClient) deleteKind(resource helm.KubernetesResource, namespac
 	}
 
 	log.Println("Deleting resource: " + resource.Name)
-	err = symDeleteResourceFunc.(func(string, string, kubernetes.Interface) error)(
-		resource.Name, namespace, k.clientSet)
+	err = symDeleteResourceFunc.(func(string, string, *KubernetesClient) error)(
+		resource.Name, namespace, k)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error destroying "+resource.Name)
 	}
@@ -315,6 +316,11 @@ func (k *KubernetesClient) updateMapper() error {
 	return nil
 }
 
+//GeClient returns the kubernetes client that was created for this client
+func (k *KubernetesClient) GetClient() *kubernetes.Clientset {
+	return k.clientSet
+}
+
 //GetMapper returns the RESTMapper that was created for this client
 func (k *KubernetesClient) GetMapper() meta.RESTMapper {
 	return k.restMapper
@@ -324,4 +330,8 @@ func (k *KubernetesClient) GetMapper() meta.RESTMapper {
 //unstructured REST calls to the apiserver
 func (k *KubernetesClient) GetDynamicClient() dynamic.Interface {
 	return k.dynamicClient
+}
+//GetCloudRegion returns the cloud region for this client
+func (k *KubernetesClient) GetCloudRegion() string {
+	return k.cloudRegion
 }

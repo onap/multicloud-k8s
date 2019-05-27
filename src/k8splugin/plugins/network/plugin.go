@@ -17,10 +17,10 @@ import (
 	"k8splugin/plugins/network/v1"
 	"regexp"
 
+	"k8splugin/internal/app"
 	utils "k8splugin/internal"
 
 	pkgerrors "github.com/pkg/errors"
-	"k8s.io/client-go/kubernetes"
 )
 
 func extractData(data string) (vnfID, cniType, networkName string) {
@@ -36,7 +36,7 @@ func extractData(data string) (vnfID, cniType, networkName string) {
 }
 
 // Create an ONAP Network object
-func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
+func Create(data *utils.ResourceData, k *app.KubernetesClient) (string, error) {
 	network := &v1.OnapNetwork{}
 	if _, err := utils.DecodeYAML(data.YamlFilePath, network); err != nil {
 		return "", pkgerrors.Wrap(err, "Decode network object error")
@@ -53,7 +53,7 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 		return "", pkgerrors.Wrap(err, "Error fetching "+cniType+" plugin")
 	}
 
-	name, err := symCreateNetworkFunc.(func(*v1.OnapNetwork) (string, error))(network)
+	name, err := symCreateNetworkFunc.(func(*v1.OnapNetwork, string) (string, error))(network, k.GetCloudRegion())
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Error during the creation for "+cniType+" plugin")
 	}
@@ -62,12 +62,12 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 }
 
 // List of Networks
-func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
+func List(namespace string, k *app.KubernetesClient) ([]string, error) {
 	return nil, nil
 }
 
 // Delete an existing Network
-func Delete(name string, namespace string, kubeclient kubernetes.Interface) error {
+func Delete(name string, namespace string, k *app.KubernetesClient) error {
 	_, cniType, networkName := extractData(name)
 	typePlugin, ok := utils.LoadedPlugins[cniType+"-network"]
 	if !ok {
@@ -79,7 +79,7 @@ func Delete(name string, namespace string, kubeclient kubernetes.Interface) erro
 		return pkgerrors.Wrap(err, "Error fetching "+cniType+" plugin")
 	}
 
-	if err := symDeleteNetworkFunc.(func(string) error)(networkName); err != nil {
+	if err := symDeleteNetworkFunc.(func(string, string) error)(networkName, k.GetCloudRegion()); err != nil {
 		return pkgerrors.Wrap(err, "Error during the deletion for "+cniType+" plugin")
 	}
 
@@ -87,6 +87,6 @@ func Delete(name string, namespace string, kubeclient kubernetes.Interface) erro
 }
 
 // Get an existing Network
-func Get(name string, namespace string, kubeclient kubernetes.Interface) (string, error) {
+func Get(name string, namespace string, k *app.KubernetesClient) (string, error) {
 	return "", nil
 }

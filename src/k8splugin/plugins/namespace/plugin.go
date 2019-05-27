@@ -16,18 +16,17 @@ package main
 import (
 	"log"
 
-	"k8s.io/client-go/kubernetes"
-
 	pkgerrors "github.com/pkg/errors"
 
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
+	"k8splugin/internal/app"
 	utils "k8splugin/internal"
 )
 
 // Create a namespace object in a specific Kubernetes cluster
-func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
+func Create(data *utils.ResourceData, k *app.KubernetesClient) (string, error) {
+        client := k.GetClient()
 	namespace := &coreV1.Namespace{
 		ObjectMeta: metaV1.ObjectMeta{
 			Name: data.Namespace,
@@ -43,7 +42,8 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 }
 
 // Get an existing namespace hosted in a specific Kubernetes cluster
-func Get(name string, namespace string, client kubernetes.Interface) (string, error) {
+func Get(name string, namespace string, k *app.KubernetesClient) (string, error) {
+        client := k.GetClient()
 	opts := metaV1.GetOptions{}
 	opts.APIVersion = "apps/v1"
 	opts.Kind = "Deployment"
@@ -57,7 +57,8 @@ func Get(name string, namespace string, client kubernetes.Interface) (string, er
 }
 
 // Delete an existing namespace hosted in a specific Kubernetes cluster
-func Delete(name string, namespace string, client kubernetes.Interface) error {
+func Delete(name string, namespace string, k *app.KubernetesClient) error {
+        client := k.GetClient()
 	deletePolicy := metaV1.DeletePropagationForeground
 	opts := &metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
@@ -72,7 +73,8 @@ func Delete(name string, namespace string, client kubernetes.Interface) error {
 }
 
 // List of existing namespaces hosted in a specific Kubernetes cluster
-func List(namespace string, client kubernetes.Interface) ([]string, error) {
+func List(namespace string, k *app.KubernetesClient) ([]string, error) {
+        client := k.GetClient()
 	opts := metaV1.ListOptions{
 		Limit: utils.ResourcesListLimit,
 	}

@@ -16,18 +16,18 @@ package main
 import (
 	"log"
 
-	"k8s.io/client-go/kubernetes"
-
 	pkgerrors "github.com/pkg/errors"
 
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"k8splugin/internal/app"
 	utils "k8splugin/internal"
 )
 
 // Create a service object in a specific Kubernetes cluster
-func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
+func Create(data *utils.ResourceData, k *app.KubernetesClient) (string, error) {
+	kubeclient := k.GetClient()
 	namespace := data.Namespace
 	if namespace == "" {
 		namespace = "default"
@@ -43,7 +43,7 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 	}
 	service.Namespace = namespace
 
-	result, err := client.CoreV1().Services(namespace).Create(service)
+	result, err := kubeclient.CoreV1().Services(namespace).Create(service)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Service error")
 	}
@@ -52,7 +52,8 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 }
 
 // List of existing services hosted in a specific Kubernetes cluster
-func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
+func List(namespace string, k *app.KubernetesClient) ([]string, error) {
+	kubeclient := k.GetClient()
 	if namespace == "" {
 		namespace = "default"
 	}
@@ -80,7 +81,8 @@ func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
 }
 
 // Delete an existing service hosted in a specific Kubernetes cluster
-func Delete(name string, namespace string, kubeclient kubernetes.Interface) error {
+func Delete(name string, namespace string, k *app.KubernetesClient) error {
+	kubeclient := k.GetClient()
 	if namespace == "" {
 		namespace = "default"
 	}
@@ -99,7 +101,8 @@ func Delete(name string, namespace string, kubeclient kubernetes.Interface) erro
 }
 
 // Get an existing service hosted in a specific Kubernetes cluster
-func Get(name string, namespace string, kubeclient kubernetes.Interface) (string, error) {
+func Get(name string, namespace string, k *app.KubernetesClient) (string, error) {
+	kubeclient := k.GetClient()
 	if namespace == "" {
 		namespace = "default"
 	}

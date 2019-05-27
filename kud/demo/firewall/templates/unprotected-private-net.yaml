@@ -5,5 +5,5 @@ metadata:
 spec:
   cnitype : ovn4nfvk8s
   name: {{ .Values.global.unprotectedNetworkName }}
-  subnet: {{ .Values.global.protectedNetCidr }}
-  gateway: 192.168.10.1/24
+  subnet: {{ .Values.global.protectedPrivateNetCidr }}
+  gateway: {{ .Values.global.protectedPrivateNetGw }}

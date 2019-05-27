@@ -6,4 +6,4 @@ spec:
   cnitype : ovn4nfvk8s
   name: {{ .Values.global.onapPrivateNetworkName }} 
   subnet: {{ .Values.global.onapPrivateNetCidr }}
-  gateway: {{ .Values.global.protectedPrivateGateway }}
+  gateway: {{ .Values.global.onapPrivateNetGw }}

@@ -16,17 +16,17 @@ package main
 import (
 	"bytes"
 	"fmt"
-	kexec "k8s.io/utils/exec"
-	"os"
-
-	pkgerrors "github.com/pkg/errors"
-	"k8splugin/plugins/network/v1"
 	"log"
+	"math/rand"
 	"strings"
+	"time"
 	"unicode"
 
-	"math/rand"
-	"time"
+	"k8splugin/internal/config"
+	v1 "k8splugin/plugins/network/v1"
+
+	pkgerrors "github.com/pkg/errors"
+	kexec "k8s.io/utils/exec"
 )
 
 const (
@@ -77,20 +77,20 @@ func init() {
 // CreateNetwork in OVN controller
 func CreateNetwork(network *v1.OnapNetwork) (string, error) {
 
-        name := network.Spec.Name
-        if name == "" {
-                return "", pkgerrors.New("Invalid Network Name")
-        }
+	name := network.Spec.Name
+	if name == "" {
+		return "", pkgerrors.New("Invalid Network Name")
+	}
 
-        subnet := network.Spec.Subnet
-        if subnet == "" {
-                return "", pkgerrors.New("Invalid Subnet Address")
-        }
+	subnet := network.Spec.Subnet
+	if subnet == "" {
+		return "", pkgerrors.New("Invalid Subnet Address")
+	}
 
-        gatewayIPMask := network.Spec.Gateway
-        if gatewayIPMask == "" {
-                return "", pkgerrors.New("Invalid Gateway Address")
-        }
+	gatewayIPMask := network.Spec.Gateway
+	if gatewayIPMask == "" {
+		return "", pkgerrors.New("Invalid Gateway Address")
+	}
 
 	routerMac, stderr, err := ovnCmd.Run(getAuthStr(), "--if-exist", "-v", "get", "logical_router_port", "rtos-"+name, "mac")
 	if err != nil {
@@ -148,6 +148,6 @@ func DeleteNetwork(name string) error {
 
 func getAuthStr() string {
 	//TODO: Remove hardcoding: Use ESR data passed to Initialize
-	ovnCentralAddress := os.Getenv("OVN_CENTRAL_ADDRESS")
+	ovnCentralAddress := config.GetConfiguration().OVNCentralAddress
 	return "--db=tcp:" + ovnCentralAddress
 }

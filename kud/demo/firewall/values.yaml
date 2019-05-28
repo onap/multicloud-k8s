@@ -19,10 +19,6 @@ resources:
 global:
 
   #Networks
-  protectedNetworkName: protected-private-net
-  protectedNetCidr: 192.168.20.0/24
-  protectedNetGw: 192.168.20.100/24
-
   unprotectedNetworkName: unprotected-private-net
   protectedPrivateNetCidr: 192.168.10.0/24
   protectedPrivateNetGw: 192.168.10.1/24
@@ -30,6 +26,11 @@ global:
   onapPrivateNetworkName: onap-private-net
   onapPrivateNetCidr: 10.10.0.0/16
   onapPrivateNetGw: 10.10.0.1/16
+
+  protectedNetworkName: protected-private-net
+  protectedNetCidr: 192.168.20.0/24
+  protectedNetGwIp: 192.168.20.100
+  protectedNetGw: 192.168.20.100/24
 
   #vFirewall container
   vfwPrivateIp0: 192.168.10.3

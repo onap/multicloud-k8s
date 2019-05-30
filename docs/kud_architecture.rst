@@ -10,7 +10,7 @@
    limitations under the License.
 
 ****************
-KRD Architecture
+KUD Architecture
 ****************
 
 This document explains the different components of the Kubernetes
@@ -78,13 +78,7 @@ installer.sh
 ############
 
 Main bash script that installs dependencies and executes ansible
-playbooks for provisioning KRD components on external nodes. This
-script uses some arguments for the additional installation of
-components. For more information about its usage:
-
-.. code-block:: bash
-
-    ./installer.sh -h
+playbooks for provisioning KUD components on external nodes.
 
 inventory/
 ##########
@@ -116,17 +110,17 @@ This folder contains a set of Ansible playbooks which perform the
 tasks required for configuring services like Multus, Virtlet and/or
 OVN.
 
-playbooks/configure-krd.yml
+playbooks/configure-kud.yml
 ***************************
 
 This ansible playbook collects the common actions among all the
-Kubernetes AddOns offered by the KRD.
+Kubernetes AddOns offered by the KUD.
 
-playbooks/krd-vars.yml
+playbooks/kud-vars.yml
 ************************
 
 This file centralizes the version numbers and source URLs used for
-different components offered by the KRD. Bumping a version requires
+different components offered by the KUD. Bumping a version requires
 extensive testing to ensure compatibility.
 
 setup.sh
@@ -158,5 +152,5 @@ tests/
 This folder contains the health check scripts that guarantee the
 proper installation/configuration of Kubernetes AddOns. Its
 execution is disabled by default. In order to enable it, it's
-necessary to pass the *-t* argument to the **installer.sh** bash
+necessary to export KUD_ENABLE_TESTS=true environment variable before calling the **installer.sh** bash
 script, usually through changing the arguments in the *Vagrantfile*.

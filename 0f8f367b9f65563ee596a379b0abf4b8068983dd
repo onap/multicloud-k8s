@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ec01d551_caca24b3",
+        "filename": "deployments/.env",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-30T21:55:39Z",
+      "side": 1,
+      "message": "These can be removed. They are not used anywhere.",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 45
+      },
+      "revId": "0f8f367b9f65563ee596a379b0abf4b8068983dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d67a9367_bfb6b7ad",
+        "filename": "deployments/_functions.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-30T21:55:39Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 28
+      },
+      "revId": "0f8f367b9f65563ee596a379b0abf4b8068983dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4efef9e4_211f18c8",
+        "filename": "deployments/docker-compose.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-30T21:55:39Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 24,
+        "startChar": 7,
+        "endLine": 26,
+        "endChar": 34
+      },
+      "revId": "0f8f367b9f65563ee596a379b0abf4b8068983dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb74240f_8d846e81",
+        "filename": "deployments/start-dev.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-05-30T21:55:39Z",
+      "side": 1,
+      "message": "Remove.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 21
+      },
+      "revId": "0f8f367b9f65563ee596a379b0abf4b8068983dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

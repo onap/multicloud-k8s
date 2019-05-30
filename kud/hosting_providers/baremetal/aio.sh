@@ -17,10 +17,9 @@ if [[ $(whoami) != 'root' ]];then
     exit 1
 fi
 
-echo "Cloning and configuring KUD project..."
-rm -rf k8s
-git clone https://git.onap.org/multicloud/k8s/
-cd k8s/kud/hosting_providers/baremetal/
+aio_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
+cd ${aio_dir}/../vagrant
+
 cat <<EOL > inventory/hosts.ini
 [all]
 localhost
@@ -47,7 +46,7 @@ localhost
 kube-node
 kube-master
 EOL
-sed -i '/andrewrothstein.kubectl/d' ../../deployment_infra/playbooks/configure-*.yml
+
 rm -f ~/.ssh/id_rsa
 echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
@@ -56,5 +55,5 @@ chmod og-wx ~/.ssh/authorized_keys
 echo "Enabling nested-virtualization"
 ./node.sh
 
-echo "Deploying KRD project"
+echo "Deploying KUD project"
 ./installer.sh | tee kud_installer.log

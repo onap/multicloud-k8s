@@ -13,7 +13,7 @@
 Bare-Metal Provisioning
 ***********************
 
-The Kubernetes Reference Deployment, aka KRD, has been designed to be consumed
+The Kubernetes Reference Deployment, aka KUD, has been designed to be consumed
 by Virtual Machines as well as Bare-Metal servers. The *vagrant/aio.sh*
 script contains the bash instructions for provisioning an All-in-One Kubernetes
 deployment in a Bare-Metal server. This document lists the Hardware & Software
@@ -37,8 +37,8 @@ Software Requirements
 
 - Ubuntu Server 16.04 LTS
 
-vagrant/aio.sh
-##############
+baremetal/aio.sh
+################
 
 This bash script provides an automated process for deploying an All-in-One
 Kubernetes cluster. Given that the ansible inventory file created by this
@@ -50,23 +50,17 @@ The following two instructions start the provisioning process.
 .. code-block:: bash
 
     $ sudo su
-    # wget -O - https://git.onap.org/multicloud/k8s/plain/vagrant/aio.sh | bash
+    # git clone https://git.onap.org/multicloud/k8s/
+    # cd k8s/kud/hosting_providers/baremetal/
+    # ./aio.sh
 
 In overall, this script can be summarized in three general phases:
 
-1. Cloning and configuring the KRD project.
+1. Generating Inventory.
 2. Enabiling Nested-Virtualization.
-3. Deploying KRD services.
+3. Deploying KUD services.
 
-**Cloning and configuring the KRD project**
-
-KRD requires multiple files(bash scripts and ansible playbooks) to operate.
-Therefore, it's necessary to clone the *ONAP multicloud/k8s* project to get
-access to the *vagrant* folder.
-
-.. code-block:: bash
-
-    git clone https://git.onap.org/multicloud/k8s/
+**Inventory**
 
 Ansible works agains multiple systems, the way for selecting them is through the
 usage of the inventory. The inventory file is a static source for determining the
@@ -102,16 +96,8 @@ an inventory file for addressing those tasks to localhost.
     kube-master
     EOL
 
-KRD consumes kubespray_ for provisioning a Kubernetes base deployment. As part
+KUD consumes kubespray_ for provisioning a Kubernetes base deployment. As part
 of the deployment process, this tool downloads and configures *kubectl* binary.
-This action conflicts with *andrewrothstein.kubectl* ansible role. Therefore is
-necessary to remove those instructions from all the ansible playbooks.
-
-.. _kubespray: https://github.com/kubernetes-incubator/kubespray
-
-.. code-block:: bash
-
-    # sed -i '/andrewrothstein.kubectl/d' playbooks/configure-*.yml
 
 Ansible uses SSH protocol for executing remote instructions. The following
 instructions create and register ssh keys which avoid the usage of passwords.
@@ -124,7 +110,7 @@ instructions create and register ssh keys which avoid the usage of passwords.
 
 **Enabling Nested-Virtualization**
 
-KRD installs Virtlet_ Kubernetes CRI for running Virtual Machine workloads.
+KUD installs Virtlet_ Kubernetes CRI for running Virtual Machine workloads.
 Nested-virtualization gives the ability of running a Virtual Machine within
 another. The *node.sh* bash script contains the instructions for enabling
 Nested-Virtualization.
@@ -135,14 +121,14 @@ Nested-Virtualization.
 
     # ./node.sh
 
-**Deploying KRD services**
+**Deploying KUD services**
 
 Finally, the KRD provisioning process can be started through the use of
 *installer.sh* bash script. The output of this script is collected in the
-*krd_installer.log* file for future reference.
+*kud_installer.log* file for future reference.
 
 .. code-block:: bash
 
-    # ./installer.sh | tee krd_installer.log
+    # ./installer.sh | tee kud_installer.log
 
 .. image:: ./img/installer_workflow.png

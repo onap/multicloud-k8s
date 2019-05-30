@@ -15,6 +15,7 @@ package main
 
 import (
 	utils "k8splugin/internal"
+	"k8splugin/internal/helm"
 	"os"
 	"plugin"
 	"reflect"
@@ -22,6 +23,7 @@ import (
 	"testing"
 
 	pkgerrors "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func LoadMockNetworkPlugins(krdLoadedPlugins *map[string]*plugin.Plugin, networkName, errMsg string) error {
@@ -51,7 +53,6 @@ func LoadMockNetworkPlugins(krdLoadedPlugins *map[string]*plugin.Plugin, network
 }
 
 func TestCreateNetwork(t *testing.T) {
-	internalVNFID := "1"
 	oldkrdPluginData := utils.LoadedPlugins
 
 	defer func() {
@@ -60,34 +61,27 @@ func TestCreateNetwork(t *testing.T) {
 
 	testCases := []struct {
 		label          string
-		input          *utils.ResourceData
+		input          string
 		mockError      string
 		mockOutput     string
 		expectedResult string
 		expectedError  string
 	}{
 		{
-			label: "Fail to decode a network object",
-			input: &utils.ResourceData{
-				YamlFilePath: "../../mock_files/mock_yamls/service.yaml",
-			},
+			label:         "Fail to decode a network object",
+			input:         "../../mock_files/mock_yamls/service.yaml",
 			expectedError: "No plugin for resource",
 		},
 		{
-			label: "Fail to create a network",
-			input: &utils.ResourceData{
-				YamlFilePath: "../../mock_files/mock_yamls/ovn4nfvk8s.yaml",
-			},
+			label:         "Fail to create a network",
+			input:         "../../mock_files/mock_yamls/ovn4nfvk8s.yaml",
 			mockError:     "Internal error",
 			expectedError: "Error during the creation for ovn4nfvk8s plugin: Internal error",
 		},
 		{
-			label: "Successfully create a ovn4nfv network",
-			input: &utils.ResourceData{
-				VnfId:        internalVNFID,
-				YamlFilePath: "../../mock_files/mock_yamls/ovn4nfvk8s.yaml",
-			},
-			expectedResult: internalVNFID + "_ovn4nfvk8s_myNetwork",
+			label:          "Successfully create a ovn4nfv network",
+			input:          "../../mock_files/mock_yamls/ovn4nfvk8s.yaml",
+			expectedResult: "ovn4nfvk8s_myNetwork",
 			mockOutput:     "myNetwork",
 		},
 	}
@@ -98,7 +92,7 @@ func TestCreateNetwork(t *testing.T) {
 			if err != nil {
 				t.Fatalf("TestCreateNetwork returned an error (%s)", err)
 			}
-			result, err := Create(testCase.input, nil)
+			result, err := networkPlugin{}.Create(testCase.input, "", nil)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create method return an un-expected (%s)", err)
@@ -157,7 +151,10 @@ func TestDeleteNetwork(t *testing.T) {
 			if err != nil {
 				t.Fatalf("TestDeleteNetwork returned an error (%s)", err)
 			}
-			err = Delete(testCase.input, "", nil)
+			err = networkPlugin{}.Delete(helm.KubernetesResource{
+				GVK:  schema.GroupVersionKind{Group: "", Version: "", Kind: "Network"},
+				Name: testCase.input,
+			}, "", nil)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create method return an un-expected (%s)", err)

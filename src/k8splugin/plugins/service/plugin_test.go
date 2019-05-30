@@ -14,54 +14,67 @@ limitations under the License.
 package main
 
 import (
+	"k8splugin/internal/helm"
 	"reflect"
 	"strings"
 	"testing"
 
-	utils "k8splugin/internal"
-
 	coreV1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	testclient "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
+type TestKubernetesConnector struct {
+	object runtime.Object
+}
+
+func (t TestKubernetesConnector) GetMapper() meta.RESTMapper {
+	return nil
+}
+
+func (t TestKubernetesConnector) GetDynamicClient() dynamic.Interface {
+	return nil
+}
+
+func (t TestKubernetesConnector) GetStandardClient() kubernetes.Interface {
+	return fake.NewSimpleClientset(t.object)
+}
+
 func TestCreateService(t *testing.T) {
-	namespace := "test1"
 	name := "mock-service"
 	testCases := []struct {
 		label          string
-		input          *utils.ResourceData
-		clientOutput   *coreV1.Service
+		input          string
+		namespace      string
+		object         *coreV1.Service
 		expectedResult string
 		expectedError  string
 	}{
 		{
-			label: "Fail to create a service with invalid type",
-			input: &utils.ResourceData{
-				YamlFilePath: "../../mock_files/mock_yamls/deployment.yaml",
-			},
-			clientOutput:  &coreV1.Service{},
+			label:         "Fail to create a service with invalid type",
+			input:         "../../mock_files/mock_yamls/deployment.yaml",
+			namespace:     "test1",
+			object:        &coreV1.Service{},
 			expectedError: "contains another resource different than Service",
 		},
 		{
-			label: "Successfully create a service",
-			input: &utils.ResourceData{
-				YamlFilePath: "../../mock_files/mock_yamls/service.yaml",
-			},
-			clientOutput: &coreV1.Service{
-				ObjectMeta: metaV1.ObjectMeta{
-					Name:      name,
-					Namespace: namespace,
-				},
-			},
+			label:          "Successfully create a service",
+			input:          "../../mock_files/mock_yamls/service.yaml",
+			namespace:      "test1",
+			object:         &coreV1.Service{},
 			expectedResult: name,
 		},
 	}
 
 	for _, testCase := range testCases {
-		client := testclient.NewSimpleClientset(testCase.clientOutput)
+		client := TestKubernetesConnector{testCase.object}
 		t.Run(testCase.label, func(t *testing.T) {
-			result, err := Create(testCase.input, client)
+			result, err := servicePlugin{}.Create(testCase.input, testCase.namespace, client)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create method return an un-expected (%s)", err)
@@ -86,38 +99,42 @@ func TestCreateService(t *testing.T) {
 }
 
 func TestListService(t *testing.T) {
-	namespace := "test1"
 	testCases := []struct {
 		label          string
-		input          string
-		clientOutput   *coreV1.ServiceList
-		expectedResult []string
+		namespace      string
+		object         *coreV1.ServiceList
+		expectedResult []helm.KubernetesResource
 	}{
 		{
 			label:          "Sucessfully to display an empty service list",
-			input:          namespace,
-			clientOutput:   &coreV1.ServiceList{},
-			expectedResult: []string{},
+			namespace:      "test1",
+			object:         &coreV1.ServiceList{},
+			expectedResult: []helm.KubernetesResource{},
 		},
 		{
-			label: "Sucessfully to display a list of existing services",
-			input: namespace,
-			clientOutput: &coreV1.ServiceList{
+			label:     "Sucessfully to display a list of existing services",
+			namespace: "test1",
+			object: &coreV1.ServiceList{
 				Items: []coreV1.Service{
 					coreV1.Service{
 						ObjectMeta: metaV1.ObjectMeta{
 							Name:      "test",
-							Namespace: namespace,
+							Namespace: "test1",
 						},
 					},
 				},
 			},
-			expectedResult: []string{"test"},
+			expectedResult: []helm.KubernetesResource{
+				{
+					Name: "test",
+					GVK:  schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Service"},
+				},
+			},
 		},
 		{
-			label: "Sucessfully display a list of existing services in default namespace",
-			input: "",
-			clientOutput: &coreV1.ServiceList{
+			label:     "Sucessfully display a list of existing services in default namespace",
+			namespace: "",
+			object: &coreV1.ServiceList{
 				Items: []coreV1.Service{
 					coreV1.Service{
 						ObjectMeta: metaV1.ObjectMeta{
@@ -128,19 +145,27 @@ func TestListService(t *testing.T) {
 					coreV1.Service{
 						ObjectMeta: metaV1.ObjectMeta{
 							Name:      "test2",
-							Namespace: namespace,
+							Namespace: "test1",
 						},
 					},
 				},
 			},
-			expectedResult: []string{"test"},
+			expectedResult: []helm.KubernetesResource{
+				{
+					Name: "test",
+					GVK:  schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Service"},
+				},
+			},
 		},
 	}
 
 	for _, testCase := range testCases {
-		client := testclient.NewSimpleClientset(testCase.clientOutput)
+		client := TestKubernetesConnector{testCase.object}
 		t.Run(testCase.label, func(t *testing.T) {
-			result, err := List(testCase.input, client)
+			result, err := servicePlugin{}.List(schema.GroupVersionKind{
+				Group:   "",
+				Version: "v1",
+				Kind:    "Service"}, testCase.namespace, client)
 			if err != nil {
 				t.Fatalf("List method returned an error (%s)", err)
 			} else {
@@ -158,14 +183,14 @@ func TestListService(t *testing.T) {
 
 func TestDeleteService(t *testing.T) {
 	testCases := []struct {
-		label        string
-		input        map[string]string
-		clientOutput *coreV1.Service
+		label  string
+		input  map[string]string
+		object *coreV1.Service
 	}{
 		{
 			label: "Sucessfully to delete an existing service",
 			input: map[string]string{"name": "test-service", "namespace": "test-namespace"},
-			clientOutput: &coreV1.Service{
+			object: &coreV1.Service{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name:      "test-service",
 					Namespace: "test-namespace",
@@ -175,7 +200,7 @@ func TestDeleteService(t *testing.T) {
 		{
 			label: "Sucessfully delete an existing service in default namespace",
 			input: map[string]string{"name": "test-service", "namespace": ""},
-			clientOutput: &coreV1.Service{
+			object: &coreV1.Service{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name:      "test-service",
 					Namespace: "default",
@@ -185,9 +210,12 @@ func TestDeleteService(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		client := testclient.NewSimpleClientset(testCase.clientOutput)
+		client := TestKubernetesConnector{testCase.object}
 		t.Run(testCase.label, func(t *testing.T) {
-			err := Delete(testCase.input["name"], testCase.input["namespace"], client)
+			err := servicePlugin{}.Delete(helm.KubernetesResource{
+				GVK:  schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Service"},
+				Name: testCase.input["name"],
+			}, testCase.input["namespace"], client)
 			if err != nil {
 				t.Fatalf("Delete method returned an error (%s)", err)
 			}
@@ -199,14 +227,14 @@ func TestGetService(t *testing.T) {
 	testCases := []struct {
 		label          string
 		input          map[string]string
-		clientOutput   *coreV1.Service
+		object         *coreV1.Service
 		expectedResult string
 		expectedError  string
 	}{
 		{
 			label: "Sucessfully to get an existing service",
 			input: map[string]string{"name": "test-service", "namespace": "test-namespace"},
-			clientOutput: &coreV1.Service{
+			object: &coreV1.Service{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name:      "test-service",
 					Namespace: "test-namespace",
@@ -217,7 +245,7 @@ func TestGetService(t *testing.T) {
 		{
 			label: "Sucessfully get an existing service from default namespaces",
 			input: map[string]string{"name": "test-service", "namespace": ""},
-			clientOutput: &coreV1.Service{
+			object: &coreV1.Service{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name:      "test-service",
 					Namespace: "default",
@@ -228,7 +256,7 @@ func TestGetService(t *testing.T) {
 		{
 			label: "Fail to get an non-existing namespace",
 			input: map[string]string{"name": "test-name", "namespace": "test-namespace"},
-			clientOutput: &coreV1.Service{
+			object: &coreV1.Service{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name:      "test-service",
 					Namespace: "default",
@@ -239,9 +267,12 @@ func TestGetService(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		client := testclient.NewSimpleClientset(testCase.clientOutput)
+		client := TestKubernetesConnector{testCase.object}
 		t.Run(testCase.label, func(t *testing.T) {
-			result, err := Get(testCase.input["name"], testCase.input["namespace"], client)
+			result, err := servicePlugin{}.Get(helm.KubernetesResource{
+				GVK:  schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Service"},
+				Name: testCase.input["name"],
+			}, testCase.input["namespace"], client)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get method return an un-expected (%s)", err)

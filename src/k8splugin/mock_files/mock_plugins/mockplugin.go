@@ -14,30 +14,43 @@ limitations under the License.
 package main
 
 import (
-	"k8s.io/client-go/kubernetes"
+	"k8splugin/internal/helm"
+	"k8splugin/internal/plugin"
 
-	utils "k8splugin/internal"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-func main() {}
+// ExportedVariable is what we will look for when calling the plugin
+var ExportedVariable mockPlugin
+
+type mockPlugin struct {
+}
 
 // Create object in a specific Kubernetes resource
-func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
+func (p mockPlugin) Create(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
 	return "resource-name", nil
 }
 
 // List of existing resources
-func List(namespace string, client kubernetes.Interface) ([]string, error) {
-	returnVal := []string{"resource-name-1", "resource-name-2"}
+func (p mockPlugin) List(gvk schema.GroupVersionKind, namespace string,
+	client plugin.KubernetesConnector) ([]helm.KubernetesResource, error) {
+	returnVal := []helm.KubernetesResource{
+		{
+			Name: "resource-name-1",
+		},
+		{
+			Name: "resource-name-2",
+		},
+	}
 	return returnVal, nil
 }
 
 // Delete existing resources
-func Delete(name string, namespace string, client kubernetes.Interface) error {
+func (p mockPlugin) Delete(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) error {
 	return nil
 }
 
 // Get existing resource host
-func Get(name string, namespace string, client kubernetes.Interface) (string, error) {
-	return name, nil
+func (p mockPlugin) Get(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) (string, error) {
+	return resource.Name, nil
 }

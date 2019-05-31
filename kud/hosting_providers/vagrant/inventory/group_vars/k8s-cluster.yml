@@ -38,8 +38,10 @@ kube_token_auth: true
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
 kube_network_plugin: flannel
 
-# Make a copy of kubeconfig on the host that runs Ansible in GITDIR/artifacts
+# Make a copy of kubeconfig (admin.conf) on the host that runs Ansible to inventory/artifacts
 kubeconfig_localhost: true
+# Copy kubectl binary on the host that runs Ansible to inventory/artifacts
+kubectl_localhost: true
 
 # Enable MountPropagation gate feature
 local_volumes_enabled: true

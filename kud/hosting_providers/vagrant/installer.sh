@@ -131,6 +131,8 @@ function install_k8s {
     # Configure environment
     mkdir -p $HOME/.kube
     cp $kud_inventory_folder/artifacts/admin.conf $HOME/.kube/config
+    # Copy Kubespray kubectl to be usable in host running Ansible. Requires kubectl_localhost: true in inventory/group_vars/k8s-cluster.yml
+    sudo cp $kud_inventory_folder/artifacts/kubectl /usr/local/bin/
 }
 
 # install_addons() - Install Kubenertes AddOns

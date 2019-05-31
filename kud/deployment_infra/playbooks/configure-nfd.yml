@@ -45,13 +45,14 @@
         - rbac.yaml
         - node-feature-discovery-daemonset.json.template
 
-- hosts: localhost
+- hosts: kube-master
   pre_tasks:
     - name: Load kud variables
       include_vars:
         file: kud-vars.yml
   tasks:
     - name: create service accounts
+      become: yes
       command: "/usr/local/bin/kubectl apply -f /tmp/{{ item }}"
       with_items:
         - rbac.yaml

@@ -84,7 +84,7 @@
             ]
           }
 
-- hosts: localhost
+- hosts: kube-master
   pre_tasks:
     - name: Load kud variables
       include_vars:
@@ -118,5 +118,6 @@
                            type: string
 
     - name: create network objects
+      become: yes
       shell: "/usr/local/bin/kubectl apply -f /tmp/crdnetwork.yml"
       ignore_errors: True

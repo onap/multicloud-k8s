@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2917cd42_187cc77a",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-06-04T20:39:48Z",
+      "side": 1,
+      "message": "Remove the requirement to run as root. Either run node.sh outside this script or only run that script with sudo in this file",
+      "revId": "7d57a2b6dca83b329387b2822602216c15c9569d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

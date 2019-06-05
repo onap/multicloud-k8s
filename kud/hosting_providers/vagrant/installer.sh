@@ -194,6 +194,7 @@ function _print_kubernetes_info {
     echo "Admin password: secret" >> $k8s_info_file
 }
 
+sudo -k # forgot sudo password
 if ! sudo -n "true"; then
     echo ""
     echo "passwordless sudo is needed for '$(id -nu)' user."

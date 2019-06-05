@@ -41,9 +41,7 @@ baremetal/aio.sh
 ################
 
 This bash script provides an automated process for deploying an All-in-One
-Kubernetes cluster. Given that the ansible inventory file created by this
-script doesn't specify any information about user and password, it's necessary
-to execute this script as root user.
+Kubernetes cluster.
 
 The following two instructions start the provisioning process.
 

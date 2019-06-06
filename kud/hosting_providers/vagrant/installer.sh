@@ -112,7 +112,11 @@ function install_k8s {
     sudo mkdir -p ${local_release_dir}/containers
     rm $tarball
 
-    sudo -E pip install -r $dest_folder/kubespray-$version/requirements.txt
+    pushd $dest_folder/kubespray-$version/
+    sudo -E pip install -r ./requirements.txt
+    sudo apt-get install -y make unzip  # install make to run mitogen target and unzip is mitogen playbook dependency
+    make mitogen
+    popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
     if [[ -n "${verbose}" ]]; then
         echo "kube_log_level: 5" | tee $kud_inventory_folder/group_vars/all.yml

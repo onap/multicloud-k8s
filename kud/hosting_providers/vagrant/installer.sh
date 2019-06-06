@@ -102,7 +102,7 @@ function install_k8s {
     version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
     local_release_dir=$(grep "local_release_dir" $kud_inventory_folder/group_vars/k8s-cluster.yml | awk -F "\"" '{print $2}')
     local tarball=v$version.tar.gz
-    sudo apt-get install -y sshpass
+    sudo apt-get install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
     _install_docker
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
@@ -112,7 +112,10 @@ function install_k8s {
     sudo mkdir -p ${local_release_dir}/containers
     rm $tarball
 
-    sudo -E pip install -r $dest_folder/kubespray-$version/requirements.txt
+    pushd $dest_folder/kubespray-$version/
+    sudo -E pip install -r ./requirements.txt
+    make mitogen
+    popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
     if [[ -n "${verbose}" ]]; then
         echo "kube_log_level: 5" | tee $kud_inventory_folder/group_vars/all.yml

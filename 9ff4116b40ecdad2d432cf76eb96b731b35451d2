@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "13de154c_09d3129a",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-06-07T14:16:53Z",
+      "side": 1,
+      "message": "This could be simplified with x\u003d\"$(readlink -f \"$(dirname \"${BASH_SOURCE[0]}\")\")\". This also addresses to file installer.sh",
+      "revId": "9ff4116b40ecdad2d432cf76eb96b731b35451d2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

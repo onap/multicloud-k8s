@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "26a6ca33_e007dde2",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-06-07T15:28:25Z",
+      "side": 1,
+      "message": "based on my testing with aio these dependencies needs to be installed.",
+      "range": {
+        "startLine": 117,
+        "startChar": 4,
+        "endLine": 117,
+        "endChar": 117
+      },
+      "revId": "ce74a1da80df6e2360ef797e405e6ba3ede57a70",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

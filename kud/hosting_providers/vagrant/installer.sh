@@ -168,7 +168,7 @@ function install_plugin {
     pushd $kud_folder/../../../deployments
     sudo ./build.sh
     if [[ "${testing_enabled}" == "true" ]]; then
-        docker-compose up -d
+        sudo ./start.sh
         pushd $kud_tests
         for functional_test in plugin plugin_edgex; do
             bash ${functional_test}.sh
@@ -218,7 +218,7 @@ kud_infra_folder=$kud_folder/../../deployment_infra
 export kud_inventory_folder=$kud_folder/inventory
 kud_inventory=$kud_inventory_folder/hosts.ini
 kud_playbooks=$kud_infra_folder/playbooks
-kud_tests=$kud_folder/tests
+kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
 

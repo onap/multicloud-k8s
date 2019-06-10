@@ -18,7 +18,7 @@ cd ${aio_dir}/../vagrant
 # For aio inventory by default get ovn central ip from local host default interface.
 # This variable used only in this file, but env variable defined to enable user to override it prior calling aio.sh.
 OVN_CENTRAL_IP_ADDRESS=${OVN_CENTRAL_IP_ADDRESS:-$(hostname -I | cut -d ' ' -f 1)}
-
+echo "Preparing inventory for ansible"
 cat <<EOL > inventory/hosts.ini
 [all]
 localhost ansible_ssh_host=${OVN_CENTRAL_IP_ADDRESS} ansible_ssh_port=22
@@ -46,9 +46,14 @@ kube-node
 kube-master
 EOL
 
-rm -f ~/.ssh/id_rsa
-echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+if ! [ -f ~/.ssh/id_rsa ]; then
+        echo "Generating rsa key for this host"
+        ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa <&-
+fi
+if ! grep -qF "$(ssh-keygen -y -f ~/.ssh/id_rsa)" ~/.ssh/authorized_keys; then
+        echo "Allowing present ~/.ssh/id_rsa key to be used for login to this host"
+        ssh-keygen -y -f ~/.ssh/id_rsa >> ~/.ssh/authorized_keys
+fi
 chmod og-wx ~/.ssh/authorized_keys
 
 echo "Enabling nested-virtualization"

@@ -15,6 +15,7 @@ set -o pipefail
 aio_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
 cd ${aio_dir}/../vagrant
 
+echo "Preparing inventory for ansible"
 cat <<EOL > inventory/hosts.ini
 [all]
 localhost
@@ -42,9 +43,14 @@ kube-node
 kube-master
 EOL
 
-rm -f ~/.ssh/id_rsa
-echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+if ! [ -f ~/.ssh/id_rsa ]; then
+        echo "Generating rsa key for this host"
+        ssh-keygen -t rsa -f ~/.ssh/id_rsa <&-
+fi
+if ! grep -qF "$(ssh-keygen -y -f ~/.ssh/id_rsa)" ~/.ssh/authorized_keys; then
+        echo "Allowing present ~/.ssh/id_rsa key to be used for login to this host"
+        ssh-keygen -y -f ~/.ssh/id_rsa >> ~/.ssh/authorized_keys
+fi
 chmod og-wx ~/.ssh/authorized_keys
 
 echo "Enabling nested-virtualization"

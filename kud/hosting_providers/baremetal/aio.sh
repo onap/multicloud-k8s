@@ -12,11 +12,6 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-if [[ $(whoami) != 'root' ]];then
-    echo "This bash script must be executed as root user"
-    exit 1
-fi
-
 aio_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
 cd ${aio_dir}/../vagrant
 
@@ -53,7 +48,7 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 chmod og-wx ~/.ssh/authorized_keys
 
 echo "Enabling nested-virtualization"
-./node.sh
+sudo ./node.sh
 
 echo "Deploying KUD project"
 ./installer.sh | tee kud_installer.log

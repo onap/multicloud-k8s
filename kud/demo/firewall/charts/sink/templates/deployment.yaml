@@ -18,7 +18,7 @@ spec:
         app: {{ include "sink.name" . }}
         release: {{ .Release.Name }}
       annotations:
-        k8s.v1.cni.cncf.io/networks: '[{"name": {{ .Values.global.ovnMultusNetworkName | quote }}}]'
+        k8s.v1.cni.cncf.io/networks: '[{"name": {{ .Values.global.ovnMultusNetworkName | quote }}, "namespace": "default"}]'
         ovnNetwork: '[
             { "name": {{ .Values.global.protectedNetworkName | quote }}, "ipAddress": {{ .Values.global.vsnPrivateIp0 | quote }}, "interface": "eth1", "defaultGateway": "false" },
             { "name": {{ .Values.global.onapPrivateNetworkName | quote }}, "ipAddress": {{ .Values.global.vsnPrivateIp1 | quote }}, "interface": "eth2" , "defaultGateway": "false"}

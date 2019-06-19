@@ -16,39 +16,42 @@ package main
 import (
 	"log"
 
-	"k8s.io/client-go/kubernetes"
-
 	pkgerrors "github.com/pkg/errors"
-
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	utils "k8splugin/internal"
+	"k8splugin/internal/helm"
+	"k8splugin/internal/plugin"
 )
 
+// ExportedVariable is what we will look for when calling the plugin
+var ExportedVariable namespacePlugin
+
+type namespacePlugin struct {
+}
+
 // Create a namespace object in a specific Kubernetes cluster
-func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
-	namespace := &coreV1.Namespace{
+func (p namespacePlugin) Create(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
+	namespaceObj := &coreV1.Namespace{
 		ObjectMeta: metaV1.ObjectMeta{
-			Name: data.Namespace,
+			Name: namespace,
 		},
 	}
-	_, err := client.CoreV1().Namespaces().Create(namespace)
+	_, err := client.GetStandardClient().CoreV1().Namespaces().Create(namespaceObj)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Namespace error")
 	}
-	log.Printf("Namespace (%s) created", data.Namespace)
+	log.Printf("Namespace (%s) created", namespace)
 
-	return data.Namespace, nil
+	return namespace, nil
 }
 
 // Get an existing namespace hosted in a specific Kubernetes cluster
-func Get(name string, namespace string, client kubernetes.Interface) (string, error) {
+func (p namespacePlugin) Get(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) (string, error) {
 	opts := metaV1.GetOptions{}
-	opts.APIVersion = "apps/v1"
-	opts.Kind = "Deployment"
-
-	ns, err := client.CoreV1().Namespaces().Get(name, opts)
+	ns, err := client.GetStandardClient().CoreV1().Namespaces().Get(resource.Name, opts)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Get Namespace error")
 	}
@@ -57,14 +60,14 @@ func Get(name string, namespace string, client kubernetes.Interface) (string, er
 }
 
 // Delete an existing namespace hosted in a specific Kubernetes cluster
-func Delete(name string, namespace string, client kubernetes.Interface) error {
+func (p namespacePlugin) Delete(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) error {
 	deletePolicy := metaV1.DeletePropagationForeground
 	opts := &metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}
 
-	log.Println("Deleting namespace: " + name)
-	if err := client.CoreV1().Namespaces().Delete(name, opts); err != nil {
+	log.Println("Deleting namespace: " + resource.Name)
+	if err := client.GetStandardClient().CoreV1().Namespaces().Delete(resource.Name, opts); err != nil {
 		return pkgerrors.Wrap(err, "Delete namespace error")
 	}
 
@@ -72,23 +75,30 @@ func Delete(name string, namespace string, client kubernetes.Interface) error {
 }
 
 // List of existing namespaces hosted in a specific Kubernetes cluster
-func List(namespace string, client kubernetes.Interface) ([]string, error) {
+// This plugin ignores both gvk and namespace arguments
+func (p namespacePlugin) List(gvk schema.GroupVersionKind, namespace string, client plugin.KubernetesConnector) ([]helm.KubernetesResource, error) {
 	opts := metaV1.ListOptions{
 		Limit: utils.ResourcesListLimit,
 	}
-	opts.APIVersion = "apps/v1"
-	opts.Kind = "Namespace"
 
-	list, err := client.CoreV1().Namespaces().List(opts)
+	list, err := client.GetStandardClient().CoreV1().Namespaces().List(opts)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Namespace list error")
 	}
 
-	result := make([]string, 0, utils.ResourcesListLimit)
+	result := make([]helm.KubernetesResource, 0, utils.ResourcesListLimit)
 	if list != nil {
-		for _, deployment := range list.Items {
-			log.Printf("%v", deployment.Name)
-			result = append(result, deployment.Name)
+		for _, ns := range list.Items {
+			log.Printf("%v", ns.Name)
+			result = append(result,
+				helm.KubernetesResource{
+					GVK: schema.GroupVersionKind{
+						Group:   "",
+						Version: "v1",
+						Kind:    "Namespace",
+					},
+					Name: ns.Name,
+				})
 		}
 	}
 

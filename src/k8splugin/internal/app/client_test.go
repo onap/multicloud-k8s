@@ -42,7 +42,7 @@ func LoadMockPlugins(krdLoadedPlugins map[string]*plugin.Plugin) error {
 	}
 
 	krdLoadedPlugins["namespace"] = mockPlugin
-	krdLoadedPlugins["deployment"] = mockPlugin
+	krdLoadedPlugins["generic"] = mockPlugin
 	krdLoadedPlugins["service"] = mockPlugin
 
 	return nil

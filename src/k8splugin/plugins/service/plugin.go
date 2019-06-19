@@ -16,23 +16,29 @@ package main
 import (
 	"log"
 
-	"k8s.io/client-go/kubernetes"
-
 	pkgerrors "github.com/pkg/errors"
-
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	utils "k8splugin/internal"
+	"k8splugin/internal/helm"
+	"k8splugin/internal/plugin"
 )
 
+// ExportedVariable is what we will look for when calling the plugin
+var ExportedVariable servicePlugin
+
+type servicePlugin struct {
+}
+
 // Create a service object in a specific Kubernetes cluster
-func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
-	namespace := data.Namespace
+func (p servicePlugin) Create(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
 	if namespace == "" {
 		namespace = "default"
 	}
-	obj, err := utils.DecodeYAML(data.YamlFilePath, nil)
+
+	obj, err := utils.DecodeYAML(yamlFilePath, nil)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Decode service object error")
 	}
@@ -43,7 +49,7 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 	}
 	service.Namespace = namespace
 
-	result, err := client.CoreV1().Services(namespace).Create(service)
+	result, err := client.GetStandardClient().CoreV1().Services(namespace).Create(service)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Service error")
 	}
@@ -52,7 +58,8 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 }
 
 // List of existing services hosted in a specific Kubernetes cluster
-func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
+// gvk parameter is not used as this plugin is specific to services only
+func (p servicePlugin) List(gvk schema.GroupVersionKind, namespace string, client plugin.KubernetesConnector) ([]helm.KubernetesResource, error) {
 	if namespace == "" {
 		namespace = "default"
 	}
@@ -60,19 +67,25 @@ func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
 	opts := metaV1.ListOptions{
 		Limit: utils.ResourcesListLimit,
 	}
-	opts.APIVersion = "apps/v1"
-	opts.Kind = "Service"
 
-	list, err := kubeclient.CoreV1().Services(namespace).List(opts)
+	list, err := client.GetStandardClient().CoreV1().Services(namespace).List(opts)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Service list error")
 	}
 
-	result := make([]string, 0, utils.ResourcesListLimit)
+	result := make([]helm.KubernetesResource, 0, utils.ResourcesListLimit)
 	if list != nil {
-		for _, deployment := range list.Items {
-			log.Printf("%v", deployment.Name)
-			result = append(result, deployment.Name)
+		for _, service := range list.Items {
+			log.Printf("%v", service.Name)
+			result = append(result,
+				helm.KubernetesResource{
+					GVK: schema.GroupVersionKind{
+						Group:   "",
+						Version: "v1",
+						Kind:    "Service",
+					},
+					Name: service.GetName(),
+				})
 		}
 	}
 
@@ -80,7 +93,7 @@ func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
 }
 
 // Delete an existing service hosted in a specific Kubernetes cluster
-func Delete(name string, namespace string, kubeclient kubernetes.Interface) error {
+func (p servicePlugin) Delete(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) error {
 	if namespace == "" {
 		namespace = "default"
 	}
@@ -90,8 +103,8 @@ func Delete(name string, namespace string, kubeclient kubernetes.Interface) erro
 		PropagationPolicy: &deletePolicy,
 	}
 
-	log.Println("Deleting service: " + name)
-	if err := kubeclient.CoreV1().Services(namespace).Delete(name, opts); err != nil {
+	log.Println("Deleting service: " + resource.Name)
+	if err := client.GetStandardClient().CoreV1().Services(namespace).Delete(resource.Name, opts); err != nil {
 		return pkgerrors.Wrap(err, "Delete service error")
 	}
 
@@ -99,18 +112,15 @@ func Delete(name string, namespace string, kubeclient kubernetes.Interface) erro
 }
 
 // Get an existing service hosted in a specific Kubernetes cluster
-func Get(name string, namespace string, kubeclient kubernetes.Interface) (string, error) {
+func (p servicePlugin) Get(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) (string, error) {
 	if namespace == "" {
 		namespace = "default"
 	}
 
 	opts := metaV1.GetOptions{}
-	opts.APIVersion = "apps/v1"
-	opts.Kind = "Service"
-
-	service, err := kubeclient.CoreV1().Services(namespace).Get(name, opts)
+	service, err := client.GetStandardClient().CoreV1().Services(namespace).Get(resource.Name, opts)
 	if err != nil {
-		return "", pkgerrors.Wrap(err, "Get Deployment error")
+		return "", pkgerrors.Wrap(err, "Get Service error")
 	}
 
 	return service.Name, nil

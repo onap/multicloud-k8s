@@ -18,36 +18,54 @@ import (
 	"strings"
 	"testing"
 
-	utils "k8splugin/internal"
+	"k8splugin/internal/helm"
 
 	coreV1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	testclient "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
+type TestKubernetesConnector struct {
+	object runtime.Object
+}
+
+func (t TestKubernetesConnector) GetMapper() meta.RESTMapper {
+	return nil
+}
+
+func (t TestKubernetesConnector) GetDynamicClient() dynamic.Interface {
+	return nil
+}
+
+func (t TestKubernetesConnector) GetStandardClient() kubernetes.Interface {
+	return fake.NewSimpleClientset(t.object)
+}
+
 func TestCreateNamespace(t *testing.T) {
-	namespace := "test1"
 	testCases := []struct {
 		label          string
-		input          *utils.ResourceData
-		clientOutput   *coreV1.Namespace
+		input          string
+		object         *coreV1.Namespace
 		expectedResult string
 		expectedError  string
 	}{
 		{
-			label: "Successfully create a namespace",
-			input: &utils.ResourceData{
-				Namespace: namespace,
-			},
-			clientOutput:   &coreV1.Namespace{},
-			expectedResult: namespace,
+			label:          "Successfully create a namespace",
+			input:          "test1",
+			object:         &coreV1.Namespace{},
+			expectedResult: "test1",
 		},
 	}
 
 	for _, testCase := range testCases {
-		client := testclient.NewSimpleClientset(testCase.clientOutput)
+		client := TestKubernetesConnector{testCase.object}
 		t.Run(testCase.label, func(t *testing.T) {
-			result, err := Create(testCase.input, client)
+			result, err := namespacePlugin{}.Create("", testCase.input, client)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create method return an un-expected (%s)", err)
@@ -72,39 +90,47 @@ func TestCreateNamespace(t *testing.T) {
 }
 
 func TestListNamespace(t *testing.T) {
-	namespace := "test1"
 	testCases := []struct {
 		label          string
 		input          string
-		clientOutput   *coreV1.NamespaceList
-		expectedResult []string
+		object         *coreV1.NamespaceList
+		expectedResult []helm.KubernetesResource
 	}{
 		{
 			label:          "Sucessfully to display an empty namespace list",
-			input:          namespace,
-			clientOutput:   &coreV1.NamespaceList{},
-			expectedResult: []string{},
+			input:          "",
+			object:         &coreV1.NamespaceList{},
+			expectedResult: []helm.KubernetesResource{},
 		},
 		{
 			label: "Sucessfully to display a list of existing namespaces",
-			input: namespace,
-			clientOutput: &coreV1.NamespaceList{
+			input: "test1",
+			object: &coreV1.NamespaceList{
 				Items: []coreV1.Namespace{
 					coreV1.Namespace{
 						ObjectMeta: metaV1.ObjectMeta{
-							Name: namespace,
+							Name: "test1",
 						},
 					},
 				},
 			},
-			expectedResult: []string{namespace},
+			expectedResult: []helm.KubernetesResource{
+				{
+					Name: "test1",
+					GVK:  schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Namespace"},
+				},
+			},
 		},
 	}
 
 	for _, testCase := range testCases {
-		client := testclient.NewSimpleClientset(testCase.clientOutput)
+		client := TestKubernetesConnector{testCase.object}
 		t.Run(testCase.label, func(t *testing.T) {
-			result, err := List(testCase.input, client)
+			result, err := namespacePlugin{}.List(schema.GroupVersionKind{
+				Group:   "",
+				Version: "v1",
+				Kind:    "Namespace",
+			}, testCase.input, client)
 			if err != nil {
 				t.Fatalf("List method returned an error (%s)", err)
 			} else {
@@ -113,7 +139,7 @@ func TestListNamespace(t *testing.T) {
 				}
 				if !reflect.DeepEqual(testCase.expectedResult, result) {
 
-					t.Fatalf("List method returned: \n%v\n and it was expected: \n%v", result, testCase.expectedResult)
+					t.Fatalf("List method returned: \n%+v\n and it was expected: \n%+v", result, testCase.expectedResult)
 				}
 			}
 		})
@@ -122,14 +148,14 @@ func TestListNamespace(t *testing.T) {
 
 func TestDeleteNamespace(t *testing.T) {
 	testCases := []struct {
-		label        string
-		input        map[string]string
-		clientOutput *coreV1.Namespace
+		label  string
+		input  map[string]string
+		object *coreV1.Namespace
 	}{
 		{
 			label: "Sucessfully to delete an existing namespace",
 			input: map[string]string{"name": "test-name", "namespace": "test-namespace"},
-			clientOutput: &coreV1.Namespace{
+			object: &coreV1.Namespace{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name: "test-name",
 				},
@@ -138,9 +164,12 @@ func TestDeleteNamespace(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		client := testclient.NewSimpleClientset(testCase.clientOutput)
+		client := TestKubernetesConnector{testCase.object}
 		t.Run(testCase.label, func(t *testing.T) {
-			err := Delete(testCase.input["name"], testCase.input["namespace"], client)
+			err := namespacePlugin{}.Delete(helm.KubernetesResource{
+				GVK:  schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Namespace"},
+				Name: testCase.input["name"],
+			}, testCase.input["namespace"], client)
 			if err != nil {
 				t.Fatalf("Delete method returned an error (%s)", err)
 			}
@@ -152,14 +181,14 @@ func TestGetNamespace(t *testing.T) {
 	testCases := []struct {
 		label          string
 		input          map[string]string
-		clientOutput   *coreV1.Namespace
+		object         *coreV1.Namespace
 		expectedResult string
 		expectedError  string
 	}{
 		{
 			label: "Sucessfully to get an existing namespace",
 			input: map[string]string{"name": "test-name", "namespace": "test-namespace"},
-			clientOutput: &coreV1.Namespace{
+			object: &coreV1.Namespace{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name: "test-name",
 				},
@@ -169,7 +198,7 @@ func TestGetNamespace(t *testing.T) {
 		{
 			label: "Fail to get an non-existing namespace",
 			input: map[string]string{"name": "test-name", "namespace": "test-namespace"},
-			clientOutput: &coreV1.Namespace{
+			object: &coreV1.Namespace{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name: "test-name2",
 				},
@@ -179,9 +208,12 @@ func TestGetNamespace(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		client := testclient.NewSimpleClientset(testCase.clientOutput)
+		client := TestKubernetesConnector{testCase.object}
 		t.Run(testCase.label, func(t *testing.T) {
-			result, err := Get(testCase.input["name"], testCase.input["namespace"], client)
+			result, err := namespacePlugin{}.Get(helm.KubernetesResource{
+				GVK:  schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Namespace"},
+				Name: testCase.input["name"],
+			}, testCase.input["namespace"], client)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get method return an un-expected (%s)", err)

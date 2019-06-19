@@ -14,31 +14,38 @@ limitations under the License.
 package main
 
 import (
-	"k8splugin/plugins/network/v1"
+	v1 "k8splugin/plugins/network/v1"
 	"regexp"
 
 	utils "k8splugin/internal"
+	"k8splugin/internal/app"
+	"k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
-	"k8s.io/client-go/kubernetes"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-func extractData(data string) (vnfID, cniType, networkName string) {
+// ExportedVariable is what we will look for when calling the plugin
+var ExportedVariable networkPlugin
+
+type networkPlugin struct {
+}
+
+func extractData(data string) (cniType, networkName string) {
 	re := regexp.MustCompile("_")
 	split := re.Split(data, -1)
 	if len(split) != 3 {
 		return
 	}
-	vnfID = split[0]
 	cniType = split[1]
 	networkName = split[2]
 	return
 }
 
 // Create an ONAP Network object
-func Create(data *utils.ResourceData, client kubernetes.Interface) (string, error) {
+func (p networkPlugin) Create(yamlFilePath string, namespace string, client *app.KubernetesClient) (string, error) {
 	network := &v1.OnapNetwork{}
-	if _, err := utils.DecodeYAML(data.YamlFilePath, network); err != nil {
+	if _, err := utils.DecodeYAML(yamlFilePath, network); err != nil {
 		return "", pkgerrors.Wrap(err, "Decode network object error")
 	}
 
@@ -58,17 +65,24 @@ func Create(data *utils.ResourceData, client kubernetes.Interface) (string, erro
 		return "", pkgerrors.Wrap(err, "Error during the creation for "+cniType+" plugin")
 	}
 
-	return data.VnfId + "_" + cniType + "_" + name, nil
+	return cniType + "_" + name, nil
+}
+
+// Get a Network
+func (p networkPlugin) Get(resource helm.KubernetesResource, namespace string, client *app.KubernetesClient) (string, error) {
+	return "", nil
 }
 
 // List of Networks
-func List(namespace string, kubeclient kubernetes.Interface) ([]string, error) {
+func (p networkPlugin) List(gvk schema.GroupVersionKind, namespace string,
+	client *app.KubernetesClient) ([]helm.KubernetesResource, error) {
+
 	return nil, nil
 }
 
 // Delete an existing Network
-func Delete(name string, namespace string, kubeclient kubernetes.Interface) error {
-	_, cniType, networkName := extractData(name)
+func (p networkPlugin) Delete(resource helm.KubernetesResource, namespace string, client *app.KubernetesClient) error {
+	cniType, networkName := extractData(resource.Name)
 	typePlugin, ok := utils.LoadedPlugins[cniType+"-network"]
 	if !ok {
 		return pkgerrors.New("No plugin for resource " + cniType + " found")
@@ -84,9 +98,4 @@ func Delete(name string, namespace string, kubeclient kubernetes.Interface) erro
 	}
 
 	return nil
-}
-
-// Get an existing Network
-func Get(name string, namespace string, kubeclient kubernetes.Interface) (string, error) {
-	return "", nil
 }

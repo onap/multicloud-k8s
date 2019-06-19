@@ -41,7 +41,7 @@ spec:
             - export protected_private_net_cidr={{ .Values.global.protectedPrivateNetCidr }}
             - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/firewall | sudo -E bash
         VirtletRootVolumeSize: 5Gi
-        k8s.v1.cni.cncf.io/networks: '[{"name": {{ .Values.global.ovnMultusNetworkName | quote }}}]'
+        k8s.v1.cni.cncf.io/networks: '[{"name": {{ .Values.global.ovnMultusNetworkName | quote }}, "namespace": "default"}]'
         ovnNetwork: '[
            { "name": {{ .Values.global.unprotectedNetworkName | quote }}, "ipAddress": {{ .Values.global.vfwPrivateIp0 | quote }}, "interface": "eth1" , "defaultGateway": "false"},
            { "name": {{ .Values.global.protectedNetworkName | quote }}, "ipAddress": {{ .Values.global.vfwPrivateIp1 | quote }}, "interface": "eth2", "defaultGateway": "false" },

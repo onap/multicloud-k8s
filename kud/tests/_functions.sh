@@ -12,6 +12,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+FUNCTIONS_DIR=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
+
 source /etc/environment
 
 function print_msg {
@@ -22,10 +24,10 @@ function print_msg {
     echo -e "${RED} $msg ---------------------------------------${NC}"
 }
 
-function _get_ovn_central_address {
-    ansible_ifconfig=$(ansible ovn-central[0] -i $test_folder/../hosting_providers/vagrant/inventory/hosts.ini -m shell -a "ifconfig eth1 |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'")
+function get_ovn_central_address {
+    ansible_ifconfig=$(ansible ovn-central[0] -i ${FUNCTIONS_DIR}/../hosting_providers/vagrant/inventory/hosts.ini -m shell -a "ifconfig ${OVN_CENTRAL_INTERFACE} |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'")
     if [[ $ansible_ifconfig != *CHANGED* ]]; then
-        echo "Fail to get the OVN central IP address from eth1 nic"
+        echo "Fail to get the OVN central IP address from ${OVN_CENTRAL_INTERFACE} nic"
         exit
     fi
     echo "$(echo ${ansible_ifconfig#*>>} | tr '\n' ':')6641"
@@ -39,7 +41,7 @@ function init_network {
     name=$(cat $fname | yq '.spec.name' | xargs)
     subnet=$(cat $fname  | yq '.spec.subnet' | xargs)
     gateway=$(cat $fname  | yq '.spec.gateway' | xargs)
-    ovn_central_address=$(_get_ovn_central_address)
+    ovn_central_address=$(get_ovn_central_address)
 
     router_mac=$(printf '00:00:00:%02X:%02X:%02X' $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
     ovn-nbctl --may-exist --db tcp:$ovn_central_address ls-add $name -- set logical_switch $name other-config:subnet=$subnet external-ids:gateway_ip=$gateway
@@ -52,7 +54,7 @@ function cleanup_network {
     local fname=$1
 
     name=$(cat $fname | yq '.spec.name' | xargs)
-    ovn_central_address=$(_get_ovn_central_address)
+    ovn_central_address=$(get_ovn_central_address)
 
     for cmd in "ls-del $name" "lrp-del rtos-$name" "lsp-del stor-$name"; do
         ovn-nbctl --if-exist --db tcp:$ovn_central_address $cmd
@@ -111,6 +113,10 @@ function wait_deployment {
 
 # setup() - Base testing setup shared among functional tests
 function setup {
+    if ! $(kubectl version &>/dev/null); then
+        echo "This funtional test requires kubectl client"
+        exit 1
+    fi
     for deployment_name in $@; do
         recreate_deployment $deployment_name
     done
@@ -126,9 +132,4 @@ function teardown {
         destroy_deployment $deployment_name
     done
 }
-
-if ! $(kubectl version &>/dev/null); then
-    echo "This funtional test requires kubectl client"
-    exit 1
-fi
-test_folder=$(pwd)
+test_folder=${FUNCTIONS_DIR}

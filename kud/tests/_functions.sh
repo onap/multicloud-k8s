@@ -12,7 +12,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-FUNCTIONS_DIR=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
+FUNCTIONS_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 source /etc/environment
 

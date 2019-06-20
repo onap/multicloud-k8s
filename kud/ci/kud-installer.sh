@@ -8,6 +8,6 @@
 
 set -x -e -o pipefail
 
-curr_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
+curr_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 cd ${curr_dir}/../hosting_providers/baremetal
 ./aio.sh

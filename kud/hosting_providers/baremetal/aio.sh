@@ -12,7 +12,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-aio_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
+aio_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 cd ${aio_dir}/../vagrant
 
 # For aio inventory by default get ovn central ip from local host default interface.

@@ -12,7 +12,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-INSTALLER_DIR=$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)
+INSTALLER_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 source ${INSTALLER_DIR}/../../tests/_functions.sh
 

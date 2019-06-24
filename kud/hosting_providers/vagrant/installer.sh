@@ -92,7 +92,7 @@ function _install_docker {
 
 function _set_environment_file {
     # By default ovn central interface is the first active network interface on localhost. If other wanted, need to export this variable in aio.sh or Vagrant file.
-    OVN_CENTRAL_INTERFACE=${OVN_CENTRAL_INTERFACE:-$(ip addr show | awk '/inet.*brd/{print $NF; exit}')}
+    OVN_CENTRAL_INTERFACE="${OVN_CENTRAL_INTERFACE:-$(ip addr show | awk '/inet.*brd/{print $NF; exit}')}"
     echo "export OVN_CENTRAL_INTERFACE=${OVN_CENTRAL_INTERFACE}" | sudo tee --append /etc/environment
     echo "export OVN_CENTRAL_ADDRESS=$(get_ovn_central_address)" | sudo tee --append /etc/environment
     echo "export KUBE_CONFIG_DIR=/opt/kubeconfig" | sudo tee --append /etc/environment
@@ -144,6 +144,7 @@ function install_k8s {
 
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
+    source /etc/environment
     echo "Installing Kubernetes AddOns"
     _install_ansible
     sudo ansible-galaxy install $verbose -r $kud_infra_folder/galaxy-requirements.yml --ignore-errors
@@ -169,7 +170,6 @@ function install_plugin {
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
     sudo cp $HOME/.kube/config /opt/kubeconfig/kud
-    source /etc/environment
 
     pushd $kud_folder/../../../deployments
     sudo ./build.sh
@@ -242,8 +242,8 @@ if [ -f $kud_folder/sources.list ]; then
 fi
 sudo apt-get update
 install_k8s
-install_addons
 _set_environment_file
+install_addons
 if ${KUD_PLUGIN_ENABLED:-false}; then
     install_plugin
 fi

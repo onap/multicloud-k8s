@@ -20,8 +20,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
-	"log"
-	"path/filepath"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
@@ -149,7 +147,6 @@ func (v *ConnectionClient) GetConnectivityRecordByName(connectionName string,
 	}
 
 	for _, value := range conn.OtherConnectivityList.ConnectivityRecords {
-		log.Println(value)
 		if connectivityRecordName == value["connectivity-record-name"] {
 			return value, nil
 		}
@@ -173,7 +170,7 @@ func (v *ConnectionClient) Delete(name string) error {
 // Download the connection information onto a kubeconfig file
 // The file is named after the name of the connection and will
 // be placed in the provided parent directory
-func (v *ConnectionClient) Download(name string, parentdir string) (string, error) {
+func (v *ConnectionClient) Download(name string) (string, error) {
 
 	conn, err := v.Get(name)
 	if err != nil {
@@ -186,11 +183,17 @@ func (v *ConnectionClient) Download(name string, parentdir string) (string, erro
 		return "", pkgerrors.Wrap(err, "Converting from base64")
 	}
 
-	target := filepath.Join(parentdir, conn.CloudRegion)
-	err = ioutil.WriteFile(target, kubeContent, 0644)
+	//Create temp file to write kubeconfig
+	//Assume this file will be deleted after usage by the consumer
+	tempF, err := ioutil.TempFile("", "kube-config-temp-")
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Creating temp file")
+	}
+
+	_, err = tempF.Write(kubeContent)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Writing kubeconfig to file")
 	}
 
-	return target, nil
+	return tempF.Name(), nil
 }

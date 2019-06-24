@@ -18,7 +18,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
@@ -45,8 +44,9 @@ type KubernetesClient struct {
 // getKubeConfig uses the connectivity client to get the kubeconfig based on the name
 // of the cloudregion. This is written out to a file.
 func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
+
 	conn := connection.NewConnectionClient()
-	kubeConfigPath, err := conn.Download(cloudregion, config.GetConfiguration().KubeConfigDir)
+	kubeConfigPath, err := conn.Download(cloudregion)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Downloading kubeconfig")
 	}

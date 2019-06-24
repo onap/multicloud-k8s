@@ -1,0 +1,10 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Kiran Kamineni <kiran.k.kamineni@intel.com>
+Code-Review+1: Akhila Kishore <akhila.kishore@intel.com>
+Code-Review+1: Samuli Silvius <s.silvius@partner.samsung.com>
+Code-Review+2: Bin Yang <bin.yang@windriver.com>
+Submitted-by: Bin Yang <bin.yang@windriver.com>
+Submitted-at: Mon, 24 Jun 2019 10:48:27 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/89634
+Project: multicloud/k8s
+Branch: refs/heads/master

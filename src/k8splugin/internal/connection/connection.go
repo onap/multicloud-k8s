@@ -20,6 +20,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 
 	"k8splugin/internal/db"
@@ -32,7 +33,13 @@ type Connection struct {
 	CloudRegion           string                 `json:"cloud-region"`
 	CloudOwner            string                 `json:"cloud-owner"`
 	Kubeconfig            string                 `json:"kubeconfig"`
-	OtherConnectivityList map[string]interface{} `json:"other-connectivity-list"`
+	OtherConnectivityList ConnectivityRecordList `json:"other-connectivity-list"`
+}
+
+// ConnectivityRecordList covers lists of connectivity records
+// and any other data that needs to be stored
+type ConnectivityRecordList struct {
+	ConnectivityRecords []map[string]string `json:"connectivity-records"`
 }
 
 // ConnectionKey is the key structure that is used in the database
@@ -56,6 +63,7 @@ type ConnectionManager interface {
 	Create(c Connection) (Connection, error)
 	Get(name string) (Connection, error)
 	Delete(name string) error
+	GetConnectivityRecordByName(connname string, name string) (map[string]string, error)
 }
 
 // ConnectionClient implements the  ConnectionManager
@@ -65,7 +73,7 @@ type ConnectionClient struct {
 	tagMeta   string
 }
 
-// New ConnectionClient returns an instance of the  ConnectionClient
+// NewConnectionClient returns an instance of the  ConnectionClient
 // which implements the  ConnectionManager
 func NewConnectionClient() *ConnectionClient {
 	return &ConnectionClient{
@@ -115,6 +123,39 @@ func (v *ConnectionClient) Get(name string) (Connection, error) {
 	}
 
 	return Connection{}, pkgerrors.New("Error getting Connection")
+}
+
+// GetConnectivityRecordByName returns Connection for corresponding to name
+// JSON example:
+// "connectivity-records" :
+// 	[
+// 		{
+// 			“connectivity-record-name” : “<name>”,   // example: OVN
+// 			“FQDN-or-ip” : “<fqdn>”,
+// 			“ca-cert-to-verify-server” : “<contents of CA certificate to validate the OVN server>”,
+// 			“ssl-initiator” : “<true/false”>,
+// 			“user-name”:  “<user name>”,   //valid if ssl-initator is false
+// 			“password” : “<password>”,      // valid if ssl-initiator is false
+// 			“private-key” :  “<contents of private key in PEM>”, // valid if ssl-initiator is true
+// 			“cert-to-present” :  “<contents of certificate to present to server>” , //valid if ssl-initiator is true
+// 		},
+// 	]
+func (v *ConnectionClient) GetConnectivityRecordByName(connectionName string,
+	connectivityRecordName string) (map[string]string, error) {
+
+	conn, err := v.Get(connectionName)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Error getting connection")
+	}
+
+	for _, value := range conn.OtherConnectivityList.ConnectivityRecords {
+		log.Println(value)
+		if connectivityRecordName == value["connectivity-record-name"] {
+			return value, nil
+		}
+	}
+
+	return nil, pkgerrors.New("Connectivity record " + connectivityRecordName + " not found")
 }
 
 // Delete the Connection from database

@@ -20,7 +20,6 @@
         file: kud-vars.yml
   roles:
     - role: andrewrothstein.go
-      go_ver: "{{ go_version }}"
   tasks:
     - name: Load kud variables
       include_vars:

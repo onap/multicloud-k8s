@@ -9,14 +9,10 @@
 ##############################################################################
 
 - hosts: localhost
-  pre_tasks:
+  tasks:
     - name: Load kud variables
       include_vars:
         file: kud-vars.yml
-  roles:
-    - role: andrewrothstein.kubernetes-helm
-      kubernetes_helm_ver: "v{{ helm_client_version }}"
-  tasks:
     - name: create istio folder
       file:
         state: directory

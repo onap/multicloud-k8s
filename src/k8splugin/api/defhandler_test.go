@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"k8splugin/internal/rb"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 	"net/http"
 	"net/http/httptest"
 	"reflect"

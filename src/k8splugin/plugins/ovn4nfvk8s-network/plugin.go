@@ -22,8 +22,8 @@ import (
 	"time"
 	"unicode"
 
-	"k8splugin/internal/config"
-	v1 "k8splugin/plugins/network/v1"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
+	v1 "github.com/onap/multicloud-k8s/src/k8splugin/plugins/network/v1"
 
 	pkgerrors "github.com/pkg/errors"
 	kexec "k8s.io/utils/exec"

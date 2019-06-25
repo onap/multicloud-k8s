@@ -14,7 +14,7 @@ limitations under the License.
 package db
 
 import (
-	k8sconfig "k8splugin/internal/config"
+	k8sconfig "github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 
 	"github.com/hashicorp/consul/api"
 	pkgerrors "github.com/pkg/errors"

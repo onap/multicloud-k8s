@@ -14,12 +14,12 @@ limitations under the License.
 package main
 
 import (
-	v1 "k8splugin/plugins/network/v1"
+	v1 "github.com/onap/multicloud-k8s/src/k8splugin/plugins/network/v1"
 	"regexp"
 
-	utils "k8splugin/internal"
-	"k8splugin/internal/app"
-	"k8splugin/internal/helm"
+	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"

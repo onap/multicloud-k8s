@@ -15,7 +15,7 @@ package main
 
 import (
 	pkgerrors "github.com/pkg/errors"
-	"k8splugin/plugins/network/v1"
+	"github.com/onap/multicloud-k8s/src/k8splugin/plugins/network/v1"
 )
 
 // Err is the error message to be sent during functional testing

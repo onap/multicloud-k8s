@@ -14,8 +14,8 @@ limitations under the License.
 package main
 
 import (
-	"k8splugin/internal/helm"
-	"k8splugin/internal/plugin"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )

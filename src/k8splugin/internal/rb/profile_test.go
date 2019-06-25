@@ -18,7 +18,7 @@ package rb
 
 import (
 	"bytes"
-	"k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"reflect"
 	"strings"
 	"testing"

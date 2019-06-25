@@ -13,12 +13,14 @@
 - hosts: kube-master:kube-node
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin/"
-  roles:
-    - role: andrewrothstein.go
-  tasks:
+  pre_tasks:
     - name: Load kud variables
       include_vars:
         file: kud-vars.yml
+  roles:
+    - role: andrewrothstein.go
+      go_ver: "{{ go_version }}"
+  tasks:
     - name: clone ovn4nfv-k8s-plugin repo
       git:
         repo: "{{ ovn4nfv_url }}"
@@ -30,6 +32,11 @@
       make:
         chdir: "{{ ovn4nfv_dest }}"
         target: clean
+    - name: Adapt go.sum to newer golang version
+      lineinfile:
+        path: "{{ ovn4nfv_dest }}/go.sum"
+        line: "k8s.io/client-go v9.0.0+incompatible h1:2kqW3X2xQ9SbFvWZjGEHBLlWc1LG9JIJNXWkuqwdZ3A="
+        regexp: 'k8s\.io/client-go v9\.0\.0\+incompatible .*'
     - name: build ovn4nfvk8s-cni
       make:
         chdir: "{{ ovn4nfv_dest }}"

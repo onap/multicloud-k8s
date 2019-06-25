@@ -30,8 +30,8 @@ Apache-2.0
 
 [1]: https://git.onap.org/multicloud/k8s
 [2]: https://github.com/kubernetes-incubator/kubespray
-[3]: playbooks/configure-ovn4nfv.yml
-[4]: playbooks/configure-virtlet.yml
-[5]: playbooks/configure-multus.yml
-[6]: playbooks/configure-nfd.yml
-[7]: playbooks/configure-istio.yml
+[3]: deployment_infra/playbooks/configure-ovn4nfv.yml
+[4]: deployment_infra/playbooks/configure-virtlet.yml
+[5]: deployment_infra/playbooks/configure-multus.yml
+[6]: deployment_infra/playbooks/configure-nfd.yml
+[7]: deployment_infra/playbooks/configure-istio.yml

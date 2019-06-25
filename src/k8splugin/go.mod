@@ -1,4 +1,4 @@
-module k8splugin
+module github.com/onap/multicloud-k8s/src/k8splugin
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect

@@ -19,8 +19,8 @@ import (
 	"log"
 	"net/http"
 
-	"k8splugin/internal/app"
-	"k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	"github.com/gorilla/mux"
 )

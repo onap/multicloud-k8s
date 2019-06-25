@@ -21,9 +21,9 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	utils "k8splugin/internal"
-	"k8splugin/internal/helm"
-	"k8splugin/internal/plugin"
+	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 )
 
 // ExportedVariable is what we will look for when calling the plugin

@@ -21,11 +21,11 @@ import (
 	"sort"
 	"testing"
 
-	utils "k8splugin/internal"
-	"k8splugin/internal/connection"
-	"k8splugin/internal/db"
-	"k8splugin/internal/helm"
-	"k8splugin/internal/rb"
+	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )

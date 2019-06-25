@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"k8splugin/internal/app"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 
 	"github.com/gorilla/mux"
 )

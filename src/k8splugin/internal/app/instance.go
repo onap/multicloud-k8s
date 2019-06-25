@@ -21,9 +21,9 @@ import (
 	"encoding/json"
 	"math/rand"
 
-	"k8splugin/internal/db"
-	"k8splugin/internal/helm"
-	"k8splugin/internal/rb"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	pkgerrors "github.com/pkg/errors"
 )

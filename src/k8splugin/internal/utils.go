@@ -21,8 +21,8 @@ import (
 	"plugin"
 	"strings"
 
-	"k8splugin/internal/config"
-	"k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -70,6 +70,7 @@ func DecodeYAML(path string, into runtime.Object) (runtime.Object, error) {
 // CheckDatabaseConnection checks if the database is up and running and
 // plugin can talk to it
 func CheckDatabaseConnection() error {
+	log.Println(config.GetConfiguration())
 	err := db.CreateDBClient(config.GetConfiguration().DatabaseType)
 	if err != nil {
 		return pkgerrors.Cause(err)

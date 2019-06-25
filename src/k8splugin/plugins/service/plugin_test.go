@@ -14,7 +14,7 @@ limitations under the License.
 package main
 
 import (
-	"k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"reflect"
 	"strings"
 	"testing"

@@ -13,12 +13,15 @@
 - hosts: kube-master:kube-node
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin/"
-  roles:
-    - role: andrewrothstein.go
-  tasks:
+  pre_tasks:
     - name: Load kud variables
       include_vars:
         file: kud-vars.yml
+  roles:
+    - role: andrewrothstein.go
+      #ovn4nfv plugin compiled by newer go (1.12.4) appears to have some issues
+      go_ver: '1.11'
+  tasks:
     - name: clone ovn4nfv-k8s-plugin repo
       git:
         repo: "{{ ovn4nfv_url }}"

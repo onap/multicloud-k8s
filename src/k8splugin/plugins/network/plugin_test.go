@@ -14,8 +14,8 @@ limitations under the License.
 package main
 
 import (
-	utils "k8splugin/internal"
-	"k8splugin/internal/helm"
+	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"os"
 	"plugin"
 	"reflect"

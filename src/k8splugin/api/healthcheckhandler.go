@@ -19,7 +19,7 @@ package api
 import (
 	"net/http"
 
-	"k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 )
 
 // healthCheckHandler executes a db read to return health of k8splugin

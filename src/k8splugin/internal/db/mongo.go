@@ -20,7 +20,7 @@ import (
 	"golang.org/x/net/context"
 	"log"
 
-	"k8splugin/internal/config"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 
 	pkgerrors "github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"

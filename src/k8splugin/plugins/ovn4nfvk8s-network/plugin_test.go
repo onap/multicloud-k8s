@@ -16,7 +16,7 @@ package main
 import (
 	pkgerrors "github.com/pkg/errors"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8splugin/plugins/network/v1"
+	"github.com/onap/multicloud-k8s/src/k8splugin/plugins/network/v1"
 	"reflect"
 	"strings"
 	"testing"

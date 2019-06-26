@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"

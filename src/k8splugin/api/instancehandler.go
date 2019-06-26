@@ -19,7 +19,7 @@ import (
 	"io"
 	"net/http"
 
-	"k8splugin/internal/app"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 
 	"github.com/gorilla/mux"
 	pkgerrors "github.com/pkg/errors"

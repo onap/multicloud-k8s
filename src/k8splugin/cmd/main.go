@@ -22,10 +22,10 @@ import (
 	"os/signal"
 	"time"
 
-	"k8splugin/api"
-	utils "k8splugin/internal"
-	"k8splugin/internal/auth"
-	"k8splugin/internal/config"
+	"github.com/onap/multicloud-k8s/src/k8splugin/api"
+	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/auth"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 
 	"github.com/gorilla/handlers"
 )

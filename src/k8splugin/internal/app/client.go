@@ -18,10 +18,10 @@ import (
 	"os"
 	"time"
 
-	"k8splugin/internal/config"
-	"k8splugin/internal/connection"
-	"k8splugin/internal/helm"
-	"k8splugin/internal/plugin"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"

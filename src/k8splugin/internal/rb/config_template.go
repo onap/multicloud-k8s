@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"os"
 	"path/filepath"
 

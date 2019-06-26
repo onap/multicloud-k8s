@@ -23,8 +23,8 @@ import (
 	"reflect"
 	"testing"
 
-	"k8splugin/internal/app"
-	"k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"

@@ -14,9 +14,9 @@ limitations under the License.
 package api
 
 import (
-	"k8splugin/internal/app"
-	"k8splugin/internal/connection"
-	"k8splugin/internal/rb"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	"github.com/gorilla/mux"
 )

@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"strings"
 
-	"k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
 )

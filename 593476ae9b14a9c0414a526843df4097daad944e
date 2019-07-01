@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9843893f_62bd03e1",
+        "filename": "kud/deployment_infra/playbooks/configure-ovn4nfv.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2019-07-01T12:14:39Z",
+      "side": 1,
+      "message": "not sure but isn\u0027t there some other procedure to handle go.sum files? Is it ok to modify it here?",
+      "range": {
+        "startLine": 35,
+        "startChar": 7,
+        "endLine": 39,
+        "endChar": 60
+      },
+      "revId": "593476ae9b14a9c0414a526843df4097daad944e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

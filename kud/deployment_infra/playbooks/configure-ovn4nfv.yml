@@ -13,19 +13,28 @@
 - hosts: kube-master:kube-node
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin/"
-  roles:
-    - role: andrewrothstein.go
-  tasks:
+  pre_tasks:
     - name: Load kud variables
       include_vars:
         file: kud-vars.yml
+  roles:
+    - role: andrewrothstein.go
+      go_ver: "{{ go_version }}"
+  tasks:
     - name: clone ovn4nfv-k8s-plugin repo
       git:
         repo: "{{ ovn4nfv_url }}"
         dest: "{{ ovn4nfv_dest }}"
-        version: "{{ ovn4nfv_version }}"
+        #version: "{{ ovn4nfv_version }}" #FIXME
         force: yes
       when: ovn4nfv_source_type == "source"
+    #FIXME
+    - name: switch to gerrit review
+      shell: "git fetch origin refs/changes/84/68184/2 && git checkout FETCH_HEAD"
+      args:
+        chdir: "{{ ovn4nfv_dest }}"
+      when: ovn4nfv_source_type == "source"
+    #EMXIF
     - name: clean ovn4nfvk8s left over files
       make:
         chdir: "{{ ovn4nfv_dest }}"

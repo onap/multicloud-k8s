@@ -25,12 +25,36 @@ function print_msg {
 }
 
 function get_ovn_central_address {
-    ansible_ifconfig=$(ansible ovn-central[0] -i ${FUNCTIONS_DIR}/../hosting_providers/vagrant/inventory/hosts.ini -m shell -a "ifconfig ${OVN_CENTRAL_INTERFACE} |grep \"inet addr\" |awk '{print \$2}' |awk -F: '{print \$2}'")
-    if [[ $ansible_ifconfig != *CHANGED* ]]; then
-        echo "Fail to get the OVN central IP address from ${OVN_CENTRAL_INTERFACE} nic"
-        exit
+    #Reuse OVN_CENTRAL_ADDRESS if available (bypassable by --force flag)
+    if [[ "${1:-}" != "--force" ]] && [[ -n "${OVN_CENTRAL_ADDRESS:-}" ]]; then
+        echo "${OVN_CENTRAL_ADDRESS}"
+        return 0
     fi
-    echo "$(echo ${ansible_ifconfig#*>>} | tr '\n' ':')6641"
+
+    local remote_command="ip address show dev $OVN_CENTRAL_INTERFACE primary"
+    declare -a ansible_command=(ansible ovn-central[0] -i \
+                "${FUNCTIONS_DIR}/../hosting_providers/vagrant/inventory/hosts.ini")
+    declare -a filter=(awk -F '[ \t/]+' \
+                'BEGIN {r=1} {for (i=1; i<=NF; i++) if ($i == "inet") {print $(i+1); r=0}} END {exit r}')
+    local result
+
+    #Determine OVN_CENTRAL_INTERFACE address
+    if ! result="$("${ansible_command[@]}" -a "${remote_command}")"; then
+        echo "Ansible error for remote host ovn-central[0]" >&2
+        return 1
+    else
+        if [[ "${result}" != *CHANGED* ]]; then
+            echo "Failed to execute command on remote host ovn-central[0]" >&2
+            return 2
+        else
+            if ! result="$("${filter[@]}" <<< "${result}")"; then
+                echo "Failed to retrieve interface address from command output" >&2
+                return 3
+            else
+                echo "${result}:6641"
+            fi
+        fi
+    fi
 }
 
 function call_api {

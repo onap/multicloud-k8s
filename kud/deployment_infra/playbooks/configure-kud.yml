@@ -7,6 +7,23 @@
 # which accompanies this distribution, and is available at
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
+- hosts: localhost
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+    - name: Check if helm client is already installed #It is in single node deployment
+      command: helm version -c
+      register: helm_client
+      failed_when: False
+    - name: Install helm
+      include_role: andrewrothstein.kubernetes-helm
+      when: helm_client.rc != 0
+  roles:
+    - role: andrewrothstein.kubernetes-helm
+      kubernetes_helm_ver: "v{{ helm_client_version }}"
+
+
 - hosts: kube-node
   become: yes
   tasks:

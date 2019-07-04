@@ -20,6 +20,7 @@ source _functions.sh
 base_url="http://localhost:9015"
 #Will resolve to file $KUBE_CONFIG_DIR/kud
 cloud_region_id="kud"
+cloud_region_owner="test_owner"
 namespace="testns"
 csar_id="94e414f6-9ca4-11e8-bb6a-52540067263b"
 rb_name="test-rbdef"
@@ -121,6 +122,21 @@ if [[ "$rbp_ret" != *"${profile_name}"* ]]; then
     exit 1
 fi
 
+print_msg "Setup cloud data"
+payload="$(cat <<EOF
+{
+    "cloud-region": "$cloud_region_id",
+    "cloud-owner": "$cloud_region_owner"
+}
+EOF
+)"
+if ! curl -sf -F "metadata=$payload" \
+        -F "file=@$HOME/.kube/config" \
+        "${base_url}/v1/connectivity-info"; then
+    echo "Unsuccessful register of cloud region"
+    exit 1
+fi
+
 print_msg "Instantiate Profile"
 payload_raw="
 {
@@ -166,6 +182,15 @@ print_msg "Deleting $inst_id VNF Instance"
 curl -X DELETE "${base_url}/v1/instance/${inst_id}"
 if [[ 404 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/${inst_id}") ]]; then
     echo "VNF Instance not deleted"
+    exit 1
+fi
+
+print_msg "Deleting ${cloud_region_id} cloud region connection"
+if ! curl -w "%{http_code}" -X DELETE -sf \
+        "${base_url}/v1/connectivity-info/${cloud_region_id}"; then
+    echo "Failed to delete cloud region connection"
+    #DELETE on /v1/connectivity-info/{region} currently doesn't return non 2**
+    #https code no matter if region has been deleted, or there was no entry
     exit 1
 fi
 

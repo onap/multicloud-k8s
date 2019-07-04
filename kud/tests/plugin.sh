@@ -17,7 +17,7 @@ source _common.sh
 source _common_test.sh
 source _functions.sh
 
-base_url="http://localhost:8081"
+base_url="http://localhost:9015"
 #Will resolve to file $KUBE_CONFIG_DIR/kud
 cloud_region_id="kud"
 namespace="testns"
@@ -34,10 +34,10 @@ function _build_generic_sim {
         return
     fi
     BUILD_ARGS="--no-cache"
-    if [ $HTTP_PROXY ]; then
+    if [ ${HTTP_PROXY:-} ]; then
         BUILD_ARGS+=" --build-arg HTTP_PROXY=${HTTP_PROXY}"
     fi
-    if [ $HTTPS_PROXY ]; then
+    if [ ${HTTPS_PROXY:-} ]; then
         BUILD_ARGS+=" --build-arg HTTPS_PROXY=${HTTPS_PROXY}"
     fi
 

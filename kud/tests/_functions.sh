@@ -16,6 +16,15 @@ FUNCTIONS_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 source /etc/environment
 
+function check_variable {
+    for arg; do
+        if [ -z "${!arg}" ]; then
+            print_msg "Failing due to empty variable: ${arg}"
+            return 1
+        fi
+    done
+}
+
 function print_msg {
     local msg=$1
     local RED='\033[0;31m'
@@ -41,12 +50,11 @@ function init_network {
     name=$(cat $fname | yq '.spec.name' | xargs)
     subnet=$(cat $fname  | yq '.spec.subnet' | xargs)
     gateway=$(cat $fname  | yq '.spec.gateway' | xargs)
-    ovn_central_address=$(get_ovn_central_address)
 
     router_mac=$(printf '00:00:00:%02X:%02X:%02X' $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
-    ovn-nbctl --may-exist --db tcp:$ovn_central_address ls-add $name -- set logical_switch $name other-config:subnet=$subnet external-ids:gateway_ip=$gateway
-    ovn-nbctl --may-exist --db tcp:$ovn_central_address lrp-add $router_name rtos-$name $router_mac $gateway
-    ovn-nbctl --may-exist --db tcp:$ovn_central_address lsp-add $name stor-$name -- set logical_switch_port stor-$name type=router options:router-port=rtos-$name addresses=\"$router_mac\"
+    ovn-nbctl --may-exist --db tcp:$OVN_CENTRAL_ADDRESS ls-add $name -- set logical_switch $name other-config:subnet=$subnet external-ids:gateway_ip=$gateway
+    ovn-nbctl --may-exist --db tcp:$OVN_CENTRAL_ADDRESS lrp-add $router_name rtos-$name $router_mac $gateway
+    ovn-nbctl --may-exist --db tcp:$OVN_CENTRAL_ADDRESS lsp-add $name stor-$name -- set logical_switch_port stor-$name type=router options:router-port=rtos-$name addresses=\"$router_mac\"
 }
 
 # cleanup_network() - This function removes the OVN resources created for the test
@@ -54,10 +62,9 @@ function cleanup_network {
     local fname=$1
 
     name=$(cat $fname | yq '.spec.name' | xargs)
-    ovn_central_address=$(get_ovn_central_address)
 
     for cmd in "ls-del $name" "lrp-del rtos-$name" "lsp-del stor-$name"; do
-        ovn-nbctl --if-exist --db tcp:$ovn_central_address $cmd
+        ovn-nbctl --if-exist --db tcp:$OVN_CENTRAL_ADDRESS $cmd
     done
 }
 
@@ -66,7 +73,7 @@ function _checks_args {
         echo "Missing CSAR ID argument"
         exit 1
     fi
-    if [[ -z $CSAR_DIR ]]; then
+    if [[ -z ${CSAR_DIR:-} ]]; then
         echo "CSAR_DIR global environment value is empty"
         exit 1
     fi
@@ -97,6 +104,8 @@ function recreate_deployment {
 # wait_deployment() - Wait process to Running status on the Deployment's pods
 function wait_deployment {
     local deployment_name=$1
+    declare -i backoff_timer="${2:-20}"
+    local image_pull_error=false
 
     status_phase=""
     while [[ $status_phase != "Running" ]]; do
@@ -105,7 +114,15 @@ function wait_deployment {
             echo "$(date +%H:%M:%S) - $deployment_name : $new_phase"
             status_phase=$new_phase
         fi
-        if [[ $new_phase == "Err"* ]]; then
+        if [[ "${new_phase}" == "ErrImagePull" ]]; then
+            if [[ "${image_pull_error}" == "false" ]]; then
+                echo "Delaying probe for ${backoff_timer} seconds"
+                image_pull_error=true
+                sleep "${backoff_timer}"
+            else
+                exit 1
+            fi
+        elif [[ $new_phase == "Err"* ]]; then
             exit 1
         fi
     done

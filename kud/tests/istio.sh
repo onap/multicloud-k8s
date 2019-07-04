@@ -36,5 +36,12 @@ for deployment in details-v1 productpage-v1 ratings-v1 reviews-v1 reviews-v2 rev
 done
 INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
 INGRESS_HOST=$(kubectl get po -l istio=ingressgateway -n istio-system -o 'jsonpath={.items[0].status.hostIP}')
-curl -o /dev/null -s -w "%{http_code}\n" http://$INGRESS_HOST:$INGRESS_PORT/productpage
+if ! http_code="$(curl -o /dev/null -s -w "%{http_code}\n" http://$INGRESS_HOST:$INGRESS_PORT/productpage)"; then
+    echo "Failed to communicate with http://$INGRESS_HOST:$INGRESS_PORT/productpage"
+    exit 1
+elif [[ "${http_code}" != [123]* ]]; then
+    echo "Istio endpoint returned with non 1xx 2xx 3xx status code: ${http_code}!"
+    exit 1
+fi
+echo "Success: Status=$http_code"
 popd

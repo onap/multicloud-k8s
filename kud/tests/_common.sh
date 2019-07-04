@@ -135,8 +135,8 @@ spec:
         app: vFirewall
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
-            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
+            { "name": "$unprotected_private_net", "interface": "eth1" },
+            { "name": "$onap_private_net", "interface": "eth2" }
         ]'
     spec:
       containers:
@@ -168,9 +168,9 @@ spec:
         app: vFirewall
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
-            { "name": "$protected_private_net", "interfaceRequest": "eth2" },
-            { "name": "$onap_private_net", "interfaceRequest": "eth3" }
+            { "name": "$unprotected_private_net", "interface": "eth1" },
+            { "name": "$protected_private_net", "interface": "eth2" },
+            { "name": "$onap_private_net", "interface": "eth3" }
         ]'
     spec:
       containers:
@@ -201,8 +201,8 @@ spec:
         context: darkstat
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "$protected_private_net", "interfaceRequest": "eth1" },
-            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
+            { "name": "$protected_private_net", "interface": "eth1" },
+            { "name": "$onap_private_net", "interface": "eth2" }
         ]'
     spec:
       containers:
@@ -673,8 +673,8 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
-            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
+            { "name": "$unprotected_private_net", "interface": "eth1" },
+            { "name": "$onap_private_net", "interface": "eth2" }
         ]'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
@@ -740,9 +740,9 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "$unprotected_private_net", "interfaceRequest": "eth1" },
-            { "name": "$protected_private_net", "interfaceRequest": "eth2" },
-            { "name": "$onap_private_net", "interfaceRequest": "eth3" }
+            { "name": "$unprotected_private_net", "interface": "eth1" },
+            { "name": "$protected_private_net", "interface": "eth2" },
+            { "name": "$onap_private_net", "interface": "eth3" }
         ]'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
@@ -806,8 +806,8 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "$protected_private_net", "interfaceRequest": "eth1" },
-            { "name": "$onap_private_net", "interfaceRequest": "eth2" }
+            { "name": "$protected_private_net", "interface": "eth1" },
+            { "name": "$onap_private_net", "interface": "eth2" }
         ]'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
@@ -886,8 +886,8 @@ spec:
         app: multus
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
-          { "name": "bridge-conf", "interfaceRequest": "eth1" },
-          { "name": "bridge-conf", "interfaceRequest": "eth2" }
+          { "name": "bridge-conf", "interface": "eth1" },
+          { "name": "bridge-conf", "interface": "eth2" }
         ]'
     spec:
       containers:

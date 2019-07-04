@@ -30,8 +30,8 @@ deployment_pod=$(kubectl get pods | grep  $multus_deployment_name | awk '{print 
 echo "===== $deployment_pod details ====="
 kubectl exec -it $deployment_pod -- ip a
 multus_nic=$(kubectl exec -it $deployment_pod -- ip a)
-if [[ $multus_nic != *"net1"* ]]; then
-    echo "The $deployment_pod pod doesn't contain the net1 nic"
+if [[ $multus_nic != *"eth1"* ]]; then
+    echo "The $deployment_pod pod doesn't contain the eth1 nic"
     exit 1
 else
     echo "Test Completed!"

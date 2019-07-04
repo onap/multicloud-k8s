@@ -13,6 +13,7 @@
 
 import json
 import logging
+import os
 
 import web
 from web import webapi
@@ -24,6 +25,9 @@ urls = (
 
 def setup_logger(name, log_file, level=logging.DEBUG):
     print("Configuring the logger...")
+
+    if not os.path.isdir(os.path.dirname(log_file)):
+        os.mkdir(os.path.dirname(log_file))
     handler = logging.FileHandler(log_file)
     formatter = logging.Formatter('%(message)s')
     handler.setFormatter(formatter)

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "603d8509_11db9c75",
+        "filename": "kud/deployment_infra/playbooks/configure-multus.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-07-09T20:57:40Z",
+      "side": 1,
+      "message": "Does this same issue effect this instance of blockinfile also?",
+      "range": {
+        "startLine": 76,
+        "startChar": 6,
+        "endLine": 76,
+        "endChar": 18
+      },
+      "revId": "495b7f95d882d63b96abb05b0857a455bfb715f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -15,57 +15,100 @@ set -o pipefail
 
 source _common_test.sh
 source _functions.sh
+source _common.sh
 
-base_url="http://localhost:8081/v1/vnf_instances/"
-cloud_region_id="kud"
-namespace="default"
+base_url="http://localhost:9015/v1"
+kubeconfig_path="$HOME/.kube/config"
 csar_id=cb009bfe-bbee-11e8-9766-525400435678
+rb_name="edgex"
+rb_version="plugin_test"
+chart_name="edgex"
+profile_name="test_profile"
+release_name="test-release"
+namespace="plugin-tests-namespace"
+cloud_region_id="kud"
+cloud_region_owner="localhost"
 
 # Setup
 install_deps
-_checks_args ${csar_id}
-cp -R ./edgex/* ${CSAR_DIR}/${csar_id}/
+populate_CSAR_edgex_rbdefinition "$csar_id"
 
-# Test
-payload_raw="
+print_msg "Registering resource bundle"
+payload="$(cat <<EOF
 {
-    \"cloud_region_id\": \"$cloud_region_id\",
-    \"namespace\": \"$namespace\",
-    \"csar_id\": \"$csar_id\"
+    "rb-name": "${rb_name}",
+    "rb-version": "${rb_version}",
+    "chart-name": "${chart_name}"
 }
-"
-payload=$(echo $payload_raw | tr '\n' ' ')
+EOF
+)"
+call_api -d "${payload}" "${base_url}/rb/definition"
 
-echo "Creating EdgeX VNF Instance"
+print_msg "Uploading resource bundle content"
+call_api --data-binary "@${CSAR_DIR}/${csar_id}/rb_definition.tar.gz" \
+         "${base_url}/rb/definition/${rb_name}/${rb_version}/content"
 
-vnf_id=$(curl -s -d "$payload" "${base_url}" | jq -r '.vnf_id')
+print_msg "Registering rb's profile"
+payload="$(cat <<EOF
+{
+    "rb-name": "${rb_name}",
+    "rb-version": "${rb_version}",
+    "profile-name": "${profile_name}",
+    "release-name": "${release_name}",
+    "namespace": "${namespace}"
+}
+EOF
+)"
+call_api -d "${payload}" "${base_url}/rb/definition/${rb_name}/${rb_version}/profile"
 
-echo "=== Validating Kubernetes ==="
-kubectl get --no-headers=true --namespace=${namespace} deployment ${cloud_region_id}-${namespace}-${vnf_id}-edgex-core-command
-kubectl get --no-headers=true --namespace=${namespace} service ${cloud_region_id}-${namespace}-${vnf_id}-edgex-core-command
-echo "VNF Instance created succesfully with id: $vnf_id"
+print_msg "Uploading profile data"
+call_api --data-binary "@${CSAR_DIR}/${csar_id}/rb_profile.tar.gz" \
+         "${base_url}/rb/definition/${rb_name}/${rb_version}/profile/${profile_name}/content"
 
-# TODO: Add heath checks to verify EdgeX services
+print_msg "Setup cloud data"
+payload="$(cat <<EOF
+{
+    "cloud-region": "$cloud_region_id",
+    "cloud-owner": "$cloud_region_owner"
+}
+EOF
+)"
+call_api -F "metadata=$payload" \
+         -F "file=@$kubeconfig_path" \
+         "${base_url}/connectivity-info" >/dev/null #massive output
 
-vnf_id_list=$(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}" | jq -r '.vnf_id_list')
-if [[ "$vnf_id_list" != *"${vnf_id}"* ]]; then
-    echo $vnf_id_list
-    echo "VNF Instance not stored"
-    exit 1
-fi
+print_msg "Creating EdgeX VNF Instance"
+payload="$(cat <<EOF
+{
+    "rb-name": "${rb_name}",
+    "rb-version": "${rb_version}",
+    "profile-name": "${profile_name}",
+    "cloud-region": "${cloud_region_id}"
+}
+EOF
+)"
+response="$(call_api -d "${payload}" "${base_url}/instance")"
+echo "$response"
+vnf_id="$(jq -r '.id' <<< "${response}")"
 
-vnf_details=$(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}/${vnf_id}")
-if [[ -z "$vnf_details" ]]; then
-    echo "Cannot retrieved VNF Instance details"
-    exit 1
-fi
-echo "VNF details $vnf_details"
+print_msg "Validating Kubernetes"
+kubectl get --no-headers=true --namespace=${namespace} deployment edgex-core-command
+kubectl get --no-headers=true --namespace=${namespace} service edgex-core-command
+# TODO: Add health checks to verify EdgeX services
 
-echo "Deleting $vnf_id VNF Instance"
-curl -X DELETE "${base_url}${cloud_region_id}/${namespace}/${vnf_id}"
-if [[ -n $(curl -s -X GET "${base_url}${cloud_region_id}/${namespace}/${vnf_id}") ]]; then
-    echo "VNF Instance not deleted"
-    exit 1
-fi
+print_msg "Retrieving VNF details"
+call_api "${base_url}/instance/${vnf_id}"
 
-# Teardown
+
+#Teardown
+print_msg "Deleting VNF Instance"
+delete_resource "${base_url}/instance/${vnf_id}"
+
+print_msg "Deleting Profile"
+delete_resource "${base_url}/rb/definition/${rb_name}/${rb_version}/profile/${profile_name}"
+
+print_msg "Deleting Resource Bundle"
+delete_resource "${base_url}/rb/definition/${rb_name}/${rb_version}"
+
+print_msg "Deleting ${cloud_region_id} cloud region connection"
+delete_resource "${base_url}/connectivity-info/${cloud_region_id}"

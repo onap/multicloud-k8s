@@ -1132,3 +1132,15 @@ function populate_CSAR_rbdefinition {
     gzip $rbd_content_tarball
     popd
 }
+
+# populate_CSAR_edgex_rbdefinition() - Function that populates CSAR folder
+# for testing resource bundle definition of edgex scenario
+function populate_CSAR_edgex_rbdefinition {
+    _checks_args "$1"
+    pushd "${CSAR_DIR}/$1"
+    print_msg "Create Helm Chart Archives"
+    rm -f *.tar.gz
+    tar -czf rb_profile.tar.gz -C $test_folder/vnfs/edgex/profile .
+    tar -czf rb_definition.tar.gz -C $test_folder/vnfs/edgex/helm edgex
+    popd
+}

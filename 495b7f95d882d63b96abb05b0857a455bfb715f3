@@ -22,6 +22,30 @@
       "revId": "495b7f95d882d63b96abb05b0857a455bfb715f3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "68fcb30f_b4b62961",
+        "filename": "kud/deployment_infra/playbooks/configure-multus.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-07-10T07:28:00Z",
+      "side": 1,
+      "message": "In short - no, this task is safe.\nHere, `marker` property of blockinfile is not unsafely overriden. This makes relevant comment blocks inserted into file, that allows blockinfile to handle repeating text not to happen. This wasn\u0027t working in task above, as json structure doesn\u0027t permit any kind of comments, that yaml does.",
+      "parentUuid": "603d8509_11db9c75",
+      "range": {
+        "startLine": 76,
+        "startChar": 6,
+        "endLine": 76,
+        "endChar": 18
+      },
+      "revId": "495b7f95d882d63b96abb05b0857a455bfb715f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

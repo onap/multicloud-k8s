@@ -21,10 +21,11 @@ import (
 	"io/ioutil"
 	"k8s.io/helm/pkg/strvals"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 
 	"github.com/ghodss/yaml"
 	pkgerrors "github.com/pkg/errors"
@@ -135,15 +136,6 @@ func (h *TemplateClient) mergeValues(dest map[string]interface{}, src map[string
 	return dest
 }
 
-func (h *TemplateClient) ensureDirectory(f string) error {
-	base := path.Dir(f)
-	_, err := os.Stat(base)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-	return os.MkdirAll(base, 0755)
-}
-
 // GenerateKubernetesArtifacts a mapping of type to fully evaluated helm template
 func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFiles []string,
 	values []string) ([]KubernetesResourceTemplate, error) {
@@ -245,7 +237,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 		}
 
 		mfilePath := filepath.Join(outputDir, m.Name)
-		h.ensureDirectory(mfilePath)
+		utils.EnsureDirectory(mfilePath)
 		err = ioutil.WriteFile(mfilePath, []byte(data), 0666)
 		if err != nil {
 			return retData, err

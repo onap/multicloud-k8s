@@ -24,6 +24,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 )
 
 func isTarGz(r io.Reader) error {
@@ -113,6 +115,11 @@ func ExtractTarBall(r io.Reader) (string, error) {
 				}
 			}
 		case tar.TypeReg:
+			err = utils.EnsureDirectory(target)
+			if err != nil {
+				return "", pkgerrors.Wrap(err, "Creating Directory")
+			}
+
 			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
 			if err != nil {
 				return "", pkgerrors.Wrap(err, "Creating file")

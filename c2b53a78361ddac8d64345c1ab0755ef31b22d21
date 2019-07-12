@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "70137cf4_64eb569a",
+        "filename": "kud/tests/_common.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1144,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-07-12T00:28:51Z",
+      "side": 1,
+      "message": "Once the 91304 patch gets merged or at a later point, this can be replaced by the helm package command. \nThe reasoning is that people will create these packages with that command instead of doing it manually with tar.",
+      "range": {
+        "startLine": 1144,
+        "startChar": 4,
+        "endLine": 1144,
+        "endChar": 71
+      },
+      "revId": "c2b53a78361ddac8d64345c1ab0755ef31b22d21",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a61fe95b_78d9ff08",
+        "filename": "kud/tests/plugin_edgex.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-07-12T00:28:51Z",
+      "side": 1,
+      "message": "set this to something other than default. We also want to test if the namespace gets created automatically.",
+      "range": {
+        "startLine": 27,
+        "startChar": 11,
+        "endLine": 27,
+        "endChar": 18
+      },
+      "revId": "c2b53a78361ddac8d64345c1ab0755ef31b22d21",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7fa8eb08_f63a2ddb",
+        "filename": "kud/tests/plugin_edgex.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-07-12T00:28:51Z",
+      "side": 1,
+      "message": "move this to a variable up top in case people want to test with a custom kubeconfig.",
+      "range": {
+        "startLine": 76,
+        "startChar": 19,
+        "endLine": 76,
+        "endChar": 38
+      },
+      "revId": "c2b53a78361ddac8d64345c1ab0755ef31b22d21",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

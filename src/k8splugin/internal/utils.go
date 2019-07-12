@@ -18,6 +18,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"path"
 	"plugin"
 	"strings"
 
@@ -127,4 +128,15 @@ func CheckInitialSettings() error {
 	}
 
 	return nil
+}
+
+//EnsureDirectory makes sure that the directories specified in the path exist
+//If not, it will create them, if possible.
+func EnsureDirectory(f string) error {
+	base := path.Dir(f)
+	_, err := os.Stat(base)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	return os.MkdirAll(base, 0755)
 }

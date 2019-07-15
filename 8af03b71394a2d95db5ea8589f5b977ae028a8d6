@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ccc0afe2_65dfc90f",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-07-15T18:22:18Z",
+      "side": 1,
+      "message": "Question about using ip command instead of ifconfig. This is not exactly related to this patch. ifconfig is being replaced by ip in most cases. Is it possible to replace that also in this patch? Or would you prefer a different patch?",
+      "range": {
+        "startLine": 35,
+        "startChar": 128,
+        "endLine": 35,
+        "endChar": 162
+      },
+      "revId": "8af03b71394a2d95db5ea8589f5b977ae028a8d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

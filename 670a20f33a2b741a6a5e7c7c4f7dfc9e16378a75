@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d76cc6a6_5d3d4537",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-07-15T18:36:55Z",
+      "side": 1,
+      "message": "Do we need this? Why not just use call_api directly in the scripts that create the resources. IMHO, it makes it easier to read those scripts.",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 1
+      },
+      "revId": "670a20f33a2b741a6a5e7c7c4f7dfc9e16378a75",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

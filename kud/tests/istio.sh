@@ -36,5 +36,5 @@ for deployment in details-v1 productpage-v1 ratings-v1 reviews-v1 reviews-v2 rev
 done
 INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
 INGRESS_HOST=$(kubectl get po -l istio=ingressgateway -n istio-system -o 'jsonpath={.items[0].status.hostIP}')
-curl -o /dev/null -s -w "%{http_code}\n" http://$INGRESS_HOST:$INGRESS_PORT/productpage
+call_api http://$INGRESS_HOST:$INGRESS_PORT/productpage >/dev/null
 popd

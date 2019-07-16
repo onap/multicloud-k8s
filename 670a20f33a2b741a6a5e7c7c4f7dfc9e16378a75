@@ -22,6 +22,30 @@
       "revId": "670a20f33a2b741a6a5e7c7c4f7dfc9e16378a75",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc759b22_f0daa6bf",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-07-16T13:52:31Z",
+      "side": 1,
+      "message": "Hi Kiran,\nI\u0027ve created this function because it serves as universal way to test if deleting resource works (first delete resource, then you shouldn\u0027t be able to \"GET\" it) in order to reduce duplicating code. Using it would also make testcases more consistent by reusing common \"delete\" scenario.\nThis Change is already merged, but if you have any further doubts or advices, please notify me in https://gerrit.onap.org/r/#/c/multicloud/k8s/+/91540/, where I\u0027ve continued aligning differences between plugin*.sh tests",
+      "parentUuid": "d76cc6a6_5d3d4537",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 1
+      },
+      "revId": "670a20f33a2b741a6a5e7c7c4f7dfc9e16378a75",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

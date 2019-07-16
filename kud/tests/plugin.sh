@@ -17,7 +17,8 @@ source _common.sh
 source _common_test.sh
 source _functions.sh
 
-base_url="http://localhost:9015"
+base_url="http://localhost:9015/v1"
+kubeconfig_path="$HOME/.kube/config"
 #Will resolve to file $KUBE_CONFIG_DIR/kud
 cloud_region_id="kud"
 cloud_region_owner="test_owner"
@@ -68,7 +69,7 @@ populate_CSAR_rbdefinition $csar_id
 
 # Test
 print_msg "Create Resource Bundle Definition Metadata"
-payload_raw="
+payload="
 {
     \"rb-name\": \"${rb_name}\",
     \"rb-version\": \"${rb_version}\",
@@ -79,14 +80,13 @@ payload_raw="
     }
 }
 "
-payload=$(echo $payload_raw | tr '\n' ' ')
-rb_ret_name=$(curl -s -d "$payload" -X POST "${base_url}/v1/rb/definition" | jq -r '."rb-name"')
+call_api -d "$payload" "${base_url}/rb/definition"
 
 print_msg "Upload Resource Bundle Definition Content"
-curl -s --data-binary @${CSAR_DIR}/${csar_id}/${rbd_content_tarball}.gz -X POST "${base_url}/v1/rb/definition/$rb_name/$rb_version/content"
+call_api --data-binary "@${CSAR_DIR}/${csar_id}/vault-consul-dev-0.0.0.tgz" "${base_url}/rb/definition/$rb_name/$rb_version/content"
 
 print_msg "Listing Resource Bundle Definitions"
-rb_list=$(curl -s -X GET "${base_url}/v1/rb/definition/$rb_name")
+rb_list=$(call_api "${base_url}/rb/definition/$rb_name")
 if [[ "$rb_list" != *"${rb_name}"* ]]; then
     echo $rb_list
     echo "Resource Bundle Definition not stored"
@@ -95,7 +95,7 @@ fi
 
 print_msg "Create Resource Bundle Profile Metadata"
 kubeversion=$(kubectl version | grep 'Server Version' | awk -F '"' '{print $6}')
-payload_raw="
+payload="
 {
     \"profile-name\": \"${profile_name}\",
     \"rb-name\": \"${rb_name}\",
@@ -108,14 +108,13 @@ payload_raw="
     }
 }
 "
-payload=$(echo $payload_raw | tr '\n' ' ')
-rbp_ret_name=$(curl -s -d "$payload" -X POST "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile" | jq -r '."profile-name"')
+call_api -d "$payload" "${base_url}/rb/definition/$rb_name/$rb_version/profile"
 
 print_msg "Upload Resource Bundle Profile Content"
-curl -s --data-binary @${CSAR_DIR}/${csar_id}/${rbp_content_tarball}.gz -X POST "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile/$profile_name/content"
+call_api --data-binary "@${CSAR_DIR}/${csar_id}/rb_profile.tar.gz" "${base_url}/rb/definition/$rb_name/$rb_version/profile/$profile_name/content"
 
 print_msg "Getting Resource Bundle Profile"
-rbp_ret=$(curl -s -X GET "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile/$profile_name")
+rbp_ret=$(call_api "${base_url}/rb/definition/$rb_name/$rb_version/profile/$profile_name")
 if [[ "$rbp_ret" != *"${profile_name}"* ]]; then
     echo $rbp_ret
     echo "Resource Bundle Profile not stored"
@@ -130,15 +129,12 @@ payload="$(cat <<EOF
 }
 EOF
 )"
-if ! curl -sf -F "metadata=$payload" \
-        -F "file=@$HOME/.kube/config" \
-        "${base_url}/v1/connectivity-info"; then
-    echo "Unsuccessful register of cloud region"
-    exit 1
-fi
+call_api -F "metadata=$payload" \
+    -F "file=@$kubeconfig_path" \
+    "${base_url}/connectivity-info" >/dev/null
 
 print_msg "Instantiate Profile"
-payload_raw="
+payload="
 {
     \"cloud-region\": \"$cloud_region_id\",
     \"rb-name\":\"$rb_name\",
@@ -146,8 +142,9 @@ payload_raw="
     \"profile-name\":\"$profile_name\"
 }
 "
-payload=$(echo $payload_raw | tr '\n' ' ')
-inst_id=$(curl -s -d "$payload" "${base_url}/v1/instance" | jq -r '.id')
+inst_id=$(call_api -d "$payload" "${base_url}/instance")
+echo "$inst_id"
+inst_id=$(jq -r '.id' <<< "$inst_id")
 
 print_msg "Validating Kubernetes"
 kubectl get --no-headers=true --namespace=${namespace} deployment ${release_name}-vault-consul-dev
@@ -155,44 +152,21 @@ kubectl get --no-headers=true --namespace=${namespace} service override-vault-co
 echo "VNF Instance created succesfully with id: $inst_id"
 
 print_msg "Getting $inst_id VNF Instance information"
-vnf_details=$(curl -s -X GET "${base_url}/v1/instance/${inst_id}")
-if [[ -z "$vnf_details" ]]; then
-    echo "Cannot retrieved VNF Instance details"
-    exit 1
-fi
-echo "VNF details $vnf_details"
-
-print_msg "Deleting $rb_name/$rb_version Resource Bundle Definition"
-curl -X DELETE "${base_url}/v1/rb/definition/$rb_name/$rb_version"
-if [[ 500 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/v1/rb/definition/$rb_name/$rb_version") ]]; then
-    echo "Resource Bundle Definition not deleted"
-# TODO: Change the HTTP code for 404 when the resource is not found in the API
-    exit 1
-fi
-
-print_msg "Deleting $profile_name Resource Bundle Profile"
-curl -X DELETE "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile/$profile_name"
-if [[ 500 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/v1/rb/definition/$rb_name/$rb_version/profile/$profile_name") ]]; then
-    echo "Resource Bundle Profile not deleted"
-# TODO: Change the HTTP code for 404 when the resource is not found in the API
-    exit 1
-fi
-
-print_msg "Deleting $inst_id VNF Instance"
-curl -X DELETE "${base_url}/v1/instance/${inst_id}"
-if [[ 404 -ne $(curl -o /dev/null -w %{http_code} -s -X GET "${base_url}/${inst_id}") ]]; then
-    echo "VNF Instance not deleted"
-    exit 1
-fi
-
-print_msg "Deleting ${cloud_region_id} cloud region connection"
-if ! curl -w "%{http_code}" -X DELETE -sf \
-        "${base_url}/v1/connectivity-info/${cloud_region_id}"; then
-    echo "Failed to delete cloud region connection"
-    #DELETE on /v1/connectivity-info/{region} currently doesn't return non 2**
-    #https code no matter if region has been deleted, or there was no entry
-    exit 1
-fi
+call_api "${base_url}/instance/${inst_id}"
 
 # Teardown
+print_msg "Deleting $rb_name/$rb_version Resource Bundle Definition"
+# TODO: Change the HTTP code for 404 when the resource is not found in the API
+delete_resource "${base_url}/rb/definition/$rb_name/$rb_version"
+
+print_msg "Deleting $profile_name Resource Bundle Profile"
+# TODO: Change the HTTP code for 404 when the resource is not found in the API
+delete_resource "${base_url}/rb/definition/$rb_name/$rb_version/profile/$profile_name"
+
+print_msg "Deleting $inst_id VNF Instance"
+delete_resource "${base_url}/instance/${inst_id}"
+
+print_msg "Deleting ${cloud_region_id} cloud region connection"
+delete_resource "${base_url}/connectivity-info/${cloud_region_id}"
+
 teardown $plugin_deployment_name

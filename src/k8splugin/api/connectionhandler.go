@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package connection
+package api
 
 import (
 	"bytes"
@@ -24,15 +24,17 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
+
 	"github.com/gorilla/mux"
 )
 
-// ConnectionHandler is used to store backend implementations objects
+// connectionHandler is used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
-type ConnectionHandler struct {
+type connectionHandler struct {
 	// Interface that implements Connectivity operations
 	// We will set this variable with a mock interface for testing
-	Client ConnectionManager
+	client connection.ConnectionManager
 }
 
 // CreateHandler handles creation of the connectivity entry in the database
@@ -40,8 +42,8 @@ type ConnectionHandler struct {
 // curl -i -F "metadata={\"cloud-region\":\"kud\",\"cloud-owner\":\"me\"};type=application/json" \
 //         -F file=@/home/user/.kube/config \
 //         -X POST http://localhost:8081/v1/connectivity-info
-func (h ConnectionHandler) CreateHandler(w http.ResponseWriter, r *http.Request) {
-	var v Connection
+func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request) {
+	var v connection.Connection
 
 	// Implemenation using multipart form
 	// Review and enable/remove at a later date
@@ -93,7 +95,7 @@ func (h ConnectionHandler) CreateHandler(w http.ResponseWriter, r *http.Request)
 
 	v.Kubeconfig = base64.StdEncoding.EncodeToString(content)
 
-	ret, err := h.Client.Create(v)
+	ret, err := h.client.Create(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -110,11 +112,11 @@ func (h ConnectionHandler) CreateHandler(w http.ResponseWriter, r *http.Request)
 
 // getHandler handles GET operations on a particular name
 // Returns a  Connectivity instance
-func (h ConnectionHandler) GetHandler(w http.ResponseWriter, r *http.Request) {
+func (h connectionHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["connname"]
 
-	ret, err := h.Client.Get(name)
+	ret, err := h.client.Get(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -130,11 +132,11 @@ func (h ConnectionHandler) GetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // deleteHandler handles DELETE operations on a particular record
-func (h ConnectionHandler) DeleteHandler(w http.ResponseWriter, r *http.Request) {
+func (h connectionHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["connname"]
 
-	err := h.Client.Delete(name)
+	err := h.client.Delete(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

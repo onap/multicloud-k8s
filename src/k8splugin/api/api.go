@@ -26,6 +26,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	profileClient rb.ProfileManager,
 	instClient app.InstanceManager,
 	configClient app.ConfigManager,
+	connectionClient connection.ConnectionManager,
 	templateClient rb.ConfigTemplateManager) *mux.Router {
 
 	router := mux.NewRouter()
@@ -51,11 +52,13 @@ func NewRouter(defClient rb.DefinitionManager,
 	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}", brokerHandler.deleteHandler).Methods("DELETE")
 
 	//Setup the connectivity api handler here
-	connectionClient := connection.NewConnectionClient()
-	connectionHandler := connection.ConnectionHandler{Client: connectionClient}
-	instRouter.HandleFunc("/connectivity-info", connectionHandler.CreateHandler).Methods("POST")
-	instRouter.HandleFunc("/connectivity-info/{connname}", connectionHandler.GetHandler).Methods("GET")
-	instRouter.HandleFunc("/connectivity-info/{connname}", connectionHandler.DeleteHandler).Methods("DELETE")
+	if connectionClient == nil {
+		connectionClient = connection.NewConnectionClient()
+	}
+	connectionHandler := connectionHandler{client: connectionClient}
+	instRouter.HandleFunc("/connectivity-info", connectionHandler.createHandler).Methods("POST")
+	instRouter.HandleFunc("/connectivity-info/{connname}", connectionHandler.getHandler).Methods("GET")
+	instRouter.HandleFunc("/connectivity-info/{connname}", connectionHandler.deleteHandler).Methods("DELETE")
 
 	//Setup resource bundle definition routes
 	if defClient == nil {

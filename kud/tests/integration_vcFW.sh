@@ -12,6 +12,27 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+for arg; do
+    case "$arg" in
+        --help|-h)
+            echo "Run integration testcase on KUD deployment" >&2
+            echo "deploying vFW demo on hybrid container-VM" >&2
+            echo "setup. Script by default leaves environment." >&2
+            echo "If you want it to be cleaned, launch script" >&2
+            echo "with --cleanup flag" >&2
+            exit 0
+            ;;
+        --cleanup)
+            CLEANUP_ENVIRONMENT=1
+            break
+            ;;
+        *)
+            #not implemented
+            break
+            ;;
+    esac
+done
+
 source _common.sh
 source _common_test.sh
 source _functions.sh
@@ -49,8 +70,14 @@ for deployment_name in $packetgen_deployment_name $firewall_deployment_name; do
 done
 
 # Teardown
-#teardown $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
-#for net in $unprotected_private_net $protected_private_net $onap_private_net; do
-#    cleanup_network $net.yaml
-#done
+if [ "${CLEANUP_ENVIRONMENT:-}" == "1" ]; then
+    print_msg "Teardown integration scenario"
+    teardown $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
+    for res in sink-service sink_configmap onap-ovn4nfvk8s-network; do
+        kubectl delete -f $res.yaml
+    done
+    for net in $unprotected_private_net $protected_private_net $onap_private_net; do
+        cleanup_network $net.yaml
+    done
+fi
 popd

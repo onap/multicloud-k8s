@@ -33,6 +33,44 @@ function get_ovn_central_address {
     echo "$(echo ${ansible_ifconfig#*>>} | tr '\n' ':')6641"
 }
 
+function call_api {
+    #Runs curl with passed flags and provides
+    #additional error handling and debug information
+
+    #Function outputs server response body
+    #and performs validation of http_code
+
+    local status
+    local curl_response_file="$(mktemp -p /tmp)"
+    local curl_common_flags=(-s -w "%{http_code}" -o "${curl_response_file}")
+    local command=(curl "${curl_common_flags[@]}" "$@")
+
+    echo "[INFO] Running '${command[@]}'" >&2
+    if ! status="$("${command[@]}")"; then
+        echo "[ERROR] Internal curl error! '$status'" >&2
+        cat "${curl_response_file}"
+        rm "${curl_response_file}"
+        return 2
+    else
+        echo "[INFO] Server replied with status: ${status}" >&2
+        cat "${curl_response_file}"
+        rm "${curl_response_file}"
+        if [[ "${status:0:1}" =~ [45] ]]; then
+            return 1
+        else
+            return 0
+        fi
+    fi
+}
+
+function delete_resource {
+    #Issues DELETE http call to provided endpoint
+    #and further validates by following GET request
+
+    call_api -X DELETE "$1"
+    ! call_api -X GET "$1" >/dev/null
+}
+
 # init_network() - This function creates the OVN resouces required by the test
 function init_network {
     local fname=$1

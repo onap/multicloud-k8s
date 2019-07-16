@@ -99,7 +99,6 @@ kubectl get --no-headers=true --namespace=${namespace} service edgex-core-comman
 print_msg "Retrieving VNF details"
 call_api "${base_url}/instance/${vnf_id}"
 
-
 #Teardown
 print_msg "Deleting VNF Instance"
 delete_resource "${base_url}/instance/${vnf_id}"

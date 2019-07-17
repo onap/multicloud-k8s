@@ -23,8 +23,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 )
 
 // ExportedVariable is what we will look for when calling the generic plugin
@@ -55,6 +56,13 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Mapping kind to resource error")
 	}
+
+	//Add the tracking label to all resources created here
+	labels := unstruct.GetLabels()
+	labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
+	unstruct.SetLabels(labels)
+
+	plugin.TagPodTemplateSpec(unstruct, client.GetInstanceID())
 
 	gvr := mapping.Resource
 	var createdObj *unstructured.Unstructured

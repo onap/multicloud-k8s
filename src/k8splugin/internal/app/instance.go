@@ -116,8 +116,10 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
 
+	id := generateInstanceID()
+
 	k8sClient := KubernetesClient{}
-	err = k8sClient.init(i.CloudRegion)
+	err = k8sClient.init(i.CloudRegion, id)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
@@ -126,8 +128,6 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
 	}
-
-	id := generateInstanceID()
 
 	//Compose the return response
 	resp := InstanceResponse{
@@ -250,7 +250,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.init(inst.Request.CloudRegion)
+	err = k8sClient.init(inst.Request.CloudRegion, inst.ID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}

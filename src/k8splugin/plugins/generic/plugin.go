@@ -21,6 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 )
@@ -56,6 +57,20 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Mapping kind to resource error")
 	}
+
+	//Add the tracking label to all resources created here
+	labels := unstruct.GetLabels()
+	//Check if labels exist for this object
+	if labels == nil {
+		labels = map[string]string{}
+	}
+	labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
+	unstruct.SetLabels(labels)
+
+	// This checks if the resource we are creating has a podSpec in it
+	// Eg: Deployment, StatefulSet, Job etc..
+	// If a PodSpec is found, the label will be added to it too.
+	plugin.TagPodsIfPresent(unstruct, client.GetInstanceID())
 
 	gvr := mapping.Resource
 	var createdObj *unstructured.Unstructured

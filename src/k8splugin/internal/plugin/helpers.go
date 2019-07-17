@@ -17,14 +17,18 @@
 package plugin
 
 import (
+	"encoding/json"
 	"log"
 	"strings"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -45,6 +49,9 @@ type KubernetesConnector interface {
 	// GetStandardClient returns the standard client that can be used to handle
 	// standard kubernetes kinds
 	GetStandardClient() kubernetes.Interface
+
+	//GetInstanceID returns the InstanceID for tracking during creation
+	GetInstanceID() string
 }
 
 // Reference is the interface that is implemented
@@ -89,4 +96,52 @@ func GetPluginByKind(kind string) (Reference, error) {
 	}
 
 	return pluginImpl, nil
+}
+
+// TagPodTemplateSpec finds the PodTemplateSpec from any workload
+// object that contains it and changes the spec to include the tag label
+func TagPodTemplateSpec(unstruct *unstructured.Unstructured, tag string) {
+
+	spec, ok := unstruct.Object["spec"].(map[string]interface{})
+	if !ok {
+		log.Println("Error converting spec to map")
+		return
+	}
+	template, ok := spec["template"].(map[string]interface{})
+	if !ok {
+		log.Println("Error converting template to map")
+		return
+	}
+
+	data, err := json.Marshal(template)
+	if err != nil {
+		log.Println("Error Marshaling Podspec")
+		return
+	}
+
+	//Attempt to convert the template to a podtemplatespec.
+	//This is to check if we have any pods being created.
+	podTemplateSpec := &corev1.PodTemplateSpec{}
+	_, err = podTemplateSpec.MarshalTo(data)
+	if err != nil {
+		log.Println("Error Marshaling to podtemplatespec" + err.Error())
+		return
+	}
+
+	//At this point, we know that the data contains a PodTemplateSpec
+	metadata, ok := template["metadata"].(map[string]interface{})
+	if !ok {
+		log.Println("Error converting metadata to map")
+		return
+	}
+
+	//Get the labels map
+	labels, ok := metadata["labels"].(map[string]interface{})
+	if !ok {
+		log.Println("Error converting labels to map")
+		return
+	}
+
+	//Add the tag label
+	labels[config.GetConfiguration().KubernetesLabelName] = tag
 }

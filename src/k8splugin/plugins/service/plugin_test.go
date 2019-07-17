@@ -14,10 +14,11 @@ limitations under the License.
 package main
 
 import (
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -43,6 +44,10 @@ func (t TestKubernetesConnector) GetDynamicClient() dynamic.Interface {
 
 func (t TestKubernetesConnector) GetStandardClient() kubernetes.Interface {
 	return fake.NewSimpleClientset(t.object)
+}
+
+func (t TestKubernetesConnector) GetInstanceID() string {
+	return ""
 }
 
 func TestCreateService(t *testing.T) {

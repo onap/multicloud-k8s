@@ -46,6 +46,10 @@ func (t TestKubernetesConnector) GetStandardClient() kubernetes.Interface {
 	return fake.NewSimpleClientset(t.object)
 }
 
+func (t TestKubernetesConnector) GetInstanceID() string {
+	return ""
+}
+
 func TestCreateNamespace(t *testing.T) {
 	testCases := []struct {
 		label          string

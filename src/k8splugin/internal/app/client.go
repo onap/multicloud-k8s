@@ -39,6 +39,7 @@ type KubernetesClient struct {
 	dynamicClient  dynamic.Interface
 	discoverClient discovery.CachedDiscoveryInterface
 	restMapper     meta.RESTMapper
+	instanceID     string
 }
 
 // getKubeConfig uses the connectivity client to get the kubeconfig based on the name
@@ -55,10 +56,16 @@ func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
 }
 
 // init loads the Kubernetes configuation values stored into the local configuration file
-func (k *KubernetesClient) init(cloudregion string) error {
+func (k *KubernetesClient) init(cloudregion string, iid string) error {
 	if cloudregion == "" {
 		return pkgerrors.New("Cloudregion is empty")
 	}
+
+	if iid == "" {
+		return pkgerrors.New("Instance ID is empty")
+	}
+
+	k.instanceID = iid
 
 	configPath, err := k.getKubeConfig(cloudregion)
 	if err != nil {
@@ -89,6 +96,7 @@ func (k *KubernetesClient) init(cloudregion string) error {
 	}
 
 	k.restMapper = restmapper.NewDeferredDiscoveryRESTMapper(k.discoverClient)
+
 	return nil
 }
 
@@ -211,4 +219,10 @@ func (k *KubernetesClient) GetDynamicClient() dynamic.Interface {
 // standard kubernetes kinds
 func (k *KubernetesClient) GetStandardClient() kubernetes.Interface {
 	return k.clientSet
+}
+
+//GetInstanceID returns the instanceID that is injected into all the
+//resources created by the plugin
+func (k *KubernetesClient) GetInstanceID() string {
+	return k.instanceID
 }

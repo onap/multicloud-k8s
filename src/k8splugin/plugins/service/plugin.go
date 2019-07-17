@@ -22,6 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 )
@@ -48,6 +49,10 @@ func (p servicePlugin) Create(yamlFilePath string, namespace string, client plug
 		return "", pkgerrors.New("Decoded object contains another resource different than Service")
 	}
 	service.Namespace = namespace
+
+	labels := service.GetLabels()
+	labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
+	service.SetLabels(labels)
 
 	result, err := client.GetStandardClient().CoreV1().Services(namespace).Create(service)
 	if err != nil {

@@ -20,8 +20,9 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 	"net/http"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	"github.com/gorilla/mux"
 )
@@ -108,6 +109,25 @@ func (h rbDefinitionHandler) listVersionsHandler(w http.ResponseWriter, r *http.
 	name := vars["rbname"]
 
 	ret, err := h.client.List(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// listVersionsHandler handles GET (list) operations on the endpoint
+// Returns a list of rb.Definitions
+func (h rbDefinitionHandler) listAllHandler(w http.ResponseWriter, r *http.Request) {
+
+	ret, err := h.client.List("")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -121,10 +121,13 @@ func (v *DefinitionClient) List(name string) ([]Definition, error) {
 				log.Printf("[Definition] Error Unmarshaling value for: %s", key)
 				continue
 			}
+
 			//Select only the definitions that match name provided
-			if def.RBName == name {
+			//If name is empty, return all
+			if def.RBName == name || name == "" {
 				results = append(results, def)
 			}
+
 		}
 	}
 

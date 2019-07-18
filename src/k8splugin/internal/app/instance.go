@@ -19,6 +19,7 @@ package app
 import (
 	"encoding/base64"
 	"encoding/json"
+	"log"
 	"math/rand"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
@@ -46,10 +47,20 @@ type InstanceResponse struct {
 	Resources []helm.KubernetesResource `json:"resources"`
 }
 
+// InstanceMiniResponse contains the response from instantiation
+// It does NOT include the created resources.
+// Use the regular GET to get the created resources for a particular instance
+type InstanceMiniResponse struct {
+	ID        string          `json:"id"`
+	Request   InstanceRequest `json:"request"`
+	Namespace string          `json:"namespace"`
+}
+
 // InstanceManager is an interface exposes the instantiation functionality
 type InstanceManager interface {
 	Create(i InstanceRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
+	List() ([]InstanceMiniResponse, error)
 	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceResponse, error)
 	Delete(id string) error
 }
@@ -169,6 +180,37 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 	}
 
 	return InstanceResponse{}, pkgerrors.New("Error getting Instance")
+}
+
+// List returns the instance for corresponding ID
+// Empty string returns all
+func (v *InstanceClient) List() ([]InstanceMiniResponse, error) {
+
+	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagInst)
+	if err != nil || len(dbres) == 0 {
+		return []InstanceMiniResponse{}, pkgerrors.Wrap(err, "Listing Instances")
+	}
+
+	var results []InstanceMiniResponse
+	for key, value := range dbres {
+		//value is a byte array
+		if value != nil {
+			resp := InstanceResponse{}
+			err = db.DBconn.Unmarshal(value, &resp)
+			if err != nil {
+				log.Printf("[Instance] Error: %s Unmarshaling Instance: %s", err.Error(), key)
+			}
+
+			miniresp := InstanceMiniResponse{
+				ID:        resp.ID,
+				Request:   resp.Request,
+				Namespace: resp.Namespace,
+			}
+			results = append(results, miniresp)
+		}
+	}
+
+	return results, nil
 }
 
 // Find returns the instances that match the given criteria

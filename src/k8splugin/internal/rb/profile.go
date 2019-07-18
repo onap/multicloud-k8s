@@ -78,8 +78,8 @@ type ProfileClient struct {
 func NewProfileClient() *ProfileClient {
 	return &ProfileClient{
 		storeName:    "rbdef",
-		tagMeta:      "metadata",
-		tagContent:   "content",
+		tagMeta:      "profilemetadata",
+		tagContent:   "profilecontent",
 		manifestName: "manifest.yaml",
 	}
 }

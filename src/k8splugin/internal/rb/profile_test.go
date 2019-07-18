@@ -145,7 +145,7 @@ func TestGetProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -265,7 +265,7 @@ func TestUploadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -306,7 +306,7 @@ func TestUploadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile2"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -330,7 +330,7 @@ func TestUploadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -425,14 +425,14 @@ func TestDownloadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
 								"\"rb-name\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
 								"\"kubernetesversion\":\"1.12.3\"}"),
-						"content": []byte("H4sICLBr9FsAA3Rlc3QudGFyAO3OQQrCMBCF4aw9RU5" +
+						"profilecontent": []byte("H4sICLBr9FsAA3Rlc3QudGFyAO3OQQrCMBCF4aw9RU5" +
 							"QEtLE40igAUtSC+2IHt9IEVwIpYtShP/bvGFmFk/SLI08Re3IVCG077Rn" +
 							"b75zYZ2yztVV8N7XP9vWSWmzZ6mP+yxx0lrF7pJzjkN/Sz//1u5/6ppKG" +
 							"R/jVLrT0VUAAAAAAAAAAAAAAAAAABu8ALXoSvkAKAAA"),
@@ -449,7 +449,7 @@ func TestDownloadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile2"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -512,7 +512,7 @@ func TestResolveProfile(t *testing.T) {
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1",
 						ProfileName: "profile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"profile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -520,7 +520,7 @@ func TestResolveProfile(t *testing.T) {
 								"\"rb-version\":\"v1\"," +
 								"\"kubernetesversion\":\"1.12.3\"}"),
 						// base64 encoding of vagrant/tests/vnfs/testrb/helm/profile
-						"content": []byte("H4sICLmjT1wAA3Byb2ZpbGUudGFyAO1Y32/bNhD2s/6Kg/KyYZZsy" +
+						"profilecontent": []byte("H4sICLmjT1wAA3Byb2ZpbGUudGFyAO1Y32/bNhD2s/6Kg/KyYZZsy" +
 							"78K78lLMsxY5gRxmqIYhoKWaJsYJWokZdfo+r/vSFmunCZNBtQJ1vF7sXX36e54vDN5T" +
 							"knGFlTpcEtS3jgO2ohBr2c/EXc/29Gg1+h0e1F32Ol1B1Gj3Ymifr8B7SPFc4BCaSIBG" +
 							"lII/SXeY/r/KIIg8NZUKiayEaw7nt7mdOQBrAkvqBqBL1ArWULflRJbJz4SYpEt2FJSJ" +

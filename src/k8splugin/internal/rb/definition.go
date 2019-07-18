@@ -79,8 +79,8 @@ type DefinitionClient struct {
 func NewDefinitionClient() *DefinitionClient {
 	return &DefinitionClient{
 		storeName:  "rbdef",
-		tagMeta:    "metadata",
-		tagContent: "content",
+		tagMeta:    "defmetadata",
+		tagContent: "defcontent",
 	}
 }
 

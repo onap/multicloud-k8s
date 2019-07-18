@@ -56,7 +56,7 @@ func TestCreateProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -79,7 +79,7 @@ func TestCreateProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v2"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -545,13 +545,13 @@ func TestResolveProfile(t *testing.T) {
 							"yJ66WPQwcHBwcHBwcHBwcHBwcHBwcHhm8Q/mTHqWgAoAAA="),
 					},
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
 								"\"chart-name\":\"vault-consul-dev\"," +
 								"\"description\":\"testresourcebundle\"}"),
 						// base64 encoding of vagrant/tests/vnfs/testrb/helm/vault-consul-dev
-						"content": []byte("H4sICEetS1wAA3ZhdWx0LWNvbnN1bC1kZXYudGFyAO0c7XLbNjK/+R" +
+						"defcontent": []byte("H4sICEetS1wAA3ZhdWx0LWNvbnN1bC1kZXYudGFyAO0c7XLbNjK/+R" +
 							"QYujdJehatb+V4czPnOmnPk9bO2Gk7nbaTgUhIxpgiGAK0o3P9QPca92S3C5AU9GXZiax" +
 							"c7rA/LJEAFovdxX4AK1/RIlGNSKSySBoxuzp4sn1oAgx6Pf0JsPipv7c63XZ70O61W4Mn" +
 							"zVZ7MGg9Ib1HoGUJCqloTsiTXAh1V79N7V8oXC3K/+iC5iqY0kmytTlQwP1ud538W51Wf" +

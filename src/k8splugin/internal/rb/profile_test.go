@@ -18,10 +18,12 @@ package rb
 
 import (
 	"bytes"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -180,6 +182,106 @@ func TestGetProfile(t *testing.T) {
 			} else {
 				if reflect.DeepEqual(testCase.expected, got) == false {
 					t.Errorf("Get Resource Bundle returned unexpected body: got %v;"+
+						" expected %v", got, testCase.expected)
+				}
+			}
+		})
+	}
+}
+
+func TestListProfile(t *testing.T) {
+
+	testCases := []struct {
+		label         string
+		name          string
+		rbdef         string
+		version       string
+		expectedError string
+		mockdb        *db.MockDB
+		expected      []Profile
+	}{
+		{
+			label:   "List Resource Bundle Profile",
+			name:    "testresourcebundle",
+			rbdef:   "testresourcebundle",
+			version: "v1",
+			expected: []Profile{
+				{
+					ProfileName:       "testprofile1",
+					ReleaseName:       "testprofilereleasename",
+					Namespace:         "testnamespace",
+					KubernetesVersion: "1.12.3",
+					RBName:            "testresourcebundle",
+					RBVersion:         "v1",
+				},
+				{
+					ProfileName:       "testprofile2",
+					ReleaseName:       "testprofilereleasename2",
+					Namespace:         "testnamespace2",
+					KubernetesVersion: "1.12.3",
+					RBName:            "testresourcebundle",
+					RBVersion:         "v1",
+				},
+			},
+			expectedError: "",
+			mockdb: &db.MockDB{
+				Items: map[string]map[string][]byte{
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
+						"profilemetadata": []byte(
+							"{\"profile-name\":\"testprofile1\"," +
+								"\"release-name\":\"testprofilereleasename\"," +
+								"\"namespace\":\"testnamespace\"," +
+								"\"rb-name\":\"testresourcebundle\"," +
+								"\"rb-version\":\"v1\"," +
+								"\"kubernetes-version\":\"1.12.3\"}"),
+					},
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile2"}.String(): {
+						"profilemetadata": []byte(
+							"{\"profile-name\":\"testprofile2\"," +
+								"\"release-name\":\"testprofilereleasename2\"," +
+								"\"namespace\":\"testnamespace2\"," +
+								"\"rb-name\":\"testresourcebundle\"," +
+								"\"rb-version\":\"v1\"," +
+								"\"kubernetes-version\":\"1.12.3\"}"),
+					},
+				},
+			},
+		},
+		{
+			label:         "List Error",
+			expectedError: "DB Error",
+			mockdb: &db.MockDB{
+				Err: pkgerrors.New("DB Error"),
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			db.DBconn = testCase.mockdb
+			impl := NewProfileClient()
+			got, err := impl.List(testCase.rbdef, testCase.version)
+			if err != nil {
+				if testCase.expectedError == "" {
+					t.Fatalf("List returned an unexpected error %s", err)
+				}
+				if strings.Contains(err.Error(), testCase.expectedError) == false {
+					t.Fatalf("List returned an unexpected error %s", err)
+				}
+			} else {
+				// Since the order of returned slice is not guaranteed
+				// Check both and return error if both don't match
+				sort.Slice(got, func(i, j int) bool {
+					return got[i].ProfileName < got[j].ProfileName
+				})
+				// Sort both as it is not expected that testCase.expected
+				// is sorted
+				sort.Slice(testCase.expected, func(i, j int) bool {
+					return testCase.expected[i].ProfileName < testCase.expected[j].ProfileName
+				})
+
+				if reflect.DeepEqual(testCase.expected, got) == false {
+					t.Errorf("List Resource Bundle returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "750d1c7e_88bc5921",
+        "filename": "kud/deployment_infra/galaxy-requirements.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-07-19T20:59:08Z",
+      "side": 1,
+      "message": "Version is different from the one in kud_vars.yml. Is this role required to be here?",
+      "range": {
+        "startLine": 11,
+        "startChar": 2,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "5a663844de500e8b701c528dfc60fb89563d29a0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

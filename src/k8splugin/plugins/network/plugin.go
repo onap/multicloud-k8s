@@ -18,8 +18,8 @@ import (
 	"regexp"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -43,7 +43,7 @@ func extractData(data string) (cniType, networkName string) {
 }
 
 // Create an ONAP Network object
-func (p networkPlugin) Create(yamlFilePath string, namespace string, client *app.KubernetesClient) (string, error) {
+func (p networkPlugin) Create(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
 	network := &v1.OnapNetwork{}
 	if _, err := utils.DecodeYAML(yamlFilePath, network); err != nil {
 		return "", pkgerrors.Wrap(err, "Decode network object error")
@@ -69,19 +69,19 @@ func (p networkPlugin) Create(yamlFilePath string, namespace string, client *app
 }
 
 // Get a Network
-func (p networkPlugin) Get(resource helm.KubernetesResource, namespace string, client *app.KubernetesClient) (string, error) {
+func (p networkPlugin) Get(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) (string, error) {
 	return "", nil
 }
 
 // List of Networks
 func (p networkPlugin) List(gvk schema.GroupVersionKind, namespace string,
-	client *app.KubernetesClient) ([]helm.KubernetesResource, error) {
+	client plugin.KubernetesConnector) ([]helm.KubernetesResource, error) {
 
 	return nil, nil
 }
 
 // Delete an existing Network
-func (p networkPlugin) Delete(resource helm.KubernetesResource, namespace string, client *app.KubernetesClient) error {
+func (p networkPlugin) Delete(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) error {
 	cniType, networkName := extractData(resource.Name)
 	typePlugin, ok := utils.LoadedPlugins[cniType+"-network"]
 	if !ok {

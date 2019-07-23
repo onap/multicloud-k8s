@@ -85,7 +85,7 @@ func defaultConfiguration() *Configuration {
 		EtcdCert:          "etcd.cert",
 		EtcdKey:           "etcd.key",
 		EtcdCAFile:        "etcd-ca.cert",
-		OVNCentralAddress: "127.0.0.1",
+		OVNCentralAddress: "127.0.0.1:6641",
 		ServicePort:       "9015",
 	}
 }

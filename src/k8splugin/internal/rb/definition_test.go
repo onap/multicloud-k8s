@@ -113,14 +113,14 @@ func TestListDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
 								"\"chart-name\":\"testchart\"}"),
 					},
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v2"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle_version2\"," +
 								"\"rb-version\":\"v2\"," +
@@ -196,7 +196,7 @@ func TestGetDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -326,7 +326,7 @@ func TestUploadDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"}"),
@@ -362,7 +362,7 @@ func TestUploadDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -400,7 +400,7 @@ func TestUploadDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -438,7 +438,7 @@ func TestUploadDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -459,7 +459,7 @@ func TestUploadDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -551,12 +551,12 @@ func TestDownloadDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
 								"\"chart-name\":\"firewall\"}"),
-						"content": []byte("H4sICLBr9FsAA3Rlc3QudGFyAO3OQQrCMBCF4aw9RU5" +
+						"defcontent": []byte("H4sICLBr9FsAA3Rlc3QudGFyAO3OQQrCMBCF4aw9RU5" +
 							"QEtLE40igAUtSC+2IHt9IEVwIpYtShP/bvGFmFk/SLI08Re3IVCG077Rn" +
 							"b75zYZ2yztVV8N7XP9vWSWmzZ6mP+yxx0lrF7pJzjkN/Sz//1u5/6ppKG" +
 							"R/jVLrT0VUAAAAAAAAAAAAAAAAAABu8ALXoSvkAKAAA"),
@@ -572,7 +572,7 @@ func TestDownloadDefinition(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +

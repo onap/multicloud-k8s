@@ -18,10 +18,12 @@ package rb
 
 import (
 	"bytes"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -56,7 +58,7 @@ func TestCreateProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -79,7 +81,7 @@ func TestCreateProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v2"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"description\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
@@ -145,7 +147,7 @@ func TestGetProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -180,6 +182,106 @@ func TestGetProfile(t *testing.T) {
 			} else {
 				if reflect.DeepEqual(testCase.expected, got) == false {
 					t.Errorf("Get Resource Bundle returned unexpected body: got %v;"+
+						" expected %v", got, testCase.expected)
+				}
+			}
+		})
+	}
+}
+
+func TestListProfile(t *testing.T) {
+
+	testCases := []struct {
+		label         string
+		name          string
+		rbdef         string
+		version       string
+		expectedError string
+		mockdb        *db.MockDB
+		expected      []Profile
+	}{
+		{
+			label:   "List Resource Bundle Profile",
+			name:    "testresourcebundle",
+			rbdef:   "testresourcebundle",
+			version: "v1",
+			expected: []Profile{
+				{
+					ProfileName:       "testprofile1",
+					ReleaseName:       "testprofilereleasename",
+					Namespace:         "testnamespace",
+					KubernetesVersion: "1.12.3",
+					RBName:            "testresourcebundle",
+					RBVersion:         "v1",
+				},
+				{
+					ProfileName:       "testprofile2",
+					ReleaseName:       "testprofilereleasename2",
+					Namespace:         "testnamespace2",
+					KubernetesVersion: "1.12.3",
+					RBName:            "testresourcebundle",
+					RBVersion:         "v1",
+				},
+			},
+			expectedError: "",
+			mockdb: &db.MockDB{
+				Items: map[string]map[string][]byte{
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
+						"profilemetadata": []byte(
+							"{\"profile-name\":\"testprofile1\"," +
+								"\"release-name\":\"testprofilereleasename\"," +
+								"\"namespace\":\"testnamespace\"," +
+								"\"rb-name\":\"testresourcebundle\"," +
+								"\"rb-version\":\"v1\"," +
+								"\"kubernetes-version\":\"1.12.3\"}"),
+					},
+					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile2"}.String(): {
+						"profilemetadata": []byte(
+							"{\"profile-name\":\"testprofile2\"," +
+								"\"release-name\":\"testprofilereleasename2\"," +
+								"\"namespace\":\"testnamespace2\"," +
+								"\"rb-name\":\"testresourcebundle\"," +
+								"\"rb-version\":\"v1\"," +
+								"\"kubernetes-version\":\"1.12.3\"}"),
+					},
+				},
+			},
+		},
+		{
+			label:         "List Error",
+			expectedError: "DB Error",
+			mockdb: &db.MockDB{
+				Err: pkgerrors.New("DB Error"),
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			db.DBconn = testCase.mockdb
+			impl := NewProfileClient()
+			got, err := impl.List(testCase.rbdef, testCase.version)
+			if err != nil {
+				if testCase.expectedError == "" {
+					t.Fatalf("List returned an unexpected error %s", err)
+				}
+				if strings.Contains(err.Error(), testCase.expectedError) == false {
+					t.Fatalf("List returned an unexpected error %s", err)
+				}
+			} else {
+				// Since the order of returned slice is not guaranteed
+				// Check both and return error if both don't match
+				sort.Slice(got, func(i, j int) bool {
+					return got[i].ProfileName < got[j].ProfileName
+				})
+				// Sort both as it is not expected that testCase.expected
+				// is sorted
+				sort.Slice(testCase.expected, func(i, j int) bool {
+					return testCase.expected[i].ProfileName < testCase.expected[j].ProfileName
+				})
+
+				if reflect.DeepEqual(testCase.expected, got) == false {
+					t.Errorf("List Resource Bundle returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}
@@ -265,7 +367,7 @@ func TestUploadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -306,7 +408,7 @@ func TestUploadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile2"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -330,7 +432,7 @@ func TestUploadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -425,14 +527,14 @@ func TestDownloadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
 								"\"rb-name\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
 								"\"kubernetesversion\":\"1.12.3\"}"),
-						"content": []byte("H4sICLBr9FsAA3Rlc3QudGFyAO3OQQrCMBCF4aw9RU5" +
+						"profilecontent": []byte("H4sICLBr9FsAA3Rlc3QudGFyAO3OQQrCMBCF4aw9RU5" +
 							"QEtLE40igAUtSC+2IHt9IEVwIpYtShP/bvGFmFk/SLI08Re3IVCG077Rn" +
 							"b75zYZ2yztVV8N7XP9vWSWmzZ6mP+yxx0lrF7pJzjkN/Sz//1u5/6ppKG" +
 							"R/jVLrT0VUAAAAAAAAAAAAAAAAAABu8ALXoSvkAKAAA"),
@@ -449,7 +551,7 @@ func TestDownloadProfile(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1", ProfileName: "testprofile2"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"testprofile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -512,7 +614,7 @@ func TestResolveProfile(t *testing.T) {
 				Items: map[string]map[string][]byte{
 					ProfileKey{RBName: "testresourcebundle", RBVersion: "v1",
 						ProfileName: "profile1"}.String(): {
-						"metadata": []byte(
+						"profilemetadata": []byte(
 							"{\"profile-name\":\"profile1\"," +
 								"\"release-name\":\"testprofilereleasename\"," +
 								"\"namespace\":\"testnamespace\"," +
@@ -520,7 +622,7 @@ func TestResolveProfile(t *testing.T) {
 								"\"rb-version\":\"v1\"," +
 								"\"kubernetesversion\":\"1.12.3\"}"),
 						// base64 encoding of vagrant/tests/vnfs/testrb/helm/profile
-						"content": []byte("H4sICLmjT1wAA3Byb2ZpbGUudGFyAO1Y32/bNhD2s/6Kg/KyYZZsy" +
+						"profilecontent": []byte("H4sICLmjT1wAA3Byb2ZpbGUudGFyAO1Y32/bNhD2s/6Kg/KyYZZsy" +
 							"78K78lLMsxY5gRxmqIYhoKWaJsYJWokZdfo+r/vSFmunCZNBtQJ1vF7sXX36e54vDN5T" +
 							"knGFlTpcEtS3jgO2ohBr2c/EXc/29Gg1+h0e1F32Ol1B1Gj3Ymifr8B7SPFc4BCaSIBG" +
 							"lII/SXeY/r/KIIg8NZUKiayEaw7nt7mdOQBrAkvqBqBL1ArWULflRJbJz4SYpEt2FJSJ" +
@@ -545,13 +647,13 @@ func TestResolveProfile(t *testing.T) {
 							"yJ66WPQwcHBwcHBwcHBwcHBwcHBwcHhm8Q/mTHqWgAoAAA="),
 					},
 					DefinitionKey{RBName: "testresourcebundle", RBVersion: "v1"}.String(): {
-						"metadata": []byte(
+						"defmetadata": []byte(
 							"{\"rb-name\":\"testresourcebundle\"," +
 								"\"rb-version\":\"v1\"," +
 								"\"chart-name\":\"vault-consul-dev\"," +
 								"\"description\":\"testresourcebundle\"}"),
 						// base64 encoding of vagrant/tests/vnfs/testrb/helm/vault-consul-dev
-						"content": []byte("H4sICEetS1wAA3ZhdWx0LWNvbnN1bC1kZXYudGFyAO0c7XLbNjK/+R" +
+						"defcontent": []byte("H4sICEetS1wAA3ZhdWx0LWNvbnN1bC1kZXYudGFyAO0c7XLbNjK/+R" +
 							"QYujdJehatb+V4czPnOmnPk9bO2Gk7nbaTgUhIxpgiGAK0o3P9QPca92S3C5AU9GXZiax" +
 							"c7rA/LJEAFovdxX4AK1/RIlGNSKSySBoxuzp4sn1oAgx6Pf0JsPipv7c63XZ70O61W4Mn" +
 							"zVZ7MGg9Ib1HoGUJCqloTsiTXAh1V79N7V8oXC3K/+iC5iqY0kmytTlQwP1ud538W51Wf" +

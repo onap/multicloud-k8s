@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"log"
 	"path/filepath"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
@@ -44,6 +45,7 @@ type Profile struct {
 type ProfileManager interface {
 	Create(def Profile) (Profile, error)
 	Get(rbName, rbVersion, prName string) (Profile, error)
+	List(rbName, rbVersion string) ([]Profile, error)
 	Delete(rbName, rbVersion, prName string) error
 	Upload(rbName, rbVersion, prName string, inp []byte) error
 }
@@ -78,8 +80,8 @@ type ProfileClient struct {
 func NewProfileClient() *ProfileClient {
 	return &ProfileClient{
 		storeName:    "rbdef",
-		tagMeta:      "metadata",
-		tagContent:   "content",
+		tagMeta:      "profilemetadata",
+		tagContent:   "profilecontent",
 		manifestName: "manifest.yaml",
 	}
 }
@@ -146,6 +148,38 @@ func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
 	}
 
 	return Profile{}, pkgerrors.New("Error getting Resource Bundle Profile")
+}
+
+// List returns the Resource Bundle Profile for corresponding ID
+func (v *ProfileClient) List(rbName, rbVersion string) ([]Profile, error) {
+
+	//Get all profiles
+	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
+	if err != nil || len(dbres) == 0 {
+		return []Profile{}, pkgerrors.Wrap(err, "No Profiles Found")
+	}
+
+	var results []Profile
+	for key, value := range dbres {
+		//value is a byte array
+		if value != nil {
+			pr := Profile{}
+			err = db.DBconn.Unmarshal(value, &pr)
+			if err != nil {
+				log.Printf("[Profile] Error: %s Unmarshaling value for: %s", err.Error(), key)
+				continue
+			}
+			if pr.RBName == rbName && pr.RBVersion == rbVersion {
+				results = append(results, pr)
+			}
+		}
+	}
+
+	if len(results) == 0 {
+		return results, pkgerrors.New("No Profiles Found for Definition and Version")
+	}
+
+	return results, nil
 }
 
 // Delete the Resource Bundle Profile from database

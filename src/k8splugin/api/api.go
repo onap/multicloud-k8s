@@ -38,6 +38,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	instHandler := instanceHandler{client: instClient}
 	instRouter := router.PathPrefix("/v1").Subrouter()
 	instRouter.HandleFunc("/instance", instHandler.createHandler).Methods("POST")
+	instRouter.HandleFunc("/instance", instHandler.listHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}", instHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}", instHandler.deleteHandler).Methods("DELETE")
 	// (TODO): Fix update method

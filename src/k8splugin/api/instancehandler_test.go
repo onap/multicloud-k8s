@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"sort"
 	"testing"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
@@ -38,8 +39,9 @@ type mockInstanceClient struct {
 	app.InstanceManager
 	// Items and err will be used to customize each test
 	// via a localized instantiation of mockInstanceClient
-	items []app.InstanceResponse
-	err   error
+	items     []app.InstanceResponse
+	miniitems []app.InstanceMiniResponse
+	err       error
 }
 
 func (m *mockInstanceClient) Create(inp app.InstanceRequest) (app.InstanceResponse, error) {
@@ -56,6 +58,14 @@ func (m *mockInstanceClient) Get(id string) (app.InstanceResponse, error) {
 	}
 
 	return m.items[0], nil
+}
+
+func (m *mockInstanceClient) List() ([]app.InstanceMiniResponse, error) {
+	if m.err != nil {
+		return []app.InstanceMiniResponse{}, m.err
+	}
+
+	return m.miniitems, nil
 }
 
 func (m *mockInstanceClient) Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]app.InstanceResponse, error) {
@@ -289,6 +299,110 @@ func TestInstanceGetHandler(t *testing.T) {
 					t.Fatalf("Parsing the returned response got an error (%s)", err)
 				}
 				if !reflect.DeepEqual(testCase.expectedResponse, &response) {
+					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+						&response, testCase.expectedResponse)
+				}
+			}
+		})
+	}
+}
+
+func TestInstanceListHandler(t *testing.T) {
+	testCases := []struct {
+		label            string
+		input            string
+		expectedCode     int
+		expectedResponse []app.InstanceMiniResponse
+		instClient       *mockInstanceClient
+	}{
+		{
+			label:        "Fail to List Instance",
+			input:        "HaKpys8e",
+			expectedCode: http.StatusInternalServerError,
+			instClient: &mockInstanceClient{
+				err: pkgerrors.New("Internal error"),
+			},
+		},
+		{
+			label:        "Succesful List Instances",
+			expectedCode: http.StatusOK,
+			expectedResponse: []app.InstanceMiniResponse{
+				{
+					ID: "HaKpys8e",
+					Request: app.InstanceRequest{
+						RBName:      "test-rbdef",
+						RBVersion:   "v1",
+						ProfileName: "profile1",
+						CloudRegion: "region1",
+					},
+					Namespace: "testnamespace",
+				},
+				{
+					ID: "HaKpys8f",
+					Request: app.InstanceRequest{
+						RBName:      "test-rbdef-two",
+						RBVersion:   "versionsomething",
+						ProfileName: "profile3",
+						CloudRegion: "region1",
+					},
+					Namespace: "testnamespace-two",
+				},
+			},
+			instClient: &mockInstanceClient{
+				miniitems: []app.InstanceMiniResponse{
+					{
+						ID: "HaKpys8e",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
+						Namespace: "testnamespace",
+					},
+					{
+						ID: "HaKpys8f",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef-two",
+							RBVersion:   "versionsomething",
+							ProfileName: "profile3",
+							CloudRegion: "region1",
+						},
+						Namespace: "testnamespace-two",
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			request := httptest.NewRequest("GET", "/v1/instance", nil)
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+
+			if testCase.expectedCode != resp.StatusCode {
+				t.Fatalf("Request method returned: %v and it was expected: %v",
+					resp.StatusCode, testCase.expectedCode)
+			}
+			if resp.StatusCode == http.StatusOK {
+				var response []app.InstanceMiniResponse
+				err := json.NewDecoder(resp.Body).Decode(&response)
+				if err != nil {
+					t.Fatalf("Parsing the returned response got an error (%s)", err)
+				}
+
+				// Since the order of returned slice is not guaranteed
+				// Sort them first and then do deepequal
+				// Check both and return error if both don't match
+				sort.Slice(response, func(i, j int) bool {
+					return response[i].ID < response[j].ID
+				})
+
+				sort.Slice(testCase.expectedResponse, func(i, j int) bool {
+					return testCase.expectedResponse[i].ID < testCase.expectedResponse[j].ID
+				})
+
+				if reflect.DeepEqual(testCase.expectedResponse, response) == false {
 					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
 						&response, testCase.expectedResponse)
 				}

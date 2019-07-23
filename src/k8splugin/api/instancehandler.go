@@ -106,6 +106,24 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getHandler retrieves information about an instance via the ID
+func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
+
+	resp, err := i.client.List()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // deleteHandler method terminates an instance via the ID
 func (i instanceHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

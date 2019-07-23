@@ -62,27 +62,25 @@
           mode: 0755
       when: multus_source_type == "tarball"
     - name: create multus configuration file
-      blockinfile:
-        marker: ""
-        path: /etc/cni/net.d/00-multus.conf
-        create: yes
-        block: |
-          {
-            "type": "multus",
-            "name": "multus-cni",
-            "cniVersion": "0.3.1",
-            "kubeconfig": "/etc/kubernetes/admin.conf",
-            "delegates": [
-              {
-                "type": "flannel",
+      copy:
+        dest: /etc/cni/net.d/00-multus.conf
+        content: |
+            {
+                "type": "multus",
+                "name": "multus-cni",
                 "cniVersion": "0.3.1",
-                "masterplugin": true,
-                "delegate": {
-                  "isDefaultGateway": true
-                }
-              }
-            ]
-          }
+                "kubeconfig": "/etc/kubernetes/admin.conf",
+                "delegates": [
+                    {
+                        "type": "flannel",
+                        "cniVersion": "0.3.1",
+                        "masterplugin": true,
+                        "delegate": {
+                            "isDefaultGateway": true
+                        }
+                    }
+                ]
+            }
 
 - hosts: localhost
   pre_tasks:

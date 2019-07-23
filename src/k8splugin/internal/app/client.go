@@ -122,8 +122,6 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
 	namespace string) (helm.KubernetesResource, error) {
 
-	log.Println("Processing Kind: " + resTempl.GVK.Kind)
-
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
 		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
 	}
@@ -137,6 +135,7 @@ func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
 
 	createdResourceName, err := pluginImpl.Create(resTempl.FilePath, namespace, k)
 	if err != nil {
+		log.Printf("Error: %s while creating: %s", err.Error(), resTempl.GVK.Kind)
 		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
 	}
 

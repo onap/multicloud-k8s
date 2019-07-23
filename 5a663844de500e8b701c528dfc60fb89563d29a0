@@ -46,6 +46,30 @@
       "revId": "5a663844de500e8b701c528dfc60fb89563d29a0",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "979864fe_1aba0727",
+        "filename": "kud/deployment_infra/galaxy-requirements.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-07-23T20:17:50Z",
+      "side": 1,
+      "message": "It can be the same as go_version: \u00271.12.4\u0027 in kud_vars. That way there is no confusion. I think we can change go_version: \u00271.12.5\u0027 in kud_vars",
+      "parentUuid": "46090f53_f4cb2477",
+      "range": {
+        "startLine": 11,
+        "startChar": 2,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "5a663844de500e8b701c528dfc60fb89563d29a0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

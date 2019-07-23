@@ -7,10 +7,10 @@ replicaCount: 1
 image:
   sinkrepo: rtsood/onap-vfw-demo-sink
   sinktag: 0.2.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   darkstatrepo: electrocucaracha/darkstat
   darkstattag: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 nameOverride: ""
 fullnameOverride: ""

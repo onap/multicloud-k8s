@@ -21,7 +21,8 @@ virtlet_image=virtlet.cloud/fedora
 virtlet_deployment_name=virtlet-deployment
 plugin_deployment_name=plugin-deployment
 plugin_service_name=plugin-service
-ovn4nfv_deployment_name=ovn4nfv-deployment
+ovn4nfv_deployment_name_1=ovn4nfv-deployment-1
+ovn4nfv_deployment_name_2=ovn4nfv-deployment-2
 onap_private_net=onap-private-net
 unprotected_private_net=unprotected-private-net
 protected_private_net=protected-private-net
@@ -1045,7 +1046,7 @@ resources:
   network:
     - onap-ovn4nfvk8s-network.yaml
   deployment:
-    - $ovn4nfv_deployment_name.yaml
+    - $ovn4nfv_deployment_name_1.yaml
 META
 
     cat << MULTUS_NET > onap-ovn4nfvk8s-network.yaml
@@ -1085,11 +1086,11 @@ spec:
   gateway: 172.16.44.1/24
 NETWORK
 
-    cat << DEPLOYMENT > $ovn4nfv_deployment_name.yaml
+    cat << DEPLOYMENT > $ovn4nfv_deployment_name_1.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: $ovn4nfv_deployment_name
+  name: $ovn4nfv_deployment_name_1
   labels:
     app: ovn4nfv
 spec:
@@ -1107,7 +1108,34 @@ spec:
                       { "name": "ovn-priv-net", "interface": "net1" , "defaultGateway": "false"}]'
     spec:
       containers:
-      - name: $ovn4nfv_deployment_name
+      - name: $ovn4nfv_deployment_name_1
+        image: "busybox"
+        command: ["top"]
+        stdin: true
+        tty: true
+DEPLOYMENT
+    cat << DEPLOYMENT > $ovn4nfv_deployment_name_2.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $ovn4nfv_deployment_name_2
+  labels:
+    app: ovn4nfv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ovn4nfv
+  template:
+    metadata:
+      labels:
+        app: ovn4nfv
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[{ "name": "$ovn_multus_network_name"}]'
+        ovnNetwork: '[{ "name": "ovn-port-net", "interface": "net0" , "defaultGateway": "false"}]'
+    spec:
+      containers:
+      - name: $ovn4nfv_deployment_name_2
         image: "busybox"
         command: ["top"]
         stdin: true

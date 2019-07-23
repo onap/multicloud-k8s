@@ -70,6 +70,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	resRouter.HandleFunc("/definition", defHandler.createHandler).Methods("POST")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/content", defHandler.uploadHandler).Methods("POST")
 	resRouter.HandleFunc("/definition/{rbname}", defHandler.listVersionsHandler).Methods("GET")
+	resRouter.HandleFunc("/definition", defHandler.listAllHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", defHandler.getHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", defHandler.deleteHandler).Methods("DELETE")
 

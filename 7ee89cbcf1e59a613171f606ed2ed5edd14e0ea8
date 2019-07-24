@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3396b1e7_34ade05d",
+        "filename": "kud/demo/firewall/charts/sink/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-07-24T05:33:54Z",
+      "side": 1,
+      "message": "This entry is duplicated and as far as I\u0027m aware it can be safely removed",
+      "range": {
+        "startLine": 13,
+        "startChar": 2,
+        "endLine": 13,
+        "endChar": 26
+      },
+      "revId": "7ee89cbcf1e59a613171f606ed2ed5edd14e0ea8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

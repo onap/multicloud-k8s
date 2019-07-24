@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eec98ef1_84602cf0",
+        "filename": "kud/tests/ovn4nfv.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-07-24T06:11:49Z",
+      "side": 1,
+      "message": "As unsuccessful (no reply packets returned) ping exits with non-zero return code and `kubectl exec` proxies exit code of command executed in container, I\u0027d suggest to check `kubectl` exit status instead of command output as it should be more robust",
+      "range": {
+        "startLine": 47,
+        "startChar": 4,
+        "endLine": 48,
+        "endChar": 46
+      },
+      "revId": "0316033e066e42c15924c8ec34be406782769776",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7025d2_7ec375cc",
+        "filename": "kud/tests/ovn4nfv.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-07-24T06:11:49Z",
+      "side": 1,
+      "message": "Please add `exit \u003cnon-zero\u003e`, as in current state, test will succeed, even if ping will fail",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 32
+      },
+      "revId": "0316033e066e42c15924c8ec34be406782769776",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

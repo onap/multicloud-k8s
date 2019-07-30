@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1bbaf9de_58e66af1",
+        "filename": "src/k8splugin/plugins/generic/plugin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-07-30T20:54:56Z",
+      "side": 1,
+      "message": "Are only Pod \u0026 services resource type assigned labels?",
+      "range": {
+        "startLine": 69,
+        "startChar": 8,
+        "endLine": 69,
+        "endChar": 26
+      },
+      "revId": "ce9121cda1e450971be7b95eac766e1ecd0ac7a0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -22,6 +22,30 @@
       "revId": "ce9121cda1e450971be7b95eac766e1ecd0ac7a0",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1dc6e654_7217e6a3",
+        "filename": "src/k8splugin/plugins/generic/plugin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-07-30T21:47:39Z",
+      "side": 1,
+      "message": "No. All resources created here get assigned the label. The previous line is doing that.\nHowever pods are not explicitly created and therefore we need to find the pods that will be created and modify the yaml to add the labels.",
+      "parentUuid": "1bbaf9de_58e66af1",
+      "range": {
+        "startLine": 69,
+        "startChar": 8,
+        "endLine": 69,
+        "endChar": 26
+      },
+      "revId": "ce9121cda1e450971be7b95eac766e1ecd0ac7a0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

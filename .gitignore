@@ -9,7 +9,7 @@ coverage.html
 docs/build
 
 # Directories
-pkg
+/pkg
 bin
 target
 src/github.com

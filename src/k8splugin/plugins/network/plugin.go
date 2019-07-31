@@ -31,14 +31,16 @@ var ExportedVariable networkPlugin
 type networkPlugin struct {
 }
 
-func extractData(data string) (cniType, networkName string) {
+func extractData(data string) (cniType, networkName string, err error) {
 	re := regexp.MustCompile("_")
 	split := re.Split(data, -1)
-	if len(split) != 3 {
+	if len(split) != 2 {
+		err = pkgerrors.New("Couldn't split resource '" + data +
+                            "' into CNI type and Network name")
 		return
 	}
-	cniType = split[1]
-	networkName = split[2]
+	cniType = split[0]
+	networkName = split[1]
 	return
 }
 
@@ -82,7 +84,11 @@ func (p networkPlugin) List(gvk schema.GroupVersionKind, namespace string,
 
 // Delete an existing Network
 func (p networkPlugin) Delete(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) error {
-	cniType, networkName := extractData(resource.Name)
+	cniType, networkName, err := extractData(resource.Name)
+	if err != nil {
+        return pkgerrors.Wrap(err, "Error extracting CNI type from resource")
+	}
+
 	typePlugin, ok := utils.LoadedPlugins[cniType+"-network"]
 	if !ok {
 		return pkgerrors.New("No plugin for resource " + cniType + " found")

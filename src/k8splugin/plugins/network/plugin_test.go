@@ -130,18 +130,23 @@ func TestDeleteNetwork(t *testing.T) {
 	}{
 		{
 			label:         "Fail to load non-existing plugin",
-			input:         "test",
-			expectedError: "No plugin for resource",
+			input:         "non-existing-cni_test",
+			expectedError: "No plugin for resource non-existing-cni",
+		},
+		{
+			label:         "Fail to extract cni from network name",
+			input:         "1_ovn4nfvk8s_test",
+            expectedError: "Error extracting CNI type from resource: Couldn't split resource '1_ovn4nfvk8s_test' into CNI type and Network name",
 		},
 		{
 			label:         "Fail to delete a network",
-			input:         "1_ovn4nfvk8s_test",
+			input:         "ovn4nfvk8s_test",
 			mockError:     "Internal error",
 			expectedError: "Error during the deletion for ovn4nfvk8s plugin: Internal error",
 		},
 		{
 			label: "Successfully delete a ovn4nfv network",
-			input: "1_ovn4nfvk8s_test",
+			input: "ovn4nfvk8s_test",
 		},
 	}
 

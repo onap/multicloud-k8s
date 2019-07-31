@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8fd8544_03467566",
+        "filename": "src/k8splugin/plugins/network/plugin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-07-31T19:29:47Z",
+      "side": 1,
+      "message": "Use pkgerrors.Wrap to include some context on the error.",
+      "range": {
+        "startLine": 88,
+        "startChar": 9,
+        "endLine": 88,
+        "endChar": 12
+      },
+      "revId": "ad082375cb428e59b507d31eff50ecb84236e2bc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -14,8 +14,9 @@ limitations under the License.
 package main
 
 import (
-	v1 "github.com/onap/multicloud-k8s/src/k8splugin/plugins/network/v1"
 	"regexp"
+
+	v1 "github.com/onap/multicloud-k8s/src/k8splugin/plugins/network/v1"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
@@ -24,6 +25,9 @@ import (
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+// Compile time check to see if networkPlugin implements the correct interface
+var _ plugin.Reference = networkPlugin{}
 
 // ExportedVariable is what we will look for when calling the plugin
 var ExportedVariable networkPlugin

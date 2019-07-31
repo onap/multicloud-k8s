@@ -1,0 +1,13 @@
+apiVersion: k8splugin.io/v1alpha1
+kind: ResourceBundleState
+metadata:
+  name: example-resourcebundlestate
+  namespace: test
+  labels:
+    "k8splugin.io/rb-inst-id": "bionic-beaver"
+spec:
+  selector:
+    matchLabels:
+      "k8splugin.io/rb-inst-id": "bionic-beaver"
+status:
+  ready: false

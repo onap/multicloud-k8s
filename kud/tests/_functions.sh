@@ -173,6 +173,26 @@ function wait_deployment {
     done
 }
 
+# wait_for_pod() - Wait until first pod matched by kubectl filters is in running status
+function wait_for_pod {
+    #Example usage:
+    # wait_for_pods example_pod
+    # wait_for_pods --namespace test different_pod
+    # wait_for_pods -n test -l app=plugin_test
+
+    status_phase=""
+    while [[ "$status_phase" != "Running" ]]; do
+        new_phase="$(kubectl get pods -o 'go-template={{ index .items 0 "status" "phase" }}' "$@" )"
+        if [[ "$new_phase" != "$status_phase" ]]; then
+            echo "$(date +%H:%M:%S) - Filter=[$*] : $new_phase"
+            status_phase="$new_phase"
+        fi
+        if [[ "$new_phase" == "Err"* ]]; then
+            exit 1
+        fi
+    done
+}
+
 # setup() - Base testing setup shared among functional tests
 function setup {
     if ! $(kubectl version &>/dev/null); then

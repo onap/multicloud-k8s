@@ -176,7 +176,7 @@ function install_plugin {
     if [[ "${testing_enabled}" == "true" ]]; then
         sudo ./start.sh
         pushd $kud_tests
-        for functional_test in plugin plugin_edgex; do
+        for functional_test in plugin plugin_edgex plugin_fw; do
             bash ${functional_test}.sh
         done
         popd

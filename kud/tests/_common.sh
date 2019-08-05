@@ -1144,3 +1144,17 @@ function populate_CSAR_edgex_rbdefinition {
     tar -czf rb_definition.tar.gz -C $test_folder/vnfs/edgex/helm edgex
     popd
 }
+
+# populate_CSAR_fw_rbdefinition() - Function that populates CSAR folder
+# for testing resource bundle definition of firewall scenario
+function populate_CSAR_fw_rbdefinition {
+    _checks_args "$1"
+    pushd "${CSAR_DIR}/$1"
+    print_msg "Create Helm Chart Archives for vFirewall"
+    rm -f *.tar.gz
+    # Reuse profile from the edgeX case as it is an empty profile
+    tar -czf rb_profile.tar.gz -C $test_folder/vnfs/edgex/profile .
+    tar -czf rb_definition.tar.gz -C $test_folder/../demo firewall
+    popd
+}
+

@@ -14,8 +14,6 @@ limitations under the License.
 package main
 
 import (
-	"log"
-
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,8 +21,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 )
 
 // ExportedVariable is what we will look for when calling the generic plugin
@@ -94,8 +92,6 @@ func (g genericPlugin) Get(resource helm.KubernetesResource,
 	}
 
 	gvr := mapping.Resource
-	log.Printf("Using gvr: %s, %s, %s", gvr.Group, gvr.Version, gvr.Resource)
-
 	opts := metav1.GetOptions{}
 	var unstruct *unstructured.Unstructured
 	switch mapping.Scope.Name() {
@@ -141,8 +137,6 @@ func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string
 	}
 
 	gvr := mapping.Resource
-	log.Printf("Using gvr: %s, %s, %s", gvr.Group, gvr.Version, gvr.Resource)
-
 	deletePolicy := metav1.DeletePropagationForeground
 	opts := &metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,

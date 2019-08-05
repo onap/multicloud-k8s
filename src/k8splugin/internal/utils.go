@@ -17,8 +17,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"path"
+	"path/filepath"
 	"plugin"
 	"strings"
 
@@ -52,13 +52,11 @@ func DecodeYAML(path string, into runtime.Object) (runtime.Object, error) {
 		}
 	}
 
-	log.Println("Reading YAML file")
 	rawBytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Read YAML file error")
 	}
 
-	log.Println("Decoding deployment YAML")
 	decode := scheme.Codecs.UniversalDeserializer().Decode
 	obj, _, err := decode(rawBytes, nil, into)
 	if err != nil {

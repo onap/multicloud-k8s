@@ -25,6 +25,9 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 )
 
+// Compile time check to see if genericPlugin implements the correct interface
+var _ plugin.Reference = genericPlugin{}
+
 // ExportedVariable is what we will look for when calling the generic plugin
 var ExportedVariable genericPlugin
 

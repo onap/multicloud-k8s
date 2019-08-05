@@ -26,6 +26,9 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 )
 
+// Compile time check to see if servicePlugin implements the correct interface
+var _ plugin.Reference = servicePlugin{}
+
 // ExportedVariable is what we will look for when calling the plugin
 var ExportedVariable servicePlugin
 

@@ -1,0 +1,50 @@
+
+
+#/*Copyright 2019 Intel Corporation, Inc
+# *
+# * Licensed under the Apache License, Version 2.0 (the "License");
+# * you may not use this file except in compliance with the License.
+# * You may obtain a copy of the License at
+# *
+# *     http://www.apache.org/licenses/LICENSE-2.0
+# *
+# * Unless required by applicable law or agreed to in writing, software
+# * distributed under the License is distributed on an "AS IS" BASIS,
+# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# * See the License for the specific language governing permissions and
+# * limitations under the License.
+# */
+apiVersion: istio.banzaicloud.io/v1beta1
+kind: Istio
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: {{ .Values.metadata.name }}
+spec:
+  version: {{ .Values.spec.version | quote }}
+  mtls: {{ .Values.spec.mtls }}
+  autoInjectionNamespaces: {{- range .Values.spec.autoInjectionNamespaces }}
+  - {{ . | quote  }}
+  {{- end }}
+  sds:
+    enabled: {{ .Values.spec.sds.enabled }}
+    udsPath: {{ .Values.spec.sds.udsPath | quote }}
+    useTrustworthyJwt: {{ .Values.spec.sds.useTrustworthyJwt }}
+    useNormalJwt: {{ .Values.spec.sds.useNormalJwt }}
+  gateways:
+    enabled: {{ .Values.spec.gateways.enabled }}
+    ingress:
+      enabled: {{ .Values.spec.gateways.ingress.enabled }}
+      sds:
+        enabled: {{ .Values.spec.gateways.ingress.sds.enabled }}
+        image: {{ .Values.spec.gateways.ingress.sds.image | quote }}
+        resources: {}
+        #  requests:
+        #    cpu: 100m
+        #    memory: 128Mi
+        #  limits:
+        #    cpu: 2000m
+        #    memory: 1024Mi
+  nodeAgent:
+    enabled: {{ .Values.spec.nodeAgent.enabled }}
+    image: {{ .Values.spec.nodeAgent.image | quote }}

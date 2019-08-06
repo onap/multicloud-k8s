@@ -52,11 +52,6 @@ committers:
       company: 'ATT'
       id: 'bh526r'
       timezone: 'America/Los_Angeles'
-    - name: 'Victor Morales'
-      email: 'victor.morales@intel.com'
-      company: 'Intel'
-      id: 'electrocucaracha'
-      timezone: 'America/Los_Angeles'
     - name: 'Ethan Lynn'
       email: 'ethanlynnl@vmware.com'
       company: 'VMWare'
@@ -77,6 +72,21 @@ committers:
       company: 'Wind River'
       id: 'Xiaohua626'
       timezone: 'Asia/Shanghai'
+    - name: 'Kiran Kamineni'
+      email: 'kiran.k.kamineni@intel.com'
+      company: 'Intel'
+      id: 'kirankamineni'
+      timezone: 'America/Los_Angeles'
+    - name: 'Ritu Sood'
+      email: 'ritu.sood@intel.com'
+      company: 'Intel'
+      id: 'ritusood'
+      timezone: 'America/Los_Angeles'
+    - name: 'Liexiang Yue'
+      email: 'yueliexiang@chinamobile.com'
+      company: 'China Mobile'
+      id: 'YueLiexiang'
+      timezone: 'Asia/Shanghai'
 tsc:
     approval: 'https://lists.onap.org/pipermail/onap-tsc'
     changes:
@@ -87,7 +97,8 @@ tsc:
               - 'Ethan Lynn'
               - 'Huang Haibin'
               - 'Sudhakar Reddy'
-          link: 'http://ircbot.wl.linuxfoundation.org/meetings/onap-meeting/2018/onap-meeting.2018-08-16-13.45.html'
+          link: "http://ircbot.wl.linuxfoundation.org/meetings/\
+           onap-meeting/2018/onap-meeting.2018-08-16-13.45.html"
         - type: 'Remove'
           name:
               - 'yun huang'
@@ -97,3 +108,13 @@ tsc:
         - type: 'Addition'
           name: 'Xiaohua Zhang'
           link: 'https://lists.onap.org/g/onap-tsc/message/4772'
+        - type: 'Remove'
+          name:
+              - 'Victor Morales'
+          link: 'https://lists.onap.org/g/onap-discuss/message/18280'
+        - type: 'Addition'
+          name:
+              - 'Kiran Kamineni'
+              - 'Liexiang Yue'
+              - 'Ritu Sood'
+          link: 'https://lists.onap.org/g/onap-discuss/message/18280'

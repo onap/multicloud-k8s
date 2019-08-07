@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aae42bd3_51959eb6",
+        "filename": "src/k8splugin/internal/plugin/helpers.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-08-07T17:13:01Z",
+      "side": 1,
+      "message": "This will show as an error in the logs. Is that the intent?",
+      "range": {
+        "startLine": 127,
+        "startChar": 2,
+        "endLine": 127,
+        "endChar": 66
+      },
+      "revId": "c341b33c47ae28415bdd7a6922f2582ae161489f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

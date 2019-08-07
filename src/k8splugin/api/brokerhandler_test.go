@@ -285,7 +285,7 @@ func TestBrokerFindHandler(t *testing.T) {
 				},
 			},
 			instClient: &mockInstanceClient{
-				items: []app.InstanceResponse{
+				miniitems: []app.InstanceMiniResponse{
 					{
 						ID: "HaKpys8e",
 						Request: app.InstanceRequest{
@@ -295,22 +295,6 @@ func TestBrokerFindHandler(t *testing.T) {
 							CloudRegion: "region1",
 						},
 						Namespace: "testnamespace",
-						Resources: []helm.KubernetesResource{
-							{
-								GVK: schema.GroupVersionKind{
-									Group:   "apps",
-									Version: "v1",
-									Kind:    "Deployment"},
-								Name: "test-deployment",
-							},
-							{
-								GVK: schema.GroupVersionKind{
-									Group:   "",
-									Version: "v1",
-									Kind:    "Service"},
-								Name: "test-service",
-							},
-						},
 					},
 				},
 			},

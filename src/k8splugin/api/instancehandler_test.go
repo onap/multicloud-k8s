@@ -60,7 +60,7 @@ func (m *mockInstanceClient) Get(id string) (app.InstanceResponse, error) {
 	return m.items[0], nil
 }
 
-func (m *mockInstanceClient) List() ([]app.InstanceMiniResponse, error) {
+func (m *mockInstanceClient) List(rbname, rbversion, profilename string) ([]app.InstanceMiniResponse, error) {
 	if m.err != nil {
 		return []app.InstanceMiniResponse{}, m.err
 	}
@@ -68,12 +68,12 @@ func (m *mockInstanceClient) List() ([]app.InstanceMiniResponse, error) {
 	return m.miniitems, nil
 }
 
-func (m *mockInstanceClient) Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]app.InstanceResponse, error) {
+func (m *mockInstanceClient) Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]app.InstanceMiniResponse, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
 
-	return m.items, nil
+	return m.miniitems, nil
 }
 
 func (m *mockInstanceClient) Delete(id string) error {
@@ -312,6 +312,8 @@ func TestInstanceListHandler(t *testing.T) {
 		label            string
 		input            string
 		expectedCode     int
+		queryParams      bool
+		queryParamsMap   map[string]string
 		expectedResponse []app.InstanceMiniResponse
 		instClient       *mockInstanceClient
 	}{
@@ -373,11 +375,52 @@ func TestInstanceListHandler(t *testing.T) {
 				},
 			},
 		},
+		{
+			label:       "List Instances Based on Query Parameters",
+			queryParams: true,
+			queryParamsMap: map[string]string{
+				"rb-name": "test-rbdef1",
+			},
+			expectedCode: http.StatusOK,
+			expectedResponse: []app.InstanceMiniResponse{
+				{
+					ID: "HaKpys8e",
+					Request: app.InstanceRequest{
+						RBName:      "test-rbdef",
+						RBVersion:   "v1",
+						ProfileName: "profile1",
+						CloudRegion: "region1",
+					},
+					Namespace: "testnamespace",
+				},
+			},
+			instClient: &mockInstanceClient{
+				miniitems: []app.InstanceMiniResponse{
+					{
+						ID: "HaKpys8e",
+						Request: app.InstanceRequest{
+							RBName:      "test-rbdef",
+							RBVersion:   "v1",
+							ProfileName: "profile1",
+							CloudRegion: "region1",
+						},
+						Namespace: "testnamespace",
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v1/instance", nil)
+			if testCase.queryParams {
+				q := request.URL.Query()
+				for k, v := range testCase.queryParamsMap {
+					q.Add(k, v)
+				}
+				request.URL.RawQuery = q.Encode()
+			}
 			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {

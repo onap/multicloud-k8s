@@ -434,7 +434,7 @@ func TestInstanceFind(t *testing.T) {
 			Items: items,
 		}
 
-		expected := []InstanceResponse{
+		expected := []InstanceMiniResponse{
 			{
 				ID: "HaKpys8e",
 				Request: InstanceRequest{
@@ -447,22 +447,6 @@ func TestInstanceFind(t *testing.T) {
 					},
 				},
 				Namespace: "testnamespace",
-				Resources: []helm.KubernetesResource{
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "apps",
-							Version: "v1",
-							Kind:    "Deployment"},
-						Name: "deployment-1",
-					},
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "",
-							Version: "v1",
-							Kind:    "Service"},
-						Name: "service-1",
-					},
-				},
 			},
 			{
 				ID: "HaKpys8f",
@@ -473,22 +457,6 @@ func TestInstanceFind(t *testing.T) {
 					CloudRegion: "region1",
 				},
 				Namespace: "testnamespace",
-				Resources: []helm.KubernetesResource{
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "apps",
-							Version: "v1",
-							Kind:    "Deployment"},
-						Name: "deployment-1",
-					},
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "",
-							Version: "v1",
-							Kind:    "Service"},
-						Name: "service-1",
-					},
-				},
 			},
 			{
 				ID: "HaKpys8g",
@@ -499,22 +467,6 @@ func TestInstanceFind(t *testing.T) {
 					CloudRegion: "region1",
 				},
 				Namespace: "testnamespace",
-				Resources: []helm.KubernetesResource{
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "apps",
-							Version: "v1",
-							Kind:    "Deployment"},
-						Name: "deployment-1",
-					},
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "",
-							Version: "v1",
-							Kind:    "Service"},
-						Name: "service-1",
-					},
-				},
 			},
 		}
 		ic := NewInstanceClient()
@@ -541,12 +493,12 @@ func TestInstanceFind(t *testing.T) {
 		}
 	})
 
-	t.Run("Successfully Find Instance By Name Version", func(t *testing.T) {
+	t.Run("Successfully Find Instance By Name and Label", func(t *testing.T) {
 		db.DBconn = &db.MockDB{
 			Items: items,
 		}
 
-		expected := []InstanceResponse{
+		expected := []InstanceMiniResponse{
 			{
 				ID: "HaKpys8e",
 				Request: InstanceRequest{
@@ -559,23 +511,53 @@ func TestInstanceFind(t *testing.T) {
 					},
 				},
 				Namespace: "testnamespace",
+			},
+		}
+		ic := NewInstanceClient()
+		name := "test-rbdef"
+		labels := map[string]string{
+			"vf_module_id": "test-vf-module-id",
+		}
+		data, err := ic.Find(name, "", "", labels)
+		if err != nil {
+			t.Fatalf("TestInstanceFind returned an error (%s)", err)
+		}
 
-				Resources: []helm.KubernetesResource{
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "apps",
-							Version: "v1",
-							Kind:    "Deployment"},
-						Name: "deployment-1",
-					},
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "",
-							Version: "v1",
-							Kind:    "Service"},
-						Name: "service-1",
+		// Since the order of returned slice is not guaranteed
+		// Check both and return error if both don't match
+		sort.Slice(data, func(i, j int) bool {
+			return data[i].ID < data[j].ID
+		})
+		// Sort both as it is not expected that testCase.expected
+		// is sorted
+		sort.Slice(expected, func(i, j int) bool {
+			return expected[i].ID < expected[j].ID
+		})
+
+		if !reflect.DeepEqual(expected, data) {
+			t.Fatalf("TestInstanceFind returned:\n result=%v\n expected=%v",
+				data, expected)
+		}
+	})
+
+	t.Run("Successfully Find Instance By Name Version", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: items,
+		}
+
+		expected := []InstanceMiniResponse{
+			{
+				ID: "HaKpys8e",
+				Request: InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+					Labels: map[string]string{
+						"vf_module_id": "test-vf-module-id",
 					},
 				},
+				Namespace: "testnamespace",
 			},
 			{
 				ID: "HaKpys8f",
@@ -586,23 +568,6 @@ func TestInstanceFind(t *testing.T) {
 					CloudRegion: "region1",
 				},
 				Namespace: "testnamespace",
-
-				Resources: []helm.KubernetesResource{
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "apps",
-							Version: "v1",
-							Kind:    "Deployment"},
-						Name: "deployment-1",
-					},
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "",
-							Version: "v1",
-							Kind:    "Service"},
-						Name: "service-1",
-					},
-				},
 			},
 		}
 		ic := NewInstanceClient()
@@ -634,7 +599,7 @@ func TestInstanceFind(t *testing.T) {
 			Items: items,
 		}
 
-		expected := []InstanceResponse{
+		expected := []InstanceMiniResponse{
 			{
 				ID: "HaKpys8e",
 				Request: InstanceRequest{
@@ -647,23 +612,6 @@ func TestInstanceFind(t *testing.T) {
 					},
 				},
 				Namespace: "testnamespace",
-
-				Resources: []helm.KubernetesResource{
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "apps",
-							Version: "v1",
-							Kind:    "Deployment"},
-						Name: "deployment-1",
-					},
-					{
-						GVK: schema.GroupVersionKind{
-							Group:   "",
-							Version: "v1",
-							Kind:    "Service"},
-						Name: "service-1",
-					},
-				},
 			},
 		}
 		ic := NewInstanceClient()

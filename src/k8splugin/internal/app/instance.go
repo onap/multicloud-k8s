@@ -60,8 +60,8 @@ type InstanceMiniResponse struct {
 type InstanceManager interface {
 	Create(i InstanceRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
-	List() ([]InstanceMiniResponse, error)
-	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceResponse, error)
+	List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error)
+	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error)
 	Delete(id string) error
 }
 
@@ -184,7 +184,7 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 
 // List returns the instance for corresponding ID
 // Empty string returns all
-func (v *InstanceClient) List() ([]InstanceMiniResponse, error) {
+func (v *InstanceClient) List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error) {
 
 	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagInst)
 	if err != nil || len(dbres) == 0 {
@@ -192,6 +192,7 @@ func (v *InstanceClient) List() ([]InstanceMiniResponse, error) {
 	}
 
 	var results []InstanceMiniResponse
+
 	for key, value := range dbres {
 		//value is a byte array
 		if value != nil {
@@ -206,6 +207,21 @@ func (v *InstanceClient) List() ([]InstanceMiniResponse, error) {
 				Request:   resp.Request,
 				Namespace: resp.Namespace,
 			}
+
+			//Filter based on the accepted keys
+			if len(rbname) != 0 &&
+				miniresp.Request.RBName != rbname {
+				continue
+			}
+			if len(rbversion) != 0 &&
+				miniresp.Request.RBVersion != rbversion {
+				continue
+			}
+			if len(profilename) != 0 &&
+				miniresp.Request.ProfileName != profilename {
+				continue
+			}
+
 			results = append(results, miniresp)
 		}
 	}
@@ -218,70 +234,36 @@ func (v *InstanceClient) List() ([]InstanceMiniResponse, error) {
 // If profile is empty, it will return all instances for a given rbName+version
 // If labelKeys are provided, the results are filtered based on that.
 // It is an AND operation for labelkeys.
-func (v *InstanceClient) Find(rbName string, version string, profile string, labelKeys map[string]string) ([]InstanceResponse, error) {
+func (v *InstanceClient) Find(rbName string, version string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error) {
 	if rbName == "" && len(labelKeys) == 0 {
-		return []InstanceResponse{}, pkgerrors.New("rbName or labelkeys is required and cannot be empty")
+		return []InstanceMiniResponse{}, pkgerrors.New("rbName or labelkeys is required and cannot be empty")
 	}
 
-	values, err := db.DBconn.ReadAll(v.storeName, v.tagInst)
-	if err != nil || len(values) == 0 {
-		return []InstanceResponse{}, pkgerrors.Wrap(err, "Find Instance")
+	responses, err := v.List(rbName, version, profile)
+	if err != nil {
+		return []InstanceMiniResponse{}, pkgerrors.Wrap(err, "Listing Instances")
 	}
 
-	response := []InstanceResponse{}
-	//values is a map[string][]byte
-InstanceResponseLoop:
-	for _, value := range values {
-		resp := InstanceResponse{}
-		db.DBconn.Unmarshal(value, &resp)
-		if err != nil {
-			return []InstanceResponse{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
-		}
-
-		// Filter by labels provided
-		if len(labelKeys) != 0 {
-			for lkey, lvalue := range labelKeys {
-				//Check if label key exists and get its value
-				if val, ok := resp.Request.Labels[lkey]; ok {
-					if lvalue != val {
-						continue InstanceResponseLoop
-					}
-				} else {
-					continue InstanceResponseLoop
-				}
-			}
-		}
-
-		if rbName != "" {
-			if resp.Request.RBName == rbName {
-
-				//Check if a version is provided and if it matches
-				if version != "" {
-					if resp.Request.RBVersion == version {
-						//Check if a profilename matches or if it is not provided
-						if profile == "" || resp.Request.ProfileName == profile {
-							response = append(response, resp)
-						}
-					}
-				} else {
-					//Append all versions as version is not provided
-					response = append(response, resp)
-				}
-			}
-		} else {
-			response = append(response, resp)
-		}
-	}
+	ret := []InstanceMiniResponse{}
 
 	//filter the list by labelKeys now
-	for _, value := range response {
-		for _, label := range labelKeys {
-			if _, ok := value.Request.Labels[label]; ok {
+	for _, resp := range responses {
+
+		add := true
+		for k, v := range labelKeys {
+			if resp.Request.Labels[k] != v {
+				add = false
+				break
 			}
 		}
+		// If label was not found in the response, don't add it
+		if add {
+			ret = append(ret, resp)
+		}
+
 	}
 
-	return response, nil
+	return ret, nil
 }
 
 // Delete the Instance from database

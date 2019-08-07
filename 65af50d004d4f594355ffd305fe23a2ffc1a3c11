@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dec7ba54_89f5ea10",
+        "filename": "deployments/helm/servicemesh/istio/istio-instance/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-07T15:56:59Z",
+      "side": 1,
+      "message": "Does this need to be there? Can this be empty?",
+      "range": {
+        "startLine": 23,
+        "startChar": 5,
+        "endLine": 23,
+        "endChar": 12
+      },
+      "revId": "65af50d004d4f594355ffd305fe23a2ffc1a3c11",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

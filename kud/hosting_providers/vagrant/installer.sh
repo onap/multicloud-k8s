@@ -163,7 +163,7 @@ function install_addons {
     if [[ "${testing_enabled}" == "true" ]]; then
         for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov}; do
             pushd $kud_tests
-            bash ${addon}.sh
+            bash -x ${addon}.sh
             popd
         done
     fi
@@ -175,6 +175,7 @@ function install_plugin {
     echo "Installing multicloud/k8s plugin"
     _install_go
     _install_docker
+    sudo -E pip install -U pyopenssl
     sudo -E pip install docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
@@ -186,7 +187,7 @@ function install_plugin {
         sudo ./start.sh
         pushd $kud_tests
         for functional_test in plugin plugin_edgex plugin_fw; do
-            bash ${functional_test}.sh
+            bash -x ${functional_test}.sh
         done
         popd
     fi

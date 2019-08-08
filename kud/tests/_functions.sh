@@ -161,7 +161,12 @@ function wait_deployment {
     local deployment_name=$1
 
     status_phase=""
+    sleep 2m
     while [[ $status_phase != "Running" ]]; do
+        kubectl get pods
+        kubectl get pods | grep $deployment_name
+        kubectl get pods | grep $deployment_name | awk '{print $3}'
+        kubectl describe pods
         new_phase=$(kubectl get pods | grep  $deployment_name | awk '{print $3}')
         if [[ $new_phase != $status_phase ]]; then
             echo "$(date +%H:%M:%S) - $deployment_name : $new_phase"

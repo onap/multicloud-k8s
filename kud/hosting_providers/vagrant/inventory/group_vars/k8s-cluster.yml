@@ -77,3 +77,5 @@ download_localhost: true
 kube_service_addresses: 10.244.0.0/18
 # Subnet for Pod IPs
 kube_pods_subnet: 10.244.64.0/18
+# Random shifts for retrying failed ops like pushing/downloading
+retry_stagger: 12

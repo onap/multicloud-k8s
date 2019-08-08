@@ -71,3 +71,6 @@ local_release_dir: "/tmp/releases"
 # cannot access each over via ssh or you want to use local docker
 # images as a cache for multiple clusters.
 download_localhost: true
+
+# Random shifts for retrying failed ops like pushing/downloading
+retry_stagger: 12

@@ -155,7 +155,7 @@ function install_addons {
         ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
         if [[ "${testing_enabled}" == "true" ]]; then
             pushd $kud_tests
-            bash ${addon}.sh
+            bash -x ${addon}.sh
             popd
         fi
     done
@@ -166,6 +166,7 @@ function install_plugin {
     echo "Installing multicloud/k8s plugin"
     _install_go
     _install_docker
+    sudo -E pip install -U pyopenssl
     sudo -E pip install docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
@@ -177,7 +178,7 @@ function install_plugin {
         sudo ./start.sh
         pushd $kud_tests
         for functional_test in plugin plugin_edgex plugin_fw; do
-            bash ${functional_test}.sh
+            bash -x ${functional_test}.sh
         done
         popd
     fi

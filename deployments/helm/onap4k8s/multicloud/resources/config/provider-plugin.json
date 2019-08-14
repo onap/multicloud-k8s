@@ -1,0 +1,60 @@
+{
+    "openstack": {
+        "vim_type": "openstack",
+        "versions": {
+            "titanium_cloud": {
+                "version": "titanium_cloud",
+                "extra_info_hint": "",
+                "provider_plugin": "multicloud-titaniumcloud"
+            },
+            "pike": {
+                "version": "pike",
+                "extra_info_hint": "",
+                "provider_plugin": "multicloud-pike"
+            },
+            "starlingx": {
+                "version": "starlingx",
+                "extra_info_hint": "",
+                "provider_plugin": "multicloud-starlingx"
+            },
+            "ocata": {
+                "version": "ocata",
+                "extra_info_hint": "",
+                "provider_plugin": "multicloud-ocata"
+            }
+        },
+        "provider_plugin": "multicloud-ocata"
+    },
+    "vmware": {
+        "vim_type": "vmware",
+        "versions": {
+            "4.0": {
+                "version": "4.0",
+                "extra_info_hint": "",
+                "provider_plugin": "multicloud-vio"
+            }
+        },
+        "provider_plugin": "multicloud-vio"
+    },
+    "azure": {
+        "vim_type": "azure",
+        "versions": {
+            "1.0": {
+                "version": "1.0",
+                "extra_info_hint": "",
+                "provider_plugin": "multicloud-azure"
+            }
+        },
+        "provider_plugin": "multicloud-azure"
+    },
+    "k8s": {
+        "vim_type": "k8s",
+        "versions": {
+            "1.0": {
+                "version": "1.0",
+                "extra_info_hint": "",
+                "provider_plugin": "multicloud-k8s"
+            }
+        }
+    }
+}

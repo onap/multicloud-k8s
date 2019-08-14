@@ -277,39 +277,43 @@ spec:
 MULTUS_NET
 
     cat << NET > $unprotected_private_net.yaml
-apiVersion: v1
-kind: onapNetwork
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: Network
+
 metadata:
   name: $unprotected_private_net
-  cnitype : ovn4nfvk8s
 spec:
-  name: $unprotected_private_net
-  subnet: $protected_private_net_cidr
-  gateway: 192.168.10.1/24
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - subnet: $protected_private_net_cidr
+    name: subnet1
+    gateway: 192.168.10.1/24
 NET
 
     cat << NET > $protected_private_net.yaml
-apiVersion: v1
-kind: onapNetwork
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: Network
 metadata:
   name: $protected_private_net
-  cnitype : ovn4nfvk8s
 spec:
-  name: $protected_private_net
-  subnet: $protected_net_cidr
-  gateway: $protected_net_gw/24
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - subnet: $protected_net_cidr
+    name: subnet1
+    gateway: $protected_net_gw/24
 NET
 
     cat << NET > $onap_private_net.yaml
-apiVersion: v1
-kind: onapNetwork
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: Network
 metadata:
   name: $onap_private_net
-  cnitype : ovn4nfvk8s
 spec:
-  name: $onap_private_net
-  subnet: $onap_private_net_cidr
-  gateway: 10.10.0.1/16
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - subnet: $onap_private_net_cidr
+    name: subnet1
+    gateway: 10.10.0.1/16
 NET
 
     proxy="apt:"
@@ -381,10 +385,10 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[{ "name": "$ovn_multus_network_name"}]'
-        ovnNetwork: '[
+        k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [
             { "name": "$unprotected_private_net", "ipAddress": "$vpg_private_ip_0", "interface": "eth1" , "defaultGateway": "false"},
             { "name": "$onap_private_net", "ipAddress": "$vpg_private_ip_1", "interface": "eth2" , "defaultGateway": "false"}
-        ]'
+        ]}'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
       affinity:
@@ -449,11 +453,11 @@ spec:
           $ssh_key
         VirtletRootVolumeSize: 5Gi
         k8s.v1.cni.cncf.io/networks: '[{ "name": "$ovn_multus_network_name"}]'
-        ovnNetwork: '[
+        k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [
             { "name": "$unprotected_private_net", "ipAddress": "$vfw_private_ip_0", "interface": "eth1" , "defaultGateway": "false"},
             { "name": "$protected_private_net", "ipAddress": "$vfw_private_ip_1", "interface": "eth2", "defaultGateway": "false" },
             { "name": "$onap_private_net", "ipAddress": "$vfw_private_ip_2", "interface": "eth3" , "defaultGateway": "false"}
-        ]'
+        ]}'
         kubernetes.io/target-runtime: virtlet.cloud
     spec:
       affinity:
@@ -506,10 +510,10 @@ spec:
         context: darkstat
       annotations:
         k8s.v1.cni.cncf.io/networks: '[{ "name": "$ovn_multus_network_name"}]'
-        ovnNetwork: '[
+        k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [
             { "name": "$protected_private_net", "ipAddress": "$vsn_private_ip_0", "interface": "eth1", "defaultGateway": "false" },
             { "name": "$onap_private_net", "ipAddress": "$vsn_private_ip_1", "interface": "eth2" , "defaultGateway": "false"}
-        ]'
+        ]}'
     spec:
       containers:
       - name: $sink_deployment_name
@@ -1060,27 +1064,29 @@ spec:
 MULTUS_NET
 
     cat << NETWORK > ovn-port-net.yaml
-apiVersion: v1
-kind: onapNetwork
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: Network
 metadata:
   name: ovn-port-net
-  cnitype : ovn4nfvk8s
 spec:
-  name: ovn-port-net
-  subnet: 172.16.33.0/24
-  gateway: 172.16.33.1/24
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - subnet: 172.16.33.0/24
+    name: subnet1
+    gateway: 172.16.33.1/24
 NETWORK
 
     cat << NETWORK > ovn-priv-net.yaml
-apiVersion: v1
-kind: onapNetwork
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: Network
 metadata:
   name: ovn-priv-net
-  cnitype : ovn4nfvk8s
 spec:
-  name: ovn-priv-net
-  subnet: 172.16.44.0/24
-  gateway: 172.16.44.1/24
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - subnet: 172.16.44.0/24
+    name: subnet1
+    gateway: 172.16.44.1/24
 NETWORK
 
     cat << DEPLOYMENT > $ovn4nfv_deployment_name.yaml
@@ -1101,8 +1107,8 @@ spec:
         app: ovn4nfv
       annotations:
         k8s.v1.cni.cncf.io/networks: '[{ "name": "$ovn_multus_network_name"}]'
-        ovnNetwork: '[{ "name": "ovn-port-net", "interface": "net0" , "defaultGateway": "false"},
-                      { "name": "ovn-priv-net", "interface": "net1" , "defaultGateway": "false"}]'
+        k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [{ "name": "ovn-port-net", "interface": "net0" , "defaultGateway": "false"},
+                      { "name": "ovn-priv-net", "interface": "net1" , "defaultGateway": "false"}]}'
     spec:
       containers:
       - name: $ovn4nfv_deployment_name

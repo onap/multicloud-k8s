@@ -18,14 +18,12 @@ source _functions.sh
 csar_id=a1c5b53e-d7ab-11e8-85b7-525400e8c29a
 
 # Setup
-install_ovn_deps
 populate_CSAR_ovn4nfv $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
 for net in ovn-priv-net ovn-port-net; do
-    cleanup_network $net.yaml
     echo "Create OVN Network $net network"
-    init_network $net.yaml
+    kubectl apply -f $net.yaml
 done
 kubectl apply -f onap-ovn4nfvk8s-network.yaml
 setup $ovn4nfv_deployment_name
@@ -45,6 +43,8 @@ fi
 
 # Teardown
 teardown $ovn4nfv_deployment_name
-cleanup_network ovn-priv-net.yaml
-cleanup_network ovn-port-net.yaml
+for net in ovn-priv-net ovn-port-net; do
+    echo "Delete OVN Network $net network"
+    kubectl delete -f $net.yaml
+done
 popd

@@ -1,0 +1,12 @@
+dependencies:
+- name: common
+  repository: http://127.0.0.1:8879
+  version: 5.0.0
+- name: mongo
+  repository: http://127.0.0.1:8879
+  version: 5.0.0
+- name: etcd
+  repository: http://127.0.0.1:8879
+  version: 5.0.0
+digest: sha256:af4fbcc60592c2384a1edcf7c951e2af36ee464dfdd10ecba6e30da314380cde
+generated: "2019-08-26T17:42:36.538794405-07:00"

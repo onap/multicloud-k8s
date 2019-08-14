@@ -27,9 +27,8 @@ populate_CSAR_vms_containers_vFW $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
 for net in $unprotected_private_net $protected_private_net $onap_private_net; do
-    cleanup_network $net.yaml
     echo "Create OVN Network $net network"
-    init_network $net.yaml
+    kubectl apply -f $net.yaml
 done
 for resource in onap-ovn4nfvk8s-network sink-service sink_configmap; do
     kubectl apply -f $resource.yaml

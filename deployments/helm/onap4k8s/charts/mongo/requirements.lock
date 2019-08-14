@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: http://127.0.0.1:8879
+  version: 5.0.0
+digest: sha256:d7c8d297f6d5c6f1be91eba57c4efb97e64fe1511840d0843a2a7445381a3557
+generated: "2019-08-26T16:56:46.359372311-07:00"

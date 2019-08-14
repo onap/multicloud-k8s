@@ -1,0 +1,43 @@
+apiVersion: v1
+entries:
+  common:
+  - apiVersion: v1
+    created: "2019-08-27T13:43:12.342662805-07:00"
+    description: Common templates for inclusion in other charts
+    digest: b717fcd1f5fae8e0d695527c61b55952169bfdc735f92f139559c809147f598a
+    name: common
+    urls:
+    - common-5.0.0.tgz
+    version: 5.0.0
+  etcd:
+  - appVersion: 2.2.5
+    created: "2019-08-27T13:43:12.343589794-07:00"
+    description: Distributed reliable key-value store for the most critical data of
+      a distributed system.
+    digest: f7cfb1c4ad26d93d20b4d5a5f881ba51302862bebd9ea7382dec1e4b6b84e59c
+    home: https://github.com/coreos/etcd
+    name: etcd
+    sources:
+    - https://github.com/coreos/etcd
+    urls:
+    - etcd-5.0.0.tgz
+    version: 5.0.0
+  mongo:
+  - apiVersion: v1
+    created: "2019-08-27T13:43:12.345490097-07:00"
+    description: MongoDB Server
+    digest: 4182b6f411164adee51353bf87f3fb2b652b495461b6a89aa07cb2fa7b34d806
+    name: mongo
+    urls:
+    - mongo-5.0.0.tgz
+    version: 5.0.0
+  multicloud-k8s:
+  - apiVersion: v1
+    created: "2019-08-27T13:43:12.348196099-07:00"
+    description: ONAP Multicloud Kubernetes Plugin
+    digest: 634f4d76b402608cdd403f4d03b0311791912abd13818bb0cbcafd4b2d1a1375
+    name: multicloud-k8s
+    urls:
+    - multicloud-k8s-5.0.0.tgz
+    version: 5.0.0
+generated: "2019-08-27T13:43:12.342220084-07:00"

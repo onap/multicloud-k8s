@@ -10,6 +10,7 @@ import (
 // ResourceBundleState is the Schema for the ResourceBundleStatees API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
+// +genclient
 type ResourceBundleState struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`

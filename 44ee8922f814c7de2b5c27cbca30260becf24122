@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5efe4646_c4a015df",
+        "filename": "kud/tests/integration_vcFW.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-16T19:49:00Z",
+      "side": 1,
+      "message": "Are these supposed to be created in the default namespace?",
+      "range": {
+        "startLine": 31,
+        "startChar": 4,
+        "endLine": 31,
+        "endChar": 30
+      },
+      "revId": "44ee8922f814c7de2b5c27cbca30260becf24122",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

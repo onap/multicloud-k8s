@@ -3,14 +3,16 @@ module monitor
 require (
 	github.com/NYTimes/gziphandler v1.0.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30 // indirect
-	github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20190725070552-09dffa6d151b // indirect
+	github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20190808131943-845cdd2aa5d7 // indirect
 	github.com/operator-framework/operator-sdk v0.9.1-0.20190729152335-7a35cfc9a7cf
 	github.com/operator-framework/operator-sdk-samples v0.0.0-20190529081445-bd30254f3a7e
+	github.com/pkg/errors v0.8.1
 	github.com/spf13/pflag v1.0.3
-	k8s.io/api v0.0.0-20190612125737-db0771252981
-	k8s.io/apimachinery v0.0.0-20190612125636-6a5db36e93ad
+	k8s.io/api v0.0.0-20190814101207-0772a1bdf941
+	k8s.io/apiextensions-apiserver v0.0.0-20190228180357-d002e88f6236
+	k8s.io/apimachinery v0.0.0-20190814100815-533d101be9a6
 	k8s.io/client-go v11.0.0+incompatible
-	k8s.io/kube-openapi v0.0.0-20190603182131-db7b694dc208 // indirect
+	k8s.io/sample-controller v0.0.0-20190814141925-f27ac7da6c3e // indirect
 	sigs.k8s.io/controller-runtime v0.1.12
 	sigs.k8s.io/controller-tools v0.1.10
 )

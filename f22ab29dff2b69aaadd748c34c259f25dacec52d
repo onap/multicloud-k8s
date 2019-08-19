@@ -22,6 +22,30 @@
       "revId": "f22ab29dff2b69aaadd748c34c259f25dacec52d",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cf2d0ac3_99f40036",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-19T18:14:39Z",
+      "side": 1,
+      "message": "No.. it will just match the version and profile.",
+      "parentUuid": "0ad7a626_40c55984",
+      "range": {
+        "startLine": 212,
+        "startChar": 3,
+        "endLine": 212,
+        "endChar": 25
+      },
+      "revId": "f22ab29dff2b69aaadd748c34c259f25dacec52d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

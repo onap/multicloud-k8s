@@ -39,6 +39,12 @@ func NewRouter(defClient rb.DefinitionManager,
 	instRouter := router.PathPrefix("/v1").Subrouter()
 	instRouter.HandleFunc("/instance", instHandler.createHandler).Methods("POST")
 	instRouter.HandleFunc("/instance", instHandler.listHandler).Methods("GET")
+	// Match rb-names, versions or profiles
+	instRouter.HandleFunc("/instance", instHandler.listHandler).
+		Queries("rb-name", "{rb-name}",
+			"rb-version", "{rb-version}",
+			"profile-name", "{profile-name}").Methods("GET")
+
 	instRouter.HandleFunc("/instance/{instID}", instHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}", instHandler.deleteHandler).Methods("DELETE")
 	// (TODO): Fix update method

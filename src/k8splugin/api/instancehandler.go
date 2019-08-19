@@ -106,10 +106,16 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// getHandler retrieves information about an instance via the ID
+// listHandler retrieves information about an instance via the ID
 func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 
-	resp, err := i.client.List()
+	//If parameters are not provided, they are sent as empty strings
+	//Which will list all instances
+	rbName := r.FormValue("rb-name")
+	rbVersion := r.FormValue("rb-version")
+	ProfileName := r.FormValue("profile-name")
+
+	resp, err := i.client.List(rbName, rbVersion, ProfileName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -17,7 +17,6 @@
 package plugin
 
 import (
-	"encoding/json"
 	"log"
 	"strings"
 
@@ -29,6 +28,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -107,44 +107,31 @@ func TagPodsIfPresent(unstruct *unstructured.Unstructured, tag string) {
 		log.Println("Error converting spec to map")
 		return
 	}
+
 	template, ok := spec["template"].(map[string]interface{})
 	if !ok {
 		log.Println("Error converting template to map")
 		return
 	}
 
-	data, err := json.Marshal(template)
-	if err != nil {
-		log.Println("Error Marshaling Podspec")
-		return
-	}
-
 	//Attempt to convert the template to a podtemplatespec.
 	//This is to check if we have any pods being created.
 	podTemplateSpec := &corev1.PodTemplateSpec{}
-	_, err = podTemplateSpec.MarshalTo(data)
+	err := runtime.DefaultUnstructuredConverter.FromUnstructured(template, podTemplateSpec)
 	if err != nil {
-		log.Println("Did not find a podTemplateSpec" + err.Error())
+		log.Println("Did not find a podTemplateSpec: " + err.Error())
 		return
 	}
 
-	//At this point, we know that the data contains a PodTemplateSpec
-	metadata, ok := template["metadata"].(map[string]interface{})
-	if !ok {
-		log.Println("Error converting metadata to map")
-		return
-	}
-
-	//Get the labels map
-	labels, ok := metadata["labels"].(map[string]string)
-	if !ok {
-		log.Println("Error converting labels to map")
-		return
-	}
-
-	//Check if labels exist for this object
+	labels := podTemplateSpec.GetLabels()
 	if labels == nil {
 		labels = map[string]string{}
 	}
 	labels[config.GetConfiguration().KubernetesLabelName] = tag
+	podTemplateSpec.SetLabels(labels)
+
+	updatedTemplate, err := runtime.DefaultUnstructuredConverter.ToUnstructured(podTemplateSpec)
+
+	//Set the label
+	spec["template"] = updatedTemplate
 }

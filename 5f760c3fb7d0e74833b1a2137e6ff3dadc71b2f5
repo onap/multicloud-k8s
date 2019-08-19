@@ -22,6 +22,30 @@
       "revId": "5f760c3fb7d0e74833b1a2137e6ff3dadc71b2f5",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bebdb56_9c0dce05",
+        "filename": "kud/hosting_providers/vagrant/inventory/group_vars/k8s-cluster.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-08-19T22:44:16Z",
+      "side": 1,
+      "message": "Hi Kiran, Kubespray v2.10.x breaks compatibility with `kube_version: 1.12.x`. `kubeadm_version` defaults to the same value as `kube_version:` because of this `kubeadmn initialize first master` fails",
+      "parentUuid": "ec76b759_76dc5968",
+      "range": {
+        "startLine": 51,
+        "startChar": 15,
+        "endLine": 51,
+        "endChar": 21
+      },
+      "revId": "5f760c3fb7d0e74833b1a2137e6ff3dadc71b2f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

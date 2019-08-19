@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ad7a626_40c55984",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-08-19T17:55:15Z",
+      "side": 1,
+      "message": "Does this mean that if rbname is empty no item will be returned?",
+      "range": {
+        "startLine": 212,
+        "startChar": 3,
+        "endLine": 212,
+        "endChar": 25
+      },
+      "revId": "f22ab29dff2b69aaadd748c34c259f25dacec52d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

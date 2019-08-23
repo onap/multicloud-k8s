@@ -17,13 +17,12 @@
 package app
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"log"
-	"math/rand"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	pkgerrors "github.com/pkg/errors"
@@ -88,13 +87,6 @@ type InstanceClient struct {
 	tagInst   string
 }
 
-// Using 6 bytes of randomness to generate an 8 character string
-func generateInstanceID() string {
-	b := make([]byte, 6)
-	rand.Read(b)
-	return base64.URLEncoding.EncodeToString(b)
-}
-
 // NewInstanceClient returns an instance of the InstanceClient
 // which implements the InstanceManager
 func NewInstanceClient() *InstanceClient {
@@ -127,7 +119,8 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
 
-	id := generateInstanceID()
+	// TODO: Only generate if id is not provided
+	id := namegenerator.Generate()
 
 	k8sClient := KubernetesClient{}
 	err = k8sClient.init(i.CloudRegion, id)

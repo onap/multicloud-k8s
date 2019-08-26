@@ -1,0 +1,14 @@
+# Default values for gateways.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+metadata:
+  name: httpbin-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  port:
+      number: 80
+      name: http
+      protocol: HTTP
+  hosts:
+  - "*"

@@ -1,0 +1,22 @@
+---
+# Source: gateways/templates/gateway.yaml
+
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: httpbin-gateway
+  labels:
+    chart: gateways-0.1.0
+    release: gateways
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+

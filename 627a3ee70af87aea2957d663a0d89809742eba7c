@@ -151,6 +151,30 @@
       "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a8957040_939a9d80",
+        "filename": "src/monitor/pkg/controller/resourcebundlestate/pod_controller.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-08-26T19:31:37Z",
+      "side": 1,
+      "message": "AFAIK, between the time this timestamp is added and the pod is deleted Reconcile for the controller may not be called and call to Reconcile can happen after the Pod is deleted. In that case, condition on line 58 will be true",
+      "parentUuid": "d910218a_9d2625ac",
+      "range": {
+        "startLine": 106,
+        "startChar": 5,
+        "endLine": 106,
+        "endChar": 33
+      },
+      "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

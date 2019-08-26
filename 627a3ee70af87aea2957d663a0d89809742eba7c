@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "415069d0_c656ce11",
+        "filename": "src/monitor/pkg/controller/resourcebundlestate/controller.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-26T19:11:11Z",
+      "side": 1,
+      "message": "This gets called when the CR is created. So, the list will be empty at that time. We check for existing statuses in the pod_controller.go.",
+      "parentUuid": "6b82c8ad_abbe672b",
+      "range": {
+        "startLine": 130,
+        "startChar": 31,
+        "endLine": 130,
+        "endChar": 37
+      },
+      "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c0785cc3_35ef7cde",
         "filename": "src/monitor/pkg/controller/resourcebundlestate/handler.go",
         "patchSetId": 5
@@ -36,6 +60,24 @@
       "writtenOn": "2019-08-26T18:57:50Z",
       "side": 1,
       "message": "Is this file being used?",
+      "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb01f4c8_18d0cd17",
+        "filename": "src/monitor/pkg/controller/resourcebundlestate/handler.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-26T19:11:11Z",
+      "side": 1,
+      "message": "Yes.In the controller.go. We are dropping all Delete, Update and Generic events for the CR.",
+      "parentUuid": "c0785cc3_35ef7cde",
       "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -76,6 +118,30 @@
       "writtenOn": "2019-08-26T18:57:50Z",
       "side": 1,
       "message": "Is this guaranteed by the framework that all Pods deletions events can be captured with this check? What if pod is deleted before this controller can look into the timestamp?",
+      "range": {
+        "startLine": 106,
+        "startChar": 5,
+        "endLine": 106,
+        "endChar": 33
+      },
+      "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d910218a_9d2625ac",
+        "filename": "src/monitor/pkg/controller/resourcebundlestate/pod_controller.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-26T19:11:11Z",
+      "side": 1,
+      "message": "According to the documentation, this is the check for deletion of pods. So, this timestamp is set to some value and then the actual deletion begins.",
+      "parentUuid": "bb84cca1_1dbf7f45",
       "range": {
         "startLine": 106,
         "startChar": 5,

@@ -223,6 +223,30 @@
       "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c1c87a98_e1498aa0",
+        "filename": "src/monitor/pkg/controller/resourcebundlestate/pod_controller.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-26T20:38:44Z",
+      "side": 1,
+      "message": "The resource is a POD here. Not sure we can add a finalizer to a pod :P",
+      "parentUuid": "bdde9340_ad445cb0",
+      "range": {
+        "startLine": 106,
+        "startChar": 5,
+        "endLine": 106,
+        "endChar": 33
+      },
+      "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

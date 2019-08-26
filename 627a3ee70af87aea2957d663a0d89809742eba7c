@@ -199,6 +199,30 @@
       "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bdde9340_ad445cb0",
+        "filename": "src/monitor/pkg/controller/resourcebundlestate/pod_controller.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1361
+      },
+      "writtenOn": "2019-08-26T20:32:56Z",
+      "side": 1,
+      "message": "Adding finalizer to the resource (during create or update) ensures that it wont get deleted until the finalizer is removed. At the same time the deletion timestamp will be non-null value for deletion. Once the necessary actions and additional clean up is done then the finalizer can be removed. At that time it will trigger reconcile one more time and if the object does not exist then we discard as we know for sure there is no finalizer. https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#finalizers",
+      "parentUuid": "5502d537_e168477d",
+      "range": {
+        "startLine": 106,
+        "startChar": 5,
+        "endLine": 106,
+        "endChar": 33
+      },
+      "revId": "627a3ee70af87aea2957d663a0d89809742eba7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

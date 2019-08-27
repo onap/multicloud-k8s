@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "2b859855_f9cbd315",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/resources/config/config.json",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-27T20:45:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8986f10_f1a9002b",
+      "revId": "07510bb10afb3e64309502f3c8722d1c95209327",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31198a6f_751e88bc",
         "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/templates/deployment.yaml",
         "patchSetId": 4
@@ -30,6 +48,30 @@
       "writtenOn": "2019-08-27T20:35:33Z",
       "side": 1,
       "message": "remove this",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 20
+      },
+      "revId": "07510bb10afb3e64309502f3c8722d1c95209327",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4e8be3e1_d52a00f8",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-27T20:45:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31198a6f_751e88bc",
       "range": {
         "startLine": 79,
         "startChar": 0,
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "cfb3dba5_a637870f",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/templates/service.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-27T20:45:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f39ad370_21e4a6e9",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 6
+      },
+      "revId": "07510bb10afb3e64309502f3c8722d1c95209327",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0ecbb206_ce94aee2",
         "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/values.yaml",
         "patchSetId": 4
@@ -76,6 +142,30 @@
       "writtenOn": "2019-08-27T20:35:33Z",
       "side": 1,
       "message": "Remove",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 20
+      },
+      "revId": "07510bb10afb3e64309502f3c8722d1c95209327",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f5c8c897_2c8743c0",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/values.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-27T20:45:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ecbb206_ce94aee2",
       "range": {
         "startLine": 99,
         "startChar": 0,

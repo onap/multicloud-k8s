@@ -22,6 +22,30 @@
       "revId": "99d00df27f624bdbbac4e742c7de233887452484",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fdefa04_d1b893a7",
+        "filename": "kud/deployment_infra/images/multus-daemonset.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-08-27T18:09:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca5985d9_7db5f9b7",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 108,
+        "endChar": 5
+      },
+      "revId": "99d00df27f624bdbbac4e742c7de233887452484",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8986f10_f1a9002b",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/resources/config/config.json",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T20:35:33Z",
+      "side": 1,
+      "message": "This file is not needed.",
+      "revId": "07510bb10afb3e64309502f3c8722d1c95209327",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31198a6f_751e88bc",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T20:35:33Z",
+      "side": 1,
+      "message": "remove this",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 20
+      },
+      "revId": "07510bb10afb3e64309502f3c8722d1c95209327",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f39ad370_21e4a6e9",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/templates/service.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T20:35:33Z",
+      "side": 1,
+      "message": "Not needed as we don\u0027t have MSB",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 6
+      },
+      "revId": "07510bb10afb3e64309502f3c8722d1c95209327",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0ecbb206_ce94aee2",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/values.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T20:35:33Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 20
+      },
+      "revId": "07510bb10afb3e64309502f3c8722d1c95209327",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

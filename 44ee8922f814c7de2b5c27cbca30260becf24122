@@ -46,6 +46,30 @@
       "revId": "44ee8922f814c7de2b5c27cbca30260becf24122",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ecef2983_db07a9fc",
+        "filename": "kud/tests/integration_vcFW.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T20:45:03Z",
+      "side": 1,
+      "message": "So, If I understand correctly, the Network CR will operate over all pods in all namespaces based on some selection criteria?",
+      "parentUuid": "d274ba03_68d559fe",
+      "range": {
+        "startLine": 31,
+        "startChar": 4,
+        "endLine": 31,
+        "endChar": 30
+      },
+      "revId": "44ee8922f814c7de2b5c27cbca30260becf24122",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

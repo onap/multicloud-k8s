@@ -1,0 +1,285 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "56293936_d59217a0",
+        "filename": "deployments/helm/onap4k8s/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "Remove the output_dir also",
+      "range": {
+        "startLine": 54,
+        "startChar": 11,
+        "endLine": 54,
+        "endChar": 22
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "24d39b1f_1537cec9",
+        "filename": "deployments/helm/onap4k8s/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "Use a different repo as we don\u0027t want to pull charts from the local repo which might have charts from OOM.",
+      "range": {
+        "startLine": 61,
+        "startChar": 16,
+        "endLine": 61,
+        "endChar": 21
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "38b89b64_5186e36d",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "Not needed.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 27
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e1558b0f_5d15e723",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "We don\u0027t need this, we can just replace this with the list of charts in the order we want to build it.\ncommon etcd mongo multicloud-k8s",
+      "range": {
+        "startLine": 21,
+        "startChar": 15,
+        "endLine": 21,
+        "endChar": 75
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "191ebe9c_3748bf8c",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 25,
+        "startChar": 7,
+        "endLine": 25,
+        "endChar": 24
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d405c68f_aed7a982",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "Also remove the output directory",
+      "range": {
+        "startLine": 48,
+        "startChar": 21,
+        "endLine": 48,
+        "endChar": 32
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "24d12752_604e226e",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "Fix the indentation here. Looks like tabs and spaces got mixed up.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 11
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6c9b5f27_5b3adde1",
+        "filename": "deployments/helm/onap4k8s/charts/etcd/requirements.lock",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "We don\u0027t need this file to be checked in.",
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "98cf77c5_21da3783",
+        "filename": "deployments/helm/onap4k8s/charts/etcd/requirements.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "Use the name of the custom repository instead of local",
+      "range": {
+        "startLine": 18,
+        "startChar": 18,
+        "endLine": 18,
+        "endChar": 23
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f19ba3c1_69049f5a",
+        "filename": "deployments/helm/onap4k8s/charts/mongo/requirements.lock",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "We don\u0027t need to checkin this file.",
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "91ad087c_3de30625",
+        "filename": "deployments/helm/onap4k8s/charts/mongo/requirements.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "same as my previous comment on this.",
+      "range": {
+        "startLine": 18,
+        "startChar": 18,
+        "endLine": 18,
+        "endChar": 23
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "803e4f9a_0c96b3db",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/requirements.lock",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "We don\u0027t need to checkin this file.",
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bdbb4543_e0fec44d",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/requirements.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-27T22:30:30Z",
+      "side": 1,
+      "message": "same as my previous comment on this.",
+      "range": {
+        "startLine": 21,
+        "startChar": 18,
+        "endLine": 27,
+        "endChar": 24
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

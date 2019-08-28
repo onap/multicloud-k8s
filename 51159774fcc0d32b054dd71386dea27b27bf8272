@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4129b4df_3704161c",
+        "filename": "kud/deployment_infra/playbooks/configure-multus.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-08-28T01:16:34Z",
+      "side": 1,
+      "message": "Relative path breaks when running aio script. Check https://gerrit.onap.org/r/#/c/multicloud/k8s/+/94388/",
+      "range": {
+        "startLine": 13,
+        "startChar": 45,
+        "endLine": 13,
+        "endChar": 76
+      },
+      "revId": "51159774fcc0d32b054dd71386dea27b27bf8272",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

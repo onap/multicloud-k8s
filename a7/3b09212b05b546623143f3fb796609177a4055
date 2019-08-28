@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Konrad Banka <k.banka@samsung.com>
+Code-Review+2: Kiran Kamineni <kiran.k.kamineni@intel.com>
+Submitted-by: Kiran Kamineni <kiran.k.kamineni@intel.com>
+Submitted-at: Wed, 28 Aug 2019 19:40:39 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/94388
+Project: multicloud/k8s
+Branch: refs/heads/master

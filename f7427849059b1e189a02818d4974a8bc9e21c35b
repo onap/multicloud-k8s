@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0ad5b3ec_b062584d",
+        "filename": "deployments/helm/onap4k8s/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56293936_d59217a0",
+      "range": {
+        "startLine": 54,
+        "startChar": 11,
+        "endLine": 54,
+        "endChar": 22
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "24d39b1f_1537cec9",
         "filename": "deployments/helm/onap4k8s/Makefile",
         "patchSetId": 6
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "ee6dfffc_415d428e",
+        "filename": "deployments/helm/onap4k8s/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24d39b1f_1537cec9",
+      "range": {
+        "startLine": 61,
+        "startChar": 16,
+        "endLine": 61,
+        "endChar": 21
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "38b89b64_5186e36d",
         "filename": "deployments/helm/onap4k8s/charts/Makefile",
         "patchSetId": 6
@@ -59,6 +107,30 @@
       "writtenOn": "2019-08-27T22:30:30Z",
       "side": 1,
       "message": "Not needed.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 27
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b72ca8a6_9d694651",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38b89b64_5186e36d",
       "range": {
         "startLine": 18,
         "startChar": 0,
@@ -117,6 +189,30 @@
     },
     {
       "key": {
+        "uuid": "17098135_85c0a062",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "191ebe9c_3748bf8c",
+      "range": {
+        "startLine": 25,
+        "startChar": 7,
+        "endLine": 25,
+        "endChar": 24
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d405c68f_aed7a982",
         "filename": "deployments/helm/onap4k8s/charts/Makefile",
         "patchSetId": 6
@@ -128,6 +224,30 @@
       "writtenOn": "2019-08-27T22:30:30Z",
       "side": 1,
       "message": "Also remove the output directory",
+      "range": {
+        "startLine": 48,
+        "startChar": 21,
+        "endLine": 48,
+        "endChar": 32
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "abaff275_cb389b10",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d405c68f_aed7a982",
       "range": {
         "startLine": 48,
         "startChar": 21,
@@ -163,6 +283,30 @@
     },
     {
       "key": {
+        "uuid": "731b9c1b_6f2faead",
+        "filename": "deployments/helm/onap4k8s/charts/Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24d12752_604e226e",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 11
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6c9b5f27_5b3adde1",
         "filename": "deployments/helm/onap4k8s/charts/etcd/requirements.lock",
         "patchSetId": 6
@@ -174,6 +318,24 @@
       "writtenOn": "2019-08-27T22:30:30Z",
       "side": 1,
       "message": "We don\u0027t need this file to be checked in.",
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "afec9364_dc40cbff",
+        "filename": "deployments/helm/onap4k8s/charts/etcd/requirements.lock",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c9b5f27_5b3adde1",
       "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -203,6 +365,30 @@
     },
     {
       "key": {
+        "uuid": "af581332_2df50288",
+        "filename": "deployments/helm/onap4k8s/charts/etcd/requirements.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98cf77c5_21da3783",
+      "range": {
+        "startLine": 18,
+        "startChar": 18,
+        "endLine": 18,
+        "endChar": 23
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f19ba3c1_69049f5a",
         "filename": "deployments/helm/onap4k8s/charts/mongo/requirements.lock",
         "patchSetId": 6
@@ -214,6 +400,24 @@
       "writtenOn": "2019-08-27T22:30:30Z",
       "side": 1,
       "message": "We don\u0027t need to checkin this file.",
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2ece8b70_6ff57331",
+        "filename": "deployments/helm/onap4k8s/charts/mongo/requirements.lock",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f19ba3c1_69049f5a",
       "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -243,6 +447,30 @@
     },
     {
       "key": {
+        "uuid": "1076fabc_8fd9a1ee",
+        "filename": "deployments/helm/onap4k8s/charts/mongo/requirements.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91ad087c_3de30625",
+      "range": {
+        "startLine": 18,
+        "startChar": 18,
+        "endLine": 18,
+        "endChar": 23
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "803e4f9a_0c96b3db",
         "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/requirements.lock",
         "patchSetId": 6
@@ -260,6 +488,24 @@
     },
     {
       "key": {
+        "uuid": "b9144943_8a3749df",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/requirements.lock",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "803e4f9a_0c96b3db",
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bdbb4543_e0fec44d",
         "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/requirements.yaml",
         "patchSetId": 6
@@ -271,6 +517,30 @@
       "writtenOn": "2019-08-27T22:30:30Z",
       "side": 1,
       "message": "same as my previous comment on this.",
+      "range": {
+        "startLine": 21,
+        "startChar": 18,
+        "endLine": 27,
+        "endChar": 24
+      },
+      "revId": "f7427849059b1e189a02818d4974a8bc9e21c35b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6f6fc6aa_8ccd242a",
+        "filename": "deployments/helm/onap4k8s/charts/multicloud-k8s/requirements.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-08-28T00:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bdbb4543_e0fec44d",
       "range": {
         "startLine": 21,
         "startChar": 18,

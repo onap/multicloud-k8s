@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1411cef7_8ca5f237",
+        "filename": "kud/deployment_infra/playbooks/configure-ovn4nfv.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-08-28T14:30:37Z",
+      "side": 1,
+      "message": "Hi Ritu, where is the playbook_dir set?",
+      "range": {
+        "startLine": 48,
+        "startChar": 49,
+        "endLine": 48,
+        "endChar": 61
+      },
+      "revId": "a73b09212b05b546623143f3fb796609177a4055",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

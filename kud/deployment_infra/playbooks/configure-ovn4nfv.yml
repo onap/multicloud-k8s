@@ -45,5 +45,5 @@
       with_inventory_hostnames: ovn-central
 
     - name: Apply NFN operator, operator roles, CRD's and ovn4nfv Daemonset
-      shell: "/usr/local/bin/kubectl apply -f ../images/nfn.yml"
+      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/nfn.yml"
       ignore_errors: True

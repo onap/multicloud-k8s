@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f77f13a8_847cb62d",
+        "filename": "deployments/helm/servicemesh/config/gateways/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-29T20:44:20Z",
+      "side": 1,
+      "message": "This can be removed.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 25
+      },
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1652ee_604694fc",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/templates/virtualservice.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-29T20:44:20Z",
+      "side": 1,
+      "message": "we also need a TCP route type to be supported here too.",
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "13417a4f_b9471b18",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-29T20:44:20Z",
+      "side": 1,
+      "message": "Not needed. Use the generated name from template functions.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 36
+      },
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9331123b_a590b329",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-29T20:44:20Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 5
+      },
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "abbc0534_534d99ab",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-08-29T20:44:20Z",
+      "side": 1,
+      "message": "Simplify this to have just a URL and a destination Route.\nWe can revisit when more customizability is needed.",
+      "range": {
+        "startLine": 22,
+        "startChar": 2,
+        "endLine": 28,
+        "endChar": 28
+      },
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -15,51 +15,63 @@ set -o pipefail
 source _common_test.sh
 
 rm -f $HOME/*.yaml
-
 pod_name=nfd-pod
 
 install_deps
 cat << POD > $HOME/$pod_name.yaml
-apiVersion:
- v1
+apiVersion: v1
 kind: Pod
 metadata:
   name: $pod_name
-  labels:
-    env: test
 spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "feature.node.kubernetes.io/cpu-hardware_multithreading"
+            operator: In
+            values:
+            - "true"
   containers:
-  - name: nginx
-    image: nginx
-nodeSelector:
-  node.alpha.kubernetes-incubator.io/nfd-network-SRIOV: true
+  - name: with-node-affinity
+    image: gcr.io/google_containers/pause:2.0
 POD
-
 if $(kubectl version &>/dev/null); then
     labels=$(kubectl get nodes -o json | jq .items[].metadata.labels)
 
     echo $labels
-    if [[ $labels != *"node.alpha.kubernetes-incubator.io"* ]]; then
+    if [[ $labels != *"kubernetes.io"* ]]; then
         exit 1
     fi
-
     kubectl delete pod $pod_name --ignore-not-found=true --now
     while kubectl get pod $pod_name &>/dev/null; do
         sleep 5
     done
     kubectl create -f $HOME/$pod_name.yaml --validate=false
-
     for pod in $pod_name; do
         status_phase=""
         while [[ $status_phase != "Running" ]]; do
             new_phase=$(kubectl get pods $pod | awk 'NR==2{print $3}')
+
+            if [[ $new_phase == "Pending" ]]; then
+                echo " Deployment type is VM based. CPU-Hardware-Multithreading not available in VM deployment. Therefore, pod will not be scheduled"
+                echo "Test completed.."
+                exit 1
+            fi
+
             if [[ $new_phase != $status_phase ]]; then
                 echo "$(date +%H:%M:%S) - $pod : $new_phase"
                 status_phase=$new_phase
             fi
-            if [[ $new_phase == "Err"* ]]; then
-                exit 1
+
+            if [[ $new_phase == "Running" ]]; then
+                echo " Test is complete.."
             fi
         done
+    done
+    kubectl delete pod $pod_name
+    while kubectl get pod $pod_name &>/dev/null; do
+        sleep 5
     done
 fi

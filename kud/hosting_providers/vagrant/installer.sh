@@ -107,6 +107,7 @@ function install_k8s {
     local_release_dir=$(grep "local_release_dir" $kud_inventory_folder/group_vars/k8s-cluster.yml | awk -F "\"" '{print $2}')
     local tarball=v$version.tar.gz
     sudo apt-get install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
+    sudo apt-get install -y gnupg2 software-properties-common
     _install_docker
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball

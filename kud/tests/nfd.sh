@@ -20,26 +20,30 @@ pod_name=nfd-pod
 
 install_deps
 cat << POD > $HOME/$pod_name.yaml
-apiVersion:
- v1
+apiVersion: v1
 kind: Pod
 metadata:
   name: $pod_name
-  labels:
-    env: test
 spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "feature.node.kubernetes.io/system-os_release.VERSION_ID"
+            operator: In
+            values:
+            - "16.04"
   containers:
-  - name: nginx
-    image: nginx
-nodeSelector:
-  node.alpha.kubernetes-incubator.io/nfd-network-SRIOV: true
+  - name: with-node-affinity
+    image: gcr.io/google_containers/pause:2.0
 POD
 
 if $(kubectl version &>/dev/null); then
     labels=$(kubectl get nodes -o json | jq .items[].metadata.labels)
 
     echo $labels
-    if [[ $labels != *"node.alpha.kubernetes-incubator.io"* ]]; then
+    if [[ $labels != *"feature.node.kubernetes.io"* ]]; then
         exit 1
     fi
 
@@ -63,3 +67,5 @@ if $(kubectl version &>/dev/null); then
         done
     done
 fi
+
+echo "The nfd-pod is created and running for O.S matching on 16.04"

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9afd7648_60291159",
+        "filename": "kud/deployment_infra/playbooks/configure-multus.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-08-30T06:54:09Z",
+      "side": 1,
+      "message": "Is it needed/safe to ignore errors of this task?",
+      "range": {
+        "startLine": 14,
+        "startChar": 6,
+        "endLine": 14,
+        "endChar": 25
+      },
+      "revId": "a5ca2f856cc251223b16983b38ae2ba835debef4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

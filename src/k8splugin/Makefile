@@ -7,9 +7,6 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-GOPATH := $(shell realpath "$(PWD)/../../")
-
-export GOPATH ...
 export GO111MODULE=on
 
 .PHONY: plugins

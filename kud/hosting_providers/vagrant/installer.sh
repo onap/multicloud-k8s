@@ -150,7 +150,7 @@ function install_addons {
     sudo ansible-galaxy install $verbose -r $kud_infra_folder/galaxy-requirements.yml --ignore-errors
 
     ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
-    for addon in ${KUD_ADDONS:-virtlet ovn4nfv}; do
+    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
         if [[ "${testing_enabled}" == "true" ]]; then

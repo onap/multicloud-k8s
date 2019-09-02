@@ -46,6 +46,30 @@
       "revId": "a5ca2f856cc251223b16983b38ae2ba835debef4",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "318c7648_897484e6",
+        "filename": "kud/deployment_infra/playbooks/configure-multus.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-09-02T07:09:59Z",
+      "side": 1,
+      "message": "Thanks for testing this. Can we remove it from playbook then? If not needed, this may cause some troubles if it stays like that",
+      "parentUuid": "614b1376_6f4ec0ac",
+      "range": {
+        "startLine": 14,
+        "startChar": 6,
+        "endLine": 14,
+        "endChar": 25
+      },
+      "revId": "a5ca2f856cc251223b16983b38ae2ba835debef4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

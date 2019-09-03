@@ -41,5 +41,5 @@ clean:
 
 .PHONY: cover
 cover:
-	@go test -p 2 ./... -coverprofile=coverage.out
+	@go test ./... -coverprofile=coverage.out
 	@go tool cover -html=coverage.out -o coverage.html

@@ -8,11 +8,9 @@
 ##############################################################################
 
 PWD := $(shell pwd)
-GOPATH := $(shell realpath "$(PWD)/../../")
 PLATFORM := linux
 BINARY := monitor
 
-export GOPATH ...
 export GO111MODULE=on
 
 all: test build

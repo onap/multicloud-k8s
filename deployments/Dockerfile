@@ -19,10 +19,6 @@ ENV no_proxy $NO_PROXY
 EXPOSE 9015
 
 RUN groupadd -r onap && useradd -r -g onap onap
-RUN apt-get update && apt-get install -y -qq apt-transport-https curl \
- && echo "deb https://packages.wand.net.nz xenial main" > /etc/apt/sources.list.d/wand.list \
- && curl https://packages.wand.net.nz/keyring.gpg -o /etc/apt/trusted.gpg.d/wand.gpg \
- && apt-get update && apt install -y -qq ovn-common
 
 WORKDIR /opt/multicloud/k8splugin
 RUN chown onap:onap /opt/multicloud/k8splugin -R

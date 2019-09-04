@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Network
-metadata:
-  name: ovn-priv-net
-spec:
-  cnitype: "ovn4nfvk8s"
-  name:    "ovn-priv-net"
-  subnet:  "172.16.33.0/24"
-  gateway: "172.16.33.1/24"

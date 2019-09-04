@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "67a6bd09_d79f1fe6",
+        "filename": "deployments/helm/servicemesh/config/gateways/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-04T20:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f77f13a8_847cb62d",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 25
+      },
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1652ee_604694fc",
         "filename": "deployments/helm/servicemesh/config/virtualservices/templates/virtualservice.yaml",
         "patchSetId": 2
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "fe0e3b0e_c00e6626",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/templates/virtualservice.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-04T20:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1652ee_604694fc",
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "13417a4f_b9471b18",
         "filename": "deployments/helm/servicemesh/config/virtualservices/values.yaml",
         "patchSetId": 2
@@ -53,6 +95,30 @@
       "writtenOn": "2019-08-29T20:44:20Z",
       "side": 1,
       "message": "Not needed. Use the generated name from template functions.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 36
+      },
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b3d34994_b859b0d6",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-04T20:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13417a4f_b9471b18",
       "range": {
         "startLine": 14,
         "startChar": 0,
@@ -88,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "c89d9331_cad8ed35",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-04T20:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9331123b_a590b329",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 5
+      },
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "abbc0534_534d99ab",
         "filename": "deployments/helm/servicemesh/config/virtualservices/values.yaml",
         "patchSetId": 2
@@ -99,6 +189,30 @@
       "writtenOn": "2019-08-29T20:44:20Z",
       "side": 1,
       "message": "Simplify this to have just a URL and a destination Route.\nWe can revisit when more customizability is needed.",
+      "range": {
+        "startLine": 22,
+        "startChar": 2,
+        "endLine": 28,
+        "endChar": 28
+      },
+      "revId": "ce39135db27211b07dab2939b43a5617e125638b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b09fac26_3943c2b1",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-04T20:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "abbc0534_534d99ab",
       "range": {
         "startLine": 22,
         "startChar": 2,

@@ -26,7 +26,6 @@ deploy: build
 .PHONY: test
 test: clean
 	@go build -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
-	@go build -buildmode=plugin -o ./mock_files/mock_plugins/mocknetworkplugin.so ./mock_files/mock_plugins/mocknetworkplugin.go
 	@go test -v ./...
 
 format:

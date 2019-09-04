@@ -37,7 +37,6 @@ type Configuration struct {
 	EtcdCert            string `json:"etcd-cert"`
 	EtcdKey             string `json:"etcd-key"`
 	EtcdCAFile          string `json:"etcd-ca-file"`
-	OVNCentralAddress   string `json:"ovn-central-address"`
 	ServicePort         string `json:"service-port"`
 	KubernetesLabelName string `json:"kubernetes-label-name"`
 }
@@ -86,7 +85,6 @@ func defaultConfiguration() *Configuration {
 		EtcdCert:            "etcd.cert",
 		EtcdKey:             "etcd.key",
 		EtcdCAFile:          "etcd-ca.cert",
-		OVNCentralAddress:   "127.0.0.1:6641",
 		ServicePort:         "9015",
 		KubernetesLabelName: "k8splugin.io/rb-instance-id",
 	}

@@ -27,7 +27,7 @@ import (
 
 func TestProcessValues(t *testing.T) {
 
-	chartDir := "../../mock_files/mock_charts/testchart1"
+	chartDir := "../../mock_files/mock_charts/testchart2"
 	profileDir := "../../mock_files/mock_profiles/profile1"
 
 	testCases := []struct {
@@ -105,7 +105,7 @@ func TestProcessValues(t *testing.T) {
 
 func TestGenerateKubernetesArtifacts(t *testing.T) {
 
-	chartDir := "../../mock_files/mock_charts/testchart1"
+	chartDir := "../../mock_files/mock_charts/testchart2"
 	profileDir := "../../mock_files/mock_profiles/profile1"
 
 	testCases := []struct {
@@ -123,7 +123,7 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 			values:     []string{},
 			//sha256 hash of the evaluated templates in each chart
 			expectedHashMap: map[string]string{
-				"testchart1/templates/service.yaml": "bbd7257d1f6ab958680e642a8fbbbea2002ebbaa9276fb51fbd71b4b66a772cc",
+				"testchart2/templates/service.yaml": "fdd6a2b6795486f0dd1d8c44379afb5ffe4072c09f9cf6594738e8ded4dd872d",
 				"subcharta/templates/service.yaml":  "570389588fffdb7193ab265888d781f3d751f3a40362533344f9aa7bb93a8bb0",
 				"subchartb/templates/service.yaml":  "5654e03d922e8ec49649b4bbda9dfc9e643b3b7c9c18b602cc7e26fd36a39c2a",
 			},
@@ -140,7 +140,7 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 			},
 			//sha256 hash of the evaluated templates in each chart
 			expectedHashMap: map[string]string{
-				"testchart1/templates/service.yaml": "4c5aa5d38b763fe4730fc31a759c40566a99a9c51f5e0fc7f93473c9affc2ca8",
+				"testchart2/templates/service.yaml": "2bb96e791ecb6a3404bc5de3f6c4182aed881630269e2aa6766df38b0f852724",
 				"subcharta/templates/service.yaml":  "570389588fffdb7193ab265888d781f3d751f3a40362533344f9aa7bb93a8bb0",
 				"subchartb/templates/service.yaml":  "5654e03d922e8ec49649b4bbda9dfc9e643b3b7c9c18b602cc7e26fd36a39c2a",
 			},

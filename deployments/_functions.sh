@@ -21,16 +21,11 @@ function start_mongo {
 }
 
 function generate_k8sconfig {
-    local ovn_address
-    if [ -n "${OVN_CENTRAL_ADDRESS:-}" ]; then
-        ovn_address="\"ovn-central-address\": \"${OVN_CENTRAL_ADDRESS}\","
-    fi
 cat << EOF > k8sconfig.json
 {
     "database-address": "${DATABASE_IP}",
     "database-type": "mongo",
     "plugin-dir": "plugins",
-    ${ovn_address}
     "service-port": "9015"
 }
 EOF

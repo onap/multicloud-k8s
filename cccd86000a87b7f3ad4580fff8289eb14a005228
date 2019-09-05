@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4ba459ff_363b4b12",
+        "filename": "deployments/helm/servicemesh/config/gateways/templates/gateway.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-05T18:07:11Z",
+      "side": 1,
+      "message": "use templated name",
+      "range": {
+        "startLine": 19,
+        "startChar": 8,
+        "endLine": 19,
+        "endChar": 28
+      },
+      "revId": "cccd86000a87b7f3ad4580fff8289eb14a005228",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "41300173_7cf9f90e",
+        "filename": "deployments/helm/servicemesh/config/virtualservices/templates/virtualservice.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-05T18:07:11Z",
+      "side": 1,
+      "message": "use generated name",
+      "range": {
+        "startLine": 19,
+        "startChar": 8,
+        "endLine": 19,
+        "endChar": 36
+      },
+      "revId": "cccd86000a87b7f3ad4580fff8289eb14a005228",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

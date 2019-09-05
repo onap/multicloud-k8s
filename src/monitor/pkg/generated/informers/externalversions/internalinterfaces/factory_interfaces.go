@@ -18,7 +18,7 @@
 package internalinterfaces
 
 import (
-	versioned "monitor/pkg/generated/clientset/versioned"
+	versioned "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

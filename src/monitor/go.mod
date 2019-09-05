@@ -1,4 +1,4 @@
-module monitor
+module github.com/onap/multicloud-k8s/src/monitor
 
 require (
 	github.com/NYTimes/gziphandler v1.0.1 // indirect

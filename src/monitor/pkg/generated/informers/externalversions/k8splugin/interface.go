@@ -18,8 +18,8 @@
 package k8splugin
 
 import (
-	internalinterfaces "monitor/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "monitor/pkg/generated/informers/externalversions/k8splugin/v1alpha1"
+	internalinterfaces "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/informers/externalversions/k8splugin/v1alpha1"
 )
 
 // Interface provides access to each of this group's versions.

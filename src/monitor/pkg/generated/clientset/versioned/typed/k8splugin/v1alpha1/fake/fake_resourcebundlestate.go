@@ -18,7 +18,7 @@
 package fake
 
 import (
-	v1alpha1 "monitor/pkg/apis/k8splugin/v1alpha1"
+	v1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"

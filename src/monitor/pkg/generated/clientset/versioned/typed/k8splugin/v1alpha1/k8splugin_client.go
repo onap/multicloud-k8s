@@ -18,8 +18,8 @@
 package v1alpha1
 
 import (
-	v1alpha1 "monitor/pkg/apis/k8splugin/v1alpha1"
-	"monitor/pkg/generated/clientset/versioned/scheme"
+	v1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
+	"github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/scheme"
 
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	rest "k8s.io/client-go/rest"

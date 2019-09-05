@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"monitor/pkg/apis/k8splugin/v1alpha1"
+	"github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 )
 
 func init() {

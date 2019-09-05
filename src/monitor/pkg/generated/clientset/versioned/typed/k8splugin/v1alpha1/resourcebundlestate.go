@@ -18,8 +18,8 @@
 package v1alpha1
 
 import (
-	v1alpha1 "monitor/pkg/apis/k8splugin/v1alpha1"
-	scheme "monitor/pkg/generated/clientset/versioned/scheme"
+	v1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
+	scheme "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/scheme"
 	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

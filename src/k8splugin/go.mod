@@ -11,7 +11,7 @@ require (
 	github.com/coreos/etcd v3.3.12+incompatible // indirect
 	github.com/cyphar/filepath-securejoin v0.2.2 // indirect
 	github.com/docker/distribution v2.7.0+incompatible // indirect
-	github.com/docker/docker v0.7.3-0.20190312165151-258edd715d46 // indirect
+	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.3.3 // indirect
 	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
@@ -50,6 +50,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
+	github.com/moby/moby v1.13.1
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180228065516-1df9eeb2bb81 // indirect
 	github.com/mongodb/mongo-go-driver v1.0.0

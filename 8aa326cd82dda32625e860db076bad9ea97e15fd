@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "38c6f6dd_4a3a0e06",
+        "filename": "kud/deployment_infra/images/nfd-master.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-09-09T22:53:47Z",
+      "side": 1,
+      "message": "Please add a comment mentioning the source of this file like a link to the nfd github repo from where these files are copied",
+      "revId": "8aa326cd82dda32625e860db076bad9ea97e15fd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

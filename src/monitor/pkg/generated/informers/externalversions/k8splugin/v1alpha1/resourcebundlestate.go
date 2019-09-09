@@ -18,10 +18,10 @@
 package v1alpha1
 
 import (
-	k8spluginv1alpha1 "monitor/pkg/apis/k8splugin/v1alpha1"
-	versioned "monitor/pkg/generated/clientset/versioned"
-	internalinterfaces "monitor/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "monitor/pkg/generated/listers/k8splugin/v1alpha1"
+	k8spluginv1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
+	versioned "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned"
+	internalinterfaces "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/listers/k8splugin/v1alpha1"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

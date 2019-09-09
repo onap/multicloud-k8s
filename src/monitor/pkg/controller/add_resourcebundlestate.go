@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"monitor/pkg/controller/resourcebundlestate"
+	"github.com/onap/multicloud-k8s/src/monitor/pkg/controller/resourcebundlestate"
 )
 
 func init() {

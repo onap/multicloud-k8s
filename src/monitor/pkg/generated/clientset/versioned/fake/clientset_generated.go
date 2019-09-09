@@ -18,9 +18,9 @@
 package fake
 
 import (
-	clientset "monitor/pkg/generated/clientset/versioned"
-	k8spluginv1alpha1 "monitor/pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1"
-	fakek8spluginv1alpha1 "monitor/pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/fake"
+	clientset "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned"
+	k8spluginv1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1"
+	fakek8spluginv1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/fake"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"

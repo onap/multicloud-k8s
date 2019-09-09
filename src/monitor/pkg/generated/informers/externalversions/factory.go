@@ -18,9 +18,9 @@
 package externalversions
 
 import (
-	versioned "monitor/pkg/generated/clientset/versioned"
-	internalinterfaces "monitor/pkg/generated/informers/externalversions/internalinterfaces"
-	k8splugin "monitor/pkg/generated/informers/externalversions/k8splugin"
+	versioned "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned"
+	internalinterfaces "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/informers/externalversions/internalinterfaces"
+	k8splugin "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/informers/externalversions/k8splugin"
 	reflect "reflect"
 	sync "sync"
 	time "time"

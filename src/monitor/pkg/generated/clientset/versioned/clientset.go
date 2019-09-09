@@ -19,7 +19,7 @@ package versioned
 
 import (
 	"fmt"
-	k8spluginv1alpha1 "monitor/pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1"
+	k8spluginv1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1"
 
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"monitor/pkg/apis/k8splugin/v1alpha1"
+	"github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"

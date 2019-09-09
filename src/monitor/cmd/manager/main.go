@@ -11,8 +11,8 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 
-	"monitor/pkg/apis"
-	"monitor/pkg/controller"
+	"github.com/onap/multicloud-k8s/src/monitor/pkg/apis"
+	"github.com/onap/multicloud-k8s/src/monitor/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	kubemetrics "github.com/operator-framework/operator-sdk/pkg/kube-metrics"

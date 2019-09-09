@@ -16,6 +16,24 @@
       "revId": "8aa326cd82dda32625e860db076bad9ea97e15fd",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e4e749a5_64e881de",
+        "filename": "kud/deployment_infra/images/nfd-master.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-09-09T23:02:10Z",
+      "side": 1,
+      "message": "Thank you for reviewing this Ritu. I\u0027ve added the link in the JIRA story. Would you want it to be added here as well?",
+      "parentUuid": "38c6f6dd_4a3a0e06",
+      "revId": "8aa326cd82dda32625e860db076bad9ea97e15fd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

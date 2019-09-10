@@ -39,6 +39,30 @@
       "revId": "90a6009716a09b8438fb1abfaf8e6992eee9f0aa",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4c1b392d_d64b0149",
+        "filename": "kud/tests/nfd.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-09-10T18:11:23Z",
+      "side": 1,
+      "message": "Hi Konrad, thank you for reviewing the patch. Before I make any changes, I want to explain why I chose \u0027cpu-hardware_multithreading\u0027 as the matchExpression over system-os_release.ID. Right now we are running KuD on 16.04 O.S. We will be moving to 18.04 in the future. However, another project which uses KuD is running on 18.04 currently. If this test case passes in one would fail in other. I also did some testing before using CPU-hardware... Upon testing with multiple match expressions and checking for the labels in 3 Hardware devices, CPU-hardware... was enabled in all 3 cases in the Bios. Hence, I chose this label. CPU-hardware... match expression would work for Baremetal, ICN deployment(another project) and VM deployment since it is bound to be not scheduled. \nThis test case is bound to fail in a VM deployment. I think I should have put a comment about it in retrospect. \nHowever, the test case passes in all the Baremetal deployment.\nSince people who use KuD defer to Baremetal deployment as opposed to VM which is used for testing purposes, I think CPU-hardware is a good candidate that fits all. \n\nHaving said that, I do agree with you that \"pending state\" test case should be changed and I will do that. \n\nPlease let me know your thoughts.",
+      "parentUuid": "51432bce_c86dc779",
+      "range": {
+        "startLine": 57,
+        "startChar": 33,
+        "endLine": 57,
+        "endChar": 40
+      },
+      "revId": "90a6009716a09b8438fb1abfaf8e6992eee9f0aa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

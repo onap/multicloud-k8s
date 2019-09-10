@@ -12,6 +12,29 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+for arg; do
+    case "$arg" in
+        --help|-h)
+            {
+                echo "Run integration testcase on KUD deployment"
+                echo "deploying vFW demo on hybrid container-VM"
+                echo "setup. Script by default cleans environment."
+                echo "If you want it to be preserved, launch script"
+                echo "with --preserve flag"
+            } >&2
+            exit 0
+            ;;
+        --preserve)
+            PRESERVE_ENVIRONMENT=1
+            break
+            ;;
+        *)
+            #not implemented
+            break
+            ;;
+    esac
+done
+
 source _common.sh
 source _common_test.sh
 source _functions.sh
@@ -23,8 +46,17 @@ if [[ ! -f $HOME/.ssh/id_rsa.pub ]]; then
     echo -e "\n\n\n" | ssh-keygen -t rsa -N ""
 fi
 populate_CSAR_vms_containers_vFW $csar_id
-
 pushd ${CSAR_DIR}/${csar_id}
+
+#Clean env
+print_msg "Cleanup scenario leftovers"
+teardown $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
+for item in $unprotected_private_net $protected_private_net $onap_private_net sink-service sink_configmap; do
+    kubectl delete -f $item.yaml --ignore-not-found
+done
+
+#Spin up
+print_msg "Instantiate vcFW"
 for net in $unprotected_private_net $protected_private_net $onap_private_net; do
     echo "Create OVN Network $net network"
     kubectl apply -f $net.yaml
@@ -33,9 +65,9 @@ for resource in onap-ovn4nfvk8s-network sink-service sink_configmap; do
     kubectl apply -f $resource.yaml
 done
 setup $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
-#kubectl port-forward deployment/$sink_deployment_name 667:667
 
 # Test
+print_msg "Verify integration functionality"
 for deployment_name in $packetgen_deployment_name $firewall_deployment_name; do
     pod_name=$(kubectl get pods | grep  $deployment_name | awk '{print $1}')
     vm=$(kubectl virt virsh list | grep ".*$deployment_name"  | awk '{print $2}')
@@ -47,8 +79,17 @@ for deployment_name in $packetgen_deployment_name $firewall_deployment_name; do
 done
 
 # Teardown
-#teardown $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
-#for net in $unprotected_private_net $protected_private_net $onap_private_net; do
-#    kubectl delete -f $net.yaml
-#done
+if [ "${PRESERVE_ENVIRONMENT:-}" == "1" ]; then
+    print_msg "Integration scenario access"
+    echo "You can access darkstat service on your pc by (for example) port forwarding sink service"
+    echo '`kubectl port-forward svc/sink-service 667`'
+    echo "or by direct access to any k8s node under port $(kubectl get svc sink-service -o jsonpath='{.spec.ports[0].nodePort}')"
+    print_msg ""
+else
+    print_msg "Teardown integration scenario"
+    teardown $packetgen_deployment_name $firewall_deployment_name $sink_deployment_name
+    for item in $unprotected_private_net $protected_private_net $onap_private_net sink-service sink_configmap; do
+        kubectl delete -f $item.yaml
+    done
+fi
 popd

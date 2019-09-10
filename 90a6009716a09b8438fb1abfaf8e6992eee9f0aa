@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfe466ea_08e86965",
+        "filename": "kud/tests/nfd.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-09-10T11:20:26Z",
+      "side": 1,
+      "message": "I\u0027ve got one suggestion here. As \u0027cpu-hardware_multithreading\u0027 capability is not that common (at least in my openstack lab such feature is not discovered on KUD node, I guess LF jenkins slaves may also not have it), I\u0027d suggest to change matchExpression so that this testcase won\u0027t fail, because such capability shouldn\u0027t limit nfd functionality.\nMy advice would be to set matchExpression based on some more common label, like \"feature.node.kubernetes.io/system-os_release.ID\" (with prior checking of assigned label value of any k8s node).",
+      "revId": "90a6009716a09b8438fb1abfaf8e6992eee9f0aa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51432bce_c86dc779",
+        "filename": "kud/tests/nfd.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-09-10T11:20:26Z",
+      "side": 1,
+      "message": "I think assuming only \"Pending\" state of pod as a fail condition may be misleading in some environments (like pod sandbox may be creating for too long time, or image pulling). I\u0027d suggest to apply further check here.\n\nHaving looked into such \"Pending\" pod, it looks like it should have in it\u0027s last (chronologicaly first) status condition, \"PodScheduled -\u003e False -\u003e Unschedulable\" information provided.\nIt can be easily retrieved with example commands:\n```\nkubectl get pods  nfd-pod -o json | jq \u0027.status.conditions[-1]\u0027 #For checking first status condition struct\nkubectl get pods  nfd-pod -o json | jq \u0027.status.conditions[-1].reason\u0027 -r #For retrieving exact status\n```\n\nI\u0027d suggest to apply some further checking like aobve here, to ensure this \"Pending\" condition is really a symptom of nfd issue.",
+      "range": {
+        "startLine": 57,
+        "startChar": 33,
+        "endLine": 57,
+        "endChar": 40
+      },
+      "revId": "90a6009716a09b8438fb1abfaf8e6992eee9f0aa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

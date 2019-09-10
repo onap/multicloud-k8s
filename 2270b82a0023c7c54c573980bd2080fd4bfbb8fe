@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ea20e724_96f4211a",
+        "filename": "src/k8splugin/api/instancehandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-10T17:17:42Z",
+      "side": 1,
+      "message": "Move this somewhere else so that packages can just use the withfields directly without worrying about formatter.",
+      "range": {
+        "startLine": 37,
+        "startChar": 8,
+        "endLine": 37,
+        "endChar": 48
+      },
+      "revId": "2270b82a0023c7c54c573980bd2080fd4bfbb8fe",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cd3797a_46c99c3c",
+        "filename": "src/k8splugin/api/instancehandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-10T17:17:42Z",
+      "side": 1,
+      "message": "The fields here should match the field that we are checking.",
+      "range": {
+        "startLine": 41,
+        "startChar": 40,
+        "endLine": 51,
+        "endChar": 116
+      },
+      "revId": "2270b82a0023c7c54c573980bd2080fd4bfbb8fe",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c17271e0_95ee8b92",
+        "filename": "src/k8splugin/api/instancehandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-10T17:17:42Z",
+      "side": 1,
+      "message": "Please use go fmt to format your code or setup your editor to do it for you. VSCode is a good editor that works for us.\nGo does not use spaces for indentation. It uses Tabs.",
+      "range": {
+        "startLine": 36,
+        "startChar": 1,
+        "endLine": 57,
+        "endChar": 1
+      },
+      "revId": "2270b82a0023c7c54c573980bd2080fd4bfbb8fe",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "af81bb92_32075978",
+        "filename": "src/k8splugin/api/instancehandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-10T17:17:42Z",
+      "side": 1,
+      "message": "Add a log statement here to track the above error from validate body.",
+      "revId": "2270b82a0023c7c54c573980bd2080fd4bfbb8fe",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

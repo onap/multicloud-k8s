@@ -22,33 +22,38 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 
 	"github.com/gorilla/mux"
-	pkgerrors "github.com/pkg/errors"
+	 logr "github.com/sirupsen/logrus"
+     pkgerrors "github.com/pkg/errors"
 )
 
 // Used to store the backend implementation objects
 // Also simplifies the mocking needed for unit testing
 type instanceHandler struct {
-	// Interface that implements the Instance operations
-	client app.InstanceManager
+        // Interface that implements the Instance operations
+        client app.InstanceManager
 }
 
 func (i instanceHandler) validateBody(body interface{}) error {
-	switch b := body.(type) {
-	case app.InstanceRequest:
-		if b.CloudRegion == "" {
-			werr := pkgerrors.Wrap(errors.New("Invalid/Missing CloudRegion in POST request"), "CreateVnfRequest bad request")
-			return werr
-		}
-		if b.RBName == "" || b.RBVersion == "" {
-			werr := pkgerrors.Wrap(errors.New("Invalid/Missing resource bundle parameters in POST request"), "CreateVnfRequest bad request")
-			return werr
-		}
-		if b.ProfileName == "" {
-			werr := pkgerrors.Wrap(errors.New("Invalid/Missing profile name in POST request"), "CreateVnfRequest bad request")
-			return werr
-		}
-	}
-	return nil
+        logr.SetFormatter(&logr.JSONFormatter{})
+        switch b := body.(type) {
+        case app.InstanceRequest:
+                if b.CloudRegion == "" {
+                        logr.WithFields(logr.Fields{"CloudRegion": "Invalid/Missing CloudRegion in POST request"}).Error("CreateVnfRequest bad request")
+                        werr := pkgerrors.Wrap(errors.New("Invalid/Missing CloudRegion in POST request"), "CreateVnfRequest bad request")
+                        return werr
+                }
+                if b.RBName == "" || b.RBVersion == "" {
+                        logr.WithFields(logr.Fields{"CloudRegion": "Invalid/Missing resource bundle parameters in POST request"}).Error("CreateVnfRequest bad request")
+                        werr := pkgerrors.Wrap(errors.New("Invalid/Missing resource bundle parameters in POST request"), "CreateVnfRequest bad request")
+                        return werr
+                }
+                if b.ProfileName == "" {
+                        logr.WithFields(logr.Fields{"CloudRegion": "Invalid/Missing profile name in POST request"}).Error("CreateVnfRequest bad request")
+                        werr := pkgerrors.Wrap(errors.New("Invalid/Missing profile name in POST request"), "CreateVnfRequest bad request")
+                        return werr
+                }
+        }
+        return nil
 }
 
 func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {

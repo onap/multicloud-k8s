@@ -24,7 +24,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
-	"github.com/moby/moby/pkg/namesgenerator"
+	"github.com/docker/engine/pkg/namesgenerator"
 	pkgerrors "github.com/pkg/errors"
 )
 

@@ -25,7 +25,7 @@ import (
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/discovery/cached/disk"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/restmapper"
@@ -37,7 +37,7 @@ import (
 type KubernetesClient struct {
 	clientSet      kubernetes.Interface
 	dynamicClient  dynamic.Interface
-	discoverClient discovery.CachedDiscoveryInterface
+	discoverClient *disk.CachedDiscoveryClient
 	restMapper     meta.RESTMapper
 	instanceID     string
 }
@@ -90,7 +90,7 @@ func (k *KubernetesClient) init(cloudregion string, iid string) error {
 		return pkgerrors.Wrap(err, "Creating dynamic client")
 	}
 
-	k.discoverClient, err = discovery.NewCachedDiscoveryClientForConfig(config, os.TempDir(), "", 10*time.Minute)
+	k.discoverClient, err = disk.NewCachedDiscoveryClientForConfig(config, os.TempDir(), "", 10*time.Minute)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Creating discovery client")
 	}

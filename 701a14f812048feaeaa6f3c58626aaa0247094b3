@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "74230720_a949b978",
+        "filename": "deployments/helm/servicemesh/policy/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-16T21:00:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55454a09_6baf1498",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 8
+      },
+      "revId": "701a14f812048feaeaa6f3c58626aaa0247094b3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7df6be33_04921792",
         "filename": "deployments/helm/servicemesh/policy/values.yaml",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2019-08-29T20:32:37Z",
       "side": 1,
       "message": "auto generated using template function.",
+      "range": {
+        "startLine": 21,
+        "startChar": 2,
+        "endLine": 21,
+        "endChar": 6
+      },
+      "revId": "701a14f812048feaeaa6f3c58626aaa0247094b3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e31a9a9d_e7b28560",
+        "filename": "deployments/helm/servicemesh/policy/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-16T21:00:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7df6be33_04921792",
       "range": {
         "startLine": 21,
         "startChar": 2,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "9a850774_93cdacec",
+        "filename": "deployments/helm/servicemesh/policy/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-16T21:00:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9d266bf_42ebc94c",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 4
+      },
+      "revId": "701a14f812048feaeaa6f3c58626aaa0247094b3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "778b9948_08984e68",
         "filename": "deployments/helm/servicemesh/policy/values.yaml",
         "patchSetId": 2
@@ -82,6 +154,30 @@
       "writtenOn": "2019-08-29T20:32:37Z",
       "side": 1,
       "message": "make this targetService",
+      "range": {
+        "startLine": 23,
+        "startChar": 1,
+        "endLine": 24,
+        "endChar": 24
+      },
+      "revId": "701a14f812048feaeaa6f3c58626aaa0247094b3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99e59f33_0215d0d0",
+        "filename": "deployments/helm/servicemesh/policy/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-16T21:00:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "778b9948_08984e68",
       "range": {
         "startLine": 23,
         "startChar": 1,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "971fb192_7a64adec",
+        "filename": "deployments/helm/servicemesh/policy/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-16T21:00:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "286c1fbb_2ff7f3f4",
+      "range": {
+        "startLine": 25,
+        "startChar": 2,
+        "endLine": 25,
+        "endChar": 9
+      },
+      "revId": "701a14f812048feaeaa6f3c58626aaa0247094b3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "acda861c_a8fac47a",
         "filename": "deployments/helm/servicemesh/policy/values.yaml",
         "patchSetId": 2
@@ -128,6 +248,30 @@
       "writtenOn": "2019-08-29T20:32:37Z",
       "side": 1,
       "message": "Move it to template",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 30
+      },
+      "revId": "701a14f812048feaeaa6f3c58626aaa0247094b3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa8098b7_18814fe5",
+        "filename": "deployments/helm/servicemesh/policy/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-16T21:00:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "acda861c_a8fac47a",
       "range": {
         "startLine": 29,
         "startChar": 0,

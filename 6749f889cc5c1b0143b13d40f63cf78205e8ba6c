@@ -1,0 +1,182 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8f802d92_3815d032",
+        "filename": "deployments/helm/servicemesh/rbac/Chart.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T19:56:10Z",
+      "side": 1,
+      "message": "update description",
+      "range": {
+        "startLine": 3,
+        "startChar": 13,
+        "endLine": 3,
+        "endChar": 40
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94c898b8_cd08133c",
+        "filename": "deployments/helm/servicemesh/rbac/templates/rbacenablement.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T19:56:10Z",
+      "side": 1,
+      "message": "license",
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d6d72bee_66ef6d34",
+        "filename": "deployments/helm/servicemesh/rbac/templates/rbacenablement.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T19:56:10Z",
+      "side": 1,
+      "message": "templatized",
+      "range": {
+        "startLine": 4,
+        "startChar": 8,
+        "endLine": 4,
+        "endChar": 15
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f95e0c67_468122dc",
+        "filename": "deployments/helm/servicemesh/rbac/templates/servicerole.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T19:56:10Z",
+      "side": 1,
+      "message": "should be templatized",
+      "range": {
+        "startLine": 19,
+        "startChar": 8,
+        "endLine": 19,
+        "endChar": 19
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "53111127_ac9a4129",
+        "filename": "deployments/helm/servicemesh/rbac/templates/servicerolebinding.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T19:56:10Z",
+      "side": 1,
+      "message": "should be templatized",
+      "range": {
+        "startLine": 19,
+        "startChar": 8,
+        "endLine": 19,
+        "endChar": 26
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "abaa358a_1ec40aa3",
+        "filename": "deployments/helm/servicemesh/rbac/values.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T19:56:10Z",
+      "side": 1,
+      "message": "rename to servicerolerule as this is not an array.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 16
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "58e830fc_6ba7757d",
+        "filename": "deployments/helm/servicemesh/rbac/values.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T19:56:10Z",
+      "side": 1,
+      "message": "Is this supposed to be an array of service name? if not, we can get rid of the plural key.",
+      "range": {
+        "startLine": 18,
+        "startChar": 4,
+        "endLine": 18,
+        "endChar": 12
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "88ee71c8_e6e313e4",
+        "filename": "deployments/helm/servicemesh/rbac/values.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T19:56:10Z",
+      "side": 1,
+      "message": "nit: I would prefer if we use camelCase for keys where appropriate as it improves readability and falls in line with the usual yaml convention used in kubernetes.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 32
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

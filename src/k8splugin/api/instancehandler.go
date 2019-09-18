@@ -106,6 +106,26 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// statusHandler retrieves status about an instance via the ID
+func (i instanceHandler) statusHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["instID"]
+
+	resp, err := i.client.Status(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // listHandler retrieves information about an instance via the ID
 func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 

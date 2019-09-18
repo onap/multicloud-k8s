@@ -22,38 +22,38 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 
 	"github.com/gorilla/mux"
-	 logr "github.com/sirupsen/logrus"
-     pkgerrors "github.com/pkg/errors"
+	pkgerrors "github.com/pkg/errors"
+	logr "github.com/sirupsen/logrus"
 )
 
 // Used to store the backend implementation objects
 // Also simplifies the mocking needed for unit testing
 type instanceHandler struct {
-        // Interface that implements the Instance operations
-        client app.InstanceManager
+	// Interface that implements the Instance operations
+	client app.InstanceManager
 }
 
 func (i instanceHandler) validateBody(body interface{}) error {
-        logr.SetFormatter(&logr.JSONFormatter{})
-        switch b := body.(type) {
-        case app.InstanceRequest:
-                if b.CloudRegion == "" {
-                        logr.WithFields(logr.Fields{"CloudRegion": "Invalid/Missing CloudRegion in POST request"}).Error("CreateVnfRequest bad request")
-                        werr := pkgerrors.Wrap(errors.New("Invalid/Missing CloudRegion in POST request"), "CreateVnfRequest bad request")
-                        return werr
-                }
-                if b.RBName == "" || b.RBVersion == "" {
-                        logr.WithFields(logr.Fields{"CloudRegion": "Invalid/Missing resource bundle parameters in POST request"}).Error("CreateVnfRequest bad request")
-                        werr := pkgerrors.Wrap(errors.New("Invalid/Missing resource bundle parameters in POST request"), "CreateVnfRequest bad request")
-                        return werr
-                }
-                if b.ProfileName == "" {
-                        logr.WithFields(logr.Fields{"CloudRegion": "Invalid/Missing profile name in POST request"}).Error("CreateVnfRequest bad request")
-                        werr := pkgerrors.Wrap(errors.New("Invalid/Missing profile name in POST request"), "CreateVnfRequest bad request")
-                        return werr
-                }
-        }
-        return nil
+	logr.SetFormatter(&logr.JSONFormatter{})
+	switch b := body.(type) {
+	case app.InstanceRequest:
+		if b.CloudRegion == "" {
+			logr.WithFields(logr.Fields{"CloudRegion": "Invalid/Missing CloudRegion in POST request"}).Error("CreateVnfRequest bad request")
+			werr := pkgerrors.Wrap(errors.New("Invalid/Missing CloudRegion in POST request"), "CreateVnfRequest bad request")
+			return werr
+		}
+		if b.RBName == "" || b.RBVersion == "" {
+			logr.WithFields(logr.Fields{"RBName": "Invalid/Missing resource bundle parameters in POST request", "RBVersion": "Invalid/Missing resource bundle parameters in POST request"}).Error("CreateVnfRequest bad request")
+			werr := pkgerrors.Wrap(errors.New("Invalid/Missing resource bundle parameters in POST request"), "CreateVnfRequest bad request")
+			return werr
+		}
+		if b.ProfileName == "" {
+			logr.WithFields(logr.Fields{"ProfileName": "Invalid/Missing profile name in POST request"}).Error("CreateVnfRequest bad request")
+			werr := pkgerrors.Wrap(errors.New("Invalid/Missing profile name in POST request"), "CreateVnfRequest bad request")
+			return werr
+		}
+	}
+	return nil
 }
 
 func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,9 +62,11 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&resource)
 	switch {
 	case err == io.EOF:
+		logr.WithFields(logr.Fields{"Error": "Body empty"}).Error("http.StatusBadRequest")
 		http.Error(w, "Body empty", http.StatusBadRequest)
 		return
 	case err != nil:
+		logr.WithFields(logr.Fields{"Error": "http.StatusUnprocessableEntity"}).Error("http.StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -72,12 +74,14 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	// Check body for expected parameters
 	err = i.validateBody(resource)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusUnprocessableEntity"}).Error("StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	resp, err := i.client.Create(resource)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -86,6 +90,7 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -98,6 +103,7 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := i.client.Get(id)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -106,6 +112,7 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -122,6 +129,7 @@ func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := i.client.List(rbName, rbVersion, ProfileName)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -130,6 +138,7 @@ func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -142,6 +151,7 @@ func (i instanceHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := i.client.Delete(id)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -152,69 +162,69 @@ func (i instanceHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 // // UpdateHandler method to update a VNF instance.
 // func UpdateHandler(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	id := vars["vnfInstanceId"]
+//      vars := mux.Vars(r)
+//      id := vars["vnfInstanceId"]
 
-// 	var resource UpdateVnfRequest
+//      var resource UpdateVnfRequest
 
-// 	if r.Body == nil {
-// 		http.Error(w, "Body empty", http.StatusBadRequest)
-// 		return
-// 	}
+//      if r.Body == nil {
+//              http.Error(w, "Body empty", http.StatusBadRequest)
+//              return
+//      }
 
-// 	err := json.NewDecoder(r.Body).Decode(&resource)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
-// 		return
-// 	}
+//      err := json.NewDecoder(r.Body).Decode(&resource)
+//      if err != nil {
+//              http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+//              return
+//      }
 
-// 	err = validateBody(resource)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
-// 		return
-// 	}
+//      err = validateBody(resource)
+//      if err != nil {
+//              http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+//              return
+//      }
 
-// 	kubeData, err := utils.ReadCSARFromFileSystem(resource.CsarID)
+//      kubeData, err := utils.ReadCSARFromFileSystem(resource.CsarID)
 
-// 	if kubeData.Deployment == nil {
-// 		werr := pkgerrors.Wrap(err, "Update VNF deployment error")
-// 		http.Error(w, werr.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	kubeData.Deployment.SetUID(types.UID(id))
+//      if kubeData.Deployment == nil {
+//              werr := pkgerrors.Wrap(err, "Update VNF deployment error")
+//              http.Error(w, werr.Error(), http.StatusInternalServerError)
+//              return
+//      }
+//      kubeData.Deployment.SetUID(types.UID(id))
 
-// 	if err != nil {
-// 		werr := pkgerrors.Wrap(err, "Update VNF deployment information error")
-// 		http.Error(w, werr.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
+//      if err != nil {
+//              werr := pkgerrors.Wrap(err, "Update VNF deployment information error")
+//              http.Error(w, werr.Error(), http.StatusInternalServerError)
+//              return
+//      }
 
-// 	// (TODO): Read kubeconfig for specific Cloud Region from local file system
-// 	// if present or download it from AAI
-// 	s, err := NewVNFInstanceService("../kubeconfig/config")
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
+//      // (TODO): Read kubeconfig for specific Cloud Region from local file system
+//      // if present or download it from AAI
+//      s, err := NewVNFInstanceService("../kubeconfig/config")
+//      if err != nil {
+//              http.Error(w, err.Error(), http.StatusInternalServerError)
+//              return
+//      }
 
-// 	err = s.Client.UpdateDeployment(kubeData.Deployment, resource.Namespace)
-// 	if err != nil {
-// 		werr := pkgerrors.Wrap(err, "Update VNF error")
+//      err = s.Client.UpdateDeployment(kubeData.Deployment, resource.Namespace)
+//      if err != nil {
+//              werr := pkgerrors.Wrap(err, "Update VNF error")
 
-// 		http.Error(w, werr.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
+//              http.Error(w, werr.Error(), http.StatusInternalServerError)
+//              return
+//      }
 
-// 	resp := UpdateVnfResponse{
-// 		DeploymentID: id,
-// 	}
+//      resp := UpdateVnfResponse{
+//              DeploymentID: id,
+//      }
 
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(http.StatusCreated)
+//      w.Header().Set("Content-Type", "application/json")
+//      w.WriteHeader(http.StatusCreated)
 
-// 	err = json.NewEncoder(w).Encode(resp)
-// 	if err != nil {
-// 		werr := pkgerrors.Wrap(err, "Parsing output of new VNF error")
-// 		http.Error(w, werr.Error(), http.StatusInternalServerError)
-// 	}
+//      err = json.NewEncoder(w).Encode(resp)
+//      if err != nil {
+//              werr := pkgerrors.Wrap(err, "Parsing output of new VNF error")
+//              http.Error(w, werr.Error(), http.StatusInternalServerError)
+//      }
 // }

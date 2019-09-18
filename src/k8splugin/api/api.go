@@ -46,6 +46,7 @@ func NewRouter(defClient rb.DefinitionManager,
 			"profile-name", "{profile-name}").Methods("GET")
 
 	instRouter.HandleFunc("/instance/{instID}", instHandler.getHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/status", instHandler.statusHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}", instHandler.deleteHandler).Methods("DELETE")
 	// (TODO): Fix update method
 	// instRouter.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2619fbcc_f27233f5",
+        "filename": "deployments/helm/servicemesh/policy/Chart.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T20:16:34Z",
+      "side": 1,
+      "message": "Update the description for this chart.",
+      "range": {
+        "startLine": 3,
+        "startChar": 13,
+        "endLine": 3,
+        "endChar": 40
+      },
+      "revId": "1c8d08a4c40f1cdb049da35eb818473b34049cf9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

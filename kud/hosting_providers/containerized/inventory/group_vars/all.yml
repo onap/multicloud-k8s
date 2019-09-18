@@ -1,0 +1,2 @@
+kube_log_level: 2
+kubeadm_enabled: true

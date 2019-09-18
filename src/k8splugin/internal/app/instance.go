@@ -26,6 +26,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	pkgerrors "github.com/pkg/errors"
+	corev1 "k8s.io/api/core/v1"
 )
 
 // InstanceRequest contains the parameters needed for instantiation
@@ -55,10 +56,29 @@ type InstanceMiniResponse struct {
 	Namespace string          `json:"namespace"`
 }
 
+// PodStatus defines the observed state of ResourceBundleState
+type PodStatus struct {
+	Name        string           `json:"name"`
+	Namespace   string           `json:"namespace"`
+	Ready       bool             `json:"ready"`
+	Status      corev1.PodStatus `json:"status,omitempty"`
+	IPAddresses []string         `json:"ipaddresses"`
+}
+
+// InstanceStatus is what is returned when status is queried for an instance
+type InstanceStatus struct {
+	Request         InstanceRequest  `json:"request"`
+	Ready           bool             `json:"ready"`
+	ResourceCount   int32            `json:"resourceCount"`
+	PodStatuses     []PodStatus      `json:"podStatuses"`
+	ServiceStatuses []corev1.Service `json:"serviceStatuses"`
+}
+
 // InstanceManager is an interface exposes the instantiation functionality
 type InstanceManager interface {
 	Create(i InstanceRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
+	Status(id string) (InstanceStatus, error)
 	List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error)
 	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error)
 	Delete(id string) error
@@ -83,16 +103,18 @@ func (dk InstanceKey) String() string {
 // InstanceClient implements the InstanceManager interface
 // It will also be used to maintain some localized state
 type InstanceClient struct {
-	storeName string
-	tagInst   string
+	storeName     string
+	tagInst       string
+	tagInstStatus string
 }
 
 // NewInstanceClient returns an instance of the InstanceClient
 // which implements the InstanceManager
 func NewInstanceClient() *InstanceClient {
 	return &InstanceClient{
-		storeName: "rbdef",
-		tagInst:   "instance",
+		storeName:     "rbdef",
+		tagInst:       "instance",
+		tagInstStatus: "instanceStatus",
 	}
 }
 
@@ -173,6 +195,32 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 	}
 
 	return InstanceResponse{}, pkgerrors.New("Error getting Instance")
+}
+
+// Status returns the status for the instance
+func (v *InstanceClient) Status(id string) (InstanceStatus, error) {
+
+	//Read the status from the DB
+	key := InstanceKey{
+		ID: id,
+	}
+
+	value, err := db.DBconn.Read(v.storeName, key, v.tagInstStatus)
+	if err != nil {
+		return InstanceStatus{}, pkgerrors.Wrap(err, "Get Instance")
+	}
+
+	//value is a byte array
+	if value != nil {
+		resp := InstanceStatus{}
+		err = db.DBconn.Unmarshal(value, &resp)
+		if err != nil {
+			return InstanceStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
+		}
+		return resp, nil
+	}
+
+	return InstanceStatus{}, pkgerrors.New("Status is not available")
 }
 
 // List returns the instance for corresponding ID

@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b683132e_da8773ac",
+        "filename": "deployments/helm/servicemesh/connectivity/virtualservices/templates/virtualservice.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T20:30:55Z",
+      "side": 1,
+      "message": "add rewrite section to switch traffic to a specific host",
+      "revId": "9db8a0d11699ccdb57296fa60ef16690c0e00864",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "02b1bcdf_07ec0b6b",
+        "filename": "deployments/helm/servicemesh/connectivity/virtualservices/values.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T20:30:55Z",
+      "side": 1,
+      "message": "add comment to tell user to provide gateway names here.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 10
+      },
+      "revId": "9db8a0d11699ccdb57296fa60ef16690c0e00864",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "780b0e48_cd905486",
+        "filename": "deployments/helm/servicemesh/connectivity/virtualservices/values.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T20:30:55Z",
+      "side": 1,
+      "message": "can be removed maybe if we use the destinationhost as the prefixmatch.",
+      "range": {
+        "startLine": 23,
+        "startChar": 13,
+        "endLine": 23,
+        "endChar": 28
+      },
+      "revId": "9db8a0d11699ccdb57296fa60ef16690c0e00864",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "603a5cac_267e3816",
+        "filename": "deployments/helm/servicemesh/connectivity/virtualservices/values.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-18T20:30:55Z",
+      "side": 1,
+      "message": "add comment that this should be filled in by user.",
+      "range": {
+        "startLine": 24,
+        "startChar": 17,
+        "endLine": 24,
+        "endChar": 31
+      },
+      "revId": "9db8a0d11699ccdb57296fa60ef16690c0e00864",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

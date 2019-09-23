@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46c029e9_976c9272",
+        "filename": "deployments/helm/servicemesh/connectivity/virtualservices/values.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-23T23:34:13Z",
+      "side": 1,
+      "message": "should be /multicloud-k8s/",
+      "range": {
+        "startLine": 25,
+        "startChar": 27,
+        "endLine": 25,
+        "endChar": 54
+      },
+      "revId": "e03675730bd396b28b4e8b4374d7bdaae4d59ceb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe579bd9_d5d87766",
+        "filename": "deployments/helm/servicemesh/connectivity/virtualservices/values.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-23T23:34:13Z",
+      "side": 1,
+      "message": "should be /",
+      "range": {
+        "startLine": 28,
+        "startChar": 24,
+        "endLine": 28,
+        "endChar": 39
+      },
+      "revId": "e03675730bd396b28b4e8b4374d7bdaae4d59ceb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

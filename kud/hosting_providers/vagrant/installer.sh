@@ -159,6 +159,15 @@ function install_addons {
             popd
         fi
     done
+
+    echo " SRIOV ENABLED: "$SRIOV_ENABLED
+    if [[ "$SRIOV_ENABLED" == "false" ]]; then
+        exit 0
+    else
+        ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-sriov.yml | sudo tee $log_folder/setup-sriov.log
+    fi
+    echo "Add-ons deployment complete..."
+
 }
 
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
@@ -229,7 +238,6 @@ kud_playbooks=$kud_infra_folder/playbooks
 kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
-
 sudo mkdir -p $log_folder
 sudo mkdir -p /opt/csar
 sudo chown -R $USER /opt/csar

@@ -23,6 +23,7 @@ import (
 
 	"github.com/gorilla/mux"
 	pkgerrors "github.com/pkg/errors"
+	logr "github.com/sirupsen/logrus"
 )
 
 // Used to store the backend implementation objects
@@ -33,17 +34,21 @@ type instanceHandler struct {
 }
 
 func (i instanceHandler) validateBody(body interface{}) error {
+	logr.SetFormatter(&logr.JSONFormatter{})
 	switch b := body.(type) {
 	case app.InstanceRequest:
 		if b.CloudRegion == "" {
+			logr.WithFields(logr.Fields{"CloudRegion": "Invalid/Missing CloudRegion in POST request"}).Error("CreateVnfRequest bad request")
 			werr := pkgerrors.Wrap(errors.New("Invalid/Missing CloudRegion in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
 		if b.RBName == "" || b.RBVersion == "" {
+			logr.WithFields(logr.Fields{"RBName": "Invalid/Missing resource bundle parameters in POST request", "RBVersion": "Invalid/Missing resource bundle parameters in POST request"}).Error("CreateVnfRequest bad request")
 			werr := pkgerrors.Wrap(errors.New("Invalid/Missing resource bundle parameters in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
 		if b.ProfileName == "" {
+			logr.WithFields(logr.Fields{"ProfileName": "Invalid/Missing profile name in POST request"}).Error("CreateVnfRequest bad request")
 			werr := pkgerrors.Wrap(errors.New("Invalid/Missing profile name in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
@@ -57,9 +62,11 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&resource)
 	switch {
 	case err == io.EOF:
+		logr.WithFields(logr.Fields{"Error": "Body empty"}).Error("http.StatusBadRequest")
 		http.Error(w, "Body empty", http.StatusBadRequest)
 		return
 	case err != nil:
+		logr.WithFields(logr.Fields{"Error": "http.StatusUnprocessableEntity"}).Error("http.StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -67,12 +74,14 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	// Check body for expected parameters
 	err = i.validateBody(resource)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusUnprocessableEntity"}).Error("StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	resp, err := i.client.Create(resource)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -81,6 +90,7 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -93,6 +103,7 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := i.client.Get(id)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -101,6 +112,7 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -117,6 +129,7 @@ func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := i.client.List(rbName, rbVersion, ProfileName)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -125,6 +138,7 @@ func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -137,6 +151,7 @@ func (i instanceHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := i.client.Delete(id)
 	if err != nil {
+		logr.WithFields(logr.Fields{"Error": "http.StatusInternalServerError"}).Error("StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -1,0 +1,57 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: localhost
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: create sriov folder
+      file:
+        state: directory
+        path: "{{ sriov_dest }}"
+    - name: getting SRIOV drivers
+      block:
+      - name: download Sriov driver tarball
+        get_url:
+          url: "{{ driver_url }}"
+          dest: "/tmp/{{ package }}.tar.gz"
+      - name: extract sriov source code
+        unarchive:
+          src: "/tmp/{{ package }}.tar.gz"
+          dest: "{{ sriov_dest }}"
+          remote_src: yes
+      - name: Build the default target
+        make:
+          chdir: "/tmp/sriov/{{ package }}/src"
+        become: yes
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: create SRIOV driver folder in the target destination
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - sriov_driver
+    - name: Copy SRIOV driver to target destination
+      command: "cp {{ sriov_dest }}/{{ package }}/src/iavf.ko /root/sriov_driver/"
+    - name: Copy SRIOV driver install script to target folder
+      command: "cp {{ playbook_dir }}/install_iavf_drivers.sh /root/sriov_driver/install.sh"
+    - name: Changing perm of "install.sh", adding "+x"
+      file: dest=~/sriov_driver/install.sh mode=a+x
+    - name: Run a script with arguments
+      shell: ~/sriov_driver/install.sh

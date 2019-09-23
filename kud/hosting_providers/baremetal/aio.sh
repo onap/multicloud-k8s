@@ -59,5 +59,6 @@ chmod og-wx ~/.ssh/authorized_keys
 echo "Enabling nested-virtualization"
 sudo ./node.sh
 
+
 echo "Deploying KUD project"
 ./installer.sh | tee kud_installer.log

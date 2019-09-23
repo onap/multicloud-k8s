@@ -1,0 +1,19 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: sriov-eno2
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: intel.com/intel_sriov_700
+spec:
+  config: '{
+    "type": "sriov",
+    "cniVersion": "0.3.1",
+    "ipam": {
+            "type": "host-local",
+            "subnet": "10.56.206.0/24",
+            "routes": [
+                    { "dst": "0.0.0.0/0" }
+            ],
+            "gateway": "10.56.206.1"
+    }
+  }'

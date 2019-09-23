@@ -59,5 +59,8 @@ chmod og-wx ~/.ssh/authorized_keys
 echo "Enabling nested-virtualization"
 sudo ./node.sh
 
+echo "Testing SRIOV hardware capabilities"
+sudo ./sriov_hardware_check.sh
+
 echo "Deploying KUD project"
 ./installer.sh | tee kud_installer.log

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-case-01
+  annotations:
+    k8s.v1.cni.cncf.io/networks: sriov-eno2
+spec:
+  containers:
+  - name: test-pod
+    image: docker.io/centos/tools:latest
+    command:
+    - /sbin/init
+    resources:
+      requests:
+        intel.com/intel_sriov_700: '1'
+      limits:
+        intel.com/intel_sriov_700: '1'

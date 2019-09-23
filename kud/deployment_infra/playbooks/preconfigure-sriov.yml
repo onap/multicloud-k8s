@@ -1,0 +1,63 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: localhost
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: create sriov folder
+      file:
+        state: directory
+        path: "{{ sriov_dest }}"
+    - name: getting SRIOV drivers
+      block:
+      - name: download Sriov driver tarball
+        get_url:
+          url: "{{ driver_url }}"
+          dest: "/tmp/{{ package }}.tar.gz"
+      - name: extract sriov source code
+        unarchive:
+          src: "/tmp/{{ package }}.tar.gz"
+          dest: "{{ sriov_dest }}"
+          remote_src: yes
+      - name: Build the default target
+        make:
+          chdir: /tmp/sriov/iavf-3.7.34/src
+        become: yes
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: create SRIOV driver folder in the target destination
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - sriov_driver
+    - name: Copy SRIOV driver to target folder
+      synchronize:
+        src: "{{ sriov_dest }}/{{ package }}/src/iavf.ko"
+        dest: /root/sriov_driver/
+      delegate_to: localhost
+    - name: Copy SRIOV driver install script to target folder
+      synchronize:
+        src: "{{ playbook_dir }}/install_iavf_drivers.sh"
+        dest: /root/sriov_driver/install.sh
+      delegate_to: localhost
+    - name: Changing perm of "/foo/bar.sh", adding "+x"
+      file: dest=~/sriov_driver/install.sh mode=a+x
+    - name: Run a script with arguments
+      shell: ~/sriov_driver/install.sh

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fc4844d_bb40203c",
+        "filename": "src/k8splugin/api/instancehandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-23T18:47:09Z",
+      "side": 1,
+      "message": "These look better. Can you also convert the long lines into two lines or more. Makes it easier to read.",
+      "revId": "b976b4a1c94be9918be9248b420279b085152918",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

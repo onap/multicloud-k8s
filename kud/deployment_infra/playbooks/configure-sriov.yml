@@ -1,0 +1,33 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- import_playbook: preconfigure-sriov.yml
+
+- hosts: localhost
+  become: yes
+  pre_tasks:
+  - block:
+    - name: "End play if SRIOV is False"
+      debug:
+        msg: "SRIOV option not available, ending play"
+    - meta: end_play
+  tasks:
+    - name: Apply Multus
+      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/multus-daemonset.yml"
+      when: SRIOV==True
+    - name: Apply SRIOV CNI
+      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/sriov-cni.yaml"
+      when: SRIOV==True
+    - name: Apply SRIOV DaemonSet
+      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/sriov-daemonset.yaml"
+      when: SRIOV==True
+    - name: Apply SRIOV Network Attachment definition
+      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/sriov-nad.yml"
+      when: SRIOV==True

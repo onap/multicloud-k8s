@@ -1,0 +1,125 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Create SRIOV driver folder in the target destination
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - sriov
+    - name: create hardware check script
+      copy:
+        dest: sriov/sriov_hardware_check.sh
+        content: |
+            ethernet_adpator_version=$( lspci | grep "Ethernet Controller X710" | head -n 1 | cut -d " " -f 8 )
+            if [ -z "$ethernet_adpator_version" ]; then
+                echo "False"
+                exit 0
+            fi
+            SRIOV_ENABLED=${ethernet_adpator_version:-"false"}
+            #checking for the right hardware version of NIC on the machine
+            if [ "$ethernet_adpator_version" == "X710" ]; then
+                echo "True"
+            else
+                echo "False"
+            fi
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x sriov_hardware_check.sh"
+      args:
+        chdir: "sriov"
+    - name: Register SRIOV
+      shell: "echo {{ SRIOV | default(False) }}"
+    - name: Run the script and Re-evaluate the variable
+      shell: ./sriov_hardware_check.sh
+      args:
+        chdir: "sriov"
+      become: yes
+      register: output
+    - debug:
+        var: output.stdout
+    - set_fact:
+        SRIOV: "{{ output.stdout }}"
+    - debug:
+        var: SRIOV
+    - block:
+      - name: "End play if SRIOV is False"
+        debug:
+          msg: "nothing to do, ending play"
+      - meta: end_play
+      when: SRIOV == false
+# Run the following task only if the SRIOV is set to True
+# i.e when SRIOV hardware is available
+- hosts: localhost
+  become: yes
+  pre_tasks:
+    - block:
+      - name: "End play if SRIOV is False"
+        debug:
+          msg: "SRIOV option not available, ending play"
+      - meta: end_play
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+      when: SRIOV == True
+  tasks:
+    - name: create sriov folder
+      file:
+        state: directory
+        path: "{{ sriov_dest }}"
+      when: SRIOV == True
+      ignore_errors: yes
+    - name: getting SRIOV drivers
+      block:
+      - name: download Sriov driver tarball
+        get_url:
+          url: "{{ driver_url }}"
+          dest: "/tmp/{{ package }}.tar.gz"
+    - name: extract sriov source code
+      unarchive:
+         src: "/tmp/{{ package }}.tar.gz"
+         dest: "{{ sriov_dest }}"
+      when: SRIOV == True
+    - name: Build the default target
+      make:
+        chdir: "/tmp/sriov/{{ package }}/src"
+      become: yes
+      when: SRIOV == True
+# Copy all the driver and install script into target node
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: create SRIOV driver folder in the target destination
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - sriov_driver
+      when: SRIOV == True
+    - name: Copy SRIOV driver to target destination
+      command: "cp {{ sriov_dest }}/{{ package }}/src/iavf.ko /root/sriov_driver/"
+      when: SRIOV == True
+    - name: Copy SRIOV driver install script to target folder
+      command: "cp {{ playbook_dir }}/install_iavf_drivers.sh /root/sriov_driver/install.sh"
+      when: SRIOV == True
+    - name: Changing perm of "install.sh", adding "+x"
+      file: dest=/root/sriov_driver/install.sh mode=a+x
+      when: SRIOV == True
+    - name: Run a script with arguments
+      shell: ./install.sh
+      args:
+        chdir: "/root/sriov_driver"
+      when: SRIOV == True

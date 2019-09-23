@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "36d25816_7e9cab78",
+        "filename": "src/statusquery/queryaai/k8s-aai.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-23T18:59:13Z",
+      "side": 1,
+      "message": "This should be a level above as main.go\nAvoid using hyphenated file names. All lower case is preferred.\n\nqueryaai can be converted to a package if needed.\n\nAlso, use go fmt before submitting the code.",
+      "revId": "fc8fe20c562b7fe29d8f6aa640baa05310bf20f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

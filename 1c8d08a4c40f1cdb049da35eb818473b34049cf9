@@ -22,6 +22,30 @@
       "revId": "1c8d08a4c40f1cdb049da35eb818473b34049cf9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1b2fee98_3d922c8e",
+        "filename": "deployments/helm/servicemesh/policy/Chart.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-09-24T00:19:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2619fbcc_f27233f5",
+      "range": {
+        "startLine": 3,
+        "startChar": 13,
+        "endLine": 3,
+        "endChar": 40
+      },
+      "revId": "1c8d08a4c40f1cdb049da35eb818473b34049cf9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "771bf5e7_17aca1a4",
+        "filename": "src/statusquery/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-24T16:44:14Z",
+      "side": 1,
+      "message": "Return error and not string",
+      "range": {
+        "startLine": 16,
+        "startChar": 38,
+        "endLine": 16,
+        "endChar": 44
+      },
+      "revId": "25d5b521e42deecde6427fc885fb4add685dc5f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "26caeb33_93d7639b",
+        "filename": "src/statusquery/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-24T16:44:14Z",
+      "side": 1,
+      "message": "Check the returned error.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 66
+      },
+      "revId": "25d5b521e42deecde6427fc885fb4add685dc5f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f092c24b_19ff8b9d",
+        "filename": "src/statusquery/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-24T16:44:14Z",
+      "side": 1,
+      "message": "Don\u0027t panic if you get an error. Return the error.",
+      "range": {
+        "startLine": 34,
+        "startChar": 1,
+        "endLine": 36,
+        "endChar": 2
+      },
+      "revId": "25d5b521e42deecde6427fc885fb4add685dc5f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce5a83d3_6e535d4b",
+        "filename": "src/statusquery/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-24T16:44:14Z",
+      "side": 1,
+      "message": "Check err",
+      "range": {
+        "startLine": 41,
+        "startChar": 19,
+        "endLine": 41,
+        "endChar": 26
+      },
+      "revId": "25d5b521e42deecde6427fc885fb4add685dc5f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a310bff6_472caaf6",
+        "filename": "src/statusquery/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-24T16:44:14Z",
+      "side": 1,
+      "message": "return nil on success and everywhere else return the error.",
+      "range": {
+        "startLine": 44,
+        "startChar": 9,
+        "endLine": 44,
+        "endChar": 16
+      },
+      "revId": "25d5b521e42deecde6427fc885fb4add685dc5f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ef67b55a_68b6aada",
+        "filename": "src/statusquery/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-09-24T16:44:14Z",
+      "side": 1,
+      "message": "This should be in a loop which will break when it get a shutdown signal. See the main function from k8splugin package for reference.",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 33
+      },
+      "revId": "25d5b521e42deecde6427fc885fb4add685dc5f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

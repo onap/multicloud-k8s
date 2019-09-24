@@ -1,0 +1,7 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Kiran Kamineni <kiran.k.kamineni@intel.com>
+Submitted-by: Kiran Kamineni <kiran.k.kamineni@intel.com>
+Submitted-at: Tue, 24 Sep 2019 16:39:55 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/94318
+Project: multicloud/k8s
+Branch: refs/heads/master

@@ -85,7 +85,7 @@ data:
               "type": "flannel",
               "name": "flannel.1",
                 "delegate": {
-                  "isDefaultGateway": true,
+                  "isDefaultGateway": false,
                   "hairpinMode": true
                 }
               },

@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ca4a0ddd_37da4ef4",
+        "filename": "deployments/helm/servicemesh/rbac/Chart.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-10-01T19:18:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f802d92_3815d032",
+      "range": {
+        "startLine": 3,
+        "startChar": 13,
+        "endLine": 3,
+        "endChar": 40
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "94c898b8_cd08133c",
         "filename": "deployments/helm/servicemesh/rbac/templates/rbacenablement.yaml",
         "patchSetId": 4
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "2641ad23_5b5cb57f",
+        "filename": "deployments/helm/servicemesh/rbac/templates/rbacenablement.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-10-01T19:18:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94c898b8_cd08133c",
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d6d72bee_66ef6d34",
         "filename": "deployments/helm/servicemesh/rbac/templates/rbacenablement.yaml",
         "patchSetId": 4
@@ -53,6 +95,30 @@
       "writtenOn": "2019-09-18T19:56:10Z",
       "side": 1,
       "message": "templatized",
+      "range": {
+        "startLine": 4,
+        "startChar": 8,
+        "endLine": 4,
+        "endChar": 15
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f87893f0_9d56a1a9",
+        "filename": "deployments/helm/servicemesh/rbac/templates/rbacenablement.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-10-01T19:18:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6d72bee_66ef6d34",
       "range": {
         "startLine": 4,
         "startChar": 8,
@@ -88,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "7a61e9ec_6a5052a9",
+        "filename": "deployments/helm/servicemesh/rbac/templates/servicerole.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-10-01T19:18:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f95e0c67_468122dc",
+      "range": {
+        "startLine": 19,
+        "startChar": 8,
+        "endLine": 19,
+        "endChar": 19
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "53111127_ac9a4129",
         "filename": "deployments/helm/servicemesh/rbac/templates/servicerolebinding.yaml",
         "patchSetId": 4
@@ -99,6 +189,30 @@
       "writtenOn": "2019-09-18T19:56:10Z",
       "side": 1,
       "message": "should be templatized",
+      "range": {
+        "startLine": 19,
+        "startChar": 8,
+        "endLine": 19,
+        "endChar": 26
+      },
+      "revId": "6749f889cc5c1b0143b13d40f63cf78205e8ba6c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b20d2bf8_c78381c1",
+        "filename": "deployments/helm/servicemesh/rbac/templates/servicerolebinding.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3261
+      },
+      "writtenOn": "2019-10-01T19:18:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53111127_ac9a4129",
       "range": {
         "startLine": 19,
         "startChar": 8,

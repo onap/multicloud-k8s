@@ -1,0 +1,280 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b35d383_38b9bfa3",
+        "filename": "kud/deployment_infra/playbooks/configure-sriov.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "Could you please merge lines or provide better indentation for readability?",
+      "range": {
+        "startLine": 17,
+        "startChar": 13,
+        "endLine": 18,
+        "endChar": 28
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82de282f_01bf054d",
+        "filename": "kud/deployment_infra/playbooks/preconfigure-sriov.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "please use variable (package) here",
+      "range": {
+        "startLine": 35,
+        "startChar": 28,
+        "endLine": 35,
+        "endChar": 39
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5492fbf4_d69e83a6",
+        "filename": "kud/deployment_infra/playbooks/preconfigure-sriov.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "Why is this `delegate_to` used in this and next task? I may be wrong, but I\u0027m missing part when `install.sh` is uploaded to `kube-node` nodes.\nIs it because it\u0027s intended for single-node use so far? If so, I\u0027d suggest to change `hosts` of this part of play to localhost",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 28
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31530b88_f66c0235",
+        "filename": "kud/deployment_infra/playbooks/preconfigure-sriov.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "Please adjust description",
+      "range": {
+        "startLine": 60,
+        "startChar": 12,
+        "endLine": 60,
+        "endChar": 54
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8dd430aa_e1eb16a3",
+        "filename": "kud/deployment_infra/playbooks/sriov-nad.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "As far as I understand, these addresses/networks should equal to the ones on interface with sriov turned on? If so, we shouldn\u0027t hardcode addresses/networks/interface-name",
+      "range": {
+        "startLine": 13,
+        "startChar": 23,
+        "endLine": 17,
+        "endChar": 35
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "155721ae_2c339350",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "In current way hardware check is performed only in single host KUD deployment. If it is planned, then it\u0027s fine.\nIf you would like to handle multi-node k8s setup, though, then I\u0027d suggest to perform sriov hardware check on all k8s workers (e.g. via ansible), and if result of this check would be success on all (any?) workers, then it could set up environment variable.",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 30
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51e40f7e_23f1e334",
+        "filename": "kud/hosting_providers/vagrant/clean_sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "Do we want to use relative path here? Just a question if maybe absolute path wouldn\u0027t fit better to what this script does inside?",
+      "range": {
+        "startLine": 16,
+        "startChar": 12,
+        "endLine": 16,
+        "endChar": 30
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "70e62a82_d05b2f36",
+        "filename": "kud/hosting_providers/vagrant/sriov_hardware_check.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "This variable is unused",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 50
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da20f5e5_26f435da",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "Please wrap this line with `if` and handle if needed because this step will fail script if \"Ethernet Controller X710\" line won\u0027t be found in lspci output and script would fail silently.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 99
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d5c10ae9_dacd4594",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "Please add following `exit \u003cexit_code\u003e` command as script will go further after this line. Also, please use `-e` flag to make echo interpret line break (\\\u0027\\\u0027n -\u003e \\n)",
+      "range": {
+        "startLine": 22,
+        "startChar": 4,
+        "endLine": 22,
+        "endChar": 81
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d6f76713_b9f23c33",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "Please define pod_name first and then rm without `*` glob, but direct file",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 20
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8724cead_b182794a",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T09:53:23Z",
+      "side": 1,
+      "message": "I think the whole loop mechanism can be simplified by calling `kubectl delete` with additional `--wait` flag, that will make it wait until deletion finishes",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 8
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

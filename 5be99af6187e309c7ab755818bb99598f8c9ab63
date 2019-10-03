@@ -163,6 +163,52 @@
     },
     {
       "key": {
+        "uuid": "881cf186_acae7e91",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T11:46:36Z",
+      "side": 1,
+      "message": "Exit here is quite dangerous, as it will make non-sriov-installations finish, without going to `install-plugin` step (if defined). I\u0027d suggest to interpret only `SRIOV_ENABLED \u003d\u003d true` option.",
+      "range": {
+        "startLine": 165,
+        "startChar": 8,
+        "endLine": 165,
+        "endChar": 14
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff7bf1ad_e240a869",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-03T11:46:36Z",
+      "side": 1,
+      "message": "Please consider launching test as it\u0027s done above for other KUD_ADDONS when `$testing_enabled` flag is turned on.",
+      "range": {
+        "startLine": 167,
+        "startChar": 0,
+        "endLine": 167,
+        "endChar": 125
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "70e62a82_d05b2f36",
         "filename": "kud/hosting_providers/vagrant/sriov_hardware_check.sh",
         "patchSetId": 10

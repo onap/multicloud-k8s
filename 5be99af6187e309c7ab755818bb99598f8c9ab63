@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "2b82bd59_20249cc9",
+        "filename": "kud/deployment_infra/playbooks/configure-sriov.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b35d383_38b9bfa3",
+      "range": {
+        "startLine": 17,
+        "startChar": 13,
+        "endLine": 18,
+        "endChar": 28
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "82de282f_01bf054d",
         "filename": "kud/deployment_infra/playbooks/preconfigure-sriov.yml",
         "patchSetId": 10
@@ -36,6 +60,30 @@
       "writtenOn": "2019-10-03T09:53:23Z",
       "side": 1,
       "message": "please use variable (package) here",
+      "range": {
+        "startLine": 35,
+        "startChar": 28,
+        "endLine": 35,
+        "endChar": 39
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0e6659_0082713f",
+        "filename": "kud/deployment_infra/playbooks/preconfigure-sriov.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82de282f_01bf054d",
       "range": {
         "startLine": 35,
         "startChar": 28,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "785f9ea6_511aeef7",
+        "filename": "kud/deployment_infra/playbooks/preconfigure-sriov.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Hi Konrad, thank you for reviewing this. Yes, currently SRIOV is intended to be used only on All-in-one nodes. But, this is a good catch, I was testing out the playbook for localhost and I missed updating this when I changed some parts of the playbook. Will change this task to run on `kube-nodes`. Thanks :)",
+      "parentUuid": "5492fbf4_d69e83a6",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 28
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31530b88_f66c0235",
         "filename": "kud/deployment_infra/playbooks/preconfigure-sriov.yml",
         "patchSetId": 10
@@ -82,6 +154,30 @@
       "writtenOn": "2019-10-03T09:53:23Z",
       "side": 1,
       "message": "Please adjust description",
+      "range": {
+        "startLine": 60,
+        "startChar": 12,
+        "endLine": 60,
+        "endChar": 54
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99b151b6_df357b9e",
+        "filename": "kud/deployment_infra/playbooks/preconfigure-sriov.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31530b88_f66c0235",
       "range": {
         "startLine": 60,
         "startChar": 12,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "c5a104ce_42e5f692",
+        "filename": "kud/deployment_infra/playbooks/sriov-nad.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "In Kernalmode, SRIOV vfs and Pfs are separate interfaces. Therefore, they are not bound or tunned to any physical address. They are the individual interfaces and this IPAM information is from CNI and the host-local IPAM assigns the IP address for each VFs.",
+      "parentUuid": "8dd430aa_e1eb16a3",
+      "range": {
+        "startLine": 13,
+        "startChar": 23,
+        "endLine": 17,
+        "endChar": 35
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "155721ae_2c339350",
         "filename": "kud/hosting_providers/baremetal/aio.sh",
         "patchSetId": 10
@@ -128,6 +248,30 @@
       "writtenOn": "2019-10-03T09:53:23Z",
       "side": 1,
       "message": "In current way hardware check is performed only in single host KUD deployment. If it is planned, then it\u0027s fine.\nIf you would like to handle multi-node k8s setup, though, then I\u0027d suggest to perform sriov hardware check on all k8s workers (e.g. via ansible), and if result of this check would be success on all (any?) workers, then it could set up environment variable.",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 30
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb64ca1a_ffbae3e8",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Yes currently SRIOV has been set up for all-in-one deployment.",
+      "parentUuid": "155721ae_2c339350",
       "range": {
         "startLine": 63,
         "startChar": 0,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "483a56e1_80a902fa",
+        "filename": "kud/hosting_providers/vagrant/clean_sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "I\u0027m sorry I don\u0027t follow. Can you elaborate?",
+      "parentUuid": "51e40f7e_23f1e334",
+      "range": {
+        "startLine": 16,
+        "startChar": 12,
+        "endLine": 16,
+        "endChar": 30
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "881cf186_acae7e91",
         "filename": "kud/hosting_providers/vagrant/installer.sh",
         "patchSetId": 10
@@ -174,6 +342,30 @@
       "writtenOn": "2019-10-03T11:46:36Z",
       "side": 1,
       "message": "Exit here is quite dangerous, as it will make non-sriov-installations finish, without going to `install-plugin` step (if defined). I\u0027d suggest to interpret only `SRIOV_ENABLED \u003d\u003d true` option.",
+      "range": {
+        "startLine": 165,
+        "startChar": 8,
+        "endLine": 165,
+        "endChar": 14
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d7ad2f0_f378ba0d",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "You\u0027re right I will remove the exit case.",
+      "parentUuid": "881cf186_acae7e91",
       "range": {
         "startLine": 165,
         "startChar": 8,
@@ -209,6 +401,30 @@
     },
     {
       "key": {
+        "uuid": "bfa4689d_12a42ba2",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff7bf1ad_e240a869",
+      "range": {
+        "startLine": 167,
+        "startChar": 0,
+        "endLine": 167,
+        "endChar": 125
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "70e62a82_d05b2f36",
         "filename": "kud/hosting_providers/vagrant/sriov_hardware_check.sh",
         "patchSetId": 10
@@ -232,6 +448,30 @@
     },
     {
       "key": {
+        "uuid": "985f4664_271fd087",
+        "filename": "kud/hosting_providers/vagrant/sriov_hardware_check.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "SRIOV ENABLED is used in the installer script to check for the flag and then make a decision to run the playbook or not.",
+      "parentUuid": "70e62a82_d05b2f36",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 50
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da20f5e5_26f435da",
         "filename": "kud/tests/sriov.sh",
         "patchSetId": 10
@@ -243,6 +483,30 @@
       "writtenOn": "2019-10-03T09:53:23Z",
       "side": 1,
       "message": "Please wrap this line with `if` and handle if needed because this step will fail script if \"Ethernet Controller X710\" line won\u0027t be found in lspci output and script would fail silently.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 99
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0e1f1c8c_8cf2e569",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da20f5e5_26f435da",
       "range": {
         "startLine": 15,
         "startChar": 0,
@@ -301,6 +565,30 @@
     },
     {
       "key": {
+        "uuid": "1ca1a760_254c0410",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6f76713_b9f23c33",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 20
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8724cead_b182794a",
         "filename": "kud/tests/sriov.sh",
         "patchSetId": 10
@@ -312,6 +600,30 @@
       "writtenOn": "2019-10-03T09:53:23Z",
       "side": 1,
       "message": "I think the whole loop mechanism can be simplified by calling `kubectl delete` with additional `--wait` flag, that will make it wait until deletion finishes",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 8
+      },
+      "revId": "5be99af6187e309c7ab755818bb99598f8c9ab63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c022857_9862b9ab",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2019-10-03T23:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8724cead_b182794a",
       "range": {
         "startLine": 27,
         "startChar": 0,

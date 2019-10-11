@@ -39,9 +39,10 @@ type mockInstanceClient struct {
 	app.InstanceManager
 	// Items and err will be used to customize each test
 	// via a localized instantiation of mockInstanceClient
-	items     []app.InstanceResponse
-	miniitems []app.InstanceMiniResponse
-	err       error
+	items      []app.InstanceResponse
+	miniitems  []app.InstanceMiniResponse
+	statusItem app.InstanceStatus
+	err        error
 }
 
 func (m *mockInstanceClient) Create(inp app.InstanceRequest) (app.InstanceResponse, error) {
@@ -58,6 +59,14 @@ func (m *mockInstanceClient) Get(id string) (app.InstanceResponse, error) {
 	}
 
 	return m.items[0], nil
+}
+
+func (m *mockInstanceClient) Status(id string) (app.InstanceStatus, error) {
+	if m.err != nil {
+		return app.InstanceStatus{}, m.err
+	}
+
+	return m.statusItem, nil
 }
 
 func (m *mockInstanceClient) List(rbname, rbversion, profilename string) ([]app.InstanceMiniResponse, error) {
@@ -302,6 +311,91 @@ func TestInstanceGetHandler(t *testing.T) {
 					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
 						&response, testCase.expectedResponse)
 				}
+			}
+		})
+	}
+}
+
+func TestStatusHandler(t *testing.T) {
+	testCases := []struct {
+		label            string
+		input            string
+		expectedCode     int
+		expectedResponse *app.InstanceStatus
+		instClient       *mockInstanceClient
+	}{
+		{
+			label:        "Fail to Get Status",
+			input:        "HaKpys8e",
+			expectedCode: http.StatusInternalServerError,
+			instClient: &mockInstanceClient{
+				err: pkgerrors.New("Internal error"),
+			},
+		},
+		{
+			label:        "Succesful GET Status",
+			input:        "HaKpys8e",
+			expectedCode: http.StatusOK,
+			expectedResponse: &app.InstanceStatus{
+				Request: app.InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+				},
+				Ready:         true,
+				ResourceCount: 2,
+				PodStatuses: []app.PodStatus{
+					{
+						Name:        "test-pod1",
+						Namespace:   "default",
+						Ready:       true,
+						IPAddresses: []string{"192.168.1.1", "192.168.2.1"},
+					},
+					{
+						Name:        "test-pod2",
+						Namespace:   "default",
+						Ready:       true,
+						IPAddresses: []string{"192.168.3.1", "192.168.5.1"},
+					},
+				},
+			},
+			instClient: &mockInstanceClient{
+				statusItem: app.InstanceStatus{
+					Request: app.InstanceRequest{
+						RBName:      "test-rbdef",
+						RBVersion:   "v1",
+						ProfileName: "profile1",
+						CloudRegion: "region1",
+					},
+					Ready:         true,
+					ResourceCount: 2,
+					PodStatuses: []app.PodStatus{
+						{
+							Name:        "test-pod1",
+							Namespace:   "default",
+							Ready:       true,
+							IPAddresses: []string{"192.168.1.1", "192.168.2.1"},
+						},
+						{
+							Name:        "test-pod2",
+							Namespace:   "default",
+							Ready:       true,
+							IPAddresses: []string{"192.168.3.1", "192.168.5.1"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			request := httptest.NewRequest("GET", "/v1/instance/"+testCase.input+"/status", nil)
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+
+			if testCase.expectedCode != resp.StatusCode {
+				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)
 			}
 		})
 	}

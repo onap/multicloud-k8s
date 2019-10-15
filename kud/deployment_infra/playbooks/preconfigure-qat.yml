@@ -1,0 +1,106 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: localhost
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create QAT dest folder
+      file:
+        state: directory
+        path: "{{ base_dest }}/qat"
+    - name: Fetching QAT driver
+      block:
+      - name: Download QAT driver tarball
+        get_url:
+          url: "{{ qat_driver_url }}"
+          dest: "{{ base_dest }}/{{ qat_package }}.tar.gz"
+
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create a destination for driver folder in the target's /tmp
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - "/tmp/quick-assist/{{ qat_package }}"
+    - name: Create QAT dest folder
+      file:
+        state: directory
+        path: "qat"
+    - name: Create QAT check script
+      copy:
+        dest: "qat/qat.sh"
+        content: |
+            #!/bin/bash
+            echo "Hello world .."
+            for i in 0434 0435 37c8 6f54 19e2; do lspci -d 8086:$i -m; done
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x qat.sh"
+      args:
+        chdir: "qat"
+        warn: False
+    - name: Run the file.
+      command: "./qat.sh"
+      args:
+        chdir: "qat"
+      register: output
+    - debug:
+        var: output.stdout_lines
+    - name: bootstrap | install qat compilation packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - pciutils
+        - build-essential
+        - libudev-dev
+        - pkg-config
+    - copy:
+        src: /tmp/qat1.7.l.4.6.0-00025.tar.gz
+        dest: /tmp/quick-assist
+        remote_src: no
+    - name: Extract QAT source code
+      unarchive:
+        src: "{{ base_dest }}/{{ qat_package }}.tar.gz"
+        dest: "/tmp/quick-assist/{{ qat_package }}"
+    - name: Configure the target
+      command: ./configure --enable-icp-sriov=host
+      args:
+        chdir: "/tmp/quick-assist/{{ qat_package }}"
+    - name: Build the default target
+      command: "sudo make install"
+      args:
+        chdir: "/tmp/quick-assist/{{ qat_package }}"
+      become: yes
+    - name: Create QAT driver folder in the target destination
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - qat_driver
+    - name: Copy QAT build directory qat target destination
+      command: "cp -r /tmp/quick-assist/{{ qat_package }}/build/ /root/qat_driver/"
+    - name: Copy QAT driver install script to target folder
+      command: "cp {{ playbook_dir }}/install_qat.sh /root/qat_driver/build/install.sh"
+    - name: Copy QAT to target folder
+      command: "cp /etc/default/qat /root/qat_driver/"
+    - name: Changing perm of "install.sh", adding "+x"
+      file: dest=~/qat_driver/build/install.sh mode=a+x
+    - name: Run a script with arguments
+      command: ./install.sh chdir=/root/qat_driver/build

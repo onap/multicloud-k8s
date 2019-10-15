@@ -1,0 +1,64 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: localhost
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create QAT dest folder
+      file:
+        state: directory
+        path: "{{ qat_dest }}/{{ qat_package }}"
+    - name: Fetching QAT driver
+      block:
+      - name: Download QAT driver tarball
+        get_url:
+          url: "{{ driver_url }}"
+          dest: "/tmp/{{ qat_package }}.tar.gz"
+      - name: Extract QAT source code
+        unarchive:
+          src: "/tmp/{{ qat_package }}.tar.gz"
+          dest: "{{ qat_dest }}/{{ qat_package }}"
+          remote_src: yes
+      - name: Configure the target
+        command: ./configure --enable-icp-sriov=host
+        args:
+          chdir: "{{ qat_dest }}/{{ qat_package }}"
+      - name: Build the default target
+        make:
+          chdir: "{{ qat_dest }}/{{ qat_package }}"
+        become: yes
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create QAT driver folder in the target destination
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - qat_driver
+    - name: Copy QAT driver to target destination
+      command: "cp -r {{ qat_dest }}/{{ qat_package }}/build/ /root/qat_driver/"
+    - name: Copy QAT driver install script to target folder
+      command: "cp {{ playbook_dir }}/install_qat.sh /root/qat_driver/build/install.sh"
+    - name: Copy QAT to target folder
+      command: "cp /etc/default/qat /root/qat_driver/build"
+    - name: Changing perm of "install.sh", adding "+x"
+      file: dest=~/qat_driver/build/install.sh mode=a+x
+    - name: Run a script with arguments
+      command: "/root/qat_driver/build/./install.sh"
+

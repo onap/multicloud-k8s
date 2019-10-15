@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "63e06bd3_d6d4b8b7",
+        "filename": "build/Dockerfile",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-10-15T20:19:31Z",
+      "side": 1,
+      "message": "Can you move this file under kud/hosting_providers/containerized. This repo holds both the source code and kud installation, currently we don\u0027t have a top-level build directory. We can in future add a build folder, taking into consideration all the functionality.",
+      "revId": "f590b77958a89623ffb3257cdd930ac1f0848a69",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bae18f9c_28c7d348",
+        "filename": "kud/hosting_providers/containerized/README.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-10-15T20:19:31Z",
+      "side": 1,
+      "message": "Nit: Space",
+      "revId": "f590b77958a89623ffb3257cdd930ac1f0848a69",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3554cec0_b6e869c9",
         "filename": "kud/hosting_providers/containerized/inventory/group_vars/k8s-cluster.yml",
         "patchSetId": 10

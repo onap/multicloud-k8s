@@ -1,0 +1,144 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: localhost
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create QAT dest folder
+      file:
+        state: directory
+        path: "{{ qat_dest }}"
+    - name: Fetching QAT driver
+      block:
+      - name: Download QAT driver tarball
+        get_url:
+          url: "{{ qat_driver_url }}"
+          dest: "{{ qat_dest }}/{{ qat_package }}.tar.gz"
+
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create a destination for driver folder in the target's /tmp
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - "{{ base_dest }}/quick-assist/{{ qat_package }}"
+    - name: Create QAT dest folder
+      file:
+        state: directory
+        path: "qat"
+    - name: Register QAT env variable
+      shell: "echo {{ QAT_ENABLED | default(False) }}"
+    - name: Create QAT check script
+      copy:
+        dest: "qat/qat.sh"
+        content: |
+            #!/bin/bash
+            qat_device=$( for i in 0434 0435 37c8 6f54 19e2; \
+                    do lspci -d 8086:$i -m; done |\
+                            grep -i "Quick*" | head -n 1 | cut -d " " -f 5 )
+            if [ -z "$qat_device" ]; then
+                echo "False"
+                exit 0
+            else
+                echo "True"
+            fi
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x qat.sh"
+      args:
+        chdir: "qat"
+        warn: False
+    - name: Run the script and re-evaluate the variable.
+      command: "./qat.sh"
+      args:
+        chdir: "qat"
+      register: output
+    - debug:
+        var: output.stdout_lines
+    - set_fact:
+        QAT_ENABLED: "{{ output.stdout }}"
+    - debug:
+        var: output
+    - name: Clean the script and folder.
+      file:
+        path: qat
+        state: absent
+    - name: bootstrap | install qat compilation packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - pciutils
+        - build-essential
+        - libudev-dev
+        - pkg-config
+      when: QAT_ENABLED
+    - copy:
+        src: "{{ qat_dest }}/{{ qat_package }}.tar.gz"
+        dest: "{{ base_dest }}/quick-assist"
+        remote_src: no
+      when: QAT_ENABLED
+    - name: Extract QAT source code
+      unarchive:
+        src: "{{ qat_dest }}/{{ qat_package }}.tar.gz"
+        dest: "{{ base_dest }}/quick-assist/{{ qat_package }}"
+      when: QAT_ENABLED
+    - name: Configure the target
+      command: ./configure --enable-icp-sriov=host
+      args:
+        chdir: "{{ base_dest }}/quick-assist/{{ qat_package }}"
+      when: QAT_ENABLED
+    - name: build qat driver
+      make:
+        chdir: "{{ base_dest }}/quick-assist/{{ qat_package }}"
+        target: "{{ item }}"
+      loop:
+        - clean
+        - uninstall
+        - install
+      when: QAT_ENABLED
+    - name: Create QAT driver folder in the target destination
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - qat_driver_dest
+      when: QAT_ENABLED
+    - name: Copy QAT build directory qat target destination
+      command: "cp -r {{ base_dest }}/quick-assist/{{ qat_package }}/build/ /root/qat_driver_dest/"
+      when: QAT_ENABLED
+    - name: Copy QAT driver install script to target folder
+      command: "cp {{ playbook_dir }}/install_qat.sh /root/qat_driver_dest/build/install.sh"
+      when: QAT_ENABLED
+    - name: Copy QAT to target folder
+      command: "cp /etc/default/qat /root/qat_driver_dest/build"
+      when: QAT_ENABLED
+    - name: Changing perm of "install.sh", adding "+x"
+      file: dest=~/qat_driver_dest/build/install.sh mode=a+x
+      when: QAT_ENABLED
+    - name: Run a script with arguments
+      command: ./install.sh chdir=/root/qat_driver_dest/build
+      when: QAT_ENABLED
+    - name: get qat devices
+      shell: /usr/local/bin/adf_ctl status | grep up | awk '{print $4 substr($1, 4)}' | tr -d ','
+      register: qat_devices
+      when: QAT_ENABLED
+    - name: Updating the qat device SSL values to avoid duplication
+      command: "./substitute.sh chdir={{ playbook_dir }}"
+      when: QAT_ENABLED

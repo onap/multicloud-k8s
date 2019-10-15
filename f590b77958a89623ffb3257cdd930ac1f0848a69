@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3554cec0_b6e869c9",
+        "filename": "kud/hosting_providers/containerized/inventory/group_vars/k8s-cluster.yml",
+        "patchSetId": 10
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-10-15T05:27:32Z",
+      "side": 1,
+      "message": "Why is this set to false? As per the comment above setting it to true will cache the images for multi-cluster installation.",
+      "range": {
+        "startLine": 73,
+        "startChar": 20,
+        "endLine": 73,
+        "endChar": 25
+      },
+      "revId": "f590b77958a89623ffb3257cdd930ac1f0848a69",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

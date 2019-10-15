@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "108c4957_21f5bbc2",
+        "filename": "kud/hosting_providers/baremetal/aio.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-10-15T05:47:41Z",
+      "side": 1,
+      "message": "Not needed",
+      "revId": "767751dec93fa909fff817a8ef16c7174904273e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "012e2f83_1578a2ed",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-10-15T05:47:41Z",
+      "side": 1,
+      "message": "This check is being done on the installer machine. This needs to be done on the nodes in the cluster. This is ok for single setup but in multi-node setup this test needs to be run on each node in cluster and on the nodes h/w is found the driver should be installed",
+      "range": {
+        "startLine": 162,
+        "startChar": 18,
+        "endLine": 162,
+        "endChar": 38
+      },
+      "revId": "767751dec93fa909fff817a8ef16c7174904273e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

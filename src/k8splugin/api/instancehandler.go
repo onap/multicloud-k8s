@@ -23,6 +23,7 @@ import (
 
 	"github.com/gorilla/mux"
 	pkgerrors "github.com/pkg/errors"
+	log "internal/logs"
 )
 
 // Used to store the backend implementation objects
@@ -36,14 +37,18 @@ func (i instanceHandler) validateBody(body interface{}) error {
 	switch b := body.(type) {
 	case app.InstanceRequest:
 		if b.CloudRegion == "" {
+			log.WithFields("CreateVnfRequest bad request", "CloudRegion", "Invalid/Missing CloudRegion in POST request")
 			werr := pkgerrors.Wrap(errors.New("Invalid/Missing CloudRegion in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
 		if b.RBName == "" || b.RBVersion == "" {
+			log.WithFields("CreateVnfRequest bad request", "RBVersion", "Invalid/Missing resource bundle parameters in POST request")
+			log.WithFields("CreateVnfRequest bad request", "RBName", "Invalid/Missing resource bundle parameters in POST request")
 			werr := pkgerrors.Wrap(errors.New("Invalid/Missing resource bundle parameters in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
 		if b.ProfileName == "" {
+			log.WithFields("CreateVnfRequest bad request", "ProfileName", "Invalid/Missing profile name in POST request")
 			werr := pkgerrors.Wrap(errors.New("Invalid/Missing profile name in POST request"), "CreateVnfRequest bad request")
 			return werr
 		}
@@ -57,9 +62,11 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&resource)
 	switch {
 	case err == io.EOF:
+		log.WithFields("http.StatusBadRequest", "Error", "Body empty")
 		http.Error(w, "Body empty", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.WithFields("http.StatusUnprocessableEntity", "Error", "http.StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -67,12 +74,14 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	// Check body for expected parameters
 	err = i.validateBody(resource)
 	if err != nil {
+		log.WithFields("StatusUnprocessableEntity", "Error", "http.StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	resp, err := i.client.Create(resource)
 	if err != nil {
+		log.WithFields("StatusInternalServerError", "Error", "http.StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -81,6 +90,7 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
+		log.WithFields("StatusInternalServerError", "Error", "http.StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -93,6 +103,7 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := i.client.Get(id)
 	if err != nil {
+		log.WithFields("StatusInternalServerError", "Error", "http.StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -101,26 +112,7 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-// statusHandler retrieves status about an instance via the ID
-func (i instanceHandler) statusHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["instID"]
-
-	resp, err := i.client.Status(id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(resp)
-	if err != nil {
+		log.WithFields("StatusInternalServerError", "Error", "http.StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -137,6 +129,7 @@ func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := i.client.List(rbName, rbVersion, ProfileName)
 	if err != nil {
+		log.WithFields("StatusInternalServerError", "Error", "http.StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -145,6 +138,7 @@ func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
+		log.WithFields("StatusInternalServerError", "Error", "http.StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -157,6 +151,7 @@ func (i instanceHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := i.client.Delete(id)
 	if err != nil {
+		log.WithFields("StatusInternalServerError", "Error", "http.StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

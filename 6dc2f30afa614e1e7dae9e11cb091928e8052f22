@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f044e453_b8ce9563",
+        "filename": "kud/hosting_providers/vagrant/Vagrantfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-10-17T09:41:45Z",
+      "side": 1,
+      "message": "Can you update virtualbox-based vagrant box as well?",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 88
+      },
+      "revId": "6dc2f30afa614e1e7dae9e11cb091928e8052f22",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

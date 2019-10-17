@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "579fd162_96915edc",
+        "filename": "build/Dockerfile",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-17T01:25:38Z",
+      "side": 1,
+      "message": "Moved it in the patch 12th",
+      "parentUuid": "63e06bd3_d6d4b8b7",
+      "revId": "f590b77958a89623ffb3257cdd930ac1f0848a69",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bae18f9c_28c7d348",
         "filename": "kud/hosting_providers/containerized/README.md",
         "patchSetId": 10

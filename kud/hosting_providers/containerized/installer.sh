@@ -27,7 +27,7 @@ function install_prerequisites {
 
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
-    local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | \
+    local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml |
         awk -F ': ' '{print $2}')
     mkdir -p /etc/ansible/
     pip install ansible==$version
@@ -100,6 +100,7 @@ function install_k8s {
 
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
+    local plugins_name=$1
     source /etc/environment
     echo "Installing Kubernetes AddOns"
     ansible-galaxy install $verbose -r \
@@ -108,7 +109,7 @@ function install_addons {
     ansible-playbook $verbose -i \
         $kud_inventory $kud_playbooks/configure-kud.yml | \
         tee $cluster_log/setup-kud.log
-    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd}; do
+    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd $plugins_name}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i \
             $kud_inventory $kud_playbooks/configure-${addon}.yml | \
@@ -188,7 +189,7 @@ function install_pkg {
 
 function install_cluster {
     install_k8s $1
-    install_addons
+    install_addons $2
     echo "installed the addons"
     if ${KUD_PLUGIN_ENABLED:-false}; then
         install_plugin
@@ -217,7 +218,11 @@ if [ "$1" == "--cluster" ]; then
     mkdir -p $cluster_log
     cp $kud_multi_cluster_path/$cluster_name/hosts.ini $kud_inventory_folder/
     cp -rf $kud_folder/inventory/group_vars $kud_inventory_folder/
-
+    if [ "$3" == "--plugins" ]; then
+        plugins_name=${@:4:$#}
+        install_cluster $cluster_name $plugins_name
+        exit 0
+    fi
     install_cluster $cluster_name
     exit 0
 fi

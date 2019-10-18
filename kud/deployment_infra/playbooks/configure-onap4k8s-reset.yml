@@ -1,0 +1,56 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: kube-master
+  tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+
+    - name: Change the onap4k8s directory and run helm delete
+      command: /usr/local/bin/helm delete --purge multicloud-onap8ks
+      register: helm_delete
+      args:
+        chdir: /opt/multicloud/deployments/helm/onap4k8s
+
+    - debug:
+        var: helm_delete.stdout_lines
+
+    - name: Change the onap4k8s directory and delete the ona4k8s-ns namespace
+      command: /usr/local/bin/kubectl delete ns onap4k8s-ns
+      register: delete_onap_ns
+      args:
+        chdir: /opt/multicloud/deployments/helm/onap4k8s
+
+    - debug:
+        var: delete_onap_ns.stdout_lines
+
+    - name: Change the onap4k8s directory and make clean
+      command: /usr/bin/make clean
+      register: make_clean
+      args:
+        chdir: /opt/multicloud/deployments/helm/onap4k8s
+
+    - debug:
+        var: make_clean.stdout_lines
+
+    - name: Change the onap4k8s directory and make repo-stop
+      command: /usr/bin/make repo-stop
+      register: make_repo_stop
+      args:
+        chdir: /opt/multicloud/deployments/helm/onap4k8s
+
+    - debug:
+        var: make_repo_stop.stdout_lines
+
+    - name: clean multicloud-k8s path
+      file:
+        state: absent
+        path: /opt/multicloud

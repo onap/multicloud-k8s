@@ -79,7 +79,7 @@ data:
       "delegates": [
         {
           "cniVersion": "0.3.1",
-          "name": "default-cni-network",
+          "name": "cni0",
           "plugins": [
             {
               "type": "flannel",

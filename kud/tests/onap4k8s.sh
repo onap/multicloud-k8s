@@ -1,4 +1,4 @@
----
+#!/bin/bash
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
 # Copyright (c) 2018
@@ -7,9 +7,9 @@
 # which accompanies this distribution, and is available at
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
-- src: andrewrothstein.go
-  version: v2.1.15
-- src: andrewrothstein.kubernetes-helm
-  version: v1.2.17
-- src: geerlingguy.docker
-  version: 2.5.2
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+source _common_test.sh

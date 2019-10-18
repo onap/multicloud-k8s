@@ -71,3 +71,8 @@ local_release_dir: "/tmp/releases"
 # cannot access each over via ssh or you want to use local docker
 # images as a cache for multiple clusters.
 download_localhost: true
+
+# Subnet for cluster IPs
+kube_service_addresses: 10.244.0.0/18
+# Subnet for Pod IPs
+kube_pods_subnet: 10.244.64.0/18

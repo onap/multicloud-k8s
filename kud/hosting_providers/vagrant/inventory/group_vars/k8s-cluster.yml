@@ -42,7 +42,8 @@ kube_network_plugin: flannel
 kubeconfig_localhost: true
 # Copy kubectl binary on the host that runs Ansible to inventory/artifacts
 kubectl_localhost: true
-
+# Disable nodelocal dns cache
+enable_nodelocaldns: false
 # Enable MountPropagation gate feature
 local_volumes_enabled: true
 local_volume_provisioner_enabled: true

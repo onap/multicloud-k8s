@@ -15,25 +15,25 @@
 # * limitations under the License.
 # */
 #Declare variables to be passed into Istio SDS template file.
+#NOTE : EDit the namespace for which you need Istio injection
 metadata:
   name: "istio-sample"
 spec:
-  version: "1.2.2"
+  version: "1.3.3"
   mtls: true
   autoInjectionNamespaces:
-  -
+  - "default"
   sds:
     enabled: true
     udsPath: "unix:/var/run/sds/uds_path"
-    useTrustworthyJwt: false
-    useNormalJwt: true
+    tokenAudience: "istio-ca"
   gateways:
     enabled: true
     ingress:
       enabled: true
       sds:
         enabled: true
-        image: "docker.io/istio/node-agent-k8s:1.2.2"
+        image: "docker.io/istio/node-agent-k8s:1.3.3"
   nodeAgent:
     enabled: true
-    image : "docker.io/istio/node-agent-k8s:1.2.2"
+    image : "docker.io/istio/node-agent-k8s:1.3.3"

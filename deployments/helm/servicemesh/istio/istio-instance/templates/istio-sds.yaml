@@ -29,8 +29,7 @@ spec:
   sds:
     enabled: {{ .Values.spec.sds.enabled }}
     udsPath: {{ .Values.spec.sds.udsPath | quote }}
-    useTrustworthyJwt: {{ .Values.spec.sds.useTrustworthyJwt }}
-    useNormalJwt: {{ .Values.spec.sds.useNormalJwt }}
+    tokenAudience: {{ .Values.spec.sds.tokenAudience | quote}}
   gateways:
     enabled: {{ .Values.spec.gateways.enabled }}
     ingress:

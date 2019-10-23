@@ -47,6 +47,6 @@ package: iavf-3.7.34
 
 go_version: '1.12.5'
 kubespray_version: 2.10.4
-helm_client_version: 2.9.1
+helm_client_version: 2.13.1
 # kud playbooks not compatible with 2.8.0 - see MULTICLOUD-634
 ansible_version: 2.7.10

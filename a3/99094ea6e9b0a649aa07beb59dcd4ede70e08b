@@ -1,0 +1,10 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Kuralamudhan Ramakrishnan <kuralamudhan.ramakrishnan@intel.com>
+Code-Review+1: Michal Ptacek <m.ptacek@partner.samsung.com>
+Code-Review+1: Pramod <pramod.raghavendra.jayathirth@intel.com>
+Code-Review+2: Ritu Sood <Ritu.Sood@intel.com>
+Submitted-by: Ritu Sood <Ritu.Sood@intel.com>
+Submitted-at: Thu, 24 Oct 2019 22:23:50 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/97287
+Project: multicloud/k8s
+Branch: refs/heads/master

@@ -27,7 +27,7 @@ function install_prerequisites {
 
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
-    local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | \
+    local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml |
         awk -F ': ' '{print $2}')
     mkdir -p /etc/ansible/
     pip install ansible==$version
@@ -100,6 +100,7 @@ function install_k8s {
 
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
+    local plugins_name=$1
     source /etc/environment
     echo "Installing Kubernetes AddOns"
     ansible-galaxy install $verbose -r \
@@ -108,7 +109,7 @@ function install_addons {
     ansible-playbook $verbose -i \
         $kud_inventory $kud_playbooks/configure-kud.yml | \
         tee $cluster_log/setup-kud.log
-    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd}; do
+    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd $plugins_name}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i \
             $kud_inventory $kud_playbooks/configure-${addon}.yml | \
@@ -188,7 +189,7 @@ function install_pkg {
 
 function install_cluster {
     install_k8s $1
-    install_addons
+    install_addons $2
     echo "installed the addons"
     if ${KUD_PLUGIN_ENABLED:-false}; then
         install_plugin
@@ -197,18 +198,53 @@ function install_cluster {
     _print_kubernetes_info
 }
 
+function usage {
+    echo "installer usage:"
+    echo "./installer.sh --install_pkg - Install the required softwarepackage"
+    echo "./installer.sh --cluster <cluster name> \
+- Install k8s cluster with default plugins"
+    echo "./installer.sh --cluster <cluster name> \
+--plugins <plugin_1 plugin_2> - Install k8s cluster with default plugins \
+and additional plugins such as onap4k8s."
+}
+
+if [ $# -eq 0 ]; then
+    echo "Error: No arguments supplied"
+    usage
+    exit 1
+fi
+
+if [ -z "$1" ]; then
+    echo "Error: Null argument passed"
+    usage
+    exit 1
+fi
 
 if [ "$1" == "--install_pkg" ]; then
     export kud_inventory_folder=$kud_folder/inventory
     kud_inventory=$kud_inventory_folder/hosts.ini
     install_pkg
+    echo "install pkg"
     exit 0
 fi
 
 if [ "$1" == "--cluster" ]; then
+    if [ -z "${2-}"  ]; then
+        echo "Error: Cluster name is null"
+        usage
+        exit 1
+    fi
+
     cluster_name=$2
     kud_multi_cluster_path=/opt/kud/multi-cluster
     cluster_path=$kud_multi_cluster_path/$cluster_name
+    echo $cluster_path
+    if [ ! -d "${cluster_path}" ]; then
+        echo "Error: cluster_path ${cluster_path} doesn't exit"
+        usage
+        exit 1
+    fi
+
     cluster_log=$kud_multi_cluster_path/$cluster_name/log
     export kud_inventory_folder=$kud_folder/inventory/$cluster_name
     kud_inventory=$kud_inventory_folder/hosts.ini
@@ -218,6 +254,27 @@ if [ "$1" == "--cluster" ]; then
     cp $kud_multi_cluster_path/$cluster_name/hosts.ini $kud_inventory_folder/
     cp -rf $kud_folder/inventory/group_vars $kud_inventory_folder/
 
+    if [ -n "$3" ]; then
+        if [ "$3" == "--plugins" ]; then
+            if [ -z "${4-}"  ]; then
+                echo "Error: plugins arguments is null; Refer the usage"
+                usage
+                exit 1
+            fi
+            plugins_name=${@:4:$#}
+            install_cluster $cluster_name $plugins_name
+            exit 0
+        else
+            echo "Error: cluster argument should have plugins; \
+                Refer the usage"
+            usage
+            exit 1
+        fi
+    fi
     install_cluster $cluster_name
     exit 0
 fi
+
+echo "Error: Refer the installer usage"
+usage
+exit 1

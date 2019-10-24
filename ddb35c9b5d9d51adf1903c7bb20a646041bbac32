@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "40df20e6_a894bf79",
+        "filename": ".project",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-10-24T18:34:18Z",
+      "side": 1,
+      "message": "What is this file for?",
+      "revId": "ddb35c9b5d9d51adf1903c7bb20a646041bbac32",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b683aa2_1e12f983",
+        "filename": "src/k8splugin/internal/logs/logger.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-10-24T18:34:18Z",
+      "side": 1,
+      "message": "prefer calling this package logger or logutils",
+      "range": {
+        "startLine": 1,
+        "startChar": 8,
+        "endLine": 1,
+        "endChar": 12
+      },
+      "revId": "ddb35c9b5d9d51adf1903c7bb20a646041bbac32",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

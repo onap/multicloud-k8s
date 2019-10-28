@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d1d15a4b_ef957a3e",
+        "filename": "deployments/helm/servicemesh/istio-operator/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2019-10-28T18:24:45Z",
+      "side": 1,
+      "message": "what sub version of ISTIO does this install? Add a comment..",
+      "revId": "ccbd9d767ad08455382e2cec91e0bfc4ed7ea942",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bae5933c_3596f9a0",
+        "filename": "deployments/helm/servicemesh/istio/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2019-10-28T18:24:45Z",
+      "side": 1,
+      "message": "Can this be automated? instead of this manual step..",
+      "revId": "ccbd9d767ad08455382e2cec91e0bfc4ed7ea942",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

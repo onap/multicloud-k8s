@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ccc0d9e_123bec09",
+        "filename": "kud/deployment_infra/images/ovn-pod.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-28T06:07:19Z",
+      "side": 1,
+      "message": "move it to test/swan.sh by source _common.sh\n\nPlease make this file generate inside the test/_common.sh. Please see this example vFW.sh",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 1,
+        "endChar": 21
+      },
+      "revId": "62ae6cb126f113f63d188373bb4adb1eada10e50",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ab983e6_d011d52a",
+        "filename": "kud/deployment_infra/images/sdwan-openwrt-ovn.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-28T06:07:19Z",
+      "side": 1,
+      "message": "Please have a script that generates the network crd with network address by source test/_common.sh",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 3
+      },
+      "revId": "62ae6cb126f113f63d188373bb4adb1eada10e50",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69f50596_1fc7e840",
+        "filename": "kud/deployment_infra/images/sdwan-openwrt-ovn.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-28T06:07:19Z",
+      "side": 1,
+      "message": "Nitpicks please remove them",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 3
+      },
+      "revId": "62ae6cb126f113f63d188373bb4adb1eada10e50",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "223b5e61_744163dd",
+        "filename": "kud/deployment_infra/images/sdwan-openwrt-ovn.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-28T06:07:19Z",
+      "side": 1,
+      "message": "Can it be a deployment ?",
+      "range": {
+        "startLine": 77,
+        "startChar": 6,
+        "endLine": 77,
+        "endChar": 9
+      },
+      "revId": "62ae6cb126f113f63d188373bb4adb1eada10e50",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e1e719c_8547ec45",
+        "filename": "kud/deployment_infra/images/sdwan-openwrt-ovn.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-28T06:07:19Z",
+      "side": 1,
+      "message": "Can we rename it to SDWAN controller ?",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 21
+      },
+      "revId": "62ae6cb126f113f63d188373bb4adb1eada10e50",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "48d444d2_0dc16da4",
+        "filename": "kud/deployment_infra/images/sdwan-openwrt-ovn.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-28T06:07:19Z",
+      "side": 1,
+      "message": "can it be rename swan-openwrt ?",
+      "range": {
+        "startLine": 86,
+        "startChar": 10,
+        "endLine": 86,
+        "endChar": 23
+      },
+      "revId": "62ae6cb126f113f63d188373bb4adb1eada10e50",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c2c2e1e4_1bbcc80b",
+        "filename": "kud/deployment_infra/playbooks/configure-sdwan.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-28T06:07:19Z",
+      "side": 1,
+      "message": "Please divide the part into 2 part\npart 1 - create network crd\n- create network crd\nshell: \u003ccreate network crd\u003e\n\npart 2 - launch the SWAN deployment\nshell: \"kubectl apply -f sdwan-deployment.yaml\"",
+      "range": {
+        "startLine": 12,
+        "startChar": 5,
+        "endLine": 12,
+        "endChar": 31
+      },
+      "revId": "62ae6cb126f113f63d188373bb4adb1eada10e50",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f843eea_b496f6d3",
+        "filename": "kud/deployment_infra/playbooks/configure-sdwan.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-10-28T06:07:19Z",
+      "side": 1,
+      "message": "should be part of swan.sh",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 87
+      },
+      "revId": "62ae6cb126f113f63d188373bb4adb1eada10e50",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

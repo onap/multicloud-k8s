@@ -247,6 +247,7 @@ if [ -f $kud_folder/sources.list ]; then
     sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup
     sudo cp $kud_folder/sources.list /etc/apt/sources.list
 fi
+add-apt-repository -r ppa:jonathonf/python-3.6
 sudo apt-get update
 install_k8s
 _set_environment_file

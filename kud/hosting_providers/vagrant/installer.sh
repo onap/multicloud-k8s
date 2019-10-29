@@ -247,6 +247,9 @@ if [ -f $kud_folder/sources.list ]; then
     sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup
     sudo cp $kud_folder/sources.list /etc/apt/sources.list
 fi
+echo "Removing ppa for jonathonf/ubuntu/python-3.6"
+sudo add-apt-repository -r ppa:jonathonf/ubuntu/python-3.6
+sudo add-apt-repository -r ppa:jonathonf/ubuntu/
 sudo apt-get update
 install_k8s
 _set_environment_file

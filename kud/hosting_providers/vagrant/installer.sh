@@ -21,6 +21,11 @@ function _install_go {
     version=$(grep "go_version" ${kud_playbooks}/kud-vars.yml | awk -F "'" '{print $2}')
     local tarball=go$version.linux-amd64.tar.gz
 
+    #gcc is required for go apps compilation
+    if ! which gcc; then
+        sudo apt-get install -y gcc
+    fi
+
     if $(go version &>/dev/null); then
         return
     fi

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab7cdf5f_e227bcde",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-10-29T23:56:55Z",
+      "side": 1,
+      "message": "This test should be outside the loop",
+      "range": {
+        "startLine": 164,
+        "startChar": 8,
+        "endLine": 164,
+        "endChar": 47
+      },
+      "revId": "7c82ff365c26ed5d13de42f327d9646814cd03f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

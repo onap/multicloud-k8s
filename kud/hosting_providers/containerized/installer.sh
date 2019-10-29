@@ -17,6 +17,9 @@ INSTALLER_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 function install_prerequisites {
 #install package for docker images
+    echo "Removing ppa for jonathonf/python-3.6"
+    ls /etc/apt/sources.list.d/ || true
+    find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
     apt-get update
     apt-get install -y curl vim wget git \
         software-properties-common python-pip sudo

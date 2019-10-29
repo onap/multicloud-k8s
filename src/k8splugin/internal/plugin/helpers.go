@@ -70,6 +70,25 @@ type Reference interface {
 	Delete(resource helm.KubernetesResource, namespace string, client KubernetesConnector) error
 }
 
+//  PlacementAdapter - interface to Placement Adapters
+type PlacementAdapter interface {
+	// Intent
+
+	// Validate and Store Intent
+	StoreIntent(intent interface{}) error
+	// Validate and Modify Intent
+	ModifyIntent(intentName string, intent interface{}) error
+	// Delete Intent
+	DeleteIntent(intentName string) error
+	// Get Intent
+	GetIntent(intentName string) (map[string]string, error)
+
+	// Site
+
+	// Get Valid Sites to deploy workload given intents and sites
+	GetSites(intentName string, resourceBundleName string, sites []string) (map[string]string, error)
+}
+
 // GetPluginByKind returns a plugin by the kind name
 // If plugin does not exist, it will return the generic plugin
 // TODO: Change this once we have a plugin registration mechanism

@@ -23,6 +23,7 @@ import (
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	pkgerrors "github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
@@ -68,6 +69,25 @@ type Reference interface {
 
 	//Delete a kubernetes resource described in the provided namespace
 	Delete(resource helm.KubernetesResource, namespace string, client KubernetesConnector) error
+}
+
+//  PlacementAdapter - interface to Placement Adapters
+type PlacementAdapter interface {
+	// Intent
+
+	// Validate and Store Intent
+	StoreIntent(intent interface{}) error
+	// Validate and Modify Intent
+	ModifyIntent(intentName string, intent interface{}) error
+	// Delete Intent
+	DeleteIntent(intentName string) error
+	// Get Intent
+	GetIntent(intentName string) (map[string]string, error)
+
+	// Site
+
+	// Get Valid Sites to deploy workload given intents and sites
+	GetSites(intentName string, profile rb.Profile, sites []string) (map[string][]string, error)
 }
 
 // GetPluginByKind returns a plugin by the kind name

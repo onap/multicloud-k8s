@@ -100,7 +100,14 @@ function install_k8s {
 
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
-    local plugins_name=$1
+    if [ ${1:+1} ]; then
+        local plugins_name=$1
+        echo "additional addons plugins $1"
+    else
+        local plugins_name=""
+        echo "no additional addons pluigns"
+    fi
+
     source /etc/environment
     echo "Installing Kubernetes AddOns"
     ansible-galaxy install $verbose -r \
@@ -189,7 +196,13 @@ function install_pkg {
 
 function install_cluster {
     install_k8s $1
-    install_addons $2
+    if [ ${2:+1} ]; then
+        echo "install default addons and $2"
+        install_addons $2
+    else
+        install_addons
+    fi
+
     echo "installed the addons"
     if ${KUD_PLUGIN_ENABLED:-false}; then
         install_plugin
@@ -254,7 +267,7 @@ if [ "$1" == "--cluster" ]; then
     cp $kud_multi_cluster_path/$cluster_name/hosts.ini $kud_inventory_folder/
     cp -rf $kud_folder/inventory/group_vars $kud_inventory_folder/
 
-    if [ -n "$3" ]; then
+    if [ ${3:+1} ]; then
         if [ "$3" == "--plugins" ]; then
             if [ -z "${4-}"  ]; then
                 echo "Error: plugins arguments is null; Refer the usage"

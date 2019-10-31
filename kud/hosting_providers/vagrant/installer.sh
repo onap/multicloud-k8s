@@ -155,7 +155,7 @@ function install_addons {
     _install_ansible
     sudo ansible-galaxy install $verbose -r $kud_infra_folder/galaxy-requirements.yml --ignore-errors
     ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
-    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov}; do
+    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov cmk}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
     done

@@ -45,6 +45,16 @@ driver_version: 3.7.34
 driver_url: "https://downloadmirror.intel.com/28943/eng/iavf-{{ driver_version }}.tar.gz"
 package: iavf-3.7.34
 
+# Intel CPU Manager for Kubernetes
+cmk_enabled: true
+cmk_namespace: kube-system
+cmk_use_all_hosts: false # 'true' will deploy CMK on the master nodes too
+cmk_hosts_list: compute01,compute02 # allows to control where CMK nodes will run, leave this option commented out to deploy on all K8s nodes
+cmk_shared_num_cores: 2 # number of CPU cores to be assigned to the "shared" pool on each of the nodes
+cmk_exclusive_num_cores: 2 # number of CPU cores to be assigned to the "exclusive" pool on each of the nodes
+#cmk_shared_mode: packed # choose between: packed, spread, default: packed
+#cmk_exclusive_mode: packed # choose between: packed, spread, default: packed
+
 go_version: '1.12.5'
 kubespray_version: 2.10.4
 helm_client_version: 2.13.1

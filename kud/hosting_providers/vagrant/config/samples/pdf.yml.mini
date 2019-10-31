@@ -18,16 +18,18 @@
     - ovn-central
 - name: "minion01"
   ip: "10.10.10.4"
-  memory: 65536
+  memory: 32768
   cpus: 16
   roles:
     - kube-node
     - ovn-controller
     - virtlet
+    - cmk
 - name: "minion02"
   ip: "10.10.10.5"
-  memory: 65536
+  memory: 32768
   cpus: 16
   roles:
     - kube-node
     - ovn-controller
+    - cmk

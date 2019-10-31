@@ -1,0 +1,91 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- import_playbook: preconfigure-cmk.yml
+- hosts: kube-master[0]
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  vars:
+    cmk_install_host: 'controller'
+
+  tasks:
+    - name: populate CMK installing hosts
+      set_fact:
+        cmk_install_host: "{{ inventory_hostname }}"
+      when:
+        inventory_hostname == 'localhost'
+
+    - name: prepare CMK config file
+      replace:
+        dest: "{{ playbook_dir }}/../images/cmk-{{ cmk_install_host }}.yaml"
+        regexp: '{{ item.pool }}=0'
+        replace: '{{ item.pool }}={{ item.cores }}'
+      with_items:
+        - { pool: 'num-shared-cores', cores: '{{ cmk_shared_num_cores }}' }
+        - { pool: 'num-exclusive-cores', cores: '{{ cmk_exclusive_num_cores }}' }
+
+    - name: install CMK components
+      command: "/usr/local/bin/kubectl create -f {{ playbook_dir }}/../images/cmk-{{ cmk_install_host }}.yaml"
+
+    - name: create a script to check CMK setup
+      copy:
+        dest: "./cmk-check.sh"
+        content: |
+            #!/bin/bash
+            echo
+            echo "waiting for cmk-nodereport effective"
+              status=0
+              while [ $status -ne 1 ]; do
+                 status=$(kubectl get cmk-nodereport | grep ENV | wc -l)
+                 sleep 1
+                 echo not found
+              done
+            echo "cmk-nodereport is effective"
+    - name: judge the runtime environment
+      shell: kubectl get nodes --all-namespaces | grep -v controller | awk 'NR==2{print $1}'
+      register: cmk_runtime_env
+    - name: prepare cmk check file
+      replace:
+        dest: "./cmk-check.sh"
+        regexp: 'ENV'
+        replace: '{{ cmk_runtime_env.stdout }}'
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x cmk-check.sh"
+      args:
+        warn: false
+    - name: Run the script and re-evaluate the variable.
+      command: "./cmk-check.sh"
+    - name: Clean the script and folder.
+      file:
+        path: ./cmk-check.sh
+        state: absent
+
+    - name: untaint nodes
+      command: kubectl taint node "{{ item }}" cmk-
+      failed_when: false
+      register: untaint_result
+      changed_when: "untaint_result.rc == 0"
+      when:
+        - cmk_untaint_required
+        - inventory_hostname != 'localhost'
+      with_items:
+        - "{{ cmk_untaint_nodes }}"
+
+    - name: untaint all-in-one localhost
+      command: kubectl taint node localhost cmk-
+      failed_when: false
+      register: untaint_result
+      changed_when: "untaint_result.rc == 0"
+      when:
+        - cmk_untaint_required
+        - inventory_hostname == 'localhost'

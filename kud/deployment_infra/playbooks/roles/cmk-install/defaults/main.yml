@@ -1,0 +1,7 @@
+---
+cmk_git_url: "https://github.com/intel/CPU-Manager-for-Kubernetes.git"
+cmk_version: "v1.4.1"
+cmk_dir: "/tmp/cmk"
+registry_local_address: "localhost:5000"
+cmk_untaint_nodes: true
+cmk_pkgs: make

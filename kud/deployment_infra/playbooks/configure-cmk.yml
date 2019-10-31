@@ -7,29 +7,20 @@
 # which accompanies this distribution, and is available at
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
-
-- name: "master"
-  ip: "10.10.10.3"
-  memory: 8192
-  cpus: 2
+- hosts: all
+#    - name: Apply CMK Daemonset
+#      command: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/cmk.yml"
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+    - name: install cmk required packges
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ cmk_pkgs }}"
   roles:
-    - kube-master
-    - etcd
-    - ovn-central
-- name: "minion01"
-  ip: "10.10.10.4"
-  memory: 32768
-  cpus: 16
-  roles:
-    - kube-node
-    - ovn-controller
-    - virtlet
-    - cmk
-- name: "minion02"
-  ip: "10.10.10.5"
-  memory: 32768
-  cpus: 16
-  roles:
-    - kube-node
-    - ovn-controller
-    - cmk
+    - role: cmk-install
+      tags: cmk
+      when: cmk_enabled | default(true)

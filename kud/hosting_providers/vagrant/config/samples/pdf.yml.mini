@@ -24,6 +24,7 @@
     - kube-node
     - ovn-controller
     - virtlet
+    - cmk
 - name: "minion02"
   ip: "10.10.10.5"
   memory: 65536
@@ -31,3 +32,4 @@
   roles:
     - kube-node
     - ovn-controller
+    - cmk

@@ -15,6 +15,10 @@ ansible playbooks allow to provision a deployment on Baremetal.
 The [installer](installer.sh) bash script contains the minimal
 Ubuntu instructions required for running this project.
 
+NOTE: for cmk bare metal deployment, preset 1/2 CPUs for
+      shared/exlusive pools respectively to fit CI server machines
+      users can adjust the parameters to meet their own requirements.
+
 ## License
 
 Apache-2.0

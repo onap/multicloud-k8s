@@ -39,6 +39,21 @@ istio_source_type: "tarball"
 istio_version: 1.0.3
 istio_url: "https://github.com/istio/istio/releases/download/{{ istio_version }}/istio-{{ istio_version }}-linux.tar.gz"
 
+# Intel CPU Manager for Kubernetes
+cmk_enabled: true
+cmk_namespace: kube-system
+cmk_use_all_hosts: false # 'true' will deploy CMK on the master nodes too
+cmk_shared_num_cores: 4 # number of CPU cores to be assigned to the "shared" pool on each of the nodes
+cmk_exclusive_num_cores: 8 # number of CPU cores to be assigned to the "exclusive" pool on each of the nodes
+cmk_git_url: "https://github.com/intel/CPU-Manager-for-Kubernetes.git"
+cmk_version: "v1.4.1"
+cmk_dir: "/tmp/cmk"
+registry_local_address: "localhost:5000"
+cmk_untaint_nodes: true
+cmk_pkgs: make,jq
+#cmk_shared_mode: packed # choose between: packed, spread, default: packed
+#cmk_exclusive_mode: packed # choose between: packed, spread, default: packed
+
 go_version: '1.12.5'
 kubespray_version: 2.10.4
 helm_client_version: 2.13.1

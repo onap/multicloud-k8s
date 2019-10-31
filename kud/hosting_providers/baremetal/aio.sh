@@ -41,6 +41,9 @@ localhost
 [virtlet]
 localhost
 
+[cmk]
+localhost
+
 [k8s-cluster:children]
 kube-node
 kube-master

@@ -1,0 +1,62 @@
+---
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: install cmk required packges
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ cmk_pkgs }}"
+
+    - name: clean CMK directory
+      file:
+        path: "{{ cmk_dir }}"
+        state: absent
+
+    - name: create CMK directory
+      file:
+        path: "{{ cmk_dir }}"
+        state: directory
+
+    - name: clone CMK repository
+      command: git clone {{ cmk_git_url }} -b {{ cmk_version }}
+      args:
+        chdir: "{{ cmk_dir }}"
+
+    - name: read current CMK version
+      command: echo v1.4.1
+      args:
+        chdir: "{{ cmk_dir }}"
+      register: cmk_img_version
+
+    - name: build CMK image
+      command: make
+      args:
+        chdir: "{{ cmk_dir }}/CPU-Manager-for-Kubernetes"
+
+    - name: tag CMK image
+      command: docker tag cmk:{{ cmk_img_version.stdout }} {{ registry_local_address }}/cmk:{{ cmk_img_version.stdout }}
+
+    - name: build list of CMK hosts
+      set_fact:
+        cmk_hosts_list: "{{ groups['kube-node'] | join(',') }}"
+      when:
+        - cmk_use_all_hosts != true
+        - (cmk_hosts_list is undefined) or (cmk_hosts_list | length == 0)
+
+- hosts: kube-master[0]
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: install cmk required packges
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ cmk_pkgs }}"

@@ -1,0 +1,107 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- import_playbook: preconfigure-cmk.yml
+- hosts: localhost
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  vars:
+    cmk_install_host: '{{ inventory_hostname }}'
+
+  tasks:
+    - name: build list of CMK nodes to untaint
+      set_fact:
+        cmk_hosts_list: "{{ groups['kube-node'] }}"
+
+    - name: generate CMK install yaml file
+      command: "cp {{ playbook_dir }}/../images/cmk.yaml {{ playbook_dir }}/../images/cmk-{{ cmk_install_host }}.yaml"
+
+    - name: customize CMK install yaml file per runtime env
+      lineinfile:
+        dest: "{{ playbook_dir }}/../images/cmk-{{ cmk_install_host }}.yaml"
+        insertafter: "nodeSelectorTerms:"
+        line: "            - matchFields:\n              - key: metadata.name\n                operator: In\n                values:\n                - '{{ item }}'"
+      register: cus_result
+      with_items:
+        - "{{ cmk_hosts_list }}"
+
+    - name: prepare CMK CPU cores per config file
+      replace:
+        dest: "{{ playbook_dir }}/../images/cmk-{{ cmk_install_host }}.yaml"
+        regexp: '{{ item.pool }}=0'
+        replace: '{{ item.pool }}={{ item.cores }}'
+      with_items:
+        - { pool: 'num-shared-cores', cores: '{{ cmk_shared_num_cores }}' }
+        - { pool: 'num-exclusive-cores', cores: '{{ cmk_exclusive_num_cores }}' }
+
+    - name: install CMK components
+      command: "/usr/local/bin/kubectl create -f {{ playbook_dir }}/../images/cmk-{{ cmk_install_host }}.yaml"
+
+    - name: wait for all cmk daemonset pods to be running
+      shell: kubectl get pods -n {{ cmk_namespace }} -l name=cmk -o jsonpath={.items[*].status.phase}
+      register: kubectl_cmk_running
+      until: "['Running'] == kubectl_cmk_running.stdout.split() | unique"
+      retries: 50
+      delay: 5
+      failed_when: false
+
+    - name: create a script to check CMK setup
+      copy:
+        dest: "./cmk-check.sh"
+        content: |
+            #!/bin/bash
+            echo
+            echo "waiting for cmk-nodereport effective"
+              status=0
+              while [ $status -ne 1 ]; do
+                 status=$(kubectl get cmk-nodereport | grep ENV | wc -l)
+                 sleep 1
+                 echo not found
+              done
+            echo "cmk-nodereport is effective"
+
+    - name: judge the runtime environment
+      set_fact:
+        cmk_runtime_env: "{{ groups['kube-node'][0] }}"
+    - debug:
+        var: cmk_runtime_env
+
+    - name: prepare cmk check file
+      replace:
+        dest: "./cmk-check.sh"
+        regexp: 'ENV'
+        replace: '{{ cmk_runtime_env }}'
+
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x cmk-check.sh"
+      args:
+        warn: false
+
+    - name: Run the script and re-evaluate the variable.
+      command: "./cmk-check.sh"
+
+    - name: Clean the script and folder.
+      file:
+        path: ./cmk-check.sh
+        state: absent
+
+    - name: untaint nodes
+      command: kubectl taint node "{{ item }}" cmk-
+      failed_when: false
+      register: untaint_result
+      changed_when: "untaint_result.rc == 0"
+      when:
+        - cmk_untaint_required
+      with_items:
+        - "{{ cmk_hosts_list }}"
+    - debug:
+        var: untaint_result

@@ -41,6 +41,9 @@ localhost
 [virtlet]
 localhost
 
+[cmk]
+localhost
+
 [k8s-cluster:children]
 kube-node
 kube-master
@@ -60,4 +63,5 @@ echo "Enabling nested-virtualization"
 sudo ./node.sh
 
 echo "Deploying KUD project"
+sudo su
 ./installer.sh | tee kud_installer.log

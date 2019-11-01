@@ -25,8 +25,8 @@ deploy: build
 
 .PHONY: test
 test: clean
-	@go build -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
-	@go test -v ./...
+	@go build -race -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
+	@go test -race ./...
 
 format:
 	@go fmt ./...
@@ -40,5 +40,5 @@ clean:
 
 .PHONY: cover
 cover:
-	@go test ./... -coverprofile=coverage.out
+	@go test -race ./... -coverprofile=coverage.out
 	@go tool cover -html=coverage.out -o coverage.html

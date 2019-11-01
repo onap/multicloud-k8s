@@ -20,6 +20,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 
 	pkgerrors "github.com/pkg/errors"
@@ -116,11 +117,17 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 		},
 	}, namespace, k)
 
+	if err != nil {
+		logutils.WithFields(err.Error(), "namespace", namespace)
+		return pkgerrors.Wrap(err, "Error checking for namespace: "+namespace)
+	}
+
 	if ns == "" {
-		log.Println("Creating " + namespace + " namespace")
+		logutils.WithFields("Creating namespace", "namespace", namespace)
 
 		_, err = pluginImpl.Create("", namespace, k)
 		if err != nil {
+			logutils.WithFields(err.Error(), "namespace", namespace)
 			return pkgerrors.Wrap(err, "Error creating "+namespace+" namespace")
 		}
 	}

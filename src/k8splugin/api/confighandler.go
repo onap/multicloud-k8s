@@ -23,6 +23,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 
 	"github.com/gorilla/mux"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Used to store backend implementations objects
@@ -42,24 +43,28 @@ func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	prName := vars["prname"]
 
 	if r.Body == nil {
+		logr.WithFields("http.StatusBadRequest", "Body", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	}
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Name is required.
 	if p.ConfigName == "" {
+		logr.WithFields("http.StatusBadRequest", "ConfigName", "Missing name in POST request")
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.Create(rbName, rbVersion, prName, p)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -68,6 +73,7 @@ func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -84,6 +90,7 @@ func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.Get(rbName, rbVersion, prName, cfgName)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -92,6 +99,7 @@ func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -107,6 +115,7 @@ func (h rbConfigHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.Delete(rbName, rbVersion, prName, cfgName)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -115,6 +124,7 @@ func (h rbConfigHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -132,18 +142,21 @@ func (h rbConfigHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	var p app.Config
 
 	if r.Body == nil {
+		logr.WithFields("http.StatusBadRequest", "Body", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	}
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	ret, err := h.client.Update(rbName, rbVersion, prName, cfgName, p)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -152,6 +165,7 @@ func (h rbConfigHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -165,6 +179,7 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 	prName := vars["prname"]
 
 	if r.Body == nil {
+		logr.WithFields("http.StatusBadRequest", "Error", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	}
@@ -172,11 +187,13 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 	var p app.ConfigRollback
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 	err = h.client.Rollback(rbName, rbVersion, prName, p)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -191,6 +208,7 @@ func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 	prName := vars["prname"]
 
 	if r.Body == nil {
+		logr.WithFields("http.StatusBadRequest", "Body", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	}
@@ -198,12 +216,14 @@ func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 	var p app.ConfigTagit
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	err = h.client.Tagit(rbName, rbVersion, prName, p)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

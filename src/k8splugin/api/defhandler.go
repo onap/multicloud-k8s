@@ -25,6 +25,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	"github.com/gorilla/mux"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Used to store backend implementations objects
@@ -42,27 +43,32 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		logr.WithFields("http.StatusBadRequest", "Error", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Name is required.
 	if v.RBName == "" {
+		logr.WithFields("http.StatusBadRequest", "RBName", "Missing name in POST request")
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	// Version is required.
 	if v.RBVersion == "" {
+		logr.WithFields("http.StatusBadRequest", "RBVersion", "Missing version in POST request")
 		http.Error(w, "Missing version in POST request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.Create(v)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -71,6 +77,7 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -84,17 +91,20 @@ func (h rbDefinitionHandler) uploadHandler(w http.ResponseWriter, r *http.Reques
 
 	inpBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		logr.WithFields("http.StatusBadRequest", "Error", "Unable to read body")
 		http.Error(w, "Unable to read body", http.StatusBadRequest)
 		return
 	}
 
 	if len(inpBytes) == 0 {
+		logr.WithFields("http.StatusBadRequest", "Error", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	}
 
 	err = h.client.Upload(name, version, inpBytes)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -110,6 +120,7 @@ func (h rbDefinitionHandler) listVersionsHandler(w http.ResponseWriter, r *http.
 
 	ret, err := h.client.List(name)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -118,6 +129,7 @@ func (h rbDefinitionHandler) listVersionsHandler(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -129,6 +141,7 @@ func (h rbDefinitionHandler) listAllHandler(w http.ResponseWriter, r *http.Reque
 
 	ret, err := h.client.List("")
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -137,6 +150,7 @@ func (h rbDefinitionHandler) listAllHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -151,6 +165,7 @@ func (h rbDefinitionHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 
 	ret, err := h.client.Get(name, version)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -159,6 +174,7 @@ func (h rbDefinitionHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -172,6 +188,7 @@ func (h rbDefinitionHandler) deleteHandler(w http.ResponseWriter, r *http.Reques
 
 	err := h.client.Delete(name, version)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

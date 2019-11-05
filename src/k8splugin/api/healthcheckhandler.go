@@ -20,6 +20,7 @@ import (
 	"net/http"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // healthCheckHandler executes a db read to return health of k8splugin
@@ -27,6 +28,7 @@ import (
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	err := db.DBconn.HealthCheck()
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

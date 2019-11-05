@@ -27,6 +27,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 
 	"github.com/gorilla/mux"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // connectionHandler is used to store backend implementations objects
@@ -50,6 +51,7 @@ func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	// Set Max size to 16mb here
 	err := r.ParseMultipartForm(16777216)
 	if err != nil {
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -58,21 +60,25 @@ func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	err = json.NewDecoder(jsn).Decode(&v)
 	switch {
 	case err == io.EOF:
+		logr.WithFields("http.StatusBadRequest", "Error", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Name is required.
 	if v.CloudRegion == "" {
+		logr.WithFields("http.StatusBadRequest", "CloudRegion", "Missing name in POST request")
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	// Cloudowner is required.
 	if v.CloudOwner == "" {
+		logr.WithFields("http.StatusBadRequest", "CloudOwner", "Missing cloudowner in POST request")
 		http.Error(w, "Missing cloudowner in POST request", http.StatusBadRequest)
 		return
 	}
@@ -80,6 +86,7 @@ func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	//Read the file section and ignore the header
 	file, _, err := r.FormFile("file")
 	if err != nil {
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "Unable to process file")
 		http.Error(w, "Unable to process file", http.StatusUnprocessableEntity)
 		return
 	}
@@ -89,6 +96,7 @@ func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	//Convert the file content to base64 for storage
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "Unable to read file")
 		http.Error(w, "Unable to read file", http.StatusUnprocessableEntity)
 		return
 	}
@@ -97,6 +105,7 @@ func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request)
 
 	ret, err := h.client.Create(v)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -105,6 +114,7 @@ func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -118,6 +128,7 @@ func (h connectionHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.Get(name)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -126,6 +137,7 @@ func (h connectionHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -138,6 +150,7 @@ func (h connectionHandler) deleteHandler(w http.ResponseWriter, r *http.Request)
 
 	err := h.client.Delete(name)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

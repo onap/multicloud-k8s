@@ -24,6 +24,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Used to store backend implementations objects
@@ -45,21 +46,25 @@ func (h rbTemplateHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	err := json.NewDecoder(r.Body).Decode(&p)
 	switch {
 	case err == io.EOF:
+		logr.WithFields("http.StatusBadRequest", "Error", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "StatusUnprocessableEntity")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Name is required.
 	if p.TemplateName == "" {
+		logr.WithFields("http.StatusBadRequest", "TemplateName", "Missing name in POST request")
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	err = h.client.Create(rbName, rbVersion, p)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -77,17 +82,20 @@ func (h rbTemplateHandler) uploadHandler(w http.ResponseWriter, r *http.Request)
 
 	inpBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		logr.WithFields("http.StatusBadRequest", "Error", "Unable to read body")
 		http.Error(w, "Unable to read body", http.StatusBadRequest)
 		return
 	}
 
 	if len(inpBytes) == 0 {
+		logr.WithFields("http.StatusBadRequest", "Body", "Empty body")
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	}
 
 	err = h.client.Upload(rbName, rbVersion, templateName, inpBytes)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -104,6 +112,7 @@ func (h rbTemplateHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.Get(rbName, rbVersion, templateName)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -112,6 +121,7 @@ func (h rbTemplateHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -126,6 +136,7 @@ func (h rbTemplateHandler) deleteHandler(w http.ResponseWriter, r *http.Request)
 
 	err := h.client.Delete(rbName, rbVersion, templateName)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -24,6 +24,7 @@ import (
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Compile time check to see if namespacePlugin implements the correct interface
@@ -44,8 +45,10 @@ func (p namespacePlugin) Create(yamlFilePath string, namespace string, client pl
 	}
 	_, err := client.GetStandardClient().CoreV1().Namespaces().Create(namespaceObj)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Create Namespace error")
 		return "", pkgerrors.Wrap(err, "Create Namespace error")
 	}
+	logr.WithFields("Namespace created", "namespace", "Namespace created")
 	log.Printf("Namespace (%s) created", namespace)
 
 	return namespace, nil
@@ -56,6 +59,7 @@ func (p namespacePlugin) Get(resource helm.KubernetesResource, namespace string,
 	opts := metaV1.GetOptions{}
 	ns, err := client.GetStandardClient().CoreV1().Namespaces().Get(resource.Name, opts)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Get Namespace error")
 		return "", pkgerrors.Wrap(err, "Get Namespace error")
 	}
 
@@ -71,6 +75,7 @@ func (p namespacePlugin) Delete(resource helm.KubernetesResource, namespace stri
 
 	log.Println("Deleting namespace: " + resource.Name)
 	if err := client.GetStandardClient().CoreV1().Namespaces().Delete(resource.Name, opts); err != nil {
+		logr.WithFields("pkgerrors", "Error", "Delete namespace error")
 		return pkgerrors.Wrap(err, "Delete namespace error")
 	}
 
@@ -86,6 +91,7 @@ func (p namespacePlugin) List(gvk schema.GroupVersionKind, namespace string, cli
 
 	list, err := client.GetStandardClient().CoreV1().Namespaces().List(opts)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Get Namespace list error")
 		return nil, pkgerrors.Wrap(err, "Get Namespace list error")
 	}
 

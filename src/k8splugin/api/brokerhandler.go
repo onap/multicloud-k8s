@@ -23,6 +23,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	"github.com/gorilla/mux"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Used to store the backend implementation objects
@@ -84,6 +85,7 @@ func (b brokerRequest) getAttributeValue(directives map[string]interface{}, inp 
 	attributes, ok := directives["attributes"].([]interface{})
 	if !ok {
 		log.Println("Unable to cast attributes to []interface{}")
+		logr.WithFields("Unable to cast attributes", "[]interface{}", "Unable to cast attributes to []interface{}")
 		return ""
 	}
 
@@ -92,18 +94,21 @@ func (b brokerRequest) getAttributeValue(directives map[string]interface{}, inp 
 		attribute, ok := value.(map[string]interface{})
 		if !ok {
 			log.Println("Unable to cast attribute to map[string]interface{}")
+			logr.WithFields("Unable to cast attribute to map[string]interface{}", "map[string]interface{}", "Unable to cast attribute to map[string]interface{}")
 			return ""
 		}
 
 		attributeName, ok := attribute["attribute_name"].(string)
 		if !ok {
 			log.Println("Unable to cast attribute_name to string")
+			logr.WithFields("Unable to cast attribute_name to string", "attribute_name", "Unable to cast attribute_name to string")
 			return ""
 		}
 		if attributeName == inp {
 			attributevalue, ok := attribute["attribute_value"].(string)
 			if !ok {
 				log.Println("Unable to cast attribute_value to string")
+				logr.WithFields("Unable to cast attribute_name to string", "attribute_value", "Unable to cast attribute_name to string")
 				return ""
 			}
 
@@ -121,39 +126,46 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	err := json.NewDecoder(r.Body).Decode(&req)
 	switch {
 	case err == io.EOF:
+		logr.WithFields("http.StatusBadRequest", "Error", "Body empty")
 		http.Error(w, "Body empty", http.StatusBadRequest)
 		return
 	case err != nil:
+		logr.WithFields("http.StatusUnprocessableEntity", "Error", "Body empty")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Check body for expected parameters
 	if req.VFModuleModelCustomizationID == "" {
+		logr.WithFields("http.StatusBadRequest", "VFModuleModelCustomizationID", "vf-module-model-customization-id is empty")
 		http.Error(w, "vf-module-model-customization-id is empty", http.StatusBadRequest)
 		return
 	}
 
 	rbName := req.getAttributeValue(req.UserDirectives, "definition-name")
 	if rbName == "" {
+		logr.WithFields("http.StatusBadRequest", "rbName", "definition-name is missing from user-directives")
 		http.Error(w, "definition-name is missing from user-directives", http.StatusBadRequest)
 		return
 	}
 
 	rbVersion := req.getAttributeValue(req.UserDirectives, "definition-version")
 	if rbVersion == "" {
+		logr.WithFields("http.StatusBadRequest", "rbVersion", "definition-version is missing from user-directives")
 		http.Error(w, "definition-version is missing from user-directives", http.StatusBadRequest)
 		return
 	}
 
 	profileName := req.getAttributeValue(req.UserDirectives, "profile-name")
 	if profileName == "" {
+		logr.WithFields("http.StatusBadRequest", "profile-name", "profile-name is missing from user-directives")
 		http.Error(w, "profile-name is missing from user-directives", http.StatusBadRequest)
 		return
 	}
 
 	vfModuleName := req.getAttributeValue(req.SDNCDirectives, "vf_module_name")
 	if vfModuleName == "" {
+		logr.WithFields("http.StatusBadRequest", "vfModuleName", "vf_module_name is missing from sdnc-directives")
 		http.Error(w, "vf_module_name is missing from sdnc-directives", http.StatusBadRequest)
 		return
 	}
@@ -170,6 +182,7 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 
 	resp, err := b.client.Create(instReq)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -185,6 +198,7 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(brokerResp)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -197,6 +211,7 @@ func (b brokerInstanceHandler) getHandler(w http.ResponseWriter, r *http.Request
 
 	resp, err := b.client.Get(instanceID)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -211,6 +226,7 @@ func (b brokerInstanceHandler) getHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(brokerResp)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -250,6 +266,7 @@ func (b brokerInstanceHandler) findHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 	err := json.NewEncoder(w).Encode(brokerResp)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -262,6 +279,7 @@ func (b brokerInstanceHandler) deleteHandler(w http.ResponseWriter, r *http.Requ
 
 	err := b.client.Delete(instanceID)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -276,6 +294,7 @@ func (b brokerInstanceHandler) deleteHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusAccepted)
 	err = json.NewEncoder(w).Encode(brokerResp)
 	if err != nil {
+		logr.WithFields("http.StatusInternalServerError", "Error", "StatusInternalServerError")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

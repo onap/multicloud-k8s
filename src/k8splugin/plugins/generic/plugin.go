@@ -24,6 +24,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Compile time check to see if genericPlugin implements the correct interface
@@ -46,6 +47,7 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 	//Ignore the returned obj as we expect the data in unstruct
 	_, err := utils.DecodeYAML(yamlFilePath, unstruct)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Decode deployment object error")
 		return "", pkgerrors.Wrap(err, "Decode deployment object error")
 	}
 
@@ -55,6 +57,7 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 	gvk := unstruct.GroupVersionKind()
 	mapping, err := mapper.RESTMapping(schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}, gvk.Version)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Mapping kind to resource error")
 		return "", pkgerrors.Wrap(err, "Mapping kind to resource error")
 	}
 
@@ -77,14 +80,18 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
+		logr.WithFields("pkgerrors", "RESTScopeNameNamespace", "RESTScopeNameNamespace for mapping")
 		createdObj, err = dynClient.Resource(gvr).Namespace(namespace).Create(unstruct, metav1.CreateOptions{})
 	case meta.RESTScopeNameRoot:
+		logr.WithFields("pkgerrors", "RESTScopeNameRoot", "RESTScopeNameRoot for mapping")
 		createdObj, err = dynClient.Resource(gvr).Create(unstruct, metav1.CreateOptions{})
 	default:
+		logr.WithFields("pkgerrors", "Error", "Got an unknown RESTSCopeName for mapping")
 		return "", pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + gvk.String())
 	}
 
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Create object error")
 		return "", pkgerrors.Wrap(err, "Create object error")
 	}
 
@@ -106,6 +113,7 @@ func (g genericPlugin) Get(resource helm.KubernetesResource,
 		Kind:  resource.GVK.Kind,
 	}, resource.GVK.Version)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Mapping kind to resource error")
 		return "", pkgerrors.Wrap(err, "Mapping kind to resource error")
 	}
 
@@ -114,14 +122,18 @@ func (g genericPlugin) Get(resource helm.KubernetesResource,
 	var unstruct *unstructured.Unstructured
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
+		logr.WithFields("pkgerrors", "RESTScopeNameNamespace", "RESTScopeNameNamespace for mapping")
 		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(resource.Name, opts)
 	case meta.RESTScopeNameRoot:
+		logr.WithFields("pkgerrors", "RESTScopeNameRoot", "RESTScopeNameRoot for mapping")
 		unstruct, err = dynClient.Resource(gvr).Get(resource.Name, opts)
 	default:
+		logr.WithFields("pkgerrors", "Error", "Got an unknown RESTSCopeName for mapping")
 		return "", pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + resource.GVK.String())
 	}
 
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Delete object error")
 		return "", pkgerrors.Wrap(err, "Delete object error")
 	}
 
@@ -151,6 +163,7 @@ func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string
 		Kind:  resource.GVK.Kind,
 	}, resource.GVK.Version)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Mapping kind to resource error")
 		return pkgerrors.Wrap(err, "Mapping kind to resource error")
 	}
 
@@ -162,14 +175,18 @@ func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string
 
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
+		logr.WithFields("pkgerrors", "RESTScopeNameNamespace", "Delete object error")
 		err = dynClient.Resource(gvr).Namespace(namespace).Delete(resource.Name, opts)
 	case meta.RESTScopeNameRoot:
+		logr.WithFields("pkgerrors", "RESTScopeNameRoot", "Delete object error")
 		err = dynClient.Resource(gvr).Delete(resource.Name, opts)
 	default:
+		logr.WithFields("pkgerrors", "Error", "Got an unknown RESTSCopeName for mapping:")
 		return pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + resource.GVK.String())
 	}
 
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Delete object error")
 		return pkgerrors.Wrap(err, "Delete object error")
 	}
 	return nil

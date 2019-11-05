@@ -28,12 +28,14 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 
 	"github.com/gorilla/handlers"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 func main() {
 
 	err := utils.CheckInitialSettings()
 	if err != nil {
+		logr.WithFields("http.FatalError", "Error", "FatalError")
 		log.Fatal(err)
 	}
 
@@ -59,11 +61,13 @@ func main() {
 
 	tlsConfig, err := auth.GetTLSConfig("ca.cert", "server.cert", "server.key")
 	if err != nil {
+		logr.WithFields("httpServer.ListenAndServe", "Error", "Error Getting TLS Configuration. Starting without TLS...")
 		log.Println("Error Getting TLS Configuration. Starting without TLS...")
 		log.Fatal(httpServer.ListenAndServe())
 	} else {
 		httpServer.TLSConfig = tlsConfig
 		// empty strings because tlsconfig already has this information
+		logr.WithFields("httpServer.ListenAndServeTLS", "TLSConfig", "Empty TLSConfig")
 		err = httpServer.ListenAndServeTLS("", "")
 	}
 }

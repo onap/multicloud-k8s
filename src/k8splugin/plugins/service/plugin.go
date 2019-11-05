@@ -25,6 +25,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
+	logr "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Compile time check to see if servicePlugin implements the correct interface
@@ -44,11 +45,13 @@ func (p servicePlugin) Create(yamlFilePath string, namespace string, client plug
 
 	obj, err := utils.DecodeYAML(yamlFilePath, nil)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Decode service object error")
 		return "", pkgerrors.Wrap(err, "Decode service object error")
 	}
 
 	service, ok := obj.(*coreV1.Service)
 	if !ok {
+		logr.WithFields("pkgerrors", "Error", "Decoded object contains another resource different than Service")
 		return "", pkgerrors.New("Decoded object contains another resource different than Service")
 	}
 	service.Namespace = namespace
@@ -63,6 +66,7 @@ func (p servicePlugin) Create(yamlFilePath string, namespace string, client plug
 
 	result, err := client.GetStandardClient().CoreV1().Services(namespace).Create(service)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Create Service error")
 		return "", pkgerrors.Wrap(err, "Create Service error")
 	}
 
@@ -82,6 +86,7 @@ func (p servicePlugin) List(gvk schema.GroupVersionKind, namespace string, clien
 
 	list, err := client.GetStandardClient().CoreV1().Services(namespace).List(opts)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Get Service list error")
 		return nil, pkgerrors.Wrap(err, "Get Service list error")
 	}
 
@@ -117,6 +122,7 @@ func (p servicePlugin) Delete(resource helm.KubernetesResource, namespace string
 
 	log.Println("Deleting service: " + resource.Name)
 	if err := client.GetStandardClient().CoreV1().Services(namespace).Delete(resource.Name, opts); err != nil {
+		logr.WithFields("pkgerrors", "Error", "Delete service error")
 		return pkgerrors.Wrap(err, "Delete service error")
 	}
 
@@ -132,6 +138,7 @@ func (p servicePlugin) Get(resource helm.KubernetesResource, namespace string, c
 	opts := metaV1.GetOptions{}
 	service, err := client.GetStandardClient().CoreV1().Services(namespace).Get(resource.Name, opts)
 	if err != nil {
+		logr.WithFields("pkgerrors", "Error", "Get Service error")
 		return "", pkgerrors.Wrap(err, "Get Service error")
 	}
 

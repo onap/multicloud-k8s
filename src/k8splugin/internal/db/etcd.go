@@ -23,6 +23,7 @@ import (
 	pkgerrors "github.com/pkg/errors"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/pkg/transport"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // EtcdConfig Configuration values needed for Etcd Client
@@ -64,6 +65,7 @@ func newClient(store *clientv3.Client, c EtcdConfig) (EtcdClient, error) {
 		}
 		tlsConfig, err := tlsInfo.ClientConfig()
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error creating etcd TLSInfo")
 			return EtcdClient{}, pkgerrors.Errorf("Error creating etcd TLSInfo: %s", err.Error())
 		}
 		// NOTE: Client relies on nil tlsConfig
@@ -79,6 +81,7 @@ func newClient(store *clientv3.Client, c EtcdConfig) (EtcdClient, error) {
 			TLS:         tlsConfig,
 		})
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error creating etcd client")
 			return EtcdClient{}, pkgerrors.Errorf("Error creating etcd client: %s", err.Error())
 		}
 	}
@@ -92,10 +95,12 @@ func newClient(store *clientv3.Client, c EtcdConfig) (EtcdClient, error) {
 func (e EtcdClient) Put(key, value string) error {
 
 	if e.cli == nil {
+		logutils.WithFields("Etcd client is empty", "Error", "Etcd Client not initialized")
 		return pkgerrors.Errorf("Etcd Client not initialized")
 	}
 	_, err := e.cli.Put(context.Background(), key, value)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error creating etcd entry")
 		return pkgerrors.Errorf("Error creating etcd entry: %s", err.Error())
 	}
 	return nil
@@ -105,13 +110,16 @@ func (e EtcdClient) Put(key, value string) error {
 func (e EtcdClient) Get(key string) ([]byte, error) {
 
 	if e.cli == nil {
+		logutils.WithFields("Etcd client is empty", "Error", "Etcd Client not initialized")
 		return nil, pkgerrors.Errorf("Etcd Client not initialized")
 	}
 	getResp, err := e.cli.Get(context.Background(), key)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error getitng etcd entry")
 		return nil, pkgerrors.Errorf("Error getitng etcd entry: %s", err.Error())
 	}
 	if getResp.Count == 0 {
+		logutils.WithFields("Empty key", "Error", "Key doesn't exist")
 		return nil, pkgerrors.Errorf("Key doesn't exist")
 	}
 	return getResp.Kvs[0].Value, nil
@@ -121,10 +129,12 @@ func (e EtcdClient) Get(key string) ([]byte, error) {
 func (e EtcdClient) Delete(key string) error {
 
 	if e.cli == nil {
+		logutils.WithFields("Etcd client is empty", "Error", "Etcd Client not initialized")
 		return pkgerrors.Errorf("Etcd Client not initialized")
 	}
 	_, err := e.cli.Delete(context.Background(), key)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete failed etcd entry")
 		return pkgerrors.Errorf("Delete failed etcd entry:%s", err.Error())
 	}
 	return nil

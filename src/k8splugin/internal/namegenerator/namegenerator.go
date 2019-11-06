@@ -26,6 +26,7 @@ import (
 
 	"github.com/docker/engine/pkg/namesgenerator"
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 const (
@@ -66,6 +67,7 @@ func (c *cache) init() {
 		c.cache = make(map[string]bool)
 		err := c.readCacheFromDB()
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error Reading from DB")
 			log.Println("Error Reading from DB: ", err.Error())
 			return
 		}
@@ -85,12 +87,14 @@ func (c *cache) readCacheFromDB() error {
 	// Read the latest from cache
 	data, err := db.DBconn.Read(storeName, cacheKeyGlobal, tag)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error reading name cache from Database")
 		log.Println("Error reading name cache from Database: ", err)
 		return pkgerrors.Wrap(err, "Reading cache from DB")
 	}
 
 	err = db.DBconn.Unmarshal(data, &c.cache)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Unmarshaling cache from DB")
 		log.Println("Error unmarshaling data into cache: ", err)
 		return pkgerrors.Wrap(err, "Unmarshaling cache from DB")
 	}
@@ -108,10 +112,12 @@ func (c *cache) writeCacheToDB() {
 		if strings.Contains(err.Error(), "Error finding master table") {
 			err = db.DBconn.Create(storeName, cacheKeyGlobal, tag, c.cache)
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Error creating the entry in DB. Will try later")
 				log.Println("Error creating the entry in DB. Will try later...")
 				return
 			}
 		} else {
+			logutils.WithFields(err.Error(), "Error", "Error updating DB")
 			log.Println("Error updating DB: ", err.Error())
 			return
 		}
@@ -129,6 +135,7 @@ func (c *cache) generateName() string {
 		name := namesgenerator.GetRandomName(0)
 		if c.isAlreadyUsed(name) {
 			// Generate another name
+			logutils.WithFields("Name already used", name, "Name already used")
 			log.Printf("Name %s already used", name)
 			continue
 		}

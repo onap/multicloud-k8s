@@ -32,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // KubernetesConnector is an interface that is expected to be implemented
@@ -77,21 +78,25 @@ func GetPluginByKind(kind string) (Reference, error) {
 
 	typePlugin, ok := utils.LoadedPlugins[strings.ToLower(kind)]
 	if !ok {
+		logutils.WithFields("False", "Error", "No plugin found")
 		log.Println("No plugin for kind " + kind + " found. Using generic Plugin")
 		typePlugin, ok = utils.LoadedPlugins["generic"]
 		if !ok {
+			logutils.WithFields("False", "Error", "No generic plugin found")
 			return nil, pkgerrors.New("No generic plugin found")
 		}
 	}
 
 	symbol, err := typePlugin.Lookup("ExportedVariable")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "No ExportedVariable symbol found")
 		return nil, pkgerrors.Wrap(err, "No ExportedVariable symbol found")
 	}
 
 	//Assert if it implements the PluginReference interface
 	pluginImpl, ok := symbol.(Reference)
 	if !ok {
+		logutils.WithFields("False", "Error", "ExportedVariable does not implement plugins.Reference interface type")
 		return nil, pkgerrors.New("ExportedVariable does not implement plugins.Reference interface type")
 	}
 
@@ -104,12 +109,14 @@ func TagPodsIfPresent(unstruct *unstructured.Unstructured, tag string) {
 
 	spec, ok := unstruct.Object["spec"].(map[string]interface{})
 	if !ok {
+		logutils.WithFields("false", "Error", "Error converting spec to map")
 		log.Println("Error converting spec to map")
 		return
 	}
 
 	template, ok := spec["template"].(map[string]interface{})
 	if !ok {
+		logutils.WithFields("False", "Error", "Error converting template to map")
 		log.Println("Error converting template to map")
 		return
 	}
@@ -119,6 +126,7 @@ func TagPodsIfPresent(unstruct *unstructured.Unstructured, tag string) {
 	podTemplateSpec := &corev1.PodTemplateSpec{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(template, podTemplateSpec)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Did not find a podTemplateSpec")
 		log.Println("Did not find a podTemplateSpec: " + err.Error())
 		return
 	}

@@ -27,6 +27,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Profile contains the parameters needed for resource bundle (rb) profiles
@@ -91,18 +92,21 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 
 	// Name is required
 	if p.ProfileName == "" {
+		logutils.WithFields("ProfileName is empty", "ProfileName", "Name is required for Resource Bundle Profile")
 		return Profile{}, pkgerrors.New("Name is required for Resource Bundle Profile")
 	}
 
 	//Check if profile already exists
 	_, err := v.Get(p.RBName, p.RBVersion, p.ProfileName)
 	if err == nil {
+		logutils.WithFields(err.Error(), "Error", "Profile already exists for this Definition")
 		return Profile{}, pkgerrors.New("Profile already exists for this Definition")
 	}
 
 	//Check if provided resource bundle information is valid
 	_, err = NewDefinitionClient().Get(p.RBName, p.RBVersion)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid Resource Bundle ID provided")
 		return Profile{}, pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}
 
@@ -119,6 +123,7 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating Profile DB Entry")
 		return Profile{}, pkgerrors.Wrap(err, "Creating Profile DB Entry")
 	}
 
@@ -134,6 +139,7 @@ func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
 	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Resource Bundle Profile")
 		return Profile{}, pkgerrors.Wrap(err, "Get Resource Bundle Profile")
 	}
 
@@ -142,11 +148,12 @@ func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
 		pr := Profile{}
 		err = db.DBconn.Unmarshal(value, &pr)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Unmarshaling Profile Value")
 			return Profile{}, pkgerrors.Wrap(err, "Unmarshaling Profile Value")
 		}
 		return pr, nil
 	}
-
+	logutils.WithFields(err.Error(), "Error", "Error getting Resource Bundle Profile")
 	return Profile{}, pkgerrors.New("Error getting Resource Bundle Profile")
 }
 
@@ -156,6 +163,7 @@ func (v *ProfileClient) List(rbName, rbVersion string) ([]Profile, error) {
 	//Get all profiles
 	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
 	if err != nil || len(dbres) == 0 {
+		logutils.WithFields(err.Error(), "Error", "No Profiles Found")
 		return []Profile{}, pkgerrors.Wrap(err, "No Profiles Found")
 	}
 
@@ -166,6 +174,7 @@ func (v *ProfileClient) List(rbName, rbVersion string) ([]Profile, error) {
 			pr := Profile{}
 			err = db.DBconn.Unmarshal(value, &pr)
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Error: %s Unmarshaling value for")
 				log.Printf("[Profile] Error: %s Unmarshaling value for: %s", err.Error(), key)
 				continue
 			}
@@ -176,6 +185,7 @@ func (v *ProfileClient) List(rbName, rbVersion string) ([]Profile, error) {
 	}
 
 	if len(results) == 0 {
+		logutils.WithFields(err.Error(), "Error", "No Profiles Found for Definition and Version")
 		return results, pkgerrors.New("No Profiles Found for Definition and Version")
 	}
 
@@ -191,11 +201,13 @@ func (v *ProfileClient) Delete(rbName, rbVersion, prName string) error {
 	}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Resource Bundle Profile")
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile")
 	}
 
 	err = db.DBconn.Delete(v.storeName, key, v.tagContent)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Resource Bundle Profile Content")
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile Content")
 	}
 
@@ -208,11 +220,13 @@ func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) err
 	//ignore the returned data here.
 	_, err := v.Get(rbName, rbVersion, prName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid Profile Name provided")
 		return pkgerrors.Errorf("Invalid Profile Name provided %s", err.Error())
 	}
 
 	err = isTarGz(bytes.NewBuffer(inp))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error in file format")
 		return pkgerrors.Errorf("Error in file format %s", err.Error())
 	}
 
@@ -225,6 +239,7 @@ func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) err
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
 	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error uploading data to db")
 		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
 	}
 
@@ -240,6 +255,7 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 	//Check if id is valid
 	_, err := v.Get(rbName, rbVersion, prName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid Profile Name provided")
 		return nil, pkgerrors.Errorf("Invalid Profile Name provided: %s", err.Error())
 	}
 
@@ -250,6 +266,7 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Resource Bundle Profile content")
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle Profile content")
 	}
 
@@ -257,6 +274,7 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 		//Decode the string from base64
 		out, err := base64.StdEncoding.DecodeString(string(value))
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Decode base64 string")
 			return nil, pkgerrors.Wrap(err, "Decode base64 string")
 		}
 
@@ -264,6 +282,7 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 			return out, nil
 		}
 	}
+	logutils.WithFields(err.Error(), "Error", "Error downloading Profile content")
 	return nil, pkgerrors.New("Error downloading Profile content")
 }
 
@@ -278,16 +297,19 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 	//If everything seems okay, then download the definition
 	prData, err := v.Download(rbName, rbVersion, profileName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Downloading Profile")
 		return sortedTemplates, pkgerrors.Wrap(err, "Downloading Profile")
 	}
 
 	prPath, err := ExtractTarBall(bytes.NewBuffer(prData))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Extracting Profile Content")
 		return sortedTemplates, pkgerrors.Wrap(err, "Extracting Profile Content")
 	}
 
 	prYamlClient, err := ProcessProfileYaml(prPath, v.manifestName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Processing Profile Manifest")
 		return sortedTemplates, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}
 
@@ -295,22 +317,26 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 
 	definition, err := definitionClient.Get(rbName, rbVersion)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Getting Definition Metadata")
 		return sortedTemplates, pkgerrors.Wrap(err, "Getting Definition Metadata")
 	}
 
 	defData, err := definitionClient.Download(rbName, rbVersion)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Downloading Definition")
 		return sortedTemplates, pkgerrors.Wrap(err, "Downloading Definition")
 	}
 
 	chartBasePath, err := ExtractTarBall(bytes.NewBuffer(defData))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Extracting Definition Charts")
 		return sortedTemplates, pkgerrors.Wrap(err, "Extracting Definition Charts")
 	}
 
 	//Get the definition ID and download its contents
 	profile, err := v.Get(rbName, rbVersion, profileName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Getting Profile")
 		return sortedTemplates, pkgerrors.Wrap(err, "Getting Profile")
 	}
 
@@ -321,6 +347,7 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 	//   chartpath: chart/config/resources/config.yaml
 	err = prYamlClient.CopyConfigurationOverrides(chartBasePath)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Copying configresources to chart")
 		return sortedTemplates, pkgerrors.Wrap(err, "Copying configresources to chart")
 	}
 
@@ -333,6 +360,7 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 		[]string{prYamlClient.GetValues()},
 		values)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Generate final k8s yaml")
 		return sortedTemplates, pkgerrors.Wrap(err, "Generate final k8s yaml")
 	}
 

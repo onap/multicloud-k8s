@@ -28,6 +28,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Definition contains the parameters needed for resource bundle (rb) definitions
@@ -93,11 +94,13 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 	//Check if this definition already exists
 	_, err := v.Get(def.RBName, def.RBVersion)
 	if err == nil {
+		logutils.WithFields(err.Error(), "Error", "Definition already exists")
 		return Definition{}, pkgerrors.New("Definition already exists")
 	}
 
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, def)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating DB Entry")
 		return Definition{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
 
@@ -108,6 +111,7 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 func (v *DefinitionClient) List(name string) ([]Definition, error) {
 	res, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
 	if err != nil || len(res) == 0 {
+		logutils.WithFields(err.Error(), "Error", "Listing Resource Bundle Definitions")
 		return []Definition{}, pkgerrors.Wrap(err, "Listing Resource Bundle Definitions")
 	}
 
@@ -118,6 +122,7 @@ func (v *DefinitionClient) List(name string) ([]Definition, error) {
 			def := Definition{}
 			err = db.DBconn.Unmarshal(value, &def)
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Error Unmarshaling value")
 				log.Printf("[Definition] Error Unmarshaling value for: %s", key)
 				continue
 			}
@@ -141,6 +146,7 @@ func (v *DefinitionClient) Get(name string, version string) (Definition, error) 
 	key := DefinitionKey{RBName: name, RBVersion: version}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Resource Bundle definition")
 		return Definition{}, pkgerrors.Wrap(err, "Get Resource Bundle definition")
 	}
 
@@ -149,11 +155,12 @@ func (v *DefinitionClient) Get(name string, version string) (Definition, error) 
 		def := Definition{}
 		err = db.DBconn.Unmarshal(value, &def)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Unmarshaling Value")
 			return Definition{}, pkgerrors.Wrap(err, "Unmarshaling Value")
 		}
 		return def, nil
 	}
-
+	logutils.WithFields(err.Error(), "Error", "Error getting Resource Bundle Definition")
 	return Definition{}, pkgerrors.New("Error getting Resource Bundle Definition")
 }
 
@@ -164,12 +171,14 @@ func (v *DefinitionClient) Delete(name string, version string) error {
 	key := DefinitionKey{RBName: name, RBVersion: version}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Resource Bundle Definition")
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition")
 	}
 
 	//Delete the content when the delete operation happens
 	err = db.DBconn.Delete(v.storeName, key, v.tagContent)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Resource Bundle Definition Content")
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition Content")
 	}
 
@@ -182,11 +191,13 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 	//Check if definition metadata exists
 	def, err := v.Get(name, version)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid Definition ID provided")
 		return pkgerrors.Errorf("Invalid Definition ID provided: %s", err.Error())
 	}
 
 	err = isTarGz(bytes.NewBuffer(inp))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error in file format")
 		return pkgerrors.Errorf("Error in file format: %s", err.Error())
 	}
 
@@ -197,11 +208,13 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 	if def.ChartName == "" {
 		path, err := ExtractTarBall(bytes.NewBuffer(inp))
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Detecting chart name")
 			return pkgerrors.Wrap(err, "Detecting chart name")
 		}
 
 		finfo, err := ioutil.ReadDir(path)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Detecting chart name")
 			return pkgerrors.Wrap(err, "Detecting chart name")
 		}
 
@@ -217,12 +230,14 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 		}
 
 		if def.ChartName == "" {
+			logutils.WithFields("ChartName is empty", "ChartName", "Unable to detect chart name")
 			return pkgerrors.New("Unable to detect chart name")
 		}
 
 		//TODO: Use db update api once db supports it.
 		err = db.DBconn.Create(v.storeName, key, v.tagMeta, def)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Storing updated chart metadata")
 			return pkgerrors.Wrap(err, "Storing updated chart metadata")
 		}
 	}
@@ -231,6 +246,7 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
 	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error uploading data to db")
 		return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
 	}
 
@@ -246,6 +262,7 @@ func (v *DefinitionClient) Download(name string, version string) ([]byte, error)
 	//Check if id is valid
 	_, err := v.Get(name, version)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid Definition ID provided")
 		return nil, pkgerrors.Errorf("Invalid Definition ID provided: %s", err.Error())
 	}
 
@@ -253,6 +270,7 @@ func (v *DefinitionClient) Download(name string, version string) ([]byte, error)
 	key := DefinitionKey{RBName: name, RBVersion: version}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Resource Bundle definition content")
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle definition content")
 	}
 
@@ -260,6 +278,7 @@ func (v *DefinitionClient) Download(name string, version string) ([]byte, error)
 		//Decode the string from base64
 		out, err := base64.StdEncoding.DecodeString(string(value))
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Decode base64 string")
 			return nil, pkgerrors.Wrap(err, "Decode base64 string")
 		}
 
@@ -267,5 +286,6 @@ func (v *DefinitionClient) Download(name string, version string) ([]byte, error)
 			return out, nil
 		}
 	}
+	logutils.WithFields(err.Error(), "Error", "Error downloading Definition content")
 	return nil, pkgerrors.New("Error downloading Definition content")
 }

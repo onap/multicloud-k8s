@@ -50,6 +50,7 @@ func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
 	conn := connection.NewConnectionClient()
 	kubeConfigPath, err := conn.Download(cloudregion)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Downloading kubeconfig")
 		return "", pkgerrors.Wrap(err, "Downloading kubeconfig")
 	}
 
@@ -59,10 +60,12 @@ func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
 // init loads the Kubernetes configuation values stored into the local configuration file
 func (k *KubernetesClient) init(cloudregion string, iid string) error {
 	if cloudregion == "" {
+		logutils.WithFields("Cloudregion is empty", "cloudregion", "Cloudregion is empty")
 		return pkgerrors.New("Cloudregion is empty")
 	}
 
 	if iid == "" {
+		logutils.WithFields("Instance ID is empty", "iid", "Instance ID is empty")
 		return pkgerrors.New("Instance ID is empty")
 	}
 
@@ -70,6 +73,7 @@ func (k *KubernetesClient) init(cloudregion string, iid string) error {
 
 	configPath, err := k.getKubeConfig(cloudregion)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get kubeconfig file")
 		return pkgerrors.Wrap(err, "Get kubeconfig file")
 	}
 
@@ -78,6 +82,7 @@ func (k *KubernetesClient) init(cloudregion string, iid string) error {
 
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "setConfig: Build config from flags raised an error")
 		return pkgerrors.Wrap(err, "setConfig: Build config from flags raised an error")
 	}
 
@@ -88,11 +93,13 @@ func (k *KubernetesClient) init(cloudregion string, iid string) error {
 
 	k.dynamicClient, err = dynamic.NewForConfig(config)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating dynamic client")
 		return pkgerrors.Wrap(err, "Creating dynamic client")
 	}
 
 	k.discoverClient, err = disk.NewCachedDiscoveryClientForConfig(config, os.TempDir(), "", 10*time.Minute)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating discovery client")
 		return pkgerrors.Wrap(err, "Creating discovery client")
 	}
 
@@ -105,6 +112,7 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 
 	pluginImpl, err := plugin.GetPluginByKind("Namespace")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Loading Namespace Plugin")
 		return pkgerrors.Wrap(err, "Loading Namespace Plugin")
 	}
 
@@ -145,12 +153,14 @@ func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
 
 	pluginImpl, err := plugin.GetPluginByKind(resTempl.GVK.Kind)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error loading plugin")
 		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error loading plugin")
 	}
 
 	createdResourceName, err := pluginImpl.Create(resTempl.FilePath, namespace, k)
 	if err != nil {
 		log.Printf("Error: %s while creating: %s", err.Error(), resTempl.GVK.Kind)
+		logutils.WithFields(err.Error(), "Error", "Error in plugin")
 		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
 	}
 
@@ -166,6 +176,7 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 
 	err := k.ensureNamespace(namespace)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating Namespace")
 		return nil, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
@@ -173,6 +184,7 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 	for _, resTempl := range sortedTemplates {
 		resCreated, err := k.createKind(resTempl, namespace)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error creating kind: %+v")
 			return nil, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
 		}
 		createdResources = append(createdResources, resCreated)
@@ -186,12 +198,14 @@ func (k *KubernetesClient) deleteKind(resource helm.KubernetesResource, namespac
 
 	pluginImpl, err := plugin.GetPluginByKind(resource.GVK.Kind)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error loading plugin")
 		return pkgerrors.Wrap(err, "Error loading plugin")
 	}
 
 	log.Println("Deleting resource: " + resource.Name)
 	err = pluginImpl.Delete(resource, namespace, k)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error deleting resource")
 		return pkgerrors.Wrap(err, "Error deleting "+resource.Name)
 	}
 
@@ -203,6 +217,7 @@ func (k *KubernetesClient) deleteResources(resources []helm.KubernetesResource, 
 	for _, res := range resources {
 		err := k.deleteKind(res, namespace)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error deleting resource")
 			return pkgerrors.Wrap(err, "Deleting resources")
 		}
 	}

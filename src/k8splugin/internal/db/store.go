@@ -18,6 +18,7 @@ import (
 	"reflect"
 
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // DBconn interface used to talk a concrete Database connection
@@ -67,6 +68,7 @@ func CreateDBClient(dbType string) error {
 		// create a consul kv store
 		DBconn, err = NewConsulStore(nil)
 	default:
+		logutils.WithFields("DB not supported", "Error", "DB not supported")
 		return pkgerrors.New(dbType + "DB not supported")
 	}
 	return err
@@ -76,6 +78,7 @@ func CreateDBClient(dbType string) error {
 func Serialize(v interface{}) (string, error) {
 	out, err := json.Marshal(v)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error serializing")
 		return "", pkgerrors.Wrap(err, "Error serializing "+reflect.TypeOf(v).String())
 	}
 	return string(out), nil
@@ -85,6 +88,7 @@ func Serialize(v interface{}) (string, error) {
 func DeSerialize(str string, v interface{}) error {
 	err := json.Unmarshal([]byte(str), &v)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error deSerializing")
 		return pkgerrors.Wrap(err, "Error deSerializing "+str)
 	}
 	return nil

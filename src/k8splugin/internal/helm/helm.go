@@ -40,6 +40,7 @@ import (
 	"k8s.io/helm/pkg/renderutil"
 	"k8s.io/helm/pkg/tiller"
 	"k8s.io/helm/pkg/timeconv"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Template is the interface for all helm templating commands
@@ -94,6 +95,7 @@ func (h *TemplateClient) processValues(valueFiles []string, values []string) ([]
 		}
 
 		if err := yaml.Unmarshal(bytes, &currentMap); err != nil {
+			logutils.WithFields(err.Error(), "Error", "failed to parse")
 			return []byte{}, fmt.Errorf("failed to parse %s: %s", filePath, err)
 		}
 		// Merge with the previous map
@@ -103,6 +105,7 @@ func (h *TemplateClient) processValues(valueFiles []string, values []string) ([]
 	//User specified value. Similar to ones provided by -x
 	for _, value := range values {
 		if err := strvals.ParseInto(value, base); err != nil {
+			logutils.WithFields(err.Error(), "Error", "failed parsing --set data")
 			return []byte{}, fmt.Errorf("failed parsing --set data: %s", err)
 		}
 	}
@@ -158,6 +161,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	//Create a temp directory in the system temp folder
 	outputDir, err := ioutil.TempDir("", "helm-tmpl-")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Got error creating temp dir")
 		return retData, pkgerrors.Wrap(err, "Got error creating temp dir")
 	}
 
@@ -173,12 +177,14 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	config := &chart.Config{Raw: string(rawVals), Values: map[string]*chart.Value{}}
 
 	if msgs := validation.IsDNS1123Label(releaseName); releaseName != "" && len(msgs) > 0 {
+		logutils.WithFields(err.Error(), "Error", "release name is not a valid DNS label")
 		return retData, fmt.Errorf("release name %s is not a valid DNS label: %s", releaseName, strings.Join(msgs, ";"))
 	}
 
 	// Check chart requirements to make sure all dependencies are present in /charts
 	c, err := chartutil.Load(chartPath)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Got error: %s")
 		return retData, pkgerrors.Errorf("Got error: %s", err.Error())
 	}
 
@@ -260,12 +266,14 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 func getGroupVersionKind(data string) (schema.GroupVersionKind, error) {
 	out, err := k8syaml.ToJSON([]byte(data))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Converting yaml to json")
 		return schema.GroupVersionKind{}, pkgerrors.Wrap(err, "Converting yaml to json")
 	}
 
 	simpleMeta := json.SimpleMetaFactory{}
 	gvk, err := simpleMeta.Interpret(out)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Parsing apiversion and kind")
 		return schema.GroupVersionKind{}, pkgerrors.Wrap(err, "Parsing apiversion and kind")
 	}
 

@@ -28,6 +28,7 @@ import (
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // LoadedPlugins stores references to the stored plugins
@@ -46,20 +47,24 @@ type ResourceData struct {
 func DecodeYAML(path string, into runtime.Object) (runtime.Object, error) {
 	if _, err := os.Stat(path); err != nil {
 		if os.IsNotExist(err) {
+			logutils.WithFields("File not found", "Error", "not found")
 			return nil, pkgerrors.New("File " + path + " not found")
 		} else {
+			logutils.WithFields(err.Error(), "Error", "Stat file error")
 			return nil, pkgerrors.Wrap(err, "Stat file error")
 		}
 	}
 
 	rawBytes, err := ioutil.ReadFile(path)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Read YAML file error")
 		return nil, pkgerrors.Wrap(err, "Read YAML file error")
 	}
 
 	decode := scheme.Codecs.UniversalDeserializer().Decode
 	obj, _, err := decode(rawBytes, nil, into)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Deserialize YAML error")
 		return nil, pkgerrors.Wrap(err, "Deserialize YAML error")
 	}
 
@@ -87,6 +92,7 @@ func CheckDatabaseConnection() error {
 	}
 	err = db.NewEtcdClient(nil, c)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Etcd Client Initialization failed with error")
 		log.Printf("Etcd Client Initialization failed with error: %s", err.Error())
 	}
 	return nil

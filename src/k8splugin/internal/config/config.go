@@ -21,6 +21,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Configuration loads up all the values that are used to configure
@@ -69,6 +70,7 @@ func readConfigFile(file string) (*Configuration, error) {
 func defaultConfiguration() *Configuration {
 	cwd, err := os.Getwd()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error getting cwd. Using .")
 		log.Println("Error getting cwd. Using .")
 		cwd = "."
 	}
@@ -96,6 +98,7 @@ func GetConfiguration() *Configuration {
 	if gConfig == nil {
 		conf, err := readConfigFile("k8sconfig.json")
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error loading config file. Using defaults.")
 			log.Println("Error loading config file. Using defaults.")
 		}
 		gConfig = conf

@@ -16,6 +16,7 @@ package db
 import (
 	"encoding/json"
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 type MockKey struct {
@@ -51,6 +52,7 @@ func (m *MockDB) Update(table string, key Key, tag string, data interface{}) err
 func (m *MockDB) Unmarshal(inp []byte, out interface{}) error {
 	err := json.Unmarshal(inp, out)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Unmarshaling json")
 		return pkgerrors.Wrap(err, "Unmarshaling json")
 	}
 	return nil

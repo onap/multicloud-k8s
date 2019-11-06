@@ -27,6 +27,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // MongoCollection defines the a subset of MongoDB operations
@@ -102,6 +103,7 @@ func (m *MongoStore) HealthCheck() error {
 
 	_, err := decodeBytes(m.db.RunCommand(context.Background(), bson.D{{"serverStatus", 1}}))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error getting server status")
 		return pkgerrors.Wrap(err, "Error getting server status")
 	}
 
@@ -129,6 +131,7 @@ func (m *MongoStore) validateParams(args ...interface{}) bool {
 // Create is used to create a DB entry
 func (m *MongoStore) Create(coll string, key Key, tag string, data interface{}) error {
 	if data == nil || !m.validateParams(coll, key, tag) {
+		logutils.WithFields("Empty data", "Error", "No Data to store")
 		return pkgerrors.New("No Data to store")
 	}
 
@@ -140,6 +143,7 @@ func (m *MongoStore) Create(coll string, key Key, tag string, data interface{}) 
 		{tag, data},
 	})
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error inserting into database")
 		return pkgerrors.Errorf("Error inserting into database: %s", err.Error())
 	}
 
@@ -159,6 +163,7 @@ func (m *MongoStore) Create(coll string, key Key, tag string, data interface{}) 
 			options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After)))
 
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error updating master table")
 		return pkgerrors.Errorf("Error updating master table: %s", err.Error())
 	}
 
@@ -168,6 +173,7 @@ func (m *MongoStore) Create(coll string, key Key, tag string, data interface{}) 
 // Update is used to update a DB entry
 func (m *MongoStore) Update(coll string, key Key, tag string, data interface{}) error {
 	if data == nil || !m.validateParams(coll, key, tag) {
+		logutils.WithFields("No data", "Error", "No Data to update")
 		return pkgerrors.New("No Data to update")
 	}
 
@@ -178,12 +184,14 @@ func (m *MongoStore) Update(coll string, key Key, tag string, data interface{}) 
 	filter := bson.D{{"key", key}}
 	keydata, err := decodeBytes(c.FindOne(context.Background(), filter))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error finding master table")
 		return pkgerrors.Errorf("Error finding master table: %s", err.Error())
 	}
 
 	//Read the tag objectID from document
 	tagoid, ok := keydata.Lookup(tag).ObjectIDOK()
 	if !ok {
+		logutils.WithFields("objectID not found", "Error", "Error finding objectID for tag ")
 		return pkgerrors.Errorf("Error finding objectID for tag %s", tag)
 	}
 
@@ -202,6 +210,7 @@ func (m *MongoStore) Update(coll string, key Key, tag string, data interface{}) 
 			options.FindOneAndUpdate().SetReturnDocument(options.After)))
 
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error updating record")
 		return pkgerrors.Errorf("Error updating record: %s", err.Error())
 	}
 
@@ -213,6 +222,7 @@ func (m *MongoStore) Update(coll string, key Key, tag string, data interface{}) 
 func (m *MongoStore) Unmarshal(inp []byte, out interface{}) error {
 	err := bson.Unmarshal(inp, out)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Unmarshaling bson")
 		return pkgerrors.Wrap(err, "Unmarshaling bson")
 	}
 	return nil
@@ -221,6 +231,7 @@ func (m *MongoStore) Unmarshal(inp []byte, out interface{}) error {
 // Read method returns the data stored for this key and for this particular tag
 func (m *MongoStore) Read(coll string, key Key, tag string) ([]byte, error) {
 	if !m.validateParams(coll, key, tag) {
+		logutils.WithFields("Missing filed", "Error", "Mandatory fields are missing")
 		return nil, pkgerrors.New("Mandatory fields are missing")
 	}
 
@@ -231,12 +242,14 @@ func (m *MongoStore) Read(coll string, key Key, tag string) ([]byte, error) {
 	filter := bson.D{{"key", key}}
 	keydata, err := decodeBytes(c.FindOne(context.Background(), filter))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error finding master table")
 		return nil, pkgerrors.Errorf("Error finding master table: %s", err.Error())
 	}
 
 	//Read the tag objectID from document
 	tagoid, ok := keydata.Lookup(tag).ObjectIDOK()
 	if !ok {
+		logutils.WithFields("objectID not found", "Error", "Error finding objectID for tag")
 		return nil, pkgerrors.Errorf("Error finding objectID for tag %s", tag)
 	}
 
@@ -244,6 +257,7 @@ func (m *MongoStore) Read(coll string, key Key, tag string) ([]byte, error) {
 	filter = bson.D{{"_id", tagoid}}
 	tagdata, err := decodeBytes(c.FindOne(ctx, filter))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error reading found object")
 		return nil, pkgerrors.Errorf("Error reading found object: %s", err.Error())
 	}
 
@@ -265,9 +279,9 @@ func (m *MongoStore) deleteObjectByID(coll string, objID primitive.ObjectID) err
 
 	_, err := c.DeleteOne(ctx, bson.D{{"_id", objID}})
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error Deleting from database")
 		return pkgerrors.Errorf("Error Deleting from database: %s", err.Error())
 	}
-
 	log.Printf("Deleted Obj with ID %s", objID.String())
 	return nil
 }
@@ -276,6 +290,7 @@ func (m *MongoStore) deleteObjectByID(coll string, objID primitive.ObjectID) err
 // TODO: delete all referenced docs if tag is empty string
 func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 	if !m.validateParams(coll, key, tag) {
+		logutils.WithFields("Missing field", "Error", "Mandatory fields are missing")
 		return pkgerrors.New("Mandatory fields are missing")
 	}
 
@@ -300,6 +315,7 @@ func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 			return nil
 		}
 		//Return any other error that was found.
+		logutils.WithFields(err.Error(), "Error", "Error decoding master table after update")
 		return pkgerrors.Errorf("Error decoding master table after update: %s",
 			err.Error())
 	}
@@ -307,17 +323,20 @@ func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 	//Read the tag objectID from document
 	elems, err := keydata.Elements()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error reading elements from database")
 		return pkgerrors.Errorf("Error reading elements from database: %s", err.Error())
 	}
 
 	tagoid, ok := keydata.Lookup(tag).ObjectIDOK()
 	if !ok {
+		logutils.WithFields("objectID not found", "Error", "Error finding objectID for tag")
 		return pkgerrors.Errorf("Error finding objectID for tag %s", tag)
 	}
 
 	//Use tag objectID to read the data from store
 	err = m.deleteObjectByID(coll, tagoid)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error deleting from database")
 		return pkgerrors.Errorf("Error deleting from database: %s", err.Error())
 	}
 
@@ -327,10 +346,12 @@ func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 	if len(elems) == 3 {
 		keyid, ok := keydata.Lookup("_id").ObjectIDOK()
 		if !ok {
+			logutils.WithFields("objectID not found", "objectID", "Error finding objectID for key")
 			return pkgerrors.Errorf("Error finding objectID for key %s", key)
 		}
 		err = m.deleteObjectByID(coll, keyid)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error deleting master table from database")
 			return pkgerrors.Errorf("Error deleting master table from database: %s", err.Error())
 		}
 	}
@@ -341,6 +362,7 @@ func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 // ReadAll is used to get all documents in db of a particular tag
 func (m *MongoStore) ReadAll(coll, tag string) (map[string][]byte, error) {
 	if !m.validateParams(coll, tag) {
+		logutils.WithFields("collection or tag not found", "Error", "Missing collection or tag name")
 		return nil, pkgerrors.New("Missing collection or tag name")
 	}
 
@@ -355,6 +377,7 @@ func (m *MongoStore) ReadAll(coll, tag string) (map[string][]byte, error) {
 	}
 	cursor, err := c.Find(ctx, filter)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error reading from database")
 		return nil, pkgerrors.Errorf("Error reading from database: %s", err.Error())
 	}
 	defer cursorClose(ctx, cursor)
@@ -368,12 +391,14 @@ func (m *MongoStore) ReadAll(coll, tag string) (map[string][]byte, error) {
 		key, ok := d.Lookup("key").DocumentOK()
 		if !ok {
 			//Throw error if key is not found
+			logutils.WithFields("Key not found", "Error", "Unable to read key from mastertable")
 			pkgerrors.New("Unable to read key from mastertable")
 		}
 
 		//Get objectID of tag document
 		tid, ok := d.Lookup(tag).ObjectIDOK()
 		if !ok {
+			logutils.WithFields("objectID not found", "objectID", "Did not find tag")
 			log.Printf("Did not find tag: %s", tag)
 			continue
 		}
@@ -381,6 +406,7 @@ func (m *MongoStore) ReadAll(coll, tag string) (map[string][]byte, error) {
 		//Find tag document and unmarshal it into []byte
 		tagData, err := decodeBytes(c.FindOne(ctx, bson.D{{"_id", tid}}))
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Unable to decode tag data")
 			log.Printf("Unable to decode tag data %s", err.Error())
 			continue
 		}
@@ -388,6 +414,7 @@ func (m *MongoStore) ReadAll(coll, tag string) (map[string][]byte, error) {
 	}
 
 	if len(result) == 0 {
+		logutils.WithFields("Did not find any objects with tag", "Error", "Did not find any objects with tag")
 		return result, pkgerrors.Errorf("Did not find any objects with tag: %s", tag)
 	}
 

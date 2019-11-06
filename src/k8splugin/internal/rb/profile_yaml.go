@@ -23,6 +23,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 /*
@@ -78,10 +79,12 @@ func (p ProfileYamlClient) CopyConfigurationOverrides(chartPath string) error {
 	for _, v := range p.override.Type.ConfigResource {
 		data, err := ioutil.ReadFile(filepath.Join(p.path, v.FilePath))
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Reading configuration file")
 			return pkgerrors.Wrap(err, "Reading configuration file")
 		}
 		err = ioutil.WriteFile(filepath.Join(chartPath, v.ChartPath), data, 0644)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Writing configuration file into chartpath")
 			return pkgerrors.Wrap(err, "Writing configuration file into chartpath")
 		}
 	}
@@ -96,12 +99,14 @@ func ProcessProfileYaml(fpath string, manifestFileName string) (ProfileYamlClien
 	p := filepath.Join(fpath, manifestFileName)
 	data, err := ioutil.ReadFile(p)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Reading manifest file")
 		return ProfileYamlClient{}, pkgerrors.Wrap(err, "Reading manifest file")
 	}
 
 	out := profileOverride{}
 	err = yaml.Unmarshal(data, &out)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Marshaling manifest yaml file")
 		return ProfileYamlClient{}, pkgerrors.Wrap(err, "Marshaling manifest yaml file")
 	}
 

@@ -23,6 +23,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Config contains the parameters needed for configuration
@@ -94,6 +95,7 @@ func (v *ConfigClient) Create(rbName, rbVersion, profileName string, p Config) (
 
 	// Check required fields
 	if p.ConfigName == "" || p.TemplateName == "" || len(p.Values) == 0 {
+		logutils.WithFields("Incomplete Configuration Provided", "Error", "Incomplete Configuration Provided")
 		return ConfigResult{}, pkgerrors.New("Incomplete Configuration Provided")
 	}
 	cs := ConfigStore{
@@ -104,9 +106,11 @@ func (v *ConfigClient) Create(rbName, rbVersion, profileName string, p Config) (
 	}
 	_, err := cs.getConfig()
 	if err == nil {
+		logutils.WithFields(err.Error(), "Error", "Create Error - Config exists")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Error - Config exists")
 	} else {
 		if strings.Contains(err.Error(), "Key doesn't exist") == false {
+			logutils.WithFields(err.Error(), "Error", "Create Error")
 			return ConfigResult{}, pkgerrors.Wrap(err, "Create Error")
 		}
 	}
@@ -116,11 +120,13 @@ func (v *ConfigClient) Create(rbName, rbVersion, profileName string, p Config) (
 	defer lock.Unlock()
 	err = applyConfig(rbName, rbVersion, profileName, p, profileChannel, "POST")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Apply Config  failed")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 	}
 	// Create Config DB Entry
 	err = cs.createConfig(p)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Create Config DB Entry")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Config DB Entry")
 	}
 	// Create Version Entry in DB for Config
@@ -131,6 +137,7 @@ func (v *ConfigClient) Create(rbName, rbVersion, profileName string, p Config) (
 	}
 	version, err := cvs.createConfigVersion(p, Config{}, "POST")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Create Config Version DB Entry")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Config Version DB Entry")
 	}
 	// Create Result structure
@@ -150,6 +157,7 @@ func (v *ConfigClient) Update(rbName, rbVersion, profileName, configName string,
 
 	// Check required fields
 	if len(p.Values) == 0 {
+		logutils.WithFields("Incomplete Configuration Provided", "Error", "Incomplete Configuration Provided")
 		return ConfigResult{}, pkgerrors.New("Incomplete Configuration Provided")
 	}
 	// Check if Config exists
@@ -161,6 +169,7 @@ func (v *ConfigClient) Update(rbName, rbVersion, profileName, configName string,
 	}
 	_, err := cs.getConfig()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Update Error - Config doesn't exist")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Error - Config doesn't exist")
 	}
 	lock, profileChannel := getProfileData(rbName + rbVersion + profileName)
@@ -169,11 +178,13 @@ func (v *ConfigClient) Update(rbName, rbVersion, profileName, configName string,
 	defer lock.Unlock()
 	err = applyConfig(rbName, rbVersion, profileName, p, profileChannel, "PUT")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Update Config DB Entry")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 	}
 	// Update Config DB Entry
 	configPrev, err := cs.updateConfig(p)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Downloading")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Config DB Entry")
 	}
 	// Create Version Entry in DB for Config
@@ -184,6 +195,7 @@ func (v *ConfigClient) Update(rbName, rbVersion, profileName, configName string,
 	}
 	version, err := cvs.createConfigVersion(p, configPrev, "PUT")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Create Config Version DB Entry")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Config Version DB Entry")
 	}
 	// Create Result structure
@@ -214,6 +226,7 @@ func (v *ConfigClient) Get(rbName, rbVersion, profileName, configName string) (C
 	}
 	cfg, err := cs.getConfig()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Config DB Entry")
 		return Config{}, pkgerrors.Wrap(err, "Get Config DB Entry")
 	}
 	return cfg, nil
@@ -231,6 +244,7 @@ func (v *ConfigClient) Delete(rbName, rbVersion, profileName, configName string)
 	}
 	p, err := cs.getConfig()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Update Error - Config doesn't exist")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Error - Config doesn't exist")
 	}
 	lock, profileChannel := getProfileData(rbName + rbVersion + profileName)
@@ -239,11 +253,13 @@ func (v *ConfigClient) Delete(rbName, rbVersion, profileName, configName string)
 	defer lock.Unlock()
 	err = applyConfig(rbName, rbVersion, profileName, p, profileChannel, "DELETE")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Apply Config  failed")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 	}
 	// Delete Config from DB
 	configPrev, err := cs.deleteConfig()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Config DB Entry")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Delete Config DB Entry")
 	}
 	// Create Version Entry in DB for Config
@@ -254,6 +270,7 @@ func (v *ConfigClient) Delete(rbName, rbVersion, profileName, configName string)
 	}
 	version, err := cvs.createConfigVersion(Config{}, configPrev, "DELETE")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Config Version DB Entry")
 		return ConfigResult{}, pkgerrors.Wrap(err, "Delete Config Version DB Entry")
 	}
 	// Create Result structure
@@ -277,16 +294,19 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 	if rback.AnyOf.ConfigTag != "" {
 		reqVersion, err = v.GetTagVersion(rbName, rbVersion, profileName, rback.AnyOf.ConfigTag)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Rollback Invalid tag")
 			return pkgerrors.Wrap(err, "Rollback Invalid tag")
 		}
 	} else if rback.AnyOf.ConfigVersion != "" {
 		reqVersion = rback.AnyOf.ConfigVersion
 	} else {
+		logutils.WithFields(err.Error(), "Error", "No valid Index for Rollback")
 		return pkgerrors.Errorf("No valid Index for Rollback")
 	}
 
 	index, err := strconv.Atoi(reqVersion)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Rollback Invalid Index")
 		return pkgerrors.Wrap(err, "Rollback Invalid Index")
 	}
 	rollbackIndex := uint(index)
@@ -303,10 +323,12 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 	}
 	currentVersion, err := cvs.getCurrentVersion()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Rollback Get Current Config Version")
 		return pkgerrors.Wrap(err, "Rollback Get Current Config Version ")
 	}
 
 	if rollbackIndex < 1 && rollbackIndex >= currentVersion {
+		logutils.WithFields("Rollback Invalid Config Version", "Error", "Rollback Invalid Config Version")
 		return pkgerrors.Wrap(err, "Rollback Invalid Config Version")
 	}
 
@@ -314,6 +336,7 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 	for i := currentVersion; i > rollbackIndex; i-- {
 		configNew, configPrev, action, err := cvs.getConfigVersion(i)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Rollback Get Config Version")
 			return pkgerrors.Wrap(err, "Rollback Get Config Version")
 		}
 		cs := ConfigStore{
@@ -326,30 +349,36 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 			// PUT is proceeded by PUT or POST
 			err = applyConfig(rbName, rbVersion, profileName, configPrev, profileChannel, "PUT")
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Apply Config  failed")
 				return pkgerrors.Wrap(err, "Apply Config  failed")
 			}
 			_, err = cs.updateConfig(configPrev)
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Update Config DB Entry")
 				return pkgerrors.Wrap(err, "Update Config DB Entry")
 			}
 		} else if action == "POST" {
 			// POST is always preceeded by Config not existing
 			err = applyConfig(rbName, rbVersion, profileName, configNew, profileChannel, "DELETE")
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Delete Config  failed")
 				return pkgerrors.Wrap(err, "Delete Config  failed")
 			}
 			_, err = cs.deleteConfig()
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Delete Config DB Entry")
 				return pkgerrors.Wrap(err, "Delete Config DB Entry")
 			}
 		} else if action == "DELETE" {
 			// DELETE is proceeded by PUT or POST
 			err = applyConfig(rbName, rbVersion, profileName, configPrev, profileChannel, "PUT")
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Delete Config  failed")
 				return pkgerrors.Wrap(err, "Delete Config  failed")
 			}
 			_, err = cs.updateConfig(configPrev)
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Update Config DB Entry")
 				return pkgerrors.Wrap(err, "Update Config DB Entry")
 			}
 		}
@@ -358,6 +387,7 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 		// Delete rolled back items
 		err = cvs.deleteConfigVersion()
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Delete Config Version")
 			return pkgerrors.Wrap(err, "Delete Config Version ")
 		}
 	}
@@ -379,12 +409,14 @@ func (v *ConfigClient) Tagit(rbName, rbVersion, profileName string, tag ConfigTa
 	}
 	currentVersion, err := cvs.getCurrentVersion()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Current Config Version")
 		return pkgerrors.Wrap(err, "Get Current Config Version ")
 	}
 	tagKey := constructKey(rbName, rbVersion, profileName, v.tagTag, tag.TagName)
 
 	err = db.Etcd.Put(tagKey, strconv.Itoa(int(currentVersion)))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "TagIt store DB")
 		return pkgerrors.Wrap(err, "TagIt store DB")
 	}
 	return nil
@@ -397,6 +429,7 @@ func (v *ConfigClient) GetTagVersion(rbName, rbVersion, profileName, tagName str
 
 	value, err := db.Etcd.Get(tagKey)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Config DB Entry Not found")
 		return "", pkgerrors.Wrap(err, "Config DB Entry Not found")
 	}
 	return string(value), nil
@@ -417,9 +450,11 @@ func (v *ConfigClient) ApplyAllConfig(rbName, rbVersion, profileName string) err
 	}
 	currentVersion, err := cvs.getCurrentVersion()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Current Config Version")
 		return pkgerrors.Wrap(err, "Get Current Config Version ")
 	}
 	if currentVersion < 1 {
+		logutils.WithFields(err.Error(), "Error", "No Config Version to Apply")
 		return pkgerrors.Wrap(err, "No Config Version to Apply")
 	}
 	//Apply all configurations
@@ -427,10 +462,12 @@ func (v *ConfigClient) ApplyAllConfig(rbName, rbVersion, profileName string) err
 	for i = 1; i <= currentVersion; i++ {
 		configNew, _, action, err := cvs.getConfigVersion(i)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Get Config Version")
 			return pkgerrors.Wrap(err, "Get Config Version")
 		}
 		err = applyConfig(rbName, rbVersion, profileName, configNew, profileChannel, action)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Apply Config  failed")
 			return pkgerrors.Wrap(err, "Apply Config  failed")
 		}
 	}

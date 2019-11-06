@@ -24,6 +24,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // Connection contains the parameters needed for Connection information for a Cloud region
@@ -89,11 +90,13 @@ func (v *ConnectionClient) Create(c Connection) (Connection, error) {
 	//Check if this Connection already exists
 	_, err := v.Get(c.CloudRegion)
 	if err == nil {
+		logutils.WithFields(err.Error(), "Error", "Connection already exists")
 		return Connection{}, pkgerrors.New("Connection already exists")
 	}
 
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, c)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating DB Entry")
 		return Connection{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
 
@@ -107,6 +110,7 @@ func (v *ConnectionClient) Get(name string) (Connection, error) {
 	key := ConnectionKey{CloudRegion: name}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Connection")
 		return Connection{}, pkgerrors.Wrap(err, "Get Connection")
 	}
 
@@ -115,11 +119,12 @@ func (v *ConnectionClient) Get(name string) (Connection, error) {
 		c := Connection{}
 		err = db.DBconn.Unmarshal(value, &c)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Unmarshaling Value")
 			return Connection{}, pkgerrors.Wrap(err, "Unmarshaling Value")
 		}
 		return c, nil
 	}
-
+	logutils.WithFields("Error getting Connection", "Error", "Error getting Connection")
 	return Connection{}, pkgerrors.New("Error getting Connection")
 }
 
@@ -143,6 +148,7 @@ func (v *ConnectionClient) GetConnectivityRecordByName(connectionName string,
 
 	conn, err := v.Get(connectionName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error getting connection")
 		return nil, pkgerrors.Wrap(err, "Error getting connection")
 	}
 
@@ -151,7 +157,7 @@ func (v *ConnectionClient) GetConnectivityRecordByName(connectionName string,
 			return value, nil
 		}
 	}
-
+	logutils.WithFields("not found", connectivityRecordName, "Connectivity record not found")
 	return nil, pkgerrors.New("Connectivity record " + connectivityRecordName + " not found")
 }
 
@@ -162,6 +168,7 @@ func (v *ConnectionClient) Delete(name string) error {
 	key := ConnectionKey{CloudRegion: name}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Connection")
 		return pkgerrors.Wrap(err, "Delete Connection")
 	}
 	return nil
@@ -174,12 +181,14 @@ func (v *ConnectionClient) Download(name string) (string, error) {
 
 	conn, err := v.Get(name)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Getting Connection info")
 		return "", pkgerrors.Wrap(err, "Getting Connection info")
 	}
 
 	//Decode the kubeconfig from base64 to string
 	kubeContent, err := base64.StdEncoding.DecodeString(conn.Kubeconfig)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Converting from base64")
 		return "", pkgerrors.Wrap(err, "Converting from base64")
 	}
 
@@ -187,11 +196,13 @@ func (v *ConnectionClient) Download(name string) (string, error) {
 	//Assume this file will be deleted after usage by the consumer
 	tempF, err := ioutil.TempFile("", "kube-config-temp-")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating temp file")
 		return "", pkgerrors.Wrap(err, "Creating temp file")
 	}
 
 	_, err = tempF.Write(kubeContent)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Writing kubeconfig to file")
 		return "", pkgerrors.Wrap(err, "Writing kubeconfig to file")
 	}
 

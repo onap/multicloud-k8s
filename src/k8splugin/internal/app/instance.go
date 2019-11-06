@@ -27,6 +27,7 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // InstanceRequest contains the parameters needed for instantiation
@@ -123,6 +124,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 
 	// Name is required
 	if i.RBName == "" || i.RBVersion == "" || i.ProfileName == "" || i.CloudRegion == "" {
+		logutils.WithFields("Empty name", "Error", "RBName, RBversion, ProfileName, CloudRegion are required to create a new instance")
 		return InstanceResponse{},
 			pkgerrors.New("RBName, RBversion, ProfileName, CloudRegion are required to create a new instance")
 	}
@@ -130,6 +132,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	//Check if profile exists
 	profile, err := rb.NewProfileClient().Get(i.RBName, i.RBVersion, i.ProfileName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Unable to find Profile to create instance")
 		return InstanceResponse{}, pkgerrors.New("Unable to find Profile to create instance")
 	}
 
@@ -138,6 +141,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	//Execute the kubernetes create command
 	sortedTemplates, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error resolving helm charts")
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
 
@@ -147,11 +151,13 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	k8sClient := KubernetesClient{}
 	err = k8sClient.init(i.CloudRegion, id)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Getting CloudRegion Information")
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
 
 	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Create Kubernetes Resources")
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
 	}
 
@@ -168,6 +174,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 	err = db.DBconn.Create(v.storeName, key, v.tagInst, resp)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating Instance DB Entry")
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Instance DB Entry")
 	}
 
@@ -181,6 +188,7 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Instance")
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Get Instance")
 	}
 
@@ -189,11 +197,12 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 		resp := InstanceResponse{}
 		err = db.DBconn.Unmarshal(value, &resp)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Unmarshaling Instance Value")
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
 		}
 		return resp, nil
 	}
-
+	logutils.WithFields("Error getting Instance", "Error", "Error getting Instance")
 	return InstanceResponse{}, pkgerrors.New("Error getting Instance")
 }
 
@@ -207,6 +216,7 @@ func (v *InstanceClient) Status(id string) (InstanceStatus, error) {
 
 	value, err := db.DBconn.Read(v.storeName, key, v.tagInstStatus)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Instance")
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Get Instance")
 	}
 
@@ -215,11 +225,12 @@ func (v *InstanceClient) Status(id string) (InstanceStatus, error) {
 		resp := InstanceStatus{}
 		err = db.DBconn.Unmarshal(value, &resp)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Unmarshaling Instance Value")
 			return InstanceStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
 		}
 		return resp, nil
 	}
-
+	logutils.WithFields("Status is not available", "Error", "Status is not available")
 	return InstanceStatus{}, pkgerrors.New("Status is not available")
 }
 
@@ -229,6 +240,7 @@ func (v *InstanceClient) List(rbname, rbversion, profilename string) ([]Instance
 
 	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagInst)
 	if err != nil || len(dbres) == 0 {
+		logutils.WithFields(err.Error(), "Error", "Listing Instances")
 		return []InstanceMiniResponse{}, pkgerrors.Wrap(err, "Listing Instances")
 	}
 
@@ -240,6 +252,7 @@ func (v *InstanceClient) List(rbname, rbversion, profilename string) ([]Instance
 			resp := InstanceResponse{}
 			err = db.DBconn.Unmarshal(value, &resp)
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Unmarshaling Instance")
 				log.Printf("[Instance] Error: %s Unmarshaling Instance: %s", err.Error(), key)
 			}
 
@@ -277,11 +290,13 @@ func (v *InstanceClient) List(rbname, rbversion, profilename string) ([]Instance
 // It is an AND operation for labelkeys.
 func (v *InstanceClient) Find(rbName string, version string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error) {
 	if rbName == "" && len(labelKeys) == 0 {
+		logutils.WithFields("rbName or labelkeys is required and cannot be empty", "Error", "rbName or labelkeys is required and cannot be empty")
 		return []InstanceMiniResponse{}, pkgerrors.New("rbName or labelkeys is required and cannot be empty")
 	}
 
 	responses, err := v.List(rbName, version, profile)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Listing Instances")
 		return []InstanceMiniResponse{}, pkgerrors.Wrap(err, "Listing Instances")
 	}
 
@@ -311,17 +326,20 @@ func (v *InstanceClient) Find(rbName string, version string, profile string, lab
 func (v *InstanceClient) Delete(id string) error {
 	inst, err := v.Get(id)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error getting Instance")
 		return pkgerrors.Wrap(err, "Error getting Instance")
 	}
 
 	k8sClient := KubernetesClient{}
 	err = k8sClient.init(inst.Request.CloudRegion, inst.ID)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Getting CloudRegion Information")
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
 
 	err = k8sClient.deleteResources(inst.Resources, inst.Namespace)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Deleting Instance Resources")
 		return pkgerrors.Wrap(err, "Deleting Instance Resources")
 	}
 
@@ -330,6 +348,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 	err = db.DBconn.Delete(v.storeName, key, v.tagInst)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Instance")
 		return pkgerrors.Wrap(err, "Delete Instance")
 	}
 

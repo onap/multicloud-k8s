@@ -33,6 +33,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 //ConfigStore contains the values that will be stored in the database
@@ -104,14 +105,17 @@ func (c ConfigStore) createConfig(p Config) error {
 	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagConfig, p.ConfigName)
 	_, err := db.Etcd.Get(cfgKey)
 	if err == nil {
+		logutils.WithFields(err.Error(), "Error", "Config DB Entry Already exists")
 		return pkgerrors.Wrap(err, "Config DB Entry Already exists")
 	}
 	configValue, err := db.Serialize(p)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Serialize Config Value")
 		return pkgerrors.Wrap(err, "Serialize Config Value")
 	}
 	err = db.Etcd.Put(cfgKey, configValue)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Config DB Entry")
 		return pkgerrors.Wrap(err, "Config DB Entry")
 	}
 	return nil
@@ -128,15 +132,18 @@ func (c ConfigStore) updateConfig(p Config) (Config, error) {
 		// If updating Config after rollback then previous config may not exist
 		err = db.DeSerialize(string(value), &configPrev)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "DeSerialize Config Value")
 			return Config{}, pkgerrors.Wrap(err, "DeSerialize Config Value")
 		}
 	}
 	configValue, err := db.Serialize(p)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Serialize Config Value")
 		return Config{}, pkgerrors.Wrap(err, "Serialize Config Value")
 	}
 	err = db.Etcd.Put(cfgKey, configValue)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Config DB Entry")
 		return Config{}, pkgerrors.Wrap(err, "Config DB Entry")
 	}
 	return configPrev, nil
@@ -147,6 +154,7 @@ func (c ConfigStore) getConfig() (Config, error) {
 	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagConfig, c.configName)
 	value, err := db.Etcd.Get(cfgKey)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Config DB Entry")
 		return Config{}, pkgerrors.Wrap(err, "Get Config DB Entry")
 	}
 	//value is a byte array
@@ -154,10 +162,12 @@ func (c ConfigStore) getConfig() (Config, error) {
 		cfg := Config{}
 		err = db.DeSerialize(string(value), &cfg)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Unmarshaling Config Value")
 			return Config{}, pkgerrors.Wrap(err, "Unmarshaling Config Value")
 		}
 		return cfg, nil
 	}
+	logutils.WithFields(err.Error(), "Error", "Get Config DB Entry")
 	return Config{}, pkgerrors.Wrap(err, "Get Config DB Entry")
 }
 
@@ -167,16 +177,19 @@ func (c ConfigStore) deleteConfig() (Config, error) {
 	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagConfig, c.configName)
 	value, err := db.Etcd.Get(cfgKey)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Config DB Entry Not found")
 		return Config{}, pkgerrors.Wrap(err, "Config DB Entry Not found")
 	}
 	configPrev := Config{}
 	err = db.DeSerialize(string(value), &configPrev)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "DeSerialize Config Value")
 		return Config{}, pkgerrors.Wrap(err, "DeSerialize Config Value")
 	}
 
 	err = db.Etcd.Delete(cfgKey)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Config DB Entry")
 		return Config{}, pkgerrors.Wrap(err, "Config DB Entry")
 	}
 	return configPrev, nil
@@ -188,6 +201,7 @@ func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, ac
 	version, err := c.incrementVersion()
 
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Next Version")
 		return 0, pkgerrors.Wrap(err, "Get Next Version")
 	}
 	versionKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagVersion, strconv.Itoa(int(version)))
@@ -199,10 +213,12 @@ func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, ac
 
 	configValue, err := db.Serialize(cs)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Serialize Config Value")
 		return 0, pkgerrors.Wrap(err, "Serialize Config Value")
 	}
 	err = db.Etcd.Put(versionKey, configValue)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Create Config DB Entry")
 		return 0, pkgerrors.Wrap(err, "Create Config DB Entry")
 	}
 	return version, nil
@@ -214,16 +230,19 @@ func (c ConfigVersionStore) deleteConfigVersion() error {
 	counter, err := c.getCurrentVersion()
 
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Next Version")
 		return pkgerrors.Wrap(err, "Get Next Version")
 	}
 	versionKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagVersion, strconv.Itoa(int(counter)))
 
 	err = db.Etcd.Delete(versionKey)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete Config DB Entry")
 		return pkgerrors.Wrap(err, "Delete Config DB Entry")
 	}
 	err = c.decrementVersion()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Decrement Version")
 		return pkgerrors.Wrap(err, "Decrement Version")
 	}
 	return nil
@@ -236,6 +255,7 @@ func (c ConfigVersionStore) getConfigVersion(version uint) (Config, Config, stri
 	versionKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagVersion, strconv.Itoa(int(version)))
 	configBytes, err := db.Etcd.Get(versionKey)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Config Version")
 		return Config{}, Config{}, "", pkgerrors.Wrap(err, "Get Config Version ")
 	}
 
@@ -243,10 +263,12 @@ func (c ConfigVersionStore) getConfigVersion(version uint) (Config, Config, stri
 		pr := configVersionDBContent{}
 		err = db.DeSerialize(string(configBytes), &pr)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "DeSerialize Config Version")
 			return Config{}, Config{}, "", pkgerrors.Wrap(err, "DeSerialize Config Version")
 		}
 		return pr.ConfigNew, pr.ConfigPrev, pr.Action, nil
 	}
+	logutils.WithFields(err.Error(), "Error", "Invalid data")
 	return Config{}, Config{}, "", pkgerrors.Wrap(err, "Invalid data ")
 }
 
@@ -261,12 +283,14 @@ func (c ConfigVersionStore) getCurrentVersion() (uint, error) {
 			// Counter not started yet, 0 is invalid value
 			return 0, nil
 		} else {
+			logutils.WithFields(err.Error(), "Error", "Get Current Version")
 			return 0, pkgerrors.Wrap(err, "Get Current Version")
 		}
 	}
 
 	index, err := strconv.Atoi(string(value))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid counter")
 		return 0, pkgerrors.Wrap(err, "Invalid counter")
 	}
 	return uint(index), nil
@@ -278,6 +302,7 @@ func (c ConfigVersionStore) updateVersion(counter uint) error {
 	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagCounter)
 	err := db.Etcd.Put(cfgKey, strconv.Itoa(int(counter)))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Counter DB Entry")
 		return pkgerrors.Wrap(err, "Counter DB Entry")
 	}
 	return nil
@@ -288,12 +313,14 @@ func (c ConfigVersionStore) incrementVersion() (uint, error) {
 
 	counter, err := c.getCurrentVersion()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Next Counter Value")
 		return 0, pkgerrors.Wrap(err, "Get Next Counter Value")
 	}
 	//This is done while Profile lock is taken
 	counter++
 	err = c.updateVersion(counter)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Store Next Counter Value")
 		return 0, pkgerrors.Wrap(err, "Store Next Counter Value")
 	}
 
@@ -305,12 +332,14 @@ func (c ConfigVersionStore) decrementVersion() error {
 
 	counter, err := c.getCurrentVersion()
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Next Counter Value")
 		return pkgerrors.Wrap(err, "Get Next Counter Value")
 	}
 	//This is done while Profile lock is taken
 	counter--
 	err = c.updateVersion(counter)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Store Next Counter Value")
 		return pkgerrors.Wrap(err, "Store Next Counter Value")
 	}
 
@@ -323,6 +352,7 @@ func applyConfig(rbName, rbVersion, profileName string, p Config, pChannel chan 
 	// Get Template and Resolve the template with values
 	crl, err := resolve(rbName, rbVersion, profileName, p)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Resolve Config")
 		return pkgerrors.Wrap(err, "Resolve Config")
 	}
 	crl.action = action
@@ -345,6 +375,7 @@ func scheduleResources(c chan configResourceList) {
 		ic := NewInstanceClient()
 		resp, err := ic.Find(data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
 		if err != nil || len(resp) == 0 {
+			logutils.WithFields(err.Error(), "Error", "Error finding a running instance. Retrying later...")
 			log.Println("Error finding a running instance. Retrying later...")
 			time.Sleep(time.Second * 10)
 			continue
@@ -356,12 +387,14 @@ func scheduleResources(c chan configResourceList) {
 				k8sClient := KubernetesClient{}
 				err = k8sClient.init(inst.Request.CloudRegion, inst.ID)
 				if err != nil {
+					logutils.WithFields(err.Error(), "Error", "Getting CloudRegion Information")
 					log.Printf("Getting CloudRegion Information: %s", err.Error())
 					//Move onto the next cloud region
 					continue
 				}
 				data.createdResources, err = k8sClient.createResources(data.resourceTemplates, inst.Namespace)
 				if err != nil {
+					logutils.WithFields(err.Error(), "Error", "Error Creating resources")
 					log.Printf("Error Creating resources: %s", err.Error())
 					continue
 				}
@@ -376,12 +409,14 @@ func scheduleResources(c chan configResourceList) {
 				k8sClient := KubernetesClient{}
 				err = k8sClient.init(inst.Request.CloudRegion, inst.ID)
 				if err != nil {
+					logutils.WithFields(err.Error(), "Error", "Getting CloudRegion Information")
 					log.Printf("Getting CloudRegion Information: %s", err.Error())
 					//Move onto the next cloud region
 					continue
 				}
 				err = k8sClient.deleteResources(data.createdResources, inst.Namespace)
 				if err != nil {
+					logutils.WithFields(err.Error(), "Error", "Error Deleting resources")
 					log.Printf("Error Deleting resources: %s", err.Error())
 					continue
 				}
@@ -398,44 +433,53 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 
 	profile, err := rb.NewProfileClient().Get(rbName, rbVersion, profileName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Reading  Profile Data")
 		return configResourceList{}, pkgerrors.Wrap(err, "Reading  Profile Data")
 	}
 
 	t, err := rb.NewConfigTemplateClient().Get(rbName, rbVersion, p.TemplateName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Getting Template")
 		return configResourceList{}, pkgerrors.Wrap(err, "Getting Template")
 	}
 	if t.ChartName == "" {
+		logutils.WithFields(err.Error(), "Error", "Invalid template no Chart.yaml file found")
 		return configResourceList{}, pkgerrors.New("Invalid template no Chart.yaml file found")
 	}
 
 	def, err := rb.NewConfigTemplateClient().Download(rbName, rbVersion, p.TemplateName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Downloading Template")
 		return configResourceList{}, pkgerrors.Wrap(err, "Downloading Template")
 	}
 
 	//Create a temp file in the system temp folder for values input
 	b, err := json.Marshal(p.Values)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error Marshalling config data")
 		return configResourceList{}, pkgerrors.Wrap(err, "Error Marshalling config data")
 	}
 	data, err := yaml.JSONToYAML(b)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "JSON to YAML")
 		return configResourceList{}, pkgerrors.Wrap(err, "JSON to YAML")
 	}
 
 	outputfile, err := ioutil.TempFile("", "helm-config-values-")
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Got error creating temp file")
 		return configResourceList{}, pkgerrors.Wrap(err, "Got error creating temp file")
 	}
 	_, err = outputfile.Write([]byte(data))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Got error writting temp file")
 		return configResourceList{}, pkgerrors.Wrap(err, "Got error writting temp file")
 	}
 	defer outputfile.Close()
 
 	chartBasePath, err := rb.ExtractTarBall(bytes.NewBuffer(def))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Extracting Template")
 		return configResourceList{}, pkgerrors.Wrap(err, "Extracting Template")
 	}
 
@@ -448,6 +492,7 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 		[]string{outputfile.Name()},
 		nil)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Generate final k8s yaml")
 		return configResourceList{}, pkgerrors.Wrap(err, "Generate final k8s yaml")
 	}
 	crl := configResourceList{

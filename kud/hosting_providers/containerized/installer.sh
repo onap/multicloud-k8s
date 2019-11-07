@@ -101,7 +101,7 @@ function install_k8s {
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
     if [ ${1:+1} ]; then
-        local plugins_name=$1
+        local plugins_name="$1"
         echo "additional addons plugins $1"
     else
         local plugins_name=""
@@ -116,17 +116,22 @@ function install_addons {
     ansible-playbook $verbose -i \
         $kud_inventory $kud_playbooks/configure-kud.yml | \
         tee $cluster_log/setup-kud.log
-    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd $plugins_name}; do
+    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov $plugins_name}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i \
             $kud_inventory $kud_playbooks/configure-${addon}.yml | \
             tee $cluster_log/setup-${addon}.log
-        if [[ "${testing_enabled}" == "true" ]]; then
+    done
+
+    echo "Run the test cases if testing_enabled is set to true."
+    if [[ "${testing_enabled}" == "true" ]]; then
+        for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov $plugins_name}; do
             pushd $kud_tests
             bash ${addon}.sh
             popd
-        fi
-    done
+        done
+    fi
+    echo "Add-ons deployment complete..."
 }
 
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
@@ -198,7 +203,7 @@ function install_cluster {
     install_k8s $1
     if [ ${2:+1} ]; then
         echo "install default addons and $2"
-        install_addons $2
+        install_addons "$2"
     else
         install_addons
     fi
@@ -275,7 +280,7 @@ if [ "$1" == "--cluster" ]; then
                 exit 1
             fi
             plugins_name=${@:4:$#}
-            install_cluster $cluster_name $plugins_name
+            install_cluster $cluster_name "$plugins_name"
             exit 0
         else
             echo "Error: cluster argument should have plugins; \

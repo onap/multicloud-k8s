@@ -100,7 +100,7 @@ spec:
           - name: secret-volume
             mountPath: "/.ssh"
           command: ["/bin/sh","-c"]
-          args: ["cp -r /.ssh /root/; chmod -R 600 /root/.ssh; ./installer --cluster $CLUSTER_NAME"]
+          args: ["cp -r /.ssh /root/; chmod -R 600 /root/.ssh; ./installer --cluster $CLUSTER_NAME --plugins onap4k8s"]
           securityContext:
             privileged: true
       volumes:

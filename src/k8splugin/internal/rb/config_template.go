@@ -28,6 +28,7 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 	"log"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // ConfigTemplate contains the parameters needed for ConfigTemplates
@@ -87,18 +88,21 @@ func (v *ConfigTemplateClient) Create(rbName, rbVersion string, p ConfigTemplate
 	log.Printf("[ConfigiTemplate]: create %s", rbName)
 	// Name is required
 	if p.TemplateName == "" {
+		logutils.WithFields("TemplateName is empty", "TemplateName", "Name is required for Resource Bundle  ConfigTemplate")
 		return pkgerrors.New("Name is required for Resource Bundle  ConfigTemplate")
 	}
 
 	//Check if  ConfigTemplate already exists
 	_, err := v.Get(rbName, rbVersion, p.TemplateName)
 	if err == nil {
+		logutils.WithFields(err.Error(), "Error", "ConfigTemplate already exists for this Definition")
 		return pkgerrors.New(" ConfigTemplate already exists for this Definition")
 	}
 
 	//Check if provided resource bundle information is valid
 	_, err = NewDefinitionClient().Get(rbName, rbVersion)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid Resource Bundle ID provided")
 		return pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}
 
@@ -110,6 +114,7 @@ func (v *ConfigTemplateClient) Create(rbName, rbVersion string, p ConfigTemplate
 
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating  ConfigTemplate DB Entry")
 		return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
 	}
 
@@ -125,6 +130,7 @@ func (v *ConfigTemplateClient) Get(rbName, rbVersion, templateName string) (Conf
 	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get ConfigTemplate")
 		return ConfigTemplate{}, pkgerrors.Wrap(err, "Get ConfigTemplate")
 	}
 
@@ -133,11 +139,12 @@ func (v *ConfigTemplateClient) Get(rbName, rbVersion, templateName string) (Conf
 		template := ConfigTemplate{}
 		err = db.DBconn.Unmarshal(value, &template)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Unmarshaling  ConfigTemplate Value")
 			return ConfigTemplate{}, pkgerrors.Wrap(err, "Unmarshaling  ConfigTemplate Value")
 		}
 		return template, nil
 	}
-
+	logutils.WithFields(err.Error(), "Error", "Error getting ConfigTemplate")
 	return ConfigTemplate{}, pkgerrors.New("Error getting ConfigTemplate")
 }
 
@@ -150,11 +157,13 @@ func (v *ConfigTemplateClient) Delete(rbName, rbVersion, templateName string) er
 	}
 	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete ConfigTemplate")
 		return pkgerrors.Wrap(err, "Delete ConfigTemplate")
 	}
 
 	err = db.DBconn.Delete(v.storeName, key, v.tagContent)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Delete  ConfigTemplate Content")
 		return pkgerrors.Wrap(err, "Delete  ConfigTemplate Content")
 	}
 
@@ -173,21 +182,25 @@ func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, in
 	//ignore the returned data here.
 	t, err := v.Get(rbName, rbVersion, templateName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid  ConfigTemplate Name  provided")
 		return pkgerrors.Errorf("Invalid  ConfigTemplate Name  provided %s", err.Error())
 	}
 
 	err = isTarGz(bytes.NewBuffer(inp))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Error in file format")
 		return pkgerrors.Errorf("Error in file format %s", err.Error())
 	}
 
 	chartBasePath, err := ExtractTarBall(bytes.NewBuffer(inp))
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Extracting Template")
 		return pkgerrors.Wrap(err, "Extracting Template")
 	}
 
 	finfo, err := ioutil.ReadDir(chartBasePath)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Detecting chart name")
 		return pkgerrors.Wrap(err, "Detecting chart name")
 	}
 
@@ -202,11 +215,13 @@ func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, in
 		}
 	}
 	if t.ChartName == "" {
+		logutils.WithFields("Invalid template", "Error", "Invalid template no Chart.yaml file found")
 		return pkgerrors.New("Invalid template no Chart.yaml file found")
 	}
 
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, t)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Creating  ConfigTemplate DB Entry")
 		return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
 	}
 
@@ -229,6 +244,7 @@ func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) 
 	//Check if rb is valid
 	_, err := v.Get(rbName, rbVersion, templateName)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid  ConfigTemplate Name provided")
 		return nil, pkgerrors.Errorf("Invalid  ConfigTemplate Name provided: %s", err.Error())
 	}
 
@@ -239,6 +255,7 @@ func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) 
 	}
 	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Get Resource ConfigTemplate content")
 		return nil, pkgerrors.Wrap(err, "Get Resource ConfigTemplate content")
 	}
 
@@ -246,6 +263,7 @@ func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) 
 		//Decode the string from base64
 		out, err := base64.StdEncoding.DecodeString(string(value))
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Decode base64 string")
 			return nil, pkgerrors.Wrap(err, "Decode base64 string")
 		}
 
@@ -253,5 +271,6 @@ func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) 
 			return out, nil
 		}
 	}
+	logutils.WithFields("Error downloading", "Error", "Error downloading  ConfigTemplate content")
 	return nil, pkgerrors.New("Error downloading  ConfigTemplate content")
 }

@@ -25,6 +25,7 @@ import (
 	"log"
 
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // GetTLSConfig initializes a tlsConfig using the CA's certificate
@@ -35,6 +36,7 @@ func GetTLSConfig(caCertFile string, certFile string, keyFile string) (*tls.Conf
 	caCert, err := ioutil.ReadFile(caCertFile)
 
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Read CA Cert file")
 		return nil, pkgerrors.Wrap(err, "Read CA Cert file")
 	}
 
@@ -50,17 +52,20 @@ func GetTLSConfig(caCertFile string, certFile string, keyFile string) (*tls.Conf
 
 	certPEMBlk, err := readPEMBlock(certFile)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Read Cert File")
 		return nil, pkgerrors.Wrap(err, "Read Cert File")
 	}
 
 	keyPEMBlk, err := readPEMBlock(keyFile)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Read Key File")
 		return nil, pkgerrors.Wrap(err, "Read Key File")
 	}
 
 	tlsConfig.Certificates = make([]tls.Certificate, 1)
 	tlsConfig.Certificates[0], err = tls.X509KeyPair(certPEMBlk, keyPEMBlk)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Load x509 cert and key")
 		return nil, pkgerrors.Wrap(err, "Load x509 cert and key")
 	}
 
@@ -72,27 +77,32 @@ func readPEMBlock(filename string) ([]byte, error) {
 
 	pemData, err := ioutil.ReadFile(filename)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Read PEM File")
 		return nil, pkgerrors.Wrap(err, "Read PEM File")
 	}
 
 	pemBlock, rest := pem.Decode(pemData)
 	if len(rest) > 0 {
+		logutils.WithFields("Pemfile has extra data", "Error", "Pemfile has extra data")
 		log.Println("Pemfile has extra data")
 	}
 
 	if x509.IsEncryptedPEMBlock(pemBlock) {
 		password, err := ioutil.ReadFile(filename + ".pass")
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Read Password File")
 			return nil, pkgerrors.Wrap(err, "Read Password File")
 		}
 
 		pByte, err := base64.StdEncoding.DecodeString(string(password))
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Decode PEM Password")
 			return nil, pkgerrors.Wrap(err, "Decode PEM Password")
 		}
 
 		pemData, err = x509.DecryptPEMBlock(pemBlock, pByte)
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Decrypt PEM Data")
 			return nil, pkgerrors.Wrap(err, "Decrypt PEM Data")
 		}
 		var newPEMBlock pem.Block

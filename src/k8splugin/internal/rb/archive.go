@@ -26,12 +26,14 @@ import (
 	"path/filepath"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 func isTarGz(r io.Reader) error {
 	//Check if it is a valid gz
 	gzf, err := gzip.NewReader(r)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid gzip format")
 		return pkgerrors.Wrap(err, "Invalid gzip format")
 	}
 
@@ -46,6 +48,7 @@ func isTarGz(r io.Reader) error {
 		if err == io.EOF {
 			//Check if we have just a gzip file without a tar archive inside
 			if first {
+				logutils.WithFields(err.Error(), "Error", "Empty or non-existant Tar file found")
 				return pkgerrors.New("Empty or non-existant Tar file found")
 			}
 			//End of archive
@@ -53,12 +56,14 @@ func isTarGz(r io.Reader) error {
 		}
 
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error reading tar fil")
 			return pkgerrors.Errorf("Error reading tar file %s", err.Error())
 		}
 
 		//Check if files are of type directory and regular file
 		if header.Typeflag != tar.TypeDir &&
 			header.Typeflag != tar.TypeReg {
+			logutils.WithFields("Unknown header in tar", "header", "Unknown header in tar")		
 			return pkgerrors.Errorf("Unknown header in tar %s, %s",
 				header.Name, string(header.Typeflag))
 		}
@@ -76,6 +81,7 @@ func ExtractTarBall(r io.Reader) (string, error) {
 	//Check if it is a valid gz
 	gzf, err := gzip.NewReader(r)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Invalid gzip format")
 		return "", pkgerrors.Wrap(err, "Invalid gzip format")
 	}
 
@@ -92,6 +98,7 @@ func ExtractTarBall(r io.Reader) (string, error) {
 		if err == io.EOF {
 			//Check if we have just a gzip file without a tar archive inside
 			if first {
+				logutils.WithFields("Empty or non-existant Tar file found", "Error", "Empty or non-existant Tar file found")
 				return "", pkgerrors.New("Empty or non-existant Tar file found")
 			}
 			//End of archive
@@ -99,6 +106,7 @@ func ExtractTarBall(r io.Reader) (string, error) {
 		}
 
 		if err != nil {
+			logutils.WithFields(err.Error(), "Error", "Error reading tar file")
 			return "", pkgerrors.Wrap(err, "Error reading tar file")
 		}
 
@@ -111,22 +119,26 @@ func ExtractTarBall(r io.Reader) (string, error) {
 				// groups and others get read and execute permissions
 				// on the folder.
 				if err := os.MkdirAll(target, 0755); err != nil {
+					logutils.WithFields(err.Error(), "Error", "Creating directory")
 					return "", pkgerrors.Wrap(err, "Creating directory")
 				}
 			}
 		case tar.TypeReg:
 			err = utils.EnsureDirectory(target)
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Creating directory")
 				return "", pkgerrors.Wrap(err, "Creating Directory")
 			}
 
 			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
 			if err != nil {
+				logutils.WithFields(err.Error(), "Error", "Creating file")
 				return "", pkgerrors.Wrap(err, "Creating file")
 			}
 
 			// copy over contents
 			if _, err := io.Copy(f, tarR); err != nil {
+				logutils.WithFields(err.Error(), "Error", "Copying file content")
 				return "", pkgerrors.Wrap(err, "Copying file content")
 			}
 

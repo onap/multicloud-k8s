@@ -18,6 +18,7 @@ import (
 
 	"github.com/hashicorp/consul/api"
 	pkgerrors "github.com/pkg/errors"
+	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 )
 
 // ConsulKVStore defines the a subset of Consul DB operations
@@ -56,6 +57,7 @@ func NewConsulStore(store ConsulKVStore) (Store, error) {
 func (c *ConsulStore) HealthCheck() error {
 	_, _, err := c.client.Get("test", nil)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Cannot talk to Datastore. Check if it is running/reachable")
 		return pkgerrors.New("[ERROR] Cannot talk to Datastore. Check if it is running/reachable.")
 	}
 	return nil
@@ -72,11 +74,13 @@ func (c *ConsulStore) Create(root string, key Key, tag string, data interface{})
 	//Convert to string as Consul only supports string based keys
 	k := key.String()
 	if k == "" {
+		logutils.WithFields("Empty string", "Error", "Key.String() returned an empty string")
 		return pkgerrors.New("Key.String() returned an empty string")
 	}
 
 	value, err := Serialize(data)
 	if err != nil {
+		logutils.WithFields(err.Error(), "Error", "Serializing input data")
 		return pkgerrors.Wrap(err, "Serializing input data")
 	}
 
@@ -99,6 +103,7 @@ func (c *ConsulStore) Read(root string, key Key, tag string) ([]byte, error) {
 	//Convert to string as Consul only supports string based keys
 	k := key.String()
 	if k == "" {
+		logutils.WithFields("Empty string", "Error", "Key.String() returned an empty string")
 		return nil, pkgerrors.New("Key.String() returned an empty string")
 	}
 
@@ -119,6 +124,7 @@ func (c *ConsulStore) Delete(root string, key Key, tag string) error {
 	//Convert to string as Consul only supports string based keys
 	k := key.String()
 	if k == "" {
+		logutils.WithFields("Empty string", "Error", "Key.String() returned an empty string")
 		return pkgerrors.New("Key.String() returned an empty string")
 	}
 	_, err := c.client.Delete(k, nil)

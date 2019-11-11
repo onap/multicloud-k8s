@@ -19,6 +19,14 @@
         repo: 'https://github.com/onap/multicloud-k8s.git'
         dest: /opt/multicloud
 
+    - name: install make package for ubuntu systems
+      apt: name=make state=present update_cache=yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: install make package for centos systems
+      yum: name=make state=present update_cache=yes
+      when: ansible_distribution == "CentOS"
+
     - name: Change the onap4k8s directory and run the command make repo
       command: /usr/bin/make repo
       register: make_repo

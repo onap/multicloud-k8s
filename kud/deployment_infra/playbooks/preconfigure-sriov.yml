@@ -31,7 +31,7 @@
       command: sriov/sriov_hardware_check.sh
       register: output
     - set_fact:
-        SRIOV: "{{ output.stdout }}"
+        _SRIOV: "{{ output.stdout }}"
     - name: Recreate the conf file for every host
       file:
         path: /tmp/sriov.conf
@@ -40,7 +40,7 @@
     - lineinfile : >
        dest=/tmp/sriov.conf
        create=yes
-       line='{{SRIOV}}'
+       line='{{_SRIOV}}'
       delegate_to: localhost
     - name: Clean the script and folder.
       file:
@@ -58,32 +58,30 @@
       become: yes
     - set_fact:
         SRIOV_NODE: "{{ installer_output.stdout }}"
-    - meta: end_play
-      when: SRIOV_NODE == "False"
     - name: Load kud variables
       include_vars:
         file: kud-vars.yml
-      when: SRIOV_NODE == "True"
+      when: SRIOV_NODE
   tasks:
     - name: Create sriov folder
       file:
         state: directory
         path: "{{ sriov_dest }}"
-      when: SRIOV_NODE == "True"
       ignore_errors: yes
+      when: SRIOV_NODE
     - name: Get SRIOV compatible driver
       get_url: "url={{ driver_url }}  dest=/tmp/{{ package }}.tar.gz"
-      when: SRIOV_NODE == "True"
+      when: SRIOV_NODE
     - name: Extract sriov source code
       unarchive:
          src: "/tmp/{{ package }}.tar.gz"
          dest: "{{ sriov_dest }}"
-      when: SRIOV_NODE == "True"
+      when: SRIOV_NODE
     - name: Build the default target
       make:
         chdir: "/tmp/sriov/{{ package }}/src"
       become: yes
-      when: SRIOV_NODE == "True"
+      when: SRIOV_NODE
 # Copy all the driver and install script into target node
 - hosts: kube-node
   become: yes
@@ -91,7 +89,7 @@
     - name: Load kud variables
       include_vars:
         file: kud-vars.yml
-      when: SRIOV == "True"
+      when: _SRIOV
   tasks:
     - name: create SRIOV driver folder in the target destination
       file:
@@ -99,18 +97,22 @@
         path: "{{ item }}"
       with_items:
         - sriov_driver
-      when: SRIOV == "True"
-    - name: Copy SRIOV driver to target destination
-      command: "cp {{ sriov_dest }}/{{ package }}/src/iavf.ko /root/sriov_driver/"
-      when: SRIOV == "True"
-    - name: Copy SRIOV driver install script to target folder
-      command: "cp {{ playbook_dir }}/install_iavf_drivers.sh /root/sriov_driver/install.sh"
-      when: SRIOV == "True"
+      when: _SRIOV
+    - copy:
+        src: "{{ sriov_dest }}/{{ package }}/src/iavf.ko"
+        dest: sriov_driver
+        remote_src: no
+      when: _SRIOV
+    - copy:
+        src: "{{ playbook_dir }}/install_iavf_drivers.sh"
+        dest: sriov_driver/install.sh
+        remote_src: no
+      when: _SRIOV
     - name: Changing perm of "install.sh", adding "+x"
-      file: dest=/root/sriov_driver/install.sh mode=a+x
-      when: SRIOV == "True"
+      file: dest=sriov_driver/install.sh mode=a+x
+      when: _SRIOV
     - name: Run a script with arguments
       shell: ./install.sh
       args:
-        chdir: "/root/sriov_driver"
-      when: SRIOV == "True"
+        chdir: "sriov_driver"
+      when: _SRIOV

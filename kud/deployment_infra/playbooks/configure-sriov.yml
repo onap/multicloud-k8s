@@ -12,25 +12,18 @@
 
 - hosts: localhost
   become: yes
-  pre_tasks:
-  - block:
-    - name: "End play if SRIOV is False"
-      debug:
-        msg: "SRIOV option not available, ending play"
-    - meta: end_play
-    when: SRIOV_NODE == "False"
   tasks:
     - debug:
         var: SRIOV_NODE
     - name: Apply Multus
       shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/multus-daemonset.yml"
-      when: SRIOV_NODE==True
+      when: SRIOV_NODE
     - name: Apply SRIOV CNI
-      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/sriov-cni.yaml"
-      when: SRIOV_NODE==True
+      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/sriov-cni.yml"
+      when: SRIOV_NODE
     - name: Apply SRIOV DaemonSet
-      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/sriov-daemonset.yaml"
-      when: SRIOV_NODE==True
+      shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/sriov-daemonset.yml"
+      when: SRIOV_NODE
     - name: Apply SRIOV Network Attachment definition
       shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/sriov-nad.yml"
-      when: SRIOV_NODE==True
+      when: SRIOV_NODE

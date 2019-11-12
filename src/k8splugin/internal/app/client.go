@@ -14,13 +14,12 @@ limitations under the License.
 package app
 
 import (
-	"log"
 	"os"
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
-	logutils "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 
 	pkgerrors "github.com/pkg/errors"
@@ -118,16 +117,24 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 	}, namespace, k)
 
 	if err != nil {
-		logutils.WithFields(err.Error(), "namespace", namespace)
+		log.Error("Error checking for namespace", log.Fields{
+			"error":     err,
+			"namespace": namespace,
+		})
 		return pkgerrors.Wrap(err, "Error checking for namespace: "+namespace)
 	}
 
 	if ns == "" {
-		logutils.WithFields("Creating namespace", "namespace", namespace)
+		log.Info("Creating Namespace", log.Fields{
+			"namespace": namespace,
+		})
 
 		_, err = pluginImpl.Create("", namespace, k)
 		if err != nil {
-			logutils.WithFields(err.Error(), "namespace", namespace)
+			log.Error("Error Creating Namespace", log.Fields{
+				"error":     err,
+				"namespace": namespace,
+			})
 			return pkgerrors.Wrap(err, "Error creating "+namespace+" namespace")
 		}
 	}
@@ -141,7 +148,9 @@ func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
 		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
 	}
 
-	log.Println("Processing file: " + resTempl.FilePath)
+	log.Info("Processing Kubernetes Resource", log.Fields{
+		"filepath": resTempl.FilePath,
+	})
 
 	pluginImpl, err := plugin.GetPluginByKind(resTempl.GVK.Kind)
 	if err != nil {
@@ -150,11 +159,19 @@ func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
 
 	createdResourceName, err := pluginImpl.Create(resTempl.FilePath, namespace, k)
 	if err != nil {
-		log.Printf("Error: %s while creating: %s", err.Error(), resTempl.GVK.Kind)
+		log.Error("Error Creating Resource", log.Fields{
+			"error":    err,
+			"gvk":      resTempl.GVK,
+			"filepath": resTempl.FilePath,
+		})
 		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
 	}
 
-	log.Print(createdResourceName + " created")
+	log.Info("Created Kubernetes Resource", log.Fields{
+		"resource": createdResourceName,
+		"gvk":      resTempl.GVK,
+	})
+
 	return helm.KubernetesResource{
 		GVK:  resTempl.GVK,
 		Name: createdResourceName,
@@ -182,14 +199,16 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 }
 
 func (k *KubernetesClient) deleteKind(resource helm.KubernetesResource, namespace string) error {
-	log.Println("Deleting Kind: " + resource.GVK.Kind)
+	log.Warn("Deleting Resource", log.Fields{
+		"gvk":      resource.GVK,
+		"resource": resource.Name,
+	})
 
 	pluginImpl, err := plugin.GetPluginByKind(resource.GVK.Kind)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error loading plugin")
 	}
 
-	log.Println("Deleting resource: " + resource.Name)
 	err = pluginImpl.Delete(resource, namespace, k)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error deleting "+resource.Name)

@@ -10,13 +10,13 @@
 
 set -o pipefail
 
-ethernet_adpator_version=$( lspci | grep "Ethernet Controller X710" | head -n 1 | cut -d " " -f 8 )
+ethernet_adpator_version=$( lspci | grep "Ethernet Controller XL710" | head -n 1 | cut -d " " -f 8 )
 if [ -z "$ethernet_adpator_version" ]; then
     echo " Ethernet adapator version is not set. SRIOV test case cannot run on this machine"
     exit 0
 fi
 #checking for the right hardware version of NIC on the machine
-if [ $ethernet_adpator_version == "X710" ]; then
+if [ $ethernet_adpator_version == "XL710" ]; then
     echo "NIC card specs match. SRIOV option avaiable for this version."
 else
     echo -e "Failed. The version supplied does not match.\nTest cannot be executed."

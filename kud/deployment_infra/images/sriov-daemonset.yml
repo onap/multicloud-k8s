@@ -13,8 +13,8 @@ data:
       "resourceList": [{
          "resourceName": "intel_sriov_700",
          "selectors": {
-            "vendors": ["8086"]
-            "devices": ["37cd"]
+            "vendors": ["8086"],
+            "drivers": ["i40evf"]
          }
        }]
     }

@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fe6c623_b8250b6f",
+        "filename": "src/statusquery/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2019-11-19T10:25:36Z",
+      "side": 1,
+      "message": "We need to link vserver with vnf and vfmodule. Now this is isolated vserver. In order to to that it is necessary to read generic-vnf information and its vf-modules information. vserver should be added to appropriate vf-module (it has vf-module type like the name of RB definition). EAch time when pods are being changes AAI data must be updates, there is no delete function here which will be needed for that. Will QueryAAI by invoked periodically? Will be some worker or listener responsible for execution of this function?",
+      "range": {
+        "startLine": 65,
+        "startChar": 16,
+        "endLine": 65,
+        "endChar": 32
+      },
+      "revId": "0cf8071243960728e24ab2ac12294693356ff73e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e55f1d98_bec705eb",
         "filename": "src/statusquery/main.go",
         "patchSetId": 4
@@ -64,6 +87,29 @@
       "writtenOn": "2019-11-18T22:57:40Z",
       "side": 1,
       "message": "same, plus specific tenant id, vserver name",
+      "revId": "0cf8071243960728e24ab2ac12294693356ff73e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aaea3476_53204506",
+        "filename": "src/statusquery/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2019-11-19T10:25:36Z",
+      "side": 1,
+      "message": "Apart from vserver it is necessary to add information about created network interfaces for specific pod. We can have many approaches here so it needs to be discussed before but definitely this information must be present here",
+      "range": {
+        "startLine": 227,
+        "startChar": 0,
+        "endLine": 228,
+        "endChar": 153
+      },
       "revId": "0cf8071243960728e24ab2ac12294693356ff73e",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true

@@ -1,0 +1,5 @@
+{
+    "database-type": "mock_db_test",
+    "database-address": "127.0.0.1",
+    "plugin-dir": "."
+}

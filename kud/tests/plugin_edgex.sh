@@ -17,7 +17,16 @@ source _common_test.sh
 source _functions.sh
 source _common.sh
 
-base_url="http://localhost:9015/v1"
+if [ ${1:+1} ]; then
+    if [ "$1" == "--external" ]; then
+        master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
+            awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
+        onap_svc_node_port=30498
+        base_url="http://$master_ip:$onap_svc_node_port/v1"
+    fi
+fi
+
+base_url=${base_url:-"http://localhost:9015/v1"}
 kubeconfig_path="$HOME/.kube/config"
 csar_id=cb009bfe-bbee-11e8-9766-525400435678
 rb_name="edgex"
@@ -90,6 +99,9 @@ EOF
 response="$(call_api -d "${payload}" "${base_url}/instance")"
 echo "$response"
 vnf_id="$(jq -r '.id' <<< "${response}")"
+
+print_msg "Waiting for EdgeX instances"
+sleep 240
 
 print_msg "Validating Kubernetes"
 kubectl get --no-headers=true --namespace=${namespace} deployment edgex-core-command

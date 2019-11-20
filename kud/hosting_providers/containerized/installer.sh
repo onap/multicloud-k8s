@@ -19,7 +19,7 @@ function install_prerequisites {
 #install package for docker images
     apt-get update
     apt-get install -y curl vim wget git \
-        software-properties-common python-pip
+        software-properties-common python-pip sudo
     add-apt-repository -y ppa:longsleep/golang-backports
     apt-get update
     apt-get install -y golang-go rsync
@@ -136,21 +136,17 @@ function install_addons {
 
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
 function install_plugin {
-    echo "Installing multicloud/k8s plugin"
-    mkdir -p /opt/{kubeconfig,consul/config}
-    cp $HOME/.kube/config /opt/kubeconfig/kud
-
-    pushd $kud_folder/../../../deployments
-    ./build.sh
+    echo "Installing multicloud/k8s onap4k8s plugin"
     if [[ "${testing_enabled}" == "true" ]]; then
-        ./start.sh
         pushd $kud_tests
-        for functional_test in plugin plugin_edgex plugin_fw; do
-            bash ${functional_test}.sh
+	echo "Test the onap4k8s installation"
+	bash onap4k8s.sh
+	echo "Test the onap4k8s plugin installation"
+        for functional_test in plugin_edgex plugin_fw; do
+            bash ${functional_test}.sh --external
         done
         popd
     fi
-    popd
 }
 
 # _print_kubernetes_info() - Prints the login Kubernetes information
@@ -191,6 +187,7 @@ k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
 
 mkdir -p /opt/csar
+export CSAR_DIR=/opt/csar
 
 function install_pkg {
 # Install dependencies

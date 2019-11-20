@@ -17,7 +17,16 @@ source _common_test.sh
 source _functions.sh
 source _common.sh
 
-base_url="http://localhost:9015/v1"
+if [ ${1:+1} ]; then
+    if [ "$1" == "--external" ]; then
+        master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
+            awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
+        onap_svc_node_port=30498
+        base_url="http://$master_ip:$onap_svc_node_port/v1"
+    fi
+fi
+
+base_url=${base_url:-"http://localhost:9015/v1"}
 kubeconfig_path="$HOME/.kube/config"
 csar_id=cc009bfe-bbee-11e8-9766-525400435678
 rb_name="vfw"
@@ -97,6 +106,9 @@ wait_for_pod -n "${namespace}" -l app=sink
 wait_for_pod -n "${namespace}" -l app=firewall
 wait_for_pod -n "${namespace}" -l app=packetgen
 # TODO: Provide some health check to verify vFW work
+
+print_msg "Waiting for VNF instances"
+sleep 480
 
 print_msg "Retrieving VNF details"
 call_api "${base_url}/instance/${vnf_id}"

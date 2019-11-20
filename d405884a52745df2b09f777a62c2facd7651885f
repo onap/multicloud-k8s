@@ -22,6 +22,30 @@
       "revId": "d405884a52745df2b09f777a62c2facd7651885f",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10d140ec_57b63c49",
+        "filename": "kud/tests/plugin_edgex.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-11-20T19:42:36Z",
+      "side": 1,
+      "message": "Hi, It is the node port value for onap4k8s from the nodePortPrefixExt:304 and nodePort: 98",
+      "parentUuid": "4750afa5_da15057c",
+      "range": {
+        "startLine": 24,
+        "startChar": 27,
+        "endLine": 24,
+        "endChar": 32
+      },
+      "revId": "d405884a52745df2b09f777a62c2facd7651885f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4750afa5_da15057c",
+        "filename": "kud/tests/plugin_edgex.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2019-11-20T17:43:05Z",
+      "side": 1,
+      "message": "What is this port?",
+      "range": {
+        "startLine": 24,
+        "startChar": 27,
+        "endLine": 24,
+        "endChar": 32
+      },
+      "revId": "d405884a52745df2b09f777a62c2facd7651885f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

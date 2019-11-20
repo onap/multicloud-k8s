@@ -38,6 +38,8 @@ $  docker build  --rm \
 	--build-arg HTTPS_PROXY=${HTTPS_PROXY} \
 	--build-arg no_proxy=${no_proxy} \
 	--build-arg NO_PROXY=${NO_PROXY} \
+        --build-arg KUD_ENABLE_TESTS=true \
+        --build-arg KUD_PLUGIN_ENABLED=true \
 	-t github.com/onap/multicloud-k8s:latest . -f build/Dockerfile
 ```
 Let's create a cluster-101 and cluster-102 hosts.ini as follows

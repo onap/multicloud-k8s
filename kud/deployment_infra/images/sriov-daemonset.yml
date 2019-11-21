@@ -14,7 +14,7 @@ data:
          "resourceName": "intel_sriov_700",
          "selectors": {
             "vendors": ["8086"],
-            "drivers": ["i40evf"]
+            "drivers": ["i40evf", "iavf"]
          }
        }]
     }

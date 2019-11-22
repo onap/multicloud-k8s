@@ -1,0 +1,82 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sdwan-config-ovn
+data:
+  entrypoint.sh: |
+    #!/bin/bash
+    # Always exit on errors.
+    set -e
+
+    interface0=net0
+    ipaddr0=`ifconfig $interface0 | awk '/inet/{print $2}' | cut -f2 -d ":" | awk 'NR==1 {print $1}'`
+
+    interface1=net1
+    ipaddr1=`ifconfig $interface1 | awk '/inet/{print $2}' | cut -f2 -d ":" | awk 'NR==1 {print $1}'`
+
+    net_config=/etc/config/network
+    cat >> $net_config << EOF
+    config interface 'wan'
+        option ifname '$interface0'
+        option proto 'static'
+        option ipaddr '$ipaddr0'
+        option netmask '255.255.255.0'
+
+    config interface 'wanb'
+        option ifname '$interface1'
+        option proto 'static'
+        option ipaddr '$ipaddr1'
+        option netmask '255.255.255.0'
+    EOF
+
+    /sbin/procd &
+    /sbin/ubusd &
+    iptables -S
+    sleep 1
+    /etc/init.d/rpcd start
+    /etc/init.d/dnsmasq start
+    /etc/init.d/network start
+    /etc/init.d/odhcpd start
+    /etc/init.d/uhttpd start
+    /etc/init.d/log start
+    /etc/init.d/dropbear start
+    /etc/init.d/mwan3 restart
+
+    echo "Entering sleep... (success)"
+
+    # Sleep forever.
+    while true; do sleep 100; done
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sdwan-ovn-pod
+  annotations:
+    k8s.v1.cni.cncf.io/networks: '[{ "name": "ovn-networkobj"}]'
+    k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [{ "name": "ovn-port-net", "interface": "net0" , "defaultGateway": "false"},
+       { "name": "ovn-priv-net", "interface": "net1" , "defaultGateway": "false"}]}'
+spec:
+  containers:
+  - name: sdwan-ovn-pod
+    image: hle2/openwrt-1806-mwan3:v0.1.0
+    ports:
+      - containerPort: 22
+      - containerPort: 80
+    command:
+    - /bin/sh
+    - /init/entrypoint.sh
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: entrypoint-sh
+        mountPath: /init
+  volumes:
+    - name: entrypoint-sh
+      configMap:
+        name: sdwan-config-ovn
+        items:
+        - key: entrypoint.sh
+          path: entrypoint.sh

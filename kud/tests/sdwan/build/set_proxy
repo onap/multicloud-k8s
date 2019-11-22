@@ -1,0 +1,2 @@
+# set docker proxy with below line, the build script will use this info
+#docker_proxy=

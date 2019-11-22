@@ -1,0 +1,40 @@
+# Create 2 ovn4nfv network attachment definition
+---
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: Network
+metadata:
+  name: ovn-port-net
+spec:
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - subnet: 172.16.33.0/24
+    name: subnet1
+    gateway: 172.16.33.1/24
+
+---
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: Network
+metadata:
+  name: ovn-priv-net
+spec:
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - subnet: 172.16.44.0/24
+    name: subnet1
+    gateway: 172.16.44.1/24
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ovn-pod
+  annotations:
+    k8s.v1.cni.cncf.io/networks: '[{ "name": "ovn-networkobj"}]'
+    k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [{ "name": "ovn-port-net", "interface": "net0" , "defaultGateway": "false"},
+       { "name": "ovn-priv-net", "interface": "net1" , "defaultGateway": "false"}]}'
+spec:
+  containers:
+  - name: ovn-pod
+    image: docker.io/centos/tools:latest
+    command:
+    - /sbin/init

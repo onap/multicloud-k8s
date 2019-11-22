@@ -1,0 +1,44 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: create ovn network and client workload
+      command: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/ovn-pod.yml"
+
+    - name: create sdwan controller
+      command: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/sdwan-openwrt-ovn.yml"
+
+- hosts: kube-master
+  become: yes
+  tasks:
+    - name: install wget package for ubuntu systems
+      apt: name=wget state=present update_cache=yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: install wget package for centos systems
+      yum: name=wget state=present update_cache=yes
+      when: ansible_distribution == "CentOS"
+
+    - name: Execute sdwan test script in cluster master
+      script: test.sh
+      register: sdwan
+
+    - debug:
+        var: sdwan.stdout_lines
+
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: delete ovn network and client workload
+      command: "/usr/local/bin/kubectl delete -f {{ playbook_dir }}/ovn-pod.yml"
+
+    - name: delete sdwan controller
+      command: "/usr/local/bin/kubectl delete -f {{ playbook_dir }}/sdwan-openwrt-ovn.yml"

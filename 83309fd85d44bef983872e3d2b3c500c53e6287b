@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4c5b7543_3094d09a",
+        "filename": "kud/tests/sdwan/build/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-11-23T00:04:45Z",
+      "side": 1,
+      "message": "Will update in the 2nd patch",
+      "parentUuid": "c969e5b5_7d53f7b7",
+      "revId": "83309fd85d44bef983872e3d2b3c500c53e6287b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "148337a6_74c3f425",
         "filename": "kud/tests/sdwan/build/set_proxy",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9180bb1b_b8ca47a6",
+        "filename": "kud/tests/sdwan/build/set_proxy",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-11-23T00:04:45Z",
+      "side": 1,
+      "message": "Add the information in the 2nd patch. This information is used to build the SDWAN docker image",
+      "parentUuid": "148337a6_74c3f425",
+      "revId": "83309fd85d44bef983872e3d2b3c500c53e6287b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4446a03_186d335a",
         "filename": "kud/tests/sdwan/ovn-pod.yml",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2019-11-22T22:05:44Z",
       "side": 1,
       "message": "The Name of the file is misleading",
+      "revId": "83309fd85d44bef983872e3d2b3c500c53e6287b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ae5bfca_a9058b25",
+        "filename": "kud/tests/sdwan/ovn-pod.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2019-11-23T00:04:45Z",
+      "side": 1,
+      "message": "Will remove this and add it as network attachment definition for ovn4nfv",
+      "parentUuid": "b4446a03_186d335a",
       "revId": "83309fd85d44bef983872e3d2b3c500c53e6287b",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false

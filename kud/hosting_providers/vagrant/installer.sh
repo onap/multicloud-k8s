@@ -44,14 +44,14 @@ function _install_pip {
         sudo -E pip install --upgrade pip
     else
         sudo apt-get install -y python-dev
-        curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
+        curl -sL https://bootstrap.pypa.io/get-pip.py | sudo -E python
     fi
 }
 
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
     if $(ansible --version &>/dev/null); then
-        sudo pip uninstall -y ansible
+        sudo -E pip uninstall -y ansible
     fi
     _install_pip
     local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
@@ -175,6 +175,8 @@ function install_plugin {
     echo "Installing multicloud/k8s plugin"
     _install_go
     _install_docker
+    sudo -E pip install -U pyopenssl #old version of library causes issue on jenkins slaves
+    sudo -E pip install --force-reinstall more-itertools #More-itertools installed by older pip may contain code not suitable for python < 3
     sudo -E pip install docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}

@@ -15,6 +15,7 @@ package app
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
@@ -116,7 +117,9 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 		},
 	}, namespace, k)
 
-	if err != nil {
+	// Check for errors getting the namespace while ignoring errors where the namespace does not exist
+	// Error message when namespace does not exist: "namespaces "namespace-name" not found"
+	if err != nil && strings.Contains(err.Error(), "not found") == false {
 		log.Error("Error checking for namespace", log.Fields{
 			"error":     err,
 			"namespace": namespace,

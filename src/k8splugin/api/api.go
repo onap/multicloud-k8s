@@ -27,7 +27,8 @@ func NewRouter(defClient rb.DefinitionManager,
 	instClient app.InstanceManager,
 	configClient app.ConfigManager,
 	connectionClient connection.ConnectionManager,
-	templateClient rb.ConfigTemplateManager) *mux.Router {
+	templateClient rb.ConfigTemplateManager,
+	regClient app.InstanceManager) *mux.Router {
 
 	router := mux.NewRouter()
 
@@ -116,6 +117,16 @@ func NewRouter(defClient rb.DefinitionManager,
 
 	// Add healthcheck path
 	instRouter.HandleFunc("/healthcheck", healthCheckHandler).Methods("GET")
+
+	// Add Registry path
+	if regClient == nil {
+	//	regClient = app.NewRegistryClient()
+	}
+	//registryHandler := registryHandler{client: regClient}
+	//registryRouter := router.PathPrefix("/v1").Subrouter()
+	//registryRouter.HandleFunc("/{cloud-owner}/{cloud-region}/registry", registryHandler.createHandler).Methods("POST")
+	//registryRouter.HandleFunc("/{cloud-owner}/{cloud-region}/registry/{id}", registryHandler.getHandler).Methods("GET")
+	//registryRouter.HandleFunc("/{cloud-owner}/{cloud-region}/registry/{id}", registryHandler.deleteHandler).Methods("DELETE")
 
 	return router
 }

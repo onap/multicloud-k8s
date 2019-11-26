@@ -54,12 +54,43 @@ func TestBrokerCreateHandler(t *testing.T) {
 				"user_directives": {
 					"attributes": [
 						{
-							"attribute_name": "definition-name",
+							"attribute_name": "k8s-rb-definition-name",
 							"attribute_value": "test-rbdef"
 						},
 						{
-							"attribute_name": "definition-version",
+							"attribute_name": "k8s-rb-definition-version",
 							"attribute_value": "v1"
+						}
+					]
+				}
+			}`)),
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			label: "Deprecated parameters passed (user_directives)",
+			input: bytes.NewBuffer([]byte(`{
+				"vf-module-model-customization-id": "97sdfkio168",
+				"sdnc_directives": {
+					"attributes": [
+						{
+							"attribute_name": "vf_module_name",
+							"attribute_value": "test-vf-module-name"
+						}
+					]
+				},
+				"user_directives": {
+					"attributes": [
+						{
+							"attribute_name": "rb-definition-name",
+							"attribute_value": "test-rbdef"
+						},
+						{
+							"attribute_name": "rb-definition-version",
+							"attribute_value": "v1"
+						},
+						{
+							"attribute_name": "rb-profile-name",
+							"attribute_value": "profile1"
 						}
 					]
 				}
@@ -75,21 +106,17 @@ func TestBrokerCreateHandler(t *testing.T) {
 						{
 							"attribute_name": "vf_module_name",
 							"attribute_value": "test-vf-module-name"
-						}
-					]
-				},
-				"user_directives": {
-					"attributes": [
+						},
 						{
-							"attribute_name": "definition-name",
+							"attribute_name": "k8s-rb-definition-name",
 							"attribute_value": "test-rbdef"
 						},
 						{
-							"attribute_name": "definition-version",
+							"attribute_name": "k8s-rb-definition-version",
 							"attribute_value": "v1"
 						},
 						{
-							"attribute_name": "profile-name",
+							"attribute_name": "k8s-rb-profile-name",
 							"attribute_value": "profile1"
 						}
 					]

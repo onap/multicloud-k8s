@@ -134,21 +134,21 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	rbName := req.getAttributeValue(req.UserDirectives, "definition-name")
+	rbName := req.getAttributeValue(req.SDNCDirectives, "k8s-rb-definition-name")
 	if rbName == "" {
-		http.Error(w, "definition-name is missing from user-directives", http.StatusBadRequest)
+		http.Error(w, "k8s-rb-definition-name is missing from sdnc-directives", http.StatusBadRequest)
 		return
 	}
 
-	rbVersion := req.getAttributeValue(req.UserDirectives, "definition-version")
+	rbVersion := req.getAttributeValue(req.SDNCDirectives, "k8s-rb-definition-version")
 	if rbVersion == "" {
-		http.Error(w, "definition-version is missing from user-directives", http.StatusBadRequest)
+		http.Error(w, "k8s-rb-definition-version is missing from sdnc-directives", http.StatusBadRequest)
 		return
 	}
 
-	profileName := req.getAttributeValue(req.UserDirectives, "profile-name")
+	profileName := req.getAttributeValue(req.SDNCDirectives, "k8s-rb-profile-name")
 	if profileName == "" {
-		http.Error(w, "profile-name is missing from user-directives", http.StatusBadRequest)
+		http.Error(w, "k8s-rb-profile-name is missing from sdnc-directives", http.StatusBadRequest)
 		return
 	}
 

@@ -182,7 +182,9 @@ function wait_for_pod {
 
     status_phase=""
     while [[ "$status_phase" != "Running" ]]; do
-        new_phase="$(kubectl get pods -o 'go-template={{ index .items 0 "status" "phase" }}' "$@" )"
+        if ! new_phase="$(kubectl get pods -o 'go-template={{ index .items 0 "status" "phase" }}' "$@" )"; then
+            new_phase="---" #Handle situation when resource is created, but no pod is yet spawned
+        fi
         if [[ "$new_phase" != "$status_phase" ]]; then
             echo "$(date +%H:%M:%S) - Filter=[$*] : $new_phase"
             status_phase="$new_phase"

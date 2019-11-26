@@ -116,14 +116,6 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 		},
 	}, namespace, k)
 
-	if err != nil {
-		log.Error("Error checking for namespace", log.Fields{
-			"error":     err,
-			"namespace": namespace,
-		})
-		return pkgerrors.Wrap(err, "Error checking for namespace: "+namespace)
-	}
-
 	if ns == "" {
 		log.Info("Creating Namespace", log.Fields{
 			"namespace": namespace,

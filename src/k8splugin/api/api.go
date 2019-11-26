@@ -117,5 +117,8 @@ func NewRouter(defClient rb.DefinitionManager,
 	// Add healthcheck path
 	instRouter.HandleFunc("/healthcheck", healthCheckHandler).Methods("GET")
 
+	a := app.NewConfigClient()
+    configClient = a
+
 	return router
 }

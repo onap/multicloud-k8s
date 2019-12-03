@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5232d7b6_5c40e5ef",
+        "filename": "src/k8splugin/api/api.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-12-03T20:12:43Z",
+      "side": 1,
+      "message": "Why are you setting this here?",
+      "range": {
+        "startLine": 120,
+        "startChar": 1,
+        "endLine": 121,
+        "endChar": 20
+      },
+      "revId": "43e095afd82fd0c678e1d1116ae52638f6156f9e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

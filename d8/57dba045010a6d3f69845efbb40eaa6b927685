@@ -1,0 +1,9 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Samuli Silvius <s.silvius@partner.samsung.com>
+Code-Review+1: Lukasz Rajewski <lukasz.rajewski@orange.com>
+Code-Review+2: Kiran Kamineni <kiran.k.kamineni@intel.com>
+Submitted-by: Kiran Kamineni <kiran.k.kamineni@intel.com>
+Submitted-at: Tue, 03 Dec 2019 20:13:52 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/98849
+Project: multicloud/k8s
+Branch: refs/heads/master

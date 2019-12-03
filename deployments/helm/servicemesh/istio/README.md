@@ -17,4 +17,6 @@
 # Steps for Instaling Istio with Istio- Operator
 
 # Step 1 - Add the helm chart to install Istio in sds configuration
+# NOTE - Edit the namespaces in istio/istio-instance/values.yaml
+# to enable istio-injection
 helm install istio-instance --name istio --namespace istio-system

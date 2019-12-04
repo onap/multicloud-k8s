@@ -912,7 +912,7 @@ func TestInstanceDelete(t *testing.T) {
 		id := "non-existing"
 		err := ic.Delete(id)
 		if err == nil {
-			t.Fatal("Expected error, got pass", err)
+			t.Fatal("Expected error, so got pass", err)
 		}
 	})
 }

@@ -82,9 +82,9 @@ func defaultConfiguration() *Configuration {
 		DatabaseType:        "mongo",
 		PluginDir:           cwd,
 		EtcdIP:              "127.0.0.1",
-		EtcdCert:            "etcd.cert",
-		EtcdKey:             "etcd.key",
-		EtcdCAFile:          "etcd-ca.cert",
+		EtcdCert:            "",
+		EtcdKey:             "",
+		EtcdCAFile:          "",
 		ServicePort:         "9015",
 		KubernetesLabelName: "k8splugin.io/rb-instance-id",
 	}

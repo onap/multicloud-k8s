@@ -71,7 +71,12 @@ func newClient(store *clientv3.Client, c EtcdConfig) (EtcdClient, error) {
 		if len(c.CertFile) == 0 && len(c.KeyFile) == 0 && len(c.CAFile) == 0 {
 			tlsConfig = nil
 		}
-		endpoint := "https://" + c.Endpoint + ":2379"
+		endpoint := ""
+		if tlsConfig == nil {
+			endpoint = "http://" + c.Endpoint + ":2379"
+		} else {
+			endpoint = "https://" + c.Endpoint + ":2379"
+		}
 
 		store, err = clientv3.New(clientv3.Config{
 			Endpoints:   []string{endpoint},

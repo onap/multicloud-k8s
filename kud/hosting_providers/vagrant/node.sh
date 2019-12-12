@@ -80,6 +80,11 @@ case ${ID,,} in
     *suse)
     ;;
     ubuntu|debian)
+        echo 'nameserver 192.168.121.1' >> /etc/resolv.conf
+        apt-get install resolvconf
+        echo 'nameserver 192.168.121.1' >> /etc/resolvconf/resolv.conf.d/head
+        resolvconf --enable-updates
+        resolvconf -u
         apt-get install -y cpu-checker
         kvm-ok
     ;;

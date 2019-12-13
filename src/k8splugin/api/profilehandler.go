@@ -21,6 +21,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
@@ -107,8 +108,14 @@ func (h rbProfileHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.Get(rbName, rbVersion, prName)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		// Separate "Not found" from generic DB errors
+		if strings.Contains(err.Error(), "Error finding") {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

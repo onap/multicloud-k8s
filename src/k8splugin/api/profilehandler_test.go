@@ -184,9 +184,18 @@ func TestRBProfileGetHandler(t *testing.T) {
 			},
 		},
 		{
-			label:        "Get Non-Exiting Bundle Profile",
-			expectedCode: http.StatusInternalServerError,
+			label:        "Get Non-Existing Profile",
+			expectedCode: http.StatusNotFound,
 			prname:       "non-existing-profile",
+			rbProClient: &mockRBProfile{
+				Items: nil,
+				Err:   pkgerrors.New("Error finding master table"),
+			},
+		},
+		{
+			label:        "Faulty DB response",
+			expectedCode: http.StatusInternalServerError,
+			prname:       "profile",
 			rbProClient: &mockRBProfile{
 				// list of Profiles that will be returned by the mockclient
 				Items: []rb.Profile{},

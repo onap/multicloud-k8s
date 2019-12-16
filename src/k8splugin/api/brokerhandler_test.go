@@ -48,18 +48,19 @@ func TestBrokerCreateHandler(t *testing.T) {
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
-			label: "Missing parameter failure",
+			label: "Missing vf-module-*-id parameter",
 			input: bytes.NewBuffer([]byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
-				"user_directives": {
+                "vf-module-model-invariant-id": "123456qwerty",
+				"sdnc_directives": {
 					"attributes": [
 						{
-							"attribute_name": "k8s-rb-definition-name",
-							"attribute_value": "test-rbdef"
+							"attribute_name": "vf_module_name",
+							"attribute_value": "test-vf-module-name"
 						},
 						{
-							"attribute_name": "k8s-rb-definition-version",
-							"attribute_value": "v1"
+							"attribute_name": "k8s-rb-profile-name",
+							"attribute_value": "profile1"
 						}
 					]
 				}
@@ -67,30 +68,16 @@ func TestBrokerCreateHandler(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			label: "Deprecated parameters passed (user_directives)",
+			label: "Missing parameter from sdnc_directives",
 			input: bytes.NewBuffer([]byte(`{
-				"vf-module-model-customization-id": "97sdfkio168",
+				"vf-module-model-customization-id": "84sdfkio938",
+                "vf-module-model-invariant-id": "123456qwerty",
+                "vf-module-model-version-id": "123qweasdzxc",
 				"sdnc_directives": {
 					"attributes": [
 						{
 							"attribute_name": "vf_module_name",
 							"attribute_value": "test-vf-module-name"
-						}
-					]
-				},
-				"user_directives": {
-					"attributes": [
-						{
-							"attribute_name": "rb-definition-name",
-							"attribute_value": "test-rbdef"
-						},
-						{
-							"attribute_name": "rb-definition-version",
-							"attribute_value": "v1"
-						},
-						{
-							"attribute_name": "rb-profile-name",
-							"attribute_value": "profile1"
 						}
 					]
 				}
@@ -101,19 +88,13 @@ func TestBrokerCreateHandler(t *testing.T) {
 			label: "Succesfully create an Instance",
 			input: bytes.NewBuffer([]byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
+                "vf-module-model-invariant-id": "123456qwerty",
+                "vf-module-model-version-id": "123qweasdzxc",
 				"sdnc_directives": {
 					"attributes": [
 						{
 							"attribute_name": "vf_module_name",
 							"attribute_value": "test-vf-module-name"
-						},
-						{
-							"attribute_name": "k8s-rb-definition-name",
-							"attribute_value": "test-rbdef"
-						},
-						{
-							"attribute_name": "k8s-rb-definition-version",
-							"attribute_value": "v1"
 						},
 						{
 							"attribute_name": "k8s-rb-profile-name",
@@ -149,8 +130,8 @@ func TestBrokerCreateHandler(t *testing.T) {
 					{
 						ID: "HaKpys8e",
 						Request: app.InstanceRequest{
-							RBName:      "test-rbdef",
-							RBVersion:   "v1",
+							RBName:      "123456qwerty",
+							RBVersion:   "123qweasdzxc",
 							ProfileName: "profile1",
 							CloudRegion: "region1",
 						},

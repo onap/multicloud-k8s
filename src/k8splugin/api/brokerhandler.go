@@ -134,15 +134,13 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	rbName := req.getAttributeValue(req.SDNCDirectives, "k8s-rb-definition-name")
-	if rbName == "" {
-		http.Error(w, "k8s-rb-definition-name is missing from sdnc-directives", http.StatusBadRequest)
+	if req.VFModuleModelInvariantID == "" {
+		http.Error(w, "vf-module-model-invariant-id is empty", http.StatusBadRequest)
 		return
 	}
 
-	rbVersion := req.getAttributeValue(req.SDNCDirectives, "k8s-rb-definition-version")
-	if rbVersion == "" {
-		http.Error(w, "k8s-rb-definition-version is missing from sdnc-directives", http.StatusBadRequest)
+	if req.VFModuleModelVersionID == "" {
+		http.Error(w, "vf-module-model-version-id is empty", http.StatusBadRequest)
 		return
 	}
 
@@ -160,8 +158,8 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 
 	// Setup the resource parameters for making the request
 	var instReq app.InstanceRequest
-	instReq.RBName = rbName
-	instReq.RBVersion = rbVersion
+	instReq.RBName = req.VFModuleModelInvariantID
+	instReq.RBVersion = req.VFModuleModelVersionID
 	instReq.ProfileName = profileName
 	instReq.CloudRegion = cloudRegion
 	instReq.Labels = map[string]string{

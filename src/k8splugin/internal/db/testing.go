@@ -15,6 +15,7 @@ package db
 
 import (
 	"encoding/json"
+
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -40,6 +41,19 @@ func (m *MockDB) HealthCheck() error {
 }
 
 func (m *MockDB) Create(table string, key Key, tag string, data interface{}) error {
+	djs, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	d := make(map[string][]byte)
+	d[tag] = djs
+
+	if m.Items == nil {
+		m.Items = make(map[string]map[string][]byte)
+	}
+	m.Items[key.String()] = d
+
 	return m.Err
 }
 

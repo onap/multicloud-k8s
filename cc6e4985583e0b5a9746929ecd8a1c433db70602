@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a2d5f6cb_96ded149",
+        "filename": "src/k8splugin/internal/plugin/helpers.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-12-20T22:24:14Z",
+      "side": 1,
+      "message": "This can be map[string][]string mapping sites to resources that need to be on the site.",
+      "range": {
+        "startLine": 89,
+        "startChar": 73,
+        "endLine": 89,
+        "endChar": 90
+      },
+      "revId": "cc6e4985583e0b5a9746929ecd8a1c433db70602",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1dbc9662_c0987287",
+        "filename": "src/k8splugin/internal/plugin/helpers.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-12-20T22:24:14Z",
+      "side": 1,
+      "message": "Should just expect an internal/rb/Profile object here.",
+      "range": {
+        "startLine": 89,
+        "startChar": 29,
+        "endLine": 89,
+        "endChar": 47
+      },
+      "revId": "cc6e4985583e0b5a9746929ecd8a1c433db70602",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

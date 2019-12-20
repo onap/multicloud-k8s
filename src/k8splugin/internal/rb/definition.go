@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -99,6 +100,40 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 	err = db.DBconn.Create(v.storeName, key, v.tagMeta, def)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Creating DB Entry")
+	}
+
+	// Create a default profile automatically
+	prc := NewProfileClient()
+	pr, err := prc.Create(Profile{
+		RBName:      def.RBName,
+		RBVersion:   def.RBVersion,
+		ProfileName: "default",
+		Namespace:   "default",
+		ReleaseName: "default",
+	})
+
+	if err != nil {
+		logutils.Error("Create Default Profile", logutils.Fields{
+			"error":        err,
+			"rb-name":      def.RBName,
+			"rb-version":   def.RBVersion,
+			"profile-name": "default",
+			"namespace":    "default",
+			"release-name": "default",
+		})
+		return Definition{}, pkgerrors.Wrap(err, "Creating Default Profile")
+	}
+
+	err = prc.Upload(pr.RBName, pr.RBVersion, pr.ProfileName, prc.getEmptyProfile())
+	if err != nil {
+		logutils.Error("Upload Empty Profile", logutils.Fields{
+			"error":           err,
+			"rb-name":         pr.RBName,
+			"rb-version":      pr.RBVersion,
+			"profile-name":    pr.ProfileName,
+			"profile-content": prc.getEmptyProfile(),
+		})
+		return Definition{}, pkgerrors.Wrap(err, "Upload Empty Profile")
 	}
 
 	return def, nil

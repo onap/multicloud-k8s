@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2f84dd71_b8f07d89",
+        "filename": "src/k8splugin/internal/rb/definition.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2019-12-23T13:03:35Z",
+      "side": 1,
+      "message": "We should also ensure removal of \"default\" profile when removing RB. If you can\u0027t manage to add it, I should be able to amend your patch next week.",
+      "range": {
+        "startLine": 196,
+        "startChar": 0,
+        "endLine": 196,
+        "endChar": 70
+      },
+      "revId": "8b3d3035cb3c076f8d63d4fd4efb21e35de3141e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# COPYRIGHT NOTICE STARTS HERE
+#
+# Copyright 2019 Intel Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# COPYRIGHT NOTICE ENDS HERE
+
+# This script prepares the runtime environment
+# for running vIPSec shell scripts on Ubuntu 18.04
+
+set -o nounset
+set -o pipefail
+set -o xtrace
+set -o errexit
+
+function setup_dependencies {
+    apt-get update
+    apt install -y wget darkstat net-tools unzip
+
+    # Configure and run Darkstat
+    sed -i "s/START_DARKSTAT=.*/START_DARKSTAT=yes/g;s/INTERFACE=.*/INTERFACE=\"-i eth1\"/g" /etc/darkstat/init.cfg
+
+    systemctl restart darkstat
+}
+
+mkdir -p /opt/config/
+echo "$protected_net_cidr"         > /opt/config/protected_net_cidr.txt
+echo "$vfw_private_ip_0"           > /opt/config/fw_ipaddr.txt
+echo "$vsn_private_ip_0"           > /opt/config/sink_ipaddr.txt
+echo "$demo_artifacts_version"     > /opt/config/demo_artifacts_version.txt
+echo "$protected_net_gw"           > /opt/config/protected_net_gw.txt
+echo "$protected_private_net_cidr" > /opt/config/unprotected_net.txt
+
+setup_dependencies
+

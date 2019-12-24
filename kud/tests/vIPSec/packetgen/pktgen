@@ -1,0 +1,62 @@
+#!/bin/bash
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2019
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+set -o nounset
+set -o pipefail
+set -o xtrace
+set -o errexit
+
+
+DPDK_DIR=$PWD/dpdk-stable
+Pktgen_Dir=$PWD/pktgen-dpdk
+
+function setup_dependencies {
+    sudo apt-get update
+    git clone http://dpdk.org/git/dpdk-stable -b 18.11
+    git clone http://dpdk.org/git/apps/pktgen-dpdk
+    KERNEL_VERSION=$(uname -r)
+    echo $KERNEL_VERSION
+    sudo apt-get install -y linux-headers-$KERNEL_VERSION libpcap-dev gcc make libnuma-dev liblua5.3-dev python 
+}
+
+function build_dpdk {
+    export RTE_SDK=$DPDK_DIR
+    export RTE_TARGET=x86_64-native-linuxapp-gcc
+    export DESTDIR=$DPDK_DIR
+    cd $RTE_SDK
+    make install T=x86_64-native-linuxapp-gcc
+    echo "DPDK install finished"
+    modprobe uio
+    insmod x86_64-native-linuxapp-gcc/kmod/igb_uio.ko
+    export interface=$(lspci -nn | grep -m1 'Ethernet controller [0200]:' | cut -d ' ' -f 1)
+    python ./usertools/dpdk-devbind.py -b igb_uio $interface
+}
+
+function build_pktgen {
+    cd $Pktgen_Dir
+    export RTE_SDK=$DPDK_DIR
+    export RTE_TARGET=x86_64-native-linuxapp-gcc
+    make
+}
+
+echo "$demo_artifacts_version"                >  /opt/config/demo_artifacts_version.txt
+echo "$vpg_private_ip_0"                      >  /opt/config/vpg_private_ip0.txt
+echo "$vpg_private_ip_1"                      >  /opt/config/vpg_private_ip1.txt
+echo "$protected_clientA_network_name"        >  /opt/config/protected_clientA_network_name.txt
+echo "$dcae_collector_ip"                     >  /opt/config/dcae_collector_ip.txt
+echo "$dcae_collector_port"                   >  /opt/config/dcae_collector_port.txt
+echo "$protected_clientA_net_gw"              >  /opt/config/protected_clientA_net_gw.txt
+echo "$protected_clientA_net_cidr"            >  /opt/config/protected_clientA_net_cidr.txt
+
+echo 'vm.nr_hugepages = 1024' >> /etc/sysctl.conf
+sysctl -p
+
+setup_dependencies
+build_dpdk
+build_pktgen

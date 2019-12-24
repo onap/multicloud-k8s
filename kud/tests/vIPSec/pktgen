@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# COPYRIGHT NOTICE STARTS HERE
+#
+# Copyright 2019 Intel Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# COPYRIGHT NOTICE ENDS HERE
+
+# This script prepares the runtime environment
+# for running vIPSec shell scripts on Ubuntu18.04
+
+set -o nounset
+set -o pipefail
+set -o xtrace
+set -o errexit
+
+
+DPDK_DIR=$PWD/dpdk
+Pktgen_Dir=$PWD/pktgen-dpdk
+
+function setup_dependencies {
+    sudo apt-get update
+    git clone http://dpdk.org/git/dpdk
+    git clone http://dpdk.org/git/apps/pktgen-dpdk
+    KERNEL_VERSION=$(uname -r)
+    echo $KERNEL_VERSION
+    sudo apt-get install -y linux-headers-$KERNEL_VERSION libpcap-dev gcc make libnuma-dev liblua5.3-dev python
+}
+
+function build_dpdk {
+    export RTE_SDK=$DPDK_DIR
+    export RTE_TARGET=x86_64-native-linux-gcc
+    export DESTDIR=$DPDK_DIR
+    cd $RTE_SDK
+    make install T=x86_64-native-linux-gcc
+    echo "DPDK install finished"
+    modprobe uio
+    insmod x86_64-native-linux-gcc/kmod/igb_uio.ko
+    export interface=$(lspci -nn | grep -m1 'Ethernet controller' | cut -d ' ' -f 1)
+    python ./usertools/dpdk-devbind.py -b igb_uio $interface
+}
+
+function build_pktgen {
+    cd $Pktgen_Dir
+    export RTE_SDK=$DPDK_DIR
+    export RTE_TARGET=x86_64-native-linux-gcc
+    make
+}
+
+mkdir /opt/config
+echo "$demo_artifacts_version"                >  /opt/config/demo_artifacts_version.txt
+echo "$vpg_private_ip_0"                      >  /opt/config/vpg_private_ip0.txt
+echo "$ipsec_a_private_ip_0"                  >  /opt/config/ipsec_a_private_ip0.txt
+echo "$protected_clientA_network_name"        >  /opt/config/protected_clientA_network_name.txt
+echo "$dcae_collector_ip"                     >  /opt/config/dcae_collector_ip.txt
+echo "$dcae_collector_port"                   >  /opt/config/dcae_collector_port.txt
+echo "$protected_clientA_net_gw"              >  /opt/config/protected_clientA_net_gw.txt
+echo "$protected_clientA_net_cidr"            >  /opt/config/protected_clientA_net_cidr.txt
+
+echo 'vm.nr_hugepages = 1024' >> /etc/sysctl.conf
+sysctl -p
+
+setup_dependencies
+build_dpdk
+build_pktgen

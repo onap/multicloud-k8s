@@ -1,0 +1,143 @@
+#!/bin/bash
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2019
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+set -o nounset
+set -o pipefail
+set -o xtrace
+set -o errexit
+
+function setup_dependencies {
+    apt-get update
+    apt-get install -y curl gnupg2 pciutils make gcc libnuma-dev python git linux-headers-`uname -r` module-init-tools libssl-dev
+    echo "deb [trusted=yes] https://packagecloud.io/fdio/release/ubuntu bionic main" >> /etc/apt/sources.list.d/99fd.io.list
+    curl -L https://packagecloud.io/fdio/master/gpgkey | apt-key add -
+}
+
+function install_vpp {
+    apt-get update
+    apt-get install -y vpp vpp-plugin-core vpp-plugin-dpdk
+}
+
+function install_dpdk {
+    cd /opt
+    git clone http://dpdk.org/git/dpdk
+    cd /opt/dpdk
+    export RTE_TARGET=x86_64-native-linux-gcc/ && export DESTDIR=/opt/dpdk && export RTE_SDK=/opt/dpdk &&  make install T=x86_64-native-linux-gcc
+    modprobe uio
+    insmod x86_64-native-linux-gcc/kmod/igb_uio.ko
+}
+
+function ipsec_settings {
+    cat > /opt/config/vpp.config << EOF
+    unix {
+            exec /opt/config/ipsec.conf
+            nodaemon
+            cli-listen /run/vpp/cli.sock
+            log /tmp/vpp.log
+         }
+
+    cpu {
+           main-core 0
+           corelist-workers 1
+        }
+
+    dpdk {
+            socket-mem 512
+            log-level debug
+            no-tx-checksum-offload
+            dev default{
+                    num-tx-desc 512
+                    num-rx-desc 512
+            }
+            dev interfaceABus
+            {
+                    workers 0
+            }
+            dev interfaceBBus
+            {
+                    workers 0
+            }
+            vdev crypto_aesni_mb0
+
+            no-multi-seg
+
+            #enable_cryptodev
+
+         }
+EOF
+
+    if [ "$sriov_enabled" = true ]; then
+        export interfaceABus=$(lspci -D -nn | grep -m1 '8086:154c' | cut -d ' ' -f 1) && export interfaceBBus=$(lspci -D -nn | grep -m2 '8086:154c' | cut -d ' ' -f 1 | tail -n1)
+    else
+        export interfaceABus=$(ls -la /sys/class/net | grep 'eth1' | cut -d '/' -f 5) && export interfaceBBus=$(ls -la /sys/class/net | grep 'eth3' | cut -d '/' -f 5)
+    fi
+    sed -i -e "s/interfaceABus/${interfaceABus}/g" -e "s/interfaceBBus/${interfaceBBus}/g" /opt/config/vpp.config
+    python /opt/dpdk/usertools/dpdk-devbind.py -b igb_uio $interfaceABus $interfaceBBus
+    export interfaceA=$(vppctl sh int | awk '$2 == "1"' | cut -d ' ' -f 1) && export interfaceB=$(vppctl sh int | awk '$2 == "2"' | cut -d ' ' -f 1)
+
+    if [ "$qat_enabled" = true ]; then
+        export qatABus=$(lspci -D -nn | grep -m1 '8086:37c9' | cut -d ' ' -f 1)
+        export qatBBus=$(lspci -D -nn | grep -m2 '8086:37c9' | cut -d ' ' -f 1 | tail -n1)
+        python /opt/dpdk/usertools/dpdk-devbind.py -b igb_uio $qatABus $qatBBus
+        sed -i "/#enable_cryptodev/a\n              dev $qatABus\n              dev $qatBBus\n" /opt/config/vpp.config
+        sed -i "/vdev crypto_aesni_mb0/d" /opt/config/vpp.config
+    fi
+
+    cat > /opt/config/ipsec.conf << EOF
+    set interface state VirtualFunctionEthernet0/5/0 up
+    set interface state VirtualFunctionEthernet0/6/0 up
+
+    set interface ip address VirtualFunctionEthernet0/5/0 input_interface_ip/24
+    set interface ip address VirtualFunctionEthernet0/6/0 output_interface_ip/24
+
+    set int promiscuous on VirtualFunctionEthernet0/5/0
+    set int promiscuous on VirtualFunctionEthernet0/6/0
+
+    set ip arp VirtualFunctionEthernet0/6/0 remote_tunnel_ip fa:16:3e:a6:e4:c7
+    set ip arp VirtualFunctionEthernet0/5/0 routing_ip fa:16:3e:f1:65:dc
+
+    ip route add count 1 packet_dst/32 via route_interface VirtualFunctionEthernet0/6/0
+
+    ipsec spd add 1
+    set interface ipsec spd VirtualFunctionEthernet0/6/0 1
+    ipsec sa add 1 spi 1921681004 esp tunnel-src local_tunnel_ip tunnel-dst remote_tunnel_ip crypto-key 2b7e151628aed2a6abf7158809cf4f3d crypto-alg aes-cbc-128 integ-key 6867666568676665686766656867666568676669 integ-alg sha1-96
+    ipsec policy add spd 1 traffic_direction priority 100 action protect sa 1 local-ip-range packet_src-packet_src remote-ip-range packet_dst-packet_dst
+    ipsec policy add spd 1 traffic_direction priority 90 protocol 50 action bypass local-ip-range packet_src-255.255.255.255 remote-ip-range remote_tunnel_ip-remote_tunnel_ip
+EOF
+
+    sed -i -e "s/input_interface_ip/${input_interface_ip}/g" -e "s/output_interface_ip/${output_interface_ip}/g" -e "s/routing_ip/${vsn_private_ip_0}/g" -e "s#VirtualFunctionEthernet0/5/0#${interfaceA}#g" -e "s#VirtualFunctionEthernet0/6/0#${interfaceB}#g" -e "s/local_tunnel_ip/${local_tunnel_ip}/g" -e "s/remote_tunnel_ip/${remote_tunnel_ip}/g" -e "s/route_interface/${route_interface}/g" -e "s/packet_src/${packet_src}/g" -e "s/packet_dst/${packet_dst}/g" -e "s/traffic_direction/${traffic_direction}/g" /opt/config/ipsec.conf
+    vpp -c /opt/config/vpp.config
+}
+
+
+mkdir /opt/config
+echo "$demo_artifacts_version"                >  /opt/config/demo_artifacts_version.txt
+echo "$dcae_collector_ip"                     >  /opt/config/dcae_collector_ip.txt
+echo "$dcae_collector_port"                   >  /opt/config/dcae_collector_port.txt
+echo "$ipsec_private_net_gw"                  >  /opt/config/ipsec_private_net_gw_ip.txt
+echo "$ipsec_private_net_cidr"                >  /opt/config/ipsec_private_net_cidr.txt
+echo "$ipsec_private_network_name"            >  /opt/config/ipsec_private_network_name.txt
+echo "$packet_src"                            >  /opt/config/packet_source_ip.txt
+echo "$packet_dst"                            >  /opt/config/packet_destination_ip.txt
+echo "$remote_tunnel_ip"                      >  /opt/config/remote_tunnel.txt
+echo "$route_interface"                       >  /opt/config/route_interface.txt
+echo "$traffic_direction"                     >  /opt/config/traffic_direction.txt
+echo "$vipsecB_private_ip_0"                  >  /opt/config/vipsecB_private_ip0.txt
+echo "$vipsecB_private_ip_2"                  >  /opt/config/vipsecB_private_ip2.txt
+echo "$protected_clientB_network_name"        >  /opt/config/protected_clientB_network_name.txt
+echo "$protected_clientB_net_gw"              >  /opt/config/protected_clientB_net_gw.txt
+echo "$protected_clientB_net_cidr"            >  /opt/config/protected_clientB_net_cidr.txt
+
+echo 'vm.nr_hugepages = 1024' >> /etc/sysctl.conf
+sysctl -p
+
+setup_dependencies
+install_vpp
+install_dpdk
+ipsec_settings

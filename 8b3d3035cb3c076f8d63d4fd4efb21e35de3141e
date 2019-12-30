@@ -22,6 +22,30 @@
       "revId": "8b3d3035cb3c076f8d63d4fd4efb21e35de3141e",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d84306d1_f3e553d0",
+        "filename": "src/k8splugin/internal/rb/definition.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 301
+      },
+      "writtenOn": "2019-12-30T23:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f84dd71_b8f07d89",
+      "range": {
+        "startLine": 196,
+        "startChar": 0,
+        "endLine": 196,
+        "endChar": 70
+      },
+      "revId": "8b3d3035cb3c076f8d63d4fd4efb21e35de3141e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

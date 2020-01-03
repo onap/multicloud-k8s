@@ -32,19 +32,21 @@ import (
 // InstanceRequest contains the parameters needed for instantiation
 // of profiles
 type InstanceRequest struct {
-	RBName      string            `json:"rb-name"`
-	RBVersion   string            `json:"rb-version"`
-	ProfileName string            `json:"profile-name"`
-	CloudRegion string            `json:"cloud-region"`
-	Labels      map[string]string `json:"labels"`
+	RBName         string            `json:"rb-name"`
+	RBVersion      string            `json:"rb-version"`
+	ProfileName    string            `json:"profile-name"`
+	CloudRegion    string            `json:"cloud-region"`
+	Labels         map[string]string `json:"labels"`
+	OverrideValues map[string]string `json:"override-values"`
 }
 
 // InstanceResponse contains the response from instantiation
 type InstanceResponse struct {
-	ID        string                    `json:"id"`
-	Request   InstanceRequest           `json:"request"`
-	Namespace string                    `json:"namespace"`
-	Resources []helm.KubernetesResource `json:"resources"`
+	ID             string                    `json:"id"`
+	Request        InstanceRequest           `json:"request"`
+	Namespace      string                    `json:"namespace"`
+	Resources      []helm.KubernetesResource `json:"resources"`
+	OverrideValues map[string]string         `json:"override-values"`
 }
 
 // InstanceMiniResponse contains the response from instantiation
@@ -133,7 +135,14 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		return InstanceResponse{}, pkgerrors.New("Unable to find Profile to create instance")
 	}
 
+	//Convert override values from map to array of strings of the following format
+	//foo=bar
 	overrideValues := []string{}
+	if i.OverrideValues != nil {
+		for k, v := range i.OverrideValues {
+			overrideValues = append(overrideValues, k+"="+v)
+		}
+	}
 
 	//Execute the kubernetes create command
 	sortedTemplates, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues)

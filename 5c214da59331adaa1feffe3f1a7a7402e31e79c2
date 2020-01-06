@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a8e8811d_79fb4d87",
+        "filename": "kud/tests/vIPSec/sink",
+        "patchSetId": 6
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2020-01-06T06:57:12Z",
+      "side": 1,
+      "message": "maybe you should add intel. maybe you can refer to https://git.onap.org/integration/tree/test/vcpe/bin/setup.sh and change to Intel",
+      "revId": "5c214da59331adaa1feffe3f1a7a7402e31e79c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

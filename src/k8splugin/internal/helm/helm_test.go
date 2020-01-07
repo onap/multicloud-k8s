@@ -75,6 +75,15 @@ func TestProcessValues(t *testing.T) {
 			expectedHash:  "516fab4ab7b76ba2ff35a97c2a79b74302543f532857b945f2fe25e717e755be",
 			expectedError: "",
 		},
+		{
+			label: "Process complex Pair Override",
+			values: []string{
+				"name={a,b,c}",
+				"servers[0].port=80",
+			},
+			expectedError: "",
+			expectedHash:  "50d9401b003f65c1ccfd1c5155106fff88c8201ab8b7d66bd6ffa4fe2883bead",
+		},
 	}
 
 	h := sha256.New()
@@ -96,7 +105,7 @@ func TestProcessValues(t *testing.T) {
 				gotHash := fmt.Sprintf("%x", h.Sum(nil))
 				h.Reset()
 				if gotHash != testCase.expectedHash {
-					t.Fatalf("Got unexpected values.yaml %s", out)
+					t.Fatalf("Got unexpected hash '%s' of values.yaml:\n%s", gotHash, out)
 				}
 			}
 		})

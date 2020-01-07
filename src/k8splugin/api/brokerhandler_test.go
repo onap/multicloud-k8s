@@ -30,6 +30,198 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+func TestConvertAttribute(t *testing.T) {
+	testCases := []struct {
+		label    string
+		input    map[string]interface{}
+		expected [2]string
+	}{
+		{
+			label: "Correct conversion",
+			input: map[string]interface{}{
+				"attribute_name":  "test",
+				"attribute_value": "value",
+			},
+			expected: [2]string{"test", "value"},
+		},
+		{
+			label: "Empty valuee",
+			input: map[string]interface{}{
+				"attribute_name":  "test2",
+				"attribute_value": "",
+			},
+			expected: [2]string{"test2", ""},
+		},
+		{
+			label: "Malformed attribute",
+			input: map[string]interface{}{
+				"attribute_nam":   "test123",
+				"attribute_value": "value123",
+			},
+			expected: [2]string{"", ""},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			var result [2]string
+			result[0], result[1] = convertAttribute(testCase.input)
+			if result != testCase.expected {
+				t.Fatalf("Expected %v, aquired %v", testCase.expected, result)
+			}
+		})
+	}
+}
+
+func TestExtractAttributes(t *testing.T) {
+	testCases := []struct {
+		label    string
+		input    map[string]interface{}
+		expected map[string]string
+	}{
+		{
+			label:    "Single variable",
+			expected: map[string]string{"test": "true"},
+			input: map[string]interface{}{"attributes": []map[string]interface{}{{
+				"attribute_name":  "test",
+				"attribute_value": "true",
+			}}},
+		},
+		{
+			label:    "Empty parameter",
+			expected: map[string]string{"test": ""},
+			input: map[string]interface{}{"attributes": []map[string]interface{}{{
+				"attribute_name":  "test",
+				"attribute_value": "",
+			}}},
+		},
+		{
+			label:    "Null entry",
+			input:    map[string]interface{}{"attributes": nil},
+			expected: make(map[string]string),
+		},
+		{
+			label: "Complex helm overrides",
+			/*
+				String with int will be later treated as int in helm.TemplateClient
+				(see helm/pkg/strvals/parser.go)
+				If unsure, convert type in helm chart like `{{ toString $value }}` or `{{ int $value }}`
+				(see http://masterminds.github.io/sprig/conversion.html)
+			*/
+			expected: map[string]string{"name": "{a, b, c}", "servers[0].port": "80"},
+			input: map[string]interface{}{"attributes": []map[string]interface{}{
+				{
+					"attribute_name":  "name",
+					"attribute_value": "{a, b, c}",
+				},
+				{
+					"attribute_name":  "servers[0].port",
+					"attribute_value": "80",
+				},
+			}},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			result := make(map[string]string)
+			extractAttributes(testCase.input, &result)
+			if !reflect.DeepEqual(result, testCase.expected) {
+				t.Fatalf("Unexpected result. Wanted '%v', retrieved '%v'",
+					testCase.expected, result)
+			}
+		})
+	}
+}
+
+func TestGetOverrideParams(t *testing.T) {
+
+	testCases := []struct {
+		label    string
+		expected map[string]string
+		input    brokerRequest
+	}{
+		{
+			label:    "Excessive parameters",
+			expected: map[string]string{"var1": "1", "var2": "2"},
+			input: brokerRequest{
+				SDNCDirectives: map[string]interface{}{
+					"attributes": []map[string]interface{}{
+						{
+							"attribute_name":  "var1",
+							"attribute_value": "1",
+						},
+						{
+							"attribute_name":  "var2",
+							"attribute_value": "2",
+						},
+						{
+							"attribute_name":  "k8s-rb-profile-name",
+							"attribute_value": "default",
+						},
+					},
+				},
+			},
+		},
+		{
+			label:    "Override variables",
+			expected: map[string]string{"empty": "", "sdnc": "sdnc", "user": "user", "oof": "oof"},
+			input: brokerRequest{
+				SDNCDirectives: map[string]interface{}{
+					"attributes": []map[string]interface{}{
+						{
+							"attribute_name":  "empty",
+							"attribute_value": "sdnc",
+						},
+						{
+							"attribute_name":  "sdnc",
+							"attribute_value": "sdnc",
+						},
+						{
+							"attribute_name":  "oof",
+							"attribute_value": "sdnc",
+						},
+					},
+				},
+				OOFDirectives: map[string]interface{}{
+					"attributes": []map[string]interface{}{
+						{
+							"attribute_name":  "oof",
+							"attribute_value": "oof",
+						},
+						{
+							"attribute_name":  "user",
+							"attribute_value": "oof",
+						},
+					},
+				},
+				UserDirectives: map[string]interface{}{
+					"attributes": []map[string]interface{}{
+						{
+							"attribute_name":  "user",
+							"attribute_value": "user",
+						},
+						{
+							"attribute_name":  "empty",
+							"attribute_value": "",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			result := testCase.input.getOverrideParams()
+			if !reflect.DeepEqual(result, testCase.expected) {
+				t.Fatalf("Unexpected result. Wanted '%v', retrieved '%v'",
+					testCase.expected, result)
+			}
+		})
+	}
+}
+
 func TestBrokerCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label        string

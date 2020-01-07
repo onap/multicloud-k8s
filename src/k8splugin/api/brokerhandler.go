@@ -16,11 +16,11 @@ package api
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 
 	"github.com/gorilla/mux"
 )
@@ -67,7 +67,95 @@ type brokerDELETEResponse struct {
 	WorkloadStatusReason map[string]interface{} `json:"workload_status_reason"`
 }
 
-// getUserDirectiveValue parses the following kind of json
+// Convert attribute passed in
+// {
+//  "attribute_name": "key",
+//  "attribute_value": "value",
+// }
+// format to
+// "key", "value" output.
+func convertAttribute(attribute map[string]interface{}) (name, value string) {
+
+	name, ok := attribute["attribute_name"].(string)
+	if !ok {
+		log.Error("Unable to extract property", log.Fields{
+			"property":  "attribute_name",
+			"directive": attribute,
+		})
+		return "", ""
+	}
+	value, ok = attribute["attribute_value"].(string)
+	if !ok {
+		log.Error("Unable to extract property", log.Fields{
+			"property":  "attribute_value",
+			"directive": attribute,
+		})
+		return name, ""
+	}
+	return
+}
+
+// Extract all attributes from given directives section and update provided
+// map with values extracted from there
+func extractAttributes(directives map[string]interface{}, result *map[string]string) {
+	extractedAttributes := make(map[string]string)
+
+	log.Info("Extracting attributes from directives", log.Fields{
+		"directives": directives,
+	})
+
+	tempAttributes, ok := directives["attributes"]
+	if !ok {
+		log.Error("Couldn't find attributes section in directives", log.Fields{
+			"directives": directives,
+		})
+		return
+	}
+	attributes, ok := tempAttributes.([]map[string]interface{})
+	if !ok {
+		log.Error("Unexpected type of directives", log.Fields{
+			"expected":   "[]map[string]interface{}",
+			"directives": tempAttributes,
+		})
+		return
+	}
+
+	for _, attribute := range attributes {
+		name, value := convertAttribute(attribute)
+		if name == "" {
+			continue
+		}
+		(*result)[name] = value
+	}
+	log.Info("Finished extracting attributes", log.Fields{
+		"attributes": extractedAttributes,
+	})
+}
+
+// Extract attributes from all directives, merge them according to priority and
+// convert to simple map format with removal of excessive keys
+func (b brokerRequest) getOverrideParams() map[string]string {
+	extractedAttributes := make(map[string]string)
+	for _, section := range [3]map[string]interface{}{b.SDNCDirectives, b.OOFDirectives, b.UserDirectives} {
+		extractAttributes(section, &extractedAttributes)
+	}
+	for key, _ := range extractedAttributes {
+		switch key {
+		case "vf_module_name", "k8s-rb-profile-name":
+			log.Info("Attribute matched ignored pattern", log.Fields{
+				"directive": key,
+				"action":    "skip",
+			})
+			delete(extractedAttributes, key)
+		}
+	}
+	log.Info("Finished extracting override params", log.Fields{
+		"overrides": extractedAttributes,
+	})
+	return extractedAttributes
+}
+
+// getAttributeValue parses the following kind of json
 // "user_attributes": {
 // 		"attributes": [
 // 		{
@@ -83,31 +171,25 @@ type brokerDELETEResponse struct {
 func (b brokerRequest) getAttributeValue(directives map[string]interface{}, inp string) string {
 	attributes, ok := directives["attributes"].([]interface{})
 	if !ok {
-		log.Println("Unable to cast attributes to []interface{}")
+		log.Error("Unable to cast directives", log.Fields{
+			"directives":  directives,
+			"casted_type": "[]interface{}",
+		})
 		return ""
 	}
 
 	for _, value := range attributes {
-
 		attribute, ok := value.(map[string]interface{})
 		if !ok {
-			log.Println("Unable to cast attribute to map[string]interface{}")
+			log.Error("Unable to cast directive", log.Fields{
+				"directive":   value,
+				"casted_type": "map[string]interface{}",
+			})
 			return ""
 		}
-
-		attributeName, ok := attribute["attribute_name"].(string)
-		if !ok {
-			log.Println("Unable to cast attribute_name to string")
-			return ""
-		}
-		if attributeName == inp {
-			attributevalue, ok := attribute["attribute_value"].(string)
-			if !ok {
-				log.Println("Unable to cast attribute_value to string")
-				return ""
-			}
-
-			return attributevalue
+		name, value := convertAttribute(attribute)
+		if name == inp {
+			return value
 		}
 	}
 	return ""
@@ -165,6 +247,7 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	instReq.Labels = map[string]string{
 		"vf_module_name": vfModuleName,
 	}
+	instReq.OverrideValues = req.getOverrideParams()
 
 	resp, err := b.client.Create(instReq)
 	if err != nil {

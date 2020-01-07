@@ -16,11 +16,11 @@ package api
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 
 	"github.com/gorilla/mux"
 )
@@ -33,16 +33,34 @@ type brokerInstanceHandler struct {
 }
 
 type brokerRequest struct {
-	GenericVnfID                 string                 `json:"generic-vnf-id"`
-	VFModuleID                   string                 `json:"vf-module-id"`
-	VFModuleModelInvariantID     string                 `json:"vf-module-model-invariant-id"`
-	VFModuleModelVersionID       string                 `json:"vf-module-model-version-id"`
-	VFModuleModelCustomizationID string                 `json:"vf-module-model-customization-id"`
-	OOFDirectives                map[string]interface{} `json:"oof_directives"`
-	SDNCDirectives               map[string]interface{} `json:"sdnc_directives"`
-	UserDirectives               map[string]interface{} `json:"user_directives"`
-	TemplateType                 string                 `json:"template_type"`
-	TemplateData                 map[string]interface{} `json:"template_data"`
+	GenericVnfID                 string       `json:"generic-vnf-id"`
+	VFModuleID                   string       `json:"vf-module-id"`
+	VFModuleModelInvariantID     string       `json:"vf-module-model-invariant-id"`
+	VFModuleModelVersionID       string       `json:"vf-module-model-version-id"`
+	VFModuleModelCustomizationID string       `json:"vf-module-model-customization-id"`
+	OOFDirectives                directive    `json:"oof_directives"`
+	SDNCDirectives               directive    `json:"sdnc_directives"`
+	UserDirectives               directive    `json:"user_directives"`
+	TemplateType                 string       `json:"template_type"`
+	TemplateData                 templateData `json:"template_data"`
+}
+
+type directive struct {
+	Attributes []attribute `json:"attributes"`
+}
+
+type attribute struct {
+	Key   string `json:"attribute_name"`
+	Value string `json:"attribute_value"`
+}
+
+type templateData struct {
+	StackName       string `json:"stack_name"` //Only this property is relevant (exported)
+	disableRollback string `json:"disable_rollback"`
+	environment     string `json:"environment"`
+	parameters      string `json:"parameters"`
+	template        string `json:"template"`
+	timeoutMins     string `json:"timeout_mins"`
 }
 
 type brokerPOSTResponse struct {
@@ -67,50 +85,16 @@ type brokerDELETEResponse struct {
 	WorkloadStatusReason map[string]interface{} `json:"workload_status_reason"`
 }
 
-// getUserDirectiveValue parses the following kind of json
-// "user_attributes": {
-// 		"attributes": [
-// 		{
-// 			"attribute_value": "foo",
-// 			"attribute_name": "bar"
-// 		},
-// 		{
-// 			"attribute_value": "value2",
-// 			"attribute_name": "name2"
-// 		}
-// 		]
-// }
-func (b brokerRequest) getAttributeValue(directives map[string]interface{}, inp string) string {
-	attributes, ok := directives["attributes"].([]interface{})
-	if !ok {
-		log.Println("Unable to cast attributes to []interface{}")
-		return ""
-	}
-
-	for _, value := range attributes {
-
-		attribute, ok := value.(map[string]interface{})
-		if !ok {
-			log.Println("Unable to cast attribute to map[string]interface{}")
-			return ""
-		}
-
-		attributeName, ok := attribute["attribute_name"].(string)
-		if !ok {
-			log.Println("Unable to cast attribute_name to string")
-			return ""
-		}
-		if attributeName == inp {
-			attributevalue, ok := attribute["attribute_value"].(string)
-			if !ok {
-				log.Println("Unable to cast attribute_value to string")
-				return ""
-			}
-
-			return attributevalue
+// Convert directives stored in broker request to map[string]string format with
+// merge including precedence provided
+func (b brokerRequest) convertDirectives() map[string]string {
+	extractedAttributes := make(map[string]string)
+	for _, section := range [3]directive{b.SDNCDirectives, b.OOFDirectives, b.UserDirectives} {
+		for _, attribute := range section.Attributes {
+			extractedAttributes[attribute.Key] = attribute.Value
 		}
 	}
-	return ""
+	return extractedAttributes
 }
 
 func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
@@ -119,6 +103,10 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 
 	var req brokerRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
+	log.Info("Broker API Payload", log.Fields{
+		"Body":    r.Body,
+		"Payload": req,
+	})
 	switch {
 	case err == io.EOF:
 		http.Error(w, "Body empty", http.StatusBadRequest)
@@ -144,15 +132,24 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	profileName := req.getAttributeValue(req.SDNCDirectives, "k8s-rb-profile-name")
-	if profileName == "" {
-		http.Error(w, "k8s-rb-profile-name is missing from sdnc-directives", http.StatusBadRequest)
+	if req.GenericVnfID == "" {
+		http.Error(w, "generic-vnf-id is empty", http.StatusBadRequest)
+		return
+	}
+	if req.VFModuleID == "" {
+		http.Error(w, "vf-module-id is empty", http.StatusBadRequest)
 		return
 	}
 
-	vfModuleName := req.getAttributeValue(req.SDNCDirectives, "vf_module_name")
-	if vfModuleName == "" {
-		http.Error(w, "vf_module_name is missing from sdnc-directives", http.StatusBadRequest)
+	if req.TemplateData.StackName == "" {
+		http.Error(w, "stack_name is missing from template_data", http.StatusBadRequest)
+		return
+	}
+
+	directives := req.convertDirectives()
+	profileName, ok := directives["k8s-rb-profile-name"]
+	if !ok {
+		http.Error(w, "k8s-rb-profile-name is missing from directives", http.StatusBadRequest)
 		return
 	}
 
@@ -163,9 +160,15 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	instReq.ProfileName = profileName
 	instReq.CloudRegion = cloudRegion
 	instReq.Labels = map[string]string{
-		"vf_module_name": vfModuleName,
+		"k8s.multicloud.onap.org/generic-vnf-id": req.GenericVnfID,
+		"k8s.multicloud.onap.org/vf-module-id":   req.VFModuleID,
+		"k8s.multicloud.onap.org/stack-name":     req.TemplateData.StackName,
 	}
+	instReq.OverrideValues = directives
 
+	log.Info("Instance API Payload", log.Fields{
+		"payload": instReq,
+	})
 	resp, err := b.client.Create(instReq)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -178,6 +181,9 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		TemplateResponse: resp.Resources,
 		WorkloadStatus:   "CREATE_COMPLETE",
 	}
+	log.Info("Broker API Response", log.Fields{
+		"response": brokerResp,
+	})
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -205,6 +211,9 @@ func (b brokerInstanceHandler) getHandler(w http.ResponseWriter, r *http.Request
 		WorkloadStatus: "CREATE_COMPLETE",
 	}
 
+	log.Info("Broker API Response", log.Fields{
+		"response": brokerResp,
+	})
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(brokerResp)
@@ -214,12 +223,12 @@ func (b brokerInstanceHandler) getHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-// getHandler retrieves information about an instance via the ID
+// findHandler retrieves information about an instance via the ID
 func (b brokerInstanceHandler) findHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	//name is an alias for vf_module_name from the so adapter
+	//name is an alias for stack-name from the so adapter
 	name := vars["name"]
-	responses, _ := b.client.Find("", "", "", map[string]string{"vf_module_name": name})
+	responses, _ := b.client.Find("", "", "", map[string]string{"k8s.multicloud.onap.org/stack-name": name})
 
 	brokerResp := brokerGETResponse{
 		TemplateType:   "heat",
@@ -244,6 +253,9 @@ func (b brokerInstanceHandler) findHandler(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
+	log.Info("Broker API Response", log.Fields{
+		"response": brokerResp,
+	})
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	err := json.NewEncoder(w).Encode(brokerResp)
@@ -269,6 +281,9 @@ func (b brokerInstanceHandler) deleteHandler(w http.ResponseWriter, r *http.Requ
 		WorkloadID:     instanceID,
 		WorkloadStatus: "DELETE_COMPLETE",
 	}
+	log.Info("Broker API Response", log.Fields{
+		"response": brokerResp,
+	})
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)

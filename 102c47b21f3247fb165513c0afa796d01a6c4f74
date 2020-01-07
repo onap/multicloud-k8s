@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46be0676_f6e64cbe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-01-07T17:41:03Z",
+      "side": 1,
+      "message": "Please add more detail what the tests are doing. Aslo add details on how to set up the environment to run these tests and what is the expected output",
+      "revId": "102c47b21f3247fb165513c0afa796d01a6c4f74",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+openapi: 3.0.2
+info:
+  title: HPA Placement Controller - Placement Intent
+  version: "1.0"
+servers:
+- url: https://{NODE_IP}:30280/api/multicloud-k8s/v2/project/{project-name}/rb/{rb-name}/{rb-version}/hpa-placement-intent
+paths:
+  /test:
+    get:
+      responses:
+        200:
+          description: OK
+components:
+  schemas: {}

@@ -1,26 +1,27 @@
 module github.com/onap/multicloud-k8s/src/orchestrator
 
 require (
-	github.com/docker/engine v0.0.0-20190620014054-c513a4c6c298
-	github.com/ghodss/yaml v1.0.0
-	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/google/go-cmp v0.2.0 // indirect
+	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.6.2
-	github.com/hashicorp/consul v1.4.0
-	github.com/json-iterator/go v1.1.8 // indirect
-	github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20191115005109-f168ebb73d8d // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
-	go.etcd.io/etcd v3.3.12+incompatible
+	github.com/stretchr/testify v1.4.0 // indirect
+	github.com/tidwall/pretty v0.0.0-20180105212114-65a9db5fad51 // indirect
+	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
+	github.com/xdg/stringprep v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.0.0
+	golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4 // indirect
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
-	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
-	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
-	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
-	k8s.io/helm v2.14.3+incompatible
-	k8s.io/klog v1.0.0 // indirect
+	golang.org/x/sys v0.0.0-20190616124812-15dcb6c0061f // indirect
+	golang.org/x/text v0.3.2 // indirect
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
 
 replace (
@@ -32,3 +33,5 @@ replace (
 	k8s.io/client-go => k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.0.0-20190409023720-1bc0c81fa51d
 )
+
+go 1.13

@@ -1,0 +1,41 @@
+syntax = "proto3";
+ 
+service controller {
+    // Placement Controllers
+    rpc UpdateSites(SitesRequest) returns (SitesResponse) {
+    }
+ 
+    // HPA Placement Controller
+    rpc StoreFeatures(StoreFeaturesRequest) returns (StoreFeaturesResponse) {
+    }
+ 
+    // Traffic Controller
+    // TBD
+}
+ 
+message SitesRequest {
+    string intent_group = 1;
+    string rb_name = 2;
+    string rb_version = 3;
+    string profile_name = 4;
+    string project_name = 5;
+    string app_context = 6;
+}
+ 
+message SitesResponse {
+    bool app_context_updated = 1;
+}
+ 
+ 
+message StoreFeaturesRequest {
+    string cluster_name = 1;
+    repeated Feature features = 2;
+}
+ 
+message Feature {
+    string feature = 1;
+}
+ 
+message StoreFeaturesResponse {
+    bool features_stored = 1;
+}

@@ -1,0 +1,32 @@
+syntax = "proto3";
+ 
+service controller {
+    // Placement Controllers
+    rpc UpdateSites(SitesRequest) returns (SitesResponse) {
+    }
+ 
+    // HPA Placement Controller
+    rpc UpdateFeatures(UpdateFeaturesRequest) returns (UpdateFeaturesResponse) {
+    }
+ 
+    // Traffic Controller
+    // TBD
+}
+ 
+message SitesRequest {
+    string intent_group = 1;
+    string app_context = 2;
+}
+ 
+message SitesResponse {
+    bool app_context_updated = 1;
+}
+ 
+ 
+message UpdateFeaturesRequest {
+    string cluster_name = 1;
+}
+ 
+message UpdateFeaturesResponse {
+    bool features_stored = 1;
+}

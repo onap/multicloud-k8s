@@ -1,0 +1,96 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "sink.fullname" . }}
+  labels:
+    app: {{ template "sink.name" . }}
+    chart: {{ template "sink.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "sink.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "sink.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        app: {{ template "sink.name" . }}
+        release: {{ template "sink.name" . }}
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
+        VirtletVCPUCount: "2"
+        VirtletCloudInitUserData: |
+          ssh_pwauth: True
+          users:
+          - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            lock_passwd: false
+            passwd: "$6$rounds=4096$wPs4Hz4tfs$a8ssMnlvH.3GX88yxXKF2cKMlVULsnydoOKgkuStTErTq2dzKZiIx9R/pPWWh5JLxzoZEx7lsSX5T2jW5WISi1"
+          runcmd:
+            - export demo_artifacts_version={{ .Values.global.demoArtifactsVersion }}
+            - export vipsecB_private_ip_0={{ .Values.global.vipsecBPrivateIp0 }}
+            - export vsn_private_ip_0={{ .Values.global.vsnPrivateIp0 }}
+            - export protected_clientB_network_name={{ .Values.global.protectedClientBNetworkName }}
+            - export dcae_collector_ip={{ .Values.global.dcaeCollectorIp }}
+            - export dcae_collector_port={{ .Values.global.dcaeCollectorPort }}
+            - export protected_clientB_net_gw={{ .Values.global.protectedClientBNetGw }}
+            - export protected_clientB_net_cidr={{ .Values.global.protectedClientBNetCidr }}
+            - export packet_src={{ .Values.global.PacketSourceIP }}
+            - export packet_dst={{ .Values.global.PacketDestinationIP }}
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vIPSec/sink | sudo -E bash
+        VirtletRootVolumeSize: 5Gi
+        kubernetes.io/target-runtime: virtlet.cloud
+        k8s.v1.cni.cncf.io/networks: '[{"name": {{ .Values.global.ovnMultusNetworkName | quote }}, "namespace": "default"}]'
+        k8s.plugin.opnfv.org/nfn-network: '{"type": "ovn4nfv", "interface":
+            [{ "name": {{ .Values.global.protectedClientBNetworkName | quote }}, "ipAddress": {{.Values.global.vsnPrivateIp0 | quote }}, "interface": "eth1", "defaultGateway": "false"},
+             { "name": {{ .Values.global.onapPrivateNetworkName | quote }}, "ipAddress": {{ .Values.global.vsnPrivateIp1 | quote }}, "interface": "eth2", "defaultGateway": "false"}]}'
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: extraRuntime
+                operator: In
+                values:
+                - virtlet
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.repository }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        tty: true
+        stdin: true
+        ports:
+          - name: http
+            containerPort: 667
+            protocol: TCP
+        #livenessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: http
+        #readinessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: http
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

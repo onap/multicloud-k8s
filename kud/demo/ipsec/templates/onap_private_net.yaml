@@ -1,0 +1,12 @@
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: Network
+metadata:
+  name: {{ .Values.global.onapPrivateNetworkName }}
+spec:
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - name: subnet1
+    subnet: {{ .Values.global.onapPrivateNetCidr }}
+    gateway: {{ .Values.global.onapPrivateNetGw }}
+
+

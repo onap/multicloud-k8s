@@ -1,0 +1,97 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "cIPsec.fullname" . }}
+  labels:
+    app: {{ template "cIPsec.name" . }}
+    chart: {{ template "cIPsec.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "cIPsec.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "cIPsec.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
+        VirtletVCPUCount: "4"
+        VirtletCloudInitUserData: |
+          ssh_pwauth: True
+          users:
+          - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            lock_passwd: false
+            passwd: "$6$rounds=4096$wPs4Hz4tfs$a8ssMnlvH.3GX88yxXKF2cKMlVULsnydoOKgkuStTErTq2dzKZiIx9R/pPWWh5JLxzoZEx7lsSX5T2jW5WISi1"
+          runcmd:
+            - export demo_artifacts_version={{ .Values.global.demoArtifactsVersion }}
+            - export vipsecA_private_ip_0={{ .Values.global.vipsecAPrivateIp0 }}
+            - export vipsecA_private_ip_2={{ .Values.global.vipsecAPrivateIp2 }}
+            - export vpg_private_ip_0={{ .Values.global.vpgPrivateIp0 }}
+            - export protected_clientA_network_name={{ .Values.global.protectedClientANetworkName }}
+            - export ipsec_private_network_name={{ .Values.global.ipsecPrivateNetworkName }}
+            - export dcae_collector_ip={{ .Values.global.dcaeCollectorIp }}
+            - export dcae_collector_port={{ .Values.global.dcaeCollectorPort }}
+            - export protected_clientA_net_gw={{ .Values.global.protectedClientANetGw }}
+            - export protected_clientA_net_cidr={{ .Values.global.protectedClientANetCidr }}
+            - export ipsec_private_net_gw={{ .Values.global.ipsecPrivateNetGwIp }}
+            - export ipsec_private_net_cidr={{ .Values.global.ipsecPrivateNetCidr }}
+            - export input_interface_ip={{ .Values.global.vipsecAPrivateIp0 }}
+            - export output_interface_ip={{ .Values.global.vipsecAPrivateIp2 }}
+            - export packet_src={{ .Values.global.PacketSourceIP }}
+            - export packet_dst={{ .Values.global.PacketDestinationIP }}
+            - export remote_tunnel_ip={{ .Values.global.vipsecBPrivateIp2 }}
+            - export route_interface={{ .Values.global.vipsecBPrivateIp2 }}
+            - export traffic_direction={{ .Values.common.traffic_direction }}
+            - export qat_enabled={{ .Values.global.qatEnabled }}
+            - export sriov_enabled={{ .Values.global.sriovEnabled }}
+            - export remote_gateway={{ .Values.common.remote_gateway }}
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vIPSec/ipsec | sudo -E bash
+        VirtletRootVolumeSize: 5Gi
+        kubernetes.io/target-runtime: virtlet.cloud
+        k8s.v1.cni.cncf.io/networks: '[{"name": {{ .Values.global.ovnMultusNetworkName | quote }}, "namespace": "default"}, {"name": {{ .Values.global.sriovMultusNetworkName | quote }} }]'
+        k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [
+           { "name": {{ .Values.global.protectedClientANetworkName | quote }}, "ipAddress": {{ .Values.global.vipsecAPrivateIp0 | quote }}, "interface": "eth1", "defaultGateway": "false" },
+           { "name": {{ .Values.global.onapPrivateNetworkName | quote }}, "ipAddress": {{ .Values.global.vipsecAPrivateIp1 | quote }}, "interface": "eth2", "defaultGateway": "false" }]}'
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: extraRuntime
+                operator: In
+                values:
+                - virtlet
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.repository }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        tty: true
+        stdin: true
+        securityContext:
+          privileged: true
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+

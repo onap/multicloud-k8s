@@ -1,0 +1,109 @@
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "remote-ipsec-gateway.fullname" . }}
+  labels:
+    app: {{ template "remote-ipsec-gateway.name" . }}
+    chart: {{ template "remote-ipsec-gateway.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "remote-ipsec-gateway.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "remote-ipsec-gateway.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        VirtletLibvirtCPUSetting: |
+          mode: host-model
+        VirtletVCPUCount: "4"
+        VirtletCloudInitUserData: |
+          ssh_pwauth: True
+          users:
+          - name: admin
+            gecos: User
+            primary-group: admin
+            groups: users
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            lock_passwd: false
+            passwd: "$6$rounds=4096$wPs4Hz4tfs$a8ssMnlvH.3GX88yxXKF2cKMlVULsnydoOKgkuStTErTq2dzKZiIx9R/pPWWh5JLxzoZEx7lsSX5T2jW5WISi1"
+          runcmd:
+            - export demo_artifacts_version={{ .Values.global.demoArtifactsVersion }}
+            - export vipsecB_private_ip_0={{ .Values.global.vipsecBPrivateIp0 }}
+            - export vipsecB_private_ip_2={{ .Values.global.vipsecBPrivateIp2 }}
+            - export vsn_private_ip_0={{ .Values.global.vsnPrivateIp0 }}
+            - export protected_clientB_network_name={{ .Values.global.protectedClientBNetworkName }}
+            - export ipsec_private_network_name={{ .Values.global.ipsecPrivateNetworkName }}
+            - export dcae_collector_ip={{ .Values.global.dcaeCollectorIp }}
+            - export dcae_collector_port={{ .Values.global.dcaeCollectorPort }}
+            - export protected_clientB_net_gw={{ .Values.global.protectedClientBNetGw }}
+            - export protected_clientB_net_cidr={{ .Values.global.protectedClientBNetCidr }}
+            - export ipsec_private_net_gw={{ .Values.global.ipsecPrivateNetGwIp }}
+            - export ipsec_private_net_cidr={{ .Values.global.ipsecPrivateNetCidr }}
+            - export input_interface_ip={{ .Values.global.vipsecBPrivateIp0 }}
+            - export output_interface_ip={{ .Values.global.vipsecBPrivateIp2 }}
+            - export packet_src={{ .Values.global.PacketSourceIP }}
+            - export packet_dst={{ .Values.global.PacketDestinationIP }}
+            - export local_tunnel_ip={{ .Values.global.vipsecAPrivateIp2 }}
+            - export remote_tunnel_ip={{ .Values.global.vipsecBPrivateIp2 }}
+            - export route_interface={{ .Values.global.vsnPrivateIp0 }}
+            - export traffic_direction={{ .Values.common.traffic_direction }}
+            - export remote_gateway={{ .Values.common.remote_gateway }}
+            - export qat_enabled={{ .Values.global.qat_enabled }}
+            - export sriov_enabled={{ .Values.global.sriov_enabled }}
+            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vIPSec/remote_ipsec | sudo -E bash
+        kubernetes.io/target-runtime: virtlet.cloud
+        k8s.v1.cni.cncf.io/networks: '[{"name": {{ .Values.global.ovnMultusNetworkName | quote }}, "namespace": "default"}, {"name": {{ .Values.global.sriovMultusNetworkName | quote }} }]'
+        k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [
+           { "name": {{ .Values.global.protectedClientBNetworkName | quote }}, "ipAddress": {{ .Values.global.vipsecBPrivateIp0 | quote }}, "interface": "eth1", "defaultGateway": "false" },
+           { "name": {{ .Values.global.onapPrivateNetworkName | quote }}, "ipAddress": {{ .Values.global.vipsecBPrivateIp1 | quote }}, "interface": "eth2", "defaultGateway": "false" }]}'
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: extraRuntime
+                operator: In
+                values:
+                - virtlet
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.repository }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        #ports:
+        #  - name: http
+        #    containerPort: 80
+        #    protocol: TCP
+        #livenessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: http
+        #readinessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: http
+        tty: true
+        stdin: true
+        securityContext:
+          privileged: true
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

@@ -1,18 +1,20 @@
 package main
 
 import (
+        "encoding/json"
+        con "github.com/VamshiKrishnaNemalikonda/GO/stringutil/constants"
+        corev1 "k8s.io/api/core/v1"
+        "os"
+        "os/signal"
+        "reflect"
+
         "bytes"
         "crypto/tls"
         "fmt"
         "io/ioutil"
         "net/http"
-        "reflect"
-        //"os"
-        //"os/signal"
-        //"time"
-        "encoding/json"
-        con "github.com/onap/multicloud-k8s/src/statusquery/constants"
-        corev1 "k8s.io/api/core/v1"
+        "strconv"
+        "time"
 )
 
 type InstanceRequest struct {
@@ -50,7 +52,7 @@ type PodInfoToAAI struct {
         VserverName2               string
         ProvStatus                 string
         I3InterfaceIPv4Address     string
-        I3InterfaceIPvPrefixLength string
+        I3InterfaceIPvPrefixLength int32
 }
 
 type RData struct {
@@ -59,10 +61,10 @@ type RData struct {
 }
 
 type RelationList struct {
-        RelatedTo         string  `json:"related-to"`
-        RelationshipLabel string  `json:"relationship-label"`
-        RelatedLink       string  `json:"related-link"`
-        RelationshipData  []RData `json:"relationship-data"`
+        RelatedTo         string     `json:"related-to"`
+        RelatedLink       string     `json:"related-link"`
+        RelationshipData  []RData    `json:"relationship-data"`
+        RelatedToProperty []Property `json:"related-to-property"`
 }
 
 type CRegion struct {
@@ -92,19 +94,43 @@ type Tenant struct {
         Tenants map[string][]TenantInfo `json:"tenants"`
 }
 
+type Property struct {
+        PropertyKey   string `json:"property-key"`
+        PropertyValue string `json:"property-value"`
+}
+
+type VFModule struct {
+        VFModuleId           string                    `json:"vf-module-id"`
+        VFModuleName         string                    `json:"vf-module-name"`
+        HeatStackId          string                    `json:"heat-stack-id"`
+        OrchestrationStatus  string                    `json:"orchestration-status"`
+        ResourceVersion      string                    `json:"resource-version"`
+        AutomatedAssignment  string                    `json:"automated-assignment"`
+        IsBaseVfModule       string                    `json:"is-base-vf-module"`
+        RelationshipList     map[string][]RelationList `json:"relationship-list"`
+        ModelInvariantId     string                    `json:"model-invariant-id"`
+        ModelVersionId       string                    `json:"model-version-id"`
+        ModelCustomizationId string                    `json:"model-customization-id"`
+        ModuleIndex          string                    `json:"module-index"`
+}
+
+type VFModules struct {
+        VFModules []VFModule `json:"vf-module"`
+}
+
 func QueryAAI() {
 
-        fmt.Println("executing QueryStatusAPI")
+        //logrus.Debug("executing QueryStatusAPI")
 
         instanceID := ListInstances()
         instanceStatus := CheckInstanceStatus(instanceID)
         podInfo := ParseStatusInstanceResponse(instanceStatus)
 
-        for _, reqData := range podInfo {
+        for {
 
-                PushPodInfoToAAI(reqData)
+                PushPodInfoToAAI(podInfo, "vnf-id", "vfm-id")
+                time.Sleep(360000 * time.Second)
 
-                //time.Sleep(360000 * time.Second)
         }
 
 }
@@ -112,27 +138,28 @@ func QueryAAI() {
 //righ now ListInstances method returning only once instance information - TBD, to loop for all the resources created
 func ListInstances() []string {
 
-        fmt.Println("ListInstances")
+        //logrus.Debug("ListInstances")
 
-        instancelist := con.MK8S_URI + ":" + con.MK8S_Port + con.MK8S_Endpoint
+        instancelist := con.MK8S_URI + ":" + con.MK8S_Port + con.MK8S_EP
         req, err := http.NewRequest(http.MethodGet, instancelist, nil)
         if err != nil {
-                panic(err)
+
+                //logrus.Error("Something went wrong while listing resources")
         }
 
         client := http.DefaultClient
         res, err := client.Do(req)
 
         if err != nil {
-                fmt.Printf("Something went wrong while listing resources")
+                //logrus.Error("Something went wrong while listing resources")
         }
-        fmt.Println("List instances request processed")
+        //logrus.Debug("List instances request processed")
 
         /*body, err := ioutil.ReadAll(res.Body)
-        if err != nil {
-                panic(err)
-        }
-        fmt.Printf("%v", string(body))*/
+          if err != nil {
+                  panic(err)
+          }
+          fmt.Printf("%v", string(body))*/
 
         defer res.Body.Close()
 
@@ -149,7 +176,7 @@ func ListInstances() []string {
 // Process the output of list instances to return specific instance ID
 func parseListInstanceResponse(rlist []InstanceMiniResponse) []string {
 
-        fmt.Printf("Executing parseListInstanceResponse - to parse response")
+        //logrus.Debug("Executing parseListInstanceResponse - to parse response")
 
         var resourceIdList []string
 
@@ -179,17 +206,20 @@ func CheckInstanceStatus(instanceList []string) []InstanceStatus {
 
 func checkStatusForEachInstance(instanceID string) InstanceStatus {
 
-        instancelist := con.MK8S_URI + ":" + con.MK8S_Port + con.MK8S_Endpoint + instanceID + "/status"
+        //logrus.Debug("Executing checkStatusForEachInstance")
+
+        instancelist := con.MK8S_URI + ":" + con.MK8S_Port + con.MK8S_EP + instanceID + "/status"
 
         req, err := http.NewRequest(http.MethodGet, instancelist, nil)
         if err != nil {
-                panic(err)
+                //logrus.Error("Error while building http request")
         }
 
         client := http.DefaultClient
         resp, err := client.Do(req)
         if err != nil {
-                panic(err)
+
+                //logrus.Error("Error while making rest request")
         }
 
         defer resp.Body.Close()
@@ -209,11 +239,14 @@ func checkStatusForEachInstance(instanceID string) InstanceStatus {
 
 func ParseStatusInstanceResponse(instanceStatusses []InstanceStatus) []PodInfoToAAI {
 
-        fmt.Printf("Executing ProcessInstanceRequest - to parse Status API response")
+        //logrus.Debug("Executing ProcessInstanceRequest - to parse Status API response")
+
+        var infoToAAI []PodInfoToAAI
 
         for _, instanceStatus := range instanceStatusses {
 
-                var pita PodInfoToAAI
+                var podInfo PodInfoToAAI
+
                 sa := reflect.ValueOf(&instanceStatus).Elem()
                 typeOf := sa.Type()
                 for i := 0; i < sa.NumField(); i++ {
@@ -224,7 +257,7 @@ func ParseStatusInstanceResponse(instanceStatusses []InstanceStatus) []PodInfoTo
                                 fmt.Printf("it's a Request object \n")
                                 request := f.Interface()
                                 if ireq, ok := request.(InstanceRequest); ok {
-                                        pita.VserverName2 = ireq.ProfileName
+                                        podInfo.VserverName2 = ireq.ProfileName
                                 } else {
                                         fmt.Printf("it's not a InstanceRequest \n")
                                 }
@@ -235,8 +268,8 @@ func ParseStatusInstanceResponse(instanceStatusses []InstanceStatus) []PodInfoTo
                                 ready := f.Interface()
                                 if pss, ok := ready.([]PodStatus); ok {
                                         for _, ps := range pss {
-                                                pita.VserverName = ps.Name
-                                                pita.ProvStatus = ps.Namespace
+                                                podInfo.VserverName = ps.Name
+                                                podInfo.ProvStatus = ps.Namespace
                                                 //fmt.Printf("%v\n", ps.IPAddresses)
                                         }
 
@@ -246,15 +279,18 @@ func ParseStatusInstanceResponse(instanceStatusses []InstanceStatus) []PodInfoTo
                         }
                 }
 
+                infoToAAI = append(infoToAAI, podInfo)
+
         }
 
-        return []PodInfoToAAI{}
+        return infoToAAI
 
 }
 
-func PushPodInfoToAAI(podInfo PodInfoToAAI) {
+func PushPodInfoToAAI(podInfoToAAI []PodInfoToAAI, vnfID, vfmID string) {
 
-        fmt.Println("executing PushPodInfoToAAI")
+        //logrus.Debug("Executing PushPodInfoToAAI ")
+
         var cloudOwner string
         var cloudRegion string
 
@@ -267,55 +303,64 @@ func PushPodInfoToAAI(podInfo PodInfoToAAI) {
                         cloudRegion = cregion.CloudRegionId
 
                 }
+
         }
 
         tenantId := getTenant(cloudOwner, cloudRegion)
 
-        //Need to parse the podInfoToAAI to input AAI api.
-        fmt.Printf("You can check podInfoToAAI structure details below")
-        fmt.Printf(podInfo.VserverName)
-        fmt.Printf(podInfo.VserverName2)
-        fmt.Printf(podInfo.ProvStatus)
-        fmt.Printf(podInfo.I3InterfaceIPv4Address)
+        if &tenantId == nil {
 
-        //Structure of payload we've as part of AAI request
-        /*{
-                          "vserver-id": "example",
-                          "vserver-name": "POD-NAME",
-                          "vserver-name2": "Relese-name/Profile-name of the POD (Labels:release=profile-k8s)",
-                          "prov-status": "NAMESPACEofthPOD",
-                          "vserver-selflink": "example-vserver-selflink-val-57201",
-                          "in-maint": true,
-                          "is-closed-loop-disabled": true,
-                          "l-interfaces": {
-                                          "l-interface": [{
-                                                          "interface-name": "example-interface-name-val-20080",
-                                                                                                        "is-port-mirrored": true,
-                                                                                                        "in-maint": true,
-                                                                                                        "is-ip-unnumbered": true,
-                                                          "l3-interface-ipv4-address-list": [{
-                                                                          "l3-interface-ipv4-address": "IP_Address",
-                                                                          "l3-interface-ipv4-prefix-length": "PORT"
-                                                          }]
-                                          }]
-                          }
-          } */
+                //logrus.Error("Tenant information not found")
 
-        payload := "{\"vserver-name\":" + "\"" + podInfo.VserverName + "\"" + ", \"vserver-name2\":" + "\"" + podInfo.VserverName2 + "\"" + ", \"prov-status\":" + "\"" + podInfo.ProvStatus + "\"" + ",\"vserver-selflink\":" + "\"example-vserver-selflink-val-57201\", \"l-interfaces\": {\"l-interface\": [{\"interface-name\": \"example-interface-name-val-20080\",\"is-port-mirrored\": true,\"in-maint\": true,\"is-ip-unnumbered\": true,\"l3-interface-ipv4-address-list\": [{\"l3-interface-ipv4-address\":" + "\"" + podInfo.I3InterfaceIPv4Address + "\"" + ",\"l3-interface-ipv4-prefix-length\":" + "\"" + podInfo.I3InterfaceIPvPrefixLength + "\"" + "}]}]}}"
+        }
+
+        var relList []RelationList
+
+        for _, eachPod := range podInfoToAAI {
+
+                vserverID := pushToAAI(eachPod, vnfID, cloudOwner, cloudRegion, tenantId)
+
+                rl := buildRelationshipDataForVFModule(eachPod.VserverName, vserverID, cloudOwner, cloudRegion, tenantId)
+                relList = append(relList, rl)
+        }
+
+        linkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId, relList)
+
+}
+
+func buildRelationshipDataForVFModule(vserverName, vserverID, cloudOwner, cloudRegion, tenantId string) RelationList {
+
+        //logrus.Debug("Executing buildRelationshipDataForVFModule")
+
+        rl := RelationList{"vserver", "/aai/v14/cloud-infrastructure/cloud-regions/cloud-region/" + cloudOwner + "/" + cloudRegion + "/tenants/tenant/" + tenantId + "/vservers/vserver/" + vserverID, []RData{RData{"cloud-region.cloud-owner", cloudOwner},
+                RData{"cloud-region.cloud-region-id", cloudRegion},
+                RData{"tenant.tenant-id", tenantId},
+                RData{"vserver.vserver-id", vserverID}},
+                []Property{Property{"vserver.vserver-name", vserverName}}}
+
+        return rl
+
+}
+
+func pushToAAI(podInfo PodInfoToAAI, vnfID, cloudOwner, cloudRegion, tenantId string) string {
+
+        //logrus.Debug("Executing pushToAAI")
+
+        payload := "{\"vserver-name\":" + "\"" + podInfo.VserverName + "\"" + ", \"vserver-name2\":" + "\"" + podInfo.VserverName2 + "\"" + ", \"prov-status\":" + "\"" + podInfo.ProvStatus + "\"" + ",\"vserver-selflink\":" + "\"example-vserver-selflink-val-57201\", \"l-interfaces\": {\"l-interface\": [{\"interface-name\": \"example-interface-name-val-20080\",\"is-port-mirrored\": true,\"in-maint\": true,\"is-ip-unnumbered\": true,\"l3-interface-ipv4-address-list\": [{\"l3-interface-ipv4-address\":" + "\"" + podInfo.I3InterfaceIPv4Address + "\"" + ",\"l3-interface-ipv4-prefix-length\":" + "\"" + strconv.FormatInt(int64(podInfo.I3InterfaceIPvPrefixLength), 10) + "\"" + "}]}]}}"
+
+        //logrus.Debug("payload to A&AI request : " + payload)
 
         http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-        url := con.AAI_URI + ":" + con.AAI_Port + con.AAI_Endpoint + "cloud-region/" + cloudOwner + "/" + cloudRegion + "/tenants/tenant/" + tenantId + "/vservers/vserver/" + podInfo.VserverName
+        //url := "https://10.212.1.30:30233/aai/v14/cloud-infrastructure/cloud-regions/cloud-region/CloudOwner/RegionOne/tenants/tenant/0b82ba13bb88428bbfd14f0c2c9177c7/vservers/vserver/" + podInfo.VserverName
 
-        fmt.Println(payload)
-        fmt.Println(url)
+        url := con.AAI_URI + ":" + con.AAI_Port + con.AAI_EP + "cloud-region/" + cloudOwner + "/" + cloudRegion + "/tenants/tenant/" + tenantId + "/vservers/vserver/" + podInfo.VserverName
 
         var jsonStr = []byte(payload)
 
         req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonStr))
 
         if err != nil {
-                fmt.Printf("error while creating new request to AAI -> ")
-                //fmt.Printf(err)
+                //logrus.Error("Error while constructing Vserver PUT request")
         }
         req.Header.Set("X-FromAppId", "SO")
         req.Header.Set("Content-Type", "application/json")
@@ -326,27 +371,27 @@ func PushPodInfoToAAI(podInfo PodInfoToAAI) {
         client := &http.Client{}
         resp, err := client.Do(req)
         if err != nil {
-                fmt.Printf("error while pushing to AAI -> ")
-                //logrus.Errorln(err)
+                //logrus.Error("Error while executing Vserver PUT api")
         }
         defer resp.Body.Close()
 
-        fmt.Println("response Status:" + resp.Status)
-        //log.Debug("response Headers:" + resp.Header)
-        body, err := ioutil.ReadAll(resp.Body)
-        if err != nil {
-        }
-        fmt.Printf("response Body:" + string(body))
+        //_ , err := ioutil.ReadAll(resp.Body)
+        //if err != nil {
+        //logrus.Error("Error while reading Vserver PUT response")
 
+        //}
+        //logrus.Debug("response Body:" + string(body))
+
+        return podInfo.VserverName
 }
 
 func getCloudRegion() CloudRegion {
 
-        fmt.Println("executing getCloudRegion")
+        //logrus.Debug("executing getCloudRegion")
 
         http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
-        apiToCR := con.AAI_URI + ":" + con.AAI_Port + con.AAI_Endpoint
+        apiToCR := con.AAI_URI + ":" + con.AAI_Port + con.AAI_EP
 
         fmt.Println(apiToCR)
 
@@ -392,9 +437,11 @@ func getCloudRegion() CloudRegion {
 
 func getTenant(cloudOwner, cloudRegion string) string {
 
+        //logrus.Debug("Executing getTenant")
+
         http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
-        apiToCR := con.AAI_URI + ":" + con.AAI_Port + con.AAI_Endpoint + "cloud-region/" + cloudOwner + "/" + cloudRegion + "?depth=all"
+        apiToCR := con.AAI_URI + ":" + con.AAI_Port + con.AAI_EP + "cloud-region/" + cloudOwner + "/" + cloudRegion + "?depth=all"
         req, err := http.NewRequest(http.MethodGet, apiToCR, nil)
         if err != nil {
                 panic(err)
@@ -442,6 +489,137 @@ func getTenant(cloudOwner, cloudRegion string) string {
         }
 
         return ""
+
+}
+
+func linkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relList []RelationList) {
+
+        //logrus.Debug("Executing linkVserverVFM")
+
+        http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
+        apiToCR := con.AAI_URI + ":" + con.AAI_Port + con.AAI_EP + con.AAI_NEP + "/" + vnfID + "/vf-modules"
+        req, err := http.NewRequest(http.MethodGet, apiToCR, nil)
+        if err != nil {
+                //logrus.Error("Error while constructing VFModules GET api request")
+
+        }
+
+        req.Header.Set("X-FromAppId", "SO")
+        req.Header.Set("Content-Type", "application/json")
+        req.Header.Set("Accept", "application/json")
+        req.Header.Set("X-TransactionId", "get_aai_subscr")
+        req.Header.Set("Authorization", "Basic QUFJOkFBSQ==")
+
+        client := http.DefaultClient
+        res, err := client.Do(req)
+
+        if err != nil {
+                //logrus.Error("Error while executing VFModules GET api")
+        }
+
+        //fmt.Printf("%v", string(body))
+
+        defer res.Body.Close()
+
+        //crJson := json.NewDecoder(res.Body)
+        //var rlist []InstanceMiniResponse
+        //err = decoder.Decode(&rlist)
+
+        body, err := ioutil.ReadAll(res.Body)
+        if err != nil {
+
+                //logrus.Error("Error while reading vfmodules API response")
+
+        }
+        //      fmt.Printf("%v", string(body))
+
+        var vfmodules VFModules
+
+        json.Unmarshal([]byte(body), &vfmodules)
+
+        vfmList := vfmodules.VFModules
+
+        for key, vfmodule := range vfmList {
+
+                if vfmodule.VFModuleId == vfmID {
+
+                        //logrus.Debug("vfmodule identified")
+
+                        vfmodule.RelationshipList = map[string][]RelationList{"relationship": relList}
+
+                        vfmList = append(vfmList, vfmodule)
+
+                        vfmList[key] = vfmList[len(vfmList)-1] // Copy last element to index i.
+                        vfmList = vfmList[:len(vfmList)-1]
+
+                        //update vfmodule with vserver data
+
+                        vfmPayload, err := json.Marshal(vfmodule)
+
+                        if err != nil {
+
+                                //logrus.Error("Error while marshalling vfmodule linked vserver info response")
+
+                        }
+
+                        pushVFModuleToAAI(string(vfmPayload), vfmID, vnfID)
+                }
+
+        }
+
+        //vfmodules.VFModules = vfmList
+
+        //vfmPayload, err := json.Marshal(vfmodules)
+        //if err != nil {
+
+        //logrus.Error("Error while marshalling vfmodule linked vserver info response")
+
+        //}
+
+        //pushVFModuleToAAI(string(vfmPayload), vfmID, vnfID)
+
+}
+
+func pushVFModuleToAAI(vfmPayload, vfmID, vnfID string) {
+
+        //logrus.Debug("Executing pushVFModuleToAAI")
+
+        http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+        url := con.AAI_URI + ":" + con.AAI_Port + con.AAI_NEP + vnfID + "/vfmodules/vf-module/" + vfmID
+
+        //logrus.Debug(vfmPayload)
+
+        var jsonStr = []byte(vfmPayload)
+
+        req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonStr))
+
+        if err != nil {
+                //logrus.Error("Error while constructing a VFModule request to AAI")
+        }
+        req.Header.Set("X-FromAppId", "SO")
+        req.Header.Set("Content-Type", "application/json")
+        req.Header.Set("Accept", "application/json")
+        req.Header.Set("X-TransactionId", "get_aai_subscr")
+        req.Header.Set("Authorization", "Basic QUFJOkFBSQ==")
+
+        client := &http.Client{}
+        resp, err := client.Do(req)
+        if err != nil {
+
+                //logrus.Error("Error while executing PUT request of VFModule to AAI")
+
+        }
+
+        defer resp.Body.Close()
+
+        //fmt.Println("response Status:" + resp.Status)
+        //body, err := ioutil.ReadAll(resp.Body)
+        //if err != nil {
+        //logrus.Error("Error while reading VFModule response to AAI")
+
+        //}
+        //logrus.Debug("response Body:" + string(body))
 
 }
 

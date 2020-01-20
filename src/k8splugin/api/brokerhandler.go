@@ -155,6 +155,18 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "vf_module_name is missing from sdnc-directives", http.StatusBadRequest)
 		return
 	}
+	
+	vnfID := req.GenericVnfID
+    if vnfID == "" {
+        http.Error(w, "generic-vnf-id is empty", http.StatusBadRequest)
+        return
+    }
+
+    vfmID := req.VFModuleID
+    if vfmID == "" {
+        http.Error(w, "vf-module-id is empty", http.StatusBadRequest)
+        return
+    }
 
 	// Setup the resource parameters for making the request
 	var instReq app.InstanceRequest
@@ -164,6 +176,8 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	instReq.CloudRegion = cloudRegion
 	instReq.Labels = map[string]string{
 		"vf_module_name": vfModuleName,
+		"vnf_id" : vnfID,
+		"vfm_id" : vfmID,
 	}
 
 	resp, err := b.client.Create(instReq)

@@ -10,8 +10,8 @@
 ##############################################################################
 
 box = {
-  :virtualbox => { :name => 'elastic/ubuntu-18.04-x86_64', :version => '20191013.0.0' },
-  :libvirt => { :name => 'generic/ubuntu1810'}
+  :virtualbox => { :name => 'elastic/ubuntu-16.04-x86_64', :version => '20180708.0.0' },
+  :libvirt => { :name => 'elastic/ubuntu-16.04-x86_64', :version=> '20180210.0.0'}
 }
 
 require 'yaml'

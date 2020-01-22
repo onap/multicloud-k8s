@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ae953300_8788d115",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-01-22T19:44:59Z",
+      "side": 1,
+      "message": "probably should run this through \u0027go fmt\u0027 to make the white space consistent.  (I don\u0027t know if that happens automatically or not)",
+      "revId": "368e66706c266c96d545597ee56bab3b3a56c9ae",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -31,12 +31,12 @@ import (
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type rbProfileHandler struct {
-	// Interface that implements bundle Definition operations
-	// We will set this variable with a mock interface for testing
+	// Interface that implements bundle profile operations
+	// Set this variable with a mock interface for testing
 	client rb.ProfileManager
 }
 
-// createHandler handles creation of the definition entry in the database
+// createHandler creates a profile entry in the database
 func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	var p rb.Profile
 
@@ -71,7 +71,7 @@ func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// uploadHandler handles upload of the bundle tar file into the database
+// uploadHandler uploads the profile artifact tar file into the database
 func (h rbProfileHandler) uploadHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	rbName := vars["rbname"]
@@ -98,8 +98,8 @@ func (h rbProfileHandler) uploadHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusOK)
 }
 
-// getHandler handles GET operations on a particular ids
-// Returns a rb.Definition
+// getHandler gets a Profile Key in the database
+// Returns an rb.Profile
 func (h rbProfileHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	rbName := vars["rbname"]
@@ -127,8 +127,8 @@ func (h rbProfileHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// getHandler handles GET operations on a particular ids
-// Returns a rb.Definition
+// getHandler gets all profiles of a Resource Bundle Key in the database
+// Returns a list of rb.Profile
 func (h rbProfileHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	rbName := vars["rbname"]
@@ -149,7 +149,7 @@ func (h rbProfileHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// deleteHandler handles DELETE operations on a particular bundle definition id
+// deleteHandler deletes a particular Profile Key in the database
 func (h rbProfileHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	rbName := vars["rbname"]

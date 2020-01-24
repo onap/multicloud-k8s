@@ -16,6 +16,29 @@
       "revId": "368e66706c266c96d545597ee56bab3b3a56c9ae",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "62581dda_57dda75b",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2020-01-24T14:12:41Z",
+      "side": 1,
+      "message": "remove this comma please\nvf_module_id would be better name",
+      "range": {
+        "startLine": 180,
+        "startChar": 18,
+        "endLine": 180,
+        "endChar": 19
+      },
+      "revId": "368e66706c266c96d545597ee56bab3b3a56c9ae",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

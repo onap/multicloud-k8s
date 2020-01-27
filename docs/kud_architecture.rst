@@ -17,8 +17,8 @@ This document explains the different components of the Kubernetes
 Reference Deployment project and how they can be configured to modify
 its default behaviour.
 
-Vagranfile
-##########
+Vagrantfile
+###########
 
 This file describes how the Virtual Machines are going to be
 configured and the scripts and arguments used during their
@@ -127,7 +127,7 @@ setup.sh
 ########
 
 This bash script is used for the installation and configuration of
-dependencies required for the usage of the KRD via Virtual Machines.
+dependencies required for the usage of the KUD via Virtual Machines.
 Some of this dependencies are:
 
   - `Vagrant <https://www.vagrantup.com/>`_,
@@ -138,7 +138,7 @@ and installed in the host machine.
 
 .. code-block:: bash
 
-    ./setup.sh -p libvirt
+    sudo ./setup.sh -p libvirt
 
 Vagrant uses VirtualBox as default Virtualization provider. It's
 possible to modify this behavior using the global enviroment variable

@@ -21,12 +21,12 @@ Linux instructions to install dependencies and plugins required for
 its usage. This script supports two Virtualization technologies
 (Libvirt and VirtualBox).
 
-    $ ./setup.sh -p libvirt
+    $ sudo ./setup.sh -p libvirt
 
 Once Vagrant is installed, it's possible to provision a cluster using
 the following instructions:
 
-    $ vagrant up && vagrant up installer
+    $ sudo vagrant up && sudo vagrant up installer
 
 ## License
 

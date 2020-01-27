@@ -156,6 +156,18 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	vnf_id := req.GenericVnfID
+	if vnf_id == "" {
+		http.Error(w, "generic-vnf-id is empty", http.StatusBadRequest)
+		return
+	}
+
+	vf_module_id := req.VFModuleID
+	if vf_module_id == "" {
+		http.Error(w, "vf-module-id is empty", http.StatusBadRequest)
+		return
+	}
+
 	// Setup the resource parameters for making the request
 	var instReq app.InstanceRequest
 	instReq.RBName = req.VFModuleModelInvariantID
@@ -164,6 +176,8 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	instReq.CloudRegion = cloudRegion
 	instReq.Labels = map[string]string{
 		"vf_module_name": vfModuleName,
+		"vnf_id":         vnf_id,
+		"vf_module_id":   vf_module_id,
 	}
 
 	resp, err := b.client.Create(instReq)

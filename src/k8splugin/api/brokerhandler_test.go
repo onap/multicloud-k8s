@@ -52,7 +52,9 @@ func TestBrokerCreateHandler(t *testing.T) {
 			input: bytes.NewBuffer([]byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
 				"vf-module-model-invariant-id": "123456qwerty",
-				"sdnc_directives": {
+                                "generic-vnf-id": "987654321",
+                                "vf-module-id": "123456789",
+			        "sdnc_directives": {
 					"attributes": [
 						{
 							"attribute_name": "vf_module_name",
@@ -68,11 +70,57 @@ func TestBrokerCreateHandler(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
+			label: "Missing generic-vnf-id parameter",
+			input: bytes.NewBuffer([]byte(`{
+                                "vf-module-model-customization-id": "84sdfkio938",
+                                "vf-module-model-invariant-id": "123456qwerty",
+                                "vf-module-model-version-id": "123qweasdzxc",
+                                "vf-module-id": "123456789",
+                                "sdnc_directives": {
+                                        "attributes": [
+                                                {
+                                                        "attribute_name": "vf_module_name",
+                                                        "attribute_value": "test-vf-module-name"
+                                                },
+                                                {
+                                                        "attribute_name": "k8s-rb-profile-name",
+                                                        "attribute_value": "profile1"
+                                                }
+                                        ]
+                                }
+                        }`)),
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			label: "Missing vf-module-id parameter",
+			input: bytes.NewBuffer([]byte(`{
+                                "vf-module-model-customization-id": "84sdfkio938",
+                                "vf-module-model-invariant-id": "123456qwerty",
+                                "vf-module-model-version-id": "123qweasdzxc",
+                                "generic-vnf-id": "987654321",
+                                "sdnc_directives": {
+                                        "attributes": [
+                                                {
+                                                        "attribute_name": "vf_module_name",
+                                                        "attribute_value": "test-vf-module-name"
+                                                },
+                                                {
+                                                        "attribute_name": "k8s-rb-profile-name",
+                                                        "attribute_value": "profile1"
+                                                }
+                                        ]
+                                }
+                        }`)),
+			expectedCode: http.StatusBadRequest,
+		},
+		{
 			label: "Missing parameter from sdnc_directives",
 			input: bytes.NewBuffer([]byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
 				"vf-module-model-invariant-id": "123456qwerty",
 				"vf-module-model-version-id": "123qweasdzxc",
+                                "generic-vnf-id": "987654321",
+                                "vf-module-id": "123456789",
 				"sdnc_directives": {
 					"attributes": [
 						{
@@ -90,6 +138,8 @@ func TestBrokerCreateHandler(t *testing.T) {
 				"vf-module-model-customization-id": "84sdfkio938",
 				"vf-module-model-invariant-id": "123456qwerty",
 				"vf-module-model-version-id": "123qweasdzxc",
+                                "generic-vnf-id": "987654321",
+                                "vf-module-id": "123456789",
 				"sdnc_directives": {
 					"attributes": [
 						{

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6d6d5177_140d5344",
+        "filename": "kud/hosting_providers/vagrant/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-01-28T23:51:47Z",
+      "side": 1,
+      "message": "Do you need to use sudo here?",
+      "range": {
+        "startLine": 29,
+        "startChar": 6,
+        "endLine": 29,
+        "endChar": 10
+      },
+      "revId": "e12255b6777b8f70b31ec32de82bd011807008fc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

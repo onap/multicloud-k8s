@@ -71,6 +71,30 @@
     },
     {
       "key": {
+        "uuid": "8aa3b698_6d3e493b",
+        "filename": "kud/hosting_providers/vagrant/cleanup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-01-29T06:25:38Z",
+      "side": 1,
+      "message": "Ok, sorry, subshell is fine, didn\u0027t notice \"\u0026\u0026\\\" at the end of line. But in case you have such long expression I\u0027d suggest to handle it with\n```\nif !docker ...; then\necho\nelse\ndocker ...\nfi\n```",
+      "parentUuid": "2220aa72_a5ec4ad2",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 1
+      },
+      "revId": "bb67858c8f5c5f42e1b24d58ee60f121b82da076",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f734a43d_cc9060f1",
         "filename": "kud/hosting_providers/vagrant/cleanup.sh",
         "patchSetId": 3

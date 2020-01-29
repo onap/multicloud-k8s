@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "daa5f00d_ec920fcd",
+        "filename": "kud/hosting_providers/vagrant/cleanup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-01-29T06:24:06Z",
+      "side": 1,
+      "message": "\"$2\" argument of script is not visible in function, as you pass only single parameter when invoking it ($1). If you want to provide all input parameters, you should invoke function like `_clean_docker \"$@\"`",
+      "range": {
+        "startLine": 20,
+        "startChar": 38,
+        "endLine": 20,
+        "endChar": 40
+      },
+      "revId": "bb67858c8f5c5f42e1b24d58ee60f121b82da076",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2220aa72_a5ec4ad2",
+        "filename": "kud/hosting_providers/vagrant/cleanup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-01-29T06:24:06Z",
+      "side": 1,
+      "message": "No need for subshell execution (\"()\") here as far as I see",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 1
+      },
+      "revId": "bb67858c8f5c5f42e1b24d58ee60f121b82da076",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a865c83_68caeb1c",
+        "filename": "kud/hosting_providers/vagrant/cleanup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-01-29T06:24:06Z",
+      "side": 1,
+      "message": "I\u0027m not convinced there is a need to use such \"fragile\" regexp here, what do you want to match for containers/image selection - container and image name and something else? Maybe it would be more robust to use --filter or --format options to `docker ps`",
+      "range": {
+        "startLine": 20,
+        "startChar": 44,
+        "endLine": 20,
+        "endChar": 72
+      },
+      "revId": "bb67858c8f5c5f42e1b24d58ee60f121b82da076",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f734a43d_cc9060f1",
+        "filename": "kud/hosting_providers/vagrant/cleanup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-01-29T06:24:06Z",
+      "side": 1,
+      "message": "This is as far as I\u0027m aware already implemented as `docker image prune`, please check if it provides required functionality. If not, I\u0027d suggest to use --format for `docker images` as suggested above.",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 114
+      },
+      "revId": "bb67858c8f5c5f42e1b24d58ee60f121b82da076",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

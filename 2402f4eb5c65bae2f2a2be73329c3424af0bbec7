@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6349311e_401a738c",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-01-30T20:38:25Z",
+      "side": 1,
+      "message": "Remove hardcoding",
+      "range": {
+        "startLine": 144,
+        "startChar": 26,
+        "endLine": 144,
+        "endChar": 45
+      },
+      "revId": "2402f4eb5c65bae2f2a2be73329c3424af0bbec7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c376d67b_8e1154b0",
+        "filename": "src/k8splugin/internal/helm/helm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-01-30T20:38:25Z",
+      "side": 1,
+      "message": "What does this comment mean here?",
+      "range": {
+        "startLine": 108,
+        "startChar": 75,
+        "endLine": 108,
+        "endChar": 81
+      },
+      "revId": "2402f4eb5c65bae2f2a2be73329c3424af0bbec7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

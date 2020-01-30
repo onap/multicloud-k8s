@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d5c37b32_0e03a2bf",
+        "filename": "src/statusquery/apiexecutor/aaipullexecutor.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-01-30T20:49:14Z",
+      "side": 1,
+      "message": "Remove commented code",
+      "range": {
+        "startLine": 96,
+        "startChar": 7,
+        "endLine": 98,
+        "endChar": 38
+      },
+      "revId": "5175c3bd2fd8e28b8407ee689fb543e9aa1d2186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4143f2cb_dd2b22e5",
+        "filename": "src/statusquery/controller/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-01-30T20:49:14Z",
+      "side": 1,
+      "message": "Add comments for functions",
+      "revId": "5175c3bd2fd8e28b8407ee689fb543e9aa1d2186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

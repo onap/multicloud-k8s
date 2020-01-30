@@ -70,6 +70,30 @@
       "revId": "e12255b6777b8f70b31ec32de82bd011807008fc",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a63a0f1_7326513d",
+        "filename": "kud/hosting_providers/vagrant/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2020-01-30T22:36:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f03d882_d5951741",
+      "range": {
+        "startLine": 29,
+        "startChar": 6,
+        "endLine": 29,
+        "endChar": 10
+      },
+      "revId": "e12255b6777b8f70b31ec32de82bd011807008fc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

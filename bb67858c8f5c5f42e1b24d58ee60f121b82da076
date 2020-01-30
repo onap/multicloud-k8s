@@ -143,6 +143,30 @@
     },
     {
       "key": {
+        "uuid": "81535fb1_f1261eaf",
+        "filename": "kud/hosting_providers/vagrant/cleanup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-01-30T10:15:11Z",
+      "side": 1,
+      "message": "Yes, sure. What I\u0027m afraid of, is that with this approach, you could match by accident an entry that is not supposed to be matched. For example if you\u0027re running this function with \"nginx\" as $2, I guess you want to remove both all containers  and images matching image \"nginx\" at any version or image \"nginx-*\"/\"nginx_*\"/... at any version. Let\u0027s now consider we have some container running image nginx, but also some other that is running command \"abc -f nginx.conf ...\". As default output from `docker ps` includes truncated command, you could by accident match container that was not supposed to be killed. Now, by using `docker ps --format` you can explicitly say what columns you want to see and then, based on it prepare relevant parser. For example, if I wanted to check whether container name or image matches pattern \"*mongo*\", I could define following pipeline:\n```\ndocker ps -a --format \"{{.Image}} {{.Names}} {{.ID}}\" | awk -v match\u003d\"$2\" \u0027$0 ~ match {print $3}\u0027\n```\nIt all actually depends on what you want to match against, but using format you can have much better prepared output to later search through.\nI\u0027m not sure if I helped with this explaination, but I hope you can see my concern.",
+      "parentUuid": "d1999fca_56383302",
+      "range": {
+        "startLine": 20,
+        "startChar": 44,
+        "endLine": 20,
+        "endChar": 72
+      },
+      "revId": "bb67858c8f5c5f42e1b24d58ee60f121b82da076",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f734a43d_cc9060f1",
         "filename": "kud/hosting_providers/vagrant/cleanup.sh",
         "patchSetId": 3

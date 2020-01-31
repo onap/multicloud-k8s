@@ -167,6 +167,30 @@
     },
     {
       "key": {
+        "uuid": "6b2cdcad_81412332",
+        "filename": "kud/hosting_providers/vagrant/cleanup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2020-01-31T00:26:59Z",
+      "side": 1,
+      "message": "Thank you Konrad, this helps. I get the context now, and the method you explained is a cleaner. I will make the changes.",
+      "parentUuid": "81535fb1_f1261eaf",
+      "range": {
+        "startLine": 20,
+        "startChar": 44,
+        "endLine": 20,
+        "endChar": 72
+      },
+      "revId": "bb67858c8f5c5f42e1b24d58ee60f121b82da076",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f734a43d_cc9060f1",
         "filename": "kud/hosting_providers/vagrant/cleanup.sh",
         "patchSetId": 3

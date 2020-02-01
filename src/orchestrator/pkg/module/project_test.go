@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package project
+package module
 
 import (
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/db"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -60,7 +60,7 @@ func TestCreateProject(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProjectClient()
-			got, err := impl.Create(testCase.inp)
+			got, err := impl.CreateProject(testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -119,7 +119,7 @@ func TestGetProject(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProjectClient()
-			got, err := impl.Get(testCase.name)
+			got, err := impl.GetProject(testCase.name)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get returned an unexpected error: %s", err)
@@ -163,7 +163,7 @@ func TestDeleteProject(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProjectClient()
-			err := impl.Delete(testCase.name)
+			err := impl.DeleteProject(testCase.name)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Delete returned an unexpected error %s", err)

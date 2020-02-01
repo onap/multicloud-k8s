@@ -21,7 +21,7 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/config"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 
 	pkgerrors "github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"

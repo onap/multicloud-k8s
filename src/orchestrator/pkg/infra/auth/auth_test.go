@@ -28,9 +28,9 @@ func TestGetTLSConfig(t *testing.T) {
 	if err == nil {
 		t.Errorf("Test failed, expected error but got none")
 	}
-	tlsConfig, err := GetTLSConfig("../../tests/certs/auth_test_certificate.pem",
-		"../../tests/certs/auth_test_certificate.pem",
-		"../../tests/certs/auth_test_key.pem")
+	tlsConfig, err := GetTLSConfig("../../../tests/certs/auth_test_certificate.pem",
+		"../../../tests/certs/auth_test_certificate.pem",
+		"../../../tests/certs/auth_test_key.pem")
 	if err != nil {
 		t.Fatal("Test Failed as GetTLSConfig returned error: " + err.Error())
 	}

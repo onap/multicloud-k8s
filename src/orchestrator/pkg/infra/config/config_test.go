@@ -29,7 +29,7 @@ func TestReadConfigurationFile(t *testing.T) {
 	})
 
 	t.Run("Read Configuration File", func(t *testing.T) {
-		conf, err := readConfigFile("../../tests/configs/mock_config.json")
+		conf, err := readConfigFile("../../../tests/configs/mock_config.json")
 		if err != nil {
 			t.Fatal("ReadConfigurationFile: Error reading file: ", err)
 		}

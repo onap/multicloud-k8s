@@ -23,9 +23,9 @@ import (
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/api"
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/auth"
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/config"
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/db"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
 	"github.com/gorilla/handlers"
 )

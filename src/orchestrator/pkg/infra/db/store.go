@@ -17,7 +17,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/config"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 
 	pkgerrors "github.com/pkg/errors"
 )

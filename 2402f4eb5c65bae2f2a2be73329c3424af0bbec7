@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "b0cb7501_fee76431",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-02-03T13:28:58Z",
+      "side": 1,
+      "message": "This was intended. I wanted to exclude parameters interpreted by Broker handler (namely: vf_module_name and k8s-rb-profile-name) from being passed further as overrides parameters for instantiation. I can align with your comment to remove it, but I think it\u0027s correct to do it this way?",
+      "parentUuid": "6349311e_401a738c",
+      "range": {
+        "startLine": 144,
+        "startChar": 26,
+        "endLine": 144,
+        "endChar": 45
+      },
+      "revId": "2402f4eb5c65bae2f2a2be73329c3424af0bbec7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c376d67b_8e1154b0",
         "filename": "src/k8splugin/internal/helm/helm_test.go",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2020-01-30T20:38:25Z",
       "side": 1,
       "message": "What does this comment mean here?",
+      "range": {
+        "startLine": 108,
+        "startChar": 75,
+        "endLine": 108,
+        "endChar": 81
+      },
+      "revId": "2402f4eb5c65bae2f2a2be73329c3424af0bbec7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aa504fe4_dc875391",
+        "filename": "src/k8splugin/internal/helm/helm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-02-03T13:28:58Z",
+      "side": 1,
+      "message": "Well, I modified this line for more meaningful error during my update of this UTs, but FIXME was intended for me to correct error message before commit, I didn\u0027t notice it :). I\u0027ve corrected error message in latest version.",
+      "parentUuid": "c376d67b_8e1154b0",
       "range": {
         "startLine": 108,
         "startChar": 75,

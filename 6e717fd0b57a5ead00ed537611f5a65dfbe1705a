@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "43953f56_1d80e88c",
+        "filename": "src/orchestrator/scripts/_functions.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-07T00:38:00Z",
+      "side": 1,
+      "message": "Any reason why we are not using Intel copyrights here ?",
+      "revId": "6e717fd0b57a5ead00ed537611f5a65dfbe1705a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63c68135_63094f82",
+        "filename": "src/orchestrator/scripts/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-07T00:38:00Z",
+      "side": 1,
+      "message": "may be 2020",
+      "revId": "6e717fd0b57a5ead00ed537611f5a65dfbe1705a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c7a78364_d6b59a28",
+        "filename": "src/orchestrator/scripts/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-07T00:38:00Z",
+      "side": 1,
+      "message": "\u00273\u0027 is often mentioned as 3.0 to avoid any sort of confusion, i guess.",
+      "revId": "6e717fd0b57a5ead00ed537611f5a65dfbe1705a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

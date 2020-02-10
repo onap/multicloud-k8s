@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2bbe237_86cc999c",
+        "filename": "kud/hosting_providers/vagrant/README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-10T21:38:05Z",
+      "side": 1,
+      "message": "Add Vagrant documentation recommendation",
+      "revId": "87a679af2e31fec441459f8959434550754246a8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

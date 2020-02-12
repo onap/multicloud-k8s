@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "12dbed34_a434fb96",
+        "filename": "src/orchestrator/pkg/infra/contextdb/etcd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-02-12T17:26:49Z",
+      "side": 1,
+      "message": "Can this be interface object to make it opaque to infra library?\n\nIf yes, same can be applied to all other interfaces to accept interface{} object  and return interface{} object",
+      "range": {
+        "startLine": 95,
+        "startChar": 25,
+        "endLine": 95,
+        "endChar": 35
+      },
+      "revId": "4883991eb3efc53807d9b9a564b301ef842ff50e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aaf86826_2fc36b8f",
+        "filename": "src/orchestrator/pkg/infra/contextdb/etcd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-02-12T17:26:49Z",
+      "side": 1,
+      "message": "To be more clear on what we are deleting, add another interface to delete just the given key.",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 29
+      },
+      "revId": "4883991eb3efc53807d9b9a564b301ef842ff50e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

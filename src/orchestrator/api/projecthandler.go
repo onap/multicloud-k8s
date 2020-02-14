@@ -21,7 +21,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/project"
+	"github.com/onap/multicloud-k8s/src/orchestrator/internal/module"
 
 	"github.com/gorilla/mux"
 )
@@ -31,12 +31,12 @@ import (
 type projectHandler struct {
 	// Interface that implements Project operations
 	// We will set this variable with a mock interface for testing
-	client project.ProjectManager
+	client module.ProjectManager
 }
 
 // Create handles creation of the Project entry in the database
 func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var p project.Project
+	var p module.Project
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 	switch {
@@ -49,7 +49,7 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Name is required.
-	if p.ProjectName == "" {
+	if p.MetaData.Name == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}

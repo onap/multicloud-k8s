@@ -14,25 +14,41 @@ limitations under the License.
 package api
 
 import (
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/project"
-
+	"github.com/onap/multicloud-k8s/src/orchestrator/internal/module"
 	"github.com/gorilla/mux"
 )
 
 // NewRouter creates a router that registers the various urls that are supported
-func NewRouter(projectClient project.ProjectManager) *mux.Router {
+func NewRouter(projectClient module.ProjectManager,
+	genericPlacementIntentClient module.GenericPlacementIntentManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 
+
+	//setting routes for project
 	if projectClient == nil {
-		projectClient = project.NewProjectClient()
+		projectClient = module.NewProjectClient()
+
 	}
 	projHandler := projectHandler{
 		client: projectClient,
 	}
-	router.HandleFunc("/project", projHandler.createHandler).Methods("POST")
-	router.HandleFunc("/project/{project-name}", projHandler.getHandler).Methods("GET")
-	router.HandleFunc("/project/{project-name}", projHandler.deleteHandler).Methods("DELETE")
+	router.HandleFunc("/projects", projHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}", projHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}", projHandler.deleteHandler).Methods("DELETE")
+
+	//setting routes for genericPlacementIntent
+	if genericPlacementIntentClient == nil {
+		genericPlacementIntentClient = module.NewGenericPlacementIntentClient()
+	}
+
+	genericPlacementIntentHandler := genericPlacementIntentHandler{
+		client: genericPlacementIntentClient,
+	}
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents", genericPlacementIntentHandler.createGenericPlacementIntentHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}",genericPlacementIntentHandler.getGenericPlacementHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}",genericPlacementIntentHandler.deleteGenericPlacementHandler).Methods("DELETE")
+
 
 	return router
 }

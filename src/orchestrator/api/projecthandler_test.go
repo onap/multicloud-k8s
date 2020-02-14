@@ -25,7 +25,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/project"
+	"github.com/onap/multicloud-k8s/src/orchestrator/internal/module"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -36,21 +36,21 @@ import (
 type mockProjectManager struct {
 	// Items and err will be used to customize each test
 	// via a localized instantiation of mockProjectManager
-	Items []project.Project
+	Items []module.Project
 	Err   error
 }
 
-func (m *mockProjectManager) Create(inp project.Project) (project.Project, error) {
+func (m *mockProjectManager) Create(inp module.Project) (module.Project, error) {
 	if m.Err != nil {
-		return project.Project{}, m.Err
+		return module.Project{}, m.Err
 	}
 
 	return m.Items[0], nil
 }
 
-func (m *mockProjectManager) Get(name string) (project.Project, error) {
+func (m *mockProjectManager) Get(name string) (module.Project, error) {
 	if m.Err != nil {
-		return project.Project{}, m.Err
+		return module.Project{}, m.Err
 	}
 
 	return m.Items[0], nil
@@ -64,7 +64,7 @@ func TestProjectCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string
 		reader        io.Reader
-		expected      project.Project
+		expected      module.Project
 		expectedCode  int
 		projectClient *mockProjectManager
 	}{
@@ -78,19 +78,29 @@ func TestProjectCreateHandler(t *testing.T) {
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
 				"project-name":"testProject",
-				"description":"Test Project used for unit testing"
+				"description":"Test Project used for unit testing",
+				"userData1":"data1",
+				"userData2":"data2",
 				}`)),
-			expected: project.Project{
-				ProjectName: "testProject",
-				Description: "Test Project used for unit testing",
+			expected: module.Project{
+				MetaData: module.ProjectMetaDataFields{
+					Name: "testProject",
+					Description: "Test Project used for unit testing",
+					UserData1: "data1",
+					UserData2: "data2",
+				},
 			},
 			projectClient: &mockProjectManager{
 				//Items that will be returned by the mocked Client
-				Items: []project.Project{
-					{
-						ProjectName: "testProject",
-						Description: "Test Project used for unit testing",
-					},
+				Items: []module.Project{
+					  		module.Project{
+								MetaData: module.ProjectMetaDataFields{
+									Name: "testProject",
+									Description: "Test Project",
+									UserData1: "data1",
+									UserData2: "data2",
+								},
+							},
 				},
 			},
 		},
@@ -107,7 +117,7 @@ func TestProjectCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v2/project", testCase.reader)
-			resp := executeRequest(request, NewRouter(testCase.projectClient))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -116,7 +126,7 @@ func TestProjectCreateHandler(t *testing.T) {
 
 			//Check returned body only if statusCreated
 			if resp.StatusCode == http.StatusCreated {
-				got := project.Project{}
+				got := module.Project{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -132,7 +142,7 @@ func TestProjectGetHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      project.Project
+		expected      module.Project
 		name, version string
 		expectedCode  int
 		projectClient *mockProjectManager
@@ -140,17 +150,25 @@ func TestProjectGetHandler(t *testing.T) {
 		{
 			label:        "Get Project",
 			expectedCode: http.StatusOK,
-			expected: project.Project{
-				ProjectName: "testProject",
-				Description: "A Test project for unit testing",
+			expected: module.Project{
+				MetaData: module.ProjectMetaDataFields{
+					Name: "testProject",
+					Description: "Test Project used for unit testing",
+					UserData1: "data1",
+					UserData2: "data2",
+				},
 			},
 			name: "testProject",
 			projectClient: &mockProjectManager{
-				Items: []project.Project{
-					{
-						ProjectName: "testProject",
-						Description: "A Test project for unit testing",
-					},
+				Items: []module.Project{
+								module.Project{
+									MetaData: module.ProjectMetaDataFields{
+										Name: "testProject",
+										Description: "Test Project used for unit testing",
+										UserData1: "data1",
+										UserData2: "data2",
+									},
+								},
 				},
 			},
 		},
@@ -159,7 +177,7 @@ func TestProjectGetHandler(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 			name:         "nonexistingproject",
 			projectClient: &mockProjectManager{
-				Items: []project.Project{},
+				Items: []module.Project{},
 				Err:   pkgerrors.New("Internal Error"),
 			},
 		},
@@ -168,7 +186,7 @@ func TestProjectGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/project/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(testCase.projectClient))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -177,7 +195,7 @@ func TestProjectGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := project.Project{}
+				got := module.Project{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -217,7 +235,7 @@ func TestProjectDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v2/project/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(testCase.projectClient))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

@@ -39,12 +39,12 @@ type Clientset struct {
 }
 
 // K8spluginV1alpha1 retrieves the K8spluginV1alpha1Client
-func (c *Clientset) K8spluginV1alpha1() k8spluginv1alpha1.K8spluginV1alpha1Interface {
+func (c set) K8spluginV1alpha1() k8spluginv1alpha1.K8spluginV1alpha1Interface {
 	return c.k8spluginV1alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
-func (c *Clientset) Discovery() discovery.DiscoveryInterface {
+func (c set) Discovery() discovery.DiscoveryInterface {
 	if c == nil {
 		return nil
 	}
@@ -54,7 +54,7 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 // NewForConfig creates a new Clientset for the given config.
 // If config's RateLimiter is not set and QPS and Burst are acceptable,
 // NewForConfig will generate a rate-limiter in configShallowCopy.
-func NewForConfig(c *rest.Config) (*Clientset, error) {
+func NewForConfig(c *rest.Config) (set, error) {
 	configShallowCopy := *c
 	if configShallowCopy.RateLimiter == nil && configShallowCopy.QPS > 0 {
 		if configShallowCopy.Burst <= 0 {
@@ -78,7 +78,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 
 // NewForConfigOrDie creates a new Clientset for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *Clientset {
+func NewForConfigOrDie(c *rest.Config) set {
 	var cs Clientset
 	cs.k8spluginV1alpha1 = k8spluginv1alpha1.NewForConfigOrDie(c)
 
@@ -87,7 +87,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 }
 
 // New creates a new Clientset for the given RESTClient.
-func New(c rest.Interface) *Clientset {
+func New(c rest.Interface) set {
 	var cs Clientset
 	cs.k8spluginV1alpha1 = k8spluginv1alpha1.New(c)
 

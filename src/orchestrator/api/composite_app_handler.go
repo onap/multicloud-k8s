@@ -26,19 +26,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Used to store backend implementations objects
+// compositeAppHandler to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
-type projectHandler struct {
-	// Interface that implements Project operations
+type compositeAppHandler struct {
+	// Interface that implements CompositeApp operations
 	// We will set this variable with a mock interface for testing
-	client moduleLib.ProjectManager
+	client moduleLib.CompositeAppManager
 }
 
-// Create handles creation of the Project entry in the database
-func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var p moduleLib.Project
+// createHandler handles creation of the CompositeApp entry in the database
+// This is a multipart handler
+func (h compositeAppHandler) createHandler(w http.ResponseWriter, r *http.Request) {
+	var c moduleLib.CompositeApp
 
-	err := json.NewDecoder(r.Body).Decode(&p)
+	err := json.NewDecoder(r.Body).Decode(&c)
 	switch {
 	case err == io.EOF:
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -49,12 +50,12 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Name is required.
-	if p.Metadata.ProjectName == "" {
+	if c.Metadata.CompositeAppName == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
-	ret, err := h.client.CreateProject(p)
+	ret, err := h.client.CreateCompositeApp(c)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -69,13 +70,14 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Get handles GET operations on a particular Project Name
-// Returns a rb.Project
-func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {
+// getHandler handles GET operations on a particular CompositeApp Name
+// Returns a compositeApp
+func (h compositeAppHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["project-name"]
+	name := vars["composite-app-name"]
+	version := vars["version"]
 
-	ret, err := h.client.GetProject(name)
+	ret, err := h.client.GetCompositeApp(name, version)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -90,12 +92,13 @@ func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Delete handles DELETE operations on a particular Project Name
-func (h projectHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
+// deleteHandler handles DELETE operations on a particular CompositeApp Name
+func (h compositeAppHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["project-name"]
+	name := vars["composite-app-name"]
+	version := vars["version"]
 
-	err := h.client.DeleteProject(name)
+	err := h.client.DeleteCompositeApp(name, version)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

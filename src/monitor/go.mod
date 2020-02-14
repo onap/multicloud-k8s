@@ -38,3 +38,5 @@ replace bitbucket.org/ww/goautoneg => github.com/munnerz/goautoneg v0.0.0-201904
 replace github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.9.0
 
 replace git.apache.org/thrift.git => github.com/apache/thrift v0.12.0
+
+go 1.13

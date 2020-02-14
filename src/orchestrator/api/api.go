@@ -1,5 +1,5 @@
 /*
-Copyright 2018 Intel Corporation.
+Copyright 2020 Intel Corporation.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -10,6 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package api
 
 import (
@@ -17,9 +18,11 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
 var moduleClient *moduleLib.Client
+
 // NewRouter creates a router that registers the various urls that are supported
-func NewRouter(projectClient moduleLib.ProjectManager) *mux.Router {
+func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 	moduleClient = moduleLib.NewClient()
@@ -32,6 +35,17 @@ func NewRouter(projectClient moduleLib.ProjectManager) *mux.Router {
 	router.HandleFunc("/projects", projHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}", projHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}", projHandler.deleteHandler).Methods("DELETE")
+
+	if compositeAppClient == nil {
+		compositeAppClient = moduleClient.CompositeApp
+	}
+	compAppHandler := compositeAppHandler{
+		client: compositeAppClient,
+	}
+
+	router.HandleFunc("/projects/{project-name}/composite-apps", compAppHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.deleteHandler).Methods("DELETE")
 
 	return router
 }

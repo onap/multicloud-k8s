@@ -20,6 +20,7 @@ package module
 type Client struct {
 	Project      *ProjectClient
 	CompositeApp *CompositeAppClient
+	Controller *ControllerClient
 	// Add Clients for API's here
 }
 
@@ -28,6 +29,7 @@ func NewClient() *Client {
 	c := &Client{}
 	c.Project = NewProjectClient()
 	c.CompositeApp = NewCompositeAppClient()
+	c.Controller = NewControllerClient()
 	// Add Client API handlers here
 	return c
 }

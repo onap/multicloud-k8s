@@ -22,12 +22,12 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/onap/multicloud-k8s/src/orchestrator/api"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
-	"github.com/gorilla/handlers"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 )
 
 func main() {

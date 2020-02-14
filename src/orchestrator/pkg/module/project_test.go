@@ -23,7 +23,6 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
-
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -39,18 +38,18 @@ func TestCreateProject(t *testing.T) {
 			label: "Create Project",
 			inp: Project{
 				MetaData: ProjectMetaData{
-					Name: "testProject",
+					Name:        "testProject",
 					Description: "A sample Project used for unit testing",
-					UserData1: "data1",
-					UserData2: "data2",
+					UserData1:   "data1",
+					UserData2:   "data2",
 				},
 			},
 			expected: Project{
 				MetaData: ProjectMetaData{
-					Name:"testProject",
+					Name:        "testProject",
 					Description: "A sample Project used for unit testing",
-					UserData1: "data1",
-					UserData2: "data2",
+					UserData1:   "data1",
+					UserData2:   "data2",
 				},
 			},
 			expectedError: "",
@@ -102,10 +101,10 @@ func TestGetProject(t *testing.T) {
 			name:  "testProject",
 			expected: Project{
 				MetaData: ProjectMetaData{
-					Name: "testProject",
+					Name:        "testProject",
 					Description: "Test project for unit testing",
-					UserData1: "userData1",
-					UserData2: "userData2",
+					UserData1:   "userData1",
+					UserData2:   "userData2",
 				},
 			},
 			expectedError: "",
@@ -114,12 +113,12 @@ func TestGetProject(t *testing.T) {
 					ProjectKey{ProjectName: "testProject"}.String(): {
 						"projectmetadata": []byte(
 							"{" +
-								"\"metadata\" : {"+
-									"\"Name\":\"testProject\"," +
-									"\"Description\":\"Test project for unit testing\"," +
-									"\"UserData1\": \"userData1\","+
-									"\"UserData2\":\"userData2\"}"+
-							"}"),
+								"\"metadata\" : {" +
+								"\"Name\":\"testProject\"," +
+								"\"Description\":\"Test project for unit testing\"," +
+								"\"UserData1\": \"userData1\"," +
+								"\"UserData2\":\"userData2\"}" +
+								"}"),
 					},
 				},
 			},

@@ -34,7 +34,8 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	err := db.InitializeDatabaseConnection()
+	err :=
+    db.InitializeDatabaseConnection("orchestrator")
 	if err != nil {
 		log.Println("Unable to initialize database connection...")
 		log.Println(err)
@@ -42,7 +43,7 @@ func main() {
 	}
 	err = contextDb.InitializeContextDatabase()
 	if err != nil {
-		log.Println("Unable to initialize database connection...")
+		log.Println("Unable to initialize context database connection...")
 		log.Println(err)
 		log.Fatalln("Exiting...")
 	}

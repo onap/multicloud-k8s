@@ -23,7 +23,7 @@ func TestCreateDBClient(t *testing.T) {
 	t.Run("Successfully create DB client", func(t *testing.T) {
 		expected := &MongoStore{}
 
-		err := createDBClient("mongo")
+		err := createDBClient("mongo", "testdb")
 		if err != nil {
 			t.Fatalf("CreateDBClient returned an error (%s)", err)
 		}
@@ -32,7 +32,7 @@ func TestCreateDBClient(t *testing.T) {
 		}
 	})
 	t.Run("Fail to create client for unsupported DB", func(t *testing.T) {
-		err := createDBClient("fakeDB")
+		err := createDBClient("fakeDB", "testdb2")
 		if err == nil {
 			t.Fatal("CreateDBClient didn't return an error")
 		}

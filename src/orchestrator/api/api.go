@@ -19,7 +19,7 @@ import (
 )
 var moduleClient *moduleLib.Client
 // NewRouter creates a router that registers the various urls that are supported
-func NewRouter(projectClient moduleLib.ProjectManager) *mux.Router {
+func NewRouter(projectClient moduleLib.ProjectManager, microserviceClient moduleLib.MicroserviceManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 	moduleClient = moduleLib.NewClient()
@@ -29,9 +29,19 @@ func NewRouter(projectClient moduleLib.ProjectManager) *mux.Router {
 	projHandler := projectHandler{
 		client: projectClient,
 	}
+	if microserviceClient == nil {
+		microserviceClient = moduleClient.Microservice
+	}
+	microservHandler := microserviceHandler{
+		client: microserviceClient,
+	}
 	router.HandleFunc("/projects", projHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}", projHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}", projHandler.deleteHandler).Methods("DELETE")
 
+	router.HandleFunc("/register-microservices", microservHandler.createHandler).Methods("POST")
+	router.HandleFunc("/register-microservices", microservHandler.createHandler).Methods("PUT")
+	router.HandleFunc("/register-microservices/{microservice-name}", microservHandler.getHandler).Methods("GET")
+	router.HandleFunc("/register-microservices/{microservice-name}", microservHandler.deleteHandler).Methods("DELETE")
 	return router
 }

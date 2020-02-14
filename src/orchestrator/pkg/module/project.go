@@ -24,16 +24,21 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-// Project contains the parameters needed for Projects
-// It implements the interface for managing the Projects
+// Project contains the metadata for Project
 type Project struct {
-	ProjectName string `json:"project-name"`
+	Metadata ProjectMeta `json:"metadata"`
+}
+
+// ProjectMeta contains parameters needed for Projects
+// It implements the interface for managing the Projects
+type ProjectMeta struct {
+	ProjectName string `json:"name"`
 	Description string `json:"description"`
 }
 
 // ProjectKey is the key structure that is used in the database
 type ProjectKey struct {
-	ProjectName string `json:"rb-name"`
+	ProjectName string `json:"name"`
 }
 
 // We will use json marshalling to convert to string to
@@ -47,7 +52,7 @@ func (pk ProjectKey) String() string {
 	return string(out)
 }
 
-// Manager is an interface exposes the Project functionality
+// ProjectManager is an interface exposes the Project functionality
 type ProjectManager interface {
 	CreateProject(pr Project) (Project, error)
 	GetProject(name string) (Project, error)
@@ -74,16 +79,16 @@ func (v *ProjectClient) CreateProject(p Project) (Project, error) {
 
 	//Construct the composite key to select the entry
 	key := ProjectKey{
-		ProjectName: p.ProjectName,
+		ProjectName: p.Metadata.ProjectName,
 	}
 
 	//Check if this Project already exists
-	_, err := v.GetProject(p.ProjectName)
+	_, err := v.GetProject(p.Metadata.ProjectName)
 	if err == nil {
 		return Project{}, pkgerrors.New("Project already exists")
 	}
 
-	err = db.DBconn.Create(p.ProjectName, key, v.tagMeta, p)
+	err = db.DBconn.Create(p.Metadata.ProjectName, key, v.tagMeta, p)
 	if err != nil {
 		return Project{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}

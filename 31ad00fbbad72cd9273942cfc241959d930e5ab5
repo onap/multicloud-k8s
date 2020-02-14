@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "05426377_5b23881c",
+        "filename": "src/orchestrator/pkg/module/microservice.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-14T23:31:39Z",
+      "side": 1,
+      "message": "i think going forward we are having here v.storename instead of \"name\"",
+      "range": {
+        "startLine": 104,
+        "startChar": 30,
+        "endLine": 104,
+        "endChar": 34
+      },
+      "revId": "31ad00fbbad72cd9273942cfc241959d930e5ab5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

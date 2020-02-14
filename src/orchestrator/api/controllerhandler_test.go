@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Intel Corporation, Inc
+ * Copyright 2020 Intel Corporation, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,81 +33,84 @@ import (
 //Creating an embedded interface via anonymous variable
 //This allows us to make mockDB satisfy the DatabaseConnection
 //interface even if we are not implementing all the methods in it
-type mockProjectManager struct {
+type mockControllerManager struct {
 	// Items and err will be used to customize each test
-	// via a localized instantiation of mockProjectManager
-	Items []moduleLib.Project
+	// via a localized instantiation of mockControllerManager
+	Items []moduleLib.Controller
 	Err   error
 }
 
-func (m *mockProjectManager) CreateProject(inp moduleLib.Project) (moduleLib.Project, error) {
+func (m *mockControllerManager) CreateController(inp moduleLib.Controller) (moduleLib.Controller, error) {
 	if m.Err != nil {
-		return moduleLib.Project{}, m.Err
+		return moduleLib.Controller{}, m.Err
 	}
 
 	return m.Items[0], nil
 }
 
-func (m *mockProjectManager) GetProject(name string) (moduleLib.Project, error) {
+func (m *mockControllerManager) GetController(name string) (moduleLib.Controller, error) {
 	if m.Err != nil {
-		return moduleLib.Project{}, m.Err
+		return moduleLib.Controller{}, m.Err
 	}
 
 	return m.Items[0], nil
 }
 
-func (m *mockProjectManager) DeleteProject(name string) error {
+func (m *mockControllerManager) DeleteController(name string) error {
 	return m.Err
 }
 
-func TestProjectCreateHandler(t *testing.T) {
+func TestControllerCreateHandler(t *testing.T) {
 	testCases := []struct {
-		label         string
-		reader        io.Reader
-		expected      moduleLib.Project
-		expectedCode  int
-		projectClient *mockProjectManager
+		label            string
+		reader           io.Reader
+		expected         moduleLib.Controller
+		expectedCode     int
+		controllerClient *mockControllerManager
 	}{
 		{
-			label:         "Missing Body Failure",
-			expectedCode:  http.StatusBadRequest,
-			projectClient: &mockProjectManager{},
+			label:            "Missing Body Failure",
+			expectedCode:     http.StatusBadRequest,
+			controllerClient: &mockControllerManager{},
 		},
 		{
-			label:        "Create Project",
+			label:        "Create Controller",
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
-				"project-name":"testProject",
-				"description":"Test Project used for unit testing"
+				"name":"testController",
+				"ip-address":"10.188.234.1",
+				"port":8080
 				}`)),
-			expected: moduleLib.Project{
-				ProjectName: "testProject",
-				Description: "Test Project used for unit testing",
+			expected: moduleLib.Controller{
+				Name:      "testController",
+				IpAddress: "10.188.234.1",
+				Port:      8080,
 			},
-			projectClient: &mockProjectManager{
+			controllerClient: &mockControllerManager{
 				//Items that will be returned by the mocked Client
-				Items: []moduleLib.Project{
+				Items: []moduleLib.Controller{
 					{
-						ProjectName: "testProject",
-						Description: "Test Project used for unit testing",
+						Name:      "testController",
+						IpAddress: "10.188.234.1",
+						Port:      8080,
 					},
 				},
 			},
 		},
 		{
-			label: "Missing Project Name in Request Body",
+			label: "Missing Controller Name in Request Body",
 			reader: bytes.NewBuffer([]byte(`{
 				"description":"test description"
 				}`)),
-			expectedCode:  http.StatusBadRequest,
-			projectClient: &mockProjectManager{},
+			expectedCode:     http.StatusBadRequest,
+			controllerClient: &mockControllerManager{},
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("POST", "/v2/projects", testCase.reader)
-			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
+			request := httptest.NewRequest("POST", "/v2/controllers", testCase.reader)
+			resp := executeRequest(request, NewRouter(nil, testCase.controllerClient))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -116,7 +119,7 @@ func TestProjectCreateHandler(t *testing.T) {
 
 			//Check returned body only if statusCreated
 			if resp.StatusCode == http.StatusCreated {
-				got := moduleLib.Project{}
+				got := moduleLib.Controller{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -128,38 +131,40 @@ func TestProjectCreateHandler(t *testing.T) {
 	}
 }
 
-func TestProjectGetHandler(t *testing.T) {
+func TestControllerGetHandler(t *testing.T) {
 
 	testCases := []struct {
-		label         string
-		expected      moduleLib.Project
-		name, version string
-		expectedCode  int
-		projectClient *mockProjectManager
+		label            string
+		expected         moduleLib.Controller
+		name, version    string
+		expectedCode     int
+		controllerClient *mockControllerManager
 	}{
 		{
-			label:        "Get Project",
+			label:        "Get Controller",
 			expectedCode: http.StatusOK,
-			expected: moduleLib.Project{
-				ProjectName: "testProject",
-				Description: "A Test project for unit testing",
+			expected: moduleLib.Controller{
+				Name:      "testController",
+				IpAddress: "10.188.234.1",
+				Port:      8080,
 			},
-			name: "testProject",
-			projectClient: &mockProjectManager{
-				Items: []moduleLib.Project{
+			name: "testController",
+			controllerClient: &mockControllerManager{
+				Items: []moduleLib.Controller{
 					{
-						ProjectName: "testProject",
-						Description: "A Test project for unit testing",
+						Name:      "testController",
+						IpAddress: "10.188.234.1",
+						Port:      8080,
 					},
 				},
 			},
 		},
 		{
-			label:        "Get Non-Exiting Project",
+			label:        "Get Non-Existing Controller",
 			expectedCode: http.StatusInternalServerError,
-			name:         "nonexistingproject",
-			projectClient: &mockProjectManager{
-				Items: []moduleLib.Project{},
+			name:         "nonexistingController",
+			controllerClient: &mockControllerManager{
+				Items: []moduleLib.Controller{},
 				Err:   pkgerrors.New("Internal Error"),
 			},
 		},
@@ -167,8 +172,8 @@ func TestProjectGetHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v2/projects/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
+			request := httptest.NewRequest("GET", "/v2/controllers/"+testCase.name, nil)
+			resp := executeRequest(request, NewRouter(nil, testCase.controllerClient))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -177,7 +182,7 @@ func TestProjectGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := moduleLib.Project{}
+				got := moduleLib.Controller{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -189,26 +194,26 @@ func TestProjectGetHandler(t *testing.T) {
 	}
 }
 
-func TestProjectDeleteHandler(t *testing.T) {
+func TestControllerDeleteHandler(t *testing.T) {
 
 	testCases := []struct {
-		label         string
-		name          string
-		version       string
-		expectedCode  int
-		projectClient *mockProjectManager
+		label            string
+		name             string
+		version          string
+		expectedCode     int
+		controllerClient *mockControllerManager
 	}{
 		{
-			label:         "Delete Project",
-			expectedCode:  http.StatusNoContent,
-			name:          "testProject",
-			projectClient: &mockProjectManager{},
+			label:            "Delete Controller",
+			expectedCode:     http.StatusNoContent,
+			name:             "testController",
+			controllerClient: &mockControllerManager{},
 		},
 		{
-			label:        "Delete Non-Exiting Project",
+			label:        "Delete Non-Existing Controller",
 			expectedCode: http.StatusInternalServerError,
-			name:         "testProject",
-			projectClient: &mockProjectManager{
+			name:         "testController",
+			controllerClient: &mockControllerManager{
 				Err: pkgerrors.New("Internal Error"),
 			},
 		},
@@ -216,8 +221,8 @@ func TestProjectDeleteHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("DELETE", "/v2/projects/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
+			request := httptest.NewRequest("DELETE", "/v2/controllers/"+testCase.name, nil)
+			resp := executeRequest(request, NewRouter(nil, testCase.controllerClient))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

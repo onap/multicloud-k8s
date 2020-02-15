@@ -22,6 +22,30 @@
       "revId": "31ad00fbbad72cd9273942cfc241959d930e5ab5",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c5b6e397_b83ad407",
+        "filename": "src/orchestrator/pkg/module/microservice.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-15T00:09:47Z",
+      "side": 1,
+      "message": "I\u0027ll take a look. Thanks.",
+      "parentUuid": "05426377_5b23881c",
+      "range": {
+        "startLine": 104,
+        "startChar": 30,
+        "endLine": 104,
+        "endChar": 34
+      },
+      "revId": "31ad00fbbad72cd9273942cfc241959d930e5ab5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

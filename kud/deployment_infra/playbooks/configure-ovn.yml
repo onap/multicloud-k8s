@@ -15,6 +15,14 @@
         file: "{{ item }}"
       with_items:
         - "{{ ansible_os_family }}.yml"
+    - name: get Wand GPI files
+      get_url:
+        url: https://packages.wand.net.nz/keyring.gpg
+        dest: /etc/apt/trusted.gpg.d/wand.gpg
+    - name: add WAND Debian Repo
+      apt_repository:
+        repo: "deb https://packages.wand.net.nz {{ ansible_lsb.codename }} ovs-2.10"
+        state: present
     - name: install OpenVSwitch packages
       package:
         name: "{{ item }}"

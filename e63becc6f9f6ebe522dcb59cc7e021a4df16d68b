@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2a52205_ac3b7f8f",
+        "filename": "src/inventory/constants/const.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-15T01:43:29Z",
+      "side": 1,
+      "message": "the code appears to be using these constants - e.g. AAI URI, PORT, Authorization, etc.  This won\u0027t work in general - i.e. in someone elses ONAP environment.  (unless I\u0027m missing something).",
+      "revId": "e63becc6f9f6ebe522dcb59cc7e021a4df16d68b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -23,10 +23,10 @@ import (
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/api"
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/auth"
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/config"
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/db"
-
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	"github.com/gorilla/handlers"
 )
 
@@ -35,6 +35,12 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	err := db.InitializeDatabaseConnection()
+	if err != nil {
+		log.Println("Unable to initialize database connection...")
+		log.Println(err)
+		log.Fatalln("Exiting...")
+	}
+        err = contextDb.InitializeContextDatabase()
 	if err != nil {
 		log.Println("Unable to initialize database connection...")
 		log.Println(err)

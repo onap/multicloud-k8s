@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package project
+package module
 
 import (
 	"encoding/json"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/db"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -47,14 +47,14 @@ func (pk ProjectKey) String() string {
 	return string(out)
 }
 
-// ProjectManager is an interface exposes the Project functionality
+// Manager is an interface exposes the Project functionality
 type ProjectManager interface {
-	Create(pr Project) (Project, error)
-	Get(name string) (Project, error)
-	Delete(name string) error
+	CreateProject(pr Project) (Project, error)
+	GetProject(name string) (Project, error)
+	DeleteProject(name string) error
 }
 
-// ProjectClient implements the ProjectManager
+// ProjectClient implements the Manager
 // It will also be used to maintain some localized state
 type ProjectClient struct {
 	storeName           string
@@ -62,15 +62,15 @@ type ProjectClient struct {
 }
 
 // NewProjectClient returns an instance of the ProjectClient
-// which implements the ProjectManager
+// which implements the Manager
 func NewProjectClient() *ProjectClient {
 	return &ProjectClient{
 		tagMeta: "projectmetadata",
 	}
 }
 
-// Create a new collection based on the project
-func (v *ProjectClient) Create(p Project) (Project, error) {
+// CreateProject a new collection based on the project
+func (v *ProjectClient) CreateProject(p Project) (Project, error) {
 
 	//Construct the composite key to select the entry
 	key := ProjectKey{
@@ -78,7 +78,7 @@ func (v *ProjectClient) Create(p Project) (Project, error) {
 	}
 
 	//Check if this Project already exists
-	_, err := v.Get(p.ProjectName)
+	_, err := v.GetProject(p.ProjectName)
 	if err == nil {
 		return Project{}, pkgerrors.New("Project already exists")
 	}
@@ -91,8 +91,8 @@ func (v *ProjectClient) Create(p Project) (Project, error) {
 	return p, nil
 }
 
-// Get returns the Project for corresponding name
-func (v *ProjectClient) Get(name string) (Project, error) {
+// GetProject returns the Project for corresponding name
+func (v *ProjectClient) GetProject(name string) (Project, error) {
 
 	//Construct the composite key to select the entry
 	key := ProjectKey{
@@ -116,8 +116,8 @@ func (v *ProjectClient) Get(name string) (Project, error) {
 	return Project{}, pkgerrors.New("Error getting Project")
 }
 
-// Delete the  Project from database
-func (v *ProjectClient) Delete(name string) error {
+// DeleteProject the  Project from database
+func (v *ProjectClient) DeleteProject(name string) error {
 
 	//Construct the composite key to select the entry
 	key := ProjectKey{

@@ -21,7 +21,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/internal/project"
+	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 
 	"github.com/gorilla/mux"
 )
@@ -31,12 +31,12 @@ import (
 type projectHandler struct {
 	// Interface that implements Project operations
 	// We will set this variable with a mock interface for testing
-	client project.ProjectManager
+	client moduleLib.ProjectManager
 }
 
 // Create handles creation of the Project entry in the database
 func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var p project.Project
+	var p moduleLib.Project
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 	switch {
@@ -54,7 +54,7 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.Create(p)
+	ret, err := h.client.CreateProject(p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -75,7 +75,7 @@ func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["project-name"]
 
-	ret, err := h.client.Get(name)
+	ret, err := h.client.GetProject(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -95,7 +95,7 @@ func (h projectHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["project-name"]
 
-	err := h.client.Delete(name)
+	err := h.client.DeleteProject(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

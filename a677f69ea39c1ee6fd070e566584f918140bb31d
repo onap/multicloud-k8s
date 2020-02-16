@@ -1,0 +1,147 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "674caa66_e9c5ebdb",
+        "filename": "src/monitor/pkg/generated/clientset/versioned/clientset.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-16T02:49:39Z",
+      "side": 1,
+      "message": "not sure why this change was required.",
+      "revId": "a677f69ea39c1ee6fd070e566584f918140bb31d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b05974ec_09f6b69c",
+        "filename": "src/orchestrator/api/composite_app_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-16T02:49:39Z",
+      "side": 1,
+      "message": "2020",
+      "range": {
+        "startLine": 2,
+        "startChar": 13,
+        "endLine": 2,
+        "endChar": 17
+      },
+      "revId": "a677f69ea39c1ee6fd070e566584f918140bb31d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a75e111a_93dbed1b",
+        "filename": "src/orchestrator/api/projecthandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-16T02:49:39Z",
+      "side": 1,
+      "message": "i think this was already part of ritu\u0027s change.",
+      "revId": "a677f69ea39c1ee6fd070e566584f918140bb31d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e9dddafc_9e1b7e63",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-16T02:49:39Z",
+      "side": 1,
+      "message": "i think storename also has to be initialized as \"orchestrator\"",
+      "revId": "a677f69ea39c1ee6fd070e566584f918140bb31d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "55175211_a5cc41f1",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-16T02:49:39Z",
+      "side": 1,
+      "message": "instead of CompositeAppname as argument, we shall have v.storename.",
+      "range": {
+        "startLine": 98,
+        "startChar": 35,
+        "endLine": 98,
+        "endChar": 51
+      },
+      "revId": "a677f69ea39c1ee6fd070e566584f918140bb31d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4fa04e56_f78c0306",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-16T02:49:39Z",
+      "side": 1,
+      "message": "instead of name as argument, we shall have v.storename.",
+      "range": {
+        "startLine": 114,
+        "startChar": 30,
+        "endLine": 114,
+        "endChar": 34
+      },
+      "revId": "a677f69ea39c1ee6fd070e566584f918140bb31d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69cab600_bc3e729b",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-16T02:49:39Z",
+      "side": 1,
+      "message": "instead of name as argument, we shall have v.storename.",
+      "range": {
+        "startLine": 140,
+        "startChar": 25,
+        "endLine": 140,
+        "endChar": 29
+      },
+      "revId": "a677f69ea39c1ee6fd070e566584f918140bb31d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

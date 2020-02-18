@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "89cd4121_0b1eff9c",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2020-02-18T08:13:08Z",
+      "side": 1,
+      "message": "comment to remove/change",
+      "range": {
+        "startLine": 229,
+        "startChar": 1,
+        "endLine": 229,
+        "endChar": 58
+      },
+      "revId": "4b4d02bc4c22aa81c2867416a54826f955c82ad0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6c31e8e5_6256632d",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2020-02-18T08:13:08Z",
+      "side": 1,
+      "message": "why do we have this namespace \"k8s.multicloud.onap.org\" in all parameters comming from SO?",
+      "range": {
+        "startLine": 231,
+        "startChar": 62,
+        "endLine": 231,
+        "endChar": 97
+      },
+      "revId": "4b4d02bc4c22aa81c2867416a54826f955c82ad0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

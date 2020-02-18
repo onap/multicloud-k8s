@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "6baa1967_5fcbfde9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-02-18T13:48:35Z",
+      "side": 1,
+      "message": "Well, I\u0027ve meant the API that is responsible for handling requests from SO (/{cloud_owner}/{cloud_region}/infra_workload)",
+      "parentUuid": "22d12928_d08ac006",
+      "range": {
+        "startLine": 7,
+        "startChar": 42,
+        "endLine": 7,
+        "endChar": 60
+      },
+      "revId": "4b4d02bc4c22aa81c2867416a54826f955c82ad0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89cd4121_0b1eff9c",
         "filename": "src/k8splugin/api/brokerhandler.go",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "f406a0a5_a5e6e8e6",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-02-18T13:48:35Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "89cd4121_0b1eff9c",
+      "range": {
+        "startLine": 229,
+        "startChar": 1,
+        "endLine": 229,
+        "endChar": 58
+      },
+      "revId": "4b4d02bc4c22aa81c2867416a54826f955c82ad0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6c31e8e5_6256632d",
         "filename": "src/k8splugin/api/brokerhandler.go",
         "patchSetId": 3
@@ -59,6 +107,30 @@
       "writtenOn": "2020-02-18T08:13:08Z",
       "side": 1,
       "message": "why do we have this namespace \"k8s.multicloud.onap.org\" in all parameters comming from SO?",
+      "range": {
+        "startLine": 231,
+        "startChar": 62,
+        "endLine": 231,
+        "endChar": 97
+      },
+      "revId": "4b4d02bc4c22aa81c2867416a54826f955c82ad0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "51e6d601_ed12b9ad",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-02-18T13:48:35Z",
+      "side": 1,
+      "message": "Well, I wanted to prefix these custom labels to provide info about their \"origin\". Currently these labels are not attached to k8s resources, but only instance metadata, however in case they would I think such namespace should be used (not necessarily this one).\n\nIn terms of name: \"k8s.multicloud.onap.org\" - I\u0027ve derived it from project page (onap.org) and repository path (k8s.multicloud). I was also thinking about k8splugin.k8s.multicloud.onap.org or k8splugin.io (that is used in other place), but I don\u0027t really know if either of these is proper so I\u0027m welcome for comments.\n\n@Ritu - could you relate to this aspect?",
+      "parentUuid": "6c31e8e5_6256632d",
       "range": {
         "startLine": 231,
         "startChar": 62,

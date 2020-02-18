@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "58cd071e_740bbb3b",
+        "filename": "src/orchestrator/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-18T19:16:25Z",
+      "side": 1,
+      "message": "I\u0027m not sure adding register-microservices or any short API name is descriptive enough. Due to the complexity of the system whoever is using the APIs need to read the docs. But I\u0027m fine changing this if you believe it is dispositive.",
+      "parentUuid": "df9c8977_0ef16d63",
+      "range": {
+        "startLine": 42,
+        "startChar": 20,
+        "endLine": 42,
+        "endChar": 35
+      },
+      "revId": "31ad00fbbad72cd9273942cfc241959d930e5ab5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b685dd3_c6dcb422",
         "filename": "src/orchestrator/pkg/module/microservice.go",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2020-02-15T00:26:40Z",
       "side": 1,
       "message": "StoreName needs to be defined. Please use \"orchestrator\" as its name",
+      "range": {
+        "startLine": 63,
+        "startChar": 1,
+        "endLine": 63,
+        "endChar": 10
+      },
+      "revId": "31ad00fbbad72cd9273942cfc241959d930e5ab5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f223deb_b9cd0ad4",
+        "filename": "src/orchestrator/pkg/module/microservice.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-18T19:16:25Z",
+      "side": 1,
+      "message": "This storeName is a variable and as of now, it is not used. Currently the orchestrator code defaults to storename \"orchestrator\": https://gerrit.onap.org/r/gitweb?p\u003dmulticloud/k8s.git;a\u003dblob;f\u003dsrc/orchestrator/pkg/infra/db/store.go;h\u003d1a9632e7ebf027a265b0be18342f0b9f0d3575aa;hb\u003d8af74ae61508a3fbfd54c25d1cfe037f3ad08ca5#l67\n\nFurther this follows the convention set in project api: https://gerrit.onap.org/r/gitweb?p\u003dmulticloud/k8s.git;a\u003dblob;f\u003dsrc/orchestrator/pkg/module/project.go;h\u003de44164f96208cca7fee12a45e192fa7ce09b60a1;hb\u003d8af74ae61508a3fbfd54c25d1cfe037f3ad08ca5#l60\n\nI assume storeName here was set in case we neeeded to change it sometime in the future. However it is not currently used in the code as far I can tell.",
+      "parentUuid": "6b685dd3_c6dcb422",
       "range": {
         "startLine": 63,
         "startChar": 1,

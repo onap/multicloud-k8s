@@ -28,9 +28,17 @@ function start_etcd {
 function generate_config {
 cat << EOF > config.json
 {
+    "ca-file": "ca.cert",
+    "server-cert": "server.cert",
+    "server-key": "server.key",
+    "password": "",
     "database-ip": "${DATABASE_IP}",
     "database-type": "mongo",
     "plugin-dir": "plugins",
+    "etcd-ip": "127.0.0.1",
+    "etcd-cert": "",
+    "etcd-key": "",
+    "etcd-ca-file": "",
     "service-port": "9015"
 }
 EOF

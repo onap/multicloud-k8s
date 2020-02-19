@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1da2ba4d_90250f8a",
+        "filename": "src/orchestrator/pkg/module/project.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-19T20:00:14Z",
+      "side": 1,
+      "message": "I think storeName should be changed to collectionName. It is a better description and it can\u0027t be confused with Store used in src\\orchestrator\\pkg\\infra\\db\\store.go",
+      "range": {
+        "startLine": 70,
+        "startChar": 1,
+        "endLine": 70,
+        "endChar": 10
+      },
+      "revId": "8528278dd5187972de8c87a64df10ba1385f6306",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d7bbe641_d122ade8",
+        "filename": "src/orchestrator/pkg/module/project.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-19T20:00:14Z",
+      "side": 1,
+      "message": "I think this should be collectionName: \"project\" or \"projects\".",
+      "range": {
+        "startLine": 79,
+        "startChar": 2,
+        "endLine": 79,
+        "endChar": 27
+      },
+      "revId": "8528278dd5187972de8c87a64df10ba1385f6306",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "10933461_b88f5c6d",
+        "filename": "src/orchestrator/pkg/module/project.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-19T20:00:14Z",
+      "side": 1,
+      "message": "I believe this should be v.collectionName but it might make sense to change v to something that describes ProjectClient better. Possibly \"pc\"",
+      "range": {
+        "startLine": 99,
+        "startChar": 24,
+        "endLine": 99,
+        "endChar": 35
+      },
+      "revId": "8528278dd5187972de8c87a64df10ba1385f6306",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

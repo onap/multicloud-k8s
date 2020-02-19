@@ -22,6 +22,30 @@
       "revId": "869a4e4967435e7b360b49ecd8d37f9f10226965",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcab3038_9dbdbe38",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-02-19T14:20:40Z",
+      "side": 1,
+      "message": "They are defined by this patch and I didn\u0027t find them elsewhere. I\u0027ve described in patchset 3 their origin for Łukasz.\n\nWhat do you mean by \"Can they be provided as input to the API\"?",
+      "parentUuid": "deb125ee_e5f6c445",
+      "range": {
+        "startLine": 162,
+        "startChar": 1,
+        "endLine": 166,
+        "endChar": 2
+      },
+      "revId": "869a4e4967435e7b360b49ecd8d37f9f10226965",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -1,6 +1,7 @@
 module github.com/onap/multicloud-k8s/src/orchestrator
 
 require (
+	github.com/coreos/etcd v3.3.12+incompatible
 	github.com/docker/engine v0.0.0-20190620014054-c513a4c6c298
 	github.com/ghodss/yaml v1.0.0
 	github.com/gogo/protobuf v1.3.1 // indirect
@@ -32,3 +33,5 @@ replace (
 	k8s.io/client-go => k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.0.0-20190409023720-1bc0c81fa51d
 )
+
+go 1.13

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Intel Corporation, Inc
+ * Copyright 2020 Intel Corporation, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,30 @@ package module
 
 import (
 	"encoding/json"
-
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
 	pkgerrors "github.com/pkg/errors"
 )
 
-// Project contains the parameters needed for Projects
-// It implements the interface for managing the Projects
+
+// Project contains the metaData for Projects
 type Project struct {
-	ProjectName string `json:"project-name"`
-	Description string `json:"description"`
+	MetaData ProjectMetaData`json:"metadata"`
 }
+
+
+// ProjectMetaData contains the parameters for creating a project
+type ProjectMetaData struct {
+	Name string `json:"name"`
+	Description string `json:"description"`
+	UserData1 string `userData1:"userData1"`
+	UserData2 string `userData2:"userData2"`
+}
+
 
 // ProjectKey is the key structure that is used in the database
 type ProjectKey struct {
-	ProjectName string `json:"rb-name"`
+	ProjectName string `json:"project"`
 }
 
 // We will use json marshalling to convert to string to
@@ -47,49 +55,55 @@ func (pk ProjectKey) String() string {
 	return string(out)
 }
 
-// Manager is an interface exposes the Project functionality
+
+// ProjectManager is an interface exposes the Project functionality
 type ProjectManager interface {
 	CreateProject(pr Project) (Project, error)
 	GetProject(name string) (Project, error)
 	DeleteProject(name string) error
 }
 
-// ProjectClient implements the Manager
+
+// ProjectClient implements the ProjectManager
 // It will also be used to maintain some localized state
 type ProjectClient struct {
 	storeName           string
 	tagMeta, tagContent string
 }
 
+
 // NewProjectClient returns an instance of the ProjectClient
-// which implements the Manager
+// which implements the ProjectManager
 func NewProjectClient() *ProjectClient {
 	return &ProjectClient{
+		storeName: "orchestrator",
 		tagMeta: "projectmetadata",
 	}
 }
+
 
 // CreateProject a new collection based on the project
 func (v *ProjectClient) CreateProject(p Project) (Project, error) {
 
 	//Construct the composite key to select the entry
 	key := ProjectKey{
-		ProjectName: p.ProjectName,
+		ProjectName: p.MetaData.Name,
 	}
 
 	//Check if this Project already exists
-	_, err := v.GetProject(p.ProjectName)
+	_, err := v.GetProject(p.MetaData.Name)
 	if err == nil {
 		return Project{}, pkgerrors.New("Project already exists")
 	}
 
-	err = db.DBconn.Create(p.ProjectName, key, v.tagMeta, p)
+	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
 	if err != nil {
 		return Project{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
 
 	return p, nil
 }
+
 
 // GetProject returns the Project for corresponding name
 func (v *ProjectClient) GetProject(name string) (Project, error) {
@@ -98,7 +112,7 @@ func (v *ProjectClient) GetProject(name string) (Project, error) {
 	key := ProjectKey{
 		ProjectName: name,
 	}
-	value, err := db.DBconn.Read(name, key, v.tagMeta)
+	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Project{}, pkgerrors.Wrap(err, "Get Project")
 	}
@@ -116,6 +130,7 @@ func (v *ProjectClient) GetProject(name string) (Project, error) {
 	return Project{}, pkgerrors.New("Error getting Project")
 }
 
+
 // DeleteProject the  Project from database
 func (v *ProjectClient) DeleteProject(name string) error {
 
@@ -123,7 +138,7 @@ func (v *ProjectClient) DeleteProject(name string) error {
 	key := ProjectKey{
 		ProjectName: name,
 	}
-	err := db.DBconn.Delete(name, key, v.tagMeta)
+	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Project Entry;")
 	}

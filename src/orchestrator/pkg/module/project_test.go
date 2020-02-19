@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Intel Corporation, Inc
+ * Copyright 2020 Intel Corporation, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
+
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -37,12 +38,20 @@ func TestCreateProject(t *testing.T) {
 		{
 			label: "Create Project",
 			inp: Project{
-				ProjectName: "testProject",
-				Description: "A sample Project used for unit testing",
+				MetaData: ProjectMetaData{
+					Name: "testProject",
+					Description: "A sample Project used for unit testing",
+					UserData1: "data1",
+					UserData2: "data2",
+				},
 			},
 			expected: Project{
-				ProjectName: "testProject",
-				Description: "A sample Project used for unit testing",
+				MetaData: ProjectMetaData{
+					Name:"testProject",
+					Description: "A sample Project used for unit testing",
+					UserData1: "data1",
+					UserData2: "data2",
+				},
 			},
 			expectedError: "",
 			mockdb:        &db.MockDB{},
@@ -92,16 +101,25 @@ func TestGetProject(t *testing.T) {
 			label: "Get Project",
 			name:  "testProject",
 			expected: Project{
-				ProjectName: "testProject",
-				Description: "Test project for unit testing",
+				MetaData: ProjectMetaData{
+					Name: "testProject",
+					Description: "Test project for unit testing",
+					UserData1: "userData1",
+					UserData2: "userData2",
+				},
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ProjectKey{ProjectName: "testProject"}.String(): {
 						"projectmetadata": []byte(
-							"{\"project-name\":\"testProject\"," +
-								"\"description\":\"Test project for unit testing\"}"),
+							"{" +
+								"\"metadata\" : {"+
+									"\"Name\":\"testProject\"," +
+									"\"Description\":\"Test project for unit testing\"," +
+									"\"UserData1\": \"userData1\","+
+									"\"UserData2\":\"userData2\"}"+
+							"}"),
 					},
 				},
 			},

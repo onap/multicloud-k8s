@@ -49,7 +49,7 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Name is required.
-	if p.ProjectName == "" {
+	if p.MetaData.Name == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
@@ -70,7 +70,7 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Get handles GET operations on a particular Project Name
-// Returns a rb.Project
+// Returns a Project
 func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["project-name"]

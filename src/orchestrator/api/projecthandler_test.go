@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Intel Corporation, Inc
+ * Copyright 2020 Intel Corporation, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,20 +77,32 @@ func TestProjectCreateHandler(t *testing.T) {
 			label:        "Create Project",
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
-				"project-name":"testProject",
-				"description":"Test Project used for unit testing"
-				}`)),
+				"metadata" : {
+					"name": "testProject",
+    				"description": "Test Project used for unit testing",
+    				"userData1": "data1",
+    				"userData2": "data2"
+				}
+			}`)),
 			expected: moduleLib.Project{
-				ProjectName: "testProject",
-				Description: "Test Project used for unit testing",
+				MetaData: moduleLib.ProjectMetaData{
+					Name: "testProject",
+					Description: "Test Project used for unit testing",
+					UserData1: "data1",
+					UserData2: "data2",
+				},
 			},
 			projectClient: &mockProjectManager{
 				//Items that will be returned by the mocked Client
 				Items: []moduleLib.Project{
-					{
-						ProjectName: "testProject",
-						Description: "Test Project used for unit testing",
-					},
+					  		moduleLib.Project{
+								MetaData: moduleLib.ProjectMetaData{
+									Name: "testProject",
+									Description: "Test Project used for unit testing",
+									UserData1: "data1",
+									UserData2: "data2",
+								},
+							},
 				},
 			},
 		},
@@ -141,16 +153,24 @@ func TestProjectGetHandler(t *testing.T) {
 			label:        "Get Project",
 			expectedCode: http.StatusOK,
 			expected: moduleLib.Project{
-				ProjectName: "testProject",
-				Description: "A Test project for unit testing",
+				MetaData: moduleLib.ProjectMetaData{
+					Name: "testProject",
+					Description: "Test Project used for unit testing",
+					UserData1: "data1",
+					UserData2: "data2",
+				},
 			},
 			name: "testProject",
 			projectClient: &mockProjectManager{
 				Items: []moduleLib.Project{
-					{
-						ProjectName: "testProject",
-						Description: "A Test project for unit testing",
-					},
+								moduleLib.Project{
+									MetaData: moduleLib.ProjectMetaData{
+										Name: "testProject",
+										Description: "Test Project used for unit testing",
+										UserData1: "data1",
+										UserData2: "data2",
+									},
+								},
 				},
 			},
 		},

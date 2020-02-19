@@ -31,7 +31,7 @@ func ExampleClient_Project() {
 		return
 	}
 	// Perform operations on Project Module
-	_, err := c.Project.CreateProject(moduleLib.Project{ProjectName: "test"})
+	_, err := c.Project.CreateProject(moduleLib.Project{MetaData: moduleLib.ProjectMetaData{Name: "test", Description: "test", UserData1: "userData1", UserData2: "userData2"}})
 	if err != nil {
 		log.Println(err)
 		return

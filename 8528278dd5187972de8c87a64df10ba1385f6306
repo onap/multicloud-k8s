@@ -2,6 +2,92 @@
   "comments": [
     {
       "key": {
+        "uuid": "63185cb9_b4bc8887",
+        "filename": "src/orchestrator/api/projecthandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-19T20:01:09Z",
+      "side": 1,
+      "message": "Change the comment",
+      "range": {
+        "startLine": 73,
+        "startChar": 13,
+        "endLine": 73,
+        "endChar": 15
+      },
+      "revId": "8528278dd5187972de8c87a64df10ba1385f6306",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cc1c39d_d4231732",
+        "filename": "src/orchestrator/go.mod",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-19T20:01:09Z",
+      "side": 1,
+      "message": "This is a duplicate of line 16",
+      "revId": "8528278dd5187972de8c87a64df10ba1385f6306",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9831ffad_9f99c8fe",
+        "filename": "src/orchestrator/go.mod",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-19T20:01:09Z",
+      "side": 1,
+      "message": "Remove this",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 7
+      },
+      "revId": "8528278dd5187972de8c87a64df10ba1385f6306",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c4b4f9c3_0544bf79",
+        "filename": "src/orchestrator/pkg/module/project.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-19T20:01:09Z",
+      "side": 1,
+      "message": "Change it to project",
+      "range": {
+        "startLine": 44,
+        "startChar": 27,
+        "endLine": 44,
+        "endChar": 34
+      },
+      "revId": "8528278dd5187972de8c87a64df10ba1385f6306",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1da2ba4d_90250f8a",
         "filename": "src/orchestrator/pkg/module/project.go",
         "patchSetId": 1

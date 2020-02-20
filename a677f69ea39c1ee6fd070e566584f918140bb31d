@@ -76,6 +76,24 @@
     },
     {
       "key": {
+        "uuid": "61786d5c_918b6829",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-20T19:01:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9dddafc_9e1b7e63",
+      "revId": "a677f69ea39c1ee6fd070e566584f918140bb31d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "55175211_a5cc41f1",
         "filename": "src/orchestrator/pkg/module/compositeapp.go",
         "patchSetId": 2

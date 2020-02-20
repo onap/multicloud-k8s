@@ -15,6 +15,7 @@ package main
 
 import (
 	"context"
+	db "hpacontroller/pkg/infra/controller-db"
 	"log"
 	"math/rand"
 	"net/http"
@@ -22,24 +23,32 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/api"
+	"github.com/gorilla/handlers"
+	"github.com/onap/multicloud-k8s/src/hpacontroller/api"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
-	"github.com/gorilla/handlers"
 )
 
 func main() {
-
+	var DBconn_Orchestrator Store
+	var DBconn_Controller Store
 	rand.Seed(time.Now().UnixNano())
 
-	err := db.InitializeDatabaseConnection("orchestrator")
+	DBconn_Orchestrator, err := db.InitializeDatabaseConnection("orchestrator")
 	if err != nil {
 		log.Println("Unable to initialize database connection...")
 		log.Println(err)
 		log.Fatalln("Exiting...")
 	}
+
+	DBconn_Controller, err := db.InitializeDatabaseConnection("hpa-controller")
+	if err != nil {
+		log.Println("Unable to initialize database connection...")
+		log.Println(err)
+		log.Fatalln("Exiting...")
+	}
+
 	err = contextDb.InitializeContextDatabase()
 	if err != nil {
 		log.Println("Unable to initialize database connection...")
@@ -49,7 +58,7 @@ func main() {
 
 	httpRouter := api.NewRouter(nil)
 	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
-	log.Println("Starting Kubernetes Multicloud API")
+	log.Println("Starting HPA Placement Controller API")
 
 	httpServer := &http.Server{
 		Handler: loggedRouter,

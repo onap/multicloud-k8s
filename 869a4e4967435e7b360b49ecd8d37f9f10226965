@@ -70,6 +70,30 @@
       "revId": "869a4e4967435e7b360b49ecd8d37f9f10226965",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e7d5948_5a7643ed",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-02-20T08:17:44Z",
+      "side": 1,
+      "message": "\u003e I think Ritu means that labels should be provided by user.\n\nWell, using direct `/instantiate` API, user can define additional set of labels with whatever name he wants. When using `/{cloud_owner}/{cloud_region}/broker_handler` (higher level API (Multicloud-compatible) used to manage instance by SO), we convert in this function standardized message from SO to request compatible with `/instantiate` API.\n\n\u003e This looks like a quite hardcoded list of labels k8s plugin would set for the application. Is that something we want? Should k8s plugin be interested of what labels users use?\n\nThis is where we can apply additional labels, that user would define by it\u0027s own in direct case, based on \"standard\" set of parameters. Because they are \"standard\" and comply to some ONAP-wide variables, I wanted to prefix them with some name, that would indicate (for example, to user querying k8splugin) which instance is managed by \"just\" k8splugin, and which one has been orchestrated by SO.\n\n\u003e Where k8s plugin needs these labels?\n\nThe only practical use of these variables so far is following:\n* \"*/stack-name\" - SO uses this label (transparent for SO, logic is implemented in k8splugin) to query for existing instances before it tries instantiate (and maybe in other cases I didn\u0027t come accross yet)\n* \"*/generic-vnf-id and */vf-module-id\" - they are important for https://jira.onap.org/browse/SO-2293 in order to map easily in k8splugin what k8s instance refers to which vf-module/vnf.",
+      "parentUuid": "4dca3be2_a930c991",
+      "range": {
+        "startLine": 162,
+        "startChar": 1,
+        "endLine": 166,
+        "endChar": 2
+      },
+      "revId": "869a4e4967435e7b360b49ecd8d37f9f10226965",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

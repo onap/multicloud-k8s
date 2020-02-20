@@ -22,6 +22,30 @@
       "revId": "7ca787f80849eb6657095a66b7e5737340782804",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b13eec4_99746a6b",
+        "filename": "src/orchestrator/pkg/module/controller.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-20T23:36:28Z",
+      "side": 1,
+      "message": "Last time we talked about this ip-address was all that was needed. I could see how \u0027host\u0027 or something similar would be useful here.",
+      "parentUuid": "c7b3ee36_11b8bdb2",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 32,
+        "endChar": 36
+      },
+      "revId": "7ca787f80849eb6657095a66b7e5737340782804",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

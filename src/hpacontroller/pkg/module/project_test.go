@@ -17,43 +17,48 @@
 package module
 
 import (
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-
 	pkgerrors "github.com/pkg/errors"
 )
 
-func TestCreateController(t *testing.T) {
+func TestCreateProject(t *testing.T) {
 	testCases := []struct {
 		label         string
-		inp           Controller
+		inp           Project
 		expectedError string
 		mockdb        *db.MockDB
-		expected      Controller
+		expected      Project
 	}{
 		{
-			label: "Create Controller",
-			inp: Controller{
-				Name: "testController",
-				Host: "132.156.0.10",
-				Port: "8080",
+			label: "Create Project",
+			inp: Project{
+				MetaData: ProjectMetaData{
+					Name:        "testProject",
+					Description: "A sample Project used for unit testing",
+					UserData1:   "data1",
+					UserData2:   "data2",
+				},
 			},
-			expected: Controller{
-				Name: "testController",
-				Host: "132.156.0.10",
-				Port: "8080",
+			expected: Project{
+				MetaData: ProjectMetaData{
+					Name:        "testProject",
+					Description: "A sample Project used for unit testing",
+					UserData1:   "data1",
+					UserData2:   "data2",
+				},
 			},
 			expectedError: "",
 			mockdb:        &db.MockDB{},
 		},
 		{
-			label:         "Failed Create Controller",
-			expectedError: "Error Creating Controller",
+			label:         "Failed Create Project",
+			expectedError: "Error Creating Project",
 			mockdb: &db.MockDB{
-				Err: pkgerrors.New("Error Creating Controller"),
+				Err: pkgerrors.New("Error Creating Project"),
 			},
 		},
 	}
@@ -61,8 +66,8 @@ func TestCreateController(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
-			impl := NewControllerClient()
-			got, err := impl.CreateController(testCase.inp)
+			impl := NewProjectClient()
+			got, err := impl.CreateProject(testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -80,7 +85,7 @@ func TestCreateController(t *testing.T) {
 	}
 }
 
-func TestGetController(t *testing.T) {
+func TestGetProject(t *testing.T) {
 
 	testCases := []struct {
 		label         string
@@ -88,24 +93,31 @@ func TestGetController(t *testing.T) {
 		expectedError string
 		mockdb        *db.MockDB
 		inp           string
-		expected      Controller
+		expected      Project
 	}{
 		{
-			label: "Get Controller",
-			name:  "testController",
-			expected: Controller{
-				Name: "testController",
-				Host: "132.156.0.10",
-				Port: "8080",
+			label: "Get Project",
+			name:  "testProject",
+			expected: Project{
+				MetaData: ProjectMetaData{
+					Name:        "testProject",
+					Description: "Test project for unit testing",
+					UserData1:   "userData1",
+					UserData2:   "userData2",
+				},
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
-					ControllerKey{ControllerName: "testController"}.String(): {
-						"controllermetadata": []byte(
-							"{\"name\":\"testController\"," +
-								"\"host\":\"132.156.0.10\"," +
-								"\"port\":\"8080\"}"),
+					ProjectKey{ProjectName: "testProject"}.String(): {
+						"projectmetadata": []byte(
+							"{" +
+								"\"metadata\" : {" +
+								"\"Name\":\"testProject\"," +
+								"\"Description\":\"Test project for unit testing\"," +
+								"\"UserData1\": \"userData1\"," +
+								"\"UserData2\":\"userData2\"}" +
+								"}"),
 					},
 				},
 			},
@@ -122,8 +134,8 @@ func TestGetController(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
-			impl := NewControllerClient()
-			got, err := impl.GetController(testCase.name)
+			impl := NewProjectClient()
+			got, err := impl.GetProject(testCase.name)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get returned an unexpected error: %s", err)
@@ -141,7 +153,7 @@ func TestGetController(t *testing.T) {
 	}
 }
 
-func TestDeleteController(t *testing.T) {
+func TestDeleteProject(t *testing.T) {
 
 	testCases := []struct {
 		label         string
@@ -150,8 +162,8 @@ func TestDeleteController(t *testing.T) {
 		mockdb        *db.MockDB
 	}{
 		{
-			label:  "Delete Controller",
-			name:   "testController",
+			label:  "Delete Project",
+			name:   "testProject",
 			mockdb: &db.MockDB{},
 		},
 		{
@@ -166,8 +178,8 @@ func TestDeleteController(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
-			impl := NewControllerClient()
-			err := impl.DeleteController(testCase.name)
+			impl := NewProjectClient()
+			err := impl.DeleteProject(testCase.name)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Delete returned an unexpected error %s", err)

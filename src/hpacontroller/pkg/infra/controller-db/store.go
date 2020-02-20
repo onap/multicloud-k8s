@@ -11,13 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package db
+package controller-db
 
 import (
 	"encoding/json"
 	"reflect"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -29,6 +30,7 @@ var DBconn Store
 // that wants to use the Store interface. This allows various
 // db backends and key types.
 type Key interface {
+	String() string
 }
 
 // Store is an interface for accessing the database
@@ -53,34 +55,22 @@ type Store interface {
 	// TODO: If tag is empty, it will delete all tags under key.
 	Delete(table string, key Key, tag string) error
 
-	// Inserts and Updates a tag with key and also adds query fields if provided
-	Insert(coll string, key Key, query interface{}, tag string, data interface{}) error
-
-	// Find the document(s) with key and get the tag values from the document(s)
-	Find(coll string, key Key, tag string) ([][]byte, error)
-
-        // Removes the document(s) matching the key if no child reference in collection
-	Remove(coll string, key Key) error
-
-	// Remove all the document(s) matching the key
-	RemoveAll(coll string, key Key) error
+	// Reads all master tables and data from the specified tag in table
+	ReadAll(table string, tag string) (map[string][]byte, error)
 }
 
 // CreateDBClient creates the DB client
-func createDBClient(dbType string, dbName string) error {
+func createDBClient(dbType string, dbName string) (Store, error) {
 	var err error
-	if dbName == "" {
-		dbName = "orchestrator"
-	}
 
 	switch dbType {
 	case "mongo":
 		// create a mongodb database with orchestrator as the name
 		DBconn, err = NewMongoStore(dbName, nil)
 	default:
-		return pkgerrors.New(dbType + "DB not supported")
+		return nil, pkgerrors.New(dbType + "DB not supported")
 	}
-	return err
+	return DBconn, err
 }
 
 // Serialize converts given data into a JSON string
@@ -103,16 +93,16 @@ func DeSerialize(str string, v interface{}) error {
 
 // InitializeDatabaseConnection sets up the connection to the
 // configured database to allow the application to talk to it.
-func InitializeDatabaseConnection(dbName string) error {
-	err := createDBClient(config.GetConfiguration().DatabaseType, dbName)
+func InitializeDatabaseConnection(dbName string) (Store, error) {
+	client, err := createDBClient(config.GetConfiguration().DatabaseType, dbName)
 	if err != nil {
-		return pkgerrors.Cause(err)
+		return nil, pkgerrors.Cause(err)
 	}
 
 	err = DBconn.HealthCheck()
 	if err != nil {
-		return pkgerrors.Cause(err)
+		return nil, pkgerrors.Cause(err)
 	}
 
-	return nil
+	return client, err
 }

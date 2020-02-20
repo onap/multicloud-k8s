@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Intel Corporation, Inc
+ * Copyright 2018 Intel Corporation, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-syntax = "proto3";
- 
-service sync {
-    // Sync
-    rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {
-    }
+package module
+
+import ()
+
+// Client for using the services in the orchestrator
+type Client struct {
+	Project *ProjectClient
+	// Add Clients for API's here
 }
- 
-message InstallAppRequest {
-    string app_context = 1;
-}
- 
-message InstallAppResponse {
-    bool app_context_installed = 1;
+
+// NewClient creates a new client for using the services
+func NewClient() *Client {
+	c := &Client{}
+	c.Project = NewProjectClient()
+	// Add Client API handlers here
+	return c
 }

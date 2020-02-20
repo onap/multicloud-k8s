@@ -69,6 +69,10 @@ type Store interface {
 // CreateDBClient creates the DB client
 func createDBClient(dbType string, dbName string) error {
 	var err error
+	if dbName == "" {
+		dbName = "orchestrator"
+	}
+
 	switch dbType {
 	case "mongo":
 		// create a mongodb database with orchestrator as the name

@@ -21,12 +21,11 @@ package controller
 import (
 	context "context"
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -126,27 +125,188 @@ func (m *ContextUpdateResponse) GetAppContextUpdated() bool {
 	return false
 }
 
+type InstallAppRequest struct {
+	AppContext           string   `protobuf:"bytes,1,opt,name=app_context,json=appContext,proto3" json:"app_context,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *InstallAppRequest) Reset()         { *m = InstallAppRequest{} }
+func (m *InstallAppRequest) String() string { return proto.CompactTextString(m) }
+func (*InstallAppRequest) ProtoMessage()    {}
+func (*InstallAppRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed7f10298fa1d90f, []int{2}
+}
+
+func (m *InstallAppRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InstallAppRequest.Unmarshal(m, b)
+}
+func (m *InstallAppRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InstallAppRequest.Marshal(b, m, deterministic)
+}
+func (m *InstallAppRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InstallAppRequest.Merge(m, src)
+}
+func (m *InstallAppRequest) XXX_Size() int {
+	return xxx_messageInfo_InstallAppRequest.Size(m)
+}
+func (m *InstallAppRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_InstallAppRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InstallAppRequest proto.InternalMessageInfo
+
+func (m *InstallAppRequest) GetAppContext() string {
+	if m != nil {
+		return m.AppContext
+	}
+	return ""
+}
+
+type InstallAppResponse struct {
+	AppContextInstalled  bool     `protobuf:"varint,1,opt,name=app_context_installed,json=appContextInstalled,proto3" json:"app_context_installed,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *InstallAppResponse) Reset()         { *m = InstallAppResponse{} }
+func (m *InstallAppResponse) String() string { return proto.CompactTextString(m) }
+func (*InstallAppResponse) ProtoMessage()    {}
+func (*InstallAppResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed7f10298fa1d90f, []int{3}
+}
+
+func (m *InstallAppResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InstallAppResponse.Unmarshal(m, b)
+}
+func (m *InstallAppResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InstallAppResponse.Marshal(b, m, deterministic)
+}
+func (m *InstallAppResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InstallAppResponse.Merge(m, src)
+}
+func (m *InstallAppResponse) XXX_Size() int {
+	return xxx_messageInfo_InstallAppResponse.Size(m)
+}
+func (m *InstallAppResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_InstallAppResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InstallAppResponse proto.InternalMessageInfo
+
+func (m *InstallAppResponse) GetAppContextInstalled() bool {
+	if m != nil {
+		return m.AppContextInstalled
+	}
+	return false
+}
+
+type HealthCheckRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *HealthCheckRequest) Reset()         { *m = HealthCheckRequest{} }
+func (m *HealthCheckRequest) String() string { return proto.CompactTextString(m) }
+func (*HealthCheckRequest) ProtoMessage()    {}
+func (*HealthCheckRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed7f10298fa1d90f, []int{4}
+}
+
+func (m *HealthCheckRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_HealthCheckRequest.Unmarshal(m, b)
+}
+func (m *HealthCheckRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_HealthCheckRequest.Marshal(b, m, deterministic)
+}
+func (m *HealthCheckRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HealthCheckRequest.Merge(m, src)
+}
+func (m *HealthCheckRequest) XXX_Size() int {
+	return xxx_messageInfo_HealthCheckRequest.Size(m)
+}
+func (m *HealthCheckRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_HealthCheckRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_HealthCheckRequest proto.InternalMessageInfo
+
+type HealthCheckResponse struct {
+	ConnectionWorking    bool     `protobuf:"varint,1,opt,name=ConnectionWorking,proto3" json:"ConnectionWorking,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *HealthCheckResponse) Reset()         { *m = HealthCheckResponse{} }
+func (m *HealthCheckResponse) String() string { return proto.CompactTextString(m) }
+func (*HealthCheckResponse) ProtoMessage()    {}
+func (*HealthCheckResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed7f10298fa1d90f, []int{5}
+}
+
+func (m *HealthCheckResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_HealthCheckResponse.Unmarshal(m, b)
+}
+func (m *HealthCheckResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_HealthCheckResponse.Marshal(b, m, deterministic)
+}
+func (m *HealthCheckResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HealthCheckResponse.Merge(m, src)
+}
+func (m *HealthCheckResponse) XXX_Size() int {
+	return xxx_messageInfo_HealthCheckResponse.Size(m)
+}
+func (m *HealthCheckResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_HealthCheckResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_HealthCheckResponse proto.InternalMessageInfo
+
+func (m *HealthCheckResponse) GetConnectionWorking() bool {
+	if m != nil {
+		return m.ConnectionWorking
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*ContextUpdateRequest)(nil), "ContextUpdateRequest")
 	proto.RegisterType((*ContextUpdateResponse)(nil), "ContextUpdateResponse")
+	proto.RegisterType((*InstallAppRequest)(nil), "InstallAppRequest")
+	proto.RegisterType((*InstallAppResponse)(nil), "InstallAppResponse")
+	proto.RegisterType((*HealthCheckRequest)(nil), "HealthCheckRequest")
+	proto.RegisterType((*HealthCheckResponse)(nil), "HealthCheckResponse")
 }
 
-func init() { proto.RegisterFile("controller.proto", fileDescriptor_ed7f10298fa1d90f) }
+func init() {
+	proto.RegisterFile("controller.proto", fileDescriptor_ed7f10298fa1d90f)
+}
 
 var fileDescriptor_ed7f10298fa1d90f = []byte{
-	// 183 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x48, 0xce, 0xcf, 0x2b,
-	0x29, 0xca, 0xcf, 0xc9, 0x49, 0x2d, 0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0x8a, 0xe2, 0x12,
-	0x71, 0xce, 0xcf, 0x2b, 0x49, 0xad, 0x28, 0x09, 0x2d, 0x48, 0x49, 0x2c, 0x49, 0x0d, 0x4a, 0x2d,
-	0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0x52, 0xe4, 0xe2, 0xc9, 0xcc, 0x2b, 0x49, 0xcd, 0x2b, 0x89, 0x4f,
-	0x2f, 0xca, 0x2f, 0x2d, 0x90, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0xe2, 0x86, 0x88, 0xb9, 0x83,
-	0x84, 0x84, 0xe4, 0xb9, 0xb8, 0x13, 0x0b, 0x0a, 0xe2, 0x93, 0x21, 0xda, 0x25, 0x98, 0xc0, 0x2a,
-	0xb8, 0x12, 0x0b, 0x0a, 0xa0, 0x06, 0x2a, 0xb9, 0x73, 0x89, 0xa2, 0x99, 0x5d, 0x5c, 0x90, 0x9f,
-	0x57, 0x9c, 0x2a, 0xa4, 0xc7, 0x25, 0x8c, 0xa4, 0x33, 0xbe, 0x14, 0x2c, 0x9b, 0x02, 0xb6, 0x83,
-	0x23, 0x48, 0x10, 0x61, 0x02, 0x44, 0x5b, 0x8a, 0x51, 0x20, 0x17, 0x17, 0xc2, 0xe1, 0x42, 0xce,
-	0x5c, 0x02, 0x10, 0x09, 0x47, 0xb8, 0x42, 0x21, 0x51, 0x3d, 0x6c, 0xbe, 0x90, 0x12, 0xd3, 0xc3,
-	0xea, 0x00, 0x25, 0x86, 0x24, 0x36, 0xb0, 0xf7, 0x8d, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x2c,
-	0xbe, 0x00, 0x80, 0x12, 0x01, 0x00, 0x00,
+	// 303 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x92, 0x4f, 0x4f, 0xb3, 0x40,
+	0x10, 0xc6, 0xe1, 0x3d, 0xbc, 0xd1, 0xc1, 0x43, 0x19, 0xc0, 0x34, 0x5c, 0xd4, 0x3d, 0x79, 0x30,
+	0x7b, 0xa8, 0x26, 0x26, 0xde, 0x1a, 0x0e, 0x6d, 0xaf, 0x24, 0xc6, 0xc4, 0x0b, 0x41, 0xd8, 0xb4,
+	0xa4, 0x64, 0x77, 0x85, 0x21, 0xf1, 0x13, 0xfa, 0xb9, 0x8c, 0xfc, 0x29, 0xd8, 0xe5, 0x3a, 0xb3,
+	0xcf, 0xf3, 0x9b, 0x67, 0x66, 0x61, 0x91, 0x29, 0x49, 0x95, 0x2a, 0x4b, 0x51, 0x71, 0x5d, 0x29,
+	0x52, 0xec, 0x1d, 0xfc, 0x48, 0x49, 0x12, 0x5f, 0xf4, 0xaa, 0xf3, 0x94, 0x44, 0x2c, 0x3e, 0x1b,
+	0x51, 0x13, 0xde, 0xc1, 0x55, 0x21, 0x49, 0x48, 0x4a, 0xf6, 0x95, 0x6a, 0xf4, 0xd2, 0xbe, 0xb5,
+	0xef, 0x2f, 0x63, 0xa7, 0xab, 0x6d, 0x7e, 0x4b, 0x78, 0x03, 0x4e, 0xaa, 0x75, 0x92, 0x75, 0xf2,
+	0xe5, 0xbf, 0xf6, 0x05, 0xa4, 0x5a, 0xf7, 0x86, 0x6c, 0x03, 0xc1, 0x99, 0x77, 0xad, 0x95, 0xac,
+	0x05, 0x72, 0xf0, 0x26, 0xca, 0xa4, 0x69, 0xbb, 0x79, 0xcb, 0xb8, 0x88, 0xdd, 0xd1, 0xa1, 0x93,
+	0xe5, 0xec, 0x09, 0xdc, 0x9d, 0xac, 0x29, 0x2d, 0xcb, 0xb5, 0xd6, 0xc3, 0x84, 0x67, 0x78, 0xdb,
+	0xc0, 0x6f, 0x01, 0xa7, 0xaa, 0x9e, 0xbd, 0x82, 0x60, 0xca, 0x2e, 0xba, 0x17, 0x27, 0xba, 0x37,
+	0x1a, 0xec, 0x86, 0x16, 0xf3, 0x01, 0xb7, 0x22, 0x2d, 0xe9, 0x10, 0x1d, 0x44, 0x76, 0xec, 0x07,
+	0x60, 0x11, 0x78, 0x7f, 0xaa, 0x3d, 0xe0, 0x01, 0xdc, 0x48, 0x49, 0x29, 0x32, 0x2a, 0x94, 0x7c,
+	0x53, 0xd5, 0xb1, 0x90, 0xfb, 0x21, 0x9a, 0xd1, 0x58, 0x7d, 0xdb, 0x00, 0xe3, 0x51, 0x30, 0x82,
+	0x45, 0x17, 0x7a, 0x7d, 0x1a, 0x03, 0x03, 0x3e, 0x77, 0xa1, 0xf0, 0x9a, 0xcf, 0x2e, 0x97, 0x59,
+	0xf8, 0x0c, 0x30, 0x06, 0x47, 0xe4, 0xc6, 0xee, 0x42, 0x8f, 0x9b, 0x9b, 0x61, 0x16, 0xbe, 0x80,
+	0x33, 0x49, 0x84, 0x1e, 0x37, 0x53, 0x87, 0x3e, 0x9f, 0x09, 0xcd, 0xac, 0x8f, 0xff, 0xed, 0x7f,
+	0x7a, 0xfc, 0x09, 0x00, 0x00, 0xff, 0xff, 0xdb, 0x7d, 0x99, 0x74, 0x63, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -163,6 +323,9 @@ const _ = grpc.SupportPackageIsVersion6
 type ControllerClient interface {
 	// Controllers
 	UpdateAppContext(ctx context.Context, in *ContextUpdateRequest, opts ...grpc.CallOption) (*ContextUpdateResponse, error)
+	// Sync
+	InstallApp(ctx context.Context, in *InstallAppRequest, opts ...grpc.CallOption) (*InstallAppResponse, error)
+	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 }
 
 type controllerClient struct {
@@ -182,10 +345,31 @@ func (c *controllerClient) UpdateAppContext(ctx context.Context, in *ContextUpda
 	return out, nil
 }
 
+func (c *controllerClient) InstallApp(ctx context.Context, in *InstallAppRequest, opts ...grpc.CallOption) (*InstallAppResponse, error) {
+	out := new(InstallAppResponse)
+	err := c.cc.Invoke(ctx, "/controller/InstallApp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
+	out := new(HealthCheckResponse)
+	err := c.cc.Invoke(ctx, "/controller/HealthCheck", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 type ControllerServer interface {
 	// Controllers
 	UpdateAppContext(context.Context, *ContextUpdateRequest) (*ContextUpdateResponse, error)
+	// Sync
+	InstallApp(context.Context, *InstallAppRequest) (*InstallAppResponse, error)
+	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 }
 
 // UnimplementedControllerServer can be embedded to have forward compatible implementations.
@@ -194,6 +378,12 @@ type UnimplementedControllerServer struct {
 
 func (*UnimplementedControllerServer) UpdateAppContext(ctx context.Context, req *ContextUpdateRequest) (*ContextUpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAppContext not implemented")
+}
+func (*UnimplementedControllerServer) InstallApp(ctx context.Context, req *InstallAppRequest) (*InstallAppResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InstallApp not implemented")
+}
+func (*UnimplementedControllerServer) HealthCheck(ctx context.Context, req *HealthCheckRequest) (*HealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
 }
 
 func RegisterControllerServer(s *grpc.Server, srv ControllerServer) {
@@ -218,6 +408,42 @@ func _Controller_UpdateAppContext_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_InstallApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InstallAppRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).InstallApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/controller/InstallApp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).InstallApp(ctx, req.(*InstallAppRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).HealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/controller/HealthCheck",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).HealthCheck(ctx, req.(*HealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Controller_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "controller",
 	HandlerType: (*ControllerServer)(nil),
@@ -225,6 +451,14 @@ var _Controller_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateAppContext",
 			Handler:    _Controller_UpdateAppContext_Handler,
+		},
+		{
+			MethodName: "InstallApp",
+			Handler:    _Controller_InstallApp_Handler,
+		},
+		{
+			MethodName: "HealthCheck",
+			Handler:    _Controller_HealthCheck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

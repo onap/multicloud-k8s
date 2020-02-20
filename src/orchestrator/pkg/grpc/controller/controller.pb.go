@@ -21,12 +21,11 @@ package controller
 import (
 	context "context"
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -126,27 +125,113 @@ func (m *ContextUpdateResponse) GetAppContextUpdated() bool {
 	return false
 }
 
+type InstallAppRequest struct {
+	AppContext           string   `protobuf:"bytes,1,opt,name=app_context,json=appContext,proto3" json:"app_context,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *InstallAppRequest) Reset()         { *m = InstallAppRequest{} }
+func (m *InstallAppRequest) String() string { return proto.CompactTextString(m) }
+func (*InstallAppRequest) ProtoMessage()    {}
+func (*InstallAppRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed7f10298fa1d90f, []int{2}
+}
+
+func (m *InstallAppRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InstallAppRequest.Unmarshal(m, b)
+}
+func (m *InstallAppRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InstallAppRequest.Marshal(b, m, deterministic)
+}
+func (m *InstallAppRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InstallAppRequest.Merge(m, src)
+}
+func (m *InstallAppRequest) XXX_Size() int {
+	return xxx_messageInfo_InstallAppRequest.Size(m)
+}
+func (m *InstallAppRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_InstallAppRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InstallAppRequest proto.InternalMessageInfo
+
+func (m *InstallAppRequest) GetAppContext() string {
+	if m != nil {
+		return m.AppContext
+	}
+	return ""
+}
+
+type InstallAppResponse struct {
+	AppContextInstalled  bool     `protobuf:"varint,1,opt,name=app_context_installed,json=appContextInstalled,proto3" json:"app_context_installed,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *InstallAppResponse) Reset()         { *m = InstallAppResponse{} }
+func (m *InstallAppResponse) String() string { return proto.CompactTextString(m) }
+func (*InstallAppResponse) ProtoMessage()    {}
+func (*InstallAppResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed7f10298fa1d90f, []int{3}
+}
+
+func (m *InstallAppResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InstallAppResponse.Unmarshal(m, b)
+}
+func (m *InstallAppResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InstallAppResponse.Marshal(b, m, deterministic)
+}
+func (m *InstallAppResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InstallAppResponse.Merge(m, src)
+}
+func (m *InstallAppResponse) XXX_Size() int {
+	return xxx_messageInfo_InstallAppResponse.Size(m)
+}
+func (m *InstallAppResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_InstallAppResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InstallAppResponse proto.InternalMessageInfo
+
+func (m *InstallAppResponse) GetAppContextInstalled() bool {
+	if m != nil {
+		return m.AppContextInstalled
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*ContextUpdateRequest)(nil), "ContextUpdateRequest")
 	proto.RegisterType((*ContextUpdateResponse)(nil), "ContextUpdateResponse")
+	proto.RegisterType((*InstallAppRequest)(nil), "InstallAppRequest")
+	proto.RegisterType((*InstallAppResponse)(nil), "InstallAppResponse")
 }
 
-func init() { proto.RegisterFile("controller.proto", fileDescriptor_ed7f10298fa1d90f) }
+func init() {
+	proto.RegisterFile("controller.proto", fileDescriptor_ed7f10298fa1d90f)
+}
 
 var fileDescriptor_ed7f10298fa1d90f = []byte{
-	// 183 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x48, 0xce, 0xcf, 0x2b,
-	0x29, 0xca, 0xcf, 0xc9, 0x49, 0x2d, 0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0x8a, 0xe2, 0x12,
-	0x71, 0xce, 0xcf, 0x2b, 0x49, 0xad, 0x28, 0x09, 0x2d, 0x48, 0x49, 0x2c, 0x49, 0x0d, 0x4a, 0x2d,
-	0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0x52, 0xe4, 0xe2, 0xc9, 0xcc, 0x2b, 0x49, 0xcd, 0x2b, 0x89, 0x4f,
-	0x2f, 0xca, 0x2f, 0x2d, 0x90, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0xe2, 0x86, 0x88, 0xb9, 0x83,
-	0x84, 0x84, 0xe4, 0xb9, 0xb8, 0x13, 0x0b, 0x0a, 0xe2, 0x93, 0x21, 0xda, 0x25, 0x98, 0xc0, 0x2a,
-	0xb8, 0x12, 0x0b, 0x0a, 0xa0, 0x06, 0x2a, 0xb9, 0x73, 0x89, 0xa2, 0x99, 0x5d, 0x5c, 0x90, 0x9f,
-	0x57, 0x9c, 0x2a, 0xa4, 0xc7, 0x25, 0x8c, 0xa4, 0x33, 0xbe, 0x14, 0x2c, 0x9b, 0x02, 0xb6, 0x83,
-	0x23, 0x48, 0x10, 0x61, 0x02, 0x44, 0x5b, 0x8a, 0x51, 0x20, 0x17, 0x17, 0xc2, 0xe1, 0x42, 0xce,
-	0x5c, 0x02, 0x10, 0x09, 0x47, 0xb8, 0x42, 0x21, 0x51, 0x3d, 0x6c, 0xbe, 0x90, 0x12, 0xd3, 0xc3,
-	0xea, 0x00, 0x25, 0x86, 0x24, 0x36, 0xb0, 0xf7, 0x8d, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x2c,
-	0xbe, 0x00, 0x80, 0x12, 0x01, 0x00, 0x00,
+	// 245 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x91, 0x31, 0x4f, 0xc3, 0x30,
+	0x10, 0x85, 0x1b, 0x06, 0x04, 0x57, 0x86, 0xf6, 0x42, 0x50, 0xd5, 0x05, 0xf0, 0xc4, 0xe4, 0xa1,
+	0x20, 0x31, 0x57, 0x1d, 0x4a, 0xd7, 0x48, 0x2c, 0x2c, 0x91, 0x69, 0x2c, 0x54, 0xc9, 0xb2, 0x0f,
+	0xfb, 0x22, 0xf1, 0x1b, 0xf8, 0xd5, 0x08, 0xbb, 0xad, 0xa3, 0xa6, 0xeb, 0xdd, 0xbd, 0xf7, 0x3d,
+	0x3f, 0xc3, 0x64, 0xeb, 0x2c, 0x7b, 0x67, 0x8c, 0xf6, 0x92, 0xbc, 0x63, 0x27, 0x3e, 0xe0, 0x76,
+	0xe5, 0x2c, 0xeb, 0x1f, 0x7e, 0xa7, 0x56, 0xb1, 0xae, 0xf5, 0x77, 0xa7, 0x03, 0xe3, 0x23, 0xdc,
+	0xec, 0x2c, 0x6b, 0xcb, 0xcd, 0x97, 0x77, 0x1d, 0xcd, 0x8a, 0x87, 0xe2, 0xe9, 0xba, 0x1e, 0xa7,
+	0xd9, 0xfa, 0x7f, 0x84, 0xf7, 0x30, 0x56, 0x44, 0xcd, 0x36, 0xc9, 0x67, 0x17, 0xf1, 0x02, 0x14,
+	0xd1, 0xde, 0x50, 0xac, 0xa1, 0x3a, 0xf1, 0x0e, 0xe4, 0x6c, 0xd0, 0x28, 0xa1, 0xec, 0x29, 0x9b,
+	0x2e, 0x6e, 0xdb, 0xc8, 0xb8, 0xaa, 0xa7, 0xd9, 0x21, 0xc9, 0x5a, 0xf1, 0x02, 0xd3, 0x8d, 0x0d,
+	0xac, 0x8c, 0x59, 0x12, 0x1d, 0x12, 0x9e, 0xe0, 0x8b, 0x01, 0xfe, 0x0d, 0xb0, 0xaf, 0xda, 0xb3,
+	0x17, 0x50, 0xf5, 0xd9, 0xbb, 0x74, 0x71, 0xa4, 0x97, 0xd9, 0x60, 0x73, 0x58, 0x2d, 0x7e, 0x0b,
+	0x80, 0xdc, 0x1c, 0xae, 0x60, 0x92, 0x92, 0x2d, 0x8f, 0xb7, 0x58, 0xc9, 0x73, 0x35, 0xce, 0xef,
+	0xe4, 0xd9, 0x06, 0xc4, 0x08, 0x5f, 0x01, 0x72, 0x3a, 0x44, 0x39, 0x78, 0xe0, 0xbc, 0x94, 0xc3,
+	0xf8, 0x62, 0xf4, 0x79, 0x19, 0x3f, 0xee, 0xf9, 0x2f, 0x00, 0x00, 0xff, 0xff, 0x09, 0xa2, 0x85,
+	0x59, 0xcc, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -163,6 +248,8 @@ const _ = grpc.SupportPackageIsVersion6
 type ControllerClient interface {
 	// Controllers
 	UpdateAppContext(ctx context.Context, in *ContextUpdateRequest, opts ...grpc.CallOption) (*ContextUpdateResponse, error)
+	// Sync
+	InstallApp(ctx context.Context, in *InstallAppRequest, opts ...grpc.CallOption) (*InstallAppResponse, error)
 }
 
 type controllerClient struct {
@@ -182,10 +269,21 @@ func (c *controllerClient) UpdateAppContext(ctx context.Context, in *ContextUpda
 	return out, nil
 }
 
+func (c *controllerClient) InstallApp(ctx context.Context, in *InstallAppRequest, opts ...grpc.CallOption) (*InstallAppResponse, error) {
+	out := new(InstallAppResponse)
+	err := c.cc.Invoke(ctx, "/controller/InstallApp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 type ControllerServer interface {
 	// Controllers
 	UpdateAppContext(context.Context, *ContextUpdateRequest) (*ContextUpdateResponse, error)
+	// Sync
+	InstallApp(context.Context, *InstallAppRequest) (*InstallAppResponse, error)
 }
 
 // UnimplementedControllerServer can be embedded to have forward compatible implementations.
@@ -194,6 +292,9 @@ type UnimplementedControllerServer struct {
 
 func (*UnimplementedControllerServer) UpdateAppContext(ctx context.Context, req *ContextUpdateRequest) (*ContextUpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAppContext not implemented")
+}
+func (*UnimplementedControllerServer) InstallApp(ctx context.Context, req *InstallAppRequest) (*InstallAppResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InstallApp not implemented")
 }
 
 func RegisterControllerServer(s *grpc.Server, srv ControllerServer) {
@@ -218,6 +319,24 @@ func _Controller_UpdateAppContext_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_InstallApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InstallAppRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).InstallApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/controller/InstallApp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).InstallApp(ctx, req.(*InstallAppRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Controller_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "controller",
 	HandlerType: (*ControllerServer)(nil),
@@ -225,6 +344,10 @@ var _Controller_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateAppContext",
 			Handler:    _Controller_UpdateAppContext_Handler,
+		},
+		{
+			MethodName: "InstallApp",
+			Handler:    _Controller_InstallApp_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

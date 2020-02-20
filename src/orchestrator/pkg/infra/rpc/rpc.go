@@ -14,12 +14,10 @@ limitations under the License.
 package rpc
 
 import (
-	"context"
 	"log"
 	"strings"
 
 	controllerpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/controller"
-	syncpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/sync"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 	pkgerrors "github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -28,7 +26,7 @@ import (
 )
 
 // RPC interface used to talk a concrete RPC Connection
-var RPC map[string]Client
+var RPC map[string]controllerpb.ControllerClient
 
 type ContextUpdateRequest interface {
 }
@@ -42,19 +40,14 @@ type InstallAppRequest interface {
 type InstallAppResponse interface {
 }
 
-// Client is an interface for accessing RPC
-type Client interface {
-	// Sends rpc to update the application context to a controller
-	UpdateAppContext(ctx context.Context, in ContextUpdateRequest, opts ...grpc.CallOption) (ContextUpdateResponse, error)
-	// Sends rpc to update the application context to a controller
-	InstallApp(ctx context.Context, in InstallAppRequest, opts ...grpc.CallOption) (InstallAppResponse, error)
-}
-
 // createRpcClient creates the Rpc Client
 func createClient(Host string, Port string, Name string) error {
 	var err error
 	var tls bool
 	var opts []grpc.DialOption
+	if RPC == nil {
+		RPC = make(map[string]controllerpb.ControllerClient)
+	}
 
 	serverAddr := Host + ":" + Port
 	serverHostVerify := config.GetConfiguration().GrpcServerHostVerify
@@ -82,12 +75,8 @@ func createClient(Host string, Port string, Name string) error {
 	}
 
 	conn, err := grpc.Dial(serverAddr, opts...)
+	RPC[Name] = controllerpb.NewControllerClient(conn)
 
-	if strings.Contains(Name, "sync") {
-		RPC[Name] = syncpb.NewSyncClient(conn)
-	} else {
-		RPC[Name] = controllerpb.NewControllerClient(conn)
-	}
 	if err != nil {
 		pkgerrors.Wrap(err, "Grpc Client Initialization failed with error")
 	}

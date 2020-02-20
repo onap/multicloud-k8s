@@ -23,6 +23,7 @@ type Client struct {
 	Controller       *ControllerClient
 	Cluster          *ClusterClient
 	CompositeProfile *CompositeProfileClient
+	AppProfile       *AppProfileClient
 	// Add Clients for API's here
 	GenericPlacementIntent *GenericPlacementIntentClient
 	AppIntent              *AppIntentClient
@@ -37,6 +38,7 @@ func NewClient() *Client {
 	c.Controller = NewControllerClient()
 	c.Cluster = NewClusterClient()
 	c.CompositeProfile = NewCompositeProfileClient()
+	c.AppProfile = NewAppProfileClient()
 	// Add Client API handlers here
 	c.GenericPlacementIntent = NewGenericPlacementIntentClient()
 	c.AppIntent = NewAppIntentClient()

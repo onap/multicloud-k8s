@@ -47,7 +47,7 @@ func main() {
 		log.Fatalln("Exiting...")
 	}
 
-	httpRouter := api.NewRouter(nil, nil, nil, nil, nil, nil, nil)
+	httpRouter := api.NewRouter(nil, nil, nil, nil, nil, nil, nil, nil)
 	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
 	log.Println("Starting Kubernetes Multicloud API")
 

@@ -119,7 +119,7 @@ func TestProjectCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v2/projects", testCase.reader)
-			resp := executeRequest(request, NewRouter(testCase.projectClient, nil, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -188,7 +188,7 @@ func TestProjectGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/projects/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(testCase.projectClient, nil, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -237,7 +237,7 @@ func TestProjectDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v2/projects/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(testCase.projectClient, nil, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

@@ -79,12 +79,12 @@ func TestControllerCreateHandler(t *testing.T) {
 			reader: bytes.NewBuffer([]byte(`{
 				"name":"testController",
 				"ip-address":"10.188.234.1",
-				"port":8080
+				"port":"8080"
 				}`)),
 			expected: moduleLib.Controller{
 				Name: "testController",
 				Host: "10.188.234.1",
-				Port: 8080,
+				Port: "8080",
 			},
 			controllerClient: &mockControllerManager{
 				//Items that will be returned by the mocked Client
@@ -92,7 +92,7 @@ func TestControllerCreateHandler(t *testing.T) {
 					{
 						Name: "testController",
 						Host: "10.188.234.1",
-						Port: 8080,
+						Port: "8080",
 					},
 				},
 			},
@@ -146,7 +146,7 @@ func TestControllerGetHandler(t *testing.T) {
 			expected: moduleLib.Controller{
 				Name: "testController",
 				Host: "10.188.234.1",
-				Port: 8080,
+				Port: "8080",
 			},
 			name: "testController",
 			controllerClient: &mockControllerManager{
@@ -154,7 +154,7 @@ func TestControllerGetHandler(t *testing.T) {
 					{
 						Name: "testController",
 						Host: "10.188.234.1",
-						Port: 8080,
+						Port: "8080",
 					},
 				},
 			},

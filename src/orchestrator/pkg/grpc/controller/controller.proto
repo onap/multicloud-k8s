@@ -23,6 +23,9 @@ service controller {
     // Sync
     rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {
     }
+
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+    }
 }
  
 message ContextUpdateRequest {
@@ -40,4 +43,13 @@ message InstallAppRequest {
  
 message InstallAppResponse {
     bool app_context_installed = 1;
+}
+
+
+message HealthCheckRequest {
+
+}
+
+message HealthCheckResponse {
+    bool ConnectionWorking = 1;
 }

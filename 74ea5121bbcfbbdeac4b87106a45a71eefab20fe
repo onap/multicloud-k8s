@@ -22,6 +22,30 @@
       "revId": "74ea5121bbcfbbdeac4b87106a45a71eefab20fe",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aebc8973_a2ffa104",
+        "filename": "kud/hosting_providers/vagrant/cleanup.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5033
+      },
+      "writtenOn": "2020-02-20T22:31:49Z",
+      "side": 1,
+      "message": "Hi Konrad, \nThank you for reviewing this. I\u0027ve reworked the whole command to use an if/else ladder.",
+      "parentUuid": "26ea6e0d_1ecb380a",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 57
+      },
+      "revId": "74ea5121bbcfbbdeac4b87106a45a71eefab20fe",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

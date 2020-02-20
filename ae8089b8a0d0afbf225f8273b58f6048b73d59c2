@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "98108784_584cf7cc",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-20T19:01:05Z",
+      "side": 1,
+      "message": "why - ? any reason ? how does this get stored in mongo ?",
+      "revId": "ae8089b8a0d0afbf225f8273b58f6048b73d59c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "80ca3aea_e9fbeb5b",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-20T19:01:05Z",
+      "side": 1,
+      "message": "Can u change the order to Name, project, version?",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 1
+      },
+      "revId": "ae8089b8a0d0afbf225f8273b58f6048b73d59c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

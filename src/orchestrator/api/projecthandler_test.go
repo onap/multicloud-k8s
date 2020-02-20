@@ -86,23 +86,23 @@ func TestProjectCreateHandler(t *testing.T) {
 			}`)),
 			expected: moduleLib.Project{
 				MetaData: moduleLib.ProjectMetaData{
-					Name: "testProject",
+					Name:        "testProject",
 					Description: "Test Project used for unit testing",
-					UserData1: "data1",
-					UserData2: "data2",
+					UserData1:   "data1",
+					UserData2:   "data2",
 				},
 			},
 			projectClient: &mockProjectManager{
 				//Items that will be returned by the mocked Client
 				Items: []moduleLib.Project{
-					  		moduleLib.Project{
-								MetaData: moduleLib.ProjectMetaData{
-									Name: "testProject",
-									Description: "Test Project used for unit testing",
-									UserData1: "data1",
-									UserData2: "data2",
-								},
-							},
+					moduleLib.Project{
+						MetaData: moduleLib.ProjectMetaData{
+							Name:        "testProject",
+							Description: "Test Project used for unit testing",
+							UserData1:   "data1",
+							UserData2:   "data2",
+						},
+					},
 				},
 			},
 		},
@@ -119,7 +119,7 @@ func TestProjectCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v2/projects", testCase.reader)
-			resp := executeRequest(request, NewRouter(testCase.projectClient))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -154,23 +154,23 @@ func TestProjectGetHandler(t *testing.T) {
 			expectedCode: http.StatusOK,
 			expected: moduleLib.Project{
 				MetaData: moduleLib.ProjectMetaData{
-					Name: "testProject",
+					Name:        "testProject",
 					Description: "Test Project used for unit testing",
-					UserData1: "data1",
-					UserData2: "data2",
+					UserData1:   "data1",
+					UserData2:   "data2",
 				},
 			},
 			name: "testProject",
 			projectClient: &mockProjectManager{
 				Items: []moduleLib.Project{
-								moduleLib.Project{
-									MetaData: moduleLib.ProjectMetaData{
-										Name: "testProject",
-										Description: "Test Project used for unit testing",
-										UserData1: "data1",
-										UserData2: "data2",
-									},
-								},
+					moduleLib.Project{
+						MetaData: moduleLib.ProjectMetaData{
+							Name:        "testProject",
+							Description: "Test Project used for unit testing",
+							UserData1:   "data1",
+							UserData2:   "data2",
+						},
+					},
 				},
 			},
 		},
@@ -188,7 +188,7 @@ func TestProjectGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/projects/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(testCase.projectClient))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -237,7 +237,7 @@ func TestProjectDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v2/projects/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(testCase.projectClient))
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

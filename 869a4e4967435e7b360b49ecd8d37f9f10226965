@@ -46,6 +46,30 @@
       "revId": "869a4e4967435e7b360b49ecd8d37f9f10226965",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4dca3be2_a930c991",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 3957
+      },
+      "writtenOn": "2020-02-20T08:03:38Z",
+      "side": 1,
+      "message": "I think Ritu means that labels should be provided by user.\n\nThis looks like a quite hardcoded list of labels k8s plugin would set for the application. Is that something we want? Should k8s plugin be interested of what labels users use?\nWhere k8s plugin needs these labels?",
+      "parentUuid": "dcab3038_9dbdbe38",
+      "range": {
+        "startLine": 162,
+        "startChar": 1,
+        "endLine": 166,
+        "endChar": 2
+      },
+      "revId": "869a4e4967435e7b360b49ecd8d37f9f10226965",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -118,6 +118,30 @@
       "revId": "869a4e4967435e7b360b49ecd8d37f9f10226965",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "04f82ec7_12e9e108",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-02-20T09:49:35Z",
+      "side": 1,
+      "message": "Okay, I think this minor change is not worth discussing. I\u0027ve published patchset 6 that doesn\u0027t contain this awkward change so I think we can all head there and forget about this part :)",
+      "parentUuid": "f2183828_e6ff8db8",
+      "range": {
+        "startLine": 162,
+        "startChar": 1,
+        "endLine": 166,
+        "endChar": 2
+      },
+      "revId": "869a4e4967435e7b360b49ecd8d37f9f10226965",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

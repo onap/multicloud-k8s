@@ -22,6 +22,7 @@ type Client struct {
 	CompositeApp *CompositeAppClient
 	Controller *ControllerClient
 	Cluster *ClusterClient
+	CompositeProfile *CompositeProfileClient
 	// Add Clients for API's here
 }
 
@@ -32,6 +33,7 @@ func NewClient() *Client {
 	c.CompositeApp = NewCompositeAppClient()
 	c.Controller = NewControllerClient()
 	c.Cluster = NewClusterClient()
+	c.CompositeProfile = NewCompositeProfileClient()
 	// Add Client API handlers here
 	return c
 }

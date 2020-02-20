@@ -27,6 +27,7 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	compositeAppClient moduleLib.CompositeAppManager,
 	ControllerClient moduleLib.ControllerManager,
 	clusterClient moduleLib.ClusterManager,
+    compositeProfileClient moduleLib.CompositeProfileManager,
 	genericPlacementIntentClient moduleLib.GenericPlacementIntentManager,
 	appIntentClient moduleLib.AppIntentManager) *mux.Router {
 
@@ -68,6 +69,18 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/projects/{project-name}/composite-apps", compAppHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.deleteHandler).Methods("DELETE")
+
+	if compositeProfileClient == nil {
+		compositeProfileClient = moduleClient.CompositeProfile
+	}
+	compProfilepHandler := compositeProfileHandler{
+		client: compositeProfileClient,
+	}
+
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles", compProfilepHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles", compProfilepHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}", compProfilepHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}", compProfilepHandler.deleteHandler).Methods("DELETE")
 
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("POST")
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("PUT")

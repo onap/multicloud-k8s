@@ -110,7 +110,7 @@ func TestControllerCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v2/controllers", testCase.reader)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.controllerClient, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.controllerClient, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -173,7 +173,7 @@ func TestControllerGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/controllers/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.controllerClient, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.controllerClient, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -222,7 +222,7 @@ func TestControllerDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v2/controllers/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.controllerClient, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.controllerClient, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

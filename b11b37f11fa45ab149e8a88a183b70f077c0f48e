@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "964c247d_c1a7832a",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-02-20T20:21:24Z",
+      "side": 1,
+      "message": "r u using tagContent ? Seems no, then pls remove it.",
+      "range": {
+        "startLine": 74,
+        "startChar": 10,
+        "endLine": 74,
+        "endChar": 20
+      },
+      "revId": "b11b37f11fa45ab149e8a88a183b70f077c0f48e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -32,7 +32,7 @@ type Controller struct {
 
 	Host string `json:"host"`
 
-	Port int64 `json:"port"`
+	Port string `json:"port"`
 }
 
 // ControllerKey is the key structure that is used in the database

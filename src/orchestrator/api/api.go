@@ -31,7 +31,8 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	appIntentClient moduleLib.AppIntentManager,
 	deploymentIntentGrpClient moduleLib.DeploymentIntentGroupManager,
 	intentClient moduleLib.IntentManager,
-	compositeProfileClient moduleLib.CompositeProfileManager) *mux.Router {
+	compositeProfileClient moduleLib.CompositeProfileManager,
+	appProfileClient moduleLib.AppProfileManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 
@@ -78,11 +79,28 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	compProfilepHandler := compositeProfileHandler{
 		client: compositeProfileClient,
 	}
+	if appProfileClient == nil {
+		appProfileClient = moduleClient.AppProfile
+	}
+	appProfileHandler := appProfileHandler{
+		client: appProfileClient,
+	}
 
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles", compProfilepHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles", compProfilepHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}", compProfilepHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}", compProfilepHandler.deleteHandler).Methods("DELETE")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles", appProfileHandler.createAppProfileHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles", appProfileHandler.getAppProfileHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles", appProfileHandler.getAppProfileHandler).Queries("app-name", "{app-name}")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{app-profile}", appProfileHandler.getAppProfileHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{app-profile}", appProfileHandler.deleteAppProfileHandler).Methods("DELETE")
+
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles", appProfileHandler.createAppProfileHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles", appProfileHandler.getAppProfileHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles", appProfileHandler.getAppProfileHandler).Queries("app-name", "{app-name}")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{app-profile}", appProfileHandler.getAppProfileHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{app-profile}", appProfileHandler.deleteAppProfileHandler).Methods("DELETE")
 
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("POST")
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("PUT")

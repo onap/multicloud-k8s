@@ -47,12 +47,7 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	projHandler := projectHandler{
 		client: projectClient,
 	}
-	if ControllerClient == nil {
-		ControllerClient = moduleClient.Controller
-	}
-	controlHandler := controllerHandler{
-		client: ControllerClient,
-	}
+
 	router.HandleFunc("/projects", projHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}", projHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}", projHandler.deleteHandler).Methods("DELETE")
@@ -109,10 +104,20 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{app-profile}", appProfileHandler.getAppProfileHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{app-profile}", appProfileHandler.deleteAppProfileHandler).Methods("DELETE")
 
+	//setting routes for controller registration
+	if ControllerClient == nil {
+		ControllerClient = moduleClient.Controller
+	}
+	controlHandler := controllerHandler{
+		client: ControllerClient,
+	}
+
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("POST")
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("PUT")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.getHandler).Methods("GET")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.deleteHandler).Methods("DELETE")
+	router.HandleFunc("/controllers/{controller-name}/healthcheck", controlHandler.healthCheck).Methods("GET")
+
 	//setting routes for genericPlacementIntent
 	if genericPlacementIntentClient == nil {
 		genericPlacementIntentClient = moduleClient.GenericPlacementIntent

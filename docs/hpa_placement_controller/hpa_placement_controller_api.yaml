@@ -1,0 +1,542 @@
+openapi: 3.0.1
+info:
+  title: HPA Placement Controller
+  description: 'This is the Multi Cluster Application Scheduler HPA Placement Controller API. Find out more at: https://wiki.onap.org/display/DW/Multi+Cluster+Application+Scheduler+HPA+Placement+Controller'
+  contact:
+    name: Marcus Williams
+    email: marcus.williams@intel.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+externalDocs:
+  description: Multi Cluster Application Scheduler HPA Placement Controller API
+  url: https://wiki.onap.org/display/DW/Multi+Cluster+Application+Scheduler+HPA+Placement+Controller
+#servers:
+#- url: https://hpaplacement.swagger.io/v2
+#- url: http://hpaplacement.swagger.io/v2
+tags:
+- name: hpa-placement-intents
+- name: workload-placements
+paths:
+  /hpa-placement-intents:
+    post:
+      tags:
+      - hpa-placement-intents
+      summary: Add a new hpa placement intent
+      operationId: addHpaPlacementIntent
+      requestBody:
+        description: Create hpa placement intent object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Hpa-placement-intent'
+        required: true
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+      x-codegen-request-body-name: body
+  /hpa-placement-intents/{hpa-intent-name}:
+    get:
+      tags:
+      - hpa-placement-intents
+      summary: Find intent by intent name
+      description: Returns an hpa-placement-intent
+      operationId: getHpaPlacementIntent
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: Nmae of HpaPlacementIntent to return
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hpa-placement-intent'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: HpaPlacementIntent not found
+          content: {}
+      security:
+      - api_key: []
+    put:
+      tags:
+      - hpa-placement-intents
+      summary: Update an existing hpa placement intent
+      operationId: updateHpaPlacementIntent
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: Nmae of HpaPlacementIntent to return
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Update existing hpa placement intent object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Hpa-placement-intent'
+        required: true
+      responses:
+        400:
+          description: Invalid intent name supplied
+          content: {}
+        404:
+          description: Intent not found
+          content: {}
+        405:
+          description: Validation exception
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - hpa-placement-intents
+      summary: Deletes a hpa placement intent
+      operationId: deleteHpaPlacementIntent
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: hpa placement intent to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        400:
+          description: Invalid intent name supplied
+          content: {}
+        404:
+          description: Intent  not found
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+  /hpa-placement-intents/{hpa-intent-name}/workload-placements:
+    post:
+      tags:
+      - workload-placements
+      summary: Add a new workload-placement
+      operationId: addWorkloadPlacement
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: Name of HpaPlacementIntent
+        required: true
+        schema:
+          type: string
+      - name: workload-placement
+        in: path
+        description: Name of workload-placement to return
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Create workload-placement intent object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workload-placement'
+        required: true
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+      x-codegen-request-body-name: body
+  /hpa-placement-intents/{hpa-intent-name}/workload-placements/{workload-placement}:
+    get:
+      tags:
+      - workload-placements
+      summary: Get by Workload Placement name
+      description: Returns an Workload Placement
+      operationId: getWorkloadPlacement
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: Nmae of HpaPlacementIntent
+        required: true
+        schema:
+          type: string
+      - name: workload-placement
+        in: path
+        description: Name of workload-placement to return
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workload-placement'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: HpaPlacementIntent not found
+          content: {}
+      security:
+      - api_key: []
+    put:
+      tags:
+      - workload-placements
+      summary: Update an existing Workload Placement
+      operationId: updateWorkloadPlacement
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: Nmae of HpaPlacementIntent
+        required: true
+        schema:
+          type: string
+      - name: workload-placement
+        in: path
+        description: Name of workload-placement to update
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Update existing hpa placement intent object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workload-placement'
+        required: true
+      responses:
+        400:
+          description: Invalid intent name supplied
+          content: {}
+        404:
+          description: Intent not found
+          content: {}
+        405:
+          description: Validation exception
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - workload-placements
+      summary: Deletes a Workload Placement
+      operationId: deleteWorkloadPlacement
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: hpa placement intent to delete
+        required: true
+        schema:
+          type: string
+      - name: workload-placement
+        in: path
+        description: Name of workload-placement to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        400:
+          description: Invalid intent name supplied
+          content: {}
+        404:
+          description: Intent  not found
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+  /hpa-placement-intents/{hpa-intent-name}/workload-placements/{workload-placement}/composite-applications:
+    post:
+      tags:
+      - composite-application
+      summary: Add a new Composite Application
+      operationId: addcompositeApplication
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: Name of HpaPlacementIntent
+        required: true
+        schema:
+          type: string
+      - name: workload-placement
+        in: path
+        description: Name of workload-placement to return
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Create workload-placement intent object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+        required: true
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+      x-codegen-request-body-name: body
+  /hpa-placement-intents/{hpa-intent-name}/workload-placements/{workload-placement}/composite-applications/{composite-application-name}:
+    get:
+      tags:
+      - composite-application
+      summary: Get by Composite Application name
+      description: Returns an Composite Application
+      operationId: getcompositeApplication
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: Nmae of HpaPlacementIntent
+        required: true
+        schema:
+          type: string
+      - name: workload-placement
+        in: path
+        description: Name of workload-placement to return
+        required: true
+        schema:
+          type: string
+      - name: composite-application-name
+        in: path
+        description: Name of composite application to return
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: HpaPlacementIntent not found
+          content: {}
+      security:
+      - api_key: []
+    put:
+      tags:
+      - workload-placements
+      summary: Update an existing Composite Application
+      operationId: updatecompositeApplication
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: Nmae of HpaPlacementIntent
+        required: true
+        schema:
+          type: string
+      - name: workload-placement
+        in: path
+        description: Name of workload-placement to update
+        required: true
+        schema:
+          type: string
+      - name: composite-application-name
+        in: path
+        description: Name of composite application to return
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Update existing composite application object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+        required: true
+      responses:
+        400:
+          description: Invalid intent name supplied
+          content: {}
+        404:
+          description: Intent not found
+          content: {}
+        405:
+          description: Validation exception
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - composite-application
+      summary: Deletes a Composite Application
+      operationId: deletecompositeApplication
+      parameters:
+      - name: hpa-intent-name
+        in: path
+        description: hpa placement intent to delete
+        required: true
+        schema:
+          type: string
+      - name: workload-placement
+        in: path
+        description: Name of workload-placement to delete
+        required: true
+        schema:
+          type: string
+      - name: composite-application-name
+        in: path
+        description: Name of composite application to return
+        required: true
+        schema:
+          type: string
+      responses:
+        400:
+          description: Invalid intent name supplied
+          content: {}
+        404:
+          description: Intent  not found
+          content: {}
+      security:
+      - hpaintent_auth:
+        - write:hpa-placement-intent
+        - read:hpa-placement-intent
+components:
+  schemas:
+    Metadata:
+      type: object
+      required:
+        - name
+        - status
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        userdata1:
+          type: string
+        userdata2:
+          type: string
+      example:
+        name: Edge-1-intent
+        description: Edge Intent for Sec. and Load Balancing
+        status: active
+        userdata1: { external-proxy-ip: "10.7.100.4" }
+        userdata2: ""
+    Spec:
+        $ref: '#/components/schemas/Application'
+    Application:
+      type: object
+      required:
+        - application-name
+        - workload-resource
+      properties:
+        application-name:
+          type: string
+        workload-resource:
+          type: string
+        platform-features:
+          $ref: '#/components/schemas/ArrayOfFeatures'
+      example: 
+        - application-name: Edge-Security
+          workload-resource: Firewall
+          platform-features: [{ "platform-feature-name": "pci-0300_102b.present", "mandatory": "True", "score": 5, "platform-feature-attribute": [ { "feature-attribute-key": "qatPresence", "feature-attribute-value": "True", "operator": "ALL", "unit": "" } ] }, { "platform-feature-name": "memory-numa", "mandatory": "True", "score": 2, "platform-feature-attribute": [ { "feature-attribute-key": "numaNodes", "feature-attribute-value": "2", "operator": "=", "unit": "" }, { "feature-attribute-key": "numaNodes", "feature-attribute-value": "4", "operator": "=", "unit": "" } ] }]
+    ArrayOfFeatures:
+      type: array
+      items:
+        $ref: '#/components/schemas/Platform-feature'
+    ArrayOfFeatureAttributes:
+      type: array
+      items:
+        $ref: '#/components/schemas/Platform-feature-attribute'
+    Hpa-placement-intent:
+      required:
+      - metadata
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    Workload-placement:
+      required:
+      - spec
+      type: object
+      properties:
+        spec:
+          $ref: '#/components/schemas/Spec'
+    Platform-feature:
+      type: object
+      required:
+      - platform-feature-name
+      - mandatory
+      - score
+      properties:
+        platform-feature-name:
+          type: string
+        mandatory:
+          type: string
+        score:
+          type: integer
+          format: int64
+        platform-feature-attribute:
+          $ref: '#/components/schemas/ArrayOfFeatureAttributes'
+    Platform-feature-attribute:
+      type: object
+      required:
+      - feature-attribute-key
+      - feature-attribute-value
+      properties:
+        feature-attribute-key:
+          type: string
+        feature-attribute-value:
+          type: string
+        operator:
+          type: string
+        unit:
+          type: string
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    hpaplacement_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://hpa-placement-controller.swagger.io/oauth/dialog
+          scopes:
+            write:hpaplacement: modify placment intents
+            read:hpaplacement: read placment intents
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header

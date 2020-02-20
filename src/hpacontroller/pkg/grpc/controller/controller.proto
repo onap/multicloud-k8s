@@ -16,16 +16,40 @@
 
 syntax = "proto3";
  
-service sync {
+service controller {
+    // Controllers
+    rpc UpdateAppContext(ContextUpdateRequest) returns (ContextUpdateResponse) {
+    }
     // Sync
     rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {
     }
+
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+    }
 }
  
+message ContextUpdateRequest {
+    string intent_group = 1;
+    string app_context = 2;
+}
+ 
+message ContextUpdateResponse {
+    bool app_context_updated = 1;
+}
+
 message InstallAppRequest {
     string app_context = 1;
 }
  
 message InstallAppResponse {
     bool app_context_installed = 1;
+}
+
+
+message HealthCheckRequest {
+
+}
+
+message HealthCheckResponse {
+    bool ConnectionWorking = 1;
 }

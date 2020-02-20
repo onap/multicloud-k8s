@@ -229,7 +229,7 @@ func TestClusterProviderCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v2/cluster-providers", testCase.reader)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -307,7 +307,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/cluster-providers", nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -377,7 +377,7 @@ func TestClusterProviderGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/cluster-providers/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -426,7 +426,7 @@ func TestClusterProviderDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v2/cluster-providers/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -538,7 +538,7 @@ of clusterTest
 
 			request := httptest.NewRequest("POST", "/v2/cluster-providers/clusterProvider1/clusters", bytes.NewBuffer(body.Bytes()))
 			request.Header.Set("Content-Type", multiwr.FormDataContentType())
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -625,7 +625,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/cluster-providers/clusterProvder1/clusters", nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -706,7 +706,7 @@ func TestClusterGetHandler(t *testing.T) {
 			if len(testCase.accept) > 0 {
 				request.Header.Set("Accept", testCase.accept)
 			}
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -784,7 +784,7 @@ of clusterTest
 			if len(testCase.accept) > 0 {
 				request.Header.Set("Accept", testCase.accept)
 			}
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -834,7 +834,7 @@ func TestClusterDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v2/cluster-providers/clusterProvider1/clusters/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -880,7 +880,7 @@ func TestClusterLabelCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v2/cluster-providers/cp1/clusters/cl1/labels", testCase.reader)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -944,7 +944,7 @@ func TestClusterLabelsGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/cluster-providers/cp1/clusters/cl1/labels", nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -1004,7 +1004,7 @@ func TestClusterLabelGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/cluster-providers/clusterProvider1/clusters/cl1/labels/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -1053,7 +1053,7 @@ func TestClusterLabelDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v2/cluster-providers/cp1/clusters/cl1/labels/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -1144,7 +1144,7 @@ func TestClusterKvPairsCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v2/cluster-providers/cp1/clusters/cl1/kv-pairs", testCase.reader)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -1262,7 +1262,7 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/cluster-providers/cp1/clusters/cl1/kv-pairs", nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -1352,7 +1352,7 @@ func TestClusterKvPairsGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v2/cluster-providers/clusterProvider1/clusters/cl1/kv-pairs/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -1401,7 +1401,7 @@ func TestClusterKvPairsDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v2/cluster-providers/cp1/clusters/cl1/kv-pairs/"+testCase.name, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, nil, testCase.clusterClient, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

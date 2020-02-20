@@ -27,6 +27,7 @@ type Client struct {
 	DeploymentIntentGroup  *DeploymentIntentGroupClient
 	Intent                 *IntentClient
 	CompositeProfile       *CompositeProfileClient
+	AppProfile             *AppProfileClient
 	// Add Clients for API's here
 }
 
@@ -42,6 +43,7 @@ func NewClient() *Client {
 	c.DeploymentIntentGroup = NewDeploymentIntentGroupClient()
 	c.Intent = NewIntentClient()
 	c.CompositeProfile = NewCompositeProfileClient()
+	c.AppProfile = NewAppProfileClient()
 	// Add Client API handlers here
 	return c
 }

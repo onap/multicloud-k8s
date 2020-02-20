@@ -18,8 +18,9 @@ package module
 
 // Client for using the services in the orchestrator
 type Client struct {
-	Project      *ProjectClient
-	CompositeApp *CompositeAppClient
+	Project          *ProjectClient
+	CompositeApp     *CompositeAppClient
+	CompositeProfile *CompositeProfileClient
 	// Add Clients for API's here
 }
 
@@ -28,6 +29,7 @@ func NewClient() *Client {
 	c := &Client{}
 	c.Project = NewProjectClient()
 	c.CompositeApp = NewCompositeAppClient()
+	c.CompositeProfile = NewCompositeProfileClient()
 	// Add Client API handlers here
 	return c
 }

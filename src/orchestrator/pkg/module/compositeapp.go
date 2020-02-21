@@ -70,8 +70,8 @@ type CompositeAppManager interface {
 // CompositeAppClient implements the CompositeAppManager
 // It will also be used to maintain some localized state
 type CompositeAppClient struct {
-	storeName           string
-	tagMeta, tagContent string
+	storeName string
+	tagMeta   string
 }
 
 // NewCompositeAppClient returns an instance of the CompositeAppClient
@@ -79,7 +79,7 @@ type CompositeAppClient struct {
 func NewCompositeAppClient() *CompositeAppClient {
 	return &CompositeAppClient{
 		storeName: "orchestrator",
-		tagMeta:   "compositeAppmetadata",
+		tagMeta:   "compositeapp",
 	}
 }
 
@@ -105,7 +105,7 @@ func (v *CompositeAppClient) CreateCompositeApp(c CompositeApp, p string) (Compo
 		return CompositeApp{}, pkgerrors.New("Unable to find the project")
 	}
 
-	err = db.DBconn.Create(v.storeName, key, v.tagMeta, c)
+	err = db.DBconn.Insert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {
 		return CompositeApp{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -122,7 +122,7 @@ func (v *CompositeAppClient) GetCompositeApp(name string, version string, p stri
 		Version:          version,
 		Project:          p,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return CompositeApp{}, pkgerrors.Wrap(err, "Get composite application")
 	}
@@ -130,7 +130,7 @@ func (v *CompositeAppClient) GetCompositeApp(name string, version string, p stri
 	//value is a byte array
 	if value != nil {
 		compApp := CompositeApp{}
-		err = db.DBconn.Unmarshal(value, &compApp)
+		err = db.DBconn.Unmarshal(value[0], &compApp)
 		if err != nil {
 			return CompositeApp{}, pkgerrors.Wrap(err, "Unmarshaling Value")
 		}
@@ -149,7 +149,7 @@ func (v *CompositeAppClient) DeleteCompositeApp(name string, version string, p s
 		Version:          version,
 		Project:          p,
 	}
-	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
+	err := db.DBconn.Remove(v.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete CompositeApp Entry;")
 	}

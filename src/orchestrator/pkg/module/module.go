@@ -20,6 +20,7 @@ package module
 type Client struct {
 	Project                *ProjectClient
 	CompositeApp           *CompositeAppClient
+	App                    *AppClient
 	Controller             *ControllerClient
 	Cluster                *ClusterClient
 	GenericPlacementIntent *GenericPlacementIntentClient
@@ -36,6 +37,7 @@ func NewClient() *Client {
 	c := &Client{}
 	c.Project = NewProjectClient()
 	c.CompositeApp = NewCompositeAppClient()
+	c.App = NewAppClient()
 	c.Controller = NewControllerClient()
 	c.Cluster = NewClusterClient()
 	c.GenericPlacementIntent = NewGenericPlacementIntentClient()

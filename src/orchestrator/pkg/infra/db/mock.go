@@ -96,3 +96,7 @@ func (m *MockDB) Find(table string, key Key, tag string) ([][]byte, error) {
 func (m *MockDB) Delete(table string, key Key, tag string) error {
 	return m.Err
 }
+
+func (m *MockDB) Remove(table string, key Key) error {
+	return m.Err
+}

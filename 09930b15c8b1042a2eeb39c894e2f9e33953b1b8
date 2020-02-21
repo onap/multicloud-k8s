@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a5839668_c77819f1",
+        "filename": "src/orchestrator/go.mod",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-21T20:26:54Z",
+      "side": 1,
+      "message": "Are we standardizing on go 1.13? If this addition was accidental remove this.",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 7
+      },
+      "revId": "09930b15c8b1042a2eeb39c894e2f9e33953b1b8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

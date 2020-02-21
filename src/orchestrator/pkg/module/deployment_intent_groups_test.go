@@ -94,7 +94,7 @@ func TestCreateDeploymentIntentGroup(t *testing.T) {
 					},
 					CompositeAppKey{CompositeAppName: "testCompositeApp",
 						Version: "testCompositeAppVersion", Project: "testProject"}.String(): {
-						"compositeAppmetadata": []byte(
+						"compositeapp": []byte(
 							"{\"metadata\":{" +
 								"\"name\":\"testCompositeApp\"," +
 								"\"description\":\"description\"," +

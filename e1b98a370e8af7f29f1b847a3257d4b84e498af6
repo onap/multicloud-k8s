@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f654415_46da8ca0",
+        "filename": "docs/controllers.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2411
+      },
+      "writtenOn": "2020-02-21T03:35:18Z",
+      "side": 1,
+      "message": "license information",
+      "revId": "e1b98a370e8af7f29f1b847a3257d4b84e498af6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "adb1acf6_9e727dea",
+        "filename": "src/orchestrator/cmd/main.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 2411
+      },
+      "writtenOn": "2020-02-21T03:35:18Z",
+      "side": 1,
+      "message": "need to add a third \"nil\" for ControllerManager",
+      "revId": "e1b98a370e8af7f29f1b847a3257d4b84e498af6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "988a9682_76480099",
+        "filename": "src/orchestrator/pkg/module/controller.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 2411
+      },
+      "writtenOn": "2020-02-21T03:35:18Z",
+      "side": 1,
+      "message": "Should this be ip-address according to V2 API spec documentation?",
+      "revId": "e1b98a370e8af7f29f1b847a3257d4b84e498af6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8a6e6840_010bdd9f",
+        "filename": "src/orchestrator/pkg/module/controller.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 2411
+      },
+      "writtenOn": "2020-02-21T03:35:18Z",
+      "side": 1,
+      "message": "tagContent can be removed as it\u0027s not being used anywhere",
+      "revId": "e1b98a370e8af7f29f1b847a3257d4b84e498af6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -35,7 +35,6 @@ type compositeAppHandler struct {
 }
 
 // createHandler handles creation of the CompositeApp entry in the database
-// This is a multipart handler
 func (h compositeAppHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	var c moduleLib.CompositeApp
 

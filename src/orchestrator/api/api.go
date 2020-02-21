@@ -22,7 +22,7 @@ import (
 var moduleClient *moduleLib.Client
 
 // NewRouter creates a router that registers the various urls that are supported
-func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager) *mux.Router {
+func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager, appClient moduleLib.AppManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 	moduleClient = moduleLib.NewClient()
@@ -46,6 +46,17 @@ func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient module
 	router.HandleFunc("/projects/{project-name}/composite-apps", compAppHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.deleteHandler).Methods("DELETE")
+
+	if appClient == nil {
+		appClient = moduleClient.App
+	}
+	appHandler := appHandler{
+		client: appClient,
+	}
+
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}/apps", appHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}/apps/{app-name}", appHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}/apps/{app-name}", appHandler.deleteHandler).Methods("DELETE")
 
 	return router
 }

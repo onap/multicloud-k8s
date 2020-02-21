@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package api
 
 import (
@@ -25,6 +26,7 @@ var moduleClient *moduleLib.Client
 // NewRouter creates a router that registers the various urls that are supported
 func NewRouter(projectClient moduleLib.ProjectManager,
 	compositeAppClient moduleLib.CompositeAppManager,
+	appClient moduleLib.AppManager,
 	ControllerClient moduleLib.ControllerManager,
 	clusterClient moduleLib.ClusterManager,
 	genericPlacementIntentClient moduleLib.GenericPlacementIntentManager,
@@ -72,6 +74,17 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/projects/{project-name}/composite-apps", compAppHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.deleteHandler).Methods("DELETE")
+
+	if appClient == nil {
+		appClient = moduleClient.App
+	}
+	appHandler := appHandler{
+		client: appClient,
+	}
+
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}/apps", appHandler.createAppHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}/apps/{app-name}", appHandler.getAppHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}/apps/{app-name}", appHandler.deleteAppHandler).Methods("DELETE")
 
 	if compositeProfileClient == nil {
 		compositeProfileClient = moduleClient.CompositeProfile

@@ -70,8 +70,8 @@ type CompositeAppManager interface {
 // CompositeAppClient implements the CompositeAppManager
 // It will also be used to maintain some localized state
 type CompositeAppClient struct {
-	storeName           string
-	tagMeta, tagContent string
+	storeName string
+	tagMeta   string
 }
 
 // NewCompositeAppClient returns an instance of the CompositeAppClient
@@ -79,7 +79,7 @@ type CompositeAppClient struct {
 func NewCompositeAppClient() *CompositeAppClient {
 	return &CompositeAppClient{
 		storeName: "orchestrator",
-		tagMeta:   "compositeAppmetadata",
+		tagMeta:   "compositeapp",
 	}
 }
 

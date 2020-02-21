@@ -22,8 +22,7 @@ import (
 var moduleClient *moduleLib.Client
 
 // NewRouter creates a router that registers the various urls that are supported
-
-func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager, ControllerClient moduleLib.ControllerManager) *mux.Router {
+func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager, ControllerClient moduleLib.ControllerManager, clusterClient moduleLib.ClusterManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 	moduleClient = moduleLib.NewClient()
@@ -38,6 +37,12 @@ func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient module
 	}
 	controlHandler := controllerHandler{
 		client: ControllerClient,
+	}
+	if clusterClient == nil {
+		clusterClient = moduleClient.Cluster
+	}
+	clusterHandler := clusterHandler{
+		client: clusterClient,
 	}
 	router.HandleFunc("/projects", projHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}", projHandler.getHandler).Methods("GET")
@@ -58,5 +63,22 @@ func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient module
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("PUT")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.getHandler).Methods("GET")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.deleteHandler).Methods("DELETE")
+	router.HandleFunc("/cluster-providers", clusterHandler.createClusterProviderHandler).Methods("POST")
+	router.HandleFunc("/cluster-providers", clusterHandler.getClusterProviderHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{name}", clusterHandler.getClusterProviderHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{name}", clusterHandler.deleteClusterProviderHandler).Methods("DELETE")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters", clusterHandler.createClusterHandler).Methods("POST")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters", clusterHandler.getClusterHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}", clusterHandler.getClusterHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}", clusterHandler.deleteClusterHandler).Methods("DELETE")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels", clusterHandler.createClusterLabelHandler).Methods("POST")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels", clusterHandler.getClusterLabelHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels/{label}", clusterHandler.getClusterLabelHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels/{label}", clusterHandler.deleteClusterLabelHandler).Methods("DELETE")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs", clusterHandler.createClusterKvPairsHandler).Methods("POST")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs", clusterHandler.getClusterKvPairsHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.getClusterKvPairsHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.deleteClusterKvPairsHandler).Methods("DELETE")
+
 	return router
 }

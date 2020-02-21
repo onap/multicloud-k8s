@@ -291,6 +291,7 @@ func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 
 	//Get the masterkey document based on given key
 	filter := bson.D{{"key", key}}
+
 	//Remove the tag ID entry from masterkey table
 	update := bson.D{
 		{

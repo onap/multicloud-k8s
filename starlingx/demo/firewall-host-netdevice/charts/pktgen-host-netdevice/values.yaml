@@ -1,0 +1,26 @@
+# Default values for packetgen.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+### must be 1 in this case, since host-device are allocatd statically
+replicaCount: 1
+
+image:
+  repository: ubuntu
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+#serivce port value for packetgen service
+  type: NodePort
+  ports:
+    port: 2831
+    nodePort: 30831
+
+resources:
+  cpu: 3
+  memory: 4Gi
+  hugepage: 256Mi

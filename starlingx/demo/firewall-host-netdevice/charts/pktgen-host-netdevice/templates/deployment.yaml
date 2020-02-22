@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "packetgen.fullname" . }}
+  labels:
+    release: {{ .Release.Name }}
+    app: {{ include "packetgen.name" . }}
+    chart: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "packetgen.name" .}}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "packetgen.name" .}}
+        release: {{ .Release.Name }}
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[
+          { "name": "host-device-{{ .Values.global.unprotectedNetPortVpg }}",
+            "interface": "veth11" }
+          ]'
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        tty: true
+        stdin: true
+        env:
+          - name: unprotectedNetCidr
+            value: "{{.Values.global.unprotectedNetCidr}}"
+          - name: unprotectedNetGw
+            value: "{{.Values.global.unprotectedNetGw}}"
+          - name: protectedNetCidr
+            value: "{{.Values.global.protectedNetCidr}}"
+          - name: protectedNetGw
+            value: "{{.Values.global.protectedNetGw}}"
+          - name: protectedNetGwIp
+            value: "{{.Values.global.protectedNetGwIp}}"
+          - name: dcaeCollectorIp
+            value: "{{.Values.global.dcaeCollectorIp}}"
+          - name: dcaeCollectorPort
+            value: "{{.Values.global.dcaeCollectorPort}}"
+        command: ["/bin/bash", "/opt/vpg_start.sh"]
+        securityContext:
+            privileged: true
+            capabilities:
+                add:
+                - CAP_SYS_ADMIN
+        volumeMounts:
+          - mountPath: /hugepages
+            name: hugepage
+          - name: lib-modules
+            mountPath: /lib/modules
+          - name: src
+            mountPath: /usr/src
+          - name: scripts
+            mountPath: /opt
+        resources:
+          requests:
+            cpu: {{ .Values.resources.cpu }}
+            memory: {{ .Values.resources.memory }}
+            hugepages-2Mi: {{ .Values.resources.hugepage }}
+          limits:
+            cpu: {{ .Values.resources.cpu }}
+            memory: {{ .Values.resources.memory }}
+            hugepages-2Mi: {{ .Values.resources.hugepage }}
+      volumes:
+        - name: hugepage
+          emptyDir:
+            medium: HugePages
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: src
+          hostPath:
+            path: /usr/src
+        - name: scripts
+          configMap:
+            name: {{ .Chart.Name }}-scripts-configmap
+      imagePullSecrets:
+      - name: admin-registry-secret

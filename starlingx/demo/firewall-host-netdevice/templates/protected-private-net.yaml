@@ -1,0 +1,23 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: host-device-{{ .Values.global.protectedNetPortVfw }}
+spec:
+  config: '{
+      "cniVersion": "0.3.0",
+      "type": "host-device",
+      "device": "{{ .Values.global.protectedNetPortVfw }}"
+    }'
+
+---
+  
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: host-device-{{ .Values.global.protectedNetPortVsn }}
+spec:
+  config: '{
+      "cniVersion": "0.3.0",
+      "type": "host-device",
+      "device": "{{ .Values.global.protectedNetPortVsn }}"
+    }'

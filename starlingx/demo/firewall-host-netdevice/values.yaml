@@ -1,0 +1,76 @@
+# Default values for firewall.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# must be 1 in this helm chart, since the host-netdevice are fixed
+replicaCount: 1
+
+image:
+  repository: ubuntu
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+resources:
+  cpu: 3
+  memory: 4Gi
+  hugepage: 256Mi
+
+#global vars for parent and subcharts.
+global:
+
+  nodeAffinity:
+    key: nodeName
+    values: worker-0
+    op: In
+
+  #Networks
+  #unprotectedNetworkName: unprotected-private-net
+  #protectedPrivateNetCidr: 192.168.10.0/24
+  #protectedPrivateNetGw: 192.168.10.1/24
+
+  unprotectedNetPortVpg: veth11
+  unprotectedNetPortVfw: veth12
+  unprotectedNetCidr: 10.10.1.0/24
+  unprotectedNetGw: 10.10.1.1/24
+
+  #onapPrivateNetworkName: onap-private-net
+  #onapPrivateNetCidr: 10.10.0.0/16
+  #onapPrivateNetGw: 10.10.0.1/16
+
+  #protectedNetworkName: protected-private-net
+  #protectedNetCidr: 192.168.20.0/24
+  #protectedNetGwIp: 192.168.20.100
+  #protectedNetGw: 192.168.20.100/24
+  protectedNetPortVfw: veth21
+  protectedNetPortVsn: veth22
+  protectedNetCidr: 10.10.2.0/24
+  protectedNetGwIp: 10.10.2.1
+  protectedNetGw: 10.10.2.1/24
+
+  #vFirewall container
+  #vfwPrivateIp0: 192.168.10.3
+  #vfwPrivateIp1: 192.168.20.2
+  #vfwPrivateIp2: 10.10.100.3
+  vfwPrivateIp0: 10.10.1.1
+  vfwPrivateIp1: 10.10.2.1
+  
+  #Packetgen container
+  #vpgPrivateIp0: 192.168.10.2
+  #vpgPrivateIp1: 10.0.100.2
+  vpgPrivateIp0: 10.10.1.2
+
+  #Sink container
+  #vsnPrivateIp0: 192.168.20.3
+  #vsnPrivateIp1: 10.10.100.4
+  vsnPrivateIp0: 10.10.2.2
+
+  #########
+  #demoArtifactsVersion: 1.5.0
+  #dcaeCollectorIp: 10.0.4.1
+  #dcaeCollectorPort: 8081
+  dcaeCollectorIp: 10.12.7.4
+  dcaeCollectorPort: 30235
+

@@ -1,0 +1,20 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: sriov-netdevice-{{ .Values.global.protectedNetName }}
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: intel.com/pci_sriov_net_{{ .Values.global.protectedNetProviderName }}
+spec:
+  config: '{
+    "type": "sriov",
+    "name": "sriov0-netdevice",
+    "vlan": {{ .Values.global.protectedNetProviderVlan }},
+    "ipam": {
+      "type": "host-local",
+      "subnet": "{{ .Values.global.protectedNetCidr }}",
+      "routes": [{
+        "dst": "0.0.0.0/0"
+      }],
+      "gateway": "{{ .Values.global.protectedNetGwIp }}"
+    }
+  }'

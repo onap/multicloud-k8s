@@ -1,0 +1,7 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Xiaohua Zhang <xiaohua.zhang@windriver.com>
+Submitted-by: Xiaohua Zhang <xiaohua.zhang@windriver.com>
+Submitted-at: Sun, 23 Feb 2020 10:38:10 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/102177
+Project: multicloud/k8s
+Branch: refs/heads/master

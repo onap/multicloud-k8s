@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sink.fullname" . }}
+  labels:
+    release: {{ .Release.Name }}
+    app: {{ include "sink.name" . }}
+    chart: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "sink.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "sink.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[
+          { "name": "sriov-device-{{ .Values.global.protectedNetName }}",
+            "interface": "veth22" }
+          ]'
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          tty: true
+          stdin: true
+          env:
+            - name: unprotectedNetCidr
+              value: "{{.Values.global.unprotectedNetCidr}}"
+            - name: unprotectedNetGwIp
+              value: "{{.Values.global.unprotectedNetGwIp}}"
+            - name: protectedNetCidr
+              value: "{{.Values.global.protectedNetCidr}}"
+            - name: protectedNetGwIp
+              value: "{{.Values.global.protectedNetGwIp}}"
+            - name: dcaeCollectorIp
+              value: "{{.Values.global.dcaeCollectorIp}}"
+            - name: dcaeCollectorPort
+              value: "{{.Values.global.dcaeCollectorPort}}"
+            - name: unprotectedNetProviderDriver
+              value: "{{.Values.global.unprotectedNetProviderDriver}}"
+            - name: protectedNetProviderDriver
+              value: "{{.Values.global.protectedNetProviderDriver}}"
+          command: ["/bin/bash", "/opt/vsn_start.sh"]
+          securityContext:
+              privileged: true
+              capabilities:
+                  add:
+                  - CAP_SYS_ADMIN
+          volumeMounts:
+            - name: scripts
+              mountPath: /opt
+          resources:
+            requests:
+              cpu: {{ .Values.resources.cpu }}
+              memory: {{ .Values.resources.memory }}
+              intel.com/pci_sriov_net_{{ .Values.global.protectedNetProviderName }}: '1'
+            limits:
+              cpu: {{ .Values.resources.cpu }}
+              memory: {{ .Values.resources.memory }}
+              intel.com/pci_sriov_net_{{ .Values.global.protectedNetProviderName }}: '1'
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ .Chart.Name }}-scripts-configmap
+      imagePullSecrets:
+      - name: admin-registry-secret

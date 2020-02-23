@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: packetgen-service
+  labels:
+    app: {{ include "packetgen.name" . }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.ports.port  }}
+      nodePort: {{ .Values.service.ports.nodePort }}
+  selector:
+    app: {{ include "packetgen.name" . }}
+    release: {{ .Release.Name }}

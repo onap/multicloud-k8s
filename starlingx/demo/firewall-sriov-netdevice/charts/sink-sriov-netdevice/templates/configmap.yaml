@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-scripts-configmap
+  labels:
+    release: {{ .Release.Name }}
+    app: {{ include "firewall.name" . }}
+    chart: {{ .Chart.Name }}
+data:
+{{ tpl (.Files.Glob "resources/scripts/init/*").AsConfig . | indent 2 }}

@@ -76,7 +76,7 @@ func (c *mockCollection) DeleteMany(ctx context.Context, filter interface{},
 
 func (c *mockCollection) UpdateOne(ctx context.Context, filter interface{}, update interface{},
 	opts ...*options.UpdateOptions) (*mongo.UpdateResult, error) {
-		return nil, c.Err
+	return nil, c.Err
 }
 
 func TestCreate(t *testing.T) {
@@ -463,4 +463,3 @@ func TestDelete(t *testing.T) {
 		})
 	}
 }
-

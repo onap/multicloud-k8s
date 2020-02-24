@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfda9f8e_347306e0",
+        "filename": "src/orchestrator/api/compositeapphandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-24T23:58:25Z",
+      "side": 1,
+      "message": "Reve this file from commit. No change",
+      "revId": "34fe166f31f8e6432737fe4c0d090c381dbd8c1d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

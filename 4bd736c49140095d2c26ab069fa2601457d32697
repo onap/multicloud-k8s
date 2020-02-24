@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5098e17a_450771bf",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-24T23:55:56Z",
+      "side": 1,
+      "message": "This can also be a cluster-label. You can use \"omitempty\" for that",
+      "range": {
+        "startLine": 44,
+        "startChar": 1,
+        "endLine": 44,
+        "endChar": 42
+      },
+      "revId": "4bd736c49140095d2c26ab069fa2601457d32697",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bac7dc95_ce72e410",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-24T23:55:56Z",
+      "side": 1,
+      "message": "Anyof can also have Cluster names.",
+      "range": {
+        "startLine": 50,
+        "startChar": 1,
+        "endLine": 50,
+        "endChar": 52
+      },
+      "revId": "4bd736c49140095d2c26ab069fa2601457d32697",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7532f6ba_5a30df34",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-24T23:55:56Z",
+      "side": 1,
+      "message": "use \"omitempty\"",
+      "range": {
+        "startLine": 55,
+        "startChar": 22,
+        "endLine": 55,
+        "endChar": 34
+      },
+      "revId": "4bd736c49140095d2c26ab069fa2601457d32697",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

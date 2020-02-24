@@ -22,7 +22,8 @@ import (
 var moduleClient *moduleLib.Client
 
 // NewRouter creates a router that registers the various urls that are supported
-func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager) *mux.Router {
+
+func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager, ControllerClient moduleLib.ControllerManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 	moduleClient = moduleLib.NewClient()
@@ -31,6 +32,12 @@ func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient module
 	}
 	projHandler := projectHandler{
 		client: projectClient,
+	}
+	if ControllerClient == nil {
+		ControllerClient = moduleClient.Controller
+	}
+	controlHandler := controllerHandler{
+		client: ControllerClient,
 	}
 	router.HandleFunc("/projects", projHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}", projHandler.getHandler).Methods("GET")
@@ -47,5 +54,9 @@ func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient module
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.deleteHandler).Methods("DELETE")
 
+	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("POST")
+	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("PUT")
+	router.HandleFunc("/controllers/{controller-name}", controlHandler.getHandler).Methods("GET")
+	router.HandleFunc("/controllers/{controller-name}", controlHandler.deleteHandler).Methods("DELETE")
 	return router
 }

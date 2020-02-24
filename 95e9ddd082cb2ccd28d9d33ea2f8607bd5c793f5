@@ -16,6 +16,24 @@
       "revId": "95e9ddd082cb2ccd28d9d33ea2f8607bd5c793f5",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0aba104_c514bc82",
+        "filename": "src/orchestrator/api/api.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-02-24T23:36:54Z",
+      "side": 1,
+      "message": "Personally I think it\u0027s cleaner to have clients in one area and handlers in next. However if you want to pattern after Srivahni\u0027s code I can push another patch.",
+      "parentUuid": "59c6f3ab_394ea79f",
+      "revId": "95e9ddd082cb2ccd28d9d33ea2f8607bd5c793f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

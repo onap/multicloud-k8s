@@ -25,6 +25,19 @@ spec:
             "interface": "veth21" }
           ]'
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              {{- range .Values.global.nodeAffinity }}
+              - key: {{ .label.labelkey }}
+                operator: {{ .label.op }}
+                values:
+                {{- range .label.labelvalues }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -34,12 +47,10 @@ spec:
         env:
         - name: unprotectedNetCidr
           value: "{{.Values.global.unprotectedNetCidr}}"
-        - name: unprotectedNetGw
-          value: "{{.Values.global.unprotectedNetGw}}"
+        - name: unprotectedNetGwIp
+          value: "{{.Values.global.unprotectedNetGwIp}}"
         - name: protectedNetCidr
           value: "{{.Values.global.protectedNetCidr}}"
-        - name: protectedNetGw
-          value: "{{.Values.global.protectedNetGw}}"
         - name: protectedNetGwIp
           value: "{{.Values.global.protectedNetGwIp}}"
         - name: dcaeCollectorIp

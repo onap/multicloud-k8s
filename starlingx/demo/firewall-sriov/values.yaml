@@ -21,9 +21,16 @@ resources:
 global:
 
   nodeAffinity:
-    key: nodeName
-    values: worker-0
-    op: In
+    - label:
+        labelkey: sriovdp
+        op: In
+        labelvalues:
+          - enabled
+    - label:
+        labelkey:  kube-cpu-mgr-policy
+        op: In
+        labelvalues:
+          - static
 
   #Networks
   #unprotectedNetworkName: unprotected-private-net

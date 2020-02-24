@@ -22,9 +22,16 @@ resources:
 global:
 
   nodeAffinity:
-    key: nodeName
-    values: worker-0
-    op: In
+    - label:
+        labelkey: sriovdp
+        op: In
+        labelvalues:
+          - enabled
+    - label:
+        labelkey:  kube-cpu-mgr-policy
+        op: In
+        labelvalues:
+          - static
 
   #Networks
   #unprotectedNetworkName: unprotected-private-net
@@ -34,7 +41,8 @@ global:
   unprotectedNetPortVpg: veth11
   unprotectedNetPortVfw: veth12
   unprotectedNetCidr: 10.10.1.0/24
-  unprotectedNetGw: 10.10.1.1/24
+  #unprotectedNetGw: 10.10.1.1/24
+  unprotectedNetGwIp: 10.10.1.1
 
   #onapPrivateNetworkName: onap-private-net
   #onapPrivateNetCidr: 10.10.0.0/16
@@ -48,7 +56,7 @@ global:
   protectedNetPortVsn: veth22
   protectedNetCidr: 10.10.2.0/24
   protectedNetGwIp: 10.10.2.1
-  protectedNetGw: 10.10.2.1/24
+  #protectedNetGw: 10.10.2.1/24
 
   #vFirewall container
   #vfwPrivateIp0: 192.168.10.3

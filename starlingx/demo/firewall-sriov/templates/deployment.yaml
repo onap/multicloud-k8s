@@ -25,6 +25,19 @@ spec:
             "interface": "veth21" }
           ]'
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              {{- range .Values.global.nodeAffinity }}
+              - key: {{ .label.labelkey }}
+                operator: {{ .label.op }}
+                values:
+                {{- range .label.labelvalues }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -48,6 +61,10 @@ spec:
           value: "{{.Values.global.unprotectedNetProviderDriver}}"
         - name: protectedNetProviderDriver
           value: "{{.Values.global.protectedNetProviderDriver}}"
+        - name: unprotectedNetProviderVlan
+          value: "{{.Values.global.unprotectedNetProviderVlan}}"
+        - name: protectedNetProviderVlan
+          value: "{{.Values.global.protectedNetProviderVlan}}"
         command: ["/bin/bash", "/opt/vfw_start.sh"]
         securityContext:
             privileged: true

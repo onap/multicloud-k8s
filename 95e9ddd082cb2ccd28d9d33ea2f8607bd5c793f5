@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59c6f3ab_394ea79f",
+        "filename": "src/orchestrator/api/api.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-24T21:26:54Z",
+      "side": 1,
+      "message": "Move this block next to the related code at line 57",
+      "revId": "95e9ddd082cb2ccd28d9d33ea2f8607bd5c793f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

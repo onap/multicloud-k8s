@@ -56,6 +56,15 @@ type Store interface {
 
 	// Reads all master tables and data from the specified tag in table
 	ReadAll(table string, tag string) (map[string][]byte, error)
+
+	// Inserts and Updates a tag with key and also adds query fields if provided
+	Insert(coll string, key Key, query interface{}, tag string, data interface{}) error
+
+	// Find the document(s) with key and get the tag values from the document(s)
+	Find(coll string, key Key, tag string) ([][]byte, error)
+
+	// Removes the document(s) matching the key
+	Remove(coll string, key Key) error
 }
 
 // CreateDBClient creates the DB client

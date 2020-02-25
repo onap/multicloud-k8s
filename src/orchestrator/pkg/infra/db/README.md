@@ -11,113 +11,139 @@ type Store interface {
 	// Unmarshal implements any unmarshaling needed for the database
 	Unmarshal(inp []byte, out interface{}) error
 
-	// Creates a new master table with key and links data with tag and
-	// creates a pointer to the newly added data in the master table
-	Create(table string, key Key, tag string, data interface{}) error
+	// Inserts and Updates a tag with key and also adds query fields if provided
+	Insert(coll string, key Key, query interface{}, tag string, data interface{}) error
 
-	// Reads data for a particular key with specific tag.
-	Read(table string, key Key, tag string) ([]byte, error)
+	// Find the document(s) with key and get the tag values from the document(s)
+	Find(coll string, key Key, tag string) ([][]byte, error)
 
-	// Update data for particular key with specific tag
-	Update(table string, key Key, tag string, data interface{}) error
-
-	// Deletes a specific tag data for key.
-	// TODO: If tag is empty, it will delete all tags under key.
-	Delete(table string, key Key, tag string) error
-
-	// Reads all master tables and data from the specified tag in table
-	ReadAll(table string, tag string) (map[string][]byte, error)
+	// Removes the document(s) matching the key
+	Remove(coll string, key Key) error
 }
 ```
 
-Therefore, `mongo.go`, `consul.go` implement the above interface and can be used as the backend as needed based on initial configuration.
+With this interface multiple database types can be supported by providing backends.
 
 ## Details on Mongo Implementation
 
 `mongo.go` implements the above interface using the `go.mongodb.org/mongo-driver` package.
 The code converts incoming binary data and creates a new document in the database.
 
-### Create
+### Insert
+
+Arguments:
+```go
+collection string
+key interface
+query interface
+tag string
+data []byte
+```
+
+Insert function inserts the provided `data` into the `collection` as a document in MongoDB. `FindOneAndUpdate` mongo API is used to achieve this with the `upsert` option set to `true`. With this if the record doesn't exist it is created and if it exists it is updated with new data for the tag.
+
+Key and Query parameters are assumed to be json structures with each element as part of the key. Those key-value pairs are used as the key for the document.
+Internally this API takes all the fields in the Key structure and adds them as fields in the document. Query parameter works just like key and it is used to add additional fields to the document. 
+
+With this key the document can be quried with Mongo `Find` function for both the key fields and Query fields.
+
+This API also adds another field called "Key" field to the document. The "Key" field is concatenation of the key part of the Key parameter. Internally this is used to figure out the type of the document.
+
+Assumption is that all the elememts of the key structure are strings.
+
+#### Example of Key Structure
+```go
+type CompositeAppKey struct {
+	CompositeAppName string `json:"compositeappname"`
+	Version          string `json:"version"`
+	Project          string `json:"project"`
+}
+```
+#### Example of Key Values
+```go
+key := CompositeAppKey{
+		CompositeAppName:  "ca1",
+		Version:           "v1",
+		Project:           "testProject",
+	}
+```
+
+#### Example of Query Structure
+```go
+type Query struct {
+	Userdata1 string `json:"userdata1"`
+}
+```
+#### Example of Document store in MongoDB
+```json
+{
+   "_id":"ObjectId("   "5e54c206f53ca130893c8020"   ")",
+   "compositeappname":"ca1",
+   "project":"testProject",
+   "version":"v1",
+   "compositeAppmetadata":{
+      "metadata":{
+         "name":"ca1",
+         "description":"Test ca",
+         "userdata1":"Data1",
+         "userdata2":"Data2"
+      },
+      "spec":{
+         "version":"v1"
+      }
+   },
+   "key":"{compositeappname,project,version,}"
+}
+```
+
+### Find
 
 Arguments:
 ```go
 collection string
 key interface
 tag string
-data []byte
 ```
 
-Create inserts the provided `data` into the `collection` which returns an auto-generated (by `mongodb`) ID which we then associate with the `key` that is provided as one of the arguments.
+Find function return one or more tag data based on the Key value. If key has all the fields defined then an exact match is looked for based on the key passed in. 
+If some of the field value in structure are empty strings then this function returns all the documents which have the same type. (ANY operation)
 
-We use the `FindOneAndUpdate` mongo API to achieve this with the `upsert` option set to `true`.
-We create the following documents in mongodb for each new definition added to the database:
+#### Example of Exact Match based on fields Key Values
+```go
+key := CompositeAppKey{
+		CompositeAppName:  "ca1",
+		Version:           "v1",
+		Project:           "testProject",
+	}
+```
 
-There is a Master Key document that contains references to other documents which are related to this `key`.
+#### Example of Match based on some fields
+This example will return all the compositeApp under project testProject.
+```go
+key := CompositeAppKey{
+		Project:           "testProject",
+		CompositeAppName:  "",
+		Version:           "",
+		
+	}
+```
 
-#### Master Key Entry
-```json
-{
-    "_id" : ObjectId("5e0a8554b78a15f71d2dce7e"),
-    "key" : { "rbname" : "edgex", "rbversion" : "v1"},
-    "defmetadata" : ObjectId("5e0a8554be261ecb57f067eb"),
-    "defcontent" : ObjectId("5e0a8377bcfcdd0f01dc7b0d")
-}
+NOTE: Key structure can be different from the original key and can include Query fields also. ANY operation is not supported for Query fields.
+
+### Remove
+
+Arguments:
+```go
+collection string
+key interface
 ```
-#### Metadata Key Entry
-```json
-{
-    "_id" : ObjectId("5e0a8554be261ecb57f067eb"),
-    "defmetadata" : { "rbname" : "edgex", "rbversion" : "v1", "chartname" : "", "description" : "", "labels" : null }
-}
-```
-#### Definition Content
-```json
-{
-    "_id" : ObjectId("5e0a8377bcfcdd0f01dc7b0d"),
-    "defcontent" : "H4sICCVd3FwAA3Byb2ZpbGUxLnRhcgDt1NEKgjAUxvFd7ylG98aWOsGXiYELxLRwJvj2rbyoIPDGiuD/uzmwM9iB7Vvruvrgw7CdXHsUn6Ejm2W3aopcP9eZLYRJM1voPN+ZndAm16kVSn9onheXMLheKeGqfdM0rq07/3bfUv9PJUkiR9+H+tSVajRymM6+lEqN7njxoVSbU+z2deX388r9nWzkr8fGSt5d79pnLOZfm0f+dRrzb7P4DZD/LyDJAAAAAAAAAAAAAAAA/+0Ksq1N5QAoAAA="
-}
-```
+Similar to find. This will remove one or more documents based on the key structure.
 
 ### Unmarshal
 
 Data in mongo is stored as `bson` which is a compressed form of `json`. We need mongo to convert the stored `bson` data to regular `json`
 that we can use in our code when returned.
 
-We just use the `bson.Unmarshal` API to achieve this.
+`bson.Unmarshal` API is used to achieve this.
 
-### Read
 
-Arguments:
-```go
-collection string
-key interface
-tag string
-```
-
-Read is straight forward and it uses the `FindOne` API to find our Mongo document based on the provided `key` and then gets the corresponding data for the given `tag`. It will return []byte which can then be passed to the `Unmarshal` function to get the desired GO object.
-
-### Delete
-
-Delete is similar to Read and deletes all the objectIDs being stored for a given `key` in the collection.
-
-## Testing Interfaces
-
-The following interface exists to allow for the development of unit tests which don't require mongo to be running.
-It is mentioned so in the code as well.
-
-```go
-// MongoCollection defines the a subset of MongoDB operations
-// Note: This interface is defined mainly for mock testing
-type MongoCollection interface {
-	InsertOne(ctx context.Context, document interface{},
-		opts ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
-	FindOne(ctx context.Context, filter interface{},
-		opts ...*options.FindOneOptions) *mongo.SingleResult
-	FindOneAndUpdate(ctx context.Context, filter interface{},
-		update interface{}, opts ...*options.FindOneAndUpdateOptions) *mongo.SingleResult
-	DeleteOne(ctx context.Context, filter interface{},
-		opts ...*options.DeleteOptions) (*mongo.DeleteResult, error)
-	Find(ctx context.Context, filter interface{},
-		opts ...*options.FindOptions) (*mongo.Cursor, error)
-}
-```

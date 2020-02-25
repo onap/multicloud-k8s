@@ -70,6 +70,16 @@ func (c *mockCollection) Find(ctx context.Context, filter interface{},
 	return c.mCursor, c.Err
 }
 
+func (c *mockCollection) DeleteMany(ctx context.Context, filter interface{},
+	opts ...*options.DeleteOptions) (*mongo.DeleteResult, error) {
+	return nil, c.Err
+}
+
+func (c *mockCollection) UpdateOne(ctx context.Context, filter interface{}, update interface{},
+	opts ...*options.UpdateOptions) (*mongo.UpdateResult, error) {
+		return nil, c.Err
+}
+
 func TestCreate(t *testing.T) {
 	testCases := []struct {
 		label         string

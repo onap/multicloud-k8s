@@ -18,10 +18,12 @@ package module
 
 // Client for using the services in the orchestrator
 type Client struct {
-	Project      *ProjectClient
-	CompositeApp *CompositeAppClient
-	Controller *ControllerClient
-	Cluster *ClusterClient
+	Project               *ProjectClient
+	CompositeApp          *CompositeAppClient
+	Controller            *ControllerClient
+	DeploymentIntentGroup *DeploymentIntentGroupClient
+	Cluster               *ClusterClient
+	Intent                *IntentClient
 	// Add Clients for API's here
 }
 
@@ -33,5 +35,7 @@ func NewClient() *Client {
 	c.Controller = NewControllerClient()
 	c.Cluster = NewClusterClient()
 	// Add Client API handlers here
+	c.DeploymentIntentGroup = NewDeploymentIntentGroupClient()
+	c.Intent = NewIntentClient()
 	return c
 }

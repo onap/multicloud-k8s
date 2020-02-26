@@ -32,16 +32,24 @@ done
 
 echo 'configure vpp ...'
 
+ifconfig veth12 0.0.0.0
+ifconfig veth12 down
+ifconfig veth21 0.0.0.0
+ifconfig veth21 down
+
+HWADDR1=$(ifconfig veth12 |grep ether | tr -s ' ' | cut -d' ' -f 3)
+HWADDR2=$(ifconfig veth21 |grep ether | tr -s ' ' | cut -d' ' -f 3)
+
 vppctl -s /run/vpp/cli-vpp2.sock show ver
 vppctl -s /run/vpp/cli-vpp2.sock show threads
 
-vppctl -s /run/vpp/cli-vpp2.sock create host-interface name veth12
+vppctl -s /run/vpp/cli-vpp2.sock create host-interface name veth12 hw-addr $HWADDR1
 
 vppctl -s /run/vpp/cli-vpp2.sock set int state host-veth12 up
 
 vppctl -s /run/vpp/cli-vpp2.sock set int ip address host-veth12 10.10.1.1/24
 
-vppctl -s /run/vpp/cli-vpp2.sock create host-interface name veth21
+vppctl -s /run/vpp/cli-vpp2.sock create host-interface name veth21 hw-addr $HWADDR2
 
 vppctl -s /run/vpp/cli-vpp2.sock set int state host-veth21 up
 

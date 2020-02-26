@@ -34,11 +34,15 @@ done
 
 echo 'configure vpp ...'
 
+ifconfig veth11 0.0.0.0
+ifconfig veth11 down
+
+HWADDR1=$(ifconfig veth11 |grep ether | tr -s ' ' | cut -d' ' -f 3)
 
 vppctl -s /run/vpp/cli-vpp1.sock show ver
 vppctl -s /run/vpp/cli-vpp1.sock show threads
 
-vppctl -s /run/vpp/cli-vpp1.sock create host-interface name veth11
+vppctl -s /run/vpp/cli-vpp1.sock create host-interface name veth11 hw-addr $HWADDR1
 
 vppctl -s /run/vpp/cli-vpp1.sock set int state host-veth11 up
 

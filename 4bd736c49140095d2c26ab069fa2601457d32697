@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "76cedc97_743895dd",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-26T23:40:51Z",
+      "side": 1,
+      "message": "Question - does cluster provider need to be provided in addition to cluster name?",
+      "parentUuid": "bac7dc95_ce72e410",
+      "range": {
+        "startLine": 50,
+        "startChar": 1,
+        "endLine": 50,
+        "endChar": 52
+      },
+      "revId": "4bd736c49140095d2c26ab069fa2601457d32697",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7532f6ba_5a30df34",
         "filename": "src/orchestrator/pkg/module/app_intent.go",
         "patchSetId": 1

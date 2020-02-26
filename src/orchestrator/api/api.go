@@ -22,8 +22,8 @@ import (
 var moduleClient *moduleLib.Client
 
 // NewRouter creates a router that registers the various urls that are supported
-
-func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager, ControllerClient moduleLib.ControllerManager) *mux.Router {
+func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager, ControllerClient moduleLib.ControllerManager,
+	deploymentIntentGrpClient moduleLib.DeploymentIntentGroupManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 	moduleClient = moduleLib.NewClient()
@@ -58,5 +58,18 @@ func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient module
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("PUT")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.getHandler).Methods("GET")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.deleteHandler).Methods("DELETE")
+
+	//setting routes for deploymentIntentGroup
+	if deploymentIntentGrpClient == nil {
+		deploymentIntentGrpClient = moduleClient.DeploymentIntentGroup
+	}
+
+	deploymentIntentGrpHandler := deploymentIntentGroupHandler{
+		client: deploymentIntentGrpClient,
+	}
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups", deploymentIntentGrpHandler.createDeploymentIntentGroupHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}", deploymentIntentGrpHandler.getDeploymentIntentGroupHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}", deploymentIntentGrpHandler.deleteDeploymentIntentGroupHandler).Methods("DELETE")
+
 	return router
 }

@@ -255,12 +255,12 @@ func (h clusterHandler) getClusterHandler(w http.ResponseWriter, r *http.Request
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		kc_bytes, err := base64.StdEncoding.DecodeString(retKubeconfig.Kubeconfig)
+		kcBytes, err := base64.StdEncoding.DecodeString(retKubeconfig.Kubeconfig)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		_, err = pw.Write(kc_bytes)
+		_, err = pw.Write(kcBytes)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -276,12 +276,12 @@ func (h clusterHandler) getClusterHandler(w http.ResponseWriter, r *http.Request
 	case "application/octet-stream":
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.WriteHeader(http.StatusOK)
-		kc_bytes, err := base64.StdEncoding.DecodeString(retKubeconfig.Kubeconfig)
+		kcBytes, err := base64.StdEncoding.DecodeString(retKubeconfig.Kubeconfig)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		_, err = w.Write(kc_bytes)
+		_, err = w.Write(kcBytes)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

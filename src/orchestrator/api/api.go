@@ -22,7 +22,12 @@ import (
 var moduleClient *moduleLib.Client
 
 // NewRouter creates a router that registers the various urls that are supported
-func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient moduleLib.CompositeAppManager, ControllerClient moduleLib.ControllerManager, clusterClient moduleLib.ClusterManager) *mux.Router {
+func NewRouter(projectClient moduleLib.ProjectManager,
+	compositeAppClient moduleLib.CompositeAppManager,
+	ControllerClient moduleLib.ControllerManager,
+	clusterClient moduleLib.ClusterManager,
+	deploymentIntentGrpClient moduleLib.DeploymentIntentGroupManager,
+	intentClient moduleLib.IntentManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 	moduleClient = moduleLib.NewClient()
@@ -79,6 +84,31 @@ func NewRouter(projectClient moduleLib.ProjectManager, compositeAppClient module
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs", clusterHandler.getClusterKvPairsHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.getClusterKvPairsHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.deleteClusterKvPairsHandler).Methods("DELETE")
+
+	//setting routes for deploymentIntentGroup
+	if deploymentIntentGrpClient == nil {
+		deploymentIntentGrpClient = moduleClient.DeploymentIntentGroup
+	}
+
+	deploymentIntentGrpHandler := deploymentIntentGroupHandler{
+		client: deploymentIntentGrpClient,
+	}
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups", deploymentIntentGrpHandler.createDeploymentIntentGroupHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}", deploymentIntentGrpHandler.getDeploymentIntentGroupHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}", deploymentIntentGrpHandler.deleteDeploymentIntentGroupHandler).Methods("DELETE")
+
+	// setting routes for AddingIntents
+	if intentClient == nil {
+		intentClient = moduleClient.Intent
+	}
+
+	intentHandler := intentHandler{
+		client: intentClient,
+	}
+
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents",intentHandler.addIntentHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/{intent-name}",intentHandler.getIntentHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/{intent-name}",intentHandler.deleteIntentHandler).Methods("DELETE")
 
 	return router
 }

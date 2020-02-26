@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2e2ff44c_2dc1800a",
+        "filename": "src/dcm/api/logicalCloudHandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-26T22:05:39Z",
+      "side": 1,
+      "message": "Is kubeconfig supposed to be part of this - and is not working yet?  Or, does this commented code just need to be removed?",
+      "revId": "7433a37d90a359b738b6e3706dbb7421288c763a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7c664848_eae2bb06",
+        "filename": "src/dcm/internal/logicalcloud/logicalcloud.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-26T22:05:39Z",
+      "side": 1,
+      "message": "is the \u0027 character before json a typo ?",
+      "revId": "7433a37d90a359b738b6e3706dbb7421288c763a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a4ef59a_b2a36998",
+        "filename": "src/dcm/internal/logicalcloud/logicalcloud.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-26T22:05:39Z",
+      "side": 1,
+      "message": "what will be the form/format of ClusterReference?  On the orchestrator side, clusters can be queried by providing the \u0027cluster-provider-name\u0027 and \u0027cluster-name\u0027.",
+      "revId": "7433a37d90a359b738b6e3706dbb7421288c763a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

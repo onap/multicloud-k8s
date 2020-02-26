@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "e78444b9_8f63d741",
+        "filename": "src/orchestrator/api/apphandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-26T23:15:14Z",
+      "side": 1,
+      "message": "Take a look at https://gerrit.onap.org/r/c/multicloud/k8s/+/102441/2/src/orchestrator/api/clusterhandler.go - the createClusterHandler() function to see how I\u0027m handling multi-part.  (you may have looked at an earlier version of the patch - but I updated since then)",
+      "revId": "696d5ecb1ec8a8b0ffdd6a440a7e9a5217c7ee14",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4b443f38_7d4e9396",
         "filename": "src/orchestrator/pkg/module/app.go",
         "patchSetId": 2
@@ -22,6 +39,30 @@
       "revId": "696d5ecb1ec8a8b0ffdd6a440a7e9a5217c7ee14",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4b94bce2_e22d8f2e",
+        "filename": "src/orchestrator/pkg/module/app.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-26T23:15:14Z",
+      "side": 1,
+      "message": "Refer to: https://gerrit.onap.org/r/c/multicloud/k8s/+/102441/2/src/orchestrator/pkg/module/cluster.go\nI have handled this issue by making a Cluster and ClusterContent struct - in your case it could be App and AppContent",
+      "parentUuid": "4b443f38_7d4e9396",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 14
+      },
+      "revId": "696d5ecb1ec8a8b0ffdd6a440a7e9a5217c7ee14",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     },
     {
       "key": {

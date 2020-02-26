@@ -25,20 +25,20 @@ import (
 
 // GenericPlacementIntent shall have 2 fields - metadata and spec
 type GenericPlacementIntent struct {
-	MetaData IntentMetaData `json:"metadata"`
-	Spec     IntentSpecData `json:"spec"`
+	MetaData GenIntentMetaData `json:"metadata"`
+	Spec     GenIntentSpecData `json:"spec"`
 }
 
-// IntentMetaData has name, description, userdata1, userdata2
-type IntentMetaData struct {
+// GenIntentMetaData has name, description, userdata1, userdata2
+type GenIntentMetaData struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	UserData1   string `json:"userData1"`
 	UserData2   string `json:"userData2"`
 }
 
-// IntentSpecData has logical-cloud-name
-type IntentSpecData struct {
+// GenIntentSpecData has logical-cloud-name
+type GenIntentSpecData struct {
 	LogicalCloud string `json:"logical-cloud"`
 }
 

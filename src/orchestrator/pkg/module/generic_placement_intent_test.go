@@ -38,13 +38,13 @@ func TestCreateGenericPlacementIntent(t *testing.T) {
 		{
 			label: "Create GenericPlacementIntent",
 			inputIntent: GenericPlacementIntent{
-				MetaData: IntentMetaData{
+				MetaData: GenIntentMetaData{
 					Name:        "testGenericPlacement",
 					Description: " A sample intent for testing",
 					UserData1:   "userData1",
 					UserData2:   "userData2",
 				},
-				Spec: IntentSpecData{
+				Spec: GenIntentSpecData{
 					LogicalCloud: "logicalCloud1",
 				},
 			},
@@ -52,13 +52,13 @@ func TestCreateGenericPlacementIntent(t *testing.T) {
 			inputCompositeApp:        "testCompositeApp",
 			inputCompositeAppVersion: "testCompositeAppVersion",
 			expected: GenericPlacementIntent{
-				MetaData: IntentMetaData{
+				MetaData: GenIntentMetaData{
 					Name:        "testGenericPlacement",
 					Description: " A sample intent for testing",
 					UserData1:   "userData1",
 					UserData2:   "userData2",
 				},
-				Spec: IntentSpecData{
+				Spec: GenIntentSpecData{
 					LogicalCloud: "logicalCloud1",
 				},
 			},
@@ -128,13 +128,13 @@ func TestGetGenericPlacementIntent(t *testing.T) {
 			compositeAppName:    "testCompositeApp",
 			compositeAppVersion: "testVersion",
 			expected: GenericPlacementIntent{
-				MetaData: IntentMetaData{
+				MetaData: GenIntentMetaData{
 					Name:        "testIntent",
 					Description: "A sample intent for testing",
 					UserData1:   "userData1",
 					UserData2:   "userData2",
 				},
-				Spec: IntentSpecData{
+				Spec: GenIntentSpecData{
 					LogicalCloud: "logicalCloud1",
 				},
 			},

@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a07ebf79_66a86ff2",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-27T18:44:09Z",
+      "side": 1,
+      "message": "Is this required?",
+      "range": {
+        "startLine": 46,
+        "startChar": 37,
+        "endLine": 46,
+        "endChar": 46
+      },
+      "revId": "0443062ec65361743757d48617f2148467a26a42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "697e9e70_f34c2459",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-27T18:44:09Z",
+      "side": 1,
+      "message": "These functions are not required for new Mongo methods - Insert, Find and Remove",
+      "range": {
+        "startLine": 89,
+        "startChar": 1,
+        "endLine": 125,
+        "endChar": 1
+      },
+      "revId": "0443062ec65361743757d48617f2148467a26a42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a19d9a9_497acf2a",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-27T18:44:09Z",
+      "side": 1,
+      "message": "rename?",
+      "range": {
+        "startLine": 203,
+        "startChar": 2,
+        "endLine": 203,
+        "endChar": 6
+      },
+      "revId": "0443062ec65361743757d48617f2148467a26a42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e003ab9_e813b056",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-02-27T18:44:09Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 532,
+        "startChar": 2,
+        "endLine": 532,
+        "endChar": 6
+      },
+      "revId": "0443062ec65361743757d48617f2148467a26a42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

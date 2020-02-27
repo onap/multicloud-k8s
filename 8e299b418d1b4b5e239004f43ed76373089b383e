@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "cf9a47f6_bfbac2cc",
+        "filename": "src/orchestrator/internal/module/generic_placement_intent.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-27T00:23:05Z",
+      "side": 1,
+      "message": "Same question as Dileep - is there a reason to copy \u0027g\u0027 into \u0027gPIntent\u0027 ?  Why not just return \u0027g\u0027 below?",
+      "parentUuid": "4b528918_818473b5",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 2
+      },
+      "revId": "8e299b418d1b4b5e239004f43ed76373089b383e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "647f6bbe_310d8e92",
         "filename": "src/orchestrator/internal/module/generic_placement_intent.go",
         "patchSetId": 1

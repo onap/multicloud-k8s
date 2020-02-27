@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "43607750_7098402d",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-27T19:18:24Z",
+      "side": 1,
+      "message": "no longer - will remove it.",
+      "parentUuid": "a07ebf79_66a86ff2",
+      "range": {
+        "startLine": 46,
+        "startChar": 37,
+        "endLine": 46,
+        "endChar": 46
+      },
+      "revId": "0443062ec65361743757d48617f2148467a26a42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "697e9e70_f34c2459",
         "filename": "src/orchestrator/pkg/module/cluster.go",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2020-02-27T18:44:09Z",
       "side": 1,
       "message": "These functions are not required for new Mongo methods - Insert, Find and Remove",
+      "range": {
+        "startLine": 89,
+        "startChar": 1,
+        "endLine": 125,
+        "endChar": 1
+      },
+      "revId": "0443062ec65361743757d48617f2148467a26a42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b5aa01a7_1c34c89c",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-27T19:18:24Z",
+      "side": 1,
+      "message": "correct - will remove (actually - compile fails with these removed.  db.Key() in mongo.go expects a String() interface. Will add back in)",
+      "parentUuid": "697e9e70_f34c2459",
       "range": {
         "startLine": 89,
         "startChar": 1,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "5c68582e_4f9d319b",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-27T19:18:24Z",
+      "side": 1,
+      "message": "will do - to all these.",
+      "parentUuid": "4a19d9a9_497acf2a",
+      "range": {
+        "startLine": 203,
+        "startChar": 2,
+        "endLine": 203,
+        "endChar": 6
+      },
+      "revId": "0443062ec65361743757d48617f2148467a26a42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e003ab9_e813b056",
         "filename": "src/orchestrator/pkg/module/cluster.go",
         "patchSetId": 2
@@ -82,6 +154,30 @@
       "writtenOn": "2020-02-27T18:44:09Z",
       "side": 1,
       "message": "Ditto",
+      "range": {
+        "startLine": 532,
+        "startChar": 2,
+        "endLine": 532,
+        "endChar": 6
+      },
+      "revId": "0443062ec65361743757d48617f2148467a26a42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "46f4c777_9d6ac9b9",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-02-27T19:18:24Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "6e003ab9_e813b056",
       "range": {
         "startLine": 532,
         "startChar": 2,

@@ -13,7 +13,7 @@
   memory: 32768
   cpus: 16
   volumes:
-    - name: sda
+    - name: sdb
       size: 50
       mount: /var/lib/docker/
   roles:

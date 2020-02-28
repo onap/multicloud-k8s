@@ -75,20 +75,3 @@ func (m *MockDB) Delete(table string, key Key, tag string) error {
 	return m.Err
 }
 
-func (m *MockDB) ReadAll(table string, tag string) (map[string][]byte, error) {
-	if m.Err != nil {
-		return nil, m.Err
-	}
-
-	ret := make(map[string][]byte)
-
-	for k, v := range m.Items {
-		for k1, v1 := range v {
-			if k1 == tag {
-				ret[k] = v1
-			}
-		}
-	}
-
-	return ret, nil
-}

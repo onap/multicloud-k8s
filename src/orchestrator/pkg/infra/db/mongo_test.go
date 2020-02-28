@@ -19,7 +19,6 @@ package db
 import (
 	"bytes"
 	"context"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -68,6 +67,16 @@ func (c *mockCollection) Find(ctx context.Context, filter interface{},
 	opts ...*options.FindOptions) (*mongo.Cursor, error) {
 
 	return c.mCursor, c.Err
+}
+
+func (c *mockCollection) DeleteMany(ctx context.Context, filter interface{},
+	opts ...*options.DeleteOptions) (*mongo.DeleteResult, error) {
+	return nil, c.Err
+}
+
+func (c *mockCollection) UpdateOne(ctx context.Context, filter interface{}, update interface{},
+	opts ...*options.UpdateOptions) (*mongo.UpdateResult, error) {
+		return nil, c.Err
 }
 
 func TestCreate(t *testing.T) {
@@ -455,143 +464,3 @@ func TestDelete(t *testing.T) {
 	}
 }
 
-func TestReadAll(t *testing.T) {
-	testCases := []struct {
-		label         string
-		input         map[string]interface{}
-		mockColl      *mockCollection
-		bson          bson.Raw
-		expectedError string
-		expected      map[string][]byte
-	}{
-		{
-			label: "Successfully Read all entries",
-			input: map[string]interface{}{
-				"coll": "collname",
-				"tag":  "metadata",
-			},
-			mockColl: &mockCollection{
-				mCursor: &mongo.Cursor{
-					// Binary form of
-					// {
-					//	"_id" : ObjectId("5c115156777ff85654248ae1"),
-					//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
-					//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
-					// }
-
-					Current: bson.Raw{
-						'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
-						'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
-						'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
-						'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
-						'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
-						'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
-						'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
-						'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
-						'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
-						'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
-						'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
-					},
-				},
-				mCursorCount: 1,
-			},
-			expected: map[string][]byte{
-				`{"name": "testdef","version": "v1"}`: []byte{
-					92, 17, 81, 86, 119, 127, 248, 86, 84, 36, 138, 225},
-			},
-		},
-		{
-			label: "UnSuccessfully Read of all entries",
-			input: map[string]interface{}{
-				"coll": "collname",
-				"tag":  "tagName",
-			},
-			mockColl: &mockCollection{
-				Err: pkgerrors.New("DB Error"),
-			},
-			expectedError: "DB Error",
-		},
-		{
-			label: "UnSuccessfull Readall, tag not found",
-			input: map[string]interface{}{
-				"coll": "collname",
-				"tag":  "tagName",
-			},
-			mockColl: &mockCollection{
-				mCursor: &mongo.Cursor{
-					// Binary form of
-					// {
-					//	"_id" : ObjectId("5c115156777ff85654248ae1"),
-					//  "key" : bson.D{{"name","testdef"},{"version","v1"}},
-					//  "metadata" : ObjectId("5c115156c9755047e318bbfd")
-					// }
-					Current: bson.Raw{
-						'\x58', '\x00', '\x00', '\x00', '\x03', '\x6b', '\x65', '\x79',
-						'\x00', '\x27', '\x00', '\x00', '\x00', '\x02', '\x6e', '\x61',
-						'\x6d', '\x65', '\x00', '\x08', '\x00', '\x00', '\x00', '\x74',
-						'\x65', '\x73', '\x74', '\x64', '\x65', '\x66', '\x00', '\x02',
-						'\x76', '\x65', '\x72', '\x73', '\x69', '\x6f', '\x6e', '\x00',
-						'\x03', '\x00', '\x00', '\x00', '\x76', '\x31', '\x00', '\x00',
-						'\x07', '\x6d', '\x65', '\x74', '\x61', '\x64', '\x61', '\x74',
-						'\x61', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77', '\x7f',
-						'\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x07', '\x5f',
-						'\x69', '\x64', '\x00', '\x5c', '\x11', '\x51', '\x56', '\x77',
-						'\x7f', '\xf8', '\x56', '\x54', '\x24', '\x8a', '\xe1', '\x00',
-					},
-				},
-				mCursorCount: 1,
-			},
-			expectedError: "Did not find any objects with tag",
-		},
-		{
-			label: "Missing input fields",
-			input: map[string]interface{}{
-				"coll": "",
-				"tag":  "",
-			},
-			expectedError: "Missing collection or tag name",
-			mockColl:      &mockCollection{},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			m, _ := NewMongoStore("name", &mongo.Database{})
-			// Override the getCollection function with our mocked version
-			getCollection = func(coll string, m *MongoStore) MongoCollection {
-				return testCase.mockColl
-			}
-
-			decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
-				return testCase.mockColl.mCursor.Current, testCase.mockColl.Err
-			}
-
-			cursorNext = func(ctx context.Context, cursor *mongo.Cursor) bool {
-				if testCase.mockColl.mCursorCount > 0 {
-					testCase.mockColl.mCursorCount -= 1
-					return true
-				}
-				return false
-			}
-
-			cursorClose = func(ctx context.Context, cursor *mongo.Cursor) error {
-				return nil
-			}
-
-			got, err := m.ReadAll(testCase.input["coll"].(string), testCase.input["tag"].(string))
-			if err != nil {
-				if testCase.expectedError == "" {
-					t.Fatalf("Readall method returned an un-expected (%s)", err)
-				}
-				if !strings.Contains(string(err.Error()), testCase.expectedError) {
-					t.Fatalf("Readall method returned an error (%s)", err)
-				}
-			} else {
-				if reflect.DeepEqual(got, testCase.expected) == false {
-					t.Fatalf("Readall returned unexpected data: %v, expected: %v",
-						got, testCase.expected)
-				}
-			}
-		})
-	}
-}

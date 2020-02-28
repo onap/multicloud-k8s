@@ -15,6 +15,7 @@ package db
 
 import (
 	"encoding/json"
+	"fmt"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -62,8 +63,9 @@ func (m *MockDB) Read(table string, key Key, tag string) ([]byte, error) {
 		return nil, m.Err
 	}
 
+	str := fmt.Sprintf("%v", key)
 	for k, v := range m.Items {
-		if k == key.String() {
+		if k == str {
 			return v[tag], nil
 		}
 	}

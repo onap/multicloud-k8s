@@ -29,7 +29,6 @@ var DBconn Store
 // that wants to use the Store interface. This allows various
 // db backends and key types.
 type Key interface {
-	String() string
 }
 
 // Store is an interface for accessing the database

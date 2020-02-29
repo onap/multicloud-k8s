@@ -4,7 +4,7 @@
 
 This project offers a means for deploying a Kubernetes cluster
 that satisfies the requirements of [ONAP multicloud/k8s plugin][1]. Its
-ansible playbooks allow to provision a deployment on Virtual Machines.
+ansible playbooks allow provisioning a deployment on Virtual Machines.
 
 ![Diagram](../../../docs/img/diagram.png)
 
@@ -21,16 +21,22 @@ Linux instructions to install dependencies and plugins required for
 its usage. This script supports two Virtualization technologies
 (Libvirt and VirtualBox).
 
-    $ ./setup.sh -p libvirt
+    $ sudo ./setup.sh -p libvirt
 
 Once Vagrant is installed, it's possible to provision a cluster using
 the following instructions:
 
     $ vagrant up && vagrant up installer
 
+In-depth documentation and use cases of various Vagrant commands [Vagrant commands][3]
+is available on the Vagrant site.
+
 ## License
 
 Apache-2.0
 
 [1]: https://git.onap.org/multicloud/k8s
+
 [2]: https://www.vagrantup.com/
+
+[3]: https://www.vagrantup.com/docs/cli/

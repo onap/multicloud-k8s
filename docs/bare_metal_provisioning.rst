@@ -122,7 +122,7 @@ Nested-Virtualization.
 
 **Deploying KUD services**
 
-Finally, the KRD provisioning process can be started through the use of
+Finally, the KUD provisioning process can be started through the use of
 *installer.sh* bash script. The output of this script is collected in the
 *kud_installer.log* file for future reference.
 

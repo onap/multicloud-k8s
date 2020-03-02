@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Intel Corporation, Inc
+ * Copyright 2019 Intel Corporation, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,23 +21,26 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+
+	"github.com/gorilla/mux"
 )
+
+// Replace with HPA API backend implimentation
 
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
-type controllerHandler struct {
-	// Interface that implements controller operations
+type projectHandler struct {
+	// Interface that implements Project operations
 	// We will set this variable with a mock interface for testing
-	client moduleLib.ControllerManager
+	client moduleLib.ProjectManager
 }
 
-// Create handles creation of the controller entry in the database
-func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var m moduleLib.Controller
+// Create handles creation of the Project entry in the database
+func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
+	var p moduleLib.Project
 
-	err := json.NewDecoder(r.Body).Decode(&m)
+	err := json.NewDecoder(r.Body).Decode(&p)
 	switch {
 	case err == io.EOF:
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -48,12 +51,12 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Name is required.
-	if m.Name == "" {
+	if p.MetaData.Name == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
-	ret, err := h.client.CreateController(m)
+	ret, err := h.client.CreateProject(p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -68,13 +71,13 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-// Get handles GET operations on a particular controller Name
-// Returns a controller
-func (h controllerHandler) getHandler(w http.ResponseWriter, r *http.Request) {
+// Get handles GET operations on a particular Project Name
+// Returns a Project
+func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["controller-name"]
+	name := vars["project-name"]
 
-	ret, err := h.client.GetController(name)
+	ret, err := h.client.GetProject(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -89,33 +92,12 @@ func (h controllerHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// healthcheck handles GET operations on a particular controller Name
-// Returns a healthcheck reponse from the grpc server of the controller
-func (h controllerHandler) healthCheck (w http.ResponseWriter, r *http.Request) {
+// Delete handles DELETE operations on a particular Project Name
+func (h projectHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["controller-name"]
+	name := vars["project-name"]
 
-	ret, err := h.client.GetController(name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(ret)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-// Delete handles DELETE operations on a particular controller Name
-func (h controllerHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	name := vars["controller-name"]
-
-	err := h.client.DeleteController(name)
+	err := h.client.DeleteProject(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -1,0 +1,16 @@
+syntax = "proto3";
+ 
+service controller {
+    // Controllers
+    rpc UpdateAppContext(ContextUpdateRequest) returns (ContextUpdateResponse) {
+    }
+}
+ 
+message ContextUpdateRequest {
+    string intent_group = 1;
+    string app_context = 2;
+}
+ 
+message ContextUpdateResponse {
+    bool app_context_updated = 1;
+}

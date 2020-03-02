@@ -1,0 +1,15 @@
+syntax = "proto3";
+ 
+service sync {
+    // Sync
+    rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {
+    }
+}
+ 
+message InstallAppRequest {
+    string app_context = 1;
+}
+ 
+message InstallAppResponse {
+    bool app_context_installed = 1;
+}

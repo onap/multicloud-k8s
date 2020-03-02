@@ -64,12 +64,12 @@ type Store interface {
 }
 
 // CreateDBClient creates the DB client
-func createDBClient(dbType string) error {
+func createDBClient(dbType string, dbName string) error {
 	var err error
 	switch dbType {
 	case "mongo":
 		// create a mongodb database with orchestrator as the name
-		DBconn, err = NewMongoStore("orchestrator", nil)
+		DBconn, err = NewMongoStore(dbName, nil)
 	default:
 		return pkgerrors.New(dbType + "DB not supported")
 	}
@@ -96,8 +96,8 @@ func DeSerialize(str string, v interface{}) error {
 
 // InitializeDatabaseConnection sets up the connection to the
 // configured database to allow the application to talk to it.
-func InitializeDatabaseConnection() error {
-	err := createDBClient(config.GetConfiguration().DatabaseType)
+func InitializeDatabaseConnection(dbName string) error {
+	err := createDBClient(config.GetConfiguration().DatabaseType, dbName)
 	if err != nil {
 		return pkgerrors.Cause(err)
 	}

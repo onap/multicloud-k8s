@@ -34,7 +34,7 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	err := db.InitializeDatabaseConnection()
+	err := db.InitializeDatabaseConnection("meco")
 	if err != nil {
 		log.Println("Unable to initialize database connection...")
 		log.Println(err)

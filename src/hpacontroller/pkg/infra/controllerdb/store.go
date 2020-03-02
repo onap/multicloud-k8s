@@ -1,5 +1,5 @@
 /*
-Copyright 2018 Intel Corporation.
+Copyright 2020 Intel Corporation.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -11,24 +11,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package db
+package controllerdb
 
 import (
 	"encoding/json"
 	"reflect"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
+	db "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
 	pkgerrors "github.com/pkg/errors"
 )
 
 // DBconn interface used to talk a concrete Database connection
-var DBconn Store
+var DBconn map[string]Store
 
 // Key is an interface that will be implemented by anypackage
 // that wants to use the Store interface. This allows various
 // db backends and key types.
 type Key interface {
+	String() string
 }
 
 // Store is an interface for accessing the database
@@ -41,42 +43,31 @@ type Store interface {
 
 	// Creates a new master document with key and links data with tag and
 	// creates a pointer(row) to the newly added data in the master table
-	Create(table string, key Key, tag string, data interface{}) error
+	Create(table string, key db.Key, tag string, data interface{}) error
 
 	// Reads data for a particular key with specific tag.
-	Read(table string, key Key, tag string) ([]byte, error)
+	Read(table string, key db.Key, tag string) ([]byte, error)
 
 	// Update data for particular key with specific tag
-	Update(table string, key Key, tag string, data interface{}) error
+	Update(table string, key db.Key, tag string, data interface{}) error
 
 	// Deletes a specific tag data for key.
 	// TODO: If tag is empty, it will delete all tags under key.
-	Delete(table string, key Key, tag string) error
+	Delete(table string, key db.Key, tag string) error
 
-	// Inserts and Updates a tag with key and also adds query fields if provided
-	Insert(coll string, key Key, query interface{}, tag string, data interface{}) error
-
-	// Find the document(s) with key and get the tag values from the document(s)
-	Find(coll string, key Key, tag string) ([][]byte, error)
-
-        // Removes the document(s) matching the key if no child reference in collection
-	Remove(coll string, key Key) error
-
-	// Remove all the document(s) matching the key
-	RemoveAll(coll string, key Key) error
 }
 
 // CreateDBClient creates the DB client
-func createDBClient(dbType string, dbName string) error {
+func createDBClient(dbType string, dbName string) (error) {
 	var err error
-	if dbName == "" {
-		dbName = "orchestrator"
-	}
 
+	if DBconn  == nil {
+		DBconn = make(map[string]Store)
+	}
 	switch dbType {
 	case "mongo":
 		// create a mongodb database with orchestrator as the name
-		DBconn, err = NewMongoStore(dbName, nil)
+		DBconn[dbName], err = db.NewMongoStore(dbName, nil)
 	default:
 		return pkgerrors.New(dbType + "DB not supported")
 	}
@@ -109,10 +100,10 @@ func InitializeDatabaseConnection(dbName string) error {
 		return pkgerrors.Cause(err)
 	}
 
-	err = DBconn.HealthCheck()
+	err = DBconn[dbName].HealthCheck()
 	if err != nil {
 		return pkgerrors.Cause(err)
 	}
 
-	return nil
+	return err
 }

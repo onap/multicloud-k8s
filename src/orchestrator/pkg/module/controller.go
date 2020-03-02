@@ -21,6 +21,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
+	rpc "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -31,7 +32,7 @@ type Controller struct {
 
 	Host string `json:"host"`
 
-	Port int64 `json:"port"`
+	Port string `json:"port"`
 }
 
 // ControllerKey is the key structure that is used in the database
@@ -91,6 +92,15 @@ func (mc *ControllerClient) CreateController(m Controller) (Controller, error) {
 	if err != nil {
 		return Controller{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
+
+	err = rpc.InitializeRPC(m.Host, m.Port, m.Name)
+	if err != nil {
+		return Controller{}, pkgerrors.Wrap(err, "Initilize RPC Failed")
+	}
+	//err = rpc.RPC["hpa"].HealthCheck()
+	//if err != nil {
+	//	return Controller{}, pkgerrors.Wrap(err, "HealthCheck Passed")
+	//}
 
 	return m, nil
 }

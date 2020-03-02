@@ -21,6 +21,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
+	rpc "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -91,6 +92,9 @@ func (mc *ControllerClient) CreateController(m Controller) (Controller, error) {
 	if err != nil {
 		return Controller{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
+
+	
+	err =  rpc.InitializeRpc(m.Host, m.Port, m.Name)
 
 	return m, nil
 }

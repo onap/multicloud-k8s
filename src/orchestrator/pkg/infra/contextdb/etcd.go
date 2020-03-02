@@ -55,9 +55,9 @@ func NewEtcdClient(store *clientv3.Client, c EtcdConfig) (ContextDb, error) {
 	var endpoint string
 	if store == nil {
 		tlsInfo := transport.TLSInfo{
-			CertFile: c.CertFile,
-			KeyFile:  c.KeyFile,
-			CAFile:   c.CAFile,
+			CertFile:      c.CertFile,
+			KeyFile:       c.KeyFile,
+			TrustedCAFile: c.CAFile,
 		}
 		tlsConfig, err := tlsInfo.ClientConfig()
 		if err != nil {

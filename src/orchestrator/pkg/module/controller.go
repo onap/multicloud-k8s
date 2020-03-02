@@ -17,10 +17,14 @@
 package module
 
 import (
+	"context"
 	"encoding/json"
+	"log"
+	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-
+	controllerpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/controller"
+	rpc "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -31,7 +35,7 @@ type Controller struct {
 
 	Host string `json:"host"`
 
-	Port int64 `json:"port"`
+	Port string `json:"port"`
 }
 
 // ControllerKey is the key structure that is used in the database
@@ -55,6 +59,7 @@ type ControllerManager interface {
 	CreateController(ms Controller) (Controller, error)
 	GetController(name string) (Controller, error)
 	DeleteController(name string) error
+	HealthCheck(controllerName string) error
 }
 
 // ControllerClient implements the Manager
@@ -75,6 +80,8 @@ func NewControllerClient() *ControllerClient {
 
 // CreateController a new collection based on the Controller
 func (mc *ControllerClient) CreateController(m Controller) (Controller, error) {
+	//var rpcClient controllerpb.ControllerClient 
+	//var healthRes *controllerpb.HealthCheckResponse
 
 	//Construct the composite key to select the entry
 	key := ControllerKey{
@@ -92,7 +99,55 @@ func (mc *ControllerClient) CreateController(m Controller) (Controller, error) {
 		return Controller{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
 
+	err = rpc.InitializeRPC(m.Host, m.Port, m.Name)
+	if err != nil {
+		return Controller{}, pkgerrors.Wrap(err, "Initilize RPC Failed")
+	}
+
+	/*ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if rpc.RPC[m.Name] != nil {
+		rpcClient = rpc.RPC[m.Name]
+		healthReq := new(controllerpb.HealthCheckRequest)
+		healthRes, err = rpcClient.HealthCheck(ctx, healthReq)
+	} else {
+		return Controller{}, pkgerrors.Wrap(err, "HealthCheck Failed - Could not get ControllerClient")
+	}
+	
+	if err != nil {
+		return Controller{}, pkgerrors.Wrap(err, "HealthCheck Failed")
+	}
+	log.Println("HealthCheck Passed: ")
+	log.Printf("%+v\n", healthRes) */
+	err = mc.HealthCheck(m.Name)
+	if err != nil {
+		return Controller{}, pkgerrors.Wrap(err, "HealthCheck Failed")
+	}
+
 	return m, nil
+}
+
+// HealthCheck performs a gRPC healthcheck of the provided controller
+func (mc *ControllerClient) HealthCheck(controllerName string)(error) {
+	var err error
+	var rpcClient controllerpb.ControllerClient 
+	var healthRes *controllerpb.HealthCheckResponse
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if rpc.RPC[controllerName] != nil {
+		rpcClient = rpc.RPC[controllerName]
+		healthReq := new(controllerpb.HealthCheckRequest)
+		healthRes, err = rpcClient.HealthCheck(ctx, healthReq)
+	} else {
+		return pkgerrors.Wrap(err, "HealthCheck Failed - Could not get ControllerClient")
+	}
+	
+	if err != nil {
+		return pkgerrors.Wrap(err, "HealthCheck Failed")
+	}
+	log.Println("HealthCheck Passed: ")
+	log.Printf("%+v\n", healthRes)
+	return err
 }
 
 // GetController returns the Controller for corresponding name

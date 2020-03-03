@@ -46,6 +46,30 @@
       "revId": "4ea5bf74aca4df51bd553797f6b8de4e7ba8530f",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d9cb5b19_cf304d88",
+        "filename": "src/orchestrator/cmd/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 667
+      },
+      "writtenOn": "2020-03-03T19:54:09Z",
+      "side": 1,
+      "message": "No one has given me a straight data model. I.E. What databases, collections, organization we are using and why. It seems some meetings are happening in SC where this is being decided but it would be ideal to have a documented plan and to have each person working on components to know what it is.\n\nI was under the impression that infra microservices (hpa controller, DCM, ETC) would have their own database and would access the orchestrator database (meco as this is name now) to verify project/app etc.",
+      "parentUuid": "79f2095d_82fa4fdc",
+      "range": {
+        "startLine": 37,
+        "startChar": 41,
+        "endLine": 37,
+        "endChar": 45
+      },
+      "revId": "4ea5bf74aca4df51bd553797f6b8de4e7ba8530f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

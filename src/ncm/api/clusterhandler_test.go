@@ -43,6 +43,7 @@ type mockClusterManager struct {
 	ClusterContentItems  []moduleLib.ClusterContent
 	ClusterLabelItems    []moduleLib.ClusterLabel
 	ClusterKvPairsItems  []moduleLib.ClusterKvPairs
+	ClusterList          []string
 	Err                  error
 }
 
@@ -104,6 +105,14 @@ func (m *mockClusterManager) GetClusters(provider string) ([]moduleLib.Cluster, 
 	}
 
 	return m.ClusterItems, nil
+}
+
+func (m *mockClusterManager) GetClustersWithLabel(provider, label string) ([]string, error) {
+	if m.Err != nil {
+		return []string{}, m.Err
+	}
+
+	return m.ClusterList, nil
 }
 
 func (m *mockClusterManager) DeleteCluster(provider, name string) error {

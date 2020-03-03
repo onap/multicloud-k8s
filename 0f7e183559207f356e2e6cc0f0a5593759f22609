@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "04da4a4e_e2928cda",
+        "filename": "src/inventory/api/aaipullapi.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T23:06:11Z",
+      "side": 1,
+      "message": "Remove whitespace",
+      "range": {
+        "startLine": 29,
+        "startChar": 41,
+        "endLine": 29,
+        "endChar": 48
+      },
+      "revId": "0f7e183559207f356e2e6cc0f0a5593759f22609",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5171ee4_7dc9c096",
+        "filename": "src/inventory/api/k8spluginapi.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T23:06:11Z",
+      "side": 1,
+      "message": "Can you continue after this error?",
+      "range": {
+        "startLine": 34,
+        "startChar": 2,
+        "endLine": 34,
+        "endChar": 64
+      },
+      "revId": "0f7e183559207f356e2e6cc0f0a5593759f22609",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9be04000_f18614d1",
+        "filename": "src/inventory/api/k8spluginapi.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T23:06:11Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 41,
+        "startChar": 2,
+        "endLine": 41,
+        "endChar": 62
+      },
+      "revId": "0f7e183559207f356e2e6cc0f0a5593759f22609",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "70759cd9_1354b29c",
+        "filename": "src/inventory/api/k8spluginapi.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T23:06:11Z",
+      "side": 1,
+      "message": "Remove white space",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 7
+      },
+      "revId": "0f7e183559207f356e2e6cc0f0a5593759f22609",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

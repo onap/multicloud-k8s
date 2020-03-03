@@ -74,6 +74,12 @@ type ClusterLabelKey struct {
 	ClusterLabelName    string `json:"label"`
 }
 
+// LabelKey is the key structure that is used in the database
+type LabelKey struct {
+	ClusterProviderName string `json:"provider"`
+	ClusterLabelName    string `json:"label"`
+}
+
 // ClusterKvPairsKey is the key structure that is used in the database
 type ClusterKvPairsKey struct {
 	ClusterProviderName string `json:"provider"`
@@ -81,7 +87,7 @@ type ClusterKvPairsKey struct {
 	ClusterKvPairsName  string `json:"kvname"`
 }
 
-// Manager is an interface exposes the Cluster functionality
+// ClusterManager is an interface exposes the Cluster functionality
 type ClusterManager interface {
 	CreateClusterProvider(pr ClusterProvider) (ClusterProvider, error)
 	GetClusterProvider(name string) (ClusterProvider, error)
@@ -91,6 +97,7 @@ type ClusterManager interface {
 	GetCluster(provider, name string) (Cluster, error)
 	GetClusterContent(provider, name string) (ClusterContent, error)
 	GetClusters(provider string) ([]Cluster, error)
+	GetClustersWithLabel(provider, label string) ([]string, error)
 	DeleteCluster(provider, name string) error
 	CreateClusterLabel(provider, cluster string, pr ClusterLabel) (ClusterLabel, error)
 	GetClusterLabel(provider, cluster, label string) (ClusterLabel, error)
@@ -316,6 +323,29 @@ func (v *ClusterClient) GetClusters(provider string) ([]Cluster, error) {
 		if err != nil {
 			return []Cluster{}, pkgerrors.Wrap(err, "Unmarshaling Value")
 		}
+		resp = append(resp, cp)
+	}
+
+	return resp, nil
+}
+
+// GetClustersWithLabel returns all the Clusters with Labels for provider
+// Support Query like /cluster-providers/{Provider}/clusters?label={label}
+func (v *ClusterClient) GetClustersWithLabel(provider, label string) ([]string, error) {
+	//Construct key and tag to select the entry
+	key := LabelKey{
+		ClusterProviderName: provider,
+		ClusterLabelName:    label,
+	}
+
+	values, err := db.DBconn.Find(v.storeName, key, "cluster")
+	if err != nil {
+		return []string{}, pkgerrors.Wrap(err, "Get Clusters")
+	}
+	var resp []string
+
+	for _, value := range values {
+		cp := string(value)
 		resp = append(resp, cp)
 	}
 

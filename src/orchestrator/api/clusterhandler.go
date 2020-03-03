@@ -194,6 +194,23 @@ func (h clusterHandler) getClusterHandler(w http.ResponseWriter, r *http.Request
 	provider := vars["provider-name"]
 	name := vars["name"]
 
+	label := r.URL.Query().Get("label")
+	if len(label) != 0 {
+		ret, err := h.client.GetClustersWithLabel(provider, label)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(w).Encode(ret)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+
 	// handle the get all clusters case - return a list of only the json parts
 	if len(name) == 0 {
 		var retList []moduleLib.Cluster

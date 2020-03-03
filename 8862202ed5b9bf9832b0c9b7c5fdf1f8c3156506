@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "4eec7f9a_fec8191e",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T22:57:42Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "543f0ec8_77fc733d",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 1
+      },
+      "revId": "8862202ed5b9bf9832b0c9b7c5fdf1f8c3156506",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "51f55a43_f457954b",
         "filename": "src/orchestrator/pkg/module/app_intent.go",
         "patchSetId": 5

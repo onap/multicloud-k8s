@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "79aae9de_93aa7781",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-03T20:58:12Z",
+      "side": 1,
+      "message": "You can just use the ClusterLabelKey above instead of making this new struct",
+      "revId": "6abef18e1838487d10f63ba05af25c6839d22480",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "87e73c25_8b08e7b8",
+        "filename": "src/orchestrator/pkg/module/cluster.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-03T20:58:12Z",
+      "side": 1,
+      "message": "\u0027 by label\u0027 - worth adding to the message?",
+      "revId": "6abef18e1838487d10f63ba05af25c6839d22480",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

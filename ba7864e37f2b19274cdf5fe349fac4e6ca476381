@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d4ba83ef_957939d1",
+        "filename": "src/orchestrator/api/app_intent_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "Add verification for these parameters",
+      "range": {
+        "startLine": 126,
+        "startChar": 1,
+        "endLine": 130,
+        "endChar": 30
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a532dbdd_8aba7723",
+        "filename": "src/orchestrator/api/generic_placement_intent_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "Add verification",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 41
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8c7fd605_fcc70d03",
+        "filename": "src/orchestrator/api/generic_placement_intent_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 119,
+        "startChar": 1,
+        "endLine": 122,
+        "endChar": 35
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e51cf9cc_a66e640b",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "this is also optional add omitempty",
+      "range": {
+        "startLine": 46,
+        "startChar": 21,
+        "endLine": 46,
+        "endChar": 35
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "66b229f3_671f1e17",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 57,
+        "startChar": 1,
+        "endLine": 58,
+        "endChar": 34
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19f0c939_1b4b7ef3",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "Move this verification after checking for the project, composite app etc",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 2
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "75b1d9be_bc8e5661",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 143,
+        "startChar": 17,
+        "endLine": 143,
+        "endChar": 23
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9cbaf6b5_cdcfc189",
+        "filename": "src/orchestrator/pkg/module/generic_placement_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "Change this to Insert function",
+      "range": {
+        "startLine": 115,
+        "startChar": 17,
+        "endLine": 115,
+        "endChar": 23
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "274db994_bb4ef1da",
+        "filename": "src/orchestrator/pkg/module/generic_placement_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T18:02:43Z",
+      "side": 1,
+      "message": "Find",
+      "range": {
+        "startLine": 132,
+        "startChar": 26,
+        "endLine": 132,
+        "endChar": 30
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "694b27bb_b1943041",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T22:44:14Z",
+      "side": 1,
+      "message": "Not needed in anymore",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 1
+      },
+      "revId": "8862202ed5b9bf9832b0c9b7c5fdf1f8c3156506",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51f55a43_f457954b",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T22:44:14Z",
+      "side": 1,
+      "message": "Change Delete to Remove in all places",
+      "range": {
+        "startLine": 189,
+        "startChar": 18,
+        "endLine": 189,
+        "endChar": 24
+      },
+      "revId": "8862202ed5b9bf9832b0c9b7c5fdf1f8c3156506",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8350128_7ad08165",
+        "filename": "src/orchestrator/pkg/module/generic_placement_intent.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T22:44:14Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 1
+      },
+      "revId": "8862202ed5b9bf9832b0c9b7c5fdf1f8c3156506",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b582576c_54b4f5a2",
+        "filename": "src/orchestrator/pkg/module/generic_placement_intent.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T22:44:14Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 160,
+        "startChar": 18,
+        "endLine": 160,
+        "endChar": 24
+      },
+      "revId": "8862202ed5b9bf9832b0c9b7c5fdf1f8c3156506",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

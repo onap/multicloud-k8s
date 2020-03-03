@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fd3d515f_b3a291a9",
+        "filename": "src/orchestrator/api/app_intent_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-03T19:37:42Z",
+      "side": 1,
+      "message": "deletion shall fail and return as all these parameters form the key for deletion.",
+      "parentUuid": "d4ba83ef_957939d1",
+      "range": {
+        "startLine": 126,
+        "startChar": 1,
+        "endLine": 130,
+        "endChar": 30
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a532dbdd_8aba7723",
         "filename": "src/orchestrator/api/generic_placement_intent_handler.go",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2020-03-03T18:02:43Z",
       "side": 1,
       "message": "Add verification",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 41
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "752817a5_7fe650b9",
+        "filename": "src/orchestrator/api/generic_placement_intent_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-03T19:37:42Z",
+      "side": 1,
+      "message": "We are verifying this at the module level.",
+      "parentUuid": "a532dbdd_8aba7723",
       "range": {
         "startLine": 55,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "3b0e5b77_8a33cf40",
+        "filename": "src/orchestrator/api/generic_placement_intent_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-03T19:37:42Z",
+      "side": 1,
+      "message": "The deletion will fail and return as all these parameters are included in the key.",
+      "parentUuid": "8c7fd605_fcc70d03",
+      "range": {
+        "startLine": 119,
+        "startChar": 1,
+        "endLine": 122,
+        "endChar": 35
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e51cf9cc_a66e640b",
         "filename": "src/orchestrator/pkg/module/app_intent.go",
         "patchSetId": 2
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "710e1554_43d5fc2a",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-03T19:37:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e51cf9cc_a66e640b",
+      "range": {
+        "startLine": 46,
+        "startChar": 21,
+        "endLine": 46,
+        "endChar": 35
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "66b229f3_671f1e17",
         "filename": "src/orchestrator/pkg/module/app_intent.go",
         "patchSetId": 2
@@ -105,6 +201,30 @@
       "writtenOn": "2020-03-03T18:02:43Z",
       "side": 1,
       "message": "Ditto",
+      "range": {
+        "startLine": 57,
+        "startChar": 1,
+        "endLine": 58,
+        "endChar": 34
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ff48a1c_b4352b08",
+        "filename": "src/orchestrator/pkg/module/app_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-03T19:37:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66b229f3_671f1e17",
       "range": {
         "startLine": 57,
         "startChar": 1,
@@ -186,6 +306,30 @@
     },
     {
       "key": {
+        "uuid": "77dae010_07ac4775",
+        "filename": "src/orchestrator/pkg/module/generic_placement_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-03T19:37:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9cbaf6b5_cdcfc189",
+      "range": {
+        "startLine": 115,
+        "startChar": 17,
+        "endLine": 115,
+        "endChar": 23
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "274db994_bb4ef1da",
         "filename": "src/orchestrator/pkg/module/generic_placement_intent.go",
         "patchSetId": 2
@@ -197,6 +341,30 @@
       "writtenOn": "2020-03-03T18:02:43Z",
       "side": 1,
       "message": "Find",
+      "range": {
+        "startLine": 132,
+        "startChar": 26,
+        "endLine": 132,
+        "endChar": 30
+      },
+      "revId": "ba7864e37f2b19274cdf5fe349fac4e6ca476381",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c6670d49_6e9d4bcb",
+        "filename": "src/orchestrator/pkg/module/generic_placement_intent.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-03T19:37:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "274db994_bb4ef1da",
       "range": {
         "startLine": 132,
         "startChar": 26,

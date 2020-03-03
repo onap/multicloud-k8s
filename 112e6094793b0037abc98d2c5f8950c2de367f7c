@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "104fa9b2_ec62e06a",
+        "filename": "src/inventory/constants/const.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T23:23:56Z",
+      "side": 1,
+      "message": "Duplicate of https://github.com/onap/multicloud-k8s/blob/master/src/k8splugin/internal/app/instance.go#L55\nUse from the original location",
+      "revId": "112e6094793b0037abc98d2c5f8950c2de367f7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "57838636_d8ba78ac",
+        "filename": "src/inventory/constants/const.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-03T23:23:56Z",
+      "side": 1,
+      "message": "Duplicate of https://github.com/onap/multicloud-k8s/blob/master/src/k8splugin/internal/app/instance.go#L71\nUse from the original location",
+      "range": {
+        "startLine": 73,
+        "startChar": 5,
+        "endLine": 73,
+        "endChar": 19
+      },
+      "revId": "112e6094793b0037abc98d2c5f8950c2de367f7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

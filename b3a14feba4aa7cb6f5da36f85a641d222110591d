@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f84ccfc_bef81617",
+        "filename": "src/orchestrator/api/add_intents_handler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-04T18:39:42Z",
+      "side": 1,
+      "message": "di?",
+      "range": {
+        "startLine": 101,
+        "startChar": 2,
+        "endLine": 101,
+        "endChar": 9
+      },
+      "revId": "b3a14feba4aa7cb6f5da36f85a641d222110591d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5db26109_5228799b",
+        "filename": "src/orchestrator/pkg/module/add_intents.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-04T18:39:42Z",
+      "side": 1,
+      "message": "Insert",
+      "range": {
+        "startLine": 127,
+        "startChar": 17,
+        "endLine": 127,
+        "endChar": 23
+      },
+      "revId": "b3a14feba4aa7cb6f5da36f85a641d222110591d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "569d25d0_f75c04df",
+        "filename": "src/orchestrator/pkg/module/add_intents.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-04T18:39:42Z",
+      "side": 1,
+      "message": "Insert",
+      "range": {
+        "startLine": 145,
+        "startChar": 26,
+        "endLine": 145,
+        "endChar": 30
+      },
+      "revId": "b3a14feba4aa7cb6f5da36f85a641d222110591d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "022b5d72_f27773b4",
+        "filename": "src/orchestrator/pkg/module/add_intents.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-04T18:39:42Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 173,
+        "startChar": 18,
+        "endLine": 173,
+        "endChar": 24
+      },
+      "revId": "b3a14feba4aa7cb6f5da36f85a641d222110591d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

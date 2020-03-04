@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dbc6599e_4bea3dd1",
+        "filename": "src/orchestrator/pkg/module/deployment_intent_groups.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-04T21:44:57Z",
+      "side": 1,
+      "message": "Make this generic. Make this a map",
+      "range": {
+        "startLine": 56,
+        "startChar": 1,
+        "endLine": 56,
+        "endChar": 48
+      },
+      "revId": "689ba13e49bf4344bea0e30175cced0d9063f010",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

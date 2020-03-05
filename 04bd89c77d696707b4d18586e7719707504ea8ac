@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "01949025_77e36531",
+        "filename": "src/orchestrator/api/app_profilehandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-05T21:44:59Z",
+      "side": 1,
+      "message": "typo?",
+      "range": {
+        "startLine": 145,
+        "startChar": 18,
+        "endLine": 145,
+        "endChar": 31
+      },
+      "revId": "04bd89c77d696707b4d18586e7719707504ea8ac",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "720c43c7_96f87dd7",
+        "filename": "src/orchestrator/pkg/module/app_profile.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-05T21:44:59Z",
+      "side": 1,
+      "message": "Can this be Multi-part response? A similar function will be required for the content tag for implementation of instantiation flow",
+      "range": {
+        "startLine": 199,
+        "startChar": 27,
+        "endLine": 199,
+        "endChar": 46
+      },
+      "revId": "04bd89c77d696707b4d18586e7719707504ea8ac",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

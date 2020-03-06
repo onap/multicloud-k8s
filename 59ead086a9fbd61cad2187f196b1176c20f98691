@@ -16,6 +16,24 @@
       "revId": "59ead086a9fbd61cad2187f196b1176c20f98691",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cad86809_0e6c7e39",
+        "filename": "src/orchestrator/pkg/infra/db/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-06T19:36:55Z",
+      "side": 1,
+      "message": "My bad, this is ok, since u have changed the dbname, not the collection name,",
+      "parentUuid": "481aba35_527925af",
+      "revId": "59ead086a9fbd61cad2187f196b1176c20f98691",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

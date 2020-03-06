@@ -34,6 +34,24 @@
       "revId": "59ead086a9fbd61cad2187f196b1176c20f98691",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aeb90c26_4f616ee5",
+        "filename": "src/orchestrator/pkg/infra/db/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4183
+      },
+      "writtenOn": "2020-03-06T19:37:10Z",
+      "side": 1,
+      "message": "Isn\u0027t that the collection name?",
+      "parentUuid": "481aba35_527925af",
+      "revId": "59ead086a9fbd61cad2187f196b1176c20f98691",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

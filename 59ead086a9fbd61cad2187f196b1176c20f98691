@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "481aba35_527925af",
+        "filename": "src/orchestrator/pkg/infra/db/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-03-06T19:31:31Z",
+      "side": 1,
+      "message": "We had hardcoded the dbname like below in multiple files.\nSo, i assume that this shall break.\n\nfunc NewCompositeAppClient() *CompositeAppClient {\n\treturn \u0026CompositeAppClient{\n\t\tstoreName: \"orchestrator\",\n\t\ttagMeta:   \"compositeAppmetadata\",\n\t}\n}",
+      "revId": "59ead086a9fbd61cad2187f196b1176c20f98691",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

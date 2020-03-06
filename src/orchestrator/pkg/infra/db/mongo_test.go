@@ -79,6 +79,11 @@ func (c *mockCollection) UpdateOne(ctx context.Context, filter interface{}, upda
 	return nil, c.Err
 }
 
+func (c *mockCollection) CountDocuments(ctx context.Context, filter interface{},
+	opts ...*options.CountOptions) (int64, error) {
+	return 1, c.Err
+}
+
 func TestCreate(t *testing.T) {
 	testCases := []struct {
 		label         string

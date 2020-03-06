@@ -130,7 +130,7 @@ key := CompositeAppKey{
 
 NOTE: Key structure can be different from the original key and can include Query fields also. ANY operation is not supported for Query fields.
 
-### Remove
+### RemoveAll
 
 Arguments:
 ```go
@@ -139,11 +139,21 @@ key interface
 ```
 Similar to find. This will remove one or more documents based on the key structure.
 
+### Remove
+
+Arguments:
+```go
+collection string
+key interface
+```
+This will remove one document based on the key structure. If child refrences exist for the key then the document will not be removed.
+
 ### Unmarshal
 
 Data in mongo is stored as `bson` which is a compressed form of `json`. We need mongo to convert the stored `bson` data to regular `json`
 that we can use in our code when returned.
 
 `bson.Unmarshal` API is used to achieve this.
+
 
 

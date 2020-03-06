@@ -49,6 +49,8 @@ type MongoCollection interface {
 		opts ...*options.FindOptions) (*mongo.Cursor, error)
 	UpdateOne(ctx context.Context, filter interface{}, update interface{},
 		opts ...*options.UpdateOptions) (*mongo.UpdateResult, error)
+        CountDocuments(ctx context.Context, filter interface{},
+		opts ...*options.CountOptions) (int64, error)
 }
 
 // MongoStore is an implementation of the db.Store interface
@@ -543,8 +545,8 @@ func (m *MongoStore) Find(coll string, key Key, tag string) ([][]byte, error) {
 	return result, nil
 }
 
-// Remove method to remove the documet by key
-func (m *MongoStore) Remove(coll string, key Key) error {
+// RemoveAll method to removes all the documet matching key
+func (m *MongoStore) RemoveAll(coll string, key Key) error {
 	if !m.validateParams(coll, key) {
 		return pkgerrors.New("Mandatory fields are missing")
 	}
@@ -560,3 +562,29 @@ func (m *MongoStore) Remove(coll string, key Key) error {
 	}
 	return nil
 }
+
+// Remove method to remove the documet by key if no child references
+func (m *MongoStore) Remove(coll string, key Key) error {
+	if !m.validateParams(coll, key) {
+		return pkgerrors.New("Mandatory fields are missing")
+	}
+	c := getCollection(coll, m)
+	ctx := context.Background()
+	filter, err := m.findFilter(key)
+	if err != nil {
+		return err
+	}
+	count, err := c.CountDocuments(context.Background(), filter)
+	if err != nil {
+		return pkgerrors.Errorf("Error finding: %s", err.Error())
+	}
+	if count > 1 {
+		return pkgerrors.Errorf("Can't delete parent without deleting child references first")
+	}
+	_, err = c.DeleteOne(ctx, filter)
+	if err != nil {
+		return pkgerrors.Errorf("Error Deleting from database: %s", err.Error())
+	}
+	return nil
+}
+

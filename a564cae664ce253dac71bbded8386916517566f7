@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1db4744d_7027b307",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-09T23:08:30Z",
+      "side": 1,
+      "message": "Use Insert method",
+      "range": {
+        "startLine": 108,
+        "startChar": 17,
+        "endLine": 108,
+        "endChar": 23
+      },
+      "revId": "a564cae664ce253dac71bbded8386916517566f7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2dbc700d_7567c137",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-09T23:08:30Z",
+      "side": 1,
+      "message": "Use Find",
+      "range": {
+        "startLine": 125,
+        "startChar": 25,
+        "endLine": 125,
+        "endChar": 29
+      },
+      "revId": "a564cae664ce253dac71bbded8386916517566f7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2a5fb5f1_bb98b029",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-09T23:08:30Z",
+      "side": 1,
+      "message": "Use Remove",
+      "range": {
+        "startLine": 152,
+        "startChar": 18,
+        "endLine": 152,
+        "endChar": 24
+      },
+      "revId": "a564cae664ce253dac71bbded8386916517566f7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

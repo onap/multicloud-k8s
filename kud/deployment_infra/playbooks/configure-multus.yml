@@ -11,3 +11,36 @@
   tasks:
     - name: Apply Multus Daemonset
       shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/multus-daemonset.yml"
+
+- hosts: kube-master
+  tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+
+    - name: getting tuning plugin
+      block:
+      - name: create cni_plugins folder
+        become: yes
+        file:
+          state: directory
+          path: "{{ cni_plugins_dest }}"
+      - name: download cni_plugins tarball
+        become: yes
+        get_url:
+          url: "{{ cni_plugins_url }}"
+          dest: "/tmp/cni-plugins-linux-amd64-v{{ cni_plugins_version }}.tgz"
+      - name: extract cni plugins
+        become: yes
+        unarchive:
+          src: "/tmp/cni-plugins-linux-amd64-v{{ cni_plugins_version }}.tgz"
+          dest: "{{ cni_plugins_dest }}"
+          remote_src: yes
+      - name: copy tuning plugin to /opt/cni/bin folder
+        become: yes
+        command: "cp {{ cni_plugins_dest }}/tuning /opt/cni/bin/"
+      - name: remove cni_plugins folder
+        file:
+          state: absent
+          path: "{{ cni_plugins_dest }}"
+      when: cni_plugins_source_type == "tarball"

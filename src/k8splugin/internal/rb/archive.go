@@ -115,6 +115,10 @@ func ExtractTarBall(r io.Reader) (string, error) {
 				}
 			}
 		case tar.TypeReg:
+			if target == outDir { // Handle '.' substituted to '' entry
+				continue
+			}
+
 			err = utils.EnsureDirectory(target)
 			if err != nil {
 				return "", pkgerrors.Wrap(err, "Creating Directory")

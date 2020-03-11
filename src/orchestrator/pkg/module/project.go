@@ -90,7 +90,7 @@ func (v *ProjectClient) CreateProject(p Project) (Project, error) {
 		return Project{}, pkgerrors.New("Project already exists")
 	}
 
-	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
+	err = db.DBconn.Insert(v.storeName, key, nil, v.tagMeta, p)
 	if err != nil {
 		return Project{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -105,7 +105,7 @@ func (v *ProjectClient) GetProject(name string) (Project, error) {
 	key := ProjectKey{
 		ProjectName: name,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Project{}, pkgerrors.Wrap(err, "Get Project")
 	}
@@ -113,7 +113,7 @@ func (v *ProjectClient) GetProject(name string) (Project, error) {
 	//value is a byte array
 	if value != nil {
 		proj := Project{}
-		err = db.DBconn.Unmarshal(value, &proj)
+		err = db.DBconn.Unmarshal(value[0], &proj)
 		if err != nil {
 			return Project{}, pkgerrors.Wrap(err, "Unmarshaling Value")
 		}
@@ -130,7 +130,7 @@ func (v *ProjectClient) DeleteProject(name string) error {
 	key := ProjectKey{
 		ProjectName: name,
 	}
-	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
+	err := db.DBconn.Remove(v.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Project Entry;")
 	}

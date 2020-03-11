@@ -241,6 +241,10 @@ function usage {
     echo "./installer.sh --cluster <cluster name> \
 --plugins <plugin_1 plugin_2> - Install k8s cluster with default plugins \
 and additional plugins such as onap4k8s."
+    echo "./installer.sh --cluster <cluster name> \
+--network <kube_pods_subnet> --plugins <plugin_1 plugin_2> - Install k8s \
+cluster with default plugins and additional plugins such as onap4k8s, \
+with option to specify kube_pods_subnet."
 }
 
 if [ $# -eq 0 ]; then
@@ -299,8 +303,25 @@ if [ "$1" == "--cluster" ]; then
             plugins_name=${@:4:$#}
             install_cluster $cluster_name "$plugins_name"
             exit 0
+        elif [ "$3" == "--network" ]; then
+            if [ -z "${4-}" ]; then
+                echo "Error: network argument is null; Refer the usage"
+                exit 1
+            fi
+            sed -i -e 's|^kube_pods_subnet.*|kube_pods_subnet: '"$4"'|g' \
+                    $kud_inventory_folder/group_vars/k8s-cluster.yml
+
+            if [ ${5:+1} ] && [ "$5" == "--plugins" ]; then
+                if [ -z "${6-}" ]; then
+                    echo "Error: plugins argument is null; Refer the usage"
+                    exit 1
+                fi
+                plugins_name=${@:6:$#}
+                install_cluster $cluster_name "$plugins_name"
+                exit 0
+            fi
         else
-            echo "Error: cluster argument should have plugins; \
+            echo "Error: cluster argument should have network or plugins; \
                 Refer the usage"
             usage
             exit 1

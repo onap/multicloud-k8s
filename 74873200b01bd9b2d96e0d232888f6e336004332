@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fb6e15a4_453a90c5",
+        "filename": "src/orchestrator/pkg/rtcontext/rtcontext.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-03-11T23:00:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ab09d52_3b2ab1a1",
+      "range": {
+        "startLine": 68,
+        "startChar": 48,
+        "endLine": 68,
+        "endChar": 51
+      },
+      "revId": "74873200b01bd9b2d96e0d232888f6e336004332",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "34bfe81f_e22adbdc",
         "filename": "src/orchestrator/pkg/rtcontext/rtcontext.go",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2020-03-11T20:54:36Z",
       "side": 1,
       "message": "I assume for this to work you need the etcd patch?",
+      "range": {
+        "startLine": 165,
+        "startChar": 21,
+        "endLine": 165,
+        "endChar": 27
+      },
+      "revId": "74873200b01bd9b2d96e0d232888f6e336004332",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7395f6_4bed01a1",
+        "filename": "src/orchestrator/pkg/rtcontext/rtcontext.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-03-11T23:00:09Z",
+      "side": 1,
+      "message": "Yes",
+      "parentUuid": "34bfe81f_e22adbdc",
       "range": {
         "startLine": 165,
         "startChar": 21,

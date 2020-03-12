@@ -27,7 +27,7 @@ import (
 	"net/http"
 	"net/textproto"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+	moduleLib "github.com/onap/multicloud-k8s/src/network/pkg/module"
 
 	"github.com/gorilla/mux"
 )

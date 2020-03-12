@@ -22,7 +22,6 @@ type Client struct {
 	CompositeApp           *CompositeAppClient
 	App                    *AppClient
 	Controller             *ControllerClient
-	Cluster                *ClusterClient
 	GenericPlacementIntent *GenericPlacementIntentClient
 	AppIntent              *AppIntentClient
 	DeploymentIntentGroup  *DeploymentIntentGroupClient
@@ -39,7 +38,6 @@ func NewClient() *Client {
 	c.CompositeApp = NewCompositeAppClient()
 	c.App = NewAppClient()
 	c.Controller = NewControllerClient()
-	c.Cluster = NewClusterClient()
 	c.GenericPlacementIntent = NewGenericPlacementIntentClient()
 	c.AppIntent = NewAppIntentClient()
 	c.DeploymentIntentGroup = NewDeploymentIntentGroupClient()

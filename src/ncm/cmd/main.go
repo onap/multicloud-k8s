@@ -1,5 +1,5 @@
 /*
-Copyright 2018 Intel Corporation.
+Copyright 2020 Intel Corporation.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
-	"github.com/onap/multicloud-k8s/src/orchestrator/api"
+	"github.com/onap/multicloud-k8s/src/ncm/api"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
@@ -47,9 +47,9 @@ func main() {
 		log.Fatalln("Exiting...")
 	}
 
-	httpRouter := api.NewRouter(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
+	httpRouter := api.NewRouter(nil)
 	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
-	log.Println("Starting Kubernetes Multicloud API")
+	log.Println("Starting Multicloud Network Customization API and controller")
 
 	httpServer := &http.Server{
 		Handler: loggedRouter,

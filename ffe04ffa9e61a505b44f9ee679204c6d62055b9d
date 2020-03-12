@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94baa60c_f57349a3",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-12T18:08:10Z",
+      "side": 1,
+      "message": "Remove this",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 1
+      },
+      "revId": "ffe04ffa9e61a505b44f9ee679204c6d62055b9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f46e777_45ca5a01",
+        "filename": "src/orchestrator/pkg/module/compositeapp.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-12T18:08:10Z",
+      "side": 1,
+      "message": "Change to Insert, Find and Remove",
+      "range": {
+        "startLine": 108,
+        "startChar": 17,
+        "endLine": 108,
+        "endChar": 23
+      },
+      "revId": "ffe04ffa9e61a505b44f9ee679204c6d62055b9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

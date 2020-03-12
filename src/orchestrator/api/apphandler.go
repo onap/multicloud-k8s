@@ -129,6 +129,30 @@ func (h appHandler) getAppHandler(w http.ResponseWriter, r *http.Request) {
 	compositeAppVersion := vars["version"]
 	name := vars["app-name"]
 
+	// handle the get all apps case - return a list of only the json parts
+	if len(name) == 0 {
+		var retList []moduleLib.App
+
+		ret, err := h.client.GetApps(projectName, compositeAppName, compositeAppVersion)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for _, app := range ret {
+			retList = append(retList, moduleLib.App{Metadata: app.Metadata})
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(w).Encode(retList)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+
 	accepted, _, err := mime.ParseMediaType(r.Header.Get("Accept"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotAcceptable)

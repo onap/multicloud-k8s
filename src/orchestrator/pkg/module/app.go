@@ -65,6 +65,7 @@ type AppManager interface {
 	CreateApp(a App, ac AppContent, p string, cN string, cV string) (App, error)
 	GetApp(name string, p string, cN string, cV string) (App, error)
 	GetAppContent(name string, p string, cN string, cV string) (AppContent, error)
+	GetApps(p string, cN string, cV string) ([]App, error)
 	DeleteApp(name string, p string, cN string, cV string) error
 }
 
@@ -181,6 +182,34 @@ func (v *AppClient) GetAppContent(name string, p string, cN string, cV string) (
 	}
 
 	return AppContent{}, pkgerrors.New("Error getting app content")
+}
+
+// GetApps returns all Apps for given composite App
+func (v *AppClient) GetApps(project, compositeApp, compositeAppVersion string) ([]App, error) {
+
+	key := AppKey{
+		App:                 "",
+		Project:             project,
+		CompositeApp:        compositeApp,
+		CompositeAppVersion: compositeAppVersion,
+	}
+
+	var resp []App
+	values, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	if err != nil {
+		return []App{}, pkgerrors.Wrap(err, "Get AppProfiles")
+	}
+
+	for _, value := range values {
+		a := App{}
+		err = db.DBconn.Unmarshal(value, &a)
+		if err != nil {
+			return []App{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+		}
+		resp = append(resp, a)
+	}
+
+	return resp, nil
 }
 
 // DeleteApp deletes the  App from database

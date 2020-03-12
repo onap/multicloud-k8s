@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fd3f672e_1bdb2373",
+        "filename": "src/orchestrator/pkg/module/app.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-12T17:15:49Z",
+      "side": 1,
+      "message": "Not required",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 1
+      },
+      "revId": "223a648ca1ffdcde03d8d2c5bd99e285fc7672f3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

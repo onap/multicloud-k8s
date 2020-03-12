@@ -29,6 +29,8 @@ type ContextDb interface {
 	Put(key string, value interface{}) error
 	// Delete k,v
 	Delete(key string) error
+	// Delete all keys in heirarchy
+	DeleteAll(key string) error
 	// Gets Json Struct from db
 	Get(key string, value interface{}) error
 	// Returns all keys with a prefix

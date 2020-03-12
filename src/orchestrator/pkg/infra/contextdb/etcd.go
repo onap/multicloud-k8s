@@ -156,13 +156,26 @@ func (e *EtcdClient) GetAllKeys(key string) ([]string, error) {
 	return keys, nil
 }
 
+// DeleteAll keys from Etcd DB
+func (e *EtcdClient) DeleteAll(key string) error {
+	cli := getEtcd(e)
+	if cli == nil {
+		return pkgerrors.Errorf("Etcd Client not initialized")
+	}
+	_, err := cli.Delete(context.Background(), key, clientv3.WithPrefix())
+	if err != nil {
+		return pkgerrors.Errorf("Delete failed etcd entry: %s", err.Error())
+	}
+	return nil
+}
+
 // Delete values from Etcd DB
 func (e *EtcdClient) Delete(key string) error {
 	cli := getEtcd(e)
 	if cli == nil {
 		return pkgerrors.Errorf("Etcd Client not initialized")
 	}
-	_, err := cli.Delete(context.Background(), key, clientv3.WithPrefix())
+	_, err := cli.Delete(context.Background(), key)
 	if err != nil {
 		return pkgerrors.Errorf("Delete failed etcd entry: %s", err.Error())
 	}

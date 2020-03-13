@@ -15,7 +15,7 @@ package api
 
 import (
 	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-	log "github.com/onap/multicloud-k8s/src/inventory/logutils"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	utils "github.com/onap/multicloud-k8s/src/inventory/utils"
 	k8sint "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	k8scon "github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"

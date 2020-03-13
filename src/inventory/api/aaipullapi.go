@@ -17,7 +17,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-	log "github.com/onap/multicloud-k8s/src/inventory/logutils"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	util "github.com/onap/multicloud-k8s/src/inventory/utils"
 	"io/ioutil"
 	"net/http"

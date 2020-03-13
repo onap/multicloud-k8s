@@ -26,3 +26,13 @@ func Warn(msg string, fields Fields) {
 func Info(msg string, fields Fields) {
 	log.WithFields(log.Fields(fields)).Info(msg)
 }
+
+// Debug uses the message provided and logs
+func Debug(msg string) {
+	log.Debug(msg)
+}
+
+// Error uses the message provided and logs
+func Error(msg string) {
+	log.Error(msg)
+}

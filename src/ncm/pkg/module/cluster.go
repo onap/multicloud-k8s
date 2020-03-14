@@ -23,14 +23,6 @@ import (
 )
 
 // ClusterProvider contains the parameters needed for ClusterProviders
-// It implements the interface for managing the ClusterProviders
-type Metadata struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	UserData1   string `json:"userData1"`
-	UserData2   string `json:"userData2"`
-}
-
 type ClusterProvider struct {
 	Metadata Metadata `json:"metadata"`
 }
@@ -105,18 +97,18 @@ type ClusterManager interface {
 // ClusterClient implements the Manager
 // It will also be used to maintain some localized state
 type ClusterClient struct {
-	storeName  string
-	tagMeta    string
-	tagContent string
+	db ClientDbInfo
 }
 
 // NewClusterClient returns an instance of the ClusterClient
 // which implements the Manager
 func NewClusterClient() *ClusterClient {
 	return &ClusterClient{
-		storeName:  "cluster",
-		tagMeta:    "clustermetadata",
-		tagContent: "clustercontent",
+		db: ClientDbInfo{
+			storeName:  "cluster",
+			tagMeta:    "clustermetadata",
+			tagContent: "clustercontent",
+		},
 	}
 }
 
@@ -134,7 +126,7 @@ func (v *ClusterClient) CreateClusterProvider(p ClusterProvider) (ClusterProvide
 		return ClusterProvider{}, pkgerrors.New("ClusterProvider already exists")
 	}
 
-	err = db.DBconn.Insert(v.storeName, key, nil, v.tagMeta, p)
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
 	if err != nil {
 		return ClusterProvider{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -150,7 +142,7 @@ func (v *ClusterClient) GetClusterProvider(name string) (ClusterProvider, error)
 		ClusterProviderName: name,
 	}
 
-	value, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
 	if err != nil {
 		return ClusterProvider{}, pkgerrors.Wrap(err, "Get ClusterProvider")
 	}
@@ -160,7 +152,7 @@ func (v *ClusterClient) GetClusterProvider(name string) (ClusterProvider, error)
 		cp := ClusterProvider{}
 		err = db.DBconn.Unmarshal(value[0], &cp)
 		if err != nil {
-			return ClusterProvider{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return ClusterProvider{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		return cp, nil
 	}
@@ -177,7 +169,7 @@ func (v *ClusterClient) GetClusterProviders() ([]ClusterProvider, error) {
 	}
 
 	var resp []ClusterProvider
-	values, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
 	if err != nil {
 		return []ClusterProvider{}, pkgerrors.Wrap(err, "Get ClusterProviders")
 	}
@@ -186,7 +178,7 @@ func (v *ClusterClient) GetClusterProviders() ([]ClusterProvider, error) {
 		cp := ClusterProvider{}
 		err = db.DBconn.Unmarshal(value, &cp)
 		if err != nil {
-			return []ClusterProvider{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return []ClusterProvider{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		resp = append(resp, cp)
 	}
@@ -202,7 +194,7 @@ func (v *ClusterClient) DeleteClusterProvider(name string) error {
 		ClusterProviderName: name,
 	}
 
-	err := db.DBconn.Remove(v.storeName, key)
+	err := db.DBconn.Remove(v.db.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ClusterProvider Entry;")
 	}
@@ -231,11 +223,11 @@ func (v *ClusterClient) CreateCluster(provider string, p Cluster, q ClusterConte
 		return Cluster{}, pkgerrors.New("Cluster already exists")
 	}
 
-	err = db.DBconn.Insert(v.storeName, key, nil, v.tagMeta, p)
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
 	if err != nil {
 		return Cluster{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
-	err = db.DBconn.Insert(v.storeName, key, nil, v.tagContent, q)
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagContent, q)
 	if err != nil {
 		return Cluster{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -251,7 +243,7 @@ func (v *ClusterClient) GetCluster(provider, name string) (Cluster, error) {
 		ClusterName:         name,
 	}
 
-	value, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
 	if err != nil {
 		return Cluster{}, pkgerrors.Wrap(err, "Get Cluster")
 	}
@@ -261,7 +253,7 @@ func (v *ClusterClient) GetCluster(provider, name string) (Cluster, error) {
 		cl := Cluster{}
 		err = db.DBconn.Unmarshal(value[0], &cl)
 		if err != nil {
-			return Cluster{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return Cluster{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		return cl, nil
 	}
@@ -277,7 +269,7 @@ func (v *ClusterClient) GetClusterContent(provider, name string) (ClusterContent
 		ClusterName:         name,
 	}
 
-	value, err := db.DBconn.Find(v.storeName, key, v.tagContent)
+	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagContent)
 	if err != nil {
 		return ClusterContent{}, pkgerrors.Wrap(err, "Get Cluster Content")
 	}
@@ -287,7 +279,7 @@ func (v *ClusterClient) GetClusterContent(provider, name string) (ClusterContent
 		cc := ClusterContent{}
 		err = db.DBconn.Unmarshal(value[0], &cc)
 		if err != nil {
-			return ClusterContent{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return ClusterContent{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		return cc, nil
 	}
@@ -303,7 +295,7 @@ func (v *ClusterClient) GetClusters(provider string) ([]Cluster, error) {
 		ClusterName:         "",
 	}
 
-	values, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
 	if err != nil {
 		return []Cluster{}, pkgerrors.Wrap(err, "Get Clusters")
 	}
@@ -314,7 +306,7 @@ func (v *ClusterClient) GetClusters(provider string) ([]Cluster, error) {
 		cp := Cluster{}
 		err = db.DBconn.Unmarshal(value, &cp)
 		if err != nil {
-			return []Cluster{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return []Cluster{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		resp = append(resp, cp)
 	}
@@ -330,7 +322,7 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		ClusterName:         name,
 	}
 
-	err := db.DBconn.Remove(v.storeName, key)
+	err := db.DBconn.Remove(v.db.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Cluster Entry;")
 	}
@@ -359,7 +351,7 @@ func (v *ClusterClient) CreateClusterLabel(provider string, cluster string, p Cl
 		return ClusterLabel{}, pkgerrors.New("Cluster Label already exists")
 	}
 
-	err = db.DBconn.Insert(v.storeName, key, nil, v.tagMeta, p)
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
 	if err != nil {
 		return ClusterLabel{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -376,7 +368,7 @@ func (v *ClusterClient) GetClusterLabel(provider, cluster, label string) (Cluste
 		ClusterLabelName:    label,
 	}
 
-	value, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
 	if err != nil {
 		return ClusterLabel{}, pkgerrors.Wrap(err, "Get Cluster")
 	}
@@ -386,7 +378,7 @@ func (v *ClusterClient) GetClusterLabel(provider, cluster, label string) (Cluste
 		cl := ClusterLabel{}
 		err = db.DBconn.Unmarshal(value[0], &cl)
 		if err != nil {
-			return ClusterLabel{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return ClusterLabel{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		return cl, nil
 	}
@@ -403,7 +395,7 @@ func (v *ClusterClient) GetClusterLabels(provider, cluster string) ([]ClusterLab
 		ClusterLabelName:    "",
 	}
 
-	values, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
 	if err != nil {
 		return []ClusterLabel{}, pkgerrors.Wrap(err, "Get Cluster Labels")
 	}
@@ -414,7 +406,7 @@ func (v *ClusterClient) GetClusterLabels(provider, cluster string) ([]ClusterLab
 		cp := ClusterLabel{}
 		err = db.DBconn.Unmarshal(value, &cp)
 		if err != nil {
-			return []ClusterLabel{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return []ClusterLabel{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		resp = append(resp, cp)
 	}
@@ -431,7 +423,7 @@ func (v *ClusterClient) DeleteClusterLabel(provider, cluster, label string) erro
 		ClusterLabelName:    label,
 	}
 
-	err := db.DBconn.Remove(v.storeName, key)
+	err := db.DBconn.Remove(v.db.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ClusterLabel Entry;")
 	}
@@ -459,7 +451,7 @@ func (v *ClusterClient) CreateClusterKvPairs(provider string, cluster string, p 
 		return ClusterKvPairs{}, pkgerrors.New("Cluster KV Pair already exists")
 	}
 
-	err = db.DBconn.Insert(v.storeName, key, nil, v.tagMeta, p)
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
 	if err != nil {
 		return ClusterKvPairs{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -476,7 +468,7 @@ func (v *ClusterClient) GetClusterKvPairs(provider, cluster, kvpair string) (Clu
 		ClusterKvPairsName:  kvpair,
 	}
 
-	value, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
 	if err != nil {
 		return ClusterKvPairs{}, pkgerrors.Wrap(err, "Get Cluster")
 	}
@@ -486,7 +478,7 @@ func (v *ClusterClient) GetClusterKvPairs(provider, cluster, kvpair string) (Clu
 		ckvp := ClusterKvPairs{}
 		err = db.DBconn.Unmarshal(value[0], &ckvp)
 		if err != nil {
-			return ClusterKvPairs{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return ClusterKvPairs{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		return ckvp, nil
 	}
@@ -503,7 +495,7 @@ func (v *ClusterClient) GetAllClusterKvPairs(provider, cluster string) ([]Cluste
 		ClusterKvPairsName:  "",
 	}
 
-	values, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
 	if err != nil {
 		return []ClusterKvPairs{}, pkgerrors.Wrap(err, "Get Cluster KV Pairs")
 	}
@@ -514,7 +506,7 @@ func (v *ClusterClient) GetAllClusterKvPairs(provider, cluster string) ([]Cluste
 		cp := ClusterKvPairs{}
 		err = db.DBconn.Unmarshal(value, &cp)
 		if err != nil {
-			return []ClusterKvPairs{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+			return []ClusterKvPairs{}, pkgerrors.Wrap(err, "Unmarshalling Value")
 		}
 		resp = append(resp, cp)
 	}
@@ -531,7 +523,7 @@ func (v *ClusterClient) DeleteClusterKvPairs(provider, cluster, kvpair string) e
 		ClusterKvPairsName:  kvpair,
 	}
 
-	err := db.DBconn.Remove(v.storeName, key)
+	err := db.DBconn.Remove(v.db.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ClusterKvPairs Entry;")
 	}

@@ -20,6 +20,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"io"
+	"net"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -62,5 +63,21 @@ func IsTarGz(r io.Reader) error {
 		first = false
 	}
 
+	return nil
+}
+
+func IsIpv4Cidr(cidr string) error {
+	_, _, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return pkgerrors.Wrapf(err, "could not parse subnet %v", cidr)
+	}
+	return nil
+}
+
+func IsIpv4(ip string) error {
+	addr := net.ParseIP(ip)
+	if addr == nil {
+		return pkgerrors.Errorf("invalid ipv4 address %v", ip)
+	}
 	return nil
 }

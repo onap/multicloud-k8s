@@ -25,7 +25,7 @@ import (
 
 var moduleClient *moduleLib.Client
 
-// for the given client and testClient, if the testClient is not null and
+// For the given client and testClient, if the testClient is not null and
 // implements the client manager interface corresponding to client, then
 // return the testClient, otherwise return the client.
 func setClient(client, testClient interface{}) interface{} {
@@ -33,6 +33,13 @@ func setClient(client, testClient interface{}) interface{} {
 	case *moduleLib.ClusterClient:
 		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*moduleLib.ClusterManager)(nil)).Elem()) {
 			c, ok := testClient.(moduleLib.ClusterManager)
+			if ok {
+				return c
+			}
+		}
+	case *moduleLib.NetworkClient:
+		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*moduleLib.NetworkManager)(nil)).Elem()) {
+			c, ok := testClient.(moduleLib.NetworkManager)
 			if ok {
 				return c
 			}
@@ -49,12 +56,11 @@ func NewRouter(testClient interface{}) *mux.Router {
 
 	moduleClient = moduleLib.NewClient()
 
+	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
+
 	clusterHandler := clusterHandler{
 		client: setClient(moduleClient.Cluster, testClient).(moduleLib.ClusterManager),
 	}
-
-	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
-
 	router.HandleFunc("/cluster-providers", clusterHandler.createClusterProviderHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers", clusterHandler.getClusterProviderHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{name}", clusterHandler.getClusterProviderHandler).Methods("GET")
@@ -71,6 +77,15 @@ func NewRouter(testClient interface{}) *mux.Router {
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs", clusterHandler.getClusterKvPairsHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.getClusterKvPairsHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.deleteClusterKvPairsHandler).Methods("DELETE")
+
+	networkHandler := networkHandler{
+		client: setClient(moduleClient.Network, testClient).(moduleLib.NetworkManager),
+	}
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/networks", networkHandler.createNetworkHandler).Methods("POST")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/networks", networkHandler.getNetworkHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/networks/{name}", networkHandler.putNetworkHandler).Methods("PUT")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/networks/{name}", networkHandler.getNetworkHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/networks/{name}", networkHandler.deleteNetworkHandler).Methods("DELETE")
 
 	return router
 }

@@ -20,6 +20,8 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"io"
+	"net"
+	"regexp"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -63,4 +65,43 @@ func IsTarGz(r io.Reader) error {
 	}
 
 	return nil
+}
+
+func IsIpv4Cidr(cidr string) error {
+	_, _, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return pkgerrors.Wrapf(err, "could not parse subnet %v", cidr)
+	}
+	return nil
+}
+
+func IsIpv4(ip string) error {
+	addr := net.ParseIP(ip)
+	if addr == nil {
+		return pkgerrors.Errorf("invalid ipv4 address %v", ip)
+	}
+	return nil
+}
+
+const validNameLength int = 63
+const validNameBeginEndCharFormat string = "[A-Za-z0-9]"
+const validNameExtraCharFormat string = "[-A-Za-z0-9_.]"
+const validNameFormat string = "(" + validNameBeginEndCharFormat + validNameExtraCharFormat + "*)?" + validNameBeginEndCharFormat
+const validNameErrorMsg string = "a valid name must start and end with an alphanumeric character and may also contain the characters '-', '_' and '.'"
+const validNameLengthMsg string = "name must have more then 0 and less then 63 characters"
+
+var validNameRegEx = regexp.MustCompile("^" + validNameFormat + "$")
+
+func IsValidName(name string) []string {
+	var errs []string
+
+	if len(name) == 0 {
+		errs = append(errs, validNameLengthMsg)
+	} else if len(name) > validNameLength {
+		errs = append(errs, validNameLengthMsg)
+	}
+	if !validNameRegEx.MatchString(name) {
+		errs = append(errs, validNameErrorMsg)
+	}
+	return errs
 }

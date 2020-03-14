@@ -18,7 +18,9 @@ package module
 
 // Client for using the services in the orchestrator
 type Client struct {
-	Cluster *ClusterClient
+	Cluster     *ClusterClient
+	Network     *NetworkClient
+	ProviderNet *ProviderNetClient
 	// Add Clients for API's here
 }
 
@@ -26,6 +28,8 @@ type Client struct {
 func NewClient() *Client {
 	c := &Client{}
 	c.Cluster = NewClusterClient()
+	c.Network = NewNetworkClient()
+	c.ProviderNet = NewProviderNetClient()
 	// Add Client API handlers here
 	return c
 }

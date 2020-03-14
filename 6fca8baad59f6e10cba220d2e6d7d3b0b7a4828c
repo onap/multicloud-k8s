@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c5cec44a_a600fbb7",
+        "filename": "src/network/pkg/module/module_definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-14T00:43:22Z",
+      "side": 1,
+      "message": "this will be removed",
+      "revId": "6fca8baad59f6e10cba220d2e6d7d3b0b7a4828c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

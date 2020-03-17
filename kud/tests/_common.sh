@@ -1158,3 +1158,15 @@ function populate_CSAR_fw_rbdefinition {
     popd
 }
 
+function populate_CSAR_composite_app_helm {
+      _checks_args "$1"
+      pushd "${CSAR_DIR}/$1"
+      print_msg "Create Helm Chart Archives for compositeApp"
+      rm -f *.tar.gz
+      tar -czf collectd.tar.gz -C $test_folder/vnfs/comp-app/collection/app1/helm .
+      tar -czf prometheus.tar.gz -C $test_folder/vnfs/comp-app/collection/app2/helm .
+      tar -czf collectd_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app1/profile .
+      tar -czf prometheus_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app2/profile .
+      popd
+}
+

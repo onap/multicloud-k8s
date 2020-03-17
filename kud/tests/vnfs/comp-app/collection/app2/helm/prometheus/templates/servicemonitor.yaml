@@ -1,0 +1,30 @@
+{{- if .Values.prometheus.additionalServiceMonitors }}
+apiVersion: v1
+kind: List
+items:
+{{- range .Values.prometheus.additionalServiceMonitors }}
+  - apiVersion: "monitoring.coreos.com/v1"
+    kind: ServiceMonitor
+    metadata:
+      name: {{ .name }}
+      "helm.sh/hook": post-install
+      "helm.sh/hook-weight": "1"
+      labels:
+        app: {{ template "prometheus.name" $ }}-prometheus
+{{ include "prometheus.labels" $ | indent 8 }}
+        {{- if .additionalLabels }}
+{{ toYaml .additionalLabels | indent 8 }}
+        {{- end }}
+    spec:
+      endpoints:
+{{ toYaml .endpoints | indent 8 }}
+    {{- if .jobLabel }}
+      jobLabel: {{ .jobLabel }}
+    {{- end }}
+      namespaceSelector:
+        matchNames:
+          - {{ $.Release.Namespace | quote }}
+      selector:
+{{ toYaml .selector  | indent 8  }}  release: {{ $.Release.Name | quote }}
+{{- end }}
+{{- end }}

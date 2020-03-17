@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c589a490_53f3350b",
+        "filename": "kud/deployment_infra/playbooks/roles/cmk-install/tasks/reset.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-03-17T14:28:41Z",
+      "side": 1,
+      "message": "Is this code written from our team ?",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 111
+      },
+      "revId": "822510088f4d0b500e68d07deb457c1611d1f1b3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

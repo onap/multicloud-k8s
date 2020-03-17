@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: {{ template "prometheus.fullname" . }}-prometheus
+  labels:
+    app: {{ template "prometheus.name" . }}-prometheus
+  "helm.sh/hook": post-install
+  "helm.sh/hook-weight": "2"
+spec:
+  serviceAccountName: {{ template "prometheus.serviceAccountName" . }}
+  serviceMonitorSelector:
+    matchLabels:
+      app: {{ template "prometheus.name" . }}-prometheus
+      release: {{ .Release.Name }}
+  serviceMonitorNamespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace | quote }}
+  resources:
+{{ toYaml .Values.prometheus.resources | indent 4 }}

@@ -1,0 +1,9 @@
+collectd_prometheus:
+  service:
+    type: ClusterIP
+    name: collectd-override
+    port: 9103
+    targetPort: 9103
+    selector:
+      app: collectd
+      collector: collectd

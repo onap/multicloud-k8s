@@ -120,7 +120,7 @@ func NewInstanceClient() *InstanceClient {
 	}
 }
 
-// Create an entry for the resource bundle profile in the database
+// Create an instance of rb on the cluster  in the database
 func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 
 	// Name is required

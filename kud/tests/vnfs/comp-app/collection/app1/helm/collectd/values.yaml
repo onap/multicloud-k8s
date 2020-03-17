@@ -1,0 +1,78 @@
+# Default values for collectd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+ingress:
+  enabled: false
+image:
+  repository: opnfv/barometer-collectd
+  tag: latest
+  pullPolicy: IfNotPresent
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+
+#serviceAccountName: cmk-serviceaccount
+
+# Uncomment the following tolerations and/or nodeSelector to select the node collectd to be deployed
+#tolerations:
+#  - operator: "Exists"
+#nodeSelector:
+#  vcmts: "true"
+
+# Uncomment the following to set environment, command and args for the collectd container
+#env:
+#- name: CMK_PROC_FS
+#  value: "/host/proc"
+#command:
+#- "/bin/bash"
+#- "-c"
+#args: [ "/opt/bin/cmk isolate --conf-dir=/etc/cmk --pool=infra /script/collectd.sh" ]
+
+# all the files under the directory resource will be mount into the directory specified by 'configMountPath' inside the container.
+# Besides that, users can specify any mount by using the 'volumeMounts' and 'volumes'.
+configMountPath: /opt/collectd/etc
+volumeMounts:
+- name: proc
+  mountPath: /mnt/proc
+  readOnly: true
+- name: root
+  mountPath: /hostfs
+  readOnly: true
+- name: etc
+  mountPath: /mnt/etc
+  readOnly: true
+- name: run
+  mountPath: /var/run/docker.sock
+
+volumes:
+- name: proc
+  hostPath:
+    path: /proc
+- name: root
+  hostPath:
+    path: /
+- name: etc
+  hostPath:
+    path: /etc
+- name: run
+  hostPath:
+    path: /var/run/docker.sock
+
+collectd_prometheus:
+  service:
+    type: ClusterIP
+    name: collectd
+    port: 9103
+    targetPort: 9103
+    selector:
+      app: collectd
+      collector: collectd

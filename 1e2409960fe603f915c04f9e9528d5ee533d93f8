@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8adc31a_80785222",
+        "filename": "src/dcm/api/keyValueHandler.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-17T23:59:04Z",
+      "side": 1,
+      "message": "key vlaue pairs are not multi-part - shouldn\u0027t need to do this.",
+      "revId": "1e2409960fe603f915c04f9e9528d5ee533d93f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d78c35d2_c845e19e",
+        "filename": "src/dcm/api/quotaHandler.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-17T23:59:04Z",
+      "side": 1,
+      "message": "quota is not multipart right?  shouldn\u0027t need to do this.",
+      "revId": "1e2409960fe603f915c04f9e9528d5ee533d93f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "373b1b95_84e050ef",
+        "filename": "src/dcm/internal/logicalcloud/keyvalue.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-17T23:59:04Z",
+      "side": 1,
+      "message": "make the json value \"name\" (to match all of our other Metadata cases",
+      "revId": "1e2409960fe603f915c04f9e9528d5ee533d93f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ecc13fca_743c291f",
+        "filename": "src/dcm/internal/logicalcloud/keyvalue.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-17T23:59:04Z",
+      "side": 1,
+      "message": "this won\u0027t work - you need a list of arbitrary key-value pairs.  take a look at how the cluster kv pair code handles this.",
+      "revId": "1e2409960fe603f915c04f9e9528d5ee533d93f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "85cd482f_dddb35fa",
+        "filename": "src/dcm/internal/logicalcloud/logicalcloud.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-17T23:59:04Z",
+      "side": 1,
+      "message": "make the json \u0027name\u0027 to match general metadata useage. (apply to all other metadata structs in the logical cloud)",
+      "revId": "1e2409960fe603f915c04f9e9528d5ee533d93f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

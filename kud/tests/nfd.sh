@@ -24,6 +24,8 @@ kind: Pod
 metadata:
   name: $pod_name
 spec:
+  nodeSelector:
+    feature.node.kubernetes.io/kernel-version.major: '4'
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

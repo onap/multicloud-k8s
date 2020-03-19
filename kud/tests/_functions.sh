@@ -214,4 +214,26 @@ function teardown {
         destroy_deployment $deployment_name
     done
 }
+
+# check_ip_range() - Verifying IP address in address range
+function check_ip_range(){
+    local IP=$1
+    local MASK=$2
+
+    if [ -z $IP ] || [ -z $MASK ]
+    then
+            return 1
+    fi
+    min=`/usr/bin/ipcalc $MASK|awk '/HostMin:/{print $2}'`
+    max=`/usr/bin/ipcalc $MASK|awk '/HostMax:/{print $2}'`
+    MIN=`echo $min|awk -F"." '{printf"%.0f\n",$1*256*256*256+$2*256*256+$3*256+$4}'`
+    MAX=`echo $max|awk -F"." '{printf"%.0f\n",$1*256*256*256+$2*256*256+$3*256+$4}'`
+    IPvalue=`echo $IP|awk -F"." '{printf"%.0f\n",$1*256*256*256+$2*256*256+$3*256+$4}'`
+    if [ "$IPvalue" -gt "$MIN" ] && [ "$IPvalue" -lt "$MAX" ]
+    then
+            return 0
+    fi
+    return 1
+}
+
 test_folder=${FUNCTIONS_DIR}

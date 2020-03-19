@@ -22,6 +22,7 @@ populate_CSAR_multus $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
 kubectl apply -f bridge-network.yaml
+kubectl apply -f macvlan-network.yaml
 
 setup $multus_deployment_name
 
@@ -30,10 +31,18 @@ deployment_pod=$(kubectl get pods | grep  $multus_deployment_name | awk '{print 
 echo "===== $deployment_pod details ====="
 kubectl exec -it $deployment_pod -- ip a
 multus_nic=$(kubectl exec -it $deployment_pod -- ip a)
+net2_ip=$(kubectl exec -it $deployment_pod -- ifconfig net2 \
+ | grep "inet addr" | awk '{ print $2}' |tr -d "addr:")
+
 if [[ $multus_nic != *"net1"* ]]; then
     echo "The $deployment_pod pod doesn't contain the net1 nic"
     exit 1
 else
+    check_ip_range "${net2_ip}" "192.168.1.0/24"
+    if [[ $? -eq 1 ]]; then
+        echo "Unexpected ip range!"
+        exit 0
+    fi
     echo "Test Completed!"
 fi
 

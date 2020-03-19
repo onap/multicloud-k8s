@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d2f38028_97709bdc",
+        "filename": "src/orchestrator/pkg/infra/validation/validation.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-19T22:40:58Z",
+      "side": 1,
+      "message": "Does it make sense to use IsValidIPv4Address from apimachinary",
+      "range": {
+        "startLine": 80,
+        "startChar": 5,
+        "endLine": 80,
+        "endChar": 12
+      },
+      "revId": "d08b7efcb335d892f0eb6f2c8e4a7d406a9b27fc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

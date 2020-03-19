@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "65f63e1a_06ae28fc",
+        "filename": "src/network/scripts/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-19T22:53:09Z",
+      "side": 1,
+      "message": "Should it be something else?",
+      "range": {
+        "startLine": 16,
+        "startChar": 54,
+        "endLine": 16,
+        "endChar": 65
+      },
+      "revId": "ea9171170be9b66c750db3009ca4ef72e97c5855",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

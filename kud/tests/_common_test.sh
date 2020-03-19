@@ -22,6 +22,16 @@ function install_deps {
     fi
 }
 
+# install_ipcalc_deps() - Install dependencies required for teststaht require ipcalc
+function install_ipcalc_deps {
+    if ! $(ipcalc --version &>/dev/null); then
+        function ipcalc_ubuntu_deps {
+            sudo apt-get install -y ipcalc
+        }
+        install_packages "" ipcalc_ubuntu_deps ""
+    fi
+}
+
 # install_ovn_deps() - Install dependencies required for tests that require OVN
 function install_ovn_deps {
     if ! $(yq --version &>/dev/null); then

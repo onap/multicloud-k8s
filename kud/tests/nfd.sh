@@ -33,6 +33,8 @@ spec:
             operator: Gt
             values:
             - '3'
+          - key: "feature.node.kubernetes.io/cpu-pstate.turbo"
+            operator: Exists
   containers:
   - name: with-node-affinity
     image: gcr.io/google_containers/pause:2.0

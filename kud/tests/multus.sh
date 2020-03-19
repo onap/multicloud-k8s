@@ -22,6 +22,7 @@ populate_CSAR_multus $csar_id
 
 pushd ${CSAR_DIR}/${csar_id}
 kubectl apply -f bridge-network.yaml
+kubectl apply -f macvlan-network.yaml
 
 setup $multus_deployment_name
 

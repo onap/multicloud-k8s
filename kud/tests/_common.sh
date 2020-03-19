@@ -46,6 +46,7 @@ protected_net_cidr='192.168.20.0/24'
 protected_private_net_cidr='192.168.10.0/24'
 onap_private_net_cidr='10.10.0.0/16'
 sink_ipaddr='192.168.20.250'
+multus_private_net_cidr='10.20.0.0/16'
 
 # populate_CSAR_containers_vFW() - This function creates the content of CSAR file
 # required for vFirewal using only containers

@@ -51,6 +51,20 @@ func setClient(client, testClient interface{}) interface{} {
 				return c
 			}
 		}
+	case *moduleLib.NetControlIntentClient:
+		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*moduleLib.NetControlIntentManager)(nil)).Elem()) {
+			c, ok := testClient.(moduleLib.NetControlIntentManager)
+			if ok {
+				return c
+			}
+		}
+	case *moduleLib.WorkloadIntentClient:
+		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*moduleLib.WorkloadIntentManager)(nil)).Elem()) {
+			c, ok := testClient.(moduleLib.WorkloadIntentManager)
+			if ok {
+				return c
+			}
+		}
 	default:
 		fmt.Printf("unknown type %T\n", cl)
 	}
@@ -102,6 +116,33 @@ func NewRouter(testClient interface{}) *mux.Router {
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/provider-networks/{name}", providernetHandler.putProviderNetHandler).Methods("PUT")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/provider-networks/{name}", providernetHandler.getProviderNetHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/provider-networks/{name}", providernetHandler.deleteProviderNetHandler).Methods("DELETE")
+
+	netcontrolintentHandler := netcontrolintentHandler{
+		client: setClient(moduleClient.NetControlIntent, testClient).(moduleLib.NetControlIntentManager),
+	}
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent", netcontrolintentHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent", netcontrolintentHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{name}", netcontrolintentHandler.putHandler).Methods("PUT")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{name}", netcontrolintentHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{name}", netcontrolintentHandler.deleteHandler).Methods("DELETE")
+
+	workloadintentHandler := workloadintentHandler{
+		client: setClient(moduleClient.WorkloadIntent, testClient).(moduleLib.WorkloadIntentManager),
+	}
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents", workloadintentHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents", workloadintentHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{name}", workloadintentHandler.putHandler).Methods("PUT")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{name}", workloadintentHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{name}", workloadintentHandler.deleteHandler).Methods("DELETE")
+
+	workloadifintentHandler := workloadifintentHandler{
+		client: setClient(moduleClient.WorkloadIfIntent, testClient).(moduleLib.WorkloadIfIntentManager),
+	}
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent}/interfaces", workloadifintentHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent}/interfaces", workloadifintentHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent}/interfaces/{name}", workloadifintentHandler.putHandler).Methods("PUT")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent}/interfaces/{name}", workloadifintentHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent}/interfaces/{name}", workloadifintentHandler.deleteHandler).Methods("DELETE")
 
 	return router
 }

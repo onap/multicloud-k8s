@@ -23,13 +23,10 @@ else
     exit 0
 fi
 
-pod_name=pod-case-01
-rm -f $HOME/$pod_name.yaml
-kubectl delete pod $pod_name --ignore-not-found=true --now --wait
-allocated_node_resource=$(kubectl describe node | grep "intel.com/intel_sriov_700" | tail -n1 |awk '{print $(NF)}')
 
-echo "The allocated resource of the node is: " $allocated_node_resource
-cat << POD > $HOME/$pod_name.yaml
+function create_pod_with_single_VF {
+
+cat << POD | kubectl create -f - --validate=false
 apiVersion: v1
 kind: Pod
 metadata:
@@ -48,7 +45,40 @@ spec:
       limits:
         intel.com/intel_sriov_700: '1'
 POD
-kubectl create -f $HOME/$pod_name.yaml --validate=false
+}
+
+function create_pod_with_multiple_VF {
+
+cat << POD | kubectl create -f - --validate=false
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-case-01
+  annotations:
+    k8s.v1.cni.cncf.io/networks: sriov-eno2, sriov-eno2
+spec:
+  containers:
+  - name: test-pod
+    image: docker.io/centos/tools:latest
+    command:
+    - /sbin/init
+    resources:
+      requests:
+        intel.com/intel_sriov_700: '2'
+      limits:
+        intel.com/intel_sriov_700: '2'
+POD
+}
+
+pod_name=pod-case-01
+rm -f $HOME/$pod_name.yaml
+kubectl delete pod $pod_name --ignore-not-found=true --now --wait
+allocated_node_resource=$(kubectl describe node | grep "intel.com/intel_sriov_700" | tail -n1 |awk '{print $(NF)}')
+
+echo "The allocated resource of the node is: " $allocated_node_resource
+create_pod_with_single_VF
+#create_pod_with_multiple_VF
+
     for pod in $pod_name; do
         status_phase=""
         while [[ $status_phase != "Running" ]]; do

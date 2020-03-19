@@ -185,6 +185,43 @@ func TestIsIpv4(t *testing.T) {
 	})
 }
 
+func TestIsMac(t *testing.T) {
+	t.Run("Valid MAC", func(t *testing.T) {
+		validmacs := []string{
+			"11:22:33:44:55:66",
+			"ab-cd-ef-12-34-56",
+			"AB-CD-EF-12-34-56",
+		}
+		for _, mac := range validmacs {
+			err := IsMac(mac)
+			if err != nil {
+				t.Errorf("Valid MAC string failed to pass: %v", mac)
+			}
+		}
+	})
+
+	t.Run("Invalid MAC", func(t *testing.T) {
+		invalidmacs := []string{
+			"",
+			"1.2.3.4.5",
+			"1.2.3.45/32",
+			"ab:cd:ef:gh:12:34",
+			"11:22-33-44:55:66",
+			"11,22,33,44,55,66",
+			"11|22|33|44|55|66",
+			"11:22:33:44:55:66:77",
+			"11-22-33-44-55",
+			"11-22-33-44-55-66-77",
+		}
+		for _, mac := range invalidmacs {
+			err := IsMac(mac)
+			if err == nil {
+				t.Errorf("Invalid MAC passed: %v", mac)
+			}
+		}
+	})
+}
+
 func TestIsValidString(t *testing.T) {
 	t.Run("Valid Strings", func(t *testing.T) {
 		validStrings := []struct {

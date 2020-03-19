@@ -70,17 +70,33 @@ func IsTarGz(r io.Reader) error {
 }
 
 func IsIpv4Cidr(cidr string) error {
-	_, _, err := net.ParseCIDR(cidr)
-	if err != nil {
-		return pkgerrors.Wrapf(err, "could not parse subnet %v", cidr)
+	ip, _, err := net.ParseCIDR(cidr)
+	if err != nil || ip.To4() == nil {
+		return pkgerrors.Wrapf(err, "could not parse ipv4 cidr %v", cidr)
+	}
+	return nil
+}
+
+func IsIp(ip string) error {
+	addr := net.ParseIP(ip)
+	if addr == nil {
+		return pkgerrors.Errorf("invalid ip address %v", ip)
 	}
 	return nil
 }
 
 func IsIpv4(ip string) error {
 	addr := net.ParseIP(ip)
-	if addr == nil {
+	if addr == nil || addr.To4() == nil {
 		return pkgerrors.Errorf("invalid ipv4 address %v", ip)
+	}
+	return nil
+}
+
+func IsMac(mac string) error {
+	_, err := net.ParseMAC(mac)
+	if err != nil {
+		return pkgerrors.Errorf("invalid MAC address %v", mac)
 	}
 	return nil
 }

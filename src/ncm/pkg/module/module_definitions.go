@@ -32,6 +32,9 @@ const CNI_TYPE_OVN4NFV string = "ovn4nfv"
 var CNI_TYPES = [...]string{CNI_TYPE_OVN4NFV}
 
 // It implements the interface for managing the ClusterProviders
+const MAX_DESCRIPTION_LEN int = 1024
+const MAX_USERDATA_LEN int = 4096
+
 type Metadata struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -63,6 +66,31 @@ type Vlan struct {
 	LogicalInterfaceName  string   `json:"logicalInterfaceName"`
 	VlanNodeSelector      string   `json:"vlanNodeSelector"`
 	NodeLabelList         []string `json:"nodeLabelList"`
+}
+
+// Check for valid format Metadata
+func IsValidMetadata(metadata Metadata) error {
+	errs := validation.IsValidName(metadata.Name)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid Metadata name=[%v], errors: %v", metadata.Name, errs)
+	}
+
+	errs = validation.IsValidString(metadata.Description, 0, MAX_DESCRIPTION_LEN, validation.VALID_ANY_STR)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid Metadata description=[%v], errors: %v", metadata.Description, errs)
+	}
+
+	errs = validation.IsValidString(metadata.UserData1, 0, MAX_DESCRIPTION_LEN, validation.VALID_ANY_STR)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid Metadata description=[%v], errors: %v", metadata.UserData1, errs)
+	}
+
+	errs = validation.IsValidString(metadata.UserData2, 0, MAX_DESCRIPTION_LEN, validation.VALID_ANY_STR)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid Metadata description=[%v], errors: %v", metadata.UserData2, errs)
+	}
+
+	return nil
 }
 
 // Check for valid format of an Ipv4Subnet

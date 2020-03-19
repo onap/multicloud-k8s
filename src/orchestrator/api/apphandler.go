@@ -27,8 +27,8 @@ import (
 	"net/http"
 	"net/textproto"
 
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
-	"github.com/onap/multicloud-k8s/src/orchestrator/utils"
 
 	"github.com/gorilla/mux"
 )
@@ -92,7 +92,7 @@ func (h appHandler) createAppHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = utils.IsTarGz(bytes.NewBuffer(content))
+	err = validation.IsTarGz(bytes.NewBuffer(content))
 	if err != nil {
 		http.Error(w, "Error in file format", http.StatusUnprocessableEntity)
 		return

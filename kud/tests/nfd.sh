@@ -18,7 +18,10 @@ rm -f $HOME/*.yaml
 pod_name=nfd-pod
 
 install_deps
-cat << POD > $HOME/$pod_name.yaml
+
+function create_pod_with_affinity {
+
+cat << POD | kubectl create -f - --validate=false
 apiVersion: v1
 kind: Pod
 metadata:
@@ -33,10 +36,52 @@ spec:
             operator: Gt
             values:
             - '3'
+        - matchExpressions:
+          - key: "feature.node.kubernetes.io/kernel-version.major"
+            operator: Lt
+            values:
+            - '20'
+        - matchExpressions:
+          - key: "feature.node.kubernetes.io/kernel-version.major"
+            operator: In
+            values:
+            - '3'
+            - '4'
+            - '5'
+        - matchExpressions:
+          - key: "feature.node.kubernetes.io/kernel-version.major"
+            operator: NotIn
+            values:
+            - '1'
+        - matchExpressions:
+          - key: "feature.node.kubernetes.io/kernel-version.major"
+            operator: Exists
+        - matchExpressions:
+          - key: "feature.node.kubernetes.io/label_is_not_exist"
+            operator: DoesNotExist
   containers:
   - name: with-node-affinity
     image: gcr.io/google_containers/pause:2.0
 POD
+}
+
+function create_pod_with_nodeSelector {
+
+cat << POD | kubectl create -f - --validate=false
+apiVersion: v1
+kind: Pod
+metadata:
+  name: $pod_name
+spec:
+  nodeSelector:
+    feature.node.kubernetes.io/kernel-version.major: '4'
+  containers:
+  - name: with-node-affinity
+    image: gcr.io/google_containers/pause:2.0
+POD
+
+}
+
 if $(kubectl version &>/dev/null); then
     labels=$(kubectl get nodes -o json | jq .items[].metadata.labels)
 
@@ -48,7 +93,10 @@ if $(kubectl version &>/dev/null); then
     while kubectl get pod $pod_name &>/dev/null; do
         sleep 5
     done
-    kubectl create -f $HOME/$pod_name.yaml --validate=false
+
+    create_pod_with_affinity
+    #create_pod_with_nodeSelector
+
     for pod in $pod_name; do
         status_phase=""
         while [[ $status_phase != "Running" ]]; do

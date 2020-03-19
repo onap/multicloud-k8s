@@ -46,6 +46,7 @@ protected_net_cidr='192.168.20.0/24'
 protected_private_net_cidr='192.168.10.0/24'
 onap_private_net_cidr='10.10.0.0/16'
 sink_ipaddr='192.168.20.250'
+multus_private_net_cidr='10.20.0.0/16'
 
 # populate_CSAR_containers_vFW() - This function creates the content of CSAR file
 # required for vFirewal using only containers
@@ -841,6 +842,7 @@ DEPLOYMENT
 # required for testing Multus feature
 function populate_CSAR_multus {
     local csar_id=$1
+    local master_name=`route | grep 'default' | awk '{print $8}'`
 
     _checks_args $csar_id
     pushd ${CSAR_DIR}/${csar_id}
@@ -849,6 +851,7 @@ function populate_CSAR_multus {
 resources:
   network:
     - bridge-network.yaml
+    - macvlan-network.yaml
   deployment:
     - $multus_deployment_name.yaml
 META
@@ -870,6 +873,25 @@ spec:
 }'
 NET
 
+    cat << NET > macvlan-network.yaml
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: macvlan-conf
+spec:
+  config: '{
+    "name": "mynet",
+    "type": "macvlan",
+    "master": "$master_name",
+    "ipam": {
+      "type": "host-local",
+      "subnet": "192.168.1.0/24",
+      "rangeStart": "192.168.1.200",
+      "rangeEnd": "192.168.1.216"
+    }
+  }'
+NET
+
     cat << DEPLOYMENT > $multus_deployment_name.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -889,7 +911,7 @@ spec:
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
           { "name": "bridge-conf", "interfaceRequest": "eth1" },
-          { "name": "bridge-conf", "interfaceRequest": "eth2" }
+          { "name": "macvlan-conf", "interfaceRequest": "eth2" }
         ]'
     spec:
       containers:

@@ -15,6 +15,7 @@ set -o pipefail
 FUNCTIONS_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 source /etc/environment
+source $FUNCTIONS_DIR/_common_test.sh
 
 function print_msg {
     local msg=$1
@@ -236,4 +237,33 @@ function teardown {
         destroy_deployment $deployment_name
     done
 }
+
+# check_ip_range() - Verifying IP address in address range
+function check_ip_range {
+    local IP=$1
+    local MASK=$2
+
+    install_ipcalc
+
+    if [[ ! -e /usr/bin/ipcalc ]]; then
+        echo -e "Command 'ipcalc' not found"
+        return 0
+    fi
+
+    if [[ -z ${IP} ]] || [[ -z ${MASK} ]]; then
+            return 1
+    fi
+    min=`/usr/bin/ipcalc $MASK|awk '/HostMin:/{print $2}'`
+    max=`/usr/bin/ipcalc $MASK|awk '/HostMax:/{print $2}'`
+    MIN=`echo $min|awk -F"." '{printf"%.0f\n",$1*256*256*256+$2*256*256+$3*256+$4}'`
+    MAX=`echo $max|awk -F"." '{printf"%.0f\n",$1*256*256*256+$2*256*256+$3*256+$4}'`
+    IPvalue=`echo $IP|awk -F"." '{printf"%.0f\n",$1*256*256*256+$2*256*256+$3*256+$4}'`
+    if [[ "$IPvalue" -gt "$MIN" ]] && [[ "$IPvalue" -lt "$MAX" ]]; then
+        echo -e "$IP in ipset $MASK"
+        return 0
+    fi
+    echo -e "$IP not in ipset $MASK"
+    return 1
+}
+
 test_folder=${FUNCTIONS_DIR}

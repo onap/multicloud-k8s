@@ -1,0 +1,203 @@
+/*
+ * Copyright 2020 Intel Corporation, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package appcontext
+
+import (
+	"fmt"
+	"testing"
+	"strings"
+	pkgerrors "github.com/pkg/errors"
+)
+
+// Mock run time context
+type MockRunTimeContext struct {
+	Items map[string]interface{}
+	Err	error
+}
+
+func (c *MockRunTimeContext) RtcCreate() (interface{}, error) {
+	var key string = "/context/9345674458787728/"
+
+	if c.Items == nil {
+		c.Items = make(map[string]interface{})
+	}
+	c.Items[key] = "9345674458787728"
+	return interface{}(key), c.Err
+
+}
+
+func (c *MockRunTimeContext) RtcGet() (interface{}, error) {
+	var key string = "/context/9345674458787728/"
+	return key, c.Err
+}
+
+func (c *MockRunTimeContext) RtcAddLevel(handle interface{}, level string, value string) (interface{}, error) {
+	str := fmt.Sprintf("%v", handle) + level + "/" + value + "/"
+	c.Items[str] = value
+	return nil, c.Err
+
+}
+
+func (c *MockRunTimeContext) RtcAddResource(handle interface{}, resname string, value interface{}) (interface{}, error) {
+	str := fmt.Sprintf("%v", handle) + "resource" + "/" + resname + "/"
+	c.Items[str] = value
+	return nil, c.Err
+
+}
+
+func (c *MockRunTimeContext) RtcAddInstruction(handle interface{}, level string, insttype string, value interface{}) (interface{}, error) {
+	str := fmt.Sprintf("%v", handle) + level + "/" + insttype + "/"
+	c.Items[str] = value
+	return nil, c.Err
+}
+
+func (c *MockRunTimeContext) RtcDeletePair(handle interface{}) (error) {
+	str := fmt.Sprintf("%v", handle)
+	delete(c.Items, str)
+	return c.Err
+}
+
+func (c *MockRunTimeContext) RtcDeletePrefix(handle interface{}) (error) {
+	for k, _ := range c.Items {
+		delete(c.Items, k)
+	}
+	return c.Err
+}
+
+func (c *MockRunTimeContext) RtcGetHandles(handle interface{}) ([]interface{}, error) {
+	var keys []interface{}
+
+	for k, _ := range c.Items {
+		keys = append(keys, string(k))
+	}
+	return keys, c.Err
+}
+
+func (c *MockRunTimeContext) RtcGetValue(handle interface{}, value interface{}) (error) {
+	key := fmt.Sprintf("%v", handle)
+	var s *string
+	s = value.(*string)
+	for kvKey, kvValue := range c.Items {
+		if kvKey == key {
+			*s = kvValue.(string)
+			return c.Err
+		}
+	}
+	return c.Err
+}
+
+func (c *MockRunTimeContext) RtcUpdateValue(handle interface{}, value interface{}) (error) {
+	key := fmt.Sprintf("%v", handle)
+	c.Items[key] = value
+	return c.Err
+}
+
+func TestCreateCompositeApp(t *testing.T) {
+	var ac = AppContext{}
+	testCases := []struct {
+		label			string
+		mockRtcontext *MockRunTimeContext
+		expectedError string
+	}{
+		{
+			label:			"Success case",
+			mockRtcontext: &MockRunTimeContext{},
+		},
+		{
+			label:			"Create returns error case",
+			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error creating run time context:")},
+			expectedError: "Error creating run time context:",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			ac.rtc = testCase.mockRtcontext
+			_, err := ac.CreateCompositeApp()
+			if err != nil {
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Method returned an error (%s)", err)
+				}
+			}
+
+		})
+	}
+}
+
+func TestGetCompositeApp(t *testing.T) {
+	var ac = AppContext{}
+	testCases := []struct {
+		label			string
+		mockRtcontext *MockRunTimeContext
+		expectedError string
+	}{
+		{
+			label:			"Success case",
+			mockRtcontext: &MockRunTimeContext{},
+		},
+		{
+			label:			"Get returns error case",
+			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error getting run time context:")},
+			expectedError: "Error getting run time context:",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			ac.rtc = testCase.mockRtcontext
+			_, err := ac.GetCompositeApp()
+			if err != nil {
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Method returned an error (%s)", err)
+				}
+			}
+
+		})
+	}
+}
+
+func TestDeleteCompositeApp(t *testing.T) {
+	var ac = AppContext{}
+	testCases := []struct {
+		label			string
+		mockRtcontext *MockRunTimeContext
+		expectedError string
+	}{
+		{
+			label:			"Success case",
+			mockRtcontext: &MockRunTimeContext{},
+		},
+		{
+			label:			"Delete returns error case",
+			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error deleting run time context:")},
+			expectedError: "Error deleting run time context:",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			ac.rtc = testCase.mockRtcontext
+			err := ac.DeleteCompositeApp()
+			if err != nil {
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Method returned an error (%s)", err)
+				}
+			}
+
+		})
+	}
+}

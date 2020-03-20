@@ -118,7 +118,7 @@ func TestCreateAppIntent(t *testing.T) {
 					},
 					CompositeAppKey{CompositeAppName: "testCompositeApp",
 						Version: "testCompositeAppVersion", Project: "testProject"}.String(): {
-						"compositeapp": []byte(
+						"compositeappmetadata": []byte(
 							"{\"metadata\":{" +
 								"\"name\":\"testCompositeApp\"," +
 								"\"description\":\"description\"," +
@@ -134,7 +134,7 @@ func TestCreateAppIntent(t *testing.T) {
 						CompositeApp: "testCompositeApp",
 						Version:      "testCompositeAppVersion",
 					}.String(): {
-						"genericplacementintent": []byte(
+						"genericplacementintentmetadata": []byte(
 							"{\"metadata\":{\"Name\":\"testIntent\"," +
 								"\"Description\":\"A sample intent for testing\"," +
 								"\"UserData1\": \"userData1\"," +
@@ -222,7 +222,7 @@ func TestGetAppIntent(t *testing.T) {
 						Version:      "testCompositeAppVersion",
 						Intent:       "testIntent",
 					}.String(): {
-						"appintent": []byte(
+						"appintentmetadata": []byte(
 							"{\"metadata\":{\"Name\":\"testAppIntent\"," +
 								"\"Description\":\"testAppIntent\"," +
 								"\"UserData1\": \"userData1\"," +

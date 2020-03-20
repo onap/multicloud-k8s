@@ -74,11 +74,11 @@ type AppIntentManager interface {
 
 // AppIntentKey is used as primary key
 type AppIntentKey struct {
-	Name         string `json:"name"`
+	Name         string `json:"appintent"`
 	Project      string `json:"project"`
 	CompositeApp string `json:"compositeapp"`
-	Version      string `json:"version"`
-	Intent       string `json:"intent-name"`
+	Version      string `json:"compositeappversion"`
+	Intent       string `json:"genericplacement"`
 }
 
 // We will use json marshalling to convert to string to
@@ -101,7 +101,7 @@ type AppIntentClient struct {
 func NewAppIntentClient() *AppIntentClient {
 	return &AppIntentClient{
 		storeName:   "orchestrator",
-		tagMetaData: "appintent",
+		tagMetaData: "appintentmetadata",
 	}
 }
 

@@ -77,7 +77,7 @@ func TestCreateApp(t *testing.T) {
 								"}"),
 					},
 					CompositeAppKey{CompositeAppName: "testCompositeApp", Version: "v1", Project: "testProject"}.String(): {
-						"compositeapp": []byte(
+						"compositeappmetadata": []byte(
 							"{" +
 								"\"metadata\":{" +
 								"\"Name\":\"testCompositeApp\"," +

@@ -65,10 +65,10 @@ type DeploymentIntentGroupManager interface {
 
 // DeploymentIntentGroupKey consists of Name of the deployment group, project name, CompositeApp name, CompositeApp version
 type DeploymentIntentGroupKey struct {
-	Name         string `json:"name"`
+	Name         string `json:"deploymentintentgroup"`
 	Project      string `json:"project"`
 	CompositeApp string `json:"compositeapp"`
-	Version      string `json:"version"`
+	Version      string `json:"compositeappversion"`
 }
 
 // We will use json marshalling to convert to string to
@@ -91,7 +91,7 @@ type DeploymentIntentGroupClient struct {
 func NewDeploymentIntentGroupClient() *DeploymentIntentGroupClient {
 	return &DeploymentIntentGroupClient{
 		storeName:   "orchestrator",
-		tagMetaData: "deploymentintentgroup",
+		tagMetaData: "deploymentintentgroupmetadata",
 	}
 }
 

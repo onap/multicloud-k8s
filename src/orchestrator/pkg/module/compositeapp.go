@@ -45,8 +45,8 @@ type CompositeAppSpec struct {
 
 // CompositeAppKey is the key structure that is used in the database
 type CompositeAppKey struct {
-	CompositeAppName string `json:"compositeappname"`
-	Version          string `json:"version"`
+	CompositeAppName string `json:"compositeapp"`
+	Version          string `json:"compositeappversion"`
 	Project          string `json:"project"`
 }
 
@@ -79,7 +79,7 @@ type CompositeAppClient struct {
 func NewCompositeAppClient() *CompositeAppClient {
 	return &CompositeAppClient{
 		storeName: "orchestrator",
-		tagMeta:   "compositeapp",
+		tagMeta:   "compositeappmetadata",
 	}
 }
 

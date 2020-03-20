@@ -54,10 +54,10 @@ type GenericPlacementIntentManager interface {
 
 // GenericPlacementIntentKey is used as the primary key
 type GenericPlacementIntentKey struct {
-	Name         string `json:"name"`
+	Name         string `json:"genericplacement"`
 	Project      string `json:"project"`
 	CompositeApp string `json:"compositeapp"`
-	Version      string `json:"version"`
+	Version      string `json:"compositeappversion"`
 }
 
 // We will use json marshalling to convert to string to
@@ -80,7 +80,7 @@ type GenericPlacementIntentClient struct {
 func NewGenericPlacementIntentClient() *GenericPlacementIntentClient {
 	return &GenericPlacementIntentClient{
 		storeName:   "orchestrator",
-		tagMetaData: "genericplacementintent",
+		tagMetaData: "genericplacementintentmetadata",
 	}
 }
 

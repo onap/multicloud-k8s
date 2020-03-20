@@ -64,11 +64,11 @@ type IntentManager interface {
 // IntentKey consists of Name if the intent, Project name, CompositeApp name,
 // CompositeApp version
 type IntentKey struct {
-	Name                  string `json:"name"`
+	Name                  string `json:"intentname"`
 	Project               string `json:"project"`
 	CompositeApp          string `json:"compositeapp"`
-	Version               string `json:"version"`
-	DeploymentIntentGroup string `json:"deployment-intent-group-name"`
+	Version               string `json:"compositeappversion"`
+	DeploymentIntentGroup string `json:"deploymentintentgroup"`
 }
 
 // We will use json marshalling to convert to string to

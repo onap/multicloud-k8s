@@ -468,6 +468,53 @@ func TestRtcGetValue(t *testing.T) {
 	}
 }
 
+func TestRtcUpdateValue(t *testing.T) {
+	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	testCases := []struct {
+		label		  string
+		mockContextDb *MockContextDb
+		key interface{}
+		value interface{}
+		expectedError string
+	}{
+		{
+			label:		  "Not valid input handle case",
+			mockContextDb: &MockContextDb{},
+			key: "/context/3528435435454354/",
+			value: "{apporder: [app1, app2, app3]}",
+			expectedError: "Not a valid run time context handle",
+		},
+		{
+			label:		  "Contextdb call returns error case",
+			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Key does not exist")},
+			key: "/context/5345674458787728/",
+			value: "{apporder: [app1, app2, app3]}",
+			expectedError: "Error updating run time context value:",
+		},
+		{
+			label:		  "Success case",
+			mockContextDb: &MockContextDb{},
+			key: "/context/5345674458787728/",
+			value: "{apporder: [app2, app3, app1]}",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			contextdb.Db = testCase.mockContextDb
+			if testCase.label ==  "Success case" {
+				contextdb.Db.Put("/context/5345674458787728/", "5345674458787728")
+			}
+			err := rtc.RtcUpdateValue(testCase.key, testCase.value)
+			if err != nil {
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Method returned an error (%s)", err)
+				}
+			}
+		})
+	}
+}
+
 func TestRtcDeletePair(t *testing.T) {
 	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {

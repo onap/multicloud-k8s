@@ -42,6 +42,7 @@ type Rtcontext interface {
 	RtcDeletePrefix(handle interface{}) (error)
 	RtcGetHandles(handle interface{}) ([]interface{}, error)
 	RtcGetValue(handle interface{}, value interface{}) (error)
+	RtcUpdateValue(handle interface{}, value interface{}) (error)
 }
 
 //Create context by assiging a new id
@@ -219,4 +220,19 @@ func (rtc *RunTimeContext) RtcGetValue(handle interface{}, value interface{}) (e
 	}
 
 	return nil
+}
+
+// Update the value of a given handle
+func (rtc *RunTimeContext) RtcUpdateValue(handle interface{}, value interface{}) (error) {
+	str := fmt.Sprintf("%v", handle)
+	sid := fmt.Sprintf("%v", rtc.cid)
+	if !strings.HasPrefix(str, sid) {
+		return pkgerrors.Errorf("Not a valid run time context handle")
+	}
+	err := contextdb.Db.Put(str, value)
+	if err != nil {
+		return pkgerrors.Errorf("Error updating run time context value: %s", err.Error())
+	}
+	return nil
+
 }

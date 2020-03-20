@@ -72,7 +72,7 @@ func TestCreateGenericPlacementIntent(t *testing.T) {
 					},
 					CompositeAppKey{CompositeAppName: "testCompositeApp",
 						Version: "testCompositeAppVersion", Project: "testProject"}.String(): {
-						"compositeapp": []byte(
+						"compositeappmetadata": []byte(
 							"{\"metadata\":{" +
 								"\"name\":\"testCompositeApp\"," +
 								"\"description\":\"description\"," +
@@ -147,7 +147,7 @@ func TestGetGenericPlacementIntent(t *testing.T) {
 						CompositeApp: "testCompositeApp",
 						Version:      "testVersion",
 					}.String(): {
-						"genericplacementintent": []byte(
+						"genericplacementintentmetadata": []byte(
 							"{\"metadata\":{\"Name\":\"testIntent\"," +
 								"\"Description\":\"A sample intent for testing\"," +
 								"\"UserData1\": \"userData1\"," +

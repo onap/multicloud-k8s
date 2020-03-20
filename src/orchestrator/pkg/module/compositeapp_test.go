@@ -132,7 +132,7 @@ func TestGetCompositeApp(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					CompositeAppKey{CompositeAppName: "testCompositeApp", Version: "v1", Project: "testProject"}.String(): {
-						"compositeapp": []byte(
+						"compositeappmetadata": []byte(
 							"{" +
 								"\"metadata\":{" +
 								"\"Name\":\"testCompositeApp\"," +
@@ -195,7 +195,7 @@ func TestDeleteCompositeApp(t *testing.T) {
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					CompositeAppKey{CompositeAppName: "testCompositeApp", Version: "v1", Project: "testProject"}.String(): {
-						"compositeapp": []byte(
+						"compositeappmetadata": []byte(
 							"{" +
 								"\"metadata\":{" +
 								"\"Name\":\"testCompositeApp\"," +

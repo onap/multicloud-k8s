@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "415712fe_e2fe327a",
+        "filename": "src/ncm/cmd/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4183
+      },
+      "writtenOn": "2020-03-20T16:02:06Z",
+      "side": 1,
+      "message": "1. Will this be better if this reads \u0027initialize database\u0027?\n2. Does ncm write to etcd as well?",
+      "range": {
+        "startLine": 45,
+        "startChar": 25,
+        "endLine": 45,
+        "endChar": 35
+      },
+      "revId": "f473a9aee82e23afff26ca059f2cdf33e66ecd0c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

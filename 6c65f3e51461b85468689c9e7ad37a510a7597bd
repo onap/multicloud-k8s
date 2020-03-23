@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7876b965_9cb70376",
+        "filename": "src/ncm/Makefile",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-23T18:53:29Z",
+      "side": 1,
+      "message": "Is this needed?",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 31,
+        "endChar": 28
+      },
+      "revId": "6c65f3e51461b85468689c9e7ad37a510a7597bd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e538565f_8f9b53f7",
+        "filename": "src/ncm/cmd/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-23T18:53:29Z",
+      "side": 1,
+      "message": "typo?",
+      "range": {
+        "startLine": 52,
+        "startChar": 60,
+        "endLine": 52,
+        "endChar": 63
+      },
+      "revId": "6c65f3e51461b85468689c9e7ad37a510a7597bd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "66297870_37c3924e",
+        "filename": "kud/tests/_common.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 5721
+      },
+      "writtenOn": "2020-03-23T16:03:57Z",
+      "side": 1,
+      "message": "Hi Konrad, it`s good suggestion, I will update about that.",
+      "parentUuid": "7a63b5be_6ebb37c6",
+      "range": {
+        "startLine": 888,
+        "startChar": 0,
+        "endLine": 889,
+        "endChar": 33
+      },
+      "revId": "7096d61ebd973f7a61d85855ab092e07d4105fa6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "264b454d_edd71d64",
         "filename": "kud/tests/nfd.sh",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2020-03-19T16:43:12Z",
       "side": 1,
       "message": "Is this feature flag set up on every k8s node regardless of having this capability or not?",
+      "range": {
+        "startLine": 36,
+        "startChar": 18,
+        "endLine": 36,
+        "endChar": 61
+      },
+      "revId": "7096d61ebd973f7a61d85855ab092e07d4105fa6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "06d5bec5_9eaaf3f3",
+        "filename": "kud/tests/nfd.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5721
+      },
+      "writtenOn": "2020-03-23T16:03:57Z",
+      "side": 1,
+      "message": "Hi Konrad, I just want to update nfd test case with using multiple verification methods. \"nodeSelector\" and \"affinity\", these two combinations may have more representative.",
+      "parentUuid": "264b454d_edd71d64",
       "range": {
         "startLine": 36,
         "startChar": 18,

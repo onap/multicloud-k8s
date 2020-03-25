@@ -29,11 +29,21 @@ type ProviderNet struct {
 }
 
 type ProviderNetSpec struct {
-	CniType         string       `json:"cniType"`
-	Ipv4Subnets     []Ipv4Subnet `json:"ipv4Subnets"`
-	ProviderNetType string       `json:"providerNetType"`
-	Vlan            Vlan         `json:"vlan"`
+	CniType         string       `json:"cniType" yaml:"cniType"`
+	Ipv4Subnets     []Ipv4Subnet `json:"ipv4Subnets" yaml:"ipv4Subnets"`
+	ProviderNetType string       `json:"providerNetType" yaml:"providerNetType"`
+	Vlan            Vlan         `json:"vlan" yaml:"vlan"`
 }
+
+// structure for the Network Custom Resource
+type CrProviderNet struct {
+	ApiVersion  string `yaml:"apiVersion"`
+	Kind        string `yaml:"kind"`
+	ProviderNet ProviderNet
+}
+
+const PROVIDER_NETWORK_APIVERSION = "k8s.plugin.opnfv.org/v1alpha1"
+const PROVIDER_NETWORK_KIND = "ProviderNetwork"
 
 // ProviderNetKey is the key structure that is used in the database
 type ProviderNetKey struct {

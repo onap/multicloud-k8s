@@ -28,6 +28,7 @@ import (
 	"testing"
 
 	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -41,6 +42,7 @@ type mockClusterManager struct {
 	ClusterProviderItems []moduleLib.ClusterProvider
 	ClusterItems         []moduleLib.Cluster
 	ClusterContentItems  []moduleLib.ClusterContent
+	ClusterContextItems  []appcontext.AppContext
 	ClusterLabelItems    []moduleLib.ClusterLabel
 	ClusterKvPairsItems  []moduleLib.ClusterKvPairs
 	Err                  error
@@ -98,6 +100,14 @@ func (m *mockClusterManager) GetClusterContent(provider, name string) (moduleLib
 	return m.ClusterContentItems[0], nil
 }
 
+func (m *mockClusterManager) GetClusterContext(provider, name string) (appcontext.AppContext, error) {
+	if m.Err != nil {
+		return appcontext.AppContext{}, m.Err
+	}
+
+	return m.ClusterContextItems[0], nil
+}
+
 func (m *mockClusterManager) GetClusters(provider string) ([]moduleLib.Cluster, error) {
 	if m.Err != nil {
 		return []moduleLib.Cluster{}, m.Err
@@ -107,6 +117,14 @@ func (m *mockClusterManager) GetClusters(provider string) ([]moduleLib.Cluster, 
 }
 
 func (m *mockClusterManager) DeleteCluster(provider, name string) error {
+	return m.Err
+}
+
+func (m *mockClusterManager) ApplyNetworkIntents(provider, name string) error {
+	return m.Err
+}
+
+func (m *mockClusterManager) TerminateNetworkIntents(provider, name string) error {
 	return m.Err
 }
 

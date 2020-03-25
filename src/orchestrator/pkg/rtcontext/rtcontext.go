@@ -19,10 +19,12 @@ package rtcontext
 import (
 	"fmt"
 	"math/rand"
-	"time"
 	"strings"
+	"time"
+
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	pkgerrors "github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 const maxrand = 0x7fffffffffffffff
@@ -32,17 +34,42 @@ type RunTimeContext struct {
 	cid interface{}
 }
 
+func (c RunTimeContext) MarshalBSON() ([]byte, error) {
+	j, err := bson.Marshal(struct {
+		Cid interface{}
+	}{
+		Cid: c.cid,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return j, nil
+}
+
+func (c *RunTimeContext) UnmarshalBSON(data []byte) error {
+	val := new(struct {
+		Cid interface{}
+	})
+
+	err := bson.Unmarshal(data, val)
+	if err != nil {
+		return err
+	}
+	c.cid = val.Cid
+	return nil
+}
+
 type Rtcontext interface {
 	RtcCreate() (interface{}, error)
 	RtcGet() (interface{}, error)
 	RtcAddLevel(handle interface{}, level string, value string) (interface{}, error)
 	RtcAddResource(handle interface{}, resname string, value interface{}) (interface{}, error)
 	RtcAddInstruction(handle interface{}, level string, insttype string, value interface{}) (interface{}, error)
-	RtcDeletePair(handle interface{}) (error)
-	RtcDeletePrefix(handle interface{}) (error)
+	RtcDeletePair(handle interface{}) error
+	RtcDeletePrefix(handle interface{}) error
 	RtcGetHandles(handle interface{}) ([]interface{}, error)
-	RtcGetValue(handle interface{}, value interface{}) (error)
-	RtcUpdateValue(handle interface{}, value interface{}) (error)
+	RtcGetValue(handle interface{}, value interface{}) error
+	RtcUpdateValue(handle interface{}, value interface{}) error
 }
 
 //Create context by assiging a new id
@@ -139,16 +166,16 @@ func (rtc *RunTimeContext) RtcAddInstruction(handle interface{}, level string, i
 	if level == "" {
 		return nil, pkgerrors.Errorf("Not a valid run time context level")
 	}
-	if insttype  == "" {
+	if insttype == "" {
 		return nil, pkgerrors.Errorf("Not a valid run time context instruction type")
 	}
 	if value == nil {
 		return nil, pkgerrors.Errorf("Not a valid run time context instruction value")
 	}
 
-	k := str + level + "/" + "instruction" + "/" + insttype +"/"
+	k := str + level + "/" + "instruction" + "/" + insttype + "/"
 	err := contextdb.Db.Put(k, fmt.Sprintf("%v", value))
-	if  err != nil  {
+	if err != nil {
 		return nil, pkgerrors.Errorf("Error adding run time context instruction: %s", err.Error())
 	}
 
@@ -156,7 +183,7 @@ func (rtc *RunTimeContext) RtcAddInstruction(handle interface{}, level string, i
 }
 
 //Delete the key value pair using given handle
-func (rtc *RunTimeContext) RtcDeletePair(handle interface{}) (error) {
+func (rtc *RunTimeContext) RtcDeletePair(handle interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	sid := fmt.Sprintf("%v", rtc.cid)
 	if !strings.HasPrefix(str, sid) {
@@ -172,7 +199,7 @@ func (rtc *RunTimeContext) RtcDeletePair(handle interface{}) (error) {
 }
 
 // Delete all handles underneath the given handle
-func (rtc *RunTimeContext) RtcDeletePrefix(handle interface{}) (error) {
+func (rtc *RunTimeContext) RtcDeletePrefix(handle interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	sid := fmt.Sprintf("%v", rtc.cid)
 	if !strings.HasPrefix(str, sid) {
@@ -207,7 +234,7 @@ func (rtc *RunTimeContext) RtcGetHandles(handle interface{}) ([]interface{}, err
 }
 
 // Get the value for a given handle
-func (rtc *RunTimeContext) RtcGetValue(handle interface{}, value interface{}) (error) {
+func (rtc *RunTimeContext) RtcGetValue(handle interface{}, value interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	sid := fmt.Sprintf("%v", rtc.cid)
 	if !strings.HasPrefix(str, sid) {
@@ -223,7 +250,7 @@ func (rtc *RunTimeContext) RtcGetValue(handle interface{}, value interface{}) (e
 }
 
 // Update the value of a given handle
-func (rtc *RunTimeContext) RtcUpdateValue(handle interface{}, value interface{}) (error) {
+func (rtc *RunTimeContext) RtcUpdateValue(handle interface{}, value interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	sid := fmt.Sprintf("%v", rtc.cid)
 	if !strings.HasPrefix(str, sid) {

@@ -17,7 +17,12 @@
 package module
 
 import (
+	"fmt"
+	"strings"
+
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	"gopkg.in/yaml.v2"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -82,8 +87,11 @@ type ClusterManager interface {
 	CreateCluster(provider string, pr Cluster, qr ClusterContent) (Cluster, error)
 	GetCluster(provider, name string) (Cluster, error)
 	GetClusterContent(provider, name string) (ClusterContent, error)
+	GetClusterContext(provider, name string) (appcontext.AppContext, error)
 	GetClusters(provider string) ([]Cluster, error)
 	DeleteCluster(provider, name string) error
+	ApplyNetworkIntents(provider, name string) error
+	TerminateNetworkIntents(provider, name string) error
 	CreateClusterLabel(provider, cluster string, pr ClusterLabel) (ClusterLabel, error)
 	GetClusterLabel(provider, cluster, label string) (ClusterLabel, error)
 	GetClusterLabels(provider, cluster string) ([]ClusterLabel, error)
@@ -108,6 +116,7 @@ func NewClusterClient() *ClusterClient {
 			storeName:  "cluster",
 			tagMeta:    "clustermetadata",
 			tagContent: "clustercontent",
+			tagContext: "clustercontext",
 		},
 	}
 }
@@ -287,6 +296,32 @@ func (v *ClusterClient) GetClusterContent(provider, name string) (ClusterContent
 	return ClusterContent{}, pkgerrors.New("Error getting Cluster Content")
 }
 
+// GetClusterContext returns the ClusterContext for corresponding provider and name
+func (v *ClusterClient) GetClusterContext(provider, name string) (appcontext.AppContext, error) {
+	//Construct key and tag to select the entry
+	key := ClusterKey{
+		ClusterProviderName: provider,
+		ClusterName:         name,
+	}
+
+	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagContext)
+	if err != nil {
+		return appcontext.AppContext{}, pkgerrors.Wrap(err, "Get Cluster Context")
+	}
+
+	//value is a byte array
+	if value != nil {
+		cc := appcontext.AppContext{}
+		err = db.DBconn.Unmarshal(value[0], &cc)
+		if err != nil {
+			return appcontext.AppContext{}, pkgerrors.Wrap(err, "Unmarshalling Value")
+		}
+		return cc, nil
+	}
+
+	return appcontext.AppContext{}, pkgerrors.New("Error getting Cluster Content")
+}
+
 // GetClusters returns all the Clusters for corresponding provider
 func (v *ClusterClient) GetClusters(provider string) ([]Cluster, error) {
 	//Construct key and tag to select the entry
@@ -327,6 +362,114 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		return pkgerrors.Wrap(err, "Delete Cluster Entry;")
 	}
 
+	return nil
+}
+
+// Apply Network Intents associated with a cluster
+func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
+	var resources []string
+
+	// Find all Network Intents for this cluster
+	networkIntents, err := NewNetworkClient().GetNetworks(provider, name)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error finding Network Intents")
+	}
+	for _, intent := range networkIntents {
+		var crNetwork = CrNetwork{
+			ApiVersion: NETWORK_APIVERSION,
+			Kind:       NETWORK_KIND,
+		}
+		crNetwork.Network = intent
+		// Produce the yaml CR document for each intent
+		y, err := yaml.Marshal(&crNetwork)
+		if err != nil {
+			fmt.Printf("Error [%v] marshalling network intent to yaml: %v\n", err, intent)
+			continue
+		}
+		resources = append(resources, string(y))
+	}
+
+	// Find all Provider Network Intents for this cluster
+	providerNetworkIntents, err := NewProviderNetClient().GetProviderNets(provider, name)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error finding Provider Network Intents")
+	}
+	for _, intent := range providerNetworkIntents {
+		var crProviderNet = CrProviderNet{
+			ApiVersion: PROVIDER_NETWORK_APIVERSION,
+			Kind:       PROVIDER_NETWORK_KIND,
+		}
+		crProviderNet.ProviderNet = intent
+		// Produce the yaml CR document for each intent
+		y, err := yaml.Marshal(&crProviderNet)
+		if err != nil {
+			fmt.Printf("Error [%v] marshalling provider network intent to yaml: %v\n", err, intent)
+			continue
+		}
+		resources = append(resources, string(y))
+	}
+
+	if len(resources) > 0 {
+		key := ClusterKey{
+			ClusterProviderName: provider,
+			ClusterName:         name,
+		}
+
+		resource := YAML_START + strings.Join(resources, YAML_END+YAML_START) + YAML_END
+		//fmt.Printf("%v", resource)
+
+		// Make a context
+		context := appcontext.AppContext{}
+		context.InitAppContext()
+		handle, err := context.CreateCompositeApp()
+		if err != nil {
+			fmt.Printf("CreateCompositeApp error: %v\n", err)
+		}
+		apphandle, err := context.AddApp(handle, "network-intents")
+		if err != nil {
+			fmt.Printf("AddApp error: %v\n", err)
+		}
+
+		// Add an app for cluster resources
+		clusterhandle, err := context.AddCluster(apphandle, provider+"/"+name)
+		if err != nil {
+			fmt.Printf("AddCluster error: %v\n", err)
+		}
+
+		_, err = context.AddResource(clusterhandle, "intents", resource)
+		if err != nil {
+			fmt.Printf("AddResource error: %v\n", err)
+		}
+
+		err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagContext, context)
+		if err != nil {
+			fmt.Printf("Add Context to DB error: %v | %v\n", err, context)
+		}
+		//fmt.Printf("Add Context to DB: %v\n", context)
+
+		// Add the resource
+	}
+
+	return nil
+}
+
+// Terminate Network Intents associated with a cluster
+func (v *ClusterClient) TerminateNetworkIntents(provider, name string) error {
+	context, err := v.GetClusterContext(provider, name)
+	if err != nil {
+		fmt.Printf("Retrieve AppContext error: %v\n", err)
+	}
+	context.InitAppContext()
+	handle, _ := context.GetResourceHandle("network-intents", provider+"/"+name, "intents")
+
+	resource, err := context.GetValue(handle)
+	fmt.Printf("%v", resource)
+
+	key := ClusterKey{
+		ClusterProviderName: provider,
+		ClusterName:         name,
+	}
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagContext, appcontext.AppContext{})
 	return nil
 }
 

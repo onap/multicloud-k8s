@@ -49,7 +49,7 @@ type MongoCollection interface {
 		opts ...*options.FindOptions) (*mongo.Cursor, error)
 	UpdateOne(ctx context.Context, filter interface{}, update interface{},
 		opts ...*options.UpdateOptions) (*mongo.UpdateResult, error)
-        CountDocuments(ctx context.Context, filter interface{},
+	CountDocuments(ctx context.Context, filter interface{},
 		opts ...*options.CountOptions) (int64, error)
 }
 
@@ -539,9 +539,6 @@ func (m *MongoStore) Find(coll string, key Key, tag string) ([][]byte, error) {
 		}
 		result = append(result, data)
 	}
-	if len(result) == 0 {
-		return result, pkgerrors.Errorf("Did not find any objects with tag: %s", tag)
-	}
 	return result, nil
 }
 
@@ -587,4 +584,3 @@ func (m *MongoStore) Remove(coll string, key Key) error {
 	}
 	return nil
 }
-

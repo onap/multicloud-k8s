@@ -49,7 +49,7 @@ type MongoCollection interface {
 		opts ...*options.FindOptions) (*mongo.Cursor, error)
 	UpdateOne(ctx context.Context, filter interface{}, update interface{},
 		opts ...*options.UpdateOptions) (*mongo.UpdateResult, error)
-        CountDocuments(ctx context.Context, filter interface{},
+	CountDocuments(ctx context.Context, filter interface{},
 		opts ...*options.CountOptions) (int64, error)
 }
 
@@ -539,9 +539,6 @@ func (m *MongoStore) Find(coll string, key Key, tag string) ([][]byte, error) {
 		}
 		result = append(result, data)
 	}
-	if len(result) == 0 {
-		return result, pkgerrors.Errorf("Did not find any objects with tag: %s", tag)
-	}
 	return result, nil
 }
 
@@ -588,3 +585,30 @@ func (m *MongoStore) Remove(coll string, key Key) error {
 	return nil
 }
 
+// RemoveTag is used to remove an element from a document
+func (m *MongoStore) RemoveTag(coll string, key Key, tag string) error {
+	c := getCollection(coll, m)
+	ctx := context.Background()
+
+	filter, err := m.findFilter(key)
+	if err != nil {
+		return err
+	}
+
+	_, err = decodeBytes(
+		c.FindOneAndUpdate(
+			ctx,
+			filter,
+			bson.D{
+				{"$unset", bson.D{
+					{tag, ""},
+				}},
+			},
+			options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After)))
+
+	if err != nil {
+		return pkgerrors.Errorf("Error removing tag: %s", err.Error())
+	}
+
+	return nil
+}

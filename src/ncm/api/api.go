@@ -97,6 +97,8 @@ func NewRouter(testClient interface{}) *mux.Router {
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters", clusterHandler.getClusterHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}", clusterHandler.getClusterHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}", clusterHandler.deleteClusterHandler).Methods("DELETE")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}/apply", clusterHandler.applyClusterHandler).Methods("POST")
+	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}/terminate", clusterHandler.terminateClusterHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels", clusterHandler.createClusterLabelHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels", clusterHandler.getClusterLabelHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels/{label}", clusterHandler.getClusterLabelHandler).Methods("GET")

@@ -17,7 +17,10 @@
 package module
 
 import (
+	"fmt"
+
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	"gopkg.in/yaml.v2"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -84,6 +87,7 @@ type ClusterManager interface {
 	GetClusterContent(provider, name string) (ClusterContent, error)
 	GetClusters(provider string) ([]Cluster, error)
 	DeleteCluster(provider, name string) error
+	ApplyNetworkIntents(provider, name string) error
 	CreateClusterLabel(provider, cluster string, pr ClusterLabel) (ClusterLabel, error)
 	GetClusterLabel(provider, cluster, label string) (ClusterLabel, error)
 	GetClusterLabels(provider, cluster string) ([]ClusterLabel, error)
@@ -325,6 +329,57 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 	err := db.DBconn.Remove(v.db.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Cluster Entry;")
+	}
+
+	return nil
+}
+
+// Apply Network Intents associated with a cluster
+func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
+	//Construct key and tag to select the entry
+	//key := ClusterKey{
+	//	ClusterProviderName: provider,
+	//	ClusterName:         name,
+	//}
+
+	// Find all Network Intents for this cluster
+	networkIntents, err := NewNetworkClient().GetNetworks(provider, name)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error finding Network Intents")
+	}
+	for _, intent := range networkIntents {
+		var crNetwork = CrNetwork{
+			ApiVersion: NETWORK_APIVERSION,
+			Kind:       NETWORK_KIND,
+		}
+		crNetwork.Network = intent
+		// Produce the yaml CR document for each intent
+		y, err := yaml.Marshal(&crNetwork)
+		if err != nil {
+			fmt.Printf("Error [%v] marshalling network intent to yaml: %v\n", err, intent)
+			continue
+		}
+		fmt.Printf("--- network intent\n%s\n\n", string(y))
+	}
+
+	// Find all Provider Network Intents for this cluster
+	providerNetworkIntents, err := NewProviderNetClient().GetProviderNets(provider, name)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error finding Provider Network Intents")
+	}
+	for _, intent := range providerNetworkIntents {
+		var crProviderNet = CrProviderNet{
+			ApiVersion: PROVIDER_NETWORK_APIVERSION,
+			Kind:       PROVIDER_NETWORK_KIND,
+		}
+		crProviderNet.ProviderNet = intent
+		// Produce the yaml CR document for each intent
+		y, err := yaml.Marshal(&crProviderNet)
+		if err != nil {
+			fmt.Printf("Error [%v] marshalling provider network intent to yaml: %v\n", err, intent)
+			continue
+		}
+		fmt.Printf("--- provider network intent\n%s\n\n", string(y))
 	}
 
 	return nil

@@ -24,8 +24,8 @@ import (
 
 // Network contains the parameters needed for dynamic networks
 type Network struct {
-	Metadata Metadata    `json:"metadata"`
-	Spec     NetworkSpec `json:"spec"`
+	Metadata Metadata    `json:"metadata" yaml:"metadata"`
+	Spec     NetworkSpec `json:"spec" yaml:"spec"`
 }
 
 type NetworkSpec struct {
@@ -39,6 +39,16 @@ type NetworkKey struct {
 	ClusterName         string `json:"cluster"`
 	NetworkName         string `json:"network"`
 }
+
+// structure for the Network Custom Resource
+type CrNetwork struct {
+	ApiVersion string `yaml:"apiVersion"`
+	Kind       string `yaml:"kind"`
+	Network    Network
+}
+
+const NETWORK_APIVERSION = "k8s.plugin.opnfv.org/v1alpha1"
+const NETWORK_KIND = "Network"
 
 // Manager is an interface exposing the Network functionality
 type NetworkManager interface {

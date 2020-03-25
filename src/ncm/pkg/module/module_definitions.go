@@ -31,28 +31,32 @@ const CNI_TYPE_OVN4NFV string = "ovn4nfv"
 
 var CNI_TYPES = [...]string{CNI_TYPE_OVN4NFV}
 
+const YAML_START = "---\n"
+const YAML_END = "...\n"
+
 // It implements the interface for managing the ClusterProviders
 const MAX_DESCRIPTION_LEN int = 1024
 const MAX_USERDATA_LEN int = 4096
 
 type Metadata struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	UserData1   string `json:"userData1"`
-	UserData2   string `json:"userData2"`
+	Name        string `json:"name" yaml:"name"`
+	Description string `json:"description" yaml:"-"`
+	UserData1   string `json:"userData1" yaml:"-"`
+	UserData2   string `json:"userData2" yaml:"-"`
 }
 
 type ClientDbInfo struct {
 	storeName  string // name of the mongodb collection to use for client documents
 	tagMeta    string // attribute key name for the json data of a client document
 	tagContent string // attribute key name for the file data of a client document
+	tagContext string // attribute key name for context object in App Context
 }
 
 type Ipv4Subnet struct {
-	Subnet  string `json:"subnet"` // CIDR notation, e.g. 172.16.33.0/24
-	Name    string `json:"name"`
-	Gateway string `json:"gateway"`    // IPv4 addre, e.g. 172.16.33.1/24
-	Exclude string `json:"excludeIps"` // space separated list of single IPs or ranges e.g. "172.16.33.2 172.16.33.5..172.16.33.10"
+	Subnet  string `json:"subnet" yaml:"subnet"` // CIDR notation, e.g. 172.16.33.0/24
+	Name    string `json:"name" yaml:"name"`
+	Gateway string `json:"gateway" yaml:"gateway"`       // IPv4 addre, e.g. 172.16.33.1/24
+	Exclude string `json:"excludeIps" yaml:"excludeIps"` // space separated list of single IPs or ranges e.g. "172.16.33.2 172.16.33.5..172.16.33.10"
 }
 
 const VLAN_NODE_ANY = "any"
@@ -61,11 +65,11 @@ const VLAN_NODE_SPECIFIC = "specific"
 var VLAN_NODE_SELECTORS = [...]string{VLAN_NODE_ANY, VLAN_NODE_SPECIFIC}
 
 type Vlan struct {
-	VlanId                int      `json:"vlanID"`
-	ProviderInterfaceName string   `json:"providerInterfaceName"`
-	LogicalInterfaceName  string   `json:"logicalInterfaceName"`
-	VlanNodeSelector      string   `json:"vlanNodeSelector"`
-	NodeLabelList         []string `json:"nodeLabelList"`
+	VlanId                int      `json:"vlanID" yaml:"vlanId"`
+	ProviderInterfaceName string   `json:"providerInterfaceName" yaml:"providerInterfaceName"`
+	LogicalInterfaceName  string   `json:"logicalInterfaceName" yaml:"logicalInterfaceName"`
+	VlanNodeSelector      string   `json:"vlanNodeSelector" yaml:"vlanNodeSelector"`
+	NodeLabelList         []string `json:"nodeLabelList" yaml:"nodeLabelList"`
 }
 
 // Check for valid format Metadata

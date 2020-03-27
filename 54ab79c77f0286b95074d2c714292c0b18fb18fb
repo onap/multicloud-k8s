@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0a505b4_28051409",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-03-27T16:39:07Z",
+      "side": 1,
+      "message": "Nit",
+      "range": {
+        "startLine": 80,
+        "startChar": 54,
+        "endLine": 80,
+        "endChar": 55
+      },
+      "revId": "54ab79c77f0286b95074d2c714292c0b18fb18fb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e6b61554_5e14798b",
+        "filename": "src/dcm/pkg/logicalcloud/quota.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-30T18:21:14Z",
+      "side": 1,
+      "message": "(applies to all instance of \u0027storeName\u0027 - since all of these resources \u0027live\u0027 under \u0027project\u0027, if you use a storeName of \u0027orchestrator\u0027 (i.e. mongo collection), then the case of deleting a project when there are existing logical clouds defined, will work.  If you use a new collection name (\u0027dcm\u0027), then there should be a check in the orchestrator project module to prevent deletion of a project if any logical clouds exist for that project.",
+      "revId": "2b04bbaae65fca53b05588e084912aabf40821cf",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

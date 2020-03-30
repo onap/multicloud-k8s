@@ -33,6 +33,8 @@ type RunTimeContext struct {
 }
 
 type Rtcontext interface {
+	RtcInit() (interface{}, error)
+	RtcReinit(interface{}) (interface{}, error)
 	RtcCreate() (interface{}, error)
 	RtcGet() (interface{}, error)
 	RtcAddLevel(handle interface{}, level string, value string) (interface{}, error)
@@ -45,15 +47,45 @@ type Rtcontext interface {
 	RtcUpdateValue(handle interface{}, value interface{}) (error)
 }
 
-//Create context by assiging a new id
-func (rtc *RunTimeContext) RtcCreate() (interface{}, error) {
-
+//Intialize context by assiging a new id
+func (rtc *RunTimeContext) RtcInit() (interface{}, error){
+	if rtc.cid != nil {
+		return nil, pkgerrors.Errorf("Error, context already intialized")
+	}
 	ra := rand.New(rand.NewSource(time.Now().UnixNano()))
 	rn := ra.Int63n(maxrand)
 	id := fmt.Sprintf("%v", rn)
 	cid := (prefix + id + "/")
 	rtc.cid = interface{}(cid)
+	return interface{}(id), nil
 
+}
+
+//Reintialize context using the given id
+func (rtc *RunTimeContext) RtcReinit(id interface{}) (interface{}, error) {
+	str := fmt.Sprintf("%v", id)
+	if ( str == "") {
+		return nil, pkgerrors.Errorf("Not a valid context id")
+	}
+	cid := (prefix + str + "/")
+	rtc.cid = interface{}(cid)
+	handle, err := rtc.RtcGet()
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error finding the context id: %s", err.Error())
+	}
+	return handle, nil
+}
+
+//Create context using the id and prefix
+func (rtc *RunTimeContext) RtcCreate() (interface{}, error) {
+	cid := fmt.Sprintf("%v", rtc.cid)
+	if ( cid == "") {
+		return nil, pkgerrors.Errorf("Error, context not intialized")
+	}
+	if !strings.HasPrefix(cid, prefix) {
+		return nil, pkgerrors.Errorf("Not a valid run time context prefix")
+	}
+	id := strings.SplitN(cid, "/", 4)[2]
 	err := contextdb.Db.Put(cid, id)
 	if err != nil {
 		return nil, pkgerrors.Errorf("Error creating run time context: %s", err.Error())

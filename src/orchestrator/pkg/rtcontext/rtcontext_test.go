@@ -80,8 +80,75 @@ func (c *MockContextDb) HealthCheck() error {
 	return nil
 }
 
-func TestRtcCreate(t *testing.T) {
+func TestRtcInit(t *testing.T) {
 	var rtc = RunTimeContext{}
+	testCases := []struct {
+		label		  string
+		mockContextDb *MockContextDb
+		expectedError string
+	}{
+		{
+			label:		  "Success case",
+			mockContextDb: &MockContextDb{},
+		},
+		{
+			label:		  "Init returns error case",
+			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
+			expectedError: "Error, context already intialized",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			contextdb.Db = testCase.mockContextDb
+			_, err := rtc.RtcInit()
+			if err != nil {
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Method returned an error (%s)", err)
+				}
+			}
+
+		})
+	}
+}
+
+func TestRtcReInit(t *testing.T) {
+	var rtc = RunTimeContext{""}
+	testCases := []struct {
+		label		  string
+		mockContextDb *MockContextDb
+		id string
+		expectedError string
+	}{
+		{
+			label:		  "Success case",
+			id:		  "5345674458787728",
+			mockContextDb: &MockContextDb{},
+		},
+		{
+			label:		  "reinit returns error case",
+			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
+			id:		  "8885674458787728",
+			expectedError: "Error finding the context id:",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			contextdb.Db = testCase.mockContextDb
+			_, err := rtc.RtcReinit("5345674458787728")
+			if err != nil {
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Method returned an error (%s)", err)
+				}
+			}
+
+		})
+	}
+}
+
+func TestRtcCreate(t *testing.T) {
+	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {
 		label		  string
 		mockContextDb *MockContextDb
@@ -113,8 +180,7 @@ func TestRtcCreate(t *testing.T) {
 }
 
 func TestRtcGet(t *testing.T) {
-	var rtc = RunTimeContext{}
-	var rtc1 = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {
 		label		  string
 		mockContextDb *MockContextDb
@@ -163,7 +229,7 @@ func TestRtcGet(t *testing.T) {
 				case "Context handle does not match":
 					contextdb.Db = testCase.mockContextDb
 					contextdb.Db.Put("/context/5345674458787728/", "6345674458787728")
-					_, err := rtc1.RtcGet()
+					_, err := rtc.RtcGet()
 					if err != nil {
 						if !strings.Contains(string(err.Error()), testCase.expectedError) {
 							t.Fatalf("Method returned an error (%s)", err)

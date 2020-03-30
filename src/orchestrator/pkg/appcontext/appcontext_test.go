@@ -40,6 +40,16 @@ func (c *MockRunTimeContext) RtcCreate() (interface{}, error) {
 
 }
 
+func (c *MockRunTimeContext) RtcInit() (interface{}, error) {
+	var id string = "9345674458787728"
+	return id, c.Err
+}
+
+func (c *MockRunTimeContext) RtcReinit(id interface{}) (interface{}, error) {
+	str := "/context/" + fmt.Sprintf("%v", id) + "/"
+	return interface{}(str), c.Err
+}
+
 func (c *MockRunTimeContext) RtcGet() (interface{}, error) {
 	var key string = "/context/9345674458787728/"
 	return key, c.Err

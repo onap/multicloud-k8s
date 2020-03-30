@@ -29,12 +29,17 @@ type AppContext struct {
 }
 
 // Init app context
-func (ac *AppContext) InitAppContext() {
-	if !ac.initDone {
-		ac.rtcObj = rtcontext.RunTimeContext{}
-		ac.initDone = true
-	}
+func (ac *AppContext) InitAppContext() (interface{}, error){
+	ac.rtcObj = rtcontext.RunTimeContext{}
 	ac.rtc = &ac.rtcObj
+	return ac.rtc.RtcInit()
+}
+
+// Reinit app context that was previously created
+func (ac *AppContext) ReinitAppContext(cid interface{}) (interface{}, error) {
+	ac.rtcObj = rtcontext.RunTimeContext{}
+	ac.rtc = &ac.rtcObj
+	return ac.rtc.RtcReinit(cid)
 }
 
 // Create a new context and returns the handle
@@ -77,7 +82,7 @@ func (ac *AppContext) AddApp(handle interface{}, appname string) (interface{}, e
 	return h, nil
 }
 
-//Delete app from the context and everything underneth 
+//Delete app from the context and everything underneth
 func (ac *AppContext) DeleteApp(handle interface{}) (error) {
 	err := ac.rtc.RtcDeletePrefix(handle)
 	if err != nil {

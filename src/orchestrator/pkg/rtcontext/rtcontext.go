@@ -18,11 +18,11 @@ package rtcontext
 
 import (
 	"fmt"
-	"math/rand"
-	"time"
-	"strings"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	pkgerrors "github.com/pkg/errors"
+	"math/rand"
+	"strings"
+	"time"
 )
 
 const maxrand = 0x7fffffffffffffff
@@ -33,27 +33,59 @@ type RunTimeContext struct {
 }
 
 type Rtcontext interface {
+	RtcInit() (interface{}, error)
+	RtcLoad(interface{}) (interface{}, error)
 	RtcCreate() (interface{}, error)
 	RtcGet() (interface{}, error)
 	RtcAddLevel(handle interface{}, level string, value string) (interface{}, error)
 	RtcAddResource(handle interface{}, resname string, value interface{}) (interface{}, error)
 	RtcAddInstruction(handle interface{}, level string, insttype string, value interface{}) (interface{}, error)
-	RtcDeletePair(handle interface{}) (error)
-	RtcDeletePrefix(handle interface{}) (error)
+	RtcDeletePair(handle interface{}) error
+	RtcDeletePrefix(handle interface{}) error
 	RtcGetHandles(handle interface{}) ([]interface{}, error)
-	RtcGetValue(handle interface{}, value interface{}) (error)
-	RtcUpdateValue(handle interface{}, value interface{}) (error)
+	RtcGetValue(handle interface{}, value interface{}) error
+	RtcUpdateValue(handle interface{}, value interface{}) error
 }
 
-//Create context by assiging a new id
-func (rtc *RunTimeContext) RtcCreate() (interface{}, error) {
-
+//Intialize context by assiging a new id
+func (rtc *RunTimeContext) RtcInit() (interface{}, error) {
+	if rtc.cid != nil {
+		return nil, pkgerrors.Errorf("Error, context already initialized")
+	}
 	ra := rand.New(rand.NewSource(time.Now().UnixNano()))
 	rn := ra.Int63n(maxrand)
 	id := fmt.Sprintf("%v", rn)
 	cid := (prefix + id + "/")
 	rtc.cid = interface{}(cid)
+	return interface{}(id), nil
 
+}
+
+//Reintialize context using the given id
+func (rtc *RunTimeContext) RtcLoad(id interface{}) (interface{}, error) {
+	str := fmt.Sprintf("%v", id)
+	if str == "" {
+		return nil, pkgerrors.Errorf("Not a valid context id")
+	}
+	cid := (prefix + str + "/")
+	rtc.cid = interface{}(cid)
+	handle, err := rtc.RtcGet()
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error finding the context id: %s", err.Error())
+	}
+	return handle, nil
+}
+
+//Create context using the id and prefix
+func (rtc *RunTimeContext) RtcCreate() (interface{}, error) {
+	cid := fmt.Sprintf("%v", rtc.cid)
+	if cid == "" {
+		return nil, pkgerrors.Errorf("Error, context not intialized")
+	}
+	if !strings.HasPrefix(cid, prefix) {
+		return nil, pkgerrors.Errorf("Not a valid run time context prefix")
+	}
+	id := strings.SplitN(cid, "/", 4)[2]
 	err := contextdb.Db.Put(cid, id)
 	if err != nil {
 		return nil, pkgerrors.Errorf("Error creating run time context: %s", err.Error())
@@ -139,16 +171,16 @@ func (rtc *RunTimeContext) RtcAddInstruction(handle interface{}, level string, i
 	if level == "" {
 		return nil, pkgerrors.Errorf("Not a valid run time context level")
 	}
-	if insttype  == "" {
+	if insttype == "" {
 		return nil, pkgerrors.Errorf("Not a valid run time context instruction type")
 	}
 	if value == nil {
 		return nil, pkgerrors.Errorf("Not a valid run time context instruction value")
 	}
 
-	k := str + level + "/" + "instruction" + "/" + insttype +"/"
+	k := str + level + "/" + "instruction" + "/" + insttype + "/"
 	err := contextdb.Db.Put(k, fmt.Sprintf("%v", value))
-	if  err != nil  {
+	if err != nil {
 		return nil, pkgerrors.Errorf("Error adding run time context instruction: %s", err.Error())
 	}
 
@@ -156,7 +188,7 @@ func (rtc *RunTimeContext) RtcAddInstruction(handle interface{}, level string, i
 }
 
 //Delete the key value pair using given handle
-func (rtc *RunTimeContext) RtcDeletePair(handle interface{}) (error) {
+func (rtc *RunTimeContext) RtcDeletePair(handle interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	sid := fmt.Sprintf("%v", rtc.cid)
 	if !strings.HasPrefix(str, sid) {
@@ -172,7 +204,7 @@ func (rtc *RunTimeContext) RtcDeletePair(handle interface{}) (error) {
 }
 
 // Delete all handles underneath the given handle
-func (rtc *RunTimeContext) RtcDeletePrefix(handle interface{}) (error) {
+func (rtc *RunTimeContext) RtcDeletePrefix(handle interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	sid := fmt.Sprintf("%v", rtc.cid)
 	if !strings.HasPrefix(str, sid) {
@@ -207,7 +239,7 @@ func (rtc *RunTimeContext) RtcGetHandles(handle interface{}) ([]interface{}, err
 }
 
 // Get the value for a given handle
-func (rtc *RunTimeContext) RtcGetValue(handle interface{}, value interface{}) (error) {
+func (rtc *RunTimeContext) RtcGetValue(handle interface{}, value interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	sid := fmt.Sprintf("%v", rtc.cid)
 	if !strings.HasPrefix(str, sid) {
@@ -223,7 +255,7 @@ func (rtc *RunTimeContext) RtcGetValue(handle interface{}, value interface{}) (e
 }
 
 // Update the value of a given handle
-func (rtc *RunTimeContext) RtcUpdateValue(handle interface{}, value interface{}) (error) {
+func (rtc *RunTimeContext) RtcUpdateValue(handle interface{}, value interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	sid := fmt.Sprintf("%v", rtc.cid)
 	if !strings.HasPrefix(str, sid) {

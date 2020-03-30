@@ -24,17 +24,22 @@ import (
 
 type AppContext struct {
 	initDone bool
-	rtcObj rtcontext.RunTimeContext
-	rtc rtcontext.Rtcontext
+	rtcObj   rtcontext.RunTimeContext
+	rtc      rtcontext.Rtcontext
 }
 
 // Init app context
-func (ac *AppContext) InitAppContext() {
-	if !ac.initDone {
-		ac.rtcObj = rtcontext.RunTimeContext{}
-		ac.initDone = true
-	}
+func (ac *AppContext) InitAppContext() (interface{}, error) {
+	ac.rtcObj = rtcontext.RunTimeContext{}
 	ac.rtc = &ac.rtcObj
+	return ac.rtc.RtcInit()
+}
+
+// Reinit app context that was previously created
+func (ac *AppContext) ReinitAppContext(cid interface{}) (interface{}, error) {
+	ac.rtcObj = rtcontext.RunTimeContext{}
+	ac.rtc = &ac.rtcObj
+	return ac.rtc.RtcReinit(cid)
 }
 
 // Create a new context and returns the handle
@@ -47,7 +52,7 @@ func (ac *AppContext) CreateCompositeApp() (interface{}, error) {
 }
 
 // Deletes the entire context
-func (ac *AppContext) DeleteCompositeApp() (error) {
+func (ac *AppContext) DeleteCompositeApp() error {
 	h, err := ac.rtc.RtcGet()
 	if err != nil {
 		return err
@@ -61,9 +66,9 @@ func (ac *AppContext) DeleteCompositeApp() (error) {
 
 //Returns the handles for a given composite app context
 func (ac *AppContext) GetCompositeApp() (interface{}, error) {
-        h, err := ac.rtc.RtcGet()
-	      if err != nil {
-	             return nil, err
+	h, err := ac.rtc.RtcGet()
+	if err != nil {
+		return nil, err
 	}
 	return h, nil
 }
@@ -77,8 +82,8 @@ func (ac *AppContext) AddApp(handle interface{}, appname string) (interface{}, e
 	return h, nil
 }
 
-//Delete app from the context and everything underneth 
-func (ac *AppContext) DeleteApp(handle interface{}) (error) {
+//Delete app from the context and everything underneth
+func (ac *AppContext) DeleteApp(handle interface{}) error {
 	err := ac.rtc.RtcDeletePrefix(handle)
 	if err != nil {
 		return err
@@ -120,7 +125,7 @@ func (ac *AppContext) AddCluster(handle interface{}, clustername string) (interf
 }
 
 //Delete cluster from the context and everything underneth
-func (ac *AppContext) DeleteCluster(handle interface{}) (error) {
+func (ac *AppContext) DeleteCluster(handle interface{}) error {
 	err := ac.rtc.RtcDeletePrefix(handle)
 	if err != nil {
 		return err
@@ -156,7 +161,7 @@ func (ac *AppContext) GetClusterHandle(appname string, clustername string) (inte
 }
 
 //Add resource under app and cluster
-func (ac *AppContext) AddResource(handle interface{},resname string, value interface{}) (interface{}, error) {
+func (ac *AppContext) AddResource(handle interface{}, resname string, value interface{}) (interface{}, error) {
 	h, err := ac.rtc.RtcAddResource(handle, resname, value)
 	if err != nil {
 		return nil, err
@@ -165,7 +170,7 @@ func (ac *AppContext) AddResource(handle interface{},resname string, value inter
 }
 
 //Delete resource given the handle
-func (ac *AppContext) DeleteResource(handle interface{}) (error) {
+func (ac *AppContext) DeleteResource(handle interface{}) error {
 	err := ac.rtc.RtcDeletePair(handle)
 	if err != nil {
 		return err
@@ -201,7 +206,7 @@ func (ac *AppContext) GetResourceHandle(appname string, clustername string, resn
 }
 
 //Update the resource value usign the given handle
-func (ac *AppContext) UpdateResourceValue(handle interface{}, value interface{}) (error) {
+func (ac *AppContext) UpdateResourceValue(handle interface{}, value interface{}) error {
 	return ac.rtc.RtcUpdateValue(handle, value)
 }
 
@@ -217,11 +222,11 @@ func (ac *AppContext) AddInstruction(handle interface{}, level string, insttype 
 	if err != nil {
 		return nil, err
 	}
-	return h,nil
+	return h, nil
 }
 
 //Delete instruction under gievn handle
-func (ac *AppContext) DeleteInstruction(handle interface{}) (error) {
+func (ac *AppContext) DeleteInstruction(handle interface{}) error {
 	err := ac.rtc.RtcDeletePair(handle)
 	if err != nil {
 		return err
@@ -244,11 +249,11 @@ func (ac *AppContext) GetAppInstruction(insttype string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return v,nil
+	return v, nil
 }
 
 //Update the instruction usign the given handle
-func (ac *AppContext) UpdateInstructionValue(handle interface{}, value interface{}) (error) {
+func (ac *AppContext) UpdateInstructionValue(handle interface{}, value interface{}) error {
 	return ac.rtc.RtcUpdateValue(handle, value)
 }
 
@@ -264,10 +269,10 @@ func (ac *AppContext) GetResourceInstruction(appname string, clustername string,
 	s := fmt.Sprintf("%v", rh) + "app/" + appname + "/cluster/" + clustername + "/resource/instruction/" + insttype
 	var v string
 	err = ac.rtc.RtcGetValue(s, &v)
-		if err != nil {
-			return nil, err
-		}
-	return v,nil
+	if err != nil {
+		return nil, err
+	}
+	return v, nil
 }
 
 //Return all the handles under the composite app
@@ -276,7 +281,7 @@ func (ac *AppContext) GetAllHandles(handle interface{}) ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return hs,nil
+	return hs, nil
 }
 
 //Returns the value for a given handle
@@ -286,5 +291,5 @@ func (ac *AppContext) GetValue(handle interface{}) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return v,nil
+	return v, nil
 }

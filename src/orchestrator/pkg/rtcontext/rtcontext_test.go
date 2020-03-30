@@ -17,21 +17,20 @@
 package rtcontext
 
 import (
-	"testing"
-	"strings"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	pkgerrors "github.com/pkg/errors"
+	"strings"
+	"testing"
 )
 
 // MockContextDb for mocking contextdb
 type MockContextDb struct {
-
 	Items map[string]interface{}
 	Err   error
 }
 
 // Put function
-func (c *MockContextDb) Put(key string, val interface{}) (error) {
+func (c *MockContextDb) Put(key string, val interface{}) error {
 	if c.Items == nil {
 		c.Items = make(map[string]interface{})
 	}
@@ -40,7 +39,7 @@ func (c *MockContextDb) Put(key string, val interface{}) (error) {
 }
 
 // Get function
-func (c *MockContextDb) Get(key string, val interface{}) (error) {
+func (c *MockContextDb) Get(key string, val interface{}) error {
 	var s *string
 	s = val.(*string)
 	for kvKey, kvValue := range c.Items {
@@ -53,13 +52,13 @@ func (c *MockContextDb) Get(key string, val interface{}) (error) {
 }
 
 // Delete function
-func (c *MockContextDb) Delete(key string) (error) {
+func (c *MockContextDb) Delete(key string) error {
 	delete(c.Items, key)
 	return c.Err
 }
 
 // Delete all function
-func (c *MockContextDb) DeleteAll(key string) (error) {
+func (c *MockContextDb) DeleteAll(key string) error {
 	for kvKey, _ := range c.Items {
 		delete(c.Items, kvKey)
 	}
@@ -80,19 +79,86 @@ func (c *MockContextDb) HealthCheck() error {
 	return nil
 }
 
-func TestRtcCreate(t *testing.T) {
+func TestRtcInit(t *testing.T) {
 	var rtc = RunTimeContext{}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
 		expectedError string
 	}{
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
 		},
 		{
-			label:		  "Create returns error case",
+			label:         "Init returns error case",
+			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
+			expectedError: "Error, context already initialized",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			contextdb.Db = testCase.mockContextDb
+			_, err := rtc.RtcInit()
+			if err != nil {
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Method returned an error (%s)", err)
+				}
+			}
+
+		})
+	}
+}
+
+func TestRtcReInit(t *testing.T) {
+	var rtc = RunTimeContext{""}
+	testCases := []struct {
+		label         string
+		mockContextDb *MockContextDb
+		id            string
+		expectedError string
+	}{
+		{
+			label:         "Success case",
+			id:            "5345674458787728",
+			mockContextDb: &MockContextDb{},
+		},
+		{
+			label:         "reinit returns error case",
+			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
+			id:            "8885674458787728",
+			expectedError: "Error finding the context id:",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			contextdb.Db = testCase.mockContextDb
+			_, err := rtc.RtcReinit("5345674458787728")
+			if err != nil {
+				if !strings.Contains(string(err.Error()), testCase.expectedError) {
+					t.Fatalf("Method returned an error (%s)", err)
+				}
+			}
+
+		})
+	}
+}
+
+func TestRtcCreate(t *testing.T) {
+	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	testCases := []struct {
+		label         string
+		mockContextDb *MockContextDb
+		expectedError string
+	}{
+		{
+			label:         "Success case",
+			mockContextDb: &MockContextDb{},
+		},
+		{
+			label:         "Create returns error case",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
 			expectedError: "Error creating run time context:",
 		},
@@ -113,24 +179,23 @@ func TestRtcCreate(t *testing.T) {
 }
 
 func TestRtcGet(t *testing.T) {
-	var rtc = RunTimeContext{}
-	var rtc1 = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
 		expectedError string
 	}{
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
 		},
 		{
-			label:		  "Get returns error case",
+			label:         "Get returns error case",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
 			expectedError: "Error getting run time context metadata:",
 		},
 		{
-			label:		  "Context handle does not match",
+			label:         "Context handle does not match",
 			mockContextDb: &MockContextDb{Err: nil},
 			expectedError: "Error matching run time context metadata",
 		},
@@ -139,36 +204,36 @@ func TestRtcGet(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			switch testCase.label {
-				case "Success case":
-					contextdb.Db = testCase.mockContextDb
-					chandle, err := rtc.RtcCreate()
-					if err != nil {
-						t.Fatalf("Create returned an error (%s)", err)
+			case "Success case":
+				contextdb.Db = testCase.mockContextDb
+				chandle, err := rtc.RtcCreate()
+				if err != nil {
+					t.Fatalf("Create returned an error (%s)", err)
+				}
+				ghandle, err := rtc.RtcGet()
+				if err != nil {
+					t.Fatalf("Get returned an error (%s)", err)
+				}
+				if chandle != ghandle {
+					t.Fatalf("Create and Get does not match")
+				}
+			case "Get returns error case":
+				contextdb.Db = testCase.mockContextDb
+				_, err := rtc.RtcGet()
+				if err != nil {
+					if !strings.Contains(string(err.Error()), testCase.expectedError) {
+						t.Fatalf("Method returned an error (%s)", err)
 					}
-					ghandle, err := rtc.RtcGet()
-					if err != nil {
-						t.Fatalf("Get returned an error (%s)", err)
+				}
+			case "Context handle does not match":
+				contextdb.Db = testCase.mockContextDb
+				contextdb.Db.Put("/context/5345674458787728/", "6345674458787728")
+				_, err := rtc.RtcGet()
+				if err != nil {
+					if !strings.Contains(string(err.Error()), testCase.expectedError) {
+						t.Fatalf("Method returned an error (%s)", err)
 					}
-					if ( chandle != ghandle ) {
-						t.Fatalf("Create and Get does not match")
-					}
-				case "Get returns error case":
-					contextdb.Db = testCase.mockContextDb
-					_, err := rtc.RtcGet()
-					if err != nil {
-						if !strings.Contains(string(err.Error()), testCase.expectedError) {
-							t.Fatalf("Method returned an error (%s)", err)
-						}
-					}
-				case "Context handle does not match":
-					contextdb.Db = testCase.mockContextDb
-					contextdb.Db.Put("/context/5345674458787728/", "6345674458787728")
-					_, err := rtc1.RtcGet()
-					if err != nil {
-						if !strings.Contains(string(err.Error()), testCase.expectedError) {
-							t.Fatalf("Method returned an error (%s)", err)
-						}
-					}
+				}
 			}
 		})
 	}
@@ -177,50 +242,50 @@ func TestRtcGet(t *testing.T) {
 func TestRtcAddLevel(t *testing.T) {
 	var rtc = RunTimeContext{"/context/3528435435454354/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
-		handle interface{}
-		level string
-		value string
+		handle        interface{}
+		level         string
+		value         string
 		expectedError string
 	}{
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/",
-			level: "app",
-			value: "testapp1",
+			handle:        "/context/3528435435454354/",
+			level:         "app",
+			value:         "testapp1",
 		},
 		{
-			label:		  "Not a valid rtc handle",
+			label:         "Not a valid rtc handle",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/9528435435454354/",
-			level: "app",
-			value: "testapp1",
+			handle:        "/context/9528435435454354/",
+			level:         "app",
+			value:         "testapp1",
 			expectedError: "Not a valid run time context handle",
 		},
 		{
-			label:		  "Not a valid rtc level",
+			label:         "Not a valid rtc level",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/",
-			level: "",
-			value: "testapp1",
+			handle:        "/context/3528435435454354/",
+			level:         "",
+			value:         "testapp1",
 			expectedError: "Not a valid run time context level",
 		},
 		{
-			label:		  "Not a valid rtc value",
+			label:         "Not a valid rtc value",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/",
-			level: "app",
-			value: "",
+			handle:        "/context/3528435435454354/",
+			level:         "app",
+			value:         "",
 			expectedError: "Not a valid run time context level value",
 		},
 		{
-			label:		  "Put returns error",
+			label:         "Put returns error",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
-			handle: "/context/3528435435454354/",
-			level: "app",
-			value: "testapp1",
+			handle:        "/context/3528435435454354/",
+			level:         "app",
+			value:         "testapp1",
 			expectedError: "Error adding run time context level:",
 		},
 	}
@@ -241,50 +306,50 @@ func TestRtcAddLevel(t *testing.T) {
 func TestRtcAddResource(t *testing.T) {
 	var rtc = RunTimeContext{"/context/3528435435454354/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
-		handle interface{}
-		resname string
-		value interface{}
+		handle        interface{}
+		resname       string
+		value         interface{}
 		expectedError string
 	}{
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			resname: "R1",
-			value: "res1",
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			resname:       "R1",
+			value:         "res1",
 		},
 		{
-			label:		  "Not a valid rtc handle",
+			label:         "Not a valid rtc handle",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/9528435435454354/app/apptest1/cluster/cluster1/",
-			resname: "R1",
-			value: "res1",
+			handle:        "/context/9528435435454354/app/apptest1/cluster/cluster1/",
+			resname:       "R1",
+			value:         "res1",
 			expectedError: "Not a valid run time context handle",
 		},
 		{
-			label:		  "Not a valid rtc resource name",
+			label:         "Not a valid rtc resource name",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			resname: "",
-			value: "res1",
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			resname:       "",
+			value:         "res1",
 			expectedError: "Not a valid run time context resource name",
 		},
 		{
-			label:		  "Not a valid rtc value",
+			label:         "Not a valid rtc value",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			resname: "R1",
-			value: nil,
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			resname:       "R1",
+			value:         nil,
 			expectedError: "Not a valid run time context resource value",
 		},
 		{
-			label:		  "Put returns error",
+			label:         "Put returns error",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			resname: "R1",
-			value: "res1",
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			resname:       "R1",
+			value:         "res1",
 			expectedError: "Error adding run time context resource:",
 		},
 	}
@@ -305,65 +370,65 @@ func TestRtcAddResource(t *testing.T) {
 func TestRtcAddInstruction(t *testing.T) {
 	var rtc = RunTimeContext{"/context/3528435435454354/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
-		handle interface{}
-		level string
-		insttype string
-		value interface{}
+		handle        interface{}
+		level         string
+		insttype      string
+		value         interface{}
 		expectedError string
 	}{
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			level: "resource",
-			insttype: "order",
-			value: "{resorder: [R3, R1, R2]}",
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			level:         "resource",
+			insttype:      "order",
+			value:         "{resorder: [R3, R1, R2]}",
 		},
 		{
-			label:		  "Not a valid rtc handle",
+			label:         "Not a valid rtc handle",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/9528435435454354/app/apptest1/cluster/cluster1/",
-			level: "resource",
-			insttype: "order",
-			value: "{resorder: [R3, R1, R2]}",
+			handle:        "/context/9528435435454354/app/apptest1/cluster/cluster1/",
+			level:         "resource",
+			insttype:      "order",
+			value:         "{resorder: [R3, R1, R2]}",
 			expectedError: "Not a valid run time context handle",
 		},
 		{
-			label:		  "Not a valid rtc level name",
+			label:         "Not a valid rtc level name",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			level: "",
-			insttype: "order",
-			value: "{resorder: [R3, R1, R2]}",
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			level:         "",
+			insttype:      "order",
+			value:         "{resorder: [R3, R1, R2]}",
 			expectedError: "Not a valid run time context level",
 		},
 		{
-			label:		  "Not a valid rtc instruction type",
+			label:         "Not a valid rtc instruction type",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			level: "resource",
-			insttype: "",
-			value: "{resorder: [R3, R1, R2]}",
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			level:         "resource",
+			insttype:      "",
+			value:         "{resorder: [R3, R1, R2]}",
 			expectedError: "Not a valid run time context instruction type",
 		},
 		{
-			label:		  "Not a valid rtc value",
+			label:         "Not a valid rtc value",
 			mockContextDb: &MockContextDb{},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			level: "resource",
-			insttype: "order",
-			value: nil,
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			level:         "resource",
+			insttype:      "order",
+			value:         nil,
 			expectedError: "Not a valid run time context instruction value",
 		},
 		{
-			label:		  "Put returns error",
+			label:         "Put returns error",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Client not intialized")},
-			handle: "/context/3528435435454354/app/apptest1/cluster/cluster1/",
-			level: "resource",
-			insttype: "order",
-			value: "{resorder: [R3, R1, R2]}",
+			handle:        "/context/3528435435454354/app/apptest1/cluster/cluster1/",
+			level:         "resource",
+			insttype:      "order",
+			value:         "{resorder: [R3, R1, R2]}",
 			expectedError: "Error adding run time context instruction:",
 		},
 	}
@@ -384,34 +449,34 @@ func TestRtcAddInstruction(t *testing.T) {
 func TestRtcGetHandles(t *testing.T) {
 	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
-		key interface{}
+		key           interface{}
 		expectedError string
 	}{
 		{
-			label:		  "Not valid input handle case",
+			label:         "Not valid input handle case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/3528435435454354/",
+			key:           "/context/3528435435454354/",
 			expectedError: "Not a valid run time context handle",
 		},
 		{
-			label:		  "Contextdb call returns error case",
+			label:         "Contextdb call returns error case",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Key does not exist")},
-			key: "/context/5345674458787728/",
+			key:           "/context/5345674458787728/",
 			expectedError: "Error getting run time context handles:",
 		},
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/5345674458787728/",
+			key:           "/context/5345674458787728/",
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			contextdb.Db = testCase.mockContextDb
-			if testCase.label ==  "Success case" {
+			if testCase.label == "Success case" {
 				contextdb.Db.Put("/context/5345674458787728/", 5345674458787728)
 			}
 			_, err := rtc.RtcGetHandles(testCase.key)
@@ -427,34 +492,34 @@ func TestRtcGetHandles(t *testing.T) {
 func TestRtcGetValue(t *testing.T) {
 	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
-		key interface{}
+		key           interface{}
 		expectedError string
 	}{
 		{
-			label:		  "Not valid input handle case",
+			label:         "Not valid input handle case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/3528435435454354/",
+			key:           "/context/3528435435454354/",
 			expectedError: "Not a valid run time context handle",
 		},
 		{
-			label:		  "Contextdb call returns error case",
+			label:         "Contextdb call returns error case",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Key does not exist")},
-			key: "/context/5345674458787728/",
+			key:           "/context/5345674458787728/",
 			expectedError: "Error getting run time context value:",
 		},
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/5345674458787728/",
+			key:           "/context/5345674458787728/",
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			contextdb.Db = testCase.mockContextDb
-			if testCase.label ==  "Success case" {
+			if testCase.label == "Success case" {
 				contextdb.Db.Put("/context/5345674458787728/", "5345674458787728")
 			}
 			var val string
@@ -471,38 +536,38 @@ func TestRtcGetValue(t *testing.T) {
 func TestRtcUpdateValue(t *testing.T) {
 	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
-		key interface{}
-		value interface{}
+		key           interface{}
+		value         interface{}
 		expectedError string
 	}{
 		{
-			label:		  "Not valid input handle case",
+			label:         "Not valid input handle case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/3528435435454354/",
-			value: "{apporder: [app1, app2, app3]}",
+			key:           "/context/3528435435454354/",
+			value:         "{apporder: [app1, app2, app3]}",
 			expectedError: "Not a valid run time context handle",
 		},
 		{
-			label:		  "Contextdb call returns error case",
+			label:         "Contextdb call returns error case",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Key does not exist")},
-			key: "/context/5345674458787728/",
-			value: "{apporder: [app1, app2, app3]}",
+			key:           "/context/5345674458787728/",
+			value:         "{apporder: [app1, app2, app3]}",
 			expectedError: "Error updating run time context value:",
 		},
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/5345674458787728/",
-			value: "{apporder: [app2, app3, app1]}",
+			key:           "/context/5345674458787728/",
+			value:         "{apporder: [app2, app3, app1]}",
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			contextdb.Db = testCase.mockContextDb
-			if testCase.label ==  "Success case" {
+			if testCase.label == "Success case" {
 				contextdb.Db.Put("/context/5345674458787728/", "5345674458787728")
 			}
 			err := rtc.RtcUpdateValue(testCase.key, testCase.value)
@@ -518,27 +583,27 @@ func TestRtcUpdateValue(t *testing.T) {
 func TestRtcDeletePair(t *testing.T) {
 	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
-		key interface{}
+		key           interface{}
 		expectedError string
 	}{
 		{
-			label:		  "Not valid input handle case",
+			label:         "Not valid input handle case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/3528435435454354/",
+			key:           "/context/3528435435454354/",
 			expectedError: "Not a valid run time context handle",
 		},
 		{
-			label:		  "Contextdb call returns error case",
+			label:         "Contextdb call returns error case",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Key does not exist")},
-			key: "/context/5345674458787728/",
+			key:           "/context/5345674458787728/",
 			expectedError: "Error deleting run time context pair:",
 		},
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/5345674458787728/",
+			key:           "/context/5345674458787728/",
 		},
 	}
 
@@ -558,27 +623,27 @@ func TestRtcDeletePair(t *testing.T) {
 func TestRtcDeletePrefix(t *testing.T) {
 	var rtc = RunTimeContext{"/context/5345674458787728/"}
 	testCases := []struct {
-		label		  string
+		label         string
 		mockContextDb *MockContextDb
-		key interface{}
+		key           interface{}
 		expectedError string
 	}{
 		{
-			label:		  "Not valid input handle case",
+			label:         "Not valid input handle case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/3528435435454354/",
+			key:           "/context/3528435435454354/",
 			expectedError: "Not a valid run time context handle",
 		},
 		{
-			label:		  "Contextdb call returns error case",
+			label:         "Contextdb call returns error case",
 			mockContextDb: &MockContextDb{Err: pkgerrors.Errorf("Key does not exist")},
-			key: "/context/5345674458787728/",
+			key:           "/context/5345674458787728/",
 			expectedError: "Error deleting run time context with prefix:",
 		},
 		{
-			label:		  "Success case",
+			label:         "Success case",
 			mockContextDb: &MockContextDb{},
-			key: "/context/5345674458787728/",
+			key:           "/context/5345674458787728/",
 		},
 	}
 

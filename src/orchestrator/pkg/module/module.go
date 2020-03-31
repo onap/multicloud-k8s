@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Intel Corporation, Inc
+ * Copyright 2020 Intel Corporation, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ type Client struct {
 	CompositeProfile       *CompositeProfileClient
 	AppProfile             *AppProfileClient
 	// Add Clients for API's here
+	Instantiation *InstantiationClient
 }
 
 // NewClient creates a new client for using the services
@@ -45,5 +46,6 @@ func NewClient() *Client {
 	c.CompositeProfile = NewCompositeProfileClient()
 	c.AppProfile = NewAppProfileClient()
 	// Add Client API handlers here
+	c.Instantiation = NewInstantiationClient()
 	return c
 }

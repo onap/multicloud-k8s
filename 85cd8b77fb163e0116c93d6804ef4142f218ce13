@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5e0e56d7_d775e0ed",
+        "filename": "src/orchestrator/utils/util-functions.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-03-31T17:36:12Z",
+      "side": 1,
+      "message": "this function is also in orchestrator/pkg/infra/validation.",
+      "revId": "85cd8b77fb163e0116c93d6804ef4142f218ce13",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

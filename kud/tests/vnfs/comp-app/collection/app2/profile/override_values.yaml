@@ -1,6 +1,6 @@
 service:
     type: ClusterIP
-    name: Prometheus
+    name: Prometheus-override-by-file
     annotations: {}
     labels: {}
     clusterIP: ""

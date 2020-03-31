@@ -59,7 +59,7 @@ type Store interface {
 	// Find the document(s) with key and get the tag values from the document(s)
 	Find(coll string, key Key, tag string) ([][]byte, error)
 
-        // Removes the document(s) matching the key if no child reference in collection
+	// Removes the document(s) matching the key if no child reference in collection
 	Remove(coll string, key Key) error
 
 	// Remove all the document(s) matching the key

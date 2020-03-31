@@ -18,15 +18,15 @@ package appcontext
 
 import (
 	"fmt"
-	"testing"
-	"strings"
 	pkgerrors "github.com/pkg/errors"
+	"strings"
+	"testing"
 )
 
 // Mock run time context
 type MockRunTimeContext struct {
 	Items map[string]interface{}
-	Err	error
+	Err   error
 }
 
 func (c *MockRunTimeContext) RtcCreate() (interface{}, error) {
@@ -65,13 +65,13 @@ func (c *MockRunTimeContext) RtcAddInstruction(handle interface{}, level string,
 	return nil, c.Err
 }
 
-func (c *MockRunTimeContext) RtcDeletePair(handle interface{}) (error) {
+func (c *MockRunTimeContext) RtcDeletePair(handle interface{}) error {
 	str := fmt.Sprintf("%v", handle)
 	delete(c.Items, str)
 	return c.Err
 }
 
-func (c *MockRunTimeContext) RtcDeletePrefix(handle interface{}) (error) {
+func (c *MockRunTimeContext) RtcDeletePrefix(handle interface{}) error {
 	for k, _ := range c.Items {
 		delete(c.Items, k)
 	}
@@ -87,7 +87,7 @@ func (c *MockRunTimeContext) RtcGetHandles(handle interface{}) ([]interface{}, e
 	return keys, c.Err
 }
 
-func (c *MockRunTimeContext) RtcGetValue(handle interface{}, value interface{}) (error) {
+func (c *MockRunTimeContext) RtcGetValue(handle interface{}, value interface{}) error {
 	key := fmt.Sprintf("%v", handle)
 	var s *string
 	s = value.(*string)
@@ -100,7 +100,7 @@ func (c *MockRunTimeContext) RtcGetValue(handle interface{}, value interface{}) 
 	return c.Err
 }
 
-func (c *MockRunTimeContext) RtcUpdateValue(handle interface{}, value interface{}) (error) {
+func (c *MockRunTimeContext) RtcUpdateValue(handle interface{}, value interface{}) error {
 	key := fmt.Sprintf("%v", handle)
 	c.Items[key] = value
 	return c.Err
@@ -109,16 +109,16 @@ func (c *MockRunTimeContext) RtcUpdateValue(handle interface{}, value interface{
 func TestCreateCompositeApp(t *testing.T) {
 	var ac = AppContext{}
 	testCases := []struct {
-		label			string
+		label         string
 		mockRtcontext *MockRunTimeContext
 		expectedError string
 	}{
 		{
-			label:			"Success case",
+			label:         "Success case",
 			mockRtcontext: &MockRunTimeContext{},
 		},
 		{
-			label:			"Create returns error case",
+			label:         "Create returns error case",
 			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error creating run time context:")},
 			expectedError: "Error creating run time context:",
 		},
@@ -141,16 +141,16 @@ func TestCreateCompositeApp(t *testing.T) {
 func TestGetCompositeApp(t *testing.T) {
 	var ac = AppContext{}
 	testCases := []struct {
-		label			string
+		label         string
 		mockRtcontext *MockRunTimeContext
 		expectedError string
 	}{
 		{
-			label:			"Success case",
+			label:         "Success case",
 			mockRtcontext: &MockRunTimeContext{},
 		},
 		{
-			label:			"Get returns error case",
+			label:         "Get returns error case",
 			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error getting run time context:")},
 			expectedError: "Error getting run time context:",
 		},
@@ -173,16 +173,16 @@ func TestGetCompositeApp(t *testing.T) {
 func TestDeleteCompositeApp(t *testing.T) {
 	var ac = AppContext{}
 	testCases := []struct {
-		label			string
+		label         string
 		mockRtcontext *MockRunTimeContext
 		expectedError string
 	}{
 		{
-			label:			"Success case",
+			label:         "Success case",
 			mockRtcontext: &MockRunTimeContext{},
 		},
 		{
-			label:			"Delete returns error case",
+			label:         "Delete returns error case",
 			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error deleting run time context:")},
 			expectedError: "Error deleting run time context:",
 		},
@@ -205,20 +205,20 @@ func TestDeleteCompositeApp(t *testing.T) {
 func TestAddApp(t *testing.T) {
 	var ac = AppContext{}
 	testCases := []struct {
-		label			string
+		label         string
 		mockRtcontext *MockRunTimeContext
-		key interface{}
+		key           interface{}
 		expectedError string
 	}{
 		{
-			label:			"Success case",
+			label:         "Success case",
 			mockRtcontext: &MockRunTimeContext{},
-			key: "/context/9345674458787728/",
+			key:           "/context/9345674458787728/",
 		},
 		{
-			label:			"Delete returns error case",
+			label:         "Delete returns error case",
 			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error adding app to run time context:")},
-			key: "/context/9345674458787728/",
+			key:           "/context/9345674458787728/",
 			expectedError: "Error adding app to run time context:",
 		},
 	}
@@ -241,29 +241,29 @@ func TestAddApp(t *testing.T) {
 func TestGetAppHandle(t *testing.T) {
 	var ac = AppContext{}
 	testCases := []struct {
-		label			string
+		label         string
 		mockRtcontext *MockRunTimeContext
-		key interface{}
-		appname string
+		key           interface{}
+		appname       string
 		expectedError string
 	}{
 		{
-			label:			"Success case",
+			label:         "Success case",
 			mockRtcontext: &MockRunTimeContext{},
-			key: "/context/9345674458787728/",
-			appname: "testapp1",
+			key:           "/context/9345674458787728/",
+			appname:       "testapp1",
 		},
 		{
-			label:			"Invalid app name case",
+			label:         "Invalid app name case",
 			mockRtcontext: &MockRunTimeContext{},
-			key: "/context/9345674458787728/",
-			appname: "",
+			key:           "/context/9345674458787728/",
+			appname:       "",
 		},
 		{
-			label:			"Delete returns error case",
+			label:         "Delete returns error case",
 			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error getting app handle from run time context:")},
-			key: "/context/9345674458787728/",
-			appname: "testapp1",
+			key:           "/context/9345674458787728/",
+			appname:       "testapp1",
 			expectedError: "Error getting app handle from run time context:",
 		},
 	}

@@ -71,6 +71,7 @@ clusterLabelName2="east-us2"
 
 deploymentIntentGroupName="test_deployment_intent_group"
 deploymentIntentGroupNameDesc="test_deployment_intent_group_desc"
+releaseName="test"
 
 chart_name="edgex"
 profile_name="test_profile"
@@ -344,20 +345,20 @@ payload="$(cat <<EOF
    },
    "spec":{
       "profile":"${main_composite_profile_name}",
-      "version":"${composite_app_version}",
+      "version":"${releaseName}",
       "override-values":[
          {
             "app-name":"${app1_name}",
             "values":
                {
-                  "imageRepository":"registry.hub.docker.com"
+                  "collectd_prometheus.service.name":"collectd-override-by-set-value"
                }
          },
          {
             "app-name":"${app2_name}",
             "values":
                {
-                  "imageRepository":"registry.hub.docker.com"
+                  "service.name":"Prometheus-override-by-set-value"
                }
          }
       ]
@@ -389,4 +390,9 @@ EOF
 )"
 call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/intents"
 # END: Adding intents to an intent group
+
+#BEGIN: Instantiation
+print_msg "Getting the sorted templates for each of the apps.."
+call_api -d "" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/instantiate"
+# END: Instantiation
 

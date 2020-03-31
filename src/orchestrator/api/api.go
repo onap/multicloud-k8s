@@ -33,7 +33,8 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	deploymentIntentGrpClient moduleLib.DeploymentIntentGroupManager,
 	intentClient moduleLib.IntentManager,
 	compositeProfileClient moduleLib.CompositeProfileManager,
-	appProfileClient moduleLib.AppProfileManager) *mux.Router {
+	appProfileClient moduleLib.AppProfileManager,
+	instantiationClient moduleLib.InstantiationManager) *mux.Router {
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 
@@ -162,6 +163,17 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents", intentHandler.addIntentHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/{intent-name}", intentHandler.getIntentHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/{intent-name}", intentHandler.deleteIntentHandler).Methods("DELETE")
+
+	// setting routes for Instantiation
+	if instantiationClient == nil {
+		instantiationClient = moduleClient.Instantiation
+	}
+
+	instantiationHandler := instantiationHandler{
+		client: instantiationClient,
+	}
+
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/instantiate", instantiationHandler.instantiateHandler).Methods("POST")
 
 	return router
 }

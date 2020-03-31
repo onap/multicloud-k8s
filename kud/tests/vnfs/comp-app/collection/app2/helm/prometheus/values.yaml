@@ -37,10 +37,11 @@ prometheus:
         - port: cadvisor-prometheus
           interval: 10s
           path: /metrics
- 
+
   resources: {}
   service:
     type: ClusterIP
+    name: Prometheus-value-file
     annotations: {}
     labels: {}
     clusterIP: ""
@@ -67,3 +68,6 @@ prometheus:
     #type: NodePort
 
     sessionAffinity: ""
+
+global:
+  imagePullSecrets: ""

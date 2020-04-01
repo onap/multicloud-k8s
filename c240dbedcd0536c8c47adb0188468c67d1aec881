@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "68541d37_87b691c8",
+        "filename": "src/k8splugin/go.mod",
+        "patchSetId": 5
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-01T17:11:21Z",
+      "side": 1,
+      "message": "Is this needed?",
+      "range": {
+        "startLine": 112,
+        "startChar": 2,
+        "endLine": 112,
+        "endChar": 7
+      },
+      "revId": "c240dbedcd0536c8c47adb0188468c67d1aec881",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "47bfcb68_92894b1a",
         "filename": "src/orchestrator/pkg/appcontext/appcontext_test.go",
         "patchSetId": 5

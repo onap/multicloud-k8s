@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.producer.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.producer.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.producer.name }}
+    spec:
+      containers:
+      - name: {{ .Values.producer.container.name }}
+        image: {{ .Values.producer.container.image }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.producer.container.port1 }}
+        - containerPort: {{ .Values.producer.container.port2 }}

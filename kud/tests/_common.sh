@@ -1158,6 +1158,30 @@ function populate_CSAR_fw_rbdefinition {
     popd
 }
 
+# populate_CSAR_eaa_rbdefinition() - Function that populates CSAR folder
+# for testing resource bundle definition of openness eaa scenario
+function populate_CSAR_eaa_rbdefinition {
+    _checks_args "$1"
+    pushd "${CSAR_DIR}/$1"
+    print_msg "Create Helm Chart Archives for Openness EAA"
+    rm -f *.tar.gz
+    tar -czf rb_profile.tar.gz -C $test_folder/openness/eaa/profile .
+    tar -czf rb_definition.tar.gz -C $test_folder/openness/eaa/helm eaa
+    popd
+}
+
+# populate_CSAR_eaa_sample_app_rbdefinition() - Function that populates CSAR folder
+# for testing resource bundle definition of openness sample-app scenario
+function populate_CSAR_eaa_sample_app_rbdefinition {
+    _checks_args "$1"
+    pushd "${CSAR_DIR}/$1"
+    print_msg "Create Helm Chart Archives for Openness EAA Sample Apps: producer and consumer"
+    rm -f *.tar.gz
+    tar -czf rb_profile.tar.gz -C $test_folder/openness/sample-app/profile .
+    tar -czf rb_definition.tar.gz -C $test_folder/openness/sample-app/helm sample-app
+    popd
+}
+
 function populate_CSAR_composite_app_helm {
     _checks_args "$1"
     pushd "${CSAR_DIR}/$1"

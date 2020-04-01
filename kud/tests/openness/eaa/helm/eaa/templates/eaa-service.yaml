@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.eaa.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterIP: {{ .Values.service.eaa.clusterIP }}
+  selector:
+    name: eaa
+  ports:
+    - name: {{ .Values.service.eaa.httpPortName}}
+      protocol: {{ .Values.service.eaa.httpProtocol}}
+      port: {{ .Values.service.eaa.httpPort }}
+      targetPort: {{ .Values.service.eaa.httpTargetPort }}
+    - name: {{ .Values.service.eaa.httpsPortName }}
+      protocol: {{ .Values.service.eaa.httpsProtocol }}
+      port: {{ .Values.service.eaa.httpsPort }}
+      targetPort: {{ .Values.service.eaa.httpsTargetPort }}

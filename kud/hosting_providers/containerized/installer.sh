@@ -145,7 +145,7 @@ function install_plugin {
         echo "Test the onap4k8s installation"
         bash onap4k8s.sh
         echo "Test the onap4k8s plugin installation"
-        for functional_test in plugin_edgex plugin_fw; do
+        for functional_test in plugin_edgex plugin_fw plugin_eaa; do
             bash ${functional_test}.sh --external
         done
         popd

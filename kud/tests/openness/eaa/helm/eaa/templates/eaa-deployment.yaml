@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.eaa.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ .Values.deployment.eaa.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.deployment.eaa.name }}
+    spec:
+      initContainers:
+      - name: {{ .Values.initContainer.name }}
+        image: {{ .Values.initContainer.image }}
+        command: ["/bin/sh"]
+        args: ["-c", "pwd"]
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: {{ .Values.initContainer.resource.requests.cpu }}
+          limits:
+            cpu: {{ .Values.initContainer.resource.limits.cpu }}
+            memory: {{ .Values.initContainer.resource.limits.memory }}
+        volumeMounts:
+        - name: {{ .Values.initContainer.volumeMounts.certsSec.name }}
+          mountPath: {{ .Values.initContainer.volumeMounts.certsSec.mountPath }}
+        - name: {{ .Values.initContainer.volumeMounts.certs.name }}
+          mountPath: {{ .Values.initContainer.volumeMounts.certs.mountPath }}
+      containers:
+      - name: {{ .Values.container.name }}
+        image: {{ .Values.container.image }}
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          readOnlyRootFilesystem: true
+        resources:
+          requests:
+            cpu: {{ .Values.container.resource.requests.cpu }}
+          limits:
+            cpu: {{ .Values.container.resource.limits.cpu }}
+            memory: {{ .Values.container.resource.limits.memory }}
+        volumeMounts:
+        - name: {{ .Values.container.volumeMounts.certs.name }}
+          mountPath: {{ .Values.container.volumeMounts.certs.mountPath }}
+        - name: {{ .Values.container.volumeMounts.certsSec.name }}
+          mountPath: {{ .Values.container.volumeMounts.certsSec.mountPath }}
+      volumes:
+      - name: {{ .Values.volumes.certsSec.name }}
+        secret:
+          secretName: {{ .Values.volumes.certsSec.secret.secretName }}
+      - name: {{ .Values.volumes.certs.name }}
+        hostPath:
+          path: {{ .Values.volumes.certs.hostPath.path }}

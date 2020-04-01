@@ -1,0 +1,77 @@
+# Copyright 2018 Intel Corporation, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+service:
+  eaa:
+    name: eaa
+    clusterIP: None
+    httpPortName: http
+    httpProtocol: TCP
+    httpPort: 80
+    httpTargetPort: 80
+    httpsPortName: https
+    httpsProtocol: TCP
+    httpsPort: 443
+    httpsTargetPort: 443
+
+deployment:
+  eaa:
+    name: eaa
+
+initContainer:
+  name: alpine
+  image: alpine:latest
+  resource:
+    requests:
+      cpu: 0.1
+    limits:
+      cpu: 0.1
+      memory: 128Mi
+  volumeMounts:
+    certsSec:
+      name: certs-sec
+      mountPath: /root/certs-sec
+    certs:
+      name: certs
+      mountPath: /root/certs
+
+container:
+  name: eaa
+  image: integratedcloudnative/eaa:1.0
+  resource:
+    requests:
+      cpu: 0.1
+    limits:
+      cpu: 1
+      memory: 128Mi
+  volumeMounts:
+    certs:
+      name: certs
+      mountPath: /home/eaa/certs/eaa
+    certsSec:
+      name: certs-sec
+      mountPath: /home/eaa/certs-sec
+
+volumes:
+  certsSec:
+    name: certs-sec
+    secret:
+      secretName: eaa-tls
+  certs:
+    name: certs
+    hostPath:
+      path: /etc/openness/certs/eaa
+
+eaaTls:
+  name: eaa-tls

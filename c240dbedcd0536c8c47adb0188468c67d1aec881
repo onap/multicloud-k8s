@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "47bfcb68_92894b1a",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-04-01T02:29:47Z",
+      "side": 1,
+      "message": "Why is this change required?",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 10
+      },
+      "revId": "c240dbedcd0536c8c47adb0188468c67d1aec881",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

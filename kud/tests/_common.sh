@@ -1120,6 +1120,85 @@ DEPLOYMENT
     popd
 }
 
+# populate_CSAR_eaa() - Create content used for Openness eaa test
+function populate_CSAR_eaa {
+    local csar_id=$1
+
+    _checks_args $csar_id
+    pushd ${CSAR_DIR}/${csar_id}
+
+    cat << POLICY > sample_policy.yml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: eaa-prod-cons-policy
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 10.16.0.0/16
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+POLICY
+
+    cat << DEPLOYMENT > sample_producer.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer
+  template:
+    metadata:
+      labels:
+        app: producer
+    spec:
+      containers:
+      - name: producer
+        image: integratedcloudnative/producer:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+DEPLOYMENT
+
+    cat << DEPLOYMENT > sample_consumer.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+      - name: consumer
+        image: integratedcloudnative/consumer:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+DEPLOYMENT
+
+    popd
+}
+
 # populate_CSAR_rbdefinition() - Function that populates CSAR folder
 # for testing resource bundle definition
 function populate_CSAR_rbdefinition {
@@ -1155,6 +1234,18 @@ function populate_CSAR_fw_rbdefinition {
     # Reuse profile from the edgeX case as it is an empty profile
     tar -czf rb_profile.tar.gz -C $test_folder/vnfs/edgex/profile .
     tar -czf rb_definition.tar.gz -C $test_folder/../demo firewall
+    popd
+}
+
+# populate_CSAR_eaa_rbdefinition() - Function that populates CSAR folder
+# for testing resource bundle definition of openness eaa scenario
+function populate_CSAR_eaa_rbdefinition {
+    _checks_args "$1"
+    pushd "${CSAR_DIR}/$1"
+    print_msg "Create Helm Chart Archives for Openness EAA"
+    rm -f *.tar.gz
+    tar -czf rb_profile.tar.gz -C $test_folder/openness/eaa/profile .
+    tar -czf rb_definition.tar.gz -C $test_folder/openness/eaa/helm eaa
     popd
 }
 

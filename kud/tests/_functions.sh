@@ -193,6 +193,27 @@ function wait_for_pod {
     done
 }
 
+# wait_for_deployment() - Wait until the deployment is ready
+function wait_for_deployment {
+    #Example usage:
+    # wait_for_deployment $DEPLOYMENT_NAME $REPLICAS
+    # wait_for_deployment example_deployment 2
+
+    status="0/"
+
+    while [[ "$status" != $2* ]]; do
+        new_status=`kubectl get deployment -A | grep $1 | awk '{print $3}'`
+        if [[ "$new_status" != "$status" ]]; then
+            status="$new_status"
+        fi
+
+        pod_status=`kubectl get pods -A | grep $1 | awk '{print $4}'`
+        if [[ "$pod_status" == "Err"* ]]; then
+            exit 1
+        fi
+    done
+}
+
 # setup() - Base testing setup shared among functional tests
 function setup {
     if ! $(kubectl version &>/dev/null); then

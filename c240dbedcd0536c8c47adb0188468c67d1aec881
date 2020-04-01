@@ -69,6 +69,46 @@
       "revId": "c240dbedcd0536c8c47adb0188468c67d1aec881",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2aedb48d_b8190542",
+        "filename": "src/orchestrator/utils/types/types.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-01T18:21:48Z",
+      "side": 1,
+      "message": "These look similar?",
+      "range": {
+        "startLine": 25,
+        "startChar": 5,
+        "endLine": 41,
+        "endChar": 1
+      },
+      "revId": "c240dbedcd0536c8c47adb0188468c67d1aec881",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "706fda92_f043e12c",
+        "filename": "src/orchestrator/utils/util-functions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-01T18:21:48Z",
+      "side": 1,
+      "message": "remove functions in the utils-function.go",
+      "revId": "c240dbedcd0536c8c47adb0188468c67d1aec881",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

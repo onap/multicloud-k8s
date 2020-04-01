@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.eaaTls.name }}
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+data:

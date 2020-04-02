@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "dc7d1668_76a2587f",
+        "filename": "kud/tests/openness/eaa/helm/eaa/Chart.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-02T06:18:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eba34857_75330076",
+      "range": {
+        "startLine": 16,
+        "startChar": 13,
+        "endLine": 16,
+        "endChar": 58
+      },
+      "revId": "c161a13f90daf596d025a204cadb5d8d67488f0a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ae0dd613_13a6a856",
         "filename": "kud/tests/openness/eaa/profile/override_values.yaml",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "8232451f_5affe77a",
+        "filename": "kud/tests/openness/eaa/profile/override_values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-02T06:18:31Z",
+      "side": 1,
+      "message": "No, this value is not used.",
+      "parentUuid": "ae0dd613_13a6a856",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 10
+      },
+      "revId": "c161a13f90daf596d025a204cadb5d8d67488f0a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "03fc2839_2248be8b",
         "filename": "kud/tests/plugin_eaa.sh",
         "patchSetId": 2
@@ -59,6 +107,30 @@
       "writtenOn": "2020-04-02T04:16:51Z",
       "side": 1,
       "message": "May use below script to wait for pod ready\nfunction wait_for_pod {\n    status_phase\u003d\"\"\n    while [[ \"$status_phase\" !\u003d \"Running\" ]]; do\n        new_phase\u003d\"$(kubectl get pods -o wide | grep ^$1 | awk \u0027{print $3}\u0027)\"\n        if [[ \"$new_phase\" !\u003d \"$status_phase\" ]]; then\n            status_phase\u003d\"$new_phase\"\n        fi\n        if [[ \"$new_phase\" \u003d\u003d \"Err\"* ]]; then\n            exit 1\n        fi\n    done\n}\n\nwait_for_pod $pod_name",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 8
+      },
+      "revId": "c161a13f90daf596d025a204cadb5d8d67488f0a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "180bacac_9830d26c",
+        "filename": "kud/tests/plugin_eaa.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-02T06:18:31Z",
+      "side": 1,
+      "message": "I find wait_for_pod in _functions.sh as following:\nhttps://github.com/onap/multicloud-k8s/blob/master/kud/tests/_functions.sh#L177\n\nBut this function is different from your script and can\u0027t be used directly because this function use the eaa\u0027s pod name which is generated randomly such as eaa-58757b57bf-v266c. Do you think I should modify wait_for_pod in _functions.sh?",
+      "parentUuid": "03fc2839_2248be8b",
       "range": {
         "startLine": 110,
         "startChar": 0,

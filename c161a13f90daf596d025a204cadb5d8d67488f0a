@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eba34857_75330076",
+        "filename": "kud/tests/openness/eaa/helm/eaa/Chart.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-04-02T04:16:51Z",
+      "side": 1,
+      "message": "Suggest changed to \"OpenNESS EAA Helm Charts for version 19.12\"",
+      "range": {
+        "startLine": 16,
+        "startChar": 13,
+        "endLine": 16,
+        "endChar": 58
+      },
+      "revId": "c161a13f90daf596d025a204cadb5d8d67488f0a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ae0dd613_13a6a856",
+        "filename": "kud/tests/openness/eaa/profile/override_values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-04-02T04:16:51Z",
+      "side": 1,
+      "message": "Is this value used in helm charts?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 10
+      },
+      "revId": "c161a13f90daf596d025a204cadb5d8d67488f0a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "03fc2839_2248be8b",
+        "filename": "kud/tests/plugin_eaa.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-04-02T04:16:51Z",
+      "side": 1,
+      "message": "May use below script to wait for pod ready\nfunction wait_for_pod {\n    status_phase\u003d\"\"\n    while [[ \"$status_phase\" !\u003d \"Running\" ]]; do\n        new_phase\u003d\"$(kubectl get pods -o wide | grep ^$1 | awk \u0027{print $3}\u0027)\"\n        if [[ \"$new_phase\" !\u003d \"$status_phase\" ]]; then\n            status_phase\u003d\"$new_phase\"\n        fi\n        if [[ \"$new_phase\" \u003d\u003d \"Err\"* ]]; then\n            exit 1\n        fi\n    done\n}\n\nwait_for_pod $pod_name",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 8
+      },
+      "revId": "c161a13f90daf596d025a204cadb5d8d67488f0a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

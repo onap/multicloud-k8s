@@ -140,6 +140,30 @@
       "revId": "c161a13f90daf596d025a204cadb5d8d67488f0a",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3186dc4c_bd5c6939",
+        "filename": "kud/tests/plugin_eaa.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-02T10:24:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "180bacac_9830d26c",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 8
+      },
+      "revId": "c161a13f90daf596d025a204cadb5d8d67488f0a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

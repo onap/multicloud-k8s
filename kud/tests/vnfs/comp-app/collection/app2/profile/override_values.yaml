@@ -1,6 +1,6 @@
 service:
     type: ClusterIP
-    name: Prometheus-override-by-file
+    nameOfPort: webPort
     annotations: {}
     labels: {}
     clusterIP: ""

@@ -351,14 +351,14 @@ payload="$(cat <<EOF
             "app-name":"${app1_name}",
             "values":
                {
-                  "collectd_prometheus.service.name":"collectd-override-by-set-value"
+                  "collectd_prometheus.service.targetPort":"9104"
                }
          },
          {
             "app-name":"${app2_name}",
             "values":
                {
-                  "service.name":"Prometheus-override-by-set-value"
+                  "prometheus.service.nameOfPort":"WebPort9090"
                }
          }
       ]

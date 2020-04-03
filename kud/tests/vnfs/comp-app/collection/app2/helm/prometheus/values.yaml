@@ -40,8 +40,8 @@ prometheus:
 
   resources: {}
   service:
+    nameOfPort: web
     type: ClusterIP
-    name: Prometheus-value-file
     annotations: {}
     labels: {}
     clusterIP: ""

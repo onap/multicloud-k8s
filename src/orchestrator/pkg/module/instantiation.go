@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 
-	"github.com/onap/multicloud-k8s/src/orchestrator/utils/types"
 	pkgerrors "github.com/pkg/errors"
 
 	"encoding/base64"
@@ -67,11 +66,11 @@ func getOverrideValuesByAppName(ov []OverrideValues, a string) map[string]string
 
 // GetSortedTemplateForApp returns the sorted templates.
 //It takes in arguments - appName, project, compositeAppName, releaseName, compositeProfileName, array of override values
-func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues []OverrideValues) ([]types.KubernetesResourceTemplate, error) {
+func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues []OverrideValues) ([]helm.KubernetesResourceTemplate, error) {
 
 	log.Println("Processing App.. ", appName)
 
-	var sortedTemplates []types.KubernetesResourceTemplate
+	var sortedTemplates []helm.KubernetesResourceTemplate
 
 	aC, err := NewAppClient().GetAppContent(appName, p, ca, v)
 	if err != nil {
@@ -107,7 +106,7 @@ func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues
 	sortedTemplates, err = helm.NewTemplateClient("", "default", rName,
 		ManifestFileName).Resolve(appContent,
 		appProfileContent, overrideValuesOfAppStr,
-		rName, appName)
+		appName)
 
 	log.Printf("The len of the sortedTemplates :: %d", len(sortedTemplates))
 

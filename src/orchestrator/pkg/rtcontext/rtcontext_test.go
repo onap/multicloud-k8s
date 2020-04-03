@@ -59,7 +59,7 @@ func (c *MockContextDb) Delete(key string) error {
 
 // Delete all function
 func (c *MockContextDb) DeleteAll(key string) error {
-	for kvKey, _ := range c.Items {
+	for kvKey := range c.Items {
 		delete(c.Items, kvKey)
 	}
 	return c.Err
@@ -69,7 +69,7 @@ func (c *MockContextDb) DeleteAll(key string) error {
 func (c *MockContextDb) GetAllKeys(path string) ([]string, error) {
 	var keys []string
 
-	for k, _ := range c.Items {
+	for k := range c.Items {
 		keys = append(keys, string(k))
 	}
 	return keys, c.Err

@@ -19,7 +19,6 @@ package helm
 import (
 	"bytes"
 	utils "github.com/onap/multicloud-k8s/src/orchestrator/utils"
-	"github.com/onap/multicloud-k8s/src/orchestrator/utils/types"
 
 	pkgerrors "github.com/pkg/errors"
 	"log"
@@ -45,6 +44,15 @@ import (
 	"k8s.io/helm/pkg/tiller"
 	"k8s.io/helm/pkg/timeconv"
 )
+
+//KubernetesResourceTemplate - Represents the template that is used to create a particular
+//resource in Kubernetes
+type KubernetesResourceTemplate struct {
+	// Tracks the apiVersion and Kind of the resource
+	GVK schema.GroupVersionKind
+	// Path to the file that contains the resource info
+	FilePath string
+}
 
 // Template is the interface for all helm templating commands
 // Any backend implementation will implement this interface and will
@@ -144,10 +152,10 @@ func (h *TemplateClient) mergeValues(dest map[string]interface{}, src map[string
 
 // GenerateKubernetesArtifacts a mapping of type to fully evaluated helm template
 func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFiles []string,
-	values []string) ([]types.KubernetesResourceTemplate, error) {
+	values []string) ([]KubernetesResourceTemplate, error) {
 
 	var outputDir, chartPath, namespace, releaseName string
-	var retData []types.KubernetesResourceTemplate
+	var retData []KubernetesResourceTemplate
 
 	releaseName = h.releaseName
 	namespace = h.kubeNameSpace
@@ -255,7 +263,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 			return retData, err
 		}
 
-		kres := types.KubernetesResourceTemplate{
+		kres := KubernetesResourceTemplate{
 			GVK:      gvk,
 			FilePath: mfilePath,
 		}
@@ -281,13 +289,20 @@ func getGroupVersionKind(data string) (schema.GroupVersionKind, error) {
 
 // Resolver is an interface exposes the helm related functionalities
 type Resolver interface {
-	Resolve(appContent, appProfileContent []byte, overrideValuesOfAppStr []string, rName string) ([]types.KubernetesResourceTemplate, error)
+	Resolve(appContent, appProfileContent []byte, overrideValuesOfAppStr []string, appName string) ([]KubernetesResourceTemplate, error)
 }
 
 // Resolve function
-func (h *TemplateClient) Resolve(appContent []byte, appProfileContent []byte, overrideValuesOfAppStr []string, rName, appName string) ([]types.KubernetesResourceTemplate, error) {
+func (h *TemplateClient) Resolve(appContent []byte, appProfileContent []byte, overrideValuesOfAppStr []string, appName string) ([]KubernetesResourceTemplate, error) {
 
-	var sortedTemplates []types.KubernetesResourceTemplate
+	var sortedTemplates []KubernetesResourceTemplate
+
+	//chartBasePath is the tmp path where the appContent(rawHelmCharts) is extracted.
+	chartBasePath, err := utils.ExtractTarBall(bytes.NewBuffer(appContent))
+	if err != nil {
+		return sortedTemplates, pkgerrors.Wrap(err, "Extracting appContent")
+	}
+	log.Printf("The chartBasePath :: %s", chartBasePath)
 
 	//prPath is the tmp path where the appProfileContent is extracted.
 	prPath, err := utils.ExtractTarBall(bytes.NewBuffer(appProfileContent))
@@ -296,15 +311,11 @@ func (h *TemplateClient) Resolve(appContent []byte, appProfileContent []byte, ov
 	}
 	log.Printf("The profile path:: %s", prPath)
 
-	prYamlClient, err := utils.ProcessProfileYaml(prPath, h.manifestName)
+	prYamlClient, err := ProcessProfileYaml(prPath, h.manifestName)
 	if err != nil {
 		return sortedTemplates, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}
 	log.Println("Got the profileYamlClient..")
-
-	//chartBasePath is the tmp path where the appContent(rawHelmCharts) is extracted.
-	chartBasePath, err := utils.ExtractTarBall(bytes.NewBuffer(appContent))
-	log.Printf("The chartBasePath :: %s", chartBasePath)
 
 	err = prYamlClient.CopyConfigurationOverrides(chartBasePath)
 	if err != nil {

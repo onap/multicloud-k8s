@@ -1,5 +1,6 @@
 MultiCloud Kubernetes Plugin
 ============================
+.. _master_index:
 
 This plugin is a part of the MultiCloud component in ONAP.
 It will allow ONAP to deploy/manage VM and container based VNFs

@@ -18,11 +18,12 @@ package rtcontext
 
 import (
 	"fmt"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
-	pkgerrors "github.com/pkg/errors"
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
+	pkgerrors "github.com/pkg/errors"
 )
 
 const maxrand = 0x7fffffffffffffff

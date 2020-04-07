@@ -19,10 +19,11 @@ package contextdb
 import (
 	"context"
 	"encoding/json"
+	"time"
+
 	pkgerrors "github.com/pkg/errors"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/pkg/transport"
-	"time"
 )
 
 // EtcdConfig Configuration values needed for Etcd Client

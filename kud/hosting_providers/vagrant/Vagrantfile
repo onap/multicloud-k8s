@@ -10,8 +10,8 @@
 ##############################################################################
 
 box = {
-  :virtualbox => { :name => 'elastic/ubuntu-18.04-x86_64', :version => '20191013.0.0'},
-  :libvirt => { :name => 'generic/ubuntu1804', :version=> '2.0.6'}
+  :virtualbox => { :name => 'elastic/ubuntu-16.04-x86_64', :version => '20180708.0.0' },
+  :libvirt => { :name => 'elastic/ubuntu-16.04-x86_64', :version=> '20180210.0.0'}
 }
 
 require 'yaml'
@@ -122,8 +122,8 @@ Vagrant.configure("2") do |config|
     installer.vm.provision 'shell', privileged: false do |sh|
       sh.env = {'KUD_PLUGIN_ENABLED': 'false', 'OVN_CENTRAL_INTERFACE': 'eth1'}
       sh.inline = <<-SHELL
-        cp /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/insecure_keys/key.pub /home/vagrant/.ssh/id_rsa.pub
-        cp /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/insecure_keys/key /home/vagrant/.ssh/id_rsa
+        cp /vagrant/insecure_keys/key.pub /home/vagrant/.ssh/id_rsa.pub
+        cp /vagrant/insecure_keys/key /home/vagrant/.ssh/id_rsa
         chown vagrant /home/vagrant/.ssh/id_rsa
         chmod 400 /home/vagrant/.ssh/id_rsa
         cd /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/ && ./installer.sh | tee kud_installer.log

@@ -196,3 +196,36 @@ func (h netcontrolintentHandler) deleteHandler(w http.ResponseWriter, r *http.Re
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// Apply handles POST operations to Apply a particular NetControlIntent to the App Context
+func (h netcontrolintentHandler) applyHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	project := vars["project"]
+	compositeApp := vars["composite-app-name"]
+	compositeAppVersion := vars["version"]
+
+	var aci struct {
+		AppContextId string `json:"appContextId"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&aci)
+
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	fmt.Printf("TESTING - net control intent apply : %v\n", aci.AppContextId)
+
+	err = h.client.ApplyNetControlIntent(name, project, compositeApp, compositeAppVersion, aci.AppContextId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

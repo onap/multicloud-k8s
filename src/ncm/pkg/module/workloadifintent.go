@@ -29,11 +29,11 @@ type WorkloadIfIntent struct {
 }
 
 type WorkloadIfIntentSpec struct {
-	IfName      string `json:"interface-name"`
-	NetworkName string `json:"network-name"`
-	DefaultIf   string `json:"default-interface"` // optional, default value is "false"
-	IpAddr      string `json:"ip-address"`        // optional, if not provided then will be dynamically allocated
-	MacAddr     string `json:"mac-address"`       // optional, if not provided then will be dynamically allocated
+	IfName      string `json:"interface"`
+	NetworkName string `json:"name"`
+	DefaultIf   string `json:"defaultGateway"` // optional, default value is "false"
+	IpAddr      string `json:"ipAddress"`      // optional, if not provided then will be dynamically allocated
+	MacAddr     string `json:"macAddress"`     // optional, if not provided then will be dynamically allocated
 }
 
 // WorkloadIfIntentKey is the key structure that is used in the database

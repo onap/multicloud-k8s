@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "629e217b_b38f40af",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-04-08T02:56:53Z",
+      "side": 1,
+      "message": "Run \"go fmt\" command to sort the imports.",
+      "revId": "2c6c07003b2f0c52bc14fdc2e4f54257aae3516a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0dc44257_fd536848",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-04-08T02:56:53Z",
+      "side": 1,
+      "message": "This returns cluster names hence the interface name shall be GetClusterNames\n\nAnd also pass in the app handle as argument, and use it instead of getting from RtcGet?",
+      "revId": "2c6c07003b2f0c52bc14fdc2e4f54257aae3516a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7ab094e8_9e1c109b",
+        "filename": "src/orchestrator/pkg/rtcontext/rtcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-04-08T02:56:53Z",
+      "side": 1,
+      "message": "Run \"go fmt\" to sort the imports",
+      "revId": "2c6c07003b2f0c52bc14fdc2e4f54257aae3516a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

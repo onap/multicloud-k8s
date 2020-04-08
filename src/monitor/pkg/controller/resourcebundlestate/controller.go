@@ -6,7 +6,10 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 
+	appsv1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	v1beta1 "k8s.io/api/extensions/v1beta1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -70,7 +73,49 @@ func (r *reconciler) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 
 	err = r.updateServices(rbstate, rbstate.Spec.Selector.MatchLabels)
 	if err != nil {
-		log.Printf("Error adding services: %v\n", err)
+		log.Printf("Error adding servicestatuses: %v\n", err)
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateConfigMaps(rbstate, rbstate.Spec.Selector.MatchLabels)
+	if err != nil {
+		log.Printf("Error adding configmapstatuses: %v\n", err)
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateDeployments(rbstate, rbstate.Spec.Selector.MatchLabels)
+	if err != nil {
+		log.Printf("Error adding deploymentstatuses: %v\n", err)
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateSecrets(rbstate, rbstate.Spec.Selector.MatchLabels)
+	if err != nil {
+		log.Printf("Error adding secretstatuses: %v\n", err)
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateDaemonSets(rbstate, rbstate.Spec.Selector.MatchLabels)
+	if err != nil {
+		log.Printf("Error adding daemonSetstatuses: %v\n", err)
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateIngresses(rbstate, rbstate.Spec.Selector.MatchLabels)
+	if err != nil {
+		log.Printf("Error adding ingressStatuses: %v\n", err)
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateJobs(rbstate, rbstate.Spec.Selector.MatchLabels)
+	if err != nil {
+		log.Printf("Error adding jobstatuses: %v\n", err)
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateStatefulSets(rbstate, rbstate.Spec.Selector.MatchLabels)
+	if err != nil {
+		log.Printf("Error adding statefulSetstatuses: %v\n", err)
 		return reconcile.Result{}, err
 	}
 
@@ -96,7 +141,16 @@ func (r *reconciler) updateServices(rbstate *v1alpha1.ResourceBundleState,
 		return err
 	}
 
-	rbstate.Status.ServiceStatuses = serviceList.Items
+	rbstate.Status.ServiceStatuses = []corev1.Service{}
+
+	for _, svc := range serviceList.Items {
+		resStatus := corev1.Service{
+			ObjectMeta: svc.ObjectMeta,
+			Status:     svc.Status,
+		}
+		rbstate.Status.ServiceStatuses = append(rbstate.Status.ServiceStatuses, resStatus)
+	}
+
 	return nil
 }
 
@@ -120,6 +174,172 @@ func (r *reconciler) updatePods(rbstate *v1alpha1.ResourceBundleState,
 			Status:     pod.Status,
 		}
 		rbstate.Status.PodStatuses = append(rbstate.Status.PodStatuses, resStatus)
+	}
+
+	return nil
+}
+
+func (r *reconciler) updateConfigMaps(rbstate *v1alpha1.ResourceBundleState,
+	selectors map[string]string) error {
+
+	// Update the CR with the ConfigMaps created as well
+	configMapList := &corev1.ConfigMapList{}
+	err := listResources(r.client, rbstate.Namespace, selectors, configMapList)
+	if err != nil {
+		log.Printf("Failed to list configMaps: %v", err)
+		return err
+	}
+
+	rbstate.Status.ConfigMapStatuses = []corev1.ConfigMap{}
+
+	for _, cm := range configMapList.Items {
+		resStatus := corev1.ConfigMap{
+			ObjectMeta: cm.ObjectMeta,
+		}
+		rbstate.Status.ConfigMapStatuses = append(rbstate.Status.ConfigMapStatuses, resStatus)
+	}
+
+	return nil
+}
+
+func (r *reconciler) updateDeployments(rbstate *v1alpha1.ResourceBundleState,
+	selectors map[string]string) error {
+
+	// Update the CR with the Deployments created as well
+	deploymentList := &appsv1.DeploymentList{}
+	err := listResources(r.client, rbstate.Namespace, selectors, deploymentList)
+	if err != nil {
+		log.Printf("Failed to list deployments: %v", err)
+		return err
+	}
+
+	rbstate.Status.DeploymentStatuses = []appsv1.Deployment{}
+
+	for _, dep := range deploymentList.Items {
+		resStatus := appsv1.Deployment{
+			ObjectMeta: dep.ObjectMeta,
+			Status:     dep.Status,
+		}
+		rbstate.Status.DeploymentStatuses = append(rbstate.Status.DeploymentStatuses, resStatus)
+	}
+
+	return nil
+}
+
+func (r *reconciler) updateSecrets(rbstate *v1alpha1.ResourceBundleState,
+	selectors map[string]string) error {
+
+	// Update the CR with the Secrets created as well
+	secretList := &corev1.SecretList{}
+	err := listResources(r.client, rbstate.Namespace, selectors, secretList)
+	if err != nil {
+		log.Printf("Failed to list secrets: %v", err)
+		return err
+	}
+
+	rbstate.Status.SecretStatuses = []corev1.Secret{}
+
+	for _, sec := range secretList.Items {
+		resStatus := corev1.Secret{
+			ObjectMeta: sec.ObjectMeta,
+		}
+		rbstate.Status.SecretStatuses = append(rbstate.Status.SecretStatuses, resStatus)
+	}
+
+	return nil
+}
+
+func (r *reconciler) updateDaemonSets(rbstate *v1alpha1.ResourceBundleState,
+	selectors map[string]string) error {
+
+	// Update the CR with the DaemonSets created as well
+	daemonSetList := &appsv1.DaemonSetList{}
+	err := listResources(r.client, rbstate.Namespace, selectors, daemonSetList)
+	if err != nil {
+		log.Printf("Failed to list DaemonSets: %v", err)
+		return err
+	}
+
+	rbstate.Status.DaemonSetStatuses = []appsv1.DaemonSet{}
+
+	for _, ds := range daemonSetList.Items {
+		resStatus := appsv1.DaemonSet{
+			ObjectMeta: ds.ObjectMeta,
+			Status:     ds.Status,
+		}
+		rbstate.Status.DaemonSetStatuses = append(rbstate.Status.DaemonSetStatuses, resStatus)
+	}
+
+	return nil
+}
+
+func (r *reconciler) updateIngresses(rbstate *v1alpha1.ResourceBundleState,
+	selectors map[string]string) error {
+
+	// Update the CR with the Ingresses created as well
+	ingressList := &v1beta1.IngressList{}
+	err := listResources(r.client, rbstate.Namespace, selectors, ingressList)
+	if err != nil {
+		log.Printf("Failed to list ingresses: %v", err)
+		return err
+	}
+
+	rbstate.Status.IngressStatuses = []v1beta1.Ingress{}
+
+	for _, ing := range ingressList.Items {
+		resStatus := v1beta1.Ingress{
+			ObjectMeta: ing.ObjectMeta,
+			Status:     ing.Status,
+		}
+		rbstate.Status.IngressStatuses = append(rbstate.Status.IngressStatuses, resStatus)
+	}
+
+	return nil
+}
+
+func (r *reconciler) updateJobs(rbstate *v1alpha1.ResourceBundleState,
+	selectors map[string]string) error {
+
+	// Update the CR with the Services created as well
+	jobList := &v1.JobList{}
+	err := listResources(r.client, rbstate.Namespace, selectors, jobList)
+	if err != nil {
+		log.Printf("Failed to list jobs: %v", err)
+		return err
+	}
+
+	rbstate.Status.JobStatuses = []v1.Job{}
+
+	for _, job := range jobList.Items {
+		resStatus := v1.Job{
+			ObjectMeta: job.ObjectMeta,
+			Status:     job.Status,
+		}
+		rbstate.Status.JobStatuses = append(rbstate.Status.JobStatuses, resStatus)
+	}
+
+	return nil
+}
+
+func (r *reconciler) updateStatefulSets(rbstate *v1alpha1.ResourceBundleState,
+	selectors map[string]string) error {
+
+	// Update the CR with the StatefulSets created as well
+	statefulSetList := &appsv1.StatefulSetList{}
+	err := listResources(r.client, rbstate.Namespace, selectors, statefulSetList)
+	if err != nil {
+		log.Printf("Failed to list statefulSets: %v", err)
+		return err
+	}
+
+	rbstate.Status.StatefulSetStatuses = []appsv1.StatefulSet{}
+
+	for _, sfs := range statefulSetList.Items {
+		resStatus := appsv1.StatefulSet{
+			ObjectMeta: sfs.ObjectMeta,
+			Status:     sfs.Status,
+		}
+		rbstate.Status.StatefulSetStatuses = append(rbstate.Status.StatefulSetStatuses, resStatus)
 	}
 
 	return nil

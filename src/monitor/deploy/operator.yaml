@@ -2,15 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: monitor
+  labels:
+    "emco/deployment-id": "bionic-beaver"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: monitor
+      "emco/deployment-id": "bionic-beaver"
   template:
     metadata:
       labels:
-        name: monitor
+        "emco/deployment-id": "bionic-beaver"
     spec:
       serviceAccountName: monitor
       containers:

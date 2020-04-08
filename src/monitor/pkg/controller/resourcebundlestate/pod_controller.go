@@ -24,7 +24,7 @@ func AddPodController(mgr manager.Manager) error {
 
 func addPodController(mgr manager.Manager, r *podReconciler) error {
 	// Create a new controller
-	c, err := controller.New("ResourceBundleState-controller", mgr, controller.Options{Reconciler: r})
+	c, err := controller.New("Pod-controller", mgr, controller.Options{Reconciler: r})
 	if err != nil {
 		return err
 	}

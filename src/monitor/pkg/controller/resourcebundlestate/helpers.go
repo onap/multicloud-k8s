@@ -12,7 +12,7 @@ import (
 // checkLabel verifies if the expected label exists and returns bool
 func checkLabel(labels map[string]string) bool {
 
-	_, ok := labels["k8splugin.io/rb-inst-id"]
+	_, ok := labels["emco/deployment-id"]
 	if !ok {
 		log.Printf("Pod does not have label. Filter it.")
 		return false
@@ -23,13 +23,13 @@ func checkLabel(labels map[string]string) bool {
 // returnLabel verifies if the expected label exists and returns a map
 func returnLabel(labels map[string]string) map[string]string {
 
-	l, ok := labels["k8splugin.io/rb-inst-id"]
+	l, ok := labels["emco/deployment-id"]
 	if !ok {
 		log.Printf("Pod does not have label. Filter it.")
 		return nil
 	}
 	return map[string]string{
-		"k8splugin.io/rb-inst-id": l,
+		"emco/deployment-id": l,
 	}
 }
 

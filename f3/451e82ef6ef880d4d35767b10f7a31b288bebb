@@ -1,0 +1,7 @@
+Code-Review+2: Jessica Wagantall <jwagantall@linuxfoundation.org>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Submitted-by: Jessica Wagantall <jwagantall@linuxfoundation.org>
+Submitted-at: Wed, 08 Apr 2020 05:40:01 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/105387
+Project: multicloud/k8s
+Branch: refs/heads/master

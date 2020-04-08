@@ -58,11 +58,46 @@ spec:
               items:
                 type: object
               type: array
+            configMapStatuses:
+              items:
+                type: object
+              type: array
+            deploymentStatuses:
+              items:
+                type: object
+              type: array
+            secretStatuses:
+              items:
+                type: object
+              type: array
+            daemonSetStatuses:
+              items:
+                type: object
+              type: array
+            ingressStatuses:
+              items:
+                type: object
+              type: array
+            jobStatuses:
+              items:
+                type: object
+              type: array
+            statefulSetStatuses:
+              items:
+                type: object
+              type: array
           required:
           - ready
           - resourceCount
           - podStatuses
           - serviceStatuses
+          - configMapStatuses
+          - deploymentStatuses
+          - secretStatuses
+          - daemonSetStatuses
+          - ingressStatuses
+          - jobStatuses
+          - statefulSetStatuses
           type: object
   version: v1alpha1
   versions:

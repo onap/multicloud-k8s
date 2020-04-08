@@ -4,10 +4,10 @@ metadata:
   name: example-resourcebundlestate
   namespace: test
   labels:
-    "k8splugin.io/rb-inst-id": "bionic-beaver"
+    "mco/deployment-id": "bionic-beaver"
 spec:
   selector:
     matchLabels:
-      "k8splugin.io/rb-inst-id": "bionic-beaver"
+      "mco/deployment-id": "bionic-beaver"
 status:
   ready: false

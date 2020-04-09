@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba39e988_042734fa",
+        "filename": "kud/tests/README.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-09T12:39:56Z",
+      "side": 1,
+      "message": "This folder contains all the test scripts.",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 56
+      },
+      "revId": "d07d69b45e1dfdacab2deab7b22426337f673790",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bfd5131a_ca303eba",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-09T12:39:56Z",
+      "side": 1,
+      "message": "Better to install ipcalc if ipcalc can\u0027t be found.",
+      "range": {
+        "startLine": 223,
+        "startChar": 4,
+        "endLine": 231,
+        "endChar": 6
+      },
+      "revId": "d07d69b45e1dfdacab2deab7b22426337f673790",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9295196_eca5bb06",
+        "filename": "kud/tests/nfd.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-09T12:39:56Z",
+      "side": 1,
+      "message": "Nit: label_does_not_exist",
+      "range": {
+        "startLine": 60,
+        "startChar": 45,
+        "endLine": 60,
+        "endChar": 63
+      },
+      "revId": "d07d69b45e1dfdacab2deab7b22426337f673790",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e20c96fa_c205188e",
+        "filename": "kud/tests/nfd.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-09T12:39:56Z",
+      "side": 1,
+      "message": "Why comment out create_pod_with_nodeSelector? create_pod_with_nodeSelector should also be executed.",
+      "range": {
+        "startLine": 98,
+        "startChar": 4,
+        "endLine": 98,
+        "endChar": 33
+      },
+      "revId": "d07d69b45e1dfdacab2deab7b22426337f673790",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68743e8b_65237134",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-09T12:39:56Z",
+      "side": 1,
+      "message": "Why comment out create_pod_with_multiple_VF? create_pod_with_multiple_VF should also be executed.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 28
+      },
+      "revId": "d07d69b45e1dfdacab2deab7b22426337f673790",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

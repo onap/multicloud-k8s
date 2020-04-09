@@ -16,6 +16,11 @@
 
 package module
 
+/*
+This file deals with the backend implementation of
+Adding/Querying AppIntents for each application in the composite-app
+*/
+
 import (
 	"encoding/json"
 	"reflect"
@@ -41,13 +46,15 @@ type MetaData struct {
 
 // AllOf consists of AnyOfArray and ClusterNames array
 type AllOf struct {
+	ProviderName     string  `json:"provider-name,omitempty"`
 	ClusterName      string  `json:"cluster-name,omitempty"`
 	ClusterLabelName string  `json:"cluster-label-name,omitempty"`
 	AnyOfArray       []AnyOf `json:"anyOf,omitempty"`
 }
 
-// AnyOf consists of Array of ClusterLabelNames
+// AnyOf consists of Array of ProviderName & ClusterLabelNames
 type AnyOf struct {
+	ProviderName     string `json:"provider-name,omitempty"`
 	ClusterName      string `json:"cluster-name,omitempty"`
 	ClusterLabelName string `json:"cluster-label-name,omitempty"`
 }
@@ -69,7 +76,14 @@ type SpecData struct {
 type AppIntentManager interface {
 	CreateAppIntent(a AppIntent, p string, ca string, v string, i string) (AppIntent, error)
 	GetAppIntent(ai string, p string, ca string, v string, i string) (AppIntent, error)
+	GetAllIntentsByApp(aN, p, ca, v, i string) (SpecData, error)
+	GetAllAppIntents(p, ca, v, i string) (ApplicationsAndClusterInfo, error)
 	DeleteAppIntent(ai string, p string, ca string, v string, i string) error
+}
+
+//AppIntentQueryKey required for query
+type AppIntentQueryKey struct {
+	AppName string `json:"app-name"`
 }
 
 // AppIntentKey is used as primary key
@@ -79,6 +93,28 @@ type AppIntentKey struct {
 	CompositeApp string `json:"compositeapp"`
 	Version      string `json:"compositeappversion"`
 	Intent       string `json:"genericplacement"`
+}
+
+// AppIntentFindByAppKey required for query
+type AppIntentFindByAppKey struct {
+	Project             string `json:"project"`
+	CompositeApp        string `json:"compositeapp"`
+	CompositeAppVersion string `json:"compositeappversion"`
+	Intent              string `json:"genericplacement"`
+	AppName             string `json:"app-name"`
+}
+
+// ApplicationsAndClusterInfo type represents the list of
+type ApplicationsAndClusterInfo struct {
+	ArrayOfAppClusterInfo []AppClusterInfo `json:"applications"`
+}
+
+// AppClusterInfo is a type linking the app and the clusters
+// on which they need to be installed.
+type AppClusterInfo struct {
+	Name       string  `json:"name"`
+	AllOfArray []AllOf `json:"allOf,omitempty"`
+	AnyOfArray []AnyOf `json:"anyOf,omitempty"`
 }
 
 // We will use json marshalling to convert to string to
@@ -105,7 +141,8 @@ func NewAppIntentClient() *AppIntentClient {
 	}
 }
 
-// CreateAppIntent creates an entry for AppIntent in the db. Other input parameters for it - projectName, compositeAppName, version, intentName.
+// CreateAppIntent creates an entry for AppIntent in the db.
+// Other input parameters for it - projectName, compositeAppName, version, intentName.
 func (c *AppIntentClient) CreateAppIntent(a AppIntent, p string, ca string, v string, i string) (AppIntent, error) {
 
 	//Check for the AppIntent already exists here.
@@ -140,7 +177,11 @@ func (c *AppIntentClient) CreateAppIntent(a AppIntent, p string, ca string, v st
 		Intent:       i,
 	}
 
-	err = db.DBconn.Insert(c.storeName, akey, nil, c.tagMetaData, a)
+	qkey := AppIntentQueryKey{
+		AppName: a.Spec.AppName,
+	}
+
+	err = db.DBconn.Insert(c.storeName, akey, qkey, c.tagMetaData, a)
 	if err != nil {
 		return AppIntent{}, pkgerrors.Wrap(err, "Create DB entry error")
 	}
@@ -174,6 +215,71 @@ func (c *AppIntentClient) GetAppIntent(ai string, p string, ca string, v string,
 
 	}
 	return AppIntent{}, pkgerrors.New("Error getting AppIntent")
+}
+
+/*
+GetAllIntentsByApp takes in parameters AppName, CompositeAppName, CompositeNameVersion
+and GenericPlacementIntentName. Returns SpecData which contains
+all the intents for the app.
+*/
+func (c *AppIntentClient) GetAllIntentsByApp(aN, p, ca, v, i string) (SpecData, error) {
+	k := AppIntentFindByAppKey{
+		Project:             p,
+		CompositeApp:        ca,
+		CompositeAppVersion: v,
+		Intent:              i,
+		AppName:             aN,
+	}
+	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
+	if err != nil {
+		return SpecData{}, pkgerrors.Wrap(err, "Get SpecData error")
+	}
+	var a AppIntent
+	err = db.DBconn.Unmarshal(result[0], &a)
+	if err != nil {
+		return SpecData{}, pkgerrors.Wrap(err, "Unmarshalling  SpecData")
+	}
+	return a.Spec, nil
+
+}
+
+/*
+GetAllAppIntents takes in paramaters ProjectName, CompositeAppName, CompositeNameVersion
+and GenericPlacementIntentName. Returns the ApplicationsAndClusterInfo Object - an array of AppClusterInfo
+*/
+func (c *AppIntentClient) GetAllAppIntents(p, ca, v, i string) (ApplicationsAndClusterInfo, error) {
+	k := AppIntentKey{
+		Name:         "",
+		Project:      p,
+		CompositeApp: ca,
+		Version:      v,
+		Intent:       i,
+	}
+	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
+	if err != nil {
+		return ApplicationsAndClusterInfo{}, pkgerrors.Wrap(err, "Get AppClusterInfo error")
+	}
+
+	var a AppIntent
+	var appClusterInfoArray []AppClusterInfo
+
+	if len(result) != 0 {
+		for i := range result {
+			a = AppIntent{}
+			err = db.DBconn.Unmarshal(result[i], &a)
+			if err != nil {
+				return ApplicationsAndClusterInfo{}, pkgerrors.Wrap(err, "Unmarshalling  AppIntent")
+			}
+			appName := a.Spec.AppName
+			allOfArray := a.Spec.Intent.AllOfArray
+			anyOfArray := a.Spec.Intent.AnyOfArray
+			appClusterInfo := AppClusterInfo{appName, allOfArray,
+				anyOfArray}
+			appClusterInfoArray = append(appClusterInfoArray, appClusterInfo)
+		}
+	}
+	applicationsAndClusterInfo := ApplicationsAndClusterInfo{appClusterInfoArray}
+	return applicationsAndClusterInfo, err
 }
 
 // DeleteAppIntent delete an AppIntent

@@ -50,17 +50,21 @@ func TestCreateAppIntent(t *testing.T) {
 					Intent: IntentStruc{
 						AllOfArray: []AllOf{
 							{
-								ClusterName: "edge1",
+								ProviderName: "aws",
+								ClusterName:  "edge1",
 								//ClusterLabelName: "edge1",
 							},
 							{
-								ClusterName: "edge2",
+								ProviderName: "aws",
+								ClusterName:  "edge2",
 								//ClusterLabelName: "edge2",
 							},
 							{
 								AnyOfArray: []AnyOf{
-									{ClusterLabelName: "east-us1"},
-									{ClusterLabelName: "east-us2"},
+									{ProviderName: "aws",
+										ClusterLabelName: "east-us1"},
+									{ProviderName: "aws",
+										ClusterLabelName: "east-us2"},
 									//{ClusterName: "east-us1"},
 									//{ClusterName: "east-us2"},
 								},
@@ -88,17 +92,21 @@ func TestCreateAppIntent(t *testing.T) {
 					Intent: IntentStruc{
 						AllOfArray: []AllOf{
 							{
-								ClusterName: "edge1",
+								ProviderName: "aws",
+								ClusterName:  "edge1",
 								//ClusterLabelName: "edge1",
 							},
 							{
-								ClusterName: "edge2",
+								ProviderName: "aws",
+								ClusterName:  "edge2",
 								//ClusterLabelName: "edge2",
 							},
 							{
 								AnyOfArray: []AnyOf{
-									{ClusterLabelName: "east-us1"},
-									{ClusterLabelName: "east-us2"},
+									{ProviderName: "aws",
+										ClusterLabelName: "east-us1"},
+									{ProviderName: "aws",
+										ClusterLabelName: "east-us2"},
 									//{ClusterName: "east-us1"},
 									//{ClusterName: "east-us2"},
 								},
@@ -197,15 +205,19 @@ func TestGetAppIntent(t *testing.T) {
 					Intent: IntentStruc{
 						AllOfArray: []AllOf{
 							{
-								ClusterName: "edge1",
+								ProviderName: "aws",
+								ClusterName:  "edge1",
 							},
 							{
-								ClusterName: "edge2",
+								ProviderName: "aws",
+								ClusterName:  "edge2",
 							},
 							{
 								AnyOfArray: []AnyOf{
-									{ClusterLabelName: "east-us1"},
-									{ClusterLabelName: "east-us2"},
+									{ProviderName: "aws",
+										ClusterLabelName: "east-us1"},
+									{ProviderName: "aws",
+										ClusterLabelName: "east-us2"},
 								},
 							},
 						},
@@ -230,13 +242,19 @@ func TestGetAppIntent(t *testing.T) {
 								"\"spec\":{\"app-name\": \"SampleApp\"," +
 								"\"intent\": {" +
 								"\"allOf\":[" +
-								"{\"cluster-name\":\"edge1\"}," +
-								"{\"cluster-name\":\"edge2\"}," +
+								"{" +
+								"\"provider-name\":\"aws\"," +
+								"\"cluster-name\":\"edge1\"}," +
+								"{" +
+								"\"provider-name\":\"aws\"," +
+								"\"cluster-name\":\"edge2\"}," +
 								"{" +
 								"\"anyOf\":[" +
 								"{" +
+								"\"provider-name\":\"aws\"," +
 								"\"cluster-label-name\":\"east-us1\"}," +
 								"{" +
+								"\"provider-name\":\"aws\"," +
 								"\"cluster-label-name\":\"east-us2\"}" +
 								"]}]" +
 								"}}}"),

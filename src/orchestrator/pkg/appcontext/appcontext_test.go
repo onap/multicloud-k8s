@@ -82,7 +82,7 @@ func (c *MockRunTimeContext) RtcDeletePair(handle interface{}) error {
 }
 
 func (c *MockRunTimeContext) RtcDeletePrefix(handle interface{}) error {
-	for k, _ := range c.Items {
+	for k := range c.Items {
 		delete(c.Items, k)
 	}
 	return c.Err
@@ -91,7 +91,7 @@ func (c *MockRunTimeContext) RtcDeletePrefix(handle interface{}) error {
 func (c *MockRunTimeContext) RtcGetHandles(handle interface{}) ([]interface{}, error) {
 	var keys []interface{}
 
-	for k, _ := range c.Items {
+	for k := range c.Items {
 		keys = append(keys, string(k))
 	}
 	return keys, c.Err
@@ -226,7 +226,7 @@ func TestAddApp(t *testing.T) {
 			key:           "/context/9345674458787728/",
 		},
 		{
-			label:         "Delete returns error case",
+			label:         "Error case for adding app",
 			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error adding app to run time context:")},
 			key:           "/context/9345674458787728/",
 			expectedError: "Error adding app to run time context:",

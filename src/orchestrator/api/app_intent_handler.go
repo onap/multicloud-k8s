@@ -18,10 +18,12 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 	"io"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
+	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 )
 
 /* Used to store backend implementation objects
@@ -117,6 +119,76 @@ func (h appIntentHandler) getAppIntentHandler(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+}
+
+/*
+getAllIntentsByAppHandler handles the URL:
+/v2/project/{project-name}/composite-apps/{composite-app-name}/{version}/generic-placement-intent/{intent-name}/app-intents?app-name=<app-name>
+*/
+func (h appIntentHandler) getAllIntentsByAppHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	pList := []string{"project-name", "composite-app-name", "composite-app-version", "intent-name"}
+	err := validation.IsValidParameterPresent(vars, pList)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	p := vars["project-name"]
+	ca := vars["composite-app-name"]
+	v := vars["composite-app-version"]
+	i := vars["intent-name"]
+	aN := r.URL.Query().Get("app-name")
+	if aN == "" {
+		http.Error(w, "Missing appName in GET request", http.StatusBadRequest)
+		return
+	}
+
+	specData, err := h.client.GetAllIntentsByApp(aN, p, ca, v, i)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(specData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	return
+
+}
+
+/* getAllAppIntentsHandler handles the URL:
+/v2/project/{project-name}/composite-apps/{composite-app-name}/{version}/generic-placement-intent/{intent-name}/app-intents
+*/
+func (h appIntentHandler) getAllAppIntentsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pList := []string{"project-name", "composite-app-name", "composite-app-version", "intent-name"}
+	err := validation.IsValidParameterPresent(vars, pList)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	p := vars["project-name"]
+	ca := vars["composite-app-name"]
+	v := vars["composite-app-version"]
+	i := vars["intent-name"]
+
+	applicationsAndClusterInfo, err := h.client.GetAllAppIntents(p, ca, v, i)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(applicationsAndClusterInfo)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	return
 
 }
 

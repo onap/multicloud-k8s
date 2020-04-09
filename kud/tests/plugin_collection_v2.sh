@@ -60,10 +60,16 @@ sub_composite_profile_name1="test_composite_profile1"
 sub_composite_profile_name2="test_composite_profile2"
 composite_profile_description="test_composite_profile_description"
 
-genericPlacementIntentName1="test_gen_placement_intent1"
-genericPlacementIntentName2="test_gen_placement_intent2"
+genericPlacementIntentName="test_gen_placement_intent1"
 genericPlacementIntentDesc="test_gen_placement_intent_desc"
 logicalCloud="logical_cloud_name"
+
+appIntentNameForApp1="appIntentForApp1"
+appIntentForApp1Desc="AppIntentForApp1Desc"
+appIntentNameForApp2="appIntentForApp2"
+appIntentForApp2Desc="AppIntentForApp2Desc"
+providerName1="aws"
+providerName2="azure"
 clusterName1="edge1"
 clusterName2="edge2"
 clusterLabelName1="east-us1"
@@ -224,25 +230,7 @@ print_msg "Registering GenericPlacementIntent for app1"
 payload="$(cat <<EOF
 {
    "metadata":{
-      "name":"${genericPlacementIntentName1}",
-      "description":"${genericPlacementIntentDesc}",
-      "userData1":"${userData1}",
-      "userData2":"${userData2}"
-   },
-   "spec":{
-      "logical-cloud":"${logicalCloud}"
-   }
-}
-EOF
-)"
-call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/generic-placement-intents"
-
-
-print_msg "Registering GenericPlacementIntent for app2"
-payload="$(cat <<EOF
-{
-   "metadata":{
-      "name":"${genericPlacementIntentName2}",
+      "name":"${genericPlacementIntentName}",
       "description":"${genericPlacementIntentDesc}",
       "userData1":"${userData1}",
       "userData2":"${userData2}"
@@ -261,8 +249,8 @@ print_msg "Adding placement intent for app1(collectd)"
 payload="$(cat <<EOF
 {
    "metadata":{
-      "name":"${genericPlacementIntentName1}",
-      "description":"${genericPlacementIntentDesc}",
+      "name":"${appIntentNameForApp1}",
+      "description":"${appIntentForApp1Desc}",
       "userData1":"${userData1}",
       "userData2":"${userData2}"
    },
@@ -270,18 +258,21 @@ payload="$(cat <<EOF
       "app-name":"${app1_name}",
       "intent":{
          "allOf":[
-            {
+            {  "provider-name":"${providerName1}",
                "cluster-name":"${clusterName1}"
             },
             {
+               "provider-name":"${providerName2}",
                "cluster-name":"${clusterName2}"
             },
             {
                "anyOf":[
                   {
+                     "provider-name":"${providerName1}",
                      "cluster-label-name":"${clusterLabelName1}"
                   },
                   {
+                     "provider-name":"${providerName2}",
                      "cluster-label-name":"${clusterLabelName2}"
                   }
                ]
@@ -292,14 +283,14 @@ payload="$(cat <<EOF
 }
 EOF
 )"
-call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/generic-placement-intents/${genericPlacementIntentName1}/app-intents"
+call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/generic-placement-intents/${genericPlacementIntentName}/app-intents"
 
 print_msg "Adding placement intent for app2(prometheus)"
 payload="$(cat <<EOF
 {
    "metadata":{
-      "name":"${genericPlacementIntentName2}",
-      "description":"${genericPlacementIntentDesc}",
+      "name":"${appIntentNameForApp2}",
+      "description":"${appIntentForApp2Desc}",
       "userData1":"${userData1}",
       "userData2":"${userData2}"
    },
@@ -308,17 +299,21 @@ payload="$(cat <<EOF
       "intent":{
          "allOf":[
             {
+               "provider-name":"${providerName1}",
                "cluster-name":"${clusterName1}"
             },
             {
+               "provider-name":"${providerName2}",
                "cluster-name":"${clusterName2}"
             },
             {
                "anyOf":[
                   {
+                     "provider-name":"${providerName1}",
                      "cluster-label-name":"${clusterLabelName1}"
                   },
                   {
+                     "provider-name":"${providerName2}",
                      "cluster-label-name":"${clusterLabelName2}"
                   }
                ]
@@ -329,7 +324,7 @@ payload="$(cat <<EOF
 }
 EOF
 )"
-call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/generic-placement-intents/${genericPlacementIntentName2}/app-intents"
+call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/generic-placement-intents/${genericPlacementIntentName}/app-intents"
 # END: Adding placement intent for each app in the composite app.
 
 # BEGIN: Registering DeploymentIntentGroup in the database
@@ -369,7 +364,7 @@ call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${
 # END: Registering DeploymentIntentGroup in the database
 
 # BEGIN: Adding intents to an intent group
-print_msg "Adding two intents to the intent group"
+print_msg "Adding the genericPlacement intent to the deploymentIntent group"
 payload="$(cat <<EOF
 {
    "metadata":{
@@ -380,8 +375,7 @@ payload="$(cat <<EOF
    },
    "spec":{
       "intent":{
-         "generic-placement-intent":"${genericPlacementIntentName1}",
-         "generic-placement-intent":"${genericPlacementIntentName2}"
+         "generic-placement-intent":"${genericPlacementIntentName}"
       }
    }
 }

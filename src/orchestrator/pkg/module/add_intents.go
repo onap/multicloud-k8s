@@ -16,6 +16,11 @@
 
 package module
 
+/*
+This files deals with the backend implementation of adding
+genericPlacementIntents to deployementIntentGroup
+*/
+
 import (
 	"encoding/json"
 	"reflect"

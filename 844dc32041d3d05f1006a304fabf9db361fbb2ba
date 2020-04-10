@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e7cb9227_fb3ac971",
+        "filename": "kud/tests/openness/eaa/profile/override_values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-04-10T04:32:02Z",
+      "side": 1,
+      "message": "if this is not used, suggest remove it.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 13
+      },
+      "revId": "844dc32041d3d05f1006a304fabf9db361fbb2ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

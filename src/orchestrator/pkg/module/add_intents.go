@@ -46,23 +46,22 @@ type IntentMetaData struct {
 
 // IntentSpecData has Intent
 type IntentSpecData struct {
-	Intent IntentObj `json:"intent"`
+	Intent map[string]string `json:"intent"`
 }
 
-// IntentObj has name of the generic placement intent
-type IntentObj struct {
-	Generic string `json:"generic"`
-}
 
 // ListOfIntents is a list of intents
 type ListOfIntents struct {
 	ListOfIntents []map[string]string `json:"intent"`
 }
 
+
 // IntentManager is an interface which exposes the IntentManager functionality
 type IntentManager interface {
 	AddIntent(a Intent, p string, ca string, v string, di string) (Intent, error)
 	GetIntent(i string, p string, ca string, v string, di string) (Intent, error)
+	GetAllIntents(p, ca, v, di string) (ListOfIntents, error)
+	GetIntentByName(i, p, ca, v, di string) (IntentSpecData, error)
 	DeleteIntent(i string, p string, ca string, v string, di string) error
 }
 
@@ -100,13 +99,16 @@ func NewIntentClient() *IntentClient {
 	}
 }
 
-// AddIntent adds a given intent to the deployment-intent-group and stores in the db. Other input parameters for it - projectName, compositeAppName, version, DeploymentIntentgroupName
+/*
+AddIntent adds a given intent to the deployment-intent-group and stores in the db.
+Other input parameters for it - projectName, compositeAppName, version, DeploymentIntentgroupName
+*/
 func (c *IntentClient) AddIntent(a Intent, p string, ca string, v string, di string) (Intent, error) {
 
 	//Check for the AddIntent already exists here.
 	res, err := c.GetIntent(a.MetaData.Name, p, ca, v, di)
 	if !reflect.DeepEqual(res, Intent{}) {
-		return Intent{}, pkgerrors.New("AppIntent already exists")
+		return Intent{}, pkgerrors.New("Intent already exists")
 	}
 
 	//Check if project exists
@@ -142,7 +144,10 @@ func (c *IntentClient) AddIntent(a Intent, p string, ca string, v string, di str
 	return a, nil
 }
 
-// GetIntent returns an Intent
+/*
+GetIntent takes in an IntentName, ProjectName, CompositeAppName, Version and DeploymentIntentGroup.
+It returns the Intent.
+*/
 func (c *IntentClient) GetIntent(i string, p string, ca string, v string, di string) (Intent, error) {
 
 	k := IntentKey{
@@ -155,7 +160,7 @@ func (c *IntentClient) GetIntent(i string, p string, ca string, v string, di str
 
 	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
 	if err != nil {
-		return Intent{}, pkgerrors.Wrap(err, "Get AppIntent error")
+		return Intent{}, pkgerrors.Wrap(err, "Get Intent error")
 	}
 
 	if result != nil {
@@ -167,8 +172,70 @@ func (c *IntentClient) GetIntent(i string, p string, ca string, v string, di str
 		return a, nil
 
 	}
-	return Intent{}, pkgerrors.New("Error getting AppIntent")
+	return Intent{}, pkgerrors.New("Error getting Intent")
 }
+
+
+/*
+GetIntentByName takes in IntentName, projectName, CompositeAppName, CompositeAppVersion
+and deploymentIntentGroupName returns the list of intents under the IntentName.
+*/
+func (c IntentClient) GetIntentByName(i string, p string, ca string, v string, di string) (IntentSpecData, error) {
+	k := IntentKey{
+		Name:                  i,
+		Project:               p,
+		CompositeApp:          ca,
+		Version:               v,
+		DeploymentIntentGroup: di,
+	}
+	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
+	if err != nil {
+		return IntentSpecData{}, pkgerrors.Wrap(err, "Get AppIntent error")
+	}
+	var a Intent
+	err = db.DBconn.Unmarshal(result[0], &a)
+	if err != nil {
+		return IntentSpecData{}, pkgerrors.Wrap(err, "Unmarshalling  Intent")
+	}
+	return a.Spec, nil
+}
+
+
+/*
+GetAllIntents takes in projectName, CompositeAppName, CompositeAppVersion,
+DeploymentIntentName . It returns ListOfIntents.
+*/
+func (c IntentClient) GetAllIntents(p string, ca string, v string, di string) (ListOfIntents, error) {
+	k := IntentKey{
+		Name:                  "",
+		Project:               p,
+		CompositeApp:          ca,
+		Version:               v,
+		DeploymentIntentGroup: di,
+	}
+
+	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
+	if err != nil {
+		return ListOfIntents{}, pkgerrors.Wrap(err, "Get AppIntent error")
+	}
+	var a Intent
+	var listOfMapOfIntents []map[string]string
+
+	if len(result) != 0 {
+		for i := range result {
+			a = Intent{}
+			err = db.DBconn.Unmarshal(result[i], &a)
+			if err != nil {
+				return ListOfIntents{}, pkgerrors.Wrap(err, "Unmarshalling Intent")
+			}
+			//mapOfIntents := ListOfIntents{a.Spec.Intent.ListOfIntents}
+			listOfMapOfIntents = append(listOfMapOfIntents, a.Spec.Intent)
+		}
+		return ListOfIntents{listOfMapOfIntents}, nil
+	}
+	return ListOfIntents{}, err
+}
+
 
 // DeleteIntent deletes a given intent tied to project, composite app and deployment intent group
 func (c IntentClient) DeleteIntent(i string, p string, ca string, v string, di string) error {
@@ -185,5 +252,4 @@ func (c IntentClient) DeleteIntent(i string, p string, ca string, v string, di s
 		return pkgerrors.Wrap(err, "Delete Project entry;")
 	}
 	return nil
-
 }

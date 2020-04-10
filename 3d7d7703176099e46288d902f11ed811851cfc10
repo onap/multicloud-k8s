@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "41a46b4f_27b01b7e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-04-10T04:43:31Z",
+      "side": 1,
+      "message": "cases",
+      "range": {
+        "startLine": 7,
+        "startChar": 35,
+        "endLine": 7,
+        "endChar": 40
+      },
+      "revId": "3d7d7703176099e46288d902f11ed811851cfc10",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "482de2eb_22e8e88b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-04-10T04:43:31Z",
+      "side": 1,
+      "message": "cases",
+      "range": {
+        "startLine": 9,
+        "startChar": 25,
+        "endLine": 9,
+        "endChar": 29
+      },
+      "revId": "3d7d7703176099e46288d902f11ed811851cfc10",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1f1009bd_f3339ccc",
+        "filename": "kud/tests/multus.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-04-10T04:43:31Z",
+      "side": 1,
+      "message": "suggest add \"cniVersion\" also (which seems to be required for k8s1.16+, same comment for below CNIs also.",
+      "range": {
+        "startLine": 57,
+        "startChar": 2,
+        "endLine": 57,
+        "endChar": 8
+      },
+      "revId": "3d7d7703176099e46288d902f11ed811851cfc10",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

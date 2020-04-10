@@ -78,6 +78,8 @@ clusterLabelName2="east-us2"
 deploymentIntentGroupName="test_deployment_intent_group"
 deploymentIntentGroupNameDesc="test_deployment_intent_group_desc"
 releaseName="test"
+intentToBeAddedinDeploymentIntentGroup="name_of_intent_to_be_added_in_deployment_group"
+intentToBeAddedinDeploymentIntentGroupDesc="desc_of_intent_to_be_added_in_deployment_group"
 
 chart_name="edgex"
 profile_name="test_profile"
@@ -369,8 +371,8 @@ print_msg "Adding the genericPlacement intent to the deploymentIntent group"
 payload="$(cat <<EOF
 {
    "metadata":{
-      "name":"${deploymentIntentGroupName}",
-      "description":"${deploymentIntentGroupNameDesc}",
+      "name":"${intentToBeAddedinDeploymentIntentGroup}",
+      "description":"${intentToBeAddedinDeploymentIntentGroupDesc}",
       "userData1":"${userData1}",
       "userData2":"${userData2}"
    },

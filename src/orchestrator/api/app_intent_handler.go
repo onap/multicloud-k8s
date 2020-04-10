@@ -160,7 +160,8 @@ func (h appIntentHandler) getAllIntentsByAppHandler(w http.ResponseWriter, r *ht
 
 }
 
-/* getAllAppIntentsHandler handles the URL:
+/*
+getAllAppIntentsHandler handles the URL:
 /v2/project/{project-name}/composite-apps/{composite-app-name}/{version}/generic-placement-intent/{intent-name}/app-intents
 */
 func (h appIntentHandler) getAllAppIntentsHandler(w http.ResponseWriter, r *http.Request) {

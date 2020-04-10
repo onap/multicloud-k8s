@@ -232,12 +232,12 @@ func (c *AppIntentClient) GetAllIntentsByApp(aN, p, ca, v, i string) (SpecData, 
 	}
 	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
 	if err != nil {
-		return SpecData{}, pkgerrors.Wrap(err, "Get SpecData error")
+		return SpecData{}, pkgerrors.Wrap(err, "Get AppIntent error")
 	}
 	var a AppIntent
 	err = db.DBconn.Unmarshal(result[0], &a)
 	if err != nil {
-		return SpecData{}, pkgerrors.Wrap(err, "Unmarshalling  SpecData")
+		return SpecData{}, pkgerrors.Wrap(err, "Unmarshalling  AppIntent")
 	}
 	return a.Spec, nil
 

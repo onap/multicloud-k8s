@@ -48,6 +48,52 @@
     },
     {
       "key": {
+        "uuid": "4c3d7a2d_1c0a2923",
+        "filename": "kud/tests/_common_test.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-10T05:48:46Z",
+      "side": 1,
+      "message": "Nit: install_ipcalc_deps should be named as install_ipcalc because it\u0027s used to install ipcalc instead of the dependencies.",
+      "range": {
+        "startLine": 26,
+        "startChar": 9,
+        "endLine": 26,
+        "endChar": 28
+      },
+      "revId": "3d7d7703176099e46288d902f11ed811851cfc10",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e4679102_2a032fbd",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-10T05:48:46Z",
+      "side": 1,
+      "message": "Should call function install_ipcalc_deps or install_ipcalc to install ipcalc if ipcalc not found.",
+      "range": {
+        "startLine": 223,
+        "startChar": 4,
+        "endLine": 230,
+        "endChar": 6
+      },
+      "revId": "3d7d7703176099e46288d902f11ed811851cfc10",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1f1009bd_f3339ccc",
         "filename": "kud/tests/multus.sh",
         "patchSetId": 6

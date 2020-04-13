@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "450f8f3f_2f0daef6",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-13T02:15:36Z",
+      "side": 1,
+      "message": "Should install ipcalc when ipcalc not found.",
+      "range": {
+        "startLine": 224,
+        "startChar": 4,
+        "endLine": 233,
+        "endChar": 6
+      },
+      "revId": "26c9345be4444ab3ad4f1bd8a2f6ac8e2643b81c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d5ce7fb_fc35dda9",
+        "filename": "kud/tests/nfd.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-13T01:37:48Z",
+      "side": 1,
+      "message": "Nit: this function should be named as create_pod_yaml_with_affinity instead of create_pod_with_affinity which indicating this function will create a pod.",
+      "range": {
+        "startLine": 22,
+        "startChar": 9,
+        "endLine": 22,
+        "endChar": 33
+      },
+      "revId": "0ec4956f3a7ec856b2245b60d414a5c653994bc0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6b00e1f2_04a6cb03",
+        "filename": "kud/tests/nfd.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-13T01:37:48Z",
+      "side": 1,
+      "message": "Nit: this function should be named as create_pod_yaml_with_nodeSelector instead of create_pod_with_nodeSelector which indicating this function will create a pod.",
+      "range": {
+        "startLine": 68,
+        "startChar": 9,
+        "endLine": 68,
+        "endChar": 37
+      },
+      "revId": "0ec4956f3a7ec856b2245b60d414a5c653994bc0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0d30603_ef7eeb1b",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-13T01:37:48Z",
+      "side": 1,
+      "message": "Nit: this function should be named as create_pod_yaml_with_single_VF instead of create_pod_with_single_VF which indicating this function will create a pod.",
+      "range": {
+        "startLine": 28,
+        "startChar": 9,
+        "endLine": 28,
+        "endChar": 34
+      },
+      "revId": "0ec4956f3a7ec856b2245b60d414a5c653994bc0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dbb1e92a_ee9c5cb6",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-04-13T01:37:48Z",
+      "side": 1,
+      "message": "Nit: this function should be named as create_pod_yaml_with_multiple_VF instead of create_pod_with_multiple_VF which indicating this function will create a pod.",
+      "range": {
+        "startLine": 51,
+        "startChar": 9,
+        "endLine": 51,
+        "endChar": 36
+      },
+      "revId": "0ec4956f3a7ec856b2245b60d414a5c653994bc0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

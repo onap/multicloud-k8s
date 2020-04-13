@@ -121,7 +121,7 @@ func (c *CompositeProfileClient) CreateCompositeProfile(cpf CompositeProfile, p 
 	return cpf, nil
 }
 
-// GetCompositeProfile shall take arguments - name of the composite profile, name of //// the project, name of the composite app and version of the composite app. It shall return the CompositeProfile if its present.
+// GetCompositeProfile shall take arguments - name of the composite profile, name of the project, name of the composite app and version of the composite app. It shall return the CompositeProfile if its present.
 func (c *CompositeProfileClient) GetCompositeProfile(cpf string, p string, ca string, v string) (CompositeProfile, error) {
 	key := CompositeProfileKey{
 		Name:         cpf,
@@ -147,7 +147,7 @@ func (c *CompositeProfileClient) GetCompositeProfile(cpf string, p string, ca st
 	return CompositeProfile{}, pkgerrors.New("Error getting CompositeProfile")
 }
 
-// GetCompositeProfile shall take arguments - name of the composite profile, name of //// the project, name of the composite app and version of the composite app. It shall return the CompositeProfile if its present.
+// GetCompositeProfiles shall take arguments - name of the project, name of the composite profile and version of the composite app. It shall return an array of CompositeProfile.
 func (c *CompositeProfileClient) GetCompositeProfiles(p string, ca string, v string) ([]CompositeProfile, error) {
 	key := CompositeProfileKey{
 		Name:         "",
@@ -175,7 +175,7 @@ func (c *CompositeProfileClient) GetCompositeProfiles(p string, ca string, v str
 	return resp, nil
 }
 
-// DeleteCompositeProfile the intent from the database
+// DeleteCompositeProfile deletes the compsiteApp profile from the database
 func (c *CompositeProfileClient) DeleteCompositeProfile(cpf string, p string, ca string, v string) error {
 	key := CompositeProfileKey{
 		Name:         cpf,

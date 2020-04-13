@@ -154,10 +154,10 @@ function install_addons {
     echo "Installing Kubernetes AddOns"
     _install_ansible
     sudo ansible-galaxy install $verbose -r $kud_infra_folder/galaxy-requirements.yml --ignore-errors
-    ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
+    ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
     for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov qat}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
-        ansible-playbook $verbose -i $kud_inventory $kud_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
+        ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
     done
     echo "Run the test cases if testing_enabled is set to true."
     if [[ "${testing_enabled}" == "true" ]]; then

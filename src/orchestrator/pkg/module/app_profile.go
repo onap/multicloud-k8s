@@ -122,7 +122,7 @@ func (c *AppProfileClient) CreateAppProfile(project, compositeApp, compositeAppV
 	//Check if composite profile exists (success assumes existance of all higher level 'parent' objects)
 	_, err = NewCompositeProfileClient().GetCompositeProfile(compositeProfile, project, compositeApp, compositeAppVersion)
 	if err != nil {
-		return AppProfile{}, pkgerrors.New("Unable to find the project")
+		return AppProfile{}, pkgerrors.New("Unable to find the compositeProfile")
 	}
 
 	// TODO: (after app api is ready) check that the app Spec.AppName exists as part of the composite app

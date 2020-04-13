@@ -19,6 +19,7 @@ package validation
 import (
 	"archive/tar"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"net"
 	"regexp"
@@ -277,4 +278,23 @@ func IsValidNumber(value, min, max int) []string {
 		errs = append(errs, "value greater than maximum")
 	}
 	return errs
+}
+
+/*
+IsValidParameterPresent method takes in a vars map and a array of string parameters
+that you expect to be present in the GET request.
+Returns Nil if all the parameters are present or else shall return error message.
+*/
+func IsValidParameterPresent(vars map[string]string, sp []string) error {
+
+	for i := range sp {
+		v := vars[sp[i]]
+		if v == "" {
+			errMessage := fmt.Sprintf("Missing %v in GET request", sp[i])
+			return fmt.Errorf(errMessage)
+		}
+
+	}
+	return nil
+
 }

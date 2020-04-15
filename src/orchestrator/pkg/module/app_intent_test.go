@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	gic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/genericplacementintentcontroller"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 )
 
@@ -48,7 +49,7 @@ func TestCreateAppIntent(t *testing.T) {
 				Spec: SpecData{
 					AppName: "SampleApp",
 					Intent: IntentStruc{
-						AllOfArray: []AllOf{
+						AllOfArray: []gic.AllOf{
 							{
 								ProviderName: "aws",
 								ClusterName:  "edge1",
@@ -60,7 +61,7 @@ func TestCreateAppIntent(t *testing.T) {
 								//ClusterLabelName: "edge2",
 							},
 							{
-								AnyOfArray: []AnyOf{
+								AnyOfArray: []gic.AnyOf{
 									{ProviderName: "aws",
 										ClusterLabelName: "east-us1"},
 									{ProviderName: "aws",
@@ -71,7 +72,7 @@ func TestCreateAppIntent(t *testing.T) {
 							},
 						},
 
-						AnyOfArray: []AnyOf{},
+						AnyOfArray: []gic.AnyOf{},
 					},
 				},
 			},
@@ -90,7 +91,7 @@ func TestCreateAppIntent(t *testing.T) {
 				Spec: SpecData{
 					AppName: "SampleApp",
 					Intent: IntentStruc{
-						AllOfArray: []AllOf{
+						AllOfArray: []gic.AllOf{
 							{
 								ProviderName: "aws",
 								ClusterName:  "edge1",
@@ -102,7 +103,7 @@ func TestCreateAppIntent(t *testing.T) {
 								//ClusterLabelName: "edge2",
 							},
 							{
-								AnyOfArray: []AnyOf{
+								AnyOfArray: []gic.AnyOf{
 									{ProviderName: "aws",
 										ClusterLabelName: "east-us1"},
 									{ProviderName: "aws",
@@ -112,7 +113,7 @@ func TestCreateAppIntent(t *testing.T) {
 								},
 							},
 						},
-						AnyOfArray: []AnyOf{},
+						AnyOfArray: []gic.AnyOf{},
 					},
 				},
 			},
@@ -203,7 +204,7 @@ func TestGetAppIntent(t *testing.T) {
 				Spec: SpecData{
 					AppName: "SampleApp",
 					Intent: IntentStruc{
-						AllOfArray: []AllOf{
+						AllOfArray: []gic.AllOf{
 							{
 								ProviderName: "aws",
 								ClusterName:  "edge1",
@@ -213,7 +214,7 @@ func TestGetAppIntent(t *testing.T) {
 								ClusterName:  "edge2",
 							},
 							{
-								AnyOfArray: []AnyOf{
+								AnyOfArray: []gic.AnyOf{
 									{ProviderName: "aws",
 										ClusterLabelName: "east-us1"},
 									{ProviderName: "aws",

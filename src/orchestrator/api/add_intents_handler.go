@@ -94,7 +94,6 @@ func (h intentHandler) getIntentByNameHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-
 	mapOfIntents, err := h.client.GetIntentByName(iN, p, ca, v, di)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

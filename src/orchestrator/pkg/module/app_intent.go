@@ -25,8 +25,8 @@ import (
 	"encoding/json"
 	"reflect"
 
+	gic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/genericplacementintentcontroller"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -44,25 +44,10 @@ type MetaData struct {
 	UserData2   string `json:"userData2"`
 }
 
-// AllOf consists of AnyOfArray and ClusterNames array
-type AllOf struct {
-	ProviderName     string  `json:"provider-name,omitempty"`
-	ClusterName      string  `json:"cluster-name,omitempty"`
-	ClusterLabelName string  `json:"cluster-label-name,omitempty"`
-	AnyOfArray       []AnyOf `json:"anyOf,omitempty"`
-}
-
-// AnyOf consists of Array of ProviderName & ClusterLabelNames
-type AnyOf struct {
-	ProviderName     string `json:"provider-name,omitempty"`
-	ClusterName      string `json:"cluster-name,omitempty"`
-	ClusterLabelName string `json:"cluster-label-name,omitempty"`
-}
-
 // IntentStruc consists of AllOfArray and AnyOfArray
 type IntentStruc struct {
-	AllOfArray []AllOf `json:"allOf,omitempty"`
-	AnyOfArray []AnyOf `json:"anyOf,omitempty"`
+	AllOfArray []gic.AllOf `json:"allOf,omitempty"`
+	AnyOfArray []gic.AnyOf `json:"anyOf,omitempty"`
 }
 
 // SpecData consists of appName and intent
@@ -112,9 +97,9 @@ type ApplicationsAndClusterInfo struct {
 // AppClusterInfo is a type linking the app and the clusters
 // on which they need to be installed.
 type AppClusterInfo struct {
-	Name       string  `json:"name"`
-	AllOfArray []AllOf `json:"allOf,omitempty"`
-	AnyOfArray []AnyOf `json:"anyOf,omitempty"`
+	Name       string      `json:"name"`
+	AllOfArray []gic.AllOf `json:"allOf,omitempty"`
+	AnyOfArray []gic.AnyOf `json:"anyOf,omitempty"`
 }
 
 // We will use json marshalling to convert to string to

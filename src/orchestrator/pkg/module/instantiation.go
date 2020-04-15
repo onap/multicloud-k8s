@@ -18,11 +18,13 @@ package module
 
 import (
 	"fmt"
-	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 
-	pkgerrors "github.com/pkg/errors"
+	gic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/genericplacementintentcontroller"
 
 	"encoding/base64"
+
+	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
+	pkgerrors "github.com/pkg/errors"
 	"log"
 )
 
@@ -62,6 +64,30 @@ func getOverrideValuesByAppName(ov []OverrideValues, a string) map[string]string
 		}
 	}
 	return map[string]string{}
+}
+
+/*
+FindGenericPlacementIntent takes in projectName, CompositeAppName, CompositeAppVersion, DeploymentIntentName
+and returns the name of the genericPlacementIntentName. Returns empty value if string not found.
+*/
+func FindGenericPlacementIntent(p, ca, v, di string) (string, error) {
+	var gi string
+	var found bool
+	iList, err := NewIntentClient().GetAllIntents(p, ca, v, di)
+	if err != nil {
+		return gi, err
+	}
+	for _, eachMap := range iList.ListOfIntents {
+		if gi, found := eachMap["generic-placement-intent"]; found {
+			log.Printf("::Name of the generic-placement-intent:: %s", gi)
+			return gi, err
+		}
+	}
+	if found == false {
+		fmt.Println("generic-placement-intent not found !")
+	}
+	return gi, pkgerrors.New("Generic-placement-intent not found")
+
 }
 
 // GetSortedTemplateForApp returns the sorted templates.
@@ -124,6 +150,12 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	overrideValues := dIGrp.Spec.OverrideValuesObj
 	cp := dIGrp.Spec.Profile
 
+	gIntent, err := FindGenericPlacementIntent(p, ca, v, di)
+	if err != nil {
+		return err
+	}
+	log.Printf("The name of the GenPlacIntent:: %s", gIntent)
+
 	log.Printf("dIGrp :: %s, releaseName :: %s and cp :: %s \n", dIGrp.MetaData.Name, rName, cp)
 	allApps, err := NewAppClient().GetApps(p, ca, v)
 	if err != nil {
@@ -136,6 +168,11 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		}
 		log.Printf("Resolved all the templates for app :: %s under the compositeApp...", eachApp.Metadata.Name)
 		log.Printf("sortedTemplates :: %v ", sortedTemplates)
+
+		specData, err := NewAppIntentClient().GetAllIntentsByApp(eachApp.Metadata.Name, p, ca, v, gIntent)
+		listOfClusters := gic.IntentResolver(eachApp.Metadata.Name, specData.Intent.AllOfArray, specData.Intent.AnyOfArray)
+		log.Printf("::listOfClusters:: %v", listOfClusters)
+
 	}
 	log.Printf("Done with instantiation...")
 	return err

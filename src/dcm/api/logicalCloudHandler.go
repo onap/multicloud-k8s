@@ -29,7 +29,9 @@ import (
 
 // logicalCloudHandler is used to store backend implementations objects
 type logicalCloudHandler struct {
-    client module.LogicalCloudManager
+    client module.LogicalCloudManager,
+    clusterClient module.ClusterManager,
+    quotaClient module.QuotaManager,
 }
 
 // CreateHandler handles creation of the logical cloud entry in the database
@@ -156,15 +158,38 @@ func (h logicalCloudHandler) deleteHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request) {
-    /*vars := mux.Vars(r)
+    vars := mux.Vars(r)
     project := vars["project-name"]
-    name := vars["logical-cloud-name"]*/
-    /*ret, err := h.client.Get(project, name)
+    name := vars["logical-cloud-name"]
+
+    // Get logical cloud 
+    lc, err := h.client.Get(project, name)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
-    }*/
+    }
+    
+    // Get Clusters
+    clusters, err := h.clusterClient.GetAllClusters(project, name)
+    
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    
 
-    // Do Some Work
-    // someApplyFunction(project, name, ret)
+    //Get Quotas
+    quotas, err := h.quotaClient.GetAllQuotas(project, name)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    
+    err = module.CreateEtcdContext(lc, clusters, quotas)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    return
 }

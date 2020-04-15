@@ -18,6 +18,7 @@ package appcontext
 
 import (
 	"fmt"
+	"strings"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/rtcontext"
 	pkgerrors "github.com/pkg/errors"
 )
@@ -158,6 +159,36 @@ func (ac *AppContext) GetClusterHandle(appname string, clustername string) (inte
 		}
 	}
 	return nil, pkgerrors.Errorf("No handle was found for the given cluster")
+}
+
+//Returns a list of all clusters for a given app
+func (ac *AppContext) GetClusters(appname string) ([]string, error) {
+	if appname == "" {
+		return nil, pkgerrors.Errorf("Not a valid run time context app name")
+	}
+
+	rh, err := ac.rtc.RtcGet()
+	if err != nil {
+		return nil, err
+	}
+
+	prefix := fmt.Sprintf("%v", rh) + "app/" + appname + "/cluster/"
+	hs, err := ac.rtc.RtcGetHandles(prefix)
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error getting handles for %v", prefix)
+	}
+	var cs []string
+	for _, h := range hs {
+		hstr := fmt.Sprintf("%v", h)
+		ks := strings.Split(hstr, prefix)
+		for _, k := range ks {
+			ck := strings.Split(k, "/")
+			if len(ck) == 2 && ck[1] == "" {
+				cs = append(cs, ck[0])
+			}
+		}
+	}
+	return cs, nil
 }
 
 //Add resource under app and cluster

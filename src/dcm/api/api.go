@@ -36,7 +36,18 @@ func NewRouter(
     if logicalCloudClient == nil {
         logicalCloudClient = module.NewLogicalCloudClient()
     }
-    logicalCloudHandler := logicalCloudHandler{client: logicalCloudClient}
+
+    if clusterClient == nil {
+        clusterClient = module.NewClusterClient()
+    }
+
+    if quotaClient == nil {
+        quotaClient = module.NewQuotaClient()
+    }
+
+    logicalCloudHandler := logicalCloudHandler{client: logicalCloudClient
+        clusterClient: clusterClient
+        quotaClient: clusterClient}
     lcRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
     lcRouter.HandleFunc(
         "/logical-clouds",
@@ -67,9 +78,7 @@ func NewRouter(
         logicalCloudHandler.associateHandler).Methods("GET")*/
 
     // Set up Cluster API
-    if clusterClient == nil {
-        clusterClient = module.NewClusterClient()
-    }
+    
     clusterHandler := clusterHandler{client: clusterClient}
     clusterRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
     clusterRouter.HandleFunc(
@@ -108,9 +117,7 @@ func NewRouter(
         userPermissionHandler.deleteHandler).Methods("DELETE")
 
     // Set up Quota API
-    if quotaClient == nil {
-        quotaClient = module.NewQuotaClient()
-    }
+    
     quotaHandler := quotaHandler{client: quotaClient}
     quotaRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
     quotaRouter.HandleFunc(

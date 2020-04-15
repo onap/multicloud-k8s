@@ -38,7 +38,6 @@ type AppMetaData struct {
 }
 
 //AppContent contains fileContent
-// TODO : This should have been []byte
 type AppContent struct {
 	FileContent string
 }

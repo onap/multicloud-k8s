@@ -47,7 +47,7 @@ func (c *MockEtcd) Delete(key string) error {
 
 func (c *MockEtcd) GetAllKeys(path string) ([]string, error) {
 	var keys []string
-	for k, _ := range c.Items {
+	for k := range c.Items {
 		keys = append(keys, string(k))
 	}
 	return keys, nil

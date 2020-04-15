@@ -105,7 +105,7 @@ func Test_compositeProfileHandler_createHandler(t *testing.T) {
 			cProfClient: &mockCompositeProfileManager{
 				//Items that will be returned by the mocked Client
 				Items: []moduleLib.CompositeProfile{
-					moduleLib.CompositeProfile{
+					{
 						Metadata: moduleLib.CompositeProfileMetadata{
 							Name:        "testCompositeProfile",
 							Description: "Test CompositeProfile used for unit testing",

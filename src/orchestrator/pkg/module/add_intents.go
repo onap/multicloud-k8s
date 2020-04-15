@@ -49,12 +49,10 @@ type IntentSpecData struct {
 	Intent map[string]string `json:"intent"`
 }
 
-
 // ListOfIntents is a list of intents
 type ListOfIntents struct {
 	ListOfIntents []map[string]string `json:"intent"`
 }
-
 
 // IntentManager is an interface which exposes the IntentManager functionality
 type IntentManager interface {
@@ -175,7 +173,6 @@ func (c *IntentClient) GetIntent(i string, p string, ca string, v string, di str
 	return Intent{}, pkgerrors.New("Error getting Intent")
 }
 
-
 /*
 GetIntentByName takes in IntentName, projectName, CompositeAppName, CompositeAppVersion
 and deploymentIntentGroupName returns the list of intents under the IntentName.
@@ -199,7 +196,6 @@ func (c IntentClient) GetIntentByName(i string, p string, ca string, v string, d
 	}
 	return a.Spec, nil
 }
-
 
 /*
 GetAllIntents takes in projectName, CompositeAppName, CompositeAppVersion,
@@ -235,7 +231,6 @@ func (c IntentClient) GetAllIntents(p string, ca string, v string, di string) (L
 	}
 	return ListOfIntents{}, err
 }
-
 
 // DeleteIntent deletes a given intent tied to project, composite app and deployment intent group
 func (c IntentClient) DeleteIntent(i string, p string, ca string, v string, di string) error {

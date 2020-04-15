@@ -17,7 +17,10 @@
 package module
 
 import (
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"gopkg.in/yaml.v2"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -79,6 +82,10 @@ type ClusterKvPairsKey struct {
 	ClusterKvPairsName  string `json:"kvname"`
 }
 
+const SEPARATOR = "+"
+const CONTEXT_CLUSTER_APP = "network-intents"
+const CONTEXT_CLUSTER_RESOURCE = "network-intents"
+
 // ClusterManager is an interface exposes the Cluster functionality
 type ClusterManager interface {
 	CreateClusterProvider(pr ClusterProvider) (ClusterProvider, error)
@@ -88,9 +95,12 @@ type ClusterManager interface {
 	CreateCluster(provider string, pr Cluster, qr ClusterContent) (Cluster, error)
 	GetCluster(provider, name string) (Cluster, error)
 	GetClusterContent(provider, name string) (ClusterContent, error)
+	GetClusterContext(provider, name string) (appcontext.AppContext, error)
 	GetClusters(provider string) ([]Cluster, error)
 	GetClustersWithLabel(provider, label string) ([]string, error)
 	DeleteCluster(provider, name string) error
+	ApplyNetworkIntents(provider, name string) error
+	TerminateNetworkIntents(provider, name string) error
 	CreateClusterLabel(provider, cluster string, pr ClusterLabel) (ClusterLabel, error)
 	GetClusterLabel(provider, cluster, label string) (ClusterLabel, error)
 	GetClusterLabels(provider, cluster string) ([]ClusterLabel, error)
@@ -115,6 +125,7 @@ func NewClusterClient() *ClusterClient {
 			storeName:  "cluster",
 			tagMeta:    "clustermetadata",
 			tagContent: "clustercontent",
+			tagContext: "clustercontext",
 		},
 	}
 }
@@ -294,6 +305,33 @@ func (v *ClusterClient) GetClusterContent(provider, name string) (ClusterContent
 	return ClusterContent{}, pkgerrors.New("Error getting Cluster Content")
 }
 
+// GetClusterContext returns the AppContext for corresponding provider and name
+func (v *ClusterClient) GetClusterContext(provider, name string) (appcontext.AppContext, error) {
+	//Construct key and tag to select the entry
+	key := ClusterKey{
+		ClusterProviderName: provider,
+		ClusterName:         name,
+	}
+
+	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagContext)
+	if err != nil {
+		return appcontext.AppContext{}, pkgerrors.Wrap(err, "Get Cluster Context")
+	}
+
+	//value is a byte array
+	if value != nil {
+		ctxVal := string(value[0])
+		var cc appcontext.AppContext
+		_, err = cc.LoadAppContext(ctxVal)
+		if err != nil {
+			return appcontext.AppContext{}, pkgerrors.Wrap(err, "Reinitializing Cluster AppContext")
+		}
+		return cc, nil
+	}
+
+	return appcontext.AppContext{}, pkgerrors.New("Error getting Cluster AppContext")
+}
+
 // GetClusters returns all the Clusters for corresponding provider
 func (v *ClusterClient) GetClusters(provider string) ([]Cluster, error) {
 	//Construct key and tag to select the entry
@@ -351,12 +389,195 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		ClusterProviderName: provider,
 		ClusterName:         name,
 	}
+	_, err := v.GetClusterContext(provider, name)
+	if err == nil {
+		return pkgerrors.Errorf("Cannot delete cluster until context is deleted: %v, %v", provider, name)
+	}
 
-	err := db.DBconn.Remove(v.db.storeName, key)
+	err = db.DBconn.Remove(v.db.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Cluster Entry;")
 	}
 
+	return nil
+}
+
+// Apply Network Intents associated with a cluster
+func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
+
+	_, err := v.GetClusterContext(provider, name)
+	if err == nil {
+		return pkgerrors.Errorf("Cluster network intents have already been applied: %v, %v", provider, name)
+	}
+
+	type resource struct {
+		name  string
+		value string
+	}
+
+	var resources []resource
+
+	// Find all Network Intents for this cluster
+	networkIntents, err := NewNetworkClient().GetNetworks(provider, name)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error finding Network Intents")
+	}
+	for _, intent := range networkIntents {
+		var crNetwork = CrNetwork{
+			ApiVersion: NETWORK_APIVERSION,
+			Kind:       NETWORK_KIND,
+		}
+		crNetwork.Network = intent
+		// Produce the yaml CR document for each intent
+		y, err := yaml.Marshal(&crNetwork)
+		if err != nil {
+			log.Info("Error marshalling network intent to yaml", log.Fields{
+				"error":  err,
+				"intent": intent,
+			})
+			continue
+		}
+		resources = append(resources, resource{
+			name:  intent.Metadata.Name + SEPARATOR + NETWORK_KIND,
+			value: string(y),
+		})
+	}
+
+	// Find all Provider Network Intents for this cluster
+	providerNetworkIntents, err := NewProviderNetClient().GetProviderNets(provider, name)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error finding Provider Network Intents")
+	}
+	for _, intent := range providerNetworkIntents {
+		var crProviderNet = CrProviderNet{
+			ApiVersion: PROVIDER_NETWORK_APIVERSION,
+			Kind:       PROVIDER_NETWORK_KIND,
+		}
+		crProviderNet.ProviderNet = intent
+		// Produce the yaml CR document for each intent
+		y, err := yaml.Marshal(&crProviderNet)
+		if err != nil {
+			log.Info("Error marshalling provider network intent to yaml", log.Fields{
+				"error":  err,
+				"intent": intent,
+			})
+			continue
+		}
+		resources = append(resources, resource{
+			name:  intent.Metadata.Name + SEPARATOR + PROVIDER_NETWORK_KIND,
+			value: string(y),
+		})
+	}
+
+	if len(resources) == 0 {
+		return nil
+	}
+
+	// Make an app context for the network intent resources
+	context := appcontext.AppContext{}
+	ctxVal, err := context.InitAppContext()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error creating AppContext")
+	}
+	handle, err := context.CreateCompositeApp()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error creating AppContext CompositeApp")
+	}
+
+	// Add an app (fixed value) to the app context
+	apphandle, err := context.AddApp(handle, CONTEXT_CLUSTER_APP)
+	if err != nil {
+		cleanuperr := context.DeleteCompositeApp()
+		if cleanuperr != nil {
+			log.Warn("Error cleaning AppContext CompositeApp create failure", log.Fields{
+				"cluster-provider": provider,
+				"cluster":          name,
+			})
+		}
+		return pkgerrors.Wrap(err, "Error adding App to AppContext")
+	}
+
+	// Add a cluster to the app
+	clusterhandle, err := context.AddCluster(apphandle, provider+SEPARATOR+name)
+	if err != nil {
+		cleanuperr := context.DeleteCompositeApp()
+		if cleanuperr != nil {
+			log.Warn("Error cleaning AppContext after add cluster failure", log.Fields{
+				"cluster-provider": provider,
+				"cluster":          name,
+			})
+		}
+		return pkgerrors.Wrap(err, "Error adding Cluster to AppContext")
+	}
+
+	// add the resources to the app context
+	for _, resource := range resources {
+		_, err = context.AddResource(clusterhandle, resource.name, resource.value)
+		if err != nil {
+			cleanuperr := context.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Warn("Error cleaning AppContext after add resource failure", log.Fields{
+					"cluster-provider": provider,
+					"cluster":          name,
+					"resource":         resource.name,
+				})
+			}
+			return pkgerrors.Wrap(err, "Error adding Resource to AppContext")
+		}
+	}
+
+	// save the context in the cluster db record
+	key := ClusterKey{
+		ClusterProviderName: provider,
+		ClusterName:         name,
+	}
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagContext, ctxVal)
+	if err != nil {
+		cleanuperr := context.DeleteCompositeApp()
+		if cleanuperr != nil {
+			log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
+				"cluster-provider": provider,
+				"cluster":          name,
+			})
+		}
+		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
+	}
+
+	// TODO: call resource synchronizer to instantiate the CRs in the cluster
+
+	return nil
+}
+
+// Terminate Network Intents associated with a cluster
+func (v *ClusterClient) TerminateNetworkIntents(provider, name string) error {
+	context, err := v.GetClusterContext(provider, name)
+	if err != nil {
+		return pkgerrors.Wrapf(err, "Error finding AppContext for cluster: %v, %v", provider, name)
+	}
+
+	// TODO: call resource synchronizer to terminate the CRs in the cluster
+
+	// remove the app context
+	cleanuperr := context.DeleteCompositeApp()
+	if cleanuperr != nil {
+		log.Warn("Error deleted AppContext", log.Fields{
+			"cluster-provider": provider,
+			"cluster":          name,
+		})
+	}
+
+	// remove the app context field from the cluster db record
+	key := ClusterKey{
+		ClusterProviderName: provider,
+		ClusterName:         name,
+	}
+	err = db.DBconn.RemoveTag(v.db.storeName, key, v.db.tagContext)
+	if err != nil {
+		log.Warn("Error removing AppContext from Cluster document", log.Fields{
+			"cluster-provider": provider,
+			"cluster":          name,
+		})
+	}
 	return nil
 }
 

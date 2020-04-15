@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "4c223c79_de767841",
+        "filename": "src/orchestrator/pkg/module/instantiation.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-04-15T23:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4c5ff40_165d8596",
+      "range": {
+        "startLine": 81,
+        "startChar": 26,
+        "endLine": 81,
+        "endChar": 52
+      },
+      "revId": "e94263587eef0ba10e1124423926a8b37b82db63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "456049cc_506e6cd3",
         "filename": "src/orchestrator/pkg/module/instantiation.go",
         "patchSetId": 1
@@ -45,6 +69,30 @@
       "revId": "e94263587eef0ba10e1124423926a8b37b82db63",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5831daa8_6520e747",
+        "filename": "src/orchestrator/pkg/module/instantiation.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-04-15T23:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "456049cc_506e6cd3",
+      "range": {
+        "startLine": 172,
+        "startChar": 12,
+        "endLine": 172,
+        "endChar": 15
+      },
+      "revId": "e94263587eef0ba10e1124423926a8b37b82db63",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

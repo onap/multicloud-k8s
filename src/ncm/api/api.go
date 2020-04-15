@@ -135,6 +135,7 @@ func NewRouter(testClient interface{}) *mux.Router {
 	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{name}", netcontrolintentHandler.putHandler).Methods("PUT")
 	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{name}", netcontrolintentHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{name}", netcontrolintentHandler.deleteHandler).Methods("DELETE")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{name}/apply", netcontrolintentHandler.applyHandler).Methods("POST")
 
 	workloadintentHandler := workloadintentHandler{
 		client: setClient(moduleClient.WorkloadIntent, testClient).(moduleLib.WorkloadIntentManager),

@@ -144,6 +144,27 @@ func (h controllerHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// healthcheck handles GET operations on a particular controller Name
+// Returns a healthcheck reponse from the grpc server of the controller
+func (h controllerHandler) healthCheck(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["controller-name"]
+
+	err := h.client.HealthCheck(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode("healthy")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // Delete handles DELETE operations on a particular controller Name
 func (h controllerHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

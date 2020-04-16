@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"time"
 
+	healthpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/healthcheck"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	rpc "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
@@ -60,6 +61,7 @@ type ControllerManager interface {
 	GetControllers() ([]Controller, error)
 	InitControllers()
 	DeleteController(name string) error
+	HealthCheck(controllerName string) error
 }
 
 // ControllerClient implements the Manager
@@ -97,7 +99,46 @@ func (mc *ControllerClient) CreateController(m Controller, mayExist bool) (Contr
 		return Controller{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
 
+	err = mc.HealthCheck(m.Name)
+	if err != nil {
+		return Controller{}, pkgerrors.Wrap(err, "HealthCheck Failed")
+	}
+
 	return m, nil
+}
+
+// HealthCheck performs a gRPC healthcheck of the provided controller
+func (mc *ControllerClient) HealthCheck(controllerName string) error {
+	var err error
+	var rpcClient healthpb.HealthcheckClient
+	var healthRes *healthpb.HealthCheckResponse
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	c, err := mc.GetController(controllerName)
+	if err != nil {
+		return pkgerrors.Wrapf(err, "HealthCheck - error find controller in db: %v", controllerName)
+	}
+	getConn := rpc.GetRpcConnReq(controllerName, c.Host, c.Port)
+	rpc.RpcCtl <- getConn
+	conn := <-getConn.RespChan
+
+	if conn != nil {
+		rpcClient = healthpb.NewHealthcheckClient(conn)
+		healthReq := new(healthpb.HealthCheckRequest)
+		healthRes, err = rpcClient.HealthCheck(ctx, healthReq)
+	} else {
+		return pkgerrors.Errorf("HealthCheck Failed - Could not get HealthcheckClient: %v", controllerName)
+	}
+
+	if err != nil {
+		return pkgerrors.Wrapf(err, "HealthCheck Failed: %v", controllerName)
+	}
+	log.Info("HealthCheck Passed", log.Fields{
+		"Controller": controllerName,
+		"Result":     healthRes,
+	})
+	return err
 }
 
 // GetController returns the Controller for corresponding name

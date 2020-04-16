@@ -22,7 +22,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+	pkgerrors "github.com/pkg/errors"
 )
 
 // Used to store backend implementations objects
@@ -31,6 +33,43 @@ type controllerHandler struct {
 	// Interface that implements controller operations
 	// We will set this variable with a mock interface for testing
 	client moduleLib.ControllerManager
+}
+
+// Check for valid format of input parameters
+func validateControllerInputs(c moduleLib.Controller) error {
+	// validate metadata
+	err := moduleLib.IsValidMetadata(c.Metadata)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Invalid controller metadata")
+	}
+
+	errs := validation.IsValidName(c.Spec.Host)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid host name for controller %v, errors: %v", c.Spec.Host, errs)
+	}
+
+	errs = validation.IsValidNumber(c.Spec.Port, 0, 65535)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid controller port [%v], errors: %v", c.Spec.Port, errs)
+	}
+
+	found := false
+	for _, val := range moduleLib.CONTROLLER_TYPES {
+		if c.Spec.Type == val {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return pkgerrors.Errorf("Invalid controller type: %v", c.Spec.Type)
+	}
+
+	errs = validation.IsValidNumber(c.Spec.Priority, moduleLib.MinControllerPriority, moduleLib.MaxControllerPriority)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid controller priority = [%v], errors: %v", c.Spec.Priority, errs)
+	}
+
+	return nil
 }
 
 // Create handles creation of the controller entry in the database
@@ -48,12 +87,55 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Name is required.
-	if m.Name == "" {
+	if m.Metadata.Name == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
-	ret, err := h.client.CreateController(m)
+	ret, err := h.client.CreateController(m, false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// Put handles creation or update of the controller entry in the database
+func (h controllerHandler) putHandler(w http.ResponseWriter, r *http.Request) {
+	var m moduleLib.Controller
+	vars := mux.Vars(r)
+	name := vars["controller-name"]
+
+	err := json.NewDecoder(r.Body).Decode(&m)
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Name is required.
+	if m.Metadata.Name == "" {
+		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+		return
+	}
+
+	// name in URL should match name in body
+	if m.Metadata.Name != name {
+		http.Error(w, "Mismatched name in PUT request", http.StatusBadRequest)
+		return
+	}
+
+	ret, err := h.client.CreateController(m, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -73,11 +155,23 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 func (h controllerHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["controller-name"]
+	var ret interface{}
+	var err error
 
-	ret, err := h.client.GetController(name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	// handle the get all controllers case
+	if len(name) == 0 {
+		ret, err = h.client.GetControllers()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+
+		ret, err = h.client.GetController(name)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4692a61f_9b68e3f6",
+        "filename": "src/ncm/pkg/module/cluster.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-16T00:37:47Z",
+      "side": 1,
+      "message": "One resource in per resource file is required. Other controllers may need to make more changes for example resource syn needs to tag the resources for monitoring.",
+      "range": {
+        "startLine": 469,
+        "startChar": 2,
+        "endLine": 469,
+        "endChar": 82
+      },
+      "revId": "66dd2da22deeacafbb134829d0889d53e3b1e310",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

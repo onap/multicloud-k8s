@@ -28,6 +28,8 @@ import (
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 )
 
 func main() {
@@ -56,12 +58,18 @@ func main() {
 		Addr:    ":" + config.GetConfiguration().ServicePort,
 	}
 
+	go rpc.HandleRpcConnections()
+	module.NewControllerClient().InitControllers()
+
 	connectionsClose := make(chan struct{})
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)
 		<-c
 		httpServer.Shutdown(context.Background())
+		closeRpc := rpc.GetRpcConnReq("", "", "")
+		rpc.RpcCtl <- closeRpc
+		<-closeRpc.RespChan
 		close(connectionsClose)
 	}()
 

@@ -17,10 +17,13 @@
 package module
 
 import (
+	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	rpc "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -55,6 +58,7 @@ type ControllerManager interface {
 	CreateController(ms Controller, mayExist bool) (Controller, error)
 	GetController(name string) (Controller, error)
 	GetControllers() ([]Controller, error)
+	InitControllers()
 	DeleteController(name string) error
 }
 
@@ -156,6 +160,19 @@ func (mc *ControllerClient) GetControllers() ([]Controller, error) {
 	return resp, nil
 }
 
+// InitControllers initializes connctions for controllers in the DB
+func (mc *ControllerClient) InitControllers() {
+	vals, _ := mc.GetControllers()
+	for _, v := range vals {
+		log.Info("Initializing RPC connection for controller", log.Fields{
+			"Controller": v.Name,
+		})
+		getConn := rpc.GetRpcConnReq(v.Name, v.Host, v.Port)
+		rpc.RpcCtl <- getConn
+		<-getConn.RespChan
+	}
+}
+
 // DeleteController the  Controller from database
 func (mc *ControllerClient) DeleteController(name string) error {
 
@@ -167,5 +184,11 @@ func (mc *ControllerClient) DeleteController(name string) error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Controller Entry;")
 	}
+
+	// send message to close rpc connection
+	rmConn := rpc.GetRpcConnReq(name, "", "")
+	rpc.RpcCtl <- rmConn
+	<-rmConn.RespChan
+
 	return nil
 }

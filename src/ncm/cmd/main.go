@@ -15,8 +15,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,14 +26,59 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/onap/multicloud-k8s/src/ncm/api"
+	register "github.com/onap/multicloud-k8s/src/ncm/pkg/grpc"
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/grpc/contextupdateserver"
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/grpc/healthcheckserver"
+	updatepb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/contextupdate"
+	healthpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/healthcheck"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/testdata"
 )
 
-func main() {
+func startGrpcServer() error {
+	var tls bool
+	var certFile string
+	var keyFile string
 
+	tls = false
+	certFile = ""
+	keyFile = ""
+
+	host, port := register.GetServerHostPort()
+
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+	if err != nil {
+		log.Fatalf("Could not listen to port: %v", err)
+	}
+	var opts []grpc.ServerOption
+	if tls {
+		if certFile == "" {
+			certFile = testdata.Path("server.pem")
+		}
+		if keyFile == "" {
+			keyFile = testdata.Path("server.key")
+		}
+		creds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
+		if err != nil {
+			log.Fatalf("Could not generate credentials %v", err)
+		}
+		opts = []grpc.ServerOption{grpc.Creds(creds)}
+	}
+	grpcServer := grpc.NewServer(opts...)
+	healthpb.RegisterHealthcheckServer(grpcServer, healthcheckserver.NewHealthcheckServer())
+	updatepb.RegisterContextupdateServer(grpcServer, contextupdateserver.NewContextupdateServer())
+
+	log.Println("Starting Network Configuration Manager gRPC Server")
+	grpcServer.Serve(lis)
+	return nil
+}
+
+func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	err := db.InitializeDatabaseConnection("mco")
@@ -54,6 +101,18 @@ func main() {
 	httpServer := &http.Server{
 		Handler: loggedRouter,
 		Addr:    ":" + config.GetConfiguration().ServicePort,
+	}
+
+	go func() {
+		err := startGrpcServer()
+		if err != nil {
+			log.Fatalf("GRPC server failed to start")
+		}
+	}()
+	// Register GRPC server to the database
+	err = register.RegisterGrpcServer(register.GetServerHostPort())
+	if err != nil {
+		log.Fatalf("GRPC server failed to register with DB")
 	}
 
 	connectionsClose := make(chan struct{})

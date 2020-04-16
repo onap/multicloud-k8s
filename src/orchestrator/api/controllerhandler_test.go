@@ -40,7 +40,7 @@ type mockControllerManager struct {
 	Err   error
 }
 
-func (m *mockControllerManager) CreateController(inp moduleLib.Controller) (moduleLib.Controller, error) {
+func (m *mockControllerManager) CreateController(inp moduleLib.Controller, mayExist bool) (moduleLib.Controller, error) {
 	if m.Err != nil {
 		return moduleLib.Controller{}, m.Err
 	}
@@ -54,6 +54,14 @@ func (m *mockControllerManager) GetController(name string) (moduleLib.Controller
 	}
 
 	return m.Items[0], nil
+}
+
+func (m *mockControllerManager) GetControllers() ([]moduleLib.Controller, error) {
+	if m.Err != nil {
+		return []moduleLib.Controller{}, m.Err
+	}
+
+	return m.Items, nil
 }
 
 func (m *mockControllerManager) DeleteController(name string) error {
@@ -77,22 +85,33 @@ func TestControllerCreateHandler(t *testing.T) {
 			label:        "Create Controller",
 			expectedCode: http.StatusCreated,
 			reader: bytes.NewBuffer([]byte(`{
-				"name":"testController",
+                "metadata": {
+				"name":"testController"
+				},
+				"spec": {
 				"ip-address":"10.188.234.1",
-				"port":8080
+				"port":8080 }
 				}`)),
 			expected: moduleLib.Controller{
-				Name: "testController",
-				Host: "10.188.234.1",
-				Port: 8080,
+				Metadata: moduleLib.Metadata{
+					Name: "testController",
+				},
+				Spec: moduleLib.ControllerSpec{
+					Host: "10.188.234.1",
+					Port: 8080,
+				},
 			},
 			controllerClient: &mockControllerManager{
 				//Items that will be returned by the mocked Client
 				Items: []moduleLib.Controller{
 					{
-						Name: "testController",
-						Host: "10.188.234.1",
-						Port: 8080,
+						Metadata: moduleLib.Metadata{
+							Name: "testController",
+						},
+						Spec: moduleLib.ControllerSpec{
+							Host: "10.188.234.1",
+							Port: 8080,
+						},
 					},
 				},
 			},
@@ -144,17 +163,25 @@ func TestControllerGetHandler(t *testing.T) {
 			label:        "Get Controller",
 			expectedCode: http.StatusOK,
 			expected: moduleLib.Controller{
-				Name: "testController",
-				Host: "10.188.234.1",
-				Port: 8080,
+				Metadata: moduleLib.Metadata{
+					Name: "testController",
+				},
+				Spec: moduleLib.ControllerSpec{
+					Host: "10.188.234.1",
+					Port: 8080,
+				},
 			},
 			name: "testController",
 			controllerClient: &mockControllerManager{
 				Items: []moduleLib.Controller{
 					{
-						Name: "testController",
-						Host: "10.188.234.1",
-						Port: 8080,
+						Metadata: moduleLib.Metadata{
+							Name: "testController",
+						},
+						Spec: moduleLib.ControllerSpec{
+							Host: "10.188.234.1",
+							Port: 8080,
+						},
 					},
 				},
 			},

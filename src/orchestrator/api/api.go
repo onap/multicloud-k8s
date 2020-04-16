@@ -111,7 +111,8 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{app-profile}", appProfileHandler.deleteAppProfileHandler).Methods("DELETE")
 
 	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("POST")
-	router.HandleFunc("/controllers", controlHandler.createHandler).Methods("PUT")
+	router.HandleFunc("/controllers", controlHandler.getHandler).Methods("GET")
+	router.HandleFunc("/controllers/{controller-name}", controlHandler.putHandler).Methods("PUT")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.getHandler).Methods("GET")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.deleteHandler).Methods("DELETE")
 	//setting routes for genericPlacementIntent

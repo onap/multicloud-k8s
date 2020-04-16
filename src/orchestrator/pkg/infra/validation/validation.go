@@ -23,6 +23,7 @@ import (
 	"io"
 	"net"
 	"regexp"
+	"strconv"
 	"strings"
 
 	pkgerrors "github.com/pkg/errors"
@@ -275,6 +276,28 @@ func IsValidNumber(value, min, max int) []string {
 		errs = append(errs, "value less than minimum")
 	}
 	if value > max {
+		errs = append(errs, "value greater than maximum")
+	}
+	return errs
+}
+
+func IsValidNumberStr(value string, min, max int) []string {
+	var errs []string
+
+	if min > max {
+		errs = append(errs, "invalid constraints")
+		return errs
+	}
+
+	n, err := strconv.Atoi(value)
+	if err != nil {
+		errs = append(errs, err.Error())
+		return errs
+	}
+	if n < min {
+		errs = append(errs, "value less than minimum")
+	}
+	if n > max {
 		errs = append(errs, "value greater than maximum")
 	}
 	return errs

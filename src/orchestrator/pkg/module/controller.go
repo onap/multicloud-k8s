@@ -27,12 +27,23 @@ import (
 // Controller contains the parameters needed for Controllers
 // It implements the interface for managing the Controllers
 type Controller struct {
-	Name string `json:"name"`
-
-	Host string `json:"host"`
-
-	Port int64 `json:"port"`
+	Metadata Metadata       `json:"metadata"`
+	Spec     ControllerSpec `json:"spec"`
 }
+
+type ControllerSpec struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Type     string `json:"type"`
+	Priority int    `json:"priority"`
+}
+
+const MinControllerPriority = 1
+const MaxControllerPriority = 1000000
+const CONTROLLER_TYPE_ACTION string = "action"
+const CONTROLLER_TYPE_PLACEMENT string = "placement"
+
+var CONTROLLER_TYPES = [...]string{CONTROLLER_TYPE_ACTION, CONTROLLER_TYPE_PLACEMENT}
 
 // ControllerKey is the key structure that is used in the database
 type ControllerKey struct {
@@ -52,8 +63,9 @@ func (mk ControllerKey) String() string {
 
 // ControllerManager is an interface exposes the Controller functionality
 type ControllerManager interface {
-	CreateController(ms Controller) (Controller, error)
+	CreateController(ms Controller, mayExist bool) (Controller, error)
 	GetController(name string) (Controller, error)
+	GetControllers() ([]Controller, error)
 	DeleteController(name string) error
 }
 
@@ -74,20 +86,20 @@ func NewControllerClient() *ControllerClient {
 }
 
 // CreateController a new collection based on the Controller
-func (mc *ControllerClient) CreateController(m Controller) (Controller, error) {
+func (mc *ControllerClient) CreateController(m Controller, mayExist bool) (Controller, error) {
 
 	//Construct the composite key to select the entry
 	key := ControllerKey{
-		ControllerName: m.Name,
+		ControllerName: m.Metadata.Name,
 	}
 
 	//Check if this Controller already exists
-	_, err := mc.GetController(m.Name)
-	if err == nil {
+	_, err := mc.GetController(m.Metadata.Name)
+	if err == nil && !mayExist {
 		return Controller{}, pkgerrors.New("Controller already exists")
 	}
 
-	err = db.DBconn.Create(mc.collectionName, key, mc.tagMeta, m)
+	err = db.DBconn.Insert(mc.collectionName, key, nil, mc.tagMeta, m)
 	if err != nil {
 		return Controller{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -102,15 +114,14 @@ func (mc *ControllerClient) GetController(name string) (Controller, error) {
 	key := ControllerKey{
 		ControllerName: name,
 	}
-	value, err := db.DBconn.Read(mc.collectionName, key, mc.tagMeta)
+	value, err := db.DBconn.Find(mc.collectionName, key, mc.tagMeta)
 	if err != nil {
 		return Controller{}, pkgerrors.Wrap(err, "Get Controller")
 	}
 
-	//value is a byte array
 	if value != nil {
 		microserv := Controller{}
-		err = db.DBconn.Unmarshal(value, &microserv)
+		err = db.DBconn.Unmarshal(value[0], &microserv)
 		if err != nil {
 			return Controller{}, pkgerrors.Wrap(err, "Unmarshaling Value")
 		}
@@ -120,6 +131,42 @@ func (mc *ControllerClient) GetController(name string) (Controller, error) {
 	return Controller{}, pkgerrors.New("Error getting Controller")
 }
 
+// GetControllers returns all the  Controllers that are registered
+func (mc *ControllerClient) GetControllers() ([]Controller, error) {
+
+	//Construct the composite key to select the entry
+	key := ControllerKey{
+		ControllerName: "",
+	}
+
+	var resp []Controller
+	values, err := db.DBconn.Find(mc.collectionName, key, mc.tagMeta)
+	if err != nil {
+		return []Controller{}, pkgerrors.Wrap(err, "Get Controller")
+	}
+
+	for _, value := range values {
+		microserv := Controller{}
+		err = db.DBconn.Unmarshal(value, &microserv)
+		if err != nil {
+			return []Controller{}, pkgerrors.Wrap(err, "Unmarshaling Value")
+		}
+
+		// run healthcheck
+		/*
+			err = mc.HealthCheck(microserv.Name)
+			if err != nil {
+				log.Warn("HealthCheck Failed", log.Fields{
+					"Controller": microserv.Name,
+				})
+			}
+		*/
+		resp = append(resp, microserv)
+	}
+
+	return resp, nil
+}
+
 // DeleteController the  Controller from database
 func (mc *ControllerClient) DeleteController(name string) error {
 
@@ -127,7 +174,7 @@ func (mc *ControllerClient) DeleteController(name string) error {
 	key := ControllerKey{
 		ControllerName: name,
 	}
-	err := db.DBconn.Delete(name, key, mc.tagMeta)
+	err := db.DBconn.Remove(mc.collectionName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Controller Entry;")
 	}

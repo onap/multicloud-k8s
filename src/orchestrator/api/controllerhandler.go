@@ -53,7 +53,50 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	ret, err := h.client.CreateController(m)
+	ret, err := h.client.CreateController(m, false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// Put handles creation or update of the controller entry in the database
+func (h controllerHandler) putHandler(w http.ResponseWriter, r *http.Request) {
+	var m moduleLib.Controller
+	vars := mux.Vars(r)
+	name := vars["name"]
+
+	err := json.NewDecoder(r.Body).Decode(&m)
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Name is required.
+	if m.Name == "" {
+		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+		return
+	}
+
+	// name in URL should match name in body
+	if m.Name != name {
+		http.Error(w, "Mismatched name in PUT request", http.StatusBadRequest)
+		return
+	}
+
+	ret, err := h.client.CreateController(m, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -73,11 +116,23 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 func (h controllerHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["controller-name"]
+	var ret interface{}
+	var err error
 
-	ret, err := h.client.GetController(name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	// handle the get all controllers case
+	if len(name) == 0 {
+		ret, err = h.client.GetControllers()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+
+		ret, err = h.client.GetController(name)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

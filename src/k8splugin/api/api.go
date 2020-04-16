@@ -54,10 +54,11 @@ func NewRouter(defClient rb.DefinitionManager,
 	//Setup the broker handler here
 	//Use the base router without any path prefixes
 	brokerHandler := brokerInstanceHandler{client: instClient}
-	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload", brokerHandler.createHandler).Methods("POST")
-	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}", brokerHandler.getHandler).Methods("GET")
-	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload", brokerHandler.findHandler).Queries("name", "{name}").Methods("GET")
-	router.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}", brokerHandler.deleteHandler).Methods("DELETE")
+	brokerRouter := router.PathPrefix("/v1").Subrouter()
+	brokerRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload", brokerHandler.createHandler).Methods("POST")
+	brokerRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}", brokerHandler.getHandler).Methods("GET")
+	brokerRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload", brokerHandler.findHandler).Queries("name", "{name}").Methods("GET")
+	brokerRouter.HandleFunc("/{cloud-owner}/{cloud-region}/infra_workload/{instID}", brokerHandler.deleteHandler).Methods("DELETE")
 
 	//Setup the connectivity api handler here
 	if connectionClient == nil {

@@ -312,7 +312,7 @@ func TestBrokerCreateHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 
-			request := httptest.NewRequest("POST", "/cloudowner/cloudregion/infra_workload", testCase.input)
+			request := httptest.NewRequest("POST", "/v1/cloudowner/cloudregion/infra_workload", testCase.input)
 			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 			defer resp.Body.Close()
 
@@ -408,7 +408,7 @@ func TestBrokerGetHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
+			request := httptest.NewRequest("GET", "/v1/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
 			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
@@ -488,7 +488,7 @@ func TestBrokerFindHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/cloudowner/cloudregion/infra_workload?name="+testCase.input, nil)
+			request := httptest.NewRequest("GET", "/v1/cloudowner/cloudregion/infra_workload?name="+testCase.input, nil)
 			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
@@ -550,7 +550,7 @@ func TestBrokerDeleteHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("DELETE", "/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
+			request := httptest.NewRequest("DELETE", "/v1/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
 			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {

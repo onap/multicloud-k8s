@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c26867d_b4ff5369",
+        "filename": "releases/0.6.0-container.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1889
+      },
+      "writtenOn": "2020-04-16T00:19:40Z",
+      "side": 1,
+      "message": "is this version appropriate for a released docker image? You might need remove the -SNAPSHOT, which complies to community convention. Thanks",
+      "range": {
+        "startLine": 8,
+        "startChar": 16,
+        "endLine": 8,
+        "endChar": 30
+      },
+      "revId": "d3a9c01c0f5b95dfe052c8a4c915b6e98af9032f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

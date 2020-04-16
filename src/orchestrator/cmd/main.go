@@ -29,7 +29,6 @@ import (
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 )
 
 func main() {
@@ -59,7 +58,6 @@ func main() {
 	}
 
 	go rpc.HandleRpcConnections()
-	module.NewControllerClient().InitControllers()
 
 	connectionsClose := make(chan struct{})
 	go func() {

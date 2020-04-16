@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	rpc "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
 	pkgerrors "github.com/pkg/errors"
 )
@@ -158,19 +157,6 @@ func (mc *ControllerClient) GetControllers() ([]Controller, error) {
 	}
 
 	return resp, nil
-}
-
-// InitControllers initializes connctions for controllers in the DB
-func (mc *ControllerClient) InitControllers() {
-	vals, _ := mc.GetControllers()
-	for _, v := range vals {
-		log.Info("Initializing RPC connection for controller", log.Fields{
-			"Controller": v.Metadata.Name,
-		})
-		getConn := rpc.GetRpcConnReq(v.Metadata.Name, v.Spec.Host, v.Spec.Port)
-		rpc.RpcCtl <- getConn
-		<-getConn.RespChan
-	}
 }
 
 // DeleteController the  Controller from database

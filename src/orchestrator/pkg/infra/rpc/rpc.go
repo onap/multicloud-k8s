@@ -14,14 +14,17 @@ limitations under the License.
 package rpc
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	pkgerrors "github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/testdata"
 )
@@ -64,14 +67,9 @@ func HandleRpcConnections() {
 	}
 	rpcConnections := make(map[string]rpcInfo)
 
-	fmt.Println("Handling RPC connections")
-
 	for {
-		fmt.Println("Waiting for connection request ...")
 		select {
 		case r := <-RpcCtl:
-			fmt.Printf("Received request for %v\n", r.Name)
-
 			// Handle shutdown request
 			if r.Name == "" {
 				fmt.Println("Shutting done RPC connection manager")
@@ -131,6 +129,18 @@ func HandleRpcConnections() {
 						})
 					}
 				} else {
+					if val.conn.GetState() == connectivity.TransientFailure {
+						val.conn.ResetConnectBackoff()
+						ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+						if !val.conn.WaitForStateChange(ctx, connectivity.TransientFailure) {
+							log.Warn("Error re-establishing RPC connection", log.Fields{
+								"Server": r.Name,
+								"Host":   val.host,
+								"Port":   val.port,
+							})
+						}
+						cancel()
+					}
 					r.RespChan <- val.conn
 					continue
 				}

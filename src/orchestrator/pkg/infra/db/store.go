@@ -64,6 +64,9 @@ type Store interface {
 
 	// Remove all the document(s) matching the key
 	RemoveAll(coll string, key Key) error
+
+	// Remove the specifiec tag from the document matching the key
+	RemoveTag(coll string, key Key, tag string) error
 }
 
 // CreateDBClient creates the DB client

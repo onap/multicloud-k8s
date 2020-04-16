@@ -20,7 +20,8 @@ import (
 	"encoding/json"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	rpc "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -66,6 +67,7 @@ type ControllerManager interface {
 	CreateController(ms Controller, mayExist bool) (Controller, error)
 	GetController(name string) (Controller, error)
 	GetControllers() ([]Controller, error)
+	InitControllers()
 	DeleteController(name string) error
 }
 
@@ -152,19 +154,23 @@ func (mc *ControllerClient) GetControllers() ([]Controller, error) {
 			return []Controller{}, pkgerrors.Wrap(err, "Unmarshaling Value")
 		}
 
-		// run healthcheck
-		/*
-			err = mc.HealthCheck(microserv.Name)
-			if err != nil {
-				log.Warn("HealthCheck Failed", log.Fields{
-					"Controller": microserv.Name,
-				})
-			}
-		*/
 		resp = append(resp, microserv)
 	}
 
 	return resp, nil
+}
+
+// InitControllers initializes connctions for controllers in the DB
+func (mc *ControllerClient) InitControllers() {
+	vals, _ := mc.GetControllers()
+	for _, v := range vals {
+		log.Info("Initializing RPC connection for controller", log.Fields{
+			"Controller": v.Metadata.Name,
+		})
+		getConn := rpc.GetRpcConnReq(v.Metadata.Name, v.Spec.Host, v.Spec.Port)
+		rpc.RpcCtl <- getConn
+		<-getConn.RespChan
+	}
 }
 
 // DeleteController the  Controller from database
@@ -178,5 +184,11 @@ func (mc *ControllerClient) DeleteController(name string) error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Controller Entry;")
 	}
+
+	// send message to close rpc connection
+	rmConn := rpc.GetRpcConnReq(name, "", 0)
+	rpc.RpcCtl <- rmConn
+	<-rmConn.RespChan
+
 	return nil
 }

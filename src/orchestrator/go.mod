@@ -15,6 +15,7 @@ require (
 	go.mongodb.org/mongo-driver v1.0.0
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
+	google.golang.org/grpc v1.19.0
 	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
 	k8s.io/helm v2.14.3+incompatible
 	k8s.io/klog v1.0.0 // indirect

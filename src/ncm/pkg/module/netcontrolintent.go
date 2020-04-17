@@ -18,7 +18,7 @@ package module
 
 import (
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-	orchestrator "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -72,14 +72,8 @@ func (v *NetControlIntentClient) CreateNetControlIntent(nci NetControlIntent, pr
 		CompositeAppVersion: compositeappversion,
 	}
 
-	//Check if composite app/version exists
-	_, err := orchestrator.NewCompositeAppClient().GetCompositeApp(compositeapp, compositeappversion, project)
-	if err != nil {
-		return NetControlIntent{}, pkgerrors.New("Unable to find the composite app/version")
-	}
-
 	//Check if this NetControlIntent already exists
-	_, err = v.GetNetControlIntent(nci.Metadata.Name, project, compositeapp, compositeappversion)
+	_, err := v.GetNetControlIntent(nci.Metadata.Name, project, compositeapp, compositeappversion)
 	if err == nil && !exists {
 		return NetControlIntent{}, pkgerrors.New("NetControlIntent already exists")
 	}

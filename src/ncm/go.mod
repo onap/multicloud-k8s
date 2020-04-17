@@ -12,6 +12,7 @@ require (
 	go.etcd.io/etcd v3.3.12+incompatible
 	go.mongodb.org/mongo-driver v1.0.0
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
+	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
 	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
 	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible

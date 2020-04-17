@@ -324,6 +324,36 @@ func (h clusterHandler) deleteClusterHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusNoContent)
 }
 
+//  apply network intents associated with the cluster
+func (h clusterHandler) applyClusterHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	provider := vars["provider-name"]
+	name := vars["name"]
+
+	err := h.client.ApplyNetworkIntents(provider, name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+//  terminate network intents associated with the cluster
+func (h clusterHandler) terminateClusterHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	provider := vars["provider-name"]
+	name := vars["name"]
+
+	err := h.client.TerminateNetworkIntents(provider, name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // Create handles creation of the ClusterLabel entry in the database
 func (h clusterHandler) createClusterLabelHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

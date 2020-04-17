@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "efdf846c_a3264c10",
+        "filename": "src/orchestrator/cmd/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-17T22:20:49Z",
+      "side": 1,
+      "message": "What about other signals like terminate etc?",
+      "range": {
+        "startLine": 67,
+        "startChar": 20,
+        "endLine": 67,
+        "endChar": 32
+      },
+      "revId": "521810357af529d4b071e053562bdcb1a69e87db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "638e8a0c_de15e698",
+        "filename": "src/orchestrator/pkg/grpc/contextupdate/contextupdate.proto",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-17T22:20:49Z",
+      "side": 1,
+      "message": "Whitespace",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 1
+      },
+      "revId": "521810357af529d4b071e053562bdcb1a69e87db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "45f754c4_db009ec4",
+        "filename": "src/orchestrator/pkg/grpc/contextupdate/contextupdate.proto",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-17T22:20:49Z",
+      "side": 1,
+      "message": "Can this be a error string to provide visibility to the orchestrator",
+      "range": {
+        "startLine": 30,
+        "startChar": 4,
+        "endLine": 30,
+        "endChar": 8
+      },
+      "revId": "521810357af529d4b071e053562bdcb1a69e87db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de8bc20b_3987bfb4",
+        "filename": "src/orchestrator/pkg/grpc/healthcheck/healthcheck.proto",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-17T22:20:49Z",
+      "side": 1,
+      "message": "Why is healthcheck a separate proto? Are all controllers going to implement 2 protos?",
+      "revId": "521810357af529d4b071e053562bdcb1a69e87db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cb97ea6a_99fc3920",
+        "filename": "src/orchestrator/pkg/grpc/installapp/installapp.proto",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-17T22:20:49Z",
+      "side": 1,
+      "message": "Whitespaces in this file",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 1
+      },
+      "revId": "521810357af529d4b071e053562bdcb1a69e87db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e9d9018_a6b2e69b",
+        "filename": "src/orchestrator/pkg/grpc/installapp/installapp.proto",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-17T22:20:49Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 41,
+        "startChar": 4,
+        "endLine": 41,
+        "endChar": 8
+      },
+      "revId": "521810357af529d4b071e053562bdcb1a69e87db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9d230ff_274a3428",
+        "filename": "src/orchestrator/pkg/infra/config/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-17T22:20:49Z",
+      "side": 1,
+      "message": "This will be different for each controller, right?",
+      "range": {
+        "startLine": 40,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 54
+      },
+      "revId": "521810357af529d4b071e053562bdcb1a69e87db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

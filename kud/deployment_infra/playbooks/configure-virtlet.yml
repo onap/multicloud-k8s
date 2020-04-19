@@ -207,11 +207,13 @@
           chdir: "{{ criproxy_dest }}"
       when: criproxy_source_type == "source"
     - name: download CRIproxy package
+      become: yes
       get_url:
         url: "{{ criproxy_url }}"
         dest: "{{ criproxy_dest }}/criproxy"
       when: criproxy_source_type == "binary"
     - name: set criproxy execution permissions
+      become: yes
       file:
         path: "{{ criproxy_dest }}/criproxy"
         mode: "+x"

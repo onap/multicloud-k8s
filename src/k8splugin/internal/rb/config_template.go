@@ -19,8 +19,8 @@ package rb
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 

@@ -18,9 +18,9 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 	"io"
 	"io/ioutil"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 	"net/http"
 
 	"github.com/gorilla/mux"

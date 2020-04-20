@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5efc4ad6_f1650ed3",
+        "filename": "src/k8splugin/api/api.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-20T21:49:27Z",
+      "side": 1,
+      "message": "Can the notion of /v1/v1 be localized to broker handler code?",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 1
+      },
+      "revId": "15694fc7ac2658af54ea9223a859fc1151d2b688",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -16,7 +16,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -25,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
 	pkgerrors "github.com/pkg/errors"
@@ -134,7 +134,7 @@ func TestConvertDirectives(t *testing.T) {
 func TestBrokerCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string
-		input         io.Reader
+		input         []byte //converts to io.Reader inside test
 		expected      brokerPOSTResponse
 		expectedError string
 		expectedCode  int
@@ -146,14 +146,14 @@ func TestBrokerCreateHandler(t *testing.T) {
 		},
 		{
 			label:        "Invalid JSON request format",
-			input:        bytes.NewBuffer([]byte("invalid")),
+			input:        []byte("invalid"),
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
 			label:         "Missing vf-module-*-id parameter",
 			expectedError: "vf-module-model-customization-id is empty",
 			expectedCode:  http.StatusBadRequest,
-			input: bytes.NewBuffer([]byte(`{
+			input: []byte(`{
 				"vf-module-model-invariant-id": "123456qwerty",
 				"vf-module-model-version-id": "123qweasdzxc",
 				"generic-vnf-id": "dummy-vnf-id",
@@ -169,13 +169,13 @@ func TestBrokerCreateHandler(t *testing.T) {
 						}
 					]
 				}
-			}`)),
+			}`),
 		},
 		{
 			label:         "Missing stack name parameter",
 			expectedError: "stack_name is missing from template_data",
 			expectedCode:  http.StatusBadRequest,
-			input: bytes.NewBuffer([]byte(`{
+			input: []byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
 				"vf-module-model-invariant-id": "123456qwerty",
 				"vf-module-model-version-id": "123qweasdzxc",
@@ -191,13 +191,13 @@ func TestBrokerCreateHandler(t *testing.T) {
 						}
 					]
 				}
-			}`)),
+			}`),
 		},
 		{
 			label:         "Missing profile name directive",
 			expectedError: "k8s-rb-profile-name is missing from directives",
 			expectedCode:  http.StatusBadRequest,
-			input: bytes.NewBuffer([]byte(`{
+			input: []byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
 				"vf-module-model-invariant-id": "123456qwerty",
 				"vf-module-model-version-id": "123qweasdzxc",
@@ -210,13 +210,13 @@ func TestBrokerCreateHandler(t *testing.T) {
 					"attributes": [
 					]
 				}
-			}`)),
+			}`),
 		},
 		{
 			label:         "Missing vf-module-id parameter",
 			expectedError: "vf-module-id is empty",
 			expectedCode:  http.StatusBadRequest,
-			input: bytes.NewBuffer([]byte(`{
+			input: []byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
 				"vf-module-model-invariant-id": "123456qwerty",
 				"vf-module-model-version-id": "123qweasdzxc",
@@ -232,11 +232,11 @@ func TestBrokerCreateHandler(t *testing.T) {
 						}
 					]
 				}
-			}`)),
+			}`),
 		},
 		{
 			label: "Succesfully create an Instance",
-			input: bytes.NewBuffer([]byte(`{
+			input: []byte(`{
 				"vf-module-model-customization-id": "84sdfkio938",
 				"vf-module-model-invariant-id": "123456qwerty",
 				"vf-module-model-version-id": "123qweasdzxc",
@@ -253,7 +253,7 @@ func TestBrokerCreateHandler(t *testing.T) {
 						}
 					]
 				}
-			}`)),
+			}`),
 			expected: brokerPOSTResponse{
 				WorkloadID:     "HaKpys8e",
 				TemplateType:   "heat",
@@ -309,42 +309,53 @@ func TestBrokerCreateHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-
-			request := httptest.NewRequest("POST", "/v1/cloudowner/cloudregion/infra_workload", testCase.input)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
-			defer resp.Body.Close()
-
-			if testCase.expectedCode != resp.StatusCode {
-				body, _ := ioutil.ReadAll(resp.Body)
-				t.Log(string(body))
-				t.Fatalf("Request method returned code '%v', but '%v' was expected",
-					resp.StatusCode, testCase.expectedCode)
-			}
-
-			if resp.StatusCode == http.StatusCreated {
-				var response brokerPOSTResponse
-				err := json.NewDecoder(resp.Body).Decode(&response)
-				if err != nil {
-					t.Fatalf("Parsing the returned response got an error (%s)", err)
-				}
-				if !reflect.DeepEqual(testCase.expected, response) {
-					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
-						response, testCase.expected)
-				}
-			} else if testCase.expectedError != "" {
-				body, err := ioutil.ReadAll(resp.Body)
-				if err == nil {
-					if !strings.Contains(string(body), testCase.expectedError) {
-						t.Fatalf("Request method returned body '%s', but '%s' wasn't found",
-							body, testCase.expectedError)
+	for _, prefix := range yieldV1Prefixes() {
+		for _, backCompat := range []string{"false", "true"} {
+			for _, testCase := range testCases {
+				t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+					config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+					var expectedCode int
+					if backCompat == "false" && prefix != "/v1" {
+						expectedCode = http.StatusNotFound
+					} else {
+						expectedCode = testCase.expectedCode
 					}
-				} else {
-					t.Fatalf("Request method returned malformed body")
-				}
+					input := bytes.NewBuffer(testCase.input)
+					request := httptest.NewRequest("POST", prefix+"/cloudowner/cloudregion/infra_workload", input)
+					resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+					defer resp.Body.Close()
+
+					if expectedCode != resp.StatusCode {
+						body, _ := ioutil.ReadAll(resp.Body)
+						t.Log(string(body))
+						t.Fatalf("Request method returned code '%v', but '%v' was expected",
+							resp.StatusCode, expectedCode)
+					}
+
+					if resp.StatusCode == http.StatusCreated {
+						var response brokerPOSTResponse
+						err := json.NewDecoder(resp.Body).Decode(&response)
+						if err != nil {
+							t.Fatalf("Parsing the returned response got an error (%s)", err)
+						}
+						if !reflect.DeepEqual(testCase.expected, response) {
+							t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+								response, testCase.expected)
+						}
+					} else if testCase.expectedError != "" {
+						body, err := ioutil.ReadAll(resp.Body)
+						if err == nil {
+							if !strings.Contains(string(body), testCase.expectedError) {
+								t.Fatalf("Request method returned body '%s', but '%s' wasn't found",
+									body, testCase.expectedError)
+							}
+						} else {
+							t.Fatalf("Request method returned malformed body")
+						}
+					}
+				})
 			}
-		})
+		}
 	}
 }
 
@@ -406,27 +417,38 @@ func TestBrokerGetHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		for _, backCompat := range []string{"false", "true"} {
+			for _, testCase := range testCases {
+				t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+					config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+					var expectedCode int
+					if backCompat == "false" && prefix != "/v1" {
+						expectedCode = http.StatusNotFound
+					} else {
+						expectedCode = testCase.expectedCode
+					}
+					request := httptest.NewRequest("GET", prefix+"/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
+					resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
-			if testCase.expectedCode != resp.StatusCode {
-				t.Fatalf("Request method returned: %v and it was expected: %v",
-					resp.StatusCode, testCase.expectedCode)
+					if expectedCode != resp.StatusCode {
+						t.Fatalf("Request method returned: %v and it was expected: %v",
+							resp.StatusCode, expectedCode)
+					}
+					if resp.StatusCode == http.StatusOK {
+						var response brokerGETResponse
+						err := json.NewDecoder(resp.Body).Decode(&response)
+						if err != nil {
+							t.Fatalf("Parsing the returned response got an error (%s)", err)
+						}
+						if !reflect.DeepEqual(testCase.expectedResponse, response) {
+							t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+								response, testCase.expectedResponse)
+						}
+					}
+				})
 			}
-			if resp.StatusCode == http.StatusOK {
-				var response brokerGETResponse
-				err := json.NewDecoder(resp.Body).Decode(&response)
-				if err != nil {
-					t.Fatalf("Parsing the returned response got an error (%s)", err)
-				}
-				if !reflect.DeepEqual(testCase.expectedResponse, response) {
-					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
-						response, testCase.expectedResponse)
-				}
-			}
-		})
+		}
 	}
 }
 
@@ -486,36 +508,47 @@ func TestBrokerFindHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/cloudowner/cloudregion/infra_workload?name="+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
-
-			if testCase.expectedCode != resp.StatusCode {
-				t.Fatalf("Request method returned: %v and it was expected: %v",
-					resp.StatusCode, testCase.expectedCode)
-			}
-			if resp.StatusCode == http.StatusOK {
-				var response brokerGETResponse
-				err := json.NewDecoder(resp.Body).Decode(&response)
-				if err != nil {
-					t.Fatalf("Parsing the returned response got an error (%s)", err)
-				}
-				if testCase.expectedResponse.WorkloadID != response.WorkloadID {
-					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
-						response.WorkloadID, testCase.expectedResponse.WorkloadID)
-				}
-				tcStacks := testCase.expectedResponse.WorkloadStatusReason["stacks"].([]map[string]interface{})
-				if len(tcStacks) != 0 {
-					//We expect only one response in this testcase.
-					resStacks := response.WorkloadStatusReason["stacks"].([]interface{})[0].(map[string]interface{})
-					if !reflect.DeepEqual(tcStacks[0], resStacks) {
-						t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
-							resStacks, tcStacks)
+	for _, prefix := range yieldV1Prefixes() {
+		for _, backCompat := range []string{"false", "true"} {
+			for _, testCase := range testCases {
+				t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+					config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+					var expectedCode int
+					if backCompat == "false" && prefix != "/v1" {
+						expectedCode = http.StatusNotFound
+					} else {
+						expectedCode = testCase.expectedCode
 					}
-				}
+					request := httptest.NewRequest("GET", prefix+"/cloudowner/cloudregion/infra_workload?name="+testCase.input, nil)
+					resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+
+					if expectedCode != resp.StatusCode {
+						t.Fatalf("Request method returned: %v and it was expected: %v",
+							resp.StatusCode, expectedCode)
+					}
+					if resp.StatusCode == http.StatusOK {
+						var response brokerGETResponse
+						err := json.NewDecoder(resp.Body).Decode(&response)
+						if err != nil {
+							t.Fatalf("Parsing the returned response got an error (%s)", err)
+						}
+						if testCase.expectedResponse.WorkloadID != response.WorkloadID {
+							t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+								response.WorkloadID, testCase.expectedResponse.WorkloadID)
+						}
+						tcStacks := testCase.expectedResponse.WorkloadStatusReason["stacks"].([]map[string]interface{})
+						if len(tcStacks) != 0 {
+							//We expect only one response in this testcase.
+							resStacks := response.WorkloadStatusReason["stacks"].([]interface{})[0].(map[string]interface{})
+							if !reflect.DeepEqual(tcStacks[0], resStacks) {
+								t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+									resStacks, tcStacks)
+							}
+						}
+					}
+				})
 			}
-		})
+		}
 	}
 }
 
@@ -548,25 +581,36 @@ func TestBrokerDeleteHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("DELETE", "/v1/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		for _, backCompat := range []string{"false", "true"} {
+			for _, testCase := range testCases {
+				t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+					config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+					var expectedCode int
+					if backCompat == "false" && prefix != "/v1" {
+						expectedCode = http.StatusNotFound
+					} else {
+						expectedCode = testCase.expectedCode
+					}
+					request := httptest.NewRequest("DELETE", prefix+"/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
+					resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
-			if testCase.expectedCode != resp.StatusCode {
-				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)
+					if expectedCode != resp.StatusCode {
+						t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, expectedCode)
+					}
+					if resp.StatusCode == http.StatusOK {
+						var response brokerGETResponse
+						err := json.NewDecoder(resp.Body).Decode(&response)
+						if err != nil {
+							t.Fatalf("Parsing the returned response got an error (%s)", err)
+						}
+						if !reflect.DeepEqual(testCase.expectedResponse, response) {
+							t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+								response, testCase.expectedResponse)
+						}
+					}
+				})
 			}
-			if resp.StatusCode == http.StatusOK {
-				var response brokerGETResponse
-				err := json.NewDecoder(resp.Body).Decode(&response)
-				if err != nil {
-					t.Fatalf("Parsing the returned response got an error (%s)", err)
-				}
-				if !reflect.DeepEqual(testCase.expectedResponse, response) {
-					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
-						response, testCase.expectedResponse)
-				}
-			}
-		})
+		}
 	}
 }

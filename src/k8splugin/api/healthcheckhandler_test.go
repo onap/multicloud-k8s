@@ -30,29 +30,33 @@ import (
 // and its backing database
 func TestHealthCheckHandler(t *testing.T) {
 
-	t.Run("OK HealthCheck", func(t *testing.T) {
-		db.DBconn = &db.MockDB{
-			Err: nil,
-		}
-		request := httptest.NewRequest("GET", "/v1/healthcheck", nil)
-		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		t.Run("OK HealthCheck ("+prefix+")", func(t *testing.T) {
+			db.DBconn = &db.MockDB{
+				Err: nil,
+			}
+			request := httptest.NewRequest("GET", prefix+"/healthcheck", nil)
+			resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil))
 
-		//Check returned code
-		if resp.StatusCode != http.StatusOK {
-			t.Fatalf("Expected %d; Got: %d", http.StatusOK, resp.StatusCode)
-		}
-	})
+			//Check returned code
+			if resp.StatusCode != http.StatusOK {
+				t.Fatalf("Expected %d; Got: %d", http.StatusOK, resp.StatusCode)
+			}
+		})
+	}
 
-	t.Run("FAILED HealthCheck", func(t *testing.T) {
-		db.DBconn = &db.MockDB{
-			Err: pkgerrors.New("Runtime Error in DB"),
-		}
-		request := httptest.NewRequest("GET", "/v1/healthcheck", nil)
-		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		t.Run("FAILED HealthCheck ("+prefix+")", func(t *testing.T) {
+			db.DBconn = &db.MockDB{
+				Err: pkgerrors.New("Runtime Error in DB"),
+			}
+			request := httptest.NewRequest("GET", prefix+"/healthcheck", nil)
+			resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil))
 
-		//Check returned code
-		if resp.StatusCode != http.StatusInternalServerError {
-			t.Fatalf("Expected %d; Got: %d", http.StatusInternalServerError, resp.StatusCode)
-		}
-	})
+			//Check returned code
+			if resp.StatusCode != http.StatusInternalServerError {
+				t.Fatalf("Expected %d; Got: %d", http.StatusInternalServerError, resp.StatusCode)
+			}
+		})
+	}
 }

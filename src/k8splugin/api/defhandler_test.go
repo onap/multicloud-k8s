@@ -19,7 +19,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -77,7 +76,7 @@ func (m *mockRBDefinition) Upload(name, version string, inp []byte) error {
 func TestRBDefCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label        string
-		reader       io.Reader
+		reader       []byte //converts to io.Reader inside test
 		expected     rb.Definition
 		expectedCode int
 		rbDefClient  *mockRBDefinition
@@ -90,12 +89,12 @@ func TestRBDefCreateHandler(t *testing.T) {
 		{
 			label:        "Create Definition",
 			expectedCode: http.StatusCreated,
-			reader: bytes.NewBuffer([]byte(`{
+			reader: []byte(`{
 				"rb-name":"testresourcebundle",
 				"rb-version":"v1",
 				"chart-name":"testchart",
 				"description":"test description"
-				}`)),
+				}`),
 			expected: rb.Definition{
 				RBName:      "testresourcebundle",
 				RBVersion:   "v1",
@@ -116,47 +115,50 @@ func TestRBDefCreateHandler(t *testing.T) {
 		},
 		{
 			label: "Missing Name in Request Body",
-			reader: bytes.NewBuffer([]byte(`{
+			reader: []byte(`{
 				"rb-version":"v1",
 				"chart-name":"testchart",
 				"description":"test description"
-				}`)),
+				}`),
 			expectedCode: http.StatusBadRequest,
 			rbDefClient:  &mockRBDefinition{},
 		},
 		{
 			label: "Missing Version in Request Body",
-			reader: bytes.NewBuffer([]byte(`{
+			reader: []byte(`{
 				"rb-name":"testresourcebundle",
 				"chart-name":"testchart",
 				"description":"test description"
-				}`)),
+				}`),
 			expectedCode: http.StatusBadRequest,
 			rbDefClient:  &mockRBDefinition{},
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("POST", "/v1/rb/definition", testCase.reader)
-			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		for _, testCase := range testCases {
+			t.Run(testCase.label+"("+prefix+")", func(t *testing.T) {
+				reader := bytes.NewBuffer(testCase.reader)
+				request := httptest.NewRequest("POST", prefix+"/rb/definition", reader)
+				resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-
-			//Check returned body only if statusCreated
-			if resp.StatusCode == http.StatusCreated {
-				got := rb.Definition{}
-				json.NewDecoder(resp.Body).Decode(&got)
-
-				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("createHandler returned unexpected body: got %v;"+
-						" expected %v", got, testCase.expected)
+				//Check returned code
+				if resp.StatusCode != testCase.expectedCode {
+					t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 				}
-			}
-		})
+
+				//Check returned body only if statusCreated
+				if resp.StatusCode == http.StatusCreated {
+					got := rb.Definition{}
+					json.NewDecoder(resp.Body).Decode(&got)
+
+					if reflect.DeepEqual(testCase.expected, got) == false {
+						t.Errorf("createHandler returned unexpected body: got %v;"+
+							" expected %v", got, testCase.expected)
+					}
+				}
+			})
+		}
 	}
 }
 
@@ -205,38 +207,40 @@ func TestRBDefListVersionsHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/rb/definition/testresourcebundle", nil)
-			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		for _, testCase := range testCases {
+			t.Run(testCase.label+"("+prefix+")", func(t *testing.T) {
+				request := httptest.NewRequest("GET", prefix+"/rb/definition/testresourcebundle", nil)
+				resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-
-			//Check returned body only if statusOK
-			if resp.StatusCode == http.StatusOK {
-				got := []rb.Definition{}
-				json.NewDecoder(resp.Body).Decode(&got)
-
-				// Since the order of returned slice is not guaranteed
-				// Check both and return error if both don't match
-				sort.Slice(got, func(i, j int) bool {
-					return got[i].RBVersion < got[j].RBVersion
-				})
-				// Sort both as it is not expected that testCase.expected
-				// is sorted
-				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].RBVersion < testCase.expected[j].RBVersion
-				})
-
-				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("listHandler returned unexpected body: got %v;"+
-						" expected %v", got, testCase.expected)
+				//Check returned code
+				if resp.StatusCode != testCase.expectedCode {
+					t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 				}
-			}
-		})
+
+				//Check returned body only if statusOK
+				if resp.StatusCode == http.StatusOK {
+					got := []rb.Definition{}
+					json.NewDecoder(resp.Body).Decode(&got)
+
+					// Since the order of returned slice is not guaranteed
+					// Check both and return error if both don't match
+					sort.Slice(got, func(i, j int) bool {
+						return got[i].RBVersion < got[j].RBVersion
+					})
+					// Sort both as it is not expected that testCase.expected
+					// is sorted
+					sort.Slice(testCase.expected, func(i, j int) bool {
+						return testCase.expected[i].RBVersion < testCase.expected[j].RBVersion
+					})
+
+					if reflect.DeepEqual(testCase.expected, got) == false {
+						t.Errorf("listHandler returned unexpected body: got %v;"+
+							" expected %v", got, testCase.expected)
+					}
+				}
+			})
+		}
 	}
 }
 
@@ -285,38 +289,40 @@ func TestRBDefListAllHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/rb/definition", nil)
-			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		for _, testCase := range testCases {
+			t.Run(testCase.label+"("+prefix+")", func(t *testing.T) {
+				request := httptest.NewRequest("GET", prefix+"/rb/definition", nil)
+				resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-
-			//Check returned body only if statusOK
-			if resp.StatusCode == http.StatusOK {
-				got := []rb.Definition{}
-				json.NewDecoder(resp.Body).Decode(&got)
-
-				// Since the order of returned slice is not guaranteed
-				// Check both and return error if both don't match
-				sort.Slice(got, func(i, j int) bool {
-					return got[i].RBVersion < got[j].RBVersion
-				})
-				// Sort both as it is not expected that testCase.expected
-				// is sorted
-				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].RBVersion < testCase.expected[j].RBVersion
-				})
-
-				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("listHandler returned unexpected body: got %v;"+
-						" expected %v", got, testCase.expected)
+				//Check returned code
+				if resp.StatusCode != testCase.expectedCode {
+					t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 				}
-			}
-		})
+
+				//Check returned body only if statusOK
+				if resp.StatusCode == http.StatusOK {
+					got := []rb.Definition{}
+					json.NewDecoder(resp.Body).Decode(&got)
+
+					// Since the order of returned slice is not guaranteed
+					// Check both and return error if both don't match
+					sort.Slice(got, func(i, j int) bool {
+						return got[i].RBVersion < got[j].RBVersion
+					})
+					// Sort both as it is not expected that testCase.expected
+					// is sorted
+					sort.Slice(testCase.expected, func(i, j int) bool {
+						return testCase.expected[i].RBVersion < testCase.expected[j].RBVersion
+					})
+
+					if reflect.DeepEqual(testCase.expected, got) == false {
+						t.Errorf("listHandler returned unexpected body: got %v;"+
+							" expected %v", got, testCase.expected)
+					}
+				}
+			})
+		}
 	}
 }
 
@@ -365,27 +371,29 @@ func TestRBDefGetHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.name+"/"+testCase.version, nil)
-			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		for _, testCase := range testCases {
+			t.Run(testCase.label+"("+prefix+")", func(t *testing.T) {
+				request := httptest.NewRequest("GET", prefix+"/rb/definition/"+testCase.name+"/"+testCase.version, nil)
+				resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-
-			//Check returned body only if statusOK
-			if resp.StatusCode == http.StatusOK {
-				got := rb.Definition{}
-				json.NewDecoder(resp.Body).Decode(&got)
-
-				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("listHandler returned unexpected body: got %v;"+
-						" expected %v", got, testCase.expected)
+				//Check returned code
+				if resp.StatusCode != testCase.expectedCode {
+					t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
 				}
-			}
-		})
+
+				//Check returned body only if statusOK
+				if resp.StatusCode == http.StatusOK {
+					got := rb.Definition{}
+					json.NewDecoder(resp.Body).Decode(&got)
+
+					if reflect.DeepEqual(testCase.expected, got) == false {
+						t.Errorf("listHandler returned unexpected body: got %v;"+
+							" expected %v", got, testCase.expected)
+					}
+				}
+			})
+		}
 	}
 }
 
@@ -416,16 +424,18 @@ func TestRBDefDeleteHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("DELETE", "/v1/rb/definition/"+testCase.name+"/"+testCase.version, nil)
-			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		for _, testCase := range testCases {
+			t.Run(testCase.label+"("+prefix+")", func(t *testing.T) {
+				request := httptest.NewRequest("DELETE", prefix+"/rb/definition/"+testCase.name+"/"+testCase.version, nil)
+				resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-		})
+				//Check returned code
+				if resp.StatusCode != testCase.expectedCode {
+					t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
+				}
+			})
+		}
 	}
 }
 
@@ -435,7 +445,7 @@ func TestRBDefUploadHandler(t *testing.T) {
 		label        string
 		name         string
 		version      string
-		body         io.Reader
+		body         []byte //converts to io.Reader inside test
 		expectedCode int
 		rbDefClient  *mockRBDefinition
 	}{
@@ -444,10 +454,10 @@ func TestRBDefUploadHandler(t *testing.T) {
 			expectedCode: http.StatusOK,
 			name:         "test-rbdef",
 			version:      "v2",
-			body: bytes.NewBuffer([]byte{
+			body: []byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
-			}),
+			},
 			rbDefClient: &mockRBDefinition{},
 		},
 		{
@@ -455,10 +465,10 @@ func TestRBDefUploadHandler(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 			name:         "test-rbdef",
 			version:      "v2",
-			body: bytes.NewBuffer([]byte{
+			body: []byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
-			}),
+			},
 			rbDefClient: &mockRBDefinition{
 				Err: pkgerrors.New("Internal Error"),
 			},
@@ -472,16 +482,19 @@ func TestRBDefUploadHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("POST",
-				"/v1/rb/definition/"+testCase.name+"/"+testCase.version+"/content", testCase.body)
-			resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+		for _, testCase := range testCases {
+			t.Run(testCase.label+"("+prefix+")", func(t *testing.T) {
+				body := bytes.NewBuffer(testCase.body)
+				request := httptest.NewRequest("POST",
+					prefix+"/rb/definition/"+testCase.name+"/"+testCase.version+"/content", body)
+				resp := executeRequest(request, NewRouter(testCase.rbDefClient, nil, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-		})
+				//Check returned code
+				if resp.StatusCode != testCase.expectedCode {
+					t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
+				}
+			})
+		}
 	}
 }

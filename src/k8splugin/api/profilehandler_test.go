@@ -19,7 +19,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -27,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -77,7 +77,7 @@ func (m *mockRBProfile) Upload(rbname, rbversion, prname string, inp []byte) err
 func TestRBProfileCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label        string
-		reader       io.Reader
+		reader       []byte //converts to io.Reader inside test
 		expected     rb.Profile
 		expectedCode int
 		rbProClient  *mockRBProfile
@@ -91,14 +91,14 @@ func TestRBProfileCreateHandler(t *testing.T) {
 		{
 			label:        "Create New Profile for Definition",
 			expectedCode: http.StatusCreated,
-			reader: bytes.NewBuffer([]byte(`{
+			reader: []byte(`{
 				"rb-name":"test-rbdef",
 				"rb-version":"v1",
 				"profile-name":"profile1",
 				"release-name":"testprofilereleasename",
 				"namespace":"default",
 				"kubernetes-version":"1.12.3"
-				}`)),
+				}`),
 			expected: rb.Profile{
 				RBName:            "test-rbdef",
 				RBVersion:         "v1",
@@ -123,28 +123,39 @@ func TestRBProfileCreateHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("POST", "/v1/rb/definition/test-rbdef/v1/profile",
-				testCase.reader)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          reader := bytes.NewBuffer(testCase.reader)
+          request := httptest.NewRequest("POST", prefix+"/rb/definition/test-rbdef/v1/profile", reader)
+          resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
+          //Check returned code
+          if resp.StatusCode != expectedCode {
+            t.Fatalf("Expected %d; Got: %d", expectedCode, resp.StatusCode)
+          }
 
-			//Check returned body only if statusCreated
-			if resp.StatusCode == http.StatusCreated {
-				got := rb.Profile{}
-				json.NewDecoder(resp.Body).Decode(&got)
+          //Check returned body only if statusCreated
+          if resp.StatusCode == http.StatusCreated {
+            got := rb.Profile{}
+            json.NewDecoder(resp.Body).Decode(&got)
 
-				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("createHandler returned unexpected body: got %v;"+
-						" expected %v", got, testCase.expected)
-				}
-			}
-		})
+            if reflect.DeepEqual(testCase.expected, got) == false {
+              t.Errorf("createHandler returned unexpected body: got %v;"+
+                " expected %v", got, testCase.expected)
+            }
+          }
+        })
+      }
+    }
 	}
 }
 
@@ -204,27 +215,38 @@ func TestRBProfileGetHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          request := httptest.NewRequest("GET", prefix+"/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
+          resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
+          //Check returned code
+          if resp.StatusCode != expectedCode {
+            t.Fatalf("Expected %d; Got: %d", expectedCode, resp.StatusCode)
+          }
 
-			//Check returned body only if statusOK
-			if resp.StatusCode == http.StatusOK {
-				got := rb.Profile{}
-				json.NewDecoder(resp.Body).Decode(&got)
+          //Check returned body only if statusOK
+          if resp.StatusCode == http.StatusOK {
+            got := rb.Profile{}
+            json.NewDecoder(resp.Body).Decode(&got)
 
-				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("listHandler returned unexpected body: got %v;"+
-						" expected %v", got, testCase.expected)
-				}
-			}
-		})
+            if reflect.DeepEqual(testCase.expected, got) == false {
+              t.Errorf("listHandler returned unexpected body: got %v;"+
+                " expected %v", got, testCase.expected)
+            }
+          }
+        })
+      }
+    }
 	}
 }
 
@@ -285,38 +307,49 @@ func TestRBProfileListHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.def+"/"+testCase.version+"/profile", nil)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          request := httptest.NewRequest("GET", prefix+"/rb/definition/"+testCase.def+"/"+testCase.version+"/profile", nil)
+          resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
+          //Check returned code
+          if resp.StatusCode != expectedCode {
+            t.Fatalf("Expected %d; Got: %d", expectedCode, resp.StatusCode)
+          }
 
-			//Check returned body only if statusOK
-			if resp.StatusCode == http.StatusOK {
-				got := []rb.Profile{}
-				json.NewDecoder(resp.Body).Decode(&got)
+          //Check returned body only if statusOK
+          if resp.StatusCode == http.StatusOK {
+            got := []rb.Profile{}
+            json.NewDecoder(resp.Body).Decode(&got)
 
-				// Since the order of returned slice is not guaranteed
-				// Check both and return error if both don't match
-				sort.Slice(got, func(i, j int) bool {
-					return got[i].ProfileName < got[j].ProfileName
-				})
-				// Sort both as it is not expected that testCase.expected
-				// is sorted
-				sort.Slice(testCase.expected, func(i, j int) bool {
-					return testCase.expected[i].ProfileName < testCase.expected[j].ProfileName
-				})
+            // Since the order of returned slice is not guaranteed
+            // Check both and return error if both don't match
+            sort.Slice(got, func(i, j int) bool {
+              return got[i].ProfileName < got[j].ProfileName
+            })
+            // Sort both as it is not expected that testCase.expected
+            // is sorted
+            sort.Slice(testCase.expected, func(i, j int) bool {
+              return testCase.expected[i].ProfileName < testCase.expected[j].ProfileName
+            })
 
-				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("listHandler returned unexpected body: got %v;"+
-						" expected %v", got, testCase.expected)
-				}
-			}
-		})
+            if reflect.DeepEqual(testCase.expected, got) == false {
+              t.Errorf("listHandler returned unexpected body: got %v;"+
+                " expected %v", got, testCase.expected)
+            }
+          }
+        })
+      }
+    }
 	}
 }
 
@@ -344,16 +377,27 @@ func TestRBProfileDeleteHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("DELETE", "/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          request := httptest.NewRequest("DELETE", prefix+"/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
+          resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-		})
+          //Check returned code
+          if resp.StatusCode != expectedCode {
+            t.Fatalf("Expected %d; Got: %d", expectedCode, resp.StatusCode)
+          }
+        })
+      }
+    }
 	}
 }
 
@@ -362,7 +406,7 @@ func TestRBProfileUploadHandler(t *testing.T) {
 	testCases := []struct {
 		label        string
 		prname       string
-		body         io.Reader
+		body         []byte //converts to io.Reader inside test
 		expectedCode int
 		rbProClient  *mockRBProfile
 	}{
@@ -370,20 +414,20 @@ func TestRBProfileUploadHandler(t *testing.T) {
 			label:        "Upload Bundle Profile Content",
 			expectedCode: http.StatusOK,
 			prname:       "profile1",
-			body: bytes.NewBuffer([]byte{
+			body: []byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
-			}),
+			},
 			rbProClient: &mockRBProfile{},
 		},
 		{
 			label:        "Upload Invalid Bundle Profile Content",
 			expectedCode: http.StatusInternalServerError,
 			prname:       "profile1",
-			body: bytes.NewBuffer([]byte{
+			body: []byte{
 				0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0xff, 0xf2, 0x48, 0xcd,
-			}),
+			},
 			rbProClient: &mockRBProfile{
 				Err: pkgerrors.New("Internal Error"),
 			},
@@ -396,16 +440,29 @@ func TestRBProfileUploadHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("POST",
-				"/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname+"/content", testCase.body)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          body := bytes.NewBuffer(testCase.body)
+          request := httptest.NewRequest("POST",
+            prefix+"/rb/definition/test-rbdef/v1/profile/"+testCase.prname+"/content",
+            body)
+          resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil))
 
-			//Check returned code
-			if resp.StatusCode != testCase.expectedCode {
-				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
-			}
-		})
+          //Check returned code
+          if resp.StatusCode != expectedCode {
+            t.Fatalf("Expected %d; Got: %d", expectedCode, resp.StatusCode)
+          }
+        })
+      }
+    }
 	}
 }

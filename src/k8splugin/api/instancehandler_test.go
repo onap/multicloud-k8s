@@ -16,7 +16,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -26,6 +25,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 
 	"github.com/gorilla/mux"
 	pkgerrors "github.com/pkg/errors"
@@ -99,7 +99,7 @@ func executeRequest(request *http.Request, router *mux.Router) *http.Response {
 func TestInstanceCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label        string
-		input        io.Reader
+		input        []byte //converts to io.Reader inside test
 		expected     app.InstanceResponse
 		expectedCode int
 		instClient   *mockInstanceClient
@@ -110,26 +110,26 @@ func TestInstanceCreateHandler(t *testing.T) {
 		},
 		{
 			label:        "Invalid JSON request format",
-			input:        bytes.NewBuffer([]byte("invalid")),
+			input:        []byte("invalid"),
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
 			label: "Missing parameter failure",
-			input: bytes.NewBuffer([]byte(`{
+			input: []byte(`{
 				"rb-name": "test-rbdef",
 				"profile-name": "profile1",
 				"cloud-region": "kud"
-			}`)),
+			}`),
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
 			label: "Succesfully create an Instance",
-			input: bytes.NewBuffer([]byte(`{
+			input: []byte(`{
 				"cloud-region": "region1",
 				"rb-name": "test-rbdef",
 				"rb-version": "v1",
 				"profile-name": "profile1"
-			}`)),
+			}`),
 			expected: app.InstanceResponse{
 				ID: "HaKpys8e",
 				Request: app.InstanceRequest{
@@ -190,26 +190,38 @@ func TestInstanceCreateHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
 
-			request := httptest.NewRequest("POST", "/v1/instance", testCase.input)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+          input := bytes.NewBuffer(testCase.input)
+          request := httptest.NewRequest("POST", prefix+"/instance", input)
+          resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
-			if testCase.expectedCode != resp.StatusCode {
-				body, _ := ioutil.ReadAll(resp.Body)
-				t.Log(string(body))
-				t.Fatalf("Request method returned: \n%v\n and it was expected: \n%v", resp.StatusCode, testCase.expectedCode)
-			}
+          if expectedCode != resp.StatusCode {
+            body, _ := ioutil.ReadAll(resp.Body)
+            t.Log(string(body))
+            t.Fatalf("Request method returned: \n%v\n and it was expected: \n%v", resp.StatusCode, expectedCode)
+          }
 
-			if resp.StatusCode == http.StatusCreated {
-				var response app.InstanceResponse
-				err := json.NewDecoder(resp.Body).Decode(&response)
-				if err != nil {
-					t.Fatalf("Parsing the returned response got an error (%s)", err)
-				}
-			}
-		})
+          if resp.StatusCode == http.StatusCreated {
+            var response app.InstanceResponse
+            err := json.NewDecoder(resp.Body).Decode(&response)
+            if err != nil {
+              t.Fatalf("Parsing the returned response got an error (%s)", err)
+            }
+          }
+        })
+      }
+    }
 	}
 }
 
@@ -292,27 +304,38 @@ func TestInstanceGetHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/instance/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          request := httptest.NewRequest("GET", prefix+"/instance/"+testCase.input, nil)
+          resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
-			if testCase.expectedCode != resp.StatusCode {
-				t.Fatalf("Request method returned: %v and it was expected: %v",
-					resp.StatusCode, testCase.expectedCode)
-			}
-			if resp.StatusCode == http.StatusOK {
-				var response app.InstanceResponse
-				err := json.NewDecoder(resp.Body).Decode(&response)
-				if err != nil {
-					t.Fatalf("Parsing the returned response got an error (%s)", err)
-				}
-				if !reflect.DeepEqual(testCase.expectedResponse, &response) {
-					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
-						&response, testCase.expectedResponse)
-				}
-			}
-		})
+          if expectedCode != resp.StatusCode {
+            t.Fatalf("Request method returned: %v and it was expected: %v",
+              resp.StatusCode, expectedCode)
+          }
+          if resp.StatusCode == http.StatusOK {
+            var response app.InstanceResponse
+            err := json.NewDecoder(resp.Body).Decode(&response)
+            if err != nil {
+              t.Fatalf("Parsing the returned response got an error (%s)", err)
+            }
+            if !reflect.DeepEqual(testCase.expectedResponse, &response) {
+              t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+                &response, testCase.expectedResponse)
+            }
+          }
+        })
+      }
+    }
 	}
 }
 
@@ -389,15 +412,26 @@ func TestStatusHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/instance/"+testCase.input+"/status", nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          request := httptest.NewRequest("GET", prefix+"/instance/"+testCase.input+"/status", nil)
+          resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
-			if testCase.expectedCode != resp.StatusCode {
-				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)
-			}
-		})
+          if expectedCode != resp.StatusCode {
+            t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, expectedCode)
+          }
+        })
+      }
+    }
 	}
 }
 
@@ -505,46 +539,57 @@ func TestInstanceListHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("GET", "/v1/instance", nil)
-			if testCase.queryParams {
-				q := request.URL.Query()
-				for k, v := range testCase.queryParamsMap {
-					q.Add(k, v)
-				}
-				request.URL.RawQuery = q.Encode()
-			}
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          request := httptest.NewRequest("GET", prefix+"/instance", nil)
+          if testCase.queryParams {
+            q := request.URL.Query()
+            for k, v := range testCase.queryParamsMap {
+              q.Add(k, v)
+            }
+            request.URL.RawQuery = q.Encode()
+          }
+          resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
-			if testCase.expectedCode != resp.StatusCode {
-				t.Fatalf("Request method returned: %v and it was expected: %v",
-					resp.StatusCode, testCase.expectedCode)
-			}
-			if resp.StatusCode == http.StatusOK {
-				var response []app.InstanceMiniResponse
-				err := json.NewDecoder(resp.Body).Decode(&response)
-				if err != nil {
-					t.Fatalf("Parsing the returned response got an error (%s)", err)
-				}
+          if expectedCode != resp.StatusCode {
+            t.Fatalf("Request method returned: %v and it was expected: %v",
+              resp.StatusCode, expectedCode)
+          }
+          if resp.StatusCode == http.StatusOK {
+            var response []app.InstanceMiniResponse
+            err := json.NewDecoder(resp.Body).Decode(&response)
+            if err != nil {
+              t.Fatalf("Parsing the returned response got an error (%s)", err)
+            }
 
-				// Since the order of returned slice is not guaranteed
-				// Sort them first and then do deepequal
-				// Check both and return error if both don't match
-				sort.Slice(response, func(i, j int) bool {
-					return response[i].ID < response[j].ID
-				})
+            // Since the order of returned slice is not guaranteed
+            // Sort them first and then do deepequal
+            // Check both and return error if both don't match
+            sort.Slice(response, func(i, j int) bool {
+              return response[i].ID < response[j].ID
+            })
 
-				sort.Slice(testCase.expectedResponse, func(i, j int) bool {
-					return testCase.expectedResponse[i].ID < testCase.expectedResponse[j].ID
-				})
+            sort.Slice(testCase.expectedResponse, func(i, j int) bool {
+              return testCase.expectedResponse[i].ID < testCase.expectedResponse[j].ID
+            })
 
-				if reflect.DeepEqual(testCase.expectedResponse, response) == false {
-					t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
-						&response, testCase.expectedResponse)
-				}
-			}
-		})
+            if reflect.DeepEqual(testCase.expectedResponse, response) == false {
+              t.Fatalf("TestGetHandler returned:\n result=%v\n expected=%v",
+                &response, testCase.expectedResponse)
+            }
+          }
+        })
+      }
+    }
 	}
 }
 
@@ -571,14 +616,25 @@ func TestDeleteHandler(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.label, func(t *testing.T) {
-			request := httptest.NewRequest("DELETE", "/v1/instance/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+	for _, prefix := range yieldV1Prefixes() {
+    for _, backCompat := range []string{"false", "true"} {
+      for _, testCase := range testCases {
+        t.Run(testCase.label+"("+backCompat+prefix+")", func(t *testing.T) {
+          config.SetConfigValue("PreserveV1BackwardCompatibility", backCompat)
+          var expectedCode int
+          if backCompat == "false" && prefix != "/v1" {
+            expectedCode = http.StatusNotFound
+          } else {
+            expectedCode = testCase.expectedCode
+          }
+          request := httptest.NewRequest("DELETE", prefix+"/instance/"+testCase.input, nil)
+          resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
 
-			if testCase.expectedCode != resp.StatusCode {
-				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)
-			}
-		})
+          if expectedCode != resp.StatusCode {
+            t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, expectedCode)
+          }
+        })
+      }
+    }
 	}
 }

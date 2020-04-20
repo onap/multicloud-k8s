@@ -39,6 +39,7 @@ type Configuration struct {
 	EtcdCAFile          string `json:"etcd-ca-file"`
 	ServicePort         string `json:"service-port"`
 	KubernetesLabelName string `json:"kubernetes-label-name"`
+  PreserveV1BackwardCompatibility string `json:"preserve-v1-backward-compatibility"` //Bool would require redefining many methods
 }
 
 // Config is the structure that stores the configuration
@@ -86,7 +87,8 @@ func defaultConfiguration() *Configuration {
 		EtcdKey:             "",
 		EtcdCAFile:          "",
 		ServicePort:         "9015",
-		KubernetesLabelName: "k8splugin.io/rb-instance-id",
+    KubernetesLabelName: "k8splugin.io/rb-instance-id",
+    PreserveV1BackwardCompatibility: "false",
 	}
 }
 

@@ -22,6 +22,30 @@
       "revId": "15694fc7ac2658af54ea9223a859fc1151d2b688",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0688df0e_f993dad5",
+        "filename": "src/k8splugin/api/api.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-04-21T13:40:21Z",
+      "side": 1,
+      "message": "Hi Ritu,\n\nI\u0027ve generalized a bit with this approach so that URLs that were earlier both reachable either directly or via MSB and via \"/\" or \"/v1\" prefix could be accessible no matter if using old/new MSB service annotation or directly.\n\nI can change it to cover only brokerHandler code if you think that\u0027s proper, but I think it\u0027s best to ensure every endpoint will be reachable in backward compatible mode?",
+      "parentUuid": "5efc4ad6_f1650ed3",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 1
+      },
+      "revId": "15694fc7ac2658af54ea9223a859fc1151d2b688",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

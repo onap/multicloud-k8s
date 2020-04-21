@@ -46,6 +46,30 @@
       "revId": "15694fc7ac2658af54ea9223a859fc1151d2b688",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa098d71_afcff941",
+        "filename": "src/k8splugin/api/api.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-04-21T15:35:21Z",
+      "side": 1,
+      "message": "Please take a look at my reply in mail thread - I\u0027ve described there intention why to provide both \"/\" and \"/v1/v1\" as prefix for backward compatibility",
+      "parentUuid": "0688df0e_f993dad5",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 1
+      },
+      "revId": "15694fc7ac2658af54ea9223a859fc1151d2b688",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46d40cec_5c9d0d0a",
+        "filename": "src/ncm/pkg/module/resources.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-22T18:39:46Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 161,
+        "endChar": 44
+      },
+      "revId": "058d15021aa6c6bb6e48aa674d31e65a0812dd4f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -13,6 +13,7 @@ require (
 	go.etcd.io/etcd v3.3.12+incompatible
 	go.mongodb.org/mongo-driver v1.0.0
 	golang.org/x/net v0.0.0-20190930134127-c5a3c61f89f3
+	google.golang.org/grpc v1.27.1
 	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
 	k8s.io/apimachinery v0.0.0-20190831074630-461753078381

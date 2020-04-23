@@ -37,14 +37,22 @@ func TestCreateController(t *testing.T) {
 		{
 			label: "Create Controller",
 			inp: Controller{
-				Name: "testController",
-				Host: "132.156.0.10",
-				Port: 8080,
+				Metadata: Metadata{
+					Name: "testController",
+				},
+				Spec: ControllerSpec{
+					Host: "132.156.0.10",
+					Port: 8080,
+				},
 			},
 			expected: Controller{
-				Name: "testController",
-				Host: "132.156.0.10",
-				Port: 8080,
+				Metadata: Metadata{
+					Name: "testController",
+				},
+				Spec: ControllerSpec{
+					Host: "132.156.0.10",
+					Port: 8080,
+				},
 			},
 			expectedError: "",
 			mockdb:        &db.MockDB{},
@@ -62,7 +70,7 @@ func TestCreateController(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewControllerClient()
-			got, err := impl.CreateController(testCase.inp)
+			got, err := impl.CreateController(testCase.inp, false)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -94,18 +102,25 @@ func TestGetController(t *testing.T) {
 			label: "Get Controller",
 			name:  "testController",
 			expected: Controller{
-				Name: "testController",
-				Host: "132.156.0.10",
-				Port: 8080,
+				Metadata: Metadata{
+					Name: "testController",
+				},
+				Spec: ControllerSpec{
+					Host: "132.156.0.10",
+					Port: 8080,
+				},
 			},
 			expectedError: "",
 			mockdb: &db.MockDB{
 				Items: map[string]map[string][]byte{
 					ControllerKey{ControllerName: "testController"}.String(): {
 						"controllermetadata": []byte(
-							"{\"name\":\"testController\"," +
+							"{\"metadata\":{" +
+								"\"name\":\"testController\"" +
+								"}," +
+								"\"spec\":{" +
 								"\"host\":\"132.156.0.10\"," +
-								"\"port\":8080}"),
+								"\"port\": 8080 }}"),
 					},
 				},
 			},

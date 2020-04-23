@@ -17,9 +17,15 @@
 package module
 
 import (
+	"context"
 	"encoding/json"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"reflect"
+	"time"
+
+	contextpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/contextupdate"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -61,6 +67,7 @@ type DeploymentIntentGroupManager interface {
 	CreateDeploymentIntentGroup(d DeploymentIntentGroup, p string, ca string, v string) (DeploymentIntentGroup, error)
 	GetDeploymentIntentGroup(di string, p string, ca string, v string) (DeploymentIntentGroup, error)
 	DeleteDeploymentIntentGroup(di string, p string, ca string, v string) error
+	InstantiateDeploymentIntentGroup(di string, p string, ca string, v string) error
 }
 
 // DeploymentIntentGroupKey consists of Name of the deployment group, project name, CompositeApp name, CompositeApp version
@@ -174,4 +181,45 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 	}
 	return nil
 
+}
+
+// InstantiateDeploymentIntentGroup instantiates a DeploymentIntentGroup
+// TODO - now this is just a simple illustration of calling the updatecontext RPC service of a controller
+// ultimately, the specific intents need to be queried and handled correctly.
+func (c *DeploymentIntentGroupClient) InstantiateDeploymentIntentGroup(di string, p string, ca string, v string) error {
+	/*k := DeploymentIntentGroupKey{
+		Name:         di,
+		Project:      p,
+		CompositeApp: ca,
+		Version:      v,
+	}*/
+
+	// For now, just 'ping' the contextupdate grpc server in the ncm controller
+	controllerName := "ncm"
+	var err error
+	var rpcClient contextpb.ContextupdateClient
+	var updateRes *contextpb.ContextUpdateResponse
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	conn := rpc.GetRpcConn(controllerName)
+
+	if conn != nil {
+		rpcClient = contextpb.NewContextupdateClient(conn)
+		updateReq := new(contextpb.ContextUpdateRequest)
+		updateReq.AppContext = "Dummy App Context ID"
+		updateRes, err = rpcClient.UpdateAppContext(ctx, updateReq)
+	} else {
+		return pkgerrors.Errorf("ContextUpdate Failed - Could not get ContextupdateClient: %v", controllerName)
+	}
+
+	if err != nil {
+		return pkgerrors.Wrapf(err, "ContextUpdate Failed: %v", controllerName)
+	}
+	log.Info("ContextUpdate Passed", log.Fields{
+		"Controller": controllerName,
+		"Result":     updateRes,
+	})
+
+	return err
 }

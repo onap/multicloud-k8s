@@ -95,7 +95,7 @@ func TestProjectCreateHandler(t *testing.T) {
 			projectClient: &mockProjectManager{
 				//Items that will be returned by the mocked Client
 				Items: []moduleLib.Project{
-					moduleLib.Project{
+					{
 						MetaData: moduleLib.ProjectMetaData{
 							Name:        "testProject",
 							Description: "Test Project used for unit testing",
@@ -163,7 +163,7 @@ func TestProjectGetHandler(t *testing.T) {
 			name: "testProject",
 			projectClient: &mockProjectManager{
 				Items: []moduleLib.Project{
-					moduleLib.Project{
+					{
 						MetaData: moduleLib.ProjectMetaData{
 							Name:        "testProject",
 							Description: "Test Project used for unit testing",

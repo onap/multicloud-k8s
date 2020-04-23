@@ -42,7 +42,7 @@ project_description="test_project_description"
 userData1="user1"
 userData2="user2"
 
-composite_app_name="test_composite_app"
+composite_app_name="test_composite_app_collection"
 composite_app_description="test_project_description"
 composite_app_version="test_composite_app_version"
 app1_helm_path="$CSAR_DIR/$csar_id/collectd.tar.gz"
@@ -58,7 +58,8 @@ app2_desc="prometheus_desc"
 main_composite_profile_name="main_composite_profile"
 sub_composite_profile_name1="test_composite_profile1"
 sub_composite_profile_name2="test_composite_profile2"
-composite_profile_description="test_composite_profile_description"
+main_composite_profile_description="main_composite_profile_description"
+sub_composite_profile_description="sub_composite_profile_description"
 
 genericPlacementIntentName="test_gen_placement_intent1"
 genericPlacementIntentDesc="test_gen_placement_intent_desc"
@@ -175,7 +176,7 @@ payload="$(cat <<EOF
 {
    "metadata":{
       "name":"${main_composite_profile_name}",
-      "description":"${composite_profile_description}",
+      "description":"${main_composite_profile_description}",
       "userData1":"${userData1}",
       "userData2":"${userData2}"
    }
@@ -192,7 +193,7 @@ payload="$(cat <<EOF
 {
    "metadata":{
       "name":"${sub_composite_profile_name1}",
-      "description":"${composite_profile_description}",
+      "description":"${sub_composite_profile_description}",
       "userData1":"${userData1}",
       "userData2":"${userData2}"
    },
@@ -212,7 +213,7 @@ payload="$(cat <<EOF
 {
    "metadata":{
       "name":"${sub_composite_profile_name2}",
-      "description":"${composite_profile_description}",
+      "description":"${sub_composite_profile_description}",
       "userData1":"${userData1}",
       "userData2":"${userData2}"
    },

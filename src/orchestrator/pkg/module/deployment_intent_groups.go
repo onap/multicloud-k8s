@@ -18,8 +18,11 @@ package module
 
 import (
 	"encoding/json"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"reflect"
+
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/contextupdateclient"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -61,6 +64,7 @@ type DeploymentIntentGroupManager interface {
 	CreateDeploymentIntentGroup(d DeploymentIntentGroup, p string, ca string, v string) (DeploymentIntentGroup, error)
 	GetDeploymentIntentGroup(di string, p string, ca string, v string) (DeploymentIntentGroup, error)
 	DeleteDeploymentIntentGroup(di string, p string, ca string, v string) error
+	InstantiateDeploymentIntentGroup(di string, p string, ca string, v string) error
 }
 
 // DeploymentIntentGroupKey consists of Name of the deployment group, project name, CompositeApp name, CompositeApp version
@@ -174,4 +178,22 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 	}
 	return nil
 
+}
+
+// InstantiateDeploymentIntentGroup instantiates a DeploymentIntentGroup
+// TODO - now this is just a simple illustration of calling the updatecontext RPC service of a controller
+// ultimately, the specific intents need to be queried and handled correctly.
+func (c *DeploymentIntentGroupClient) InstantiateDeploymentIntentGroup(di string, p string, ca string, v string) error {
+
+	// use project  in API to get the controllerName (for testing)
+	// use composite app in API to get the IntentName (for testing)
+	// use composite app version in API to get the appContextId (for testing)
+	err := contextupdateclient.InvokeContextUpdate(p, ca, v)
+	if err != nil {
+		log.Error("ContextUpdate Error", log.Fields{
+			"Error": err,
+		})
+	}
+
+	return err
 }

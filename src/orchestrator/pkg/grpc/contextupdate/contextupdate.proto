@@ -24,6 +24,7 @@ service contextupdate {
 
 message ContextUpdateRequest {
     string app_context = 1;
+    string intent_name = 2;
 }
 
 message ContextUpdateResponse {

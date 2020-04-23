@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/grpc/contextupdateserver"
 	updatepb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/contextupdate"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
@@ -34,6 +33,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"github.com/onap/multicloud-k8s/src/ovnaction/api"
 	register "github.com/onap/multicloud-k8s/src/ovnaction/pkg/grpc"
+	"github.com/onap/multicloud-k8s/src/ovnaction/pkg/grpc/contextupdateserver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/testdata"
@@ -73,10 +73,10 @@ func startGrpcServer() error {
 	grpcServer := grpc.NewServer(opts...)
 	updatepb.RegisterContextupdateServer(grpcServer, contextupdateserver.NewContextupdateServer())
 
-	log.Println("Starting Network Configuration Manager gRPC Server")
+	log.Println("Starting OVN Network Action Controller gRPC Server")
 	err = grpcServer.Serve(lis)
 	if err != nil {
-		log.Fatalf("ncm grpc server is not serving %v", err)
+		log.Fatalf("ovnaction grpc server is not serving %v", err)
 	}
 	return err
 }

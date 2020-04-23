@@ -116,6 +116,7 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.putHandler).Methods("PUT")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.getHandler).Methods("GET")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.deleteHandler).Methods("DELETE")
+
 	//setting routes for genericPlacementIntent
 	if genericPlacementIntentClient == nil {
 		genericPlacementIntentClient = moduleClient.GenericPlacementIntent

@@ -15,10 +15,11 @@ package contextupdateserver
 
 import (
 	"context"
-	"encoding/json"
-	"log"
+	"fmt"
 
 	contextpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/contextupdate"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/ovnaction/internal/action"
 	//"google.golang.org/grpc/codes"
 	//"google.golang.org/grpc/status"
 )
@@ -28,14 +29,18 @@ type contextupdateServer struct {
 }
 
 func (cs *contextupdateServer) UpdateAppContext(ctx context.Context, req *contextpb.ContextUpdateRequest) (*contextpb.ContextUpdateResponse, error) {
-	contextUpdateReq, _ := json.Marshal(req)
-	log.Println("GRPC Server received contextupdateRequest: ", string(contextUpdateReq))
+	log.Info("Received Update App Context request", log.Fields{
+		"AppContextId": req.AppContext,
+		"IntentName":   req.IntentName,
+	})
 
-	// Insert call to Server Functionality here
-	//
-	//
+	err := action.UpdateAppContext(req.IntentName, req.AppContext)
 
-	return &contextpb.ContextUpdateResponse{AppContextUpdated: true}, nil
+	if err != nil {
+		return &contextpb.ContextUpdateResponse{AppContextUpdated: false, AppContextUpdateMessage: err.Error()}, nil
+	}
+
+	return &contextpb.ContextUpdateResponse{AppContextUpdated: true, AppContextUpdateMessage: fmt.Sprintf("Successful application of intent %v to %v", req.IntentName, req.AppContext)}, nil
 }
 
 // NewContextUpdateServer exported

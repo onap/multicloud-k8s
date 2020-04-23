@@ -4,6 +4,7 @@ build:
 	$(MAKE) -C orchestrator build
 	$(MAKE) -C ncm build
 	$(MAKE) -C dcm build
+	$(MAKE) -C hpacontroller build
 
 deploy:
 	$(MAKE) -C monitor deploy
@@ -11,6 +12,7 @@ deploy:
 	$(MAKE) -C orchestrator deploy
 	$(MAKE) -C ncm deploy
 	$(MAKE) -C dcm deploy
+	$(MAKE) -C hpacontroller deploy
 
 all:
 	$(MAKE) -C monitor all
@@ -18,6 +20,7 @@ all:
 	$(MAKE) -C orchestrator all
 	$(MAKE) -C ncm all
 	$(MAKE) -C dcm all
+	$(MAKE) -C hpacontroller all
 
 clean:
 	$(MAKE) -C monitor clean
@@ -25,3 +28,4 @@ clean:
 	$(MAKE) -C orchestrator clean
 	$(MAKE) -C ncm clean
 	$(MAKE) -C dcm clean
+	$(MAKE) -C hpacontroller clean

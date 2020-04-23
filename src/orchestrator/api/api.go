@@ -116,6 +116,7 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.putHandler).Methods("PUT")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.getHandler).Methods("GET")
 	router.HandleFunc("/controllers/{controller-name}", controlHandler.deleteHandler).Methods("DELETE")
+
 	//setting routes for genericPlacementIntent
 	if genericPlacementIntentClient == nil {
 		genericPlacementIntentClient = moduleClient.GenericPlacementIntent
@@ -153,6 +154,7 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups", deploymentIntentGrpHandler.createDeploymentIntentGroupHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}", deploymentIntentGrpHandler.getDeploymentIntentGroupHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}", deploymentIntentGrpHandler.deleteDeploymentIntentGroupHandler).Methods("DELETE")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/instantiate", deploymentIntentGrpHandler.instantiateDeploymentIntentGroupHandler).Methods("POST")
 
 	// setting routes for AddingIntents
 	if intentClient == nil {

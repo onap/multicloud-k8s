@@ -68,6 +68,10 @@ func (m *mockControllerManager) DeleteController(name string) error {
 	return m.Err
 }
 
+func (m *mockControllerManager) InitControllers() {
+	return
+}
+
 func TestControllerCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label            string

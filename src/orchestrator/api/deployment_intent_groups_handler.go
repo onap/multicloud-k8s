@@ -131,3 +131,20 @@ func (h deploymentIntentGroupHandler) deleteDeploymentIntentGroupHandler(w http.
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// initial sample to illustrate sending app context update rpc messages to controllers
+func (h deploymentIntentGroupHandler) instantiateDeploymentIntentGroupHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	p := vars["project-name"]
+	ca := vars["composite-app-name"]
+	v := vars["composite-app-version"]
+	di := vars["deployment-intent-group-name"]
+
+	err := h.client.InstantiateDeploymentIntentGroup(di, p, ca, v)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}

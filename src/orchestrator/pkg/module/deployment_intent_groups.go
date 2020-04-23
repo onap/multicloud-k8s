@@ -18,8 +18,9 @@ package module
 
 import (
 	"encoding/json"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"reflect"
+
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
 	pkgerrors "github.com/pkg/errors"
 )

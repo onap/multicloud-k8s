@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ffccf2c_efb347ce",
+        "filename": "src/orchestrator/pkg/infra/config/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-23T21:46:51Z",
+      "side": 1,
+      "message": "Each controller/server will have different credentials",
+      "range": {
+        "startLine": 40,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 53
+      },
+      "revId": "9c94d49be9d443981c537b1aa0179c36cea46cd3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

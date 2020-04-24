@@ -298,7 +298,7 @@ func (ac *AppContext) GetResourceInstruction(appname string, clustername string,
 	if err != nil {
 		return nil, err
 	}
-	s := fmt.Sprintf("%v", rh) + "app/" + appname + "/cluster/" + clustername + "/resource/instruction/" + insttype
+	s := fmt.Sprintf("%v", rh) + "app/" + appname + "/cluster/" + clustername + "/resource/instruction/" + insttype + "/"
 	var v string
 	err = ac.rtc.RtcGetValue(s, &v)
 	if err != nil {

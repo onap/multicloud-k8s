@@ -18,8 +18,16 @@ import (
 	"log"
 	"math/rand"
 	"time"
+	//"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
+	//"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+/*
+	gplugin "rsync/pkg/resource"
+	plugin "rsync/pkg/plugin"
+	"rsync/pkg/app"
+*/
+	"rsync/pkg/context"
 )
 
 func main() {
@@ -45,5 +53,38 @@ func main() {
 	}
 
 	// Initialize grpc
+
+        instca := context.CompositeAppContext{}
+
+        err = instca.InstantiateComApp("7871147865598089755")
+        if err != nil {
+                fmt.Printf("\n instantiation failed \n")
+        }
+/*
+	k8sClient := app.KubernetesClient{}
+	err = k8sClient.Init("testcluster", "12345")
+	if err != nil {
+		fmt.Printf(" Init failed = %s", err.Error())
+		//return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
+	}
+*/
+/*
+        _, err = k8sClient.CreateResources(nil, "default")
+        if err != nil {
+		fmt.Printf(" Create resource failed = %s", err.Error())
+                //return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
+        }
+*/
+/*
+
+	var c plugin.KubernetesConnector
+	c = &k8sClient
+	var gp gplugin.GenericPlugin
+	_, err = gp.Create("/vagrant/yaml/example.yml","default", c)
+	if err != nil {
+		fmt.Printf(" Create failed = %s", err.Error())
+	}
+	fmt.Println("Initialization done")
+*/
 
 }

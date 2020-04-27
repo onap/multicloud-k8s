@@ -30,6 +30,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/testdata"
+
+	"rsync/pkg/context"
 )
 
 func startGrpcServer() error {
@@ -95,6 +97,16 @@ func main() {
 		log.Println(err)
 		log.Fatalln("Exiting...")
 	}
+
+        instca := context.CompositeAppContext{}
+        err = instca.InstantiateComApp("7871147865598089755")
+        if err != nil {
+                fmt.Printf("\n instantiation failed \n")
+                err := instca.TerminateComApp("7871147865598089755")
+                if err != nil {
+                        fmt.Printf("\n Termination failed : %s \n", err.Error())
+                }
+        }
 
 	// Start grpc
 	fmt.Println("starting rsync GRPC server..")

@@ -21,6 +21,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
 	//"google.golang.org/grpc/codes"
 	//"google.golang.org/grpc/status"
+	con "rsync/pkg/context"
 )
 
 type installappServer struct {
@@ -31,10 +32,15 @@ func (cs *installappServer) InstallApp(ctx context.Context, req *installapp.Inst
 	installAppReq, _ := json.Marshal(req)
 	log.Println("GRPC Server received installAppRequest: ", string(installAppReq))
 
-	// Insert call to Server Functionality here
-	//
-	//
-
+	// Try instantiate the comp app 
+        err := instca.InstantiateComApp(req.GetAppContext())
+        if err != nil {
+                fmt.Printf("\n Instantiation failed : %s \n", err.Error())
+		err := instca.TerminateComApp(req.GetAppContext())
+		if err != nil {
+			fmt.Printf("\n Termination failed : %s \n", err.Error())
+		}
+        }
 	return &installapp.InstallAppResponse{AppContextInstalled: true}, nil
 }
 

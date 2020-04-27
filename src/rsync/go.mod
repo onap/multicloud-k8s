@@ -5,7 +5,10 @@ go 1.13
 require (
 	github.com/golang/protobuf v1.3.4
 	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200527175204-ef27eb4d63f1
+	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3 // indirect
+	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/grpc v1.27.1
+	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
 )
 
 replace (

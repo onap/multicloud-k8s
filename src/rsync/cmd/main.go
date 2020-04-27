@@ -20,7 +20,8 @@ import (
 	"net"
 	register "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc"
 	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
-	"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installappserver"
+	//"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installappserver"
+	"rsync/pkg/grpc/installappserver"
 	"strings"
 	"time"
 
@@ -30,6 +31,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/testdata"
+
 )
 
 func startGrpcServer() error {

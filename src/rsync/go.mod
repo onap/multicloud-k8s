@@ -1,16 +1,26 @@
-module github.com/onap/multicloud-k8s/src/rsync
+module rsync
 
 go 1.13
 
 require (
-	github.com/golang/protobuf v1.3.4
+	github.com/docker/engine v1.13.1
+	github.com/ghodss/yaml v1.0.0
+	github.com/golang/protobuf v1.4.1
+	github.com/hashicorp/consul/api v1.4.0
+	github.com/onap/multicloud-k8s/src/clm v0.0.0-00010101000000-000000000000
+	github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee
 	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4
-	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3 // indirect
-	google.golang.org/appengine v1.4.0 // indirect
+	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200529003854-0a7bf256bde5
+	github.com/pkg/errors v0.8.1
+	github.com/sirupsen/logrus v1.4.2
+	go.etcd.io/etcd v3.3.12+incompatible
+	go.mongodb.org/mongo-driver v1.0.0
+	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
 	google.golang.org/grpc v1.27.1
-	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
-	github.com/googleapis/gnostic v0.4.0
-	k8s.io/kubernetes v1.14.1
+	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
+	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
+	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
+	k8s.io/helm v2.14.3+incompatible
 )
 
 replace (

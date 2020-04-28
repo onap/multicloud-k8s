@@ -24,6 +24,7 @@ type Client struct {
 	NetControlIntent *NetControlIntentClient
 	WorkloadIntent   *WorkloadIntentClient
 	WorkloadIfIntent *WorkloadIfIntentClient
+	Chain            *ChainClient
 	// Add Clients for API's here
 }
 
@@ -36,6 +37,7 @@ func NewClient() *Client {
 	c.NetControlIntent = NewNetControlIntentClient()
 	c.WorkloadIntent = NewWorkloadIntentClient()
 	c.WorkloadIfIntent = NewWorkloadIfIntentClient()
+	c.Chain = NewChainClient()
 	// Add Client API handlers here
 	return c
 }

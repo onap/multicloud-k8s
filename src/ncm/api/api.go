@@ -72,6 +72,13 @@ func setClient(client, testClient interface{}) interface{} {
 				return c
 			}
 		}
+	case *moduleLib.ChainClient:
+		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*moduleLib.ChainManager)(nil)).Elem()) {
+			c, ok := testClient.(moduleLib.ChainManager)
+			if ok {
+				return c
+			}
+		}
 	default:
 		fmt.Printf("unknown type %T\n", cl)
 	}
@@ -154,6 +161,15 @@ func NewRouter(testClient interface{}) *mux.Router {
 	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent}/interfaces/{name}", workloadifintentHandler.putHandler).Methods("PUT")
 	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent}/interfaces/{name}", workloadifintentHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent}/interfaces/{name}", workloadifintentHandler.deleteHandler).Methods("DELETE")
+
+	chainHandler := chainHandler{
+		client: setClient(moduleClient.Chain, testClient).(moduleLib.ChainManager),
+	}
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/network-chains", chainHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/network-chains", chainHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/network-chains/{name}", chainHandler.putHandler).Methods("PUT")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/network-chains/{name}", chainHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects/{project}/composite-apps/{composite-app-name}/{version}/network-controller-intent/{net-control-intent}/network-chains/{name}", chainHandler.deleteHandler).Methods("DELETE")
 
 	return router
 }

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3aaedd8a_42f9e98f",
+        "filename": "src/orchestrator/pkg/infra/config/config.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-04-28T22:05:19Z",
+      "side": 1,
+      "message": "Clean up the fields are not being used",
+      "range": {
+        "startLine": 40,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 54
+      },
+      "revId": "6fb1d4750457bd3c91c2bc547dac6d04de1072c0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -22,6 +22,30 @@
       "revId": "9c94d49be9d443981c537b1aa0179c36cea46cd3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6371baf6_b090c2ed",
+        "filename": "src/orchestrator/pkg/infra/config/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-04-28T05:23:30Z",
+      "side": 1,
+      "message": "If there is a common CA, then each server can have it\u0027s own certificate and the client just needs the one CA file.  So, as long as each microservice acts as only 1 server at most, I think this set of config attributes will be fine.",
+      "parentUuid": "9ffccf2c_efb347ce",
+      "range": {
+        "startLine": 40,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 53
+      },
+      "revId": "9c94d49be9d443981c537b1aa0179c36cea46cd3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

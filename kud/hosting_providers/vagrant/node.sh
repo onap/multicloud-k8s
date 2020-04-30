@@ -76,6 +76,7 @@ fi
 modprobe vhost_net
 echo vhost_net >> /etc/modules
 source /etc/os-release || source /usr/lib/os-release
+apt-get install -y rsync
 case ${ID,,} in
     *suse)
     ;;

@@ -22,6 +22,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/rtcontext"
 	pkgerrors "github.com/pkg/errors"
+	"log"
 )
 
 type AppContext struct {
@@ -81,6 +82,7 @@ func (ac *AppContext) AddApp(handle interface{}, appname string) (interface{}, e
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("AddAppHandle::%v", h)
 	return h, nil
 }
 
@@ -93,7 +95,7 @@ func (ac *AppContext) DeleteApp(handle interface{}) error {
 	return nil
 }
 
-//Returns the hanlde for a given app
+//Returns the handle for a given app
 func (ac *AppContext) GetAppHandle(appname string) (interface{}, error) {
 	if appname == "" {
 		return nil, pkgerrors.Errorf("Not a valid run time context app name")
@@ -123,6 +125,7 @@ func (ac *AppContext) AddCluster(handle interface{}, clustername string) (interf
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("AddClusterHandler:: %v", h)
 	return h, nil
 }
 
@@ -193,11 +196,12 @@ func (ac *AppContext) GetClusterNames(appname string) ([]string, error) {
 }
 
 //Add resource under app and cluster
-func (ac *AppContext) AddResource(handle interface{}, resname string, value interface{}) (interface{}, error) {
+func (ac *AppContext) AddResource(handle interface{}, resname string, value []byte) (interface{}, error) {
 	h, err := ac.rtc.RtcAddResource(handle, resname, value)
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("AddResourceHandle::%v", h)
 	return h, nil
 }
 
@@ -238,7 +242,7 @@ func (ac *AppContext) GetResourceHandle(appname string, clustername string, resn
 }
 
 //Update the resource value usign the given handle
-func (ac *AppContext) UpdateResourceValue(handle interface{}, value interface{}) error {
+func (ac *AppContext) UpdateResourceValue(handle interface{}, value []byte) error {
 	return ac.rtc.RtcUpdateValue(handle, value)
 }
 
@@ -254,6 +258,7 @@ func (ac *AppContext) AddInstruction(handle interface{}, level string, insttype 
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("AddInstructionHandle :: %v", h)
 	return h, nil
 }
 

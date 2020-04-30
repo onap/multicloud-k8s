@@ -41,7 +41,7 @@ istio_version: 1.0.3
 istio_url: "https://github.com/istio/istio/releases/download/{{ istio_version }}/istio-{{ istio_version }}-linux.tar.gz"
 
 go_version: '1.12.5'
-kubespray_version: 2.10.4
+kubespray_version: 2.12.5
 helm_client_version: 2.13.1
 # kud playbooks not compatible with 2.8.0 - see MULTICLOUD-634
 ansible_version: 2.7.10

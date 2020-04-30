@@ -120,6 +120,7 @@ function install_k8s {
     sudo mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
     sudo chown -R $USER $dest_folder/kubespray-$version
     sudo mkdir -p ${local_release_dir}/containers
+    sudo mkdir -p ${local_release_dir}/releases
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/

@@ -120,6 +120,7 @@ function install_k8s {
     sudo mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
     sudo chown -R $USER $dest_folder/kubespray-$version
     sudo mkdir -p ${local_release_dir}/containers
+    sudo mkdir -p ${local_release_dir}/releases
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/
@@ -139,7 +140,8 @@ function install_k8s {
     if [[ -n "${https_proxy:-}" ]]; then
         echo "https_proxy: \"$https_proxy\"" | tee --append $kud_inventory_folder/group_vars/all.yml
     fi
-    ansible-playbook $verbose -i $kud_inventory $dest_folder/kubespray-$version/cluster.yml --become --become-user=root | sudo tee $log_folder/setup-kubernetes.log
+    wget https://raw.githubusercontent.com/kubernetes-sigs/kubespray/release-2.10/cluster.yml
+    ansible-playbook $verbose -i $kud_inventory ./cluster.yml --become --become-user=root | sudo tee $log_folder/setup-kubernetes.log
 
     # Configure environment
     mkdir -p $HOME/.kube

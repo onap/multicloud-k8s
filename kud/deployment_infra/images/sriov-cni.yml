@@ -2,7 +2,7 @@
 # Based on:
 # https://github.com/intel/sriov-cni/blob/master/images/sriov-cni-daemonset.yaml
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube-sriov-cni-ds-amd64
@@ -11,6 +11,10 @@ metadata:
     tier: node
     app: sriov-cni
 spec:
+  selector:
+    matchLabels:
+      tier: node
+      app: sriov-cni
   template:
     metadata:
       labels:

@@ -448,7 +448,7 @@ data:
           kubeconfig=/etc/kubernetes/admin.conf
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: ovn4nfv-cni
@@ -456,6 +456,9 @@ metadata:
   labels:
     app: ovn4nfv
 spec:
+  selector:
+    matchLabels:
+      app: ovn4nfv
   updateStrategy:
     type: RollingUpdate
   template:
@@ -505,7 +508,7 @@ spec:
               path: ovn4nfv_k8s.conf
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: nfn-agent
@@ -513,6 +516,9 @@ metadata:
   labels:
     app: nfn-agent
 spec:
+  selector:
+    matchLabels:
+      app: nfn-agent
   updateStrategy:
     type: RollingUpdate
   template:

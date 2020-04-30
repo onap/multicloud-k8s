@@ -63,17 +63,19 @@ helm_enabled: true
 #kube_proxy_mode: ipvs
 
 # Download container images only once then push to cluster nodes in batches
-download_run_once: True
+download_run_once: False
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
 local_release_dir: "/tmp/releases"
+download_cache_dir: "/tmp/kubespray_cache"
+retry_stagger: 10
 
 #Set download_localhost: True to make localhost the download delegate. This can be useful if 
 #cluster nodes cannot access external addresses. To use this requires that docker is installed 
 #and running on the ansible master and that the current user is either in the docker group or 
 #can do passwordless sudo, to be able to access docker. 
-download_localhost: True
+download_localhost: False
 
 # Subnet for cluster IPs
 kube_service_addresses: 10.244.0.0/18

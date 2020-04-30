@@ -22,6 +22,30 @@
       "revId": "377a457e64a5a4cd4709c1c2bb99158ce69d4ac3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2bd06466_3bfa415d",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-04-30T00:33:30Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "02ebb085_1276ab8a",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 152
+      },
+      "revId": "377a457e64a5a4cd4709c1c2bb99158ce69d4ac3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

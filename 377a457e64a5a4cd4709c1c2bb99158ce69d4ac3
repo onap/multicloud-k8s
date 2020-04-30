@@ -46,6 +46,30 @@
       "revId": "377a457e64a5a4cd4709c1c2bb99158ce69d4ac3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e04e6db_34cdae74",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-04-30T00:35:44Z",
+      "side": 1,
+      "message": "Could we do the same for the containerized installer.sh as well ?",
+      "parentUuid": "2bd06466_3bfa415d",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 152
+      },
+      "revId": "377a457e64a5a4cd4709c1c2bb99158ce69d4ac3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

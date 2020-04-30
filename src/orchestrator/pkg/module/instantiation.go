@@ -17,15 +17,17 @@
 package module
 
 import (
-	"fmt"
-
-	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
-
 	"encoding/base64"
-
+	"fmt"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	"github.com/onap/multicloud-k8s/src/orchestrator/utils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 	pkgerrors "github.com/pkg/errors"
-	"log"
+	"io/ioutil"
+	//"log"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 )
 
 // ManifestFileName is the name given to the manifest file in the profile package
@@ -34,10 +36,29 @@ const ManifestFileName = "manifest.yaml"
 // GenericPlacementIntentName denotes the generic placement intent name
 const GenericPlacementIntentName = "generic-placement-intent"
 
+// SEPARATOR used while creating clusternames to store in etcd
+const SEPARATOR = "+"
+
 // InstantiationClient implements the InstantiationManager
 type InstantiationClient struct {
-	storeName   string
-	tagMetaData string
+	db InstantiationClientDbInfo
+}
+
+/*
+InstantiationKey used in storing the contextid in the momgodb
+It consists of
+GenericPlacementIntentName,
+ProjectName,
+CompositeAppName,
+CompositeAppVersion,
+DeploymentIntentGroup
+*/
+type InstantiationKey struct {
+	IntentName            string
+	Project               string
+	CompositeApp          string
+	Version               string
+	DeploymentIntentGroup string
 }
 
 // InstantiationManager is an interface which exposes the
@@ -47,11 +68,19 @@ type InstantiationManager interface {
 	Instantiate(p string, ca string, v string, di string) error
 }
 
+// InstantiationClientDbInfo consists of storeName and tagContext
+type InstantiationClientDbInfo struct {
+	storeName  string // name of the mongodb collection to use for Instantiationclient documents
+	tagContext string // attribute key name for context object in App Context
+}
+
 // NewInstantiationClient returns an instance of InstantiationClient
 func NewInstantiationClient() *InstantiationClient {
 	return &InstantiationClient{
-		storeName:   "orchestrator",
-		tagMetaData: "instantiation",
+		db: InstantiationClientDbInfo{
+			storeName:  "orchestrator",
+			tagContext: "contextid",
+		},
 	}
 }
 
@@ -70,10 +99,10 @@ func getOverrideValuesByAppName(ov []OverrideValues, a string) map[string]string
 }
 
 /*
-FindGenericPlacementIntent takes in projectName, CompositeAppName, CompositeAppVersion, DeploymentIntentName
+findGenericPlacementIntent takes in projectName, CompositeAppName, CompositeAppVersion, DeploymentIntentName
 and returns the name of the genericPlacementIntentName. Returns empty value if string not found.
 */
-func FindGenericPlacementIntent(p, ca, v, di string) (string, error) {
+func findGenericPlacementIntent(p, ca, v, di string) (string, error) {
 	var gi string
 	var found bool
 	iList, err := NewIntentClient().GetAllIntents(p, ca, v, di)
@@ -82,7 +111,7 @@ func FindGenericPlacementIntent(p, ca, v, di string) (string, error) {
 	}
 	for _, eachMap := range iList.ListOfIntents {
 		if gi, found := eachMap[GenericPlacementIntentName]; found {
-			log.Printf("::Name of the generic-placement-intent:: %s", gi)
+			log.Info(":: Name of the generic-placement-intent ::", log.Fields{"GenPlmtIntent":gi})
 			return gi, err
 		}
 	}
@@ -97,7 +126,8 @@ func FindGenericPlacementIntent(p, ca, v, di string) (string, error) {
 //It takes in arguments - appName, project, compositeAppName, releaseName, compositeProfileName, array of override values
 func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues []OverrideValues) ([]helm.KubernetesResourceTemplate, error) {
 
-	log.Println("Processing App.. ", appName)
+
+	log.Info(":: Processing App ::", log.Fields{"appName":appName})
 
 	var sortedTemplates []helm.KubernetesResourceTemplate
 
@@ -109,7 +139,8 @@ func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues
 	if err != nil {
 		return sortedTemplates, pkgerrors.Wrap(err, "Fail to convert to byte array")
 	}
-	log.Println("Got the app content..")
+
+	log.Info(":: Got the app content.. ::", log.Fields{"appName":appName})
 
 	appPC, err := NewAppProfileClient().GetAppProfileContentByApp(p, ca, v, cp, appName)
 	if err != nil {
@@ -120,7 +151,7 @@ func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues
 		return sortedTemplates, pkgerrors.Wrap(err, "Fail to convert to byte array")
 	}
 
-	log.Println("Got the app Profile content ...")
+	log.Info(":: Got the app Profile content .. ::", log.Fields{"appName":appName})
 
 	overrideValuesOfApp := getOverrideValuesByAppName(overrideValues, appName)
 	//Convert override values from map to array of strings of the following format
@@ -137,12 +168,111 @@ func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues
 		appProfileContent, overrideValuesOfAppStr,
 		appName)
 
-	log.Printf("The len of the sortedTemplates :: %d", len(sortedTemplates))
+	log.Info(":: Total no. of sorted templates ::", log.Fields{"len(sortedTemplates):":len(sortedTemplates)})
 
 	return sortedTemplates, err
 }
 
-// Instantiate methods takes in project
+// resource consists of name of reource
+type resource struct {
+	name        string
+	filecontent []byte
+}
+
+// getResources shall take in the sorted templates and output the resources
+// which consists of name(name+kind) and filecontent
+func getResources(st []helm.KubernetesResourceTemplate) ([]resource, error) {
+	var resources []resource
+	for _, t := range st {
+		yamlStruct, err := utils.ExtractYamlParameters(t.FilePath)
+		yamlFile, err := ioutil.ReadFile(t.FilePath)
+		if err != nil {
+			return nil, pkgerrors.Wrap(err, "Failed to get the resources..")
+		}
+		n := yamlStruct.Metadata.Name + SEPARATOR + yamlStruct.Kind
+
+		resources = append(resources, resource{name: n, filecontent: yamlFile})
+
+		log.Info(":: Added resource into resource-order ::", log.Fields{"ResourceName":n})
+	}
+	return resources, nil
+}
+
+func addResourcesToCluster(ct appcontext.AppContext, ch interface{}, resources []resource, resourceOrder []string) error {
+	for _, resource := range resources {
+
+		resourceOrder = append(resourceOrder, resource.name)
+		_, err := ct.AddResource(ch, resource.name, resource.filecontent)
+		if err != nil {
+			cleanuperr := ct.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Info(":: Error Cleaning up AppContext after add resource failure ::", log.Fields{"Resource":resource.name, "Error":cleanuperr.Error})
+			}
+			return pkgerrors.Wrapf(err, "Error adding resource ::%s to AppContext", resource.name)
+		}
+		_, err = ct.AddInstruction(ch, "resource", "order", resourceOrder)
+		if err != nil {
+			cleanuperr := ct.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Info(":: Error Cleaning up AppContext after add instruction failure ::", log.Fields{"Resource":resource.name, "Error":cleanuperr.Error})
+			}
+			return pkgerrors.Wrapf(err, "Error adding instruction for resource ::%s to AppContext", resource.name)
+		}
+	}
+	return nil
+}
+
+func addClustersToAppContext(l gpic.Clusters, ct appcontext.AppContext, appHandle interface{}, resources []resource) error {
+	for _, c := range l.ClustersWithName {
+		p := c.ProviderName
+		n := c.ClusterName
+		var resourceOrder []string
+		clusterhandle, err := ct.AddCluster(appHandle, p+SEPARATOR+n)
+		if err != nil {
+			cleanuperr := ct.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Info(":: Error Cleaning up AppContext after add cluster failure ::", log.Fields{"cluster-provider":p, "cluster-name":n, "Error":cleanuperr.Error})
+			}
+			return pkgerrors.Wrapf(err, "Error adding Cluster(provider::%s and name::%s) to AppContext", p, n)
+		}
+
+		err = addResourcesToCluster(ct, clusterhandle, resources, resourceOrder)
+		if err != nil {
+			return pkgerrors.Wrapf(err, "Error adding Resources to Cluster(provider::%s and name::%s) to AppContext", p, n)
+		}
+	}
+	return nil
+}
+
+/*
+verifyResources method is just to check if the resource handles are correctly saved.
+*/
+
+func verifyResources(l gpic.Clusters, ct appcontext.AppContext, resources []resource, appName string) error {
+	for _, c := range l.ClustersWithName {
+		p := c.ProviderName
+		n := c.ClusterName
+		cn := p + SEPARATOR + n
+		for _, res := range resources {
+
+			rh, err := ct.GetResourceHandle(appName, cn, res.name)
+			if err != nil {
+				return pkgerrors.Wrapf(err, "Error getting resoure handle for resource :: %s, app:: %s, cluster :: %s", appName, res.name, cn)
+			}
+			log.Info(":: GetResourceHandle ::", log.Fields{"ResourceHandler":rh, "appName":appName, "Cluster": cn, "Resource":res.name})
+
+		}
+
+	}
+
+	return nil
+}
+
+/*
+Instantiate methods takes in projectName, compositeAppName, compositeAppVersion,
+DeploymentIntentName. This method is responsible for template resolution, intent
+resolution, creation and saving of context for saving into etcd.
+*/
 func (c InstantiationClient) Instantiate(p string, ca string, v string, di string) error {
 
 	dIGrp, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroup(di, p, ca, v)
@@ -153,36 +283,102 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	overrideValues := dIGrp.Spec.OverrideValuesObj
 	cp := dIGrp.Spec.Profile
 
-	gIntent, err := FindGenericPlacementIntent(p, ca, v, di)
+	gIntent, err := findGenericPlacementIntent(p, ca, v, di)
 	if err != nil {
 		return err
 	}
-	log.Printf("The name of the GenPlacIntent:: %s", gIntent)
 
-	log.Printf("dIGrp :: %s, releaseName :: %s and cp :: %s \n", dIGrp.MetaData.Name, rName, cp)
+	log.Info(":: The name of the GenPlacIntent ::", log.Fields{"GenPlmtIntent":gIntent})
+	log.Info(":: DeploymentIntentGroup, ReleaseName, CompositeProfile ::", log.Fields{"dIGrp":dIGrp.MetaData.Name, "releaseName":rName, "cp":cp})
+
 	allApps, err := NewAppClient().GetApps(p, ca, v)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Not finding the apps")
 	}
+
+	// Make an app context for the compositeApp
+	context := appcontext.AppContext{}
+	ctxval, err := context.InitAppContext()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error creating AppContext CompositeApp")
+	}
+	compositeHandle, err := context.CreateCompositeApp()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error creating AppContext")
+	}
+
+	var appOrder []string
+
+	// Add composite app using appContext
 	for _, eachApp := range allApps {
+		appOrder = append(appOrder, eachApp.Metadata.Name)
 		sortedTemplates, err := GetSortedTemplateForApp(eachApp.Metadata.Name, p, ca, v, rName, cp, overrideValues)
+
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the sorted templates for app")
 		}
-		log.Printf("Resolved all the templates for app :: %s under the compositeApp...", eachApp.Metadata.Name)
-		log.Printf("sortedTemplates :: %v ", sortedTemplates)
+
+		log.Info(":: Resolved all the templates ::", log.Fields{"appName":eachApp.Metadata.Name, "SortedTemplate":sortedTemplates})
+
+		resources, err := getResources(sortedTemplates)
+		if err != nil {
+			return pkgerrors.Wrapf(err, "Unable to get the resources for app :: %s", eachApp.Metadata.Name)
+		}
 
 		specData, err := NewAppIntentClient().GetAllIntentsByApp(eachApp.Metadata.Name, p, ca, v, gIntent)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents for app")
 		}
-		listOfClusters,err := gpic.IntentResolver(specData.Intent)
-		if err!=nil {
+		listOfClusters, err := gpic.IntentResolver(specData.Intent)
+		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents resolved for app")
 		}
-		log.Printf("::listOfClusters:: %v", listOfClusters)
+
+		log.Info(":: listOfClusters ::", log.Fields{"listOfClusters":listOfClusters})
+
+		//BEGIN: storing into etcd
+		// Add an app to the app context
+		apphandle, err := context.AddApp(compositeHandle, eachApp.Metadata.Name)
+		if err != nil {
+			cleanuperr := context.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Info(":: Error Cleaning up AppContext compositeApp failure ::", log.Fields{"Error":cleanuperr.Error(), "AppName":eachApp.Metadata.Name})
+			}
+			return pkgerrors.Wrap(err, "Error adding App to AppContext")
+		}
+		err = addClustersToAppContext(listOfClusters, context, apphandle, resources)
+		if err != nil {
+			log.Info(":: Error while adding cluster and resources to app ::", log.Fields{"Error":err.Error(), "AppName":eachApp.Metadata.Name})
+		}
+		err = verifyResources(listOfClusters, context, resources, eachApp.Metadata.Name)
+		if err != nil {
+			log.Info(":: Error while verifying resources in app ::", log.Fields{"Error":err.Error(), "AppName":eachApp.Metadata.Name})
+		}
 
 	}
-	log.Printf("Done with instantiation...")
+	context.AddInstruction(compositeHandle, "app", "order", appOrder)
+	//END: storing into etcd
+
+	// BEGIN:: save the context in the orchestrator db record
+	key := InstantiationKey{
+		IntentName:            gIntent,
+		Project:               p,
+		CompositeApp:          ca,
+		Version:               v,
+		DeploymentIntentGroup: di,
+	}
+
+	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagContext, ctxval)
+	if err != nil {
+		cleanuperr := context.DeleteCompositeApp()
+		if cleanuperr != nil {
+
+			log.Info(":: Error Cleaning up AppContext while saving context in the db for GPIntent ::", log.Fields{"Error":cleanuperr.Error(), "GPIntent":gIntent, "DeploymentIntentGroup":di, "CompositeApp":ca, "CompositeAppVersion":v, "Project":p})
+		}
+		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
+	}
+	// END:: save the context in the orchestrator db record
+
+	log.Info(":: Done with instantiation... ::", log.Fields{"CompositeAppName":ca})
 	return err
 }

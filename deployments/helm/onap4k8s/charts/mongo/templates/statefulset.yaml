@@ -14,7 +14,7 @@
 # limitations under the License.
 */}}
 
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ include "common.fullname" . }}
@@ -25,6 +25,10 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
+  selector:
+    matchLabels:
+      app: {{ include "common.name" . }}
+      release: {{ .Release.Name }}
   serviceName: {{ .Values.service.name }}
   replicas: {{ .Values.replicaCount }}
   template:

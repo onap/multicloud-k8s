@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ include "common.fullname" .  }}
@@ -21,6 +21,12 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: {{ include "common.name" . }}
 spec:
+  selector:
+    matchLabels:
+      heritage: "{{ .Release.Service }}"
+      release: "{{ .Release.Name }}"
+      chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+      app: {{ include "common.name" . }}
   serviceName: {{ include "common.servicename" .}}
   replicas: {{ .Values.replicaCount }}
   template:

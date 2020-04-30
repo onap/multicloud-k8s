@@ -33,6 +33,7 @@ if [ ${1:+1} ]; then
 fi
 
 base_url=${base_url:-"http://localhost:9015/v2"}
+
 kubeconfig_path="$HOME/.kube/config"
 csar_id=cb009bfe-bbee-11e8-9766-525400435678
 
@@ -69,12 +70,12 @@ appIntentNameForApp1="appIntentForApp1"
 appIntentForApp1Desc="AppIntentForApp1Desc"
 appIntentNameForApp2="appIntentForApp2"
 appIntentForApp2Desc="AppIntentForApp2Desc"
-providerName1="aws"
-providerName2="azure"
-clusterName1="edge1"
-clusterName2="edge2"
-clusterLabelName1="east-us1"
-clusterLabelName2="east-us2"
+providerName1="cluster_provider1"
+providerName2="cluster_provider2"
+clusterName1="clusterName1"
+clusterName2="clusterName2"
+clusterLabelName1="clusterLabel1"
+clusterLabelName2="clusterLabel2"
 
 deploymentIntentGroupName="test_deployment_intent_group"
 deploymentIntentGroupNameDesc="test_deployment_intent_group_desc"
@@ -93,7 +94,53 @@ cloud_region_owner="localhost"
 install_deps
 populate_CSAR_composite_app_helm "$csar_id"
 
-# BEGIN: Register project API
+# BEGIN :: Delete statements are issued so that we clean up the 'orchestrator' collection
+# and freshly populate the documents, also it serves as a direct test
+# for all our DELETE APIs and an indirect test for all GET APIs
+
+
+print_msg "Deleting intentToBeAddedinDeploymentIntentGroup"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/intents/${intentToBeAddedinDeploymentIntentGroup}"
+
+print_msg "Deleting ${deploymentIntentGroupName}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}"
+
+print_msg "Deleting ${appIntentNameForApp2}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/generic-placement-intents/${genericPlacementIntentName}/app-intents/${appIntentNameForApp2}"
+
+print_msg "Deleting ${appIntentNameForApp1}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/generic-placement-intents/${genericPlacementIntentName}/app-intents/${appIntentNameForApp1}"
+
+print_msg "Deleting ${genericPlacementIntentName}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/generic-placement-intents/${genericPlacementIntentName}"
+
+print_msg "Deleting ${sub_composite_profile_name2}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/composite-profiles/${main_composite_profile_name}/profiles/${sub_composite_profile_name2}"
+
+print_msg "Deleting ${sub_composite_profile_name1}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/composite-profiles/${main_composite_profile_name}/profiles/${sub_composite_profile_name1}"
+
+print_msg "Deleting ${main_composite_profile_name}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/composite-profiles/${main_composite_profile_name}"
+
+print_msg "Deleting ${app2_name}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/apps/${app2_name}"
+
+print_msg "Deleting ${app1_name}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/apps/${app1_name}"
+
+print_msg "Deleting ${composite_app_name}/${composite_app_version}"
+delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}"
+
+print_msg "Deleting ${project_name}"
+delete_resource "${base_url}/projects/${project_name}"
+
+# END :: Delete statements were issued so that we clean up the db
+# and freshly populate the documents, also it serves as a direct test
+# for all our DELETE APIs and an indirect test for all GET APIs
+
+
+# BEGIN: Register project
 print_msg "Registering project"
 payload="$(cat <<EOF
 {
@@ -107,9 +154,9 @@ payload="$(cat <<EOF
 EOF
 )"
 call_api -d "${payload}" "${base_url}/projects"
-# END: Register project API
+# END: Register project
 
-# BEGIN: Register composite-app API
+# BEGIN: Register composite-app
 print_msg "Registering composite-app"
 payload="$(cat <<EOF
 {
@@ -126,7 +173,7 @@ payload="$(cat <<EOF
 EOF
 )"
 call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps"
-# END: Register composite-app API
+# END: Register composite-app
 
 
 

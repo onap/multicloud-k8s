@@ -80,7 +80,8 @@ case ${ID,,} in
     *suse)
     ;;
     ubuntu|debian)
-        apt-get install -y cpu-checker
+        apt-get upgrade -y rsync
+	apt-get install -y cpu-checker
         kvm-ok
     ;;
     rhel|centos|fedora)

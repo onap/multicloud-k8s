@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "55ff0533_20db2618",
+        "filename": "kud/deployment_infra/playbooks/configure-cmk.yml",
+        "patchSetId": 74
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-01T01:20:51Z",
+      "side": 1,
+      "message": "why the host name is hardcoded here?",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 44
+      },
+      "revId": "9ee662133732beced9b1fdeca9e96faa57234797",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e199f44_3216ee7c",
+        "filename": "kud/deployment_infra/playbooks/configure-cmk.yml",
+        "patchSetId": 74
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-01T01:20:51Z",
+      "side": 1,
+      "message": "why the host name is hardcoded here?",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 44
+      },
+      "revId": "9ee662133732beced9b1fdeca9e96faa57234797",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "227017a7_ccc40fd0",
+        "filename": "kud/deployment_infra/playbooks/configure-cmk.yml",
+        "patchSetId": 74
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-01T01:20:51Z",
+      "side": 1,
+      "message": "why the host name is hardcoded here?",
+      "range": {
+        "startLine": 108,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 46
+      },
+      "revId": "9ee662133732beced9b1fdeca9e96faa57234797",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3a334ca_4e9a79ec",
+        "filename": "kud/deployment_infra/playbooks/configure-cmk.yml",
+        "patchSetId": 74
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-01T01:20:51Z",
+      "side": 1,
+      "message": "why the host name is hardcoded here?",
+      "range": {
+        "startLine": 118,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 46
+      },
+      "revId": "9ee662133732beced9b1fdeca9e96faa57234797",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

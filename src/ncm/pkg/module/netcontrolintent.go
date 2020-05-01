@@ -281,7 +281,7 @@ func (v *NetControlIntentClient) ApplyNetControlIntent(name, project, compositea
 			}
 
 			// Update resource in AppContext
-			err = context.UpdateResourceValue(rh, string(y))
+			err = context.UpdateResourceValue(rh, []byte(string(y)))
 			if err != nil {
 				log.Error("Network updating app context resource handle", log.Fields{
 					"error":           err,

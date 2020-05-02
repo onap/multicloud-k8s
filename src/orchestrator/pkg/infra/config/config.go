@@ -26,19 +26,24 @@ import (
 // Configuration loads up all the values that are used to configure
 // backend implementations
 type Configuration struct {
-	CAFile              string `json:"ca-file"`
-	ServerCert          string `json:"server-cert"`
-	ServerKey           string `json:"server-key"`
-	Password            string `json:"password"`
-	DatabaseIP          string `json:"database-ip"`
-	DatabaseType        string `json:"database-type"`
-	PluginDir           string `json:"plugin-dir"`
-	EtcdIP              string `json:"etcd-ip"`
-	EtcdCert            string `json:"etcd-cert"`
-	EtcdKey             string `json:"etcd-key"`
-	EtcdCAFile          string `json:"etcd-ca-file"`
-	ServicePort         string `json:"service-port"`
-	KubernetesLabelName string `json:"kubernetes-label-name"`
+	CAFile                 string `json:"ca-file"`
+	ServerCert             string `json:"server-cert"`
+	ServerKey              string `json:"server-key"`
+	Password               string `json:"password"`
+	DatabaseIP             string `json:"database-ip"`
+	DatabaseType           string `json:"database-type"`
+	PluginDir              string `json:"plugin-dir"`
+	EtcdIP                 string `json:"etcd-ip"`
+	EtcdCert               string `json:"etcd-cert"`
+	EtcdKey                string `json:"etcd-key"`
+	EtcdCAFile             string `json:"etcd-ca-file"`
+	GrpcServerCert         string `json:"grpc-server-cert"`
+	GrpcServerKey          string `json:"grpc-server-key"`
+	GrpcCAFile             string `json:"grpc-ca-file"`
+	GrpcEnableTLS          string `json:"grpc-enable-tls"`
+	GrpcServerNameOverride string `json:"grpc-server-name-override"`
+	ServicePort            string `json:"service-port"`
+	KubernetesLabelName    string `json:"kubernetes-label-name"`
 }
 
 // Config is the structure that stores the configuration
@@ -75,19 +80,24 @@ func defaultConfiguration() *Configuration {
 	}
 
 	return &Configuration{
-		CAFile:              "ca.cert",
-		ServerCert:          "server.cert",
-		ServerKey:           "server.key",
-		Password:            "",
-		DatabaseIP:          "127.0.0.1",
-		DatabaseType:        "mongo",
-		PluginDir:           cwd,
-		EtcdIP:              "127.0.0.1",
-		EtcdCert:            "",
-		EtcdKey:             "",
-		EtcdCAFile:          "",
-		ServicePort:         "9015",
-		KubernetesLabelName: "orchestrator.io/rb-instance-id",
+		CAFile:                 "ca.cert",
+		ServerCert:             "server.cert",
+		ServerKey:              "server.key",
+		Password:               "",
+		DatabaseIP:             "127.0.0.1",
+		DatabaseType:           "mongo",
+		PluginDir:              cwd,
+		EtcdIP:                 "127.0.0.1",
+		EtcdCert:               "",
+		EtcdKey:                "",
+		EtcdCAFile:             "",
+		GrpcServerCert:         "",
+		GrpcServerKey:          "",
+		GrpcCAFile:             "",
+		GrpcEnableTLS:          "disable",
+		GrpcServerNameOverride: "",
+		ServicePort:            "9015",
+		KubernetesLabelName:    "orchestrator.io/rb-instance-id",
 	}
 }
 

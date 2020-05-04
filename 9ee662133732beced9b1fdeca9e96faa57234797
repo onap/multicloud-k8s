@@ -48,6 +48,23 @@
     },
     {
       "key": {
+        "uuid": "a7b43a97_3118d1c0",
+        "filename": "kud/deployment_infra/playbooks/configure-cmk.yml",
+        "patchSetId": 74
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-04T22:01:00Z",
+      "side": 1,
+      "message": "why the host name is hardcoded here?",
+      "revId": "9ee662133732beced9b1fdeca9e96faa57234797",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "227017a7_ccc40fd0",
         "filename": "kud/deployment_infra/playbooks/configure-cmk.yml",
         "patchSetId": 74

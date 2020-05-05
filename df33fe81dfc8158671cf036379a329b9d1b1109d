@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "be08030b_857c4c29",
+        "filename": "kud/hosting_providers/vagrant/inventory/group_vars/k8s-cluster.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-05T23:42:45Z",
+      "side": 1,
+      "message": "Please add kube_version: v1.16.9 in https://github.com/onap/multicloud-k8s/blob/master/kud/hosting_providers/containerized/inventory/group_vars/k8s-cluster.yml#L51 as well",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 21
+      },
+      "revId": "df33fe81dfc8158671cf036379a329b9d1b1109d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

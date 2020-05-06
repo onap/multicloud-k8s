@@ -22,6 +22,30 @@
       "revId": "d3a9c01c0f5b95dfe052c8a4c915b6e98af9032f",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd1ed433_733ac74e",
+        "filename": "releases/0.6.0-container.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-05-06T17:26:11Z",
+      "side": 1,
+      "message": "My understanding was that this version is the version of the container to pull to produce the release image (which would then get the \u0027container_release_tag\u0027 value from line 2)?  But, this is just my best guess - first time trying to help with this process.",
+      "parentUuid": "1c26867d_b4ff5369",
+      "range": {
+        "startLine": 8,
+        "startChar": 16,
+        "endLine": 8,
+        "endChar": 30
+      },
+      "revId": "d3a9c01c0f5b95dfe052c8a4c915b6e98af9032f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

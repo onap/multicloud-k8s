@@ -1,0 +1,35 @@
+#!/bin/sh -e
+
+cmd=${1:-""}
+
+case ${cmd} in
+   "mco")
+      ./orchestrator
+      ;;
+
+   "ncm")
+      ./ncm
+      ;;
+
+   "dcm")
+      ./dcm
+      ;;
+
+   "rsync")
+      ./rsync
+      ;;
+
+   "ovnaction")
+      ./ovnaction
+      ;;
+
+   "clm")
+      ./clm
+      ;;
+
+    *)
+      echo "invalid command ${cmd}"
+      sleep infinity
+
+esac
+

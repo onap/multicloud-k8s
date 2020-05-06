@@ -46,6 +46,30 @@
       "revId": "d3a9c01c0f5b95dfe052c8a4c915b6e98af9032f",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "689b2c9a_1a642396",
+        "filename": "releases/0.6.0-container.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 481
+      },
+      "writtenOn": "2020-05-06T17:39:55Z",
+      "side": 1,
+      "message": "That is correct. This version is basically the version of the candidate image that you want to produce a release from. \nThe job will pull using \"version\" and re-tag with \"container_release_tag\" and push to releases",
+      "parentUuid": "fd1ed433_733ac74e",
+      "range": {
+        "startLine": 8,
+        "startChar": 16,
+        "endLine": 8,
+        "endChar": 30
+      },
+      "revId": "d3a9c01c0f5b95dfe052c8a4c915b6e98af9032f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

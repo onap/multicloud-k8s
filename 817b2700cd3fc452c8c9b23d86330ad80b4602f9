@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cdcffb71_33744a5e",
+        "filename": "kud/hosting_providers/vagrant/inventory/group_vars/k8s-cluster.yml",
+        "patchSetId": 28
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-09T06:13:16Z",
+      "side": 1,
+      "message": "https://github.com/kubernetes-sigs/kubespray/issues/3749\nhttps://github.com/kubernetes-sigs/kubespray/pull/4448\n\nCan we try only download_run_once:false",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 23
+      },
+      "revId": "817b2700cd3fc452c8c9b23d86330ad80b4602f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

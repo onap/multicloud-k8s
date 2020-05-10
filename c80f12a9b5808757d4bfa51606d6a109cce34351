@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e39a8cb_e1f16f7d",
+        "filename": "kud/hosting_providers/vagrant/inventory/group_vars/k8s-cluster.yml",
+        "patchSetId": 32
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-10T18:35:03Z",
+      "side": 1,
+      "message": "Why is this change required? Isn\u0027t this going to make installation slower and also will require more bandwidth",
+      "range": {
+        "startLine": 64,
+        "startChar": 19,
+        "endLine": 64,
+        "endChar": 24
+      },
+      "revId": "c80f12a9b5808757d4bfa51606d6a109cce34351",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8feaf735_276ab809",
+        "filename": "kud/hosting_providers/vagrant/inventory/group_vars/k8s-cluster.yml",
+        "patchSetId": 32
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-10T18:35:03Z",
+      "side": 1,
+      "message": "Based on the comment this seems like a feature to help debugging",
+      "range": {
+        "startLine": 72,
+        "startChar": 2,
+        "endLine": 73,
+        "endChar": 35
+      },
+      "revId": "c80f12a9b5808757d4bfa51606d6a109cce34351",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

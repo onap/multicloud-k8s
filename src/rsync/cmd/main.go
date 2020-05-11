@@ -18,9 +18,45 @@ import (
 	"log"
 	"math/rand"
 	"time"
+	"net"
+	"google.golang.org/grpc"
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
+	installpb "rsync/pkg/grpc/installapp"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	register "rsync/pkg/grpc"
 )
+
+func startGrpcServer() error {
+
+	host, port := register.GetServerHostPort()
+        //lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", "localhost", port))
+        lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+	if err != nil {
+                log.Fatalf("Could not listen to port: %v", err)
+        }
+        var opts []grpc.ServerOption
+/*
+        if tls {
+                if certFile == "" {
+                        certFile = testdata.Path("server.pem")
+                }
+                if keyFile == "" {
+                        keyFile = testdata.Path("server.key")
+                }
+                creds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
+                if err != nil {
+                        log.Fatalf("Could not generate credentials %v", err)
+                }
+                opts = []grpc.ServerOption{grpc.Creds(creds)}
+        }
+*/
+        grpcServer := grpc.NewServer(opts...)
+	installpb.RegisterContextupdateServer(grpcServer, installappserver.NewInstallAppServer())
+
+        log.Println("Starting rsync gRPC Server")
+        grpcServer.Serve(lis)
+        return nil
+}
 
 func main() {
 
@@ -44,6 +80,10 @@ func main() {
 		log.Fatalln("Exiting...")
 	}
 
-	// Initialize grpc
-
+	// Start grpc
+	fmt.Println("starting rsync GRPC server..")
+	err = startGrpcServer()
+	if err != nil {
+		log.Fatalf("GRPC server failed to start")
+	}
 }

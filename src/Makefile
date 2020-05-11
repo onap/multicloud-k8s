@@ -2,7 +2,7 @@ build:
 	$(MAKE) -C monitor build
 	$(MAKE) -C k8splugin build
 	$(MAKE) -C orchestrator build
-	$(MAKE) -C ncm build
+	$(MAKE) -C ncm build 
 	$(MAKE) -C dcm build
 	$(MAKE) -C rsync build
 

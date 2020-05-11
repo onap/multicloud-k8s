@@ -22,7 +22,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/rtcontext"
 	pkgerrors "github.com/pkg/errors"
-	//"log"
+
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 )
 
@@ -30,6 +30,16 @@ type AppContext struct {
 	initDone bool
 	rtcObj   rtcontext.RunTimeContext
 	rtc      rtcontext.Rtcontext
+}
+
+// CompositeAppMeta consists of projectName, CompositeAppName,
+// CompositeAppVersion, ReleaseName. This shall be used for
+// instantiation of a compositeApp
+type CompositeAppMeta struct {
+	Project      string `json:"Project"`
+	CompositeApp string `json:"CompositeApp"`
+	Version      string `json:"Version"`
+	Release      string `json:"Release"`
 }
 
 // Init app context
@@ -46,12 +56,22 @@ func (ac *AppContext) LoadAppContext(cid interface{}) (interface{}, error) {
 	return ac.rtc.RtcLoad(cid)
 }
 
-// Create a new context and returns the handle
+// CreateCompositeApp is deprecated, use CreateCompositeAppNew instead
 func (ac *AppContext) CreateCompositeApp() (interface{}, error) {
 	h, err := ac.rtc.RtcCreate()
 	if err != nil {
 		return nil, err
 	}
+	return h, nil
+}
+
+// CreateCompositeAppNew method takes in the meta data of app and returns composite app handle as interface.
+func (ac *AppContext) CreateCompositeAppNew(meta interface{}) (interface{}, error) {
+	h, err := ac.rtc.RtcCreateNew(meta)
+	if err != nil {
+		return nil, err
+	}
+	log.Info(":: CreateCompositeApp ::", log.Fields{"CompositeAppHandle": h})
 	return h, nil
 }
 
@@ -83,7 +103,7 @@ func (ac *AppContext) AddApp(handle interface{}, appname string) (interface{}, e
 	if err != nil {
 		return nil, err
 	}
-	log.Info(":: Added app handle ::", log.Fields{"AppHandle":h})
+	log.Info(":: Added app handle ::", log.Fields{"AppHandle": h})
 	return h, nil
 }
 
@@ -126,7 +146,7 @@ func (ac *AppContext) AddCluster(handle interface{}, clustername string) (interf
 	if err != nil {
 		return nil, err
 	}
-	log.Info(":: Added cluster handle ::", log.Fields{"ClusterHandler":h})
+	log.Info(":: Added cluster handle ::", log.Fields{"ClusterHandler": h})
 	return h, nil
 }
 
@@ -202,7 +222,7 @@ func (ac *AppContext) AddResource(handle interface{}, resname string, value []by
 	if err != nil {
 		return nil, err
 	}
-	log.Info(":: Added resource handle ::", log.Fields{"ResourceHandler":h})
+	log.Info(":: Added resource handle ::", log.Fields{"ResourceHandler": h})
 
 	return h, nil
 }
@@ -260,7 +280,7 @@ func (ac *AppContext) AddInstruction(handle interface{}, level string, insttype 
 	if err != nil {
 		return nil, err
 	}
-	log.Info(":: Added instruction handle ::", log.Fields{"InstructionHandler":h})
+	log.Info(":: Added instruction handle ::", log.Fields{"InstructionHandler": h})
 	return h, nil
 }
 
@@ -331,4 +351,25 @@ func (ac *AppContext) GetValue(handle interface{}) (interface{}, error) {
 		return nil, err
 	}
 	return v, nil
+}
+
+// GetMeta returns the meta data associated with the compositeApp
+// Its return type is CompositeAppMeta
+func (ac *AppContext) GetMeta() (CompositeAppMeta, error) {
+	mi, err := ac.rtcObj.RtcGetMeta()
+
+	if err != nil {
+		return CompositeAppMeta{}, pkgerrors.Errorf("Failed to get compositeApp meta")
+	}
+	datamap, ok := mi.(map[string]interface{})
+	if ok == false {
+		return CompositeAppMeta{}, pkgerrors.Errorf("Failed to cast meta interface to compositeApp meta")
+	}
+
+	p := fmt.Sprintf("%v", datamap["Project"])
+	ca := fmt.Sprintf("%v", datamap["CompositeApp"])
+	v := fmt.Sprintf("%v", datamap["Version"])
+	rn := fmt.Sprintf("%v", datamap["Release"])
+
+	return CompositeAppMeta{Project: p, CompositeApp: ca, Version: v, Release: rn}, nil
 }

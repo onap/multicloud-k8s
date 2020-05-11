@@ -112,7 +112,7 @@ func TestRtcInit(t *testing.T) {
 }
 
 func TestRtcLoad(t *testing.T) {
-	var rtc = RunTimeContext{""}
+	var rtc = RunTimeContext{"", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -147,7 +147,7 @@ func TestRtcLoad(t *testing.T) {
 }
 
 func TestRtcCreate(t *testing.T) {
-	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -179,7 +179,7 @@ func TestRtcCreate(t *testing.T) {
 }
 
 func TestRtcGet(t *testing.T) {
-	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -240,7 +240,7 @@ func TestRtcGet(t *testing.T) {
 }
 
 func TestRtcAddLevel(t *testing.T) {
-	var rtc = RunTimeContext{"/context/3528435435454354/"}
+	var rtc = RunTimeContext{"/context/3528435435454354/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -304,7 +304,7 @@ func TestRtcAddLevel(t *testing.T) {
 }
 
 func TestRtcAddResource(t *testing.T) {
-	var rtc = RunTimeContext{"/context/3528435435454354/"}
+	var rtc = RunTimeContext{"/context/3528435435454354/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -368,7 +368,7 @@ func TestRtcAddResource(t *testing.T) {
 }
 
 func TestRtcAddInstruction(t *testing.T) {
-	var rtc = RunTimeContext{"/context/3528435435454354/"}
+	var rtc = RunTimeContext{"/context/3528435435454354/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -447,7 +447,7 @@ func TestRtcAddInstruction(t *testing.T) {
 }
 
 func TestRtcGetHandles(t *testing.T) {
-	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -490,7 +490,7 @@ func TestRtcGetHandles(t *testing.T) {
 }
 
 func TestRtcGetValue(t *testing.T) {
-	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -534,7 +534,7 @@ func TestRtcGetValue(t *testing.T) {
 }
 
 func TestRtcUpdateValue(t *testing.T) {
-	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -581,7 +581,7 @@ func TestRtcUpdateValue(t *testing.T) {
 }
 
 func TestRtcDeletePair(t *testing.T) {
-	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb
@@ -621,7 +621,7 @@ func TestRtcDeletePair(t *testing.T) {
 }
 
 func TestRtcDeletePrefix(t *testing.T) {
-	var rtc = RunTimeContext{"/context/5345674458787728/"}
+	var rtc = RunTimeContext{"/context/5345674458787728/", ""}
 	testCases := []struct {
 		label         string
 		mockContextDb *MockContextDb

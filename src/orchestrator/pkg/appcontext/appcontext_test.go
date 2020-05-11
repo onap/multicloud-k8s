@@ -29,6 +29,13 @@ type MockRunTimeContext struct {
 	Err   error
 }
 
+type MockCompositeAppMeta struct {
+	Project      string
+	CompositeApp string
+	Version      string
+	Release      string
+}
+
 func (c *MockRunTimeContext) RtcCreate() (interface{}, error) {
 	var key string = "/context/9345674458787728/"
 
@@ -38,6 +45,16 @@ func (c *MockRunTimeContext) RtcCreate() (interface{}, error) {
 	c.Items[key] = "9345674458787728"
 	return interface{}(key), c.Err
 
+}
+
+func (c *MockRunTimeContext) RtcAddMeta(meta interface{}) error {
+	var cid string = "/context/9345674458787728/"
+	key := cid + "meta" + "/"
+	if c.Items == nil {
+		c.Items = make(map[string]interface{})
+	}
+	c.Items[key] = meta
+	return nil
 }
 
 func (c *MockRunTimeContext) RtcInit() (interface{}, error) {
@@ -53,6 +70,11 @@ func (c *MockRunTimeContext) RtcLoad(id interface{}) (interface{}, error) {
 func (c *MockRunTimeContext) RtcGet() (interface{}, error) {
 	var key string = "/context/9345674458787728/"
 	return key, c.Err
+}
+
+func (c *MockRunTimeContext) RtcGetMeta() (interface{}, error) {
+	meta := CompositeAppMeta{Project: "pn", CompositeApp: "ca", Version: "v", Release: "rName"}
+	return meta, nil
 }
 
 func (c *MockRunTimeContext) RtcAddLevel(handle interface{}, level string, value string) (interface{}, error) {
@@ -122,15 +144,18 @@ func TestCreateCompositeApp(t *testing.T) {
 		label         string
 		mockRtcontext *MockRunTimeContext
 		expectedError string
+		meta          interface{}
 	}{
 		{
 			label:         "Success case",
 			mockRtcontext: &MockRunTimeContext{},
+			meta:          interface{}(MockCompositeAppMeta{Project: "Testproject", CompositeApp: "TestCompApp", Version: "CompAppVersion", Release: "TestRelease"}),
 		},
 		{
 			label:         "Create returns error case",
 			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error creating run time context:")},
 			expectedError: "Error creating run time context:",
+			meta:          interface{}(MockCompositeAppMeta{Project: "Testproject", CompositeApp: "TestCompApp", Version: "CompAppVersion", Release: "TestRelease"}),
 		},
 	}
 
@@ -169,7 +194,7 @@ func TestGetCompositeApp(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			ac.rtc = testCase.mockRtcontext
-			_, err := ac.GetCompositeApp()
+			_, err := ac.GetCompositeAppHandle()
 			if err != nil {
 				if !strings.Contains(string(err.Error()), testCase.expectedError) {
 					t.Fatalf("Method returned an error (%s)", err)
@@ -219,17 +244,20 @@ func TestAddApp(t *testing.T) {
 		mockRtcontext *MockRunTimeContext
 		key           interface{}
 		expectedError string
+		meta          interface{}
 	}{
 		{
 			label:         "Success case",
 			mockRtcontext: &MockRunTimeContext{},
 			key:           "/context/9345674458787728/",
+			meta:          interface{}(MockCompositeAppMeta{Project: "Testproject", CompositeApp: "TestCompApp", Version: "CompAppVersion", Release: "TestRelease"}),
 		},
 		{
 			label:         "Error case for adding app",
 			mockRtcontext: &MockRunTimeContext{Err: pkgerrors.Errorf("Error adding app to run time context:")},
 			key:           "/context/9345674458787728/",
 			expectedError: "Error adding app to run time context:",
+			meta:          interface{}(MockCompositeAppMeta{Project: "Testproject", CompositeApp: "TestCompApp", Version: "CompAppVersion", Release: "TestRelease"}),
 		},
 	}
 

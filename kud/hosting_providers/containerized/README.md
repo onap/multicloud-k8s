@@ -25,6 +25,24 @@ Installer script finds the `hosts.init` for each cluster in `/opt/multi-cluster/
 
 Kubernetes jobs(a cluster per job) are used to install multiple clusters and logs of each cluster deployments are stored in the `/opt/kud/multi-cluster/<cluster-name>/logs` and artifacts are stored as follows `/opt/kud/multi-cluster/<cluster-name>/artifacts`
 
+## Creating TestBed for Testing and Development
+
+This section creates VM for testing and development work in containerization setup. User can skip this steps, if they have baremetal avaiable for testing or development.
+
+```
+$ git clone https://github.com/onap/multicloud-k8s.git
+$ pushd multicloud-k8s/kud/hosting_providers/vagrant
+$ sudo ./setup.sh -p libvirt
+$ popd
+$ pushd multicloud-k8s/kud/hosting_providers/containerized/testing
+$ vagrant up
+$ popd
+```
+Do following steps to keep note of
+1. Get the IP address for the Vagrant machine - <VAGRANT_IP_ADDRESS>
+2. Copy the host /root/.ssh/id_rsa.pub into the vagrant /root/.ssh/authorized_keys
+3. From host make sure to ssh into vagrant without password ssh root@<VAGRANT_IP_ADDRESS>
+
 ## Quickstart Installation Guide
 
 Build the kud docker images as follows, add KUD_ENABLE_TESTS & KUD_PLUGIN_ENABLED for the testing only:
@@ -40,7 +58,7 @@ $  docker build  --rm \
 	--build-arg NO_PROXY=${NO_PROXY} \
         --build-arg KUD_ENABLE_TESTS=true \
         --build-arg KUD_PLUGIN_ENABLED=true \
-	-t github.com/onap/multicloud-k8s:latest . -f build/Dockerfile
+	-t github.com/onap/multicloud-k8s:latest . -f kud/build/Dockerfile
 ```
 Let's create a cluster-101 and cluster-102 hosts.ini as follows
 
@@ -48,12 +66,12 @@ Let's create a cluster-101 and cluster-102 hosts.ini as follows
 $ mkdir -p /opt/kud/multi-cluster/{cluster-101,cluster-102}
 ```
 
-Create hosts.ini as follows in the direcotry cluster-101(c01 IP address 10.10.10.3) and cluster-102(c02 IP address 10.10.10.5)
+Create hosts.ini as follows in the direcotry cluster-101(c01 IP address 10.10.10.3) and cluster-102(c02 IP address 10.10.10.5). If user used Vagrant setup as mentioned in the above steps, replace the IP address with vagrant IP address
 
 ```
-/opt/kud/multi-cluster/cluster-101/hosts.ini
+$ cat /opt/kud/multi-cluster/cluster-101/hosts.ini
 [all]
-c01 ansible_ssh_host=10.10.10.5 ansible_ssh_port=22
+c01 ansible_ssh_host=<VAGRANT_IP_ADDRESS> ansible_ssh_port=22
 
 [kube-master]
 c01
@@ -116,6 +134,10 @@ spec:
   backoffLimit: 0
 
 EOF
+```
+See the logs as follows to see the progress of KUD installation
+```
+$ kubectl logs -f kud-$CLUSTER_NAME-<AAAA>
 ```
 
 Multi - cluster information from the host machine;

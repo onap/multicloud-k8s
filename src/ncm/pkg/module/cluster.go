@@ -479,7 +479,7 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error creating AppContext")
 	}
-	handle, err := context.CreateCompositeApp()
+	handle, err := context.CreateCompositeApp("")
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error creating AppContext CompositeApp")
 	}

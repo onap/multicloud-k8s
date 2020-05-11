@@ -8,11 +8,8 @@ require (
 	github.com/gorilla/mux v1.6.2
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20200127152046-0ee521d56061
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200511064412-8e0c00c4c59a
 	github.com/pkg/errors v0.8.1
-	github.com/sirupsen/logrus v1.4.2
-	go.etcd.io/etcd v3.3.12+incompatible
-	go.mongodb.org/mongo-driver v1.0.0
-	golang.org/x/net v0.0.0-20190930134127-c5a3c61f89f3
 	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
 	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
@@ -31,6 +28,7 @@ replace (
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.0.0-20190409023024-d644b00f3b79
 	k8s.io/client-go => k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.0.0-20190409023720-1bc0c81fa51d
+	github.com/onap/multicloud-k8s/src/orchestrator => /w/workspace/multicloud-k8s-master-verify-golang/src/orchestrator // want the CICD to use this local path for build to pass
 )
 
 go 1.13

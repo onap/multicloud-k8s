@@ -29,13 +29,14 @@ const maxrand = 0x7fffffffffffffff
 const prefix string = "/context/"
 
 type RunTimeContext struct {
-	cid interface{}
+	cid  interface{}
+	meta interface{}
 }
 
 type Rtcontext interface {
 	RtcInit() (interface{}, error)
 	RtcLoad(interface{}) (interface{}, error)
-	RtcCreate() (interface{}, error)
+	RtcCreate(meta interface{}) (interface{}, error)
 	RtcGet() (interface{}, error)
 	RtcAddLevel(handle interface{}, level string, value string) (interface{}, error)
 	RtcAddResource(handle interface{}, resname string, value interface{}) (interface{}, error)
@@ -45,6 +46,8 @@ type Rtcontext interface {
 	RtcGetHandles(handle interface{}) ([]interface{}, error)
 	RtcGetValue(handle interface{}, value interface{}) error
 	RtcUpdateValue(handle interface{}, value interface{}) error
+	//RtcGetStoreContext(handle interface{}) (interface{}, error)
+	RtcGetMeta() (interface{}, error)
 }
 
 //Intialize context by assiging a new id
@@ -77,7 +80,7 @@ func (rtc *RunTimeContext) RtcLoad(id interface{}) (interface{}, error) {
 }
 
 //Create context using the id and prefix
-func (rtc *RunTimeContext) RtcCreate() (interface{}, error) {
+func (rtc *RunTimeContext) RtcCreate(meta interface{}) (interface{}, error) {
 	cid := fmt.Sprintf("%v", rtc.cid)
 	if cid == "" {
 		return nil, pkgerrors.Errorf("Error, context not intialized")
@@ -85,10 +88,19 @@ func (rtc *RunTimeContext) RtcCreate() (interface{}, error) {
 	if !strings.HasPrefix(cid, prefix) {
 		return nil, pkgerrors.Errorf("Not a valid run time context prefix")
 	}
+
 	id := strings.SplitN(cid, "/", 4)[2]
+	//sc := StoreContext{id: id, meta: meta}
 	err := contextdb.Db.Put(cid, id)
 	if err != nil {
 		return nil, pkgerrors.Errorf("Error creating run time context: %s", err.Error())
+	}
+
+	rtc.meta = meta
+	k := cid + "meta" + "/"
+	err = contextdb.Db.Put(k, rtc.meta)
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error saving metadata in run time context: %s", err.Error())
 	}
 
 	return rtc.cid, nil
@@ -112,6 +124,30 @@ func (rtc *RunTimeContext) RtcGet() (interface{}, error) {
 
 	return rtc.cid, nil
 }
+
+// RtcGetMeta method fetches the meta data of the rtc object and returns it.
+func (rtc *RunTimeContext) RtcGetMeta() (interface{}, error) {
+	str := fmt.Sprintf("%v", rtc.cid)
+	if !strings.HasPrefix(str, prefix) {
+		return nil, pkgerrors.Errorf("Not a valid run time context")
+	}
+
+	var value interface{}
+	k := str + "meta" + "/"
+	err := contextdb.Db.Get(k, &value)
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error getting run time context metadata: %s", err.Error())
+	}
+	return value, nil
+
+}
+
+// func (rtc *RunTimeContext) RtcGetStoreContext(handle interface{}) (interface{}, error)  {
+// 	var sc StoreContext
+// 	rtc.RtcGetValue(handle, &sc)
+// 	return sc.meta, nil
+
+// }
 
 //Add a new level at a given handle and return the new handle
 func (rtc *RunTimeContext) RtcAddLevel(handle interface{}, level string, value string) (interface{}, error) {
@@ -177,7 +213,6 @@ func (rtc *RunTimeContext) RtcAddInstruction(handle interface{}, level string, i
 	if value == nil {
 		return nil, pkgerrors.Errorf("Not a valid run time context instruction value")
 	}
-
 	k := str + level + "/" + "instruction" + "/" + insttype + "/"
 	err := contextdb.Db.Put(k, fmt.Sprintf("%v", value))
 	if err != nil {
@@ -194,7 +229,6 @@ func (rtc *RunTimeContext) RtcDeletePair(handle interface{}) error {
 	if !strings.HasPrefix(str, sid) {
 		return pkgerrors.Errorf("Not a valid run time context handle")
 	}
-
 	err := contextdb.Db.Delete(str)
 	if err != nil {
 		return pkgerrors.Errorf("Error deleting run time context pair: %s", err.Error())

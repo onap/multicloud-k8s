@@ -25,7 +25,8 @@ import (
 	"reflect"
 	"testing"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -36,29 +37,29 @@ import (
 type mockControllerManager struct {
 	// Items and err will be used to customize each test
 	// via a localized instantiation of mockControllerManager
-	Items []moduleLib.Controller
+	Items []controller.Controller
 	Err   error
 }
 
-func (m *mockControllerManager) CreateController(inp moduleLib.Controller, mayExist bool) (moduleLib.Controller, error) {
+func (m *mockControllerManager) CreateController(inp controller.Controller, mayExist bool) (controller.Controller, error) {
 	if m.Err != nil {
-		return moduleLib.Controller{}, m.Err
+		return controller.Controller{}, m.Err
 	}
 
 	return m.Items[0], nil
 }
 
-func (m *mockControllerManager) GetController(name string) (moduleLib.Controller, error) {
+func (m *mockControllerManager) GetController(name string) (controller.Controller, error) {
 	if m.Err != nil {
-		return moduleLib.Controller{}, m.Err
+		return controller.Controller{}, m.Err
 	}
 
 	return m.Items[0], nil
 }
 
-func (m *mockControllerManager) GetControllers() ([]moduleLib.Controller, error) {
+func (m *mockControllerManager) GetControllers() ([]controller.Controller, error) {
 	if m.Err != nil {
-		return []moduleLib.Controller{}, m.Err
+		return []controller.Controller{}, m.Err
 	}
 
 	return m.Items, nil
@@ -76,7 +77,7 @@ func TestControllerCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label            string
 		reader           io.Reader
-		expected         moduleLib.Controller
+		expected         controller.Controller
 		expectedCode     int
 		controllerClient *mockControllerManager
 	}{
@@ -96,23 +97,23 @@ func TestControllerCreateHandler(t *testing.T) {
 				"ip-address":"10.188.234.1",
 				"port":8080 }
 				}`)),
-			expected: moduleLib.Controller{
-				Metadata: moduleLib.Metadata{
+			expected: controller.Controller{
+				Metadata: types.Metadata{
 					Name: "testController",
 				},
-				Spec: moduleLib.ControllerSpec{
+				Spec: controller.ControllerSpec{
 					Host: "10.188.234.1",
 					Port: 8080,
 				},
 			},
 			controllerClient: &mockControllerManager{
 				//Items that will be returned by the mocked Client
-				Items: []moduleLib.Controller{
+				Items: []controller.Controller{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name: "testController",
 						},
-						Spec: moduleLib.ControllerSpec{
+						Spec: controller.ControllerSpec{
 							Host: "10.188.234.1",
 							Port: 8080,
 						},
@@ -142,7 +143,7 @@ func TestControllerCreateHandler(t *testing.T) {
 
 			//Check returned body only if statusCreated
 			if resp.StatusCode == http.StatusCreated {
-				got := moduleLib.Controller{}
+				got := controller.Controller{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -158,7 +159,7 @@ func TestControllerGetHandler(t *testing.T) {
 
 	testCases := []struct {
 		label            string
-		expected         moduleLib.Controller
+		expected         controller.Controller
 		name, version    string
 		expectedCode     int
 		controllerClient *mockControllerManager
@@ -166,23 +167,23 @@ func TestControllerGetHandler(t *testing.T) {
 		{
 			label:        "Get Controller",
 			expectedCode: http.StatusOK,
-			expected: moduleLib.Controller{
-				Metadata: moduleLib.Metadata{
+			expected: controller.Controller{
+				Metadata: types.Metadata{
 					Name: "testController",
 				},
-				Spec: moduleLib.ControllerSpec{
+				Spec: controller.ControllerSpec{
 					Host: "10.188.234.1",
 					Port: 8080,
 				},
 			},
 			name: "testController",
 			controllerClient: &mockControllerManager{
-				Items: []moduleLib.Controller{
+				Items: []controller.Controller{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name: "testController",
 						},
-						Spec: moduleLib.ControllerSpec{
+						Spec: controller.ControllerSpec{
 							Host: "10.188.234.1",
 							Port: 8080,
 						},
@@ -195,7 +196,7 @@ func TestControllerGetHandler(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 			name:         "nonexistingController",
 			controllerClient: &mockControllerManager{
-				Items: []moduleLib.Controller{},
+				Items: []controller.Controller{},
 				Err:   pkgerrors.New("Internal Error"),
 			},
 		},
@@ -213,7 +214,7 @@ func TestControllerGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := moduleLib.Controller{}
+				got := controller.Controller{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {

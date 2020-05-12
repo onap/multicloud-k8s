@@ -19,6 +19,7 @@ package api
 import (
 	"github.com/gorilla/mux"
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+	controller "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 )
 
 var moduleClient *moduleLib.Client
@@ -27,7 +28,7 @@ var moduleClient *moduleLib.Client
 func NewRouter(projectClient moduleLib.ProjectManager,
 	compositeAppClient moduleLib.CompositeAppManager,
 	appClient moduleLib.AppManager,
-	ControllerClient moduleLib.ControllerManager,
+	ControllerClient controller.ControllerManager,
 	genericPlacementIntentClient moduleLib.GenericPlacementIntentManager,
 	appIntentClient moduleLib.AppIntentManager,
 	deploymentIntentGrpClient moduleLib.DeploymentIntentGroupManager,

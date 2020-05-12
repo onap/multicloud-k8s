@@ -29,7 +29,7 @@ import (
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 )
 
 func main() {
@@ -58,7 +58,7 @@ func main() {
 		Addr:    ":" + config.GetConfiguration().ServicePort,
 	}
 
-	module.NewControllerClient().InitControllers()
+	controller.NewControllerClient().InitControllers()
 
 	connectionsClose := make(chan struct{})
 	go func() {

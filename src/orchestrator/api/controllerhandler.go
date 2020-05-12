@@ -23,7 +23,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
-	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+	controller "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
+	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -32,13 +33,13 @@ import (
 type controllerHandler struct {
 	// Interface that implements controller operations
 	// We will set this variable with a mock interface for testing
-	client moduleLib.ControllerManager
+	client controller.ControllerManager
 }
 
 // Check for valid format of input parameters
-func validateControllerInputs(c moduleLib.Controller) error {
+func validateControllerInputs(c controller.Controller) error {
 	// validate metadata
-	err := moduleLib.IsValidMetadata(c.Metadata)
+	err := mtypes.IsValidMetadata(c.Metadata)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Invalid controller metadata")
 	}
@@ -54,7 +55,7 @@ func validateControllerInputs(c moduleLib.Controller) error {
 	}
 
 	found := false
-	for _, val := range moduleLib.CONTROLLER_TYPES {
+	for _, val := range controller.CONTROLLER_TYPES {
 		if c.Spec.Type == val {
 			found = true
 			break
@@ -64,7 +65,7 @@ func validateControllerInputs(c moduleLib.Controller) error {
 		return pkgerrors.Errorf("Invalid controller type: %v", c.Spec.Type)
 	}
 
-	errs = validation.IsValidNumber(c.Spec.Priority, moduleLib.MinControllerPriority, moduleLib.MaxControllerPriority)
+	errs = validation.IsValidNumber(c.Spec.Priority, controller.MinControllerPriority, controller.MaxControllerPriority)
 	if len(errs) > 0 {
 		return pkgerrors.Errorf("Invalid controller priority = [%v], errors: %v", c.Spec.Priority, errs)
 	}
@@ -74,7 +75,7 @@ func validateControllerInputs(c moduleLib.Controller) error {
 
 // Create handles creation of the controller entry in the database
 func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var m moduleLib.Controller
+	var m controller.Controller
 
 	err := json.NewDecoder(r.Body).Decode(&m)
 	switch {
@@ -109,7 +110,7 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 
 // Put handles creation or update of the controller entry in the database
 func (h controllerHandler) putHandler(w http.ResponseWriter, r *http.Request) {
-	var m moduleLib.Controller
+	var m controller.Controller
 	vars := mux.Vars(r)
 	name := vars["controller-name"]
 

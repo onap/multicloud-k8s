@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package module
+package controller
 
 import (
 	"reflect"
@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -37,7 +38,7 @@ func TestCreateController(t *testing.T) {
 		{
 			label: "Create Controller",
 			inp: Controller{
-				Metadata: Metadata{
+				Metadata: types.Metadata{
 					Name: "testController",
 				},
 				Spec: ControllerSpec{
@@ -46,7 +47,7 @@ func TestCreateController(t *testing.T) {
 				},
 			},
 			expected: Controller{
-				Metadata: Metadata{
+				Metadata: types.Metadata{
 					Name: "testController",
 				},
 				Spec: ControllerSpec{
@@ -102,7 +103,7 @@ func TestGetController(t *testing.T) {
 			label: "Get Controller",
 			name:  "testController",
 			expected: Controller{
-				Metadata: Metadata{
+				Metadata: types.Metadata{
 					Name: "testController",
 				},
 				Spec: ControllerSpec{

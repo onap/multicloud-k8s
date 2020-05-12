@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package module
+package controller
 
 import (
 	"encoding/json"
@@ -22,14 +22,15 @@ import (
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	rpc "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
+	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 	pkgerrors "github.com/pkg/errors"
 )
 
 // Controller contains the parameters needed for Controllers
 // It implements the interface for managing the Controllers
 type Controller struct {
-	Metadata Metadata       `json:"metadata"`
-	Spec     ControllerSpec `json:"spec"`
+	Metadata mtypes.Metadata `json:"metadata"`
+	Spec     ControllerSpec  `json:"spec"`
 }
 
 type ControllerSpec struct {

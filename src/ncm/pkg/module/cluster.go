@@ -17,9 +17,15 @@
 package module
 
 import (
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	"context"
+	"time"
+
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/grpc"
+	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
+	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
 	"gopkg.in/yaml.v2"
 
 	pkgerrors "github.com/pkg/errors"
@@ -474,20 +480,20 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 	}
 
 	// Make an app context for the network intent resources
-	context := appcontext.AppContext{}
-	ctxVal, err := context.InitAppContext()
+	ac := appcontext.AppContext{}
+	ctxVal, err := ac.InitAppContext()
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error creating AppContext")
 	}
-	handle, err := context.CreateCompositeApp()
+	handle, err := ac.CreateCompositeApp()
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error creating AppContext CompositeApp")
 	}
 
 	// Add an app (fixed value) to the app context
-	apphandle, err := context.AddApp(handle, CONTEXT_CLUSTER_APP)
+	apphandle, err := ac.AddApp(handle, CONTEXT_CLUSTER_APP)
 	if err != nil {
-		cleanuperr := context.DeleteCompositeApp()
+		cleanuperr := ac.DeleteCompositeApp()
 		if cleanuperr != nil {
 			log.Warn("Error cleaning AppContext CompositeApp create failure", log.Fields{
 				"cluster-provider": provider,
@@ -498,9 +504,9 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 	}
 
 	// Add a cluster to the app
-	clusterhandle, err := context.AddCluster(apphandle, provider+SEPARATOR+name)
+	clusterhandle, err := ac.AddCluster(apphandle, provider+SEPARATOR+name)
 	if err != nil {
-		cleanuperr := context.DeleteCompositeApp()
+		cleanuperr := ac.DeleteCompositeApp()
 		if cleanuperr != nil {
 			log.Warn("Error cleaning AppContext after add cluster failure", log.Fields{
 				"cluster-provider": provider,
@@ -512,9 +518,9 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 
 	// add the resources to the app context
 	for _, resource := range resources {
-		_, err = context.AddResource(clusterhandle, resource.name, resource.value)
+		_, err = ac.AddResource(clusterhandle, resource.name, resource.value)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
+			cleanuperr := ac.DeleteCompositeApp()
 			if cleanuperr != nil {
 				log.Warn("Error cleaning AppContext after add resource failure", log.Fields{
 					"cluster-provider": provider,
@@ -533,7 +539,7 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 	}
 	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagContext, ctxVal)
 	if err != nil {
-		cleanuperr := context.DeleteCompositeApp()
+		cleanuperr := ac.DeleteCompositeApp()
 		if cleanuperr != nil {
 			log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
 				"cluster-provider": provider,
@@ -543,7 +549,32 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
 	}
 
-	// TODO: call resource synchronizer to instantiate the CRs in the cluster
+	// call resource synchronizer to instantiate the CRs in the cluster
+	conn := rpc.GetRpcConn(grpc.RsyncName)
+	if conn == nil {
+		grpc.InitRsyncClient()
+		conn = rpc.GetRpcConn(grpc.RsyncName)
+	}
+
+	var rpcClient installpb.InstallappClient
+	var installRes *installpb.InstallAppResponse
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if conn != nil {
+		rpcClient = installpb.NewInstallappClient(conn)
+		installReq := new(installpb.InstallAppRequest)
+		installReq.AppContext = ctxVal.(string)
+		installRes, err = rpcClient.InstallApp(ctx, installReq)
+		if err == nil {
+			log.Info("Response from InstappApp GRPC call", log.Fields{
+				"Succeeded": installRes.AppContextInstalled,
+				"Message":   installRes.AppContextInstallMessage,
+			})
+		}
+	} else {
+		return pkgerrors.Errorf("InstallApp Failed - Could not get InstallAppClient: %v", grpc.RsyncName)
+	}
 
 	return nil
 }

@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb2f98d1_111e0b12",
+        "filename": "src/ncm/cmd/main.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-13T17:11:47Z",
+      "side": 1,
+      "message": "Should the error checked for this call?",
+      "range": {
+        "startLine": 77,
+        "startChar": 1,
+        "endLine": 77,
+        "endChar": 22
+      },
+      "revId": "4bed69660a8db9bf81f137c3f7f09136d074f0d7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c42fcca5_d8b895c3",
+        "filename": "src/ncm/pkg/grpc/register.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-13T17:11:47Z",
+      "side": 1,
+      "message": "Is this function used?",
+      "range": {
+        "startLine": 61,
+        "startChar": 5,
+        "endLine": 61,
+        "endChar": 26
+      },
+      "revId": "4bed69660a8db9bf81f137c3f7f09136d074f0d7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

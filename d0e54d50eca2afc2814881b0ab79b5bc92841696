@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "18362565_33c359eb",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-14T22:49:27Z",
+      "side": 1,
+      "message": "Can this functionality be part of the GetCompositeApp where that CompositeAppMeta is returned in that function",
+      "range": {
+        "startLine": 350,
+        "startChar": 22,
+        "endLine": 350,
+        "endChar": 29
+      },
+      "revId": "d0e54d50eca2afc2814881b0ab79b5bc92841696",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fc630f26_2714eeca",
+        "filename": "src/orchestrator/pkg/module/instantiation.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-14T22:49:27Z",
+      "side": 1,
+      "message": "Remove this commented code",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 0
+      },
+      "revId": "d0e54d50eca2afc2814881b0ab79b5bc92841696",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

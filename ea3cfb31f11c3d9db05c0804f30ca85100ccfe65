@@ -46,6 +46,30 @@
       "revId": "ea3cfb31f11c3d9db05c0804f30ca85100ccfe65",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a7d842d8_ab6fdfc9",
+        "filename": "kud/deployment_infra/playbooks/kud-vars.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-05-14T23:54:38Z",
+      "side": 1,
+      "message": "That makes sense. But is there any blocker from going all the way to 0.8.6 (maybe it\u0027s more stable)?",
+      "parentUuid": "7943733e_5cd08446",
+      "range": {
+        "startLine": 56,
+        "startChar": 21,
+        "endLine": 56,
+        "endChar": 26
+      },
+      "revId": "ea3cfb31f11c3d9db05c0804f30ca85100ccfe65",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

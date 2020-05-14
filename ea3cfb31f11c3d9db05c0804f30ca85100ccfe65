@@ -22,6 +22,30 @@
       "revId": "ea3cfb31f11c3d9db05c0804f30ca85100ccfe65",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7943733e_5cd08446",
+        "filename": "kud/deployment_infra/playbooks/kud-vars.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4005
+      },
+      "writtenOn": "2020-05-14T23:33:19Z",
+      "side": 1,
+      "message": "Hi Igor, kubespray_version above is 2.10.4; it supports cni_plugins_version 0.6.0. This is the minimum version upgrade needed for tuning plugin to set mac address to an interface:\nhttps://github.com/intel/multus-cni/issues/266\nhttps://github.com/containernetworking/plugins/pull/343.\nNote: If kubespray version is getting upgraded to 2.11 or above, this patch is not needed.",
+      "parentUuid": "1956a00f_bc23b449",
+      "range": {
+        "startLine": 56,
+        "startChar": 21,
+        "endLine": 56,
+        "endChar": 26
+      },
+      "revId": "ea3cfb31f11c3d9db05c0804f30ca85100ccfe65",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5478993a_8f5c1171",
+        "filename": "kud/deployment_infra/playbooks/configure-bpa.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-05-14T23:50:07Z",
+      "side": 1,
+      "message": "Why do we want to ignore errors for the BPA operator plugin?",
+      "revId": "91c0af4a0ffc110b29cac2ba65238245024dc7a4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2440797_c326a5d5",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-05-14T23:50:07Z",
+      "side": 1,
+      "message": "Should clarify what kube_pods_subnet is.\nMaybe: with option to specify subnet for Pod IPs (consistent with k8s-cluster.yml).",
+      "range": {
+        "startLine": 247,
+        "startChar": 23,
+        "endLine": 247,
+        "endChar": 39
+      },
+      "revId": "91c0af4a0ffc110b29cac2ba65238245024dc7a4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "136c87ef_d0ee639e",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-05-14T23:50:07Z",
+      "side": 1,
+      "message": "At some point this whole thing should be refactored, kind of like https://argbash.io/generate. It can become quite a mess over time to parse args like this.",
+      "revId": "91c0af4a0ffc110b29cac2ba65238245024dc7a4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

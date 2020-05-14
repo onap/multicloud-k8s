@@ -19,14 +19,104 @@ package utils
 import (
 	"archive/tar"
 	"compress/gzip"
+	"strings"
+
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
 
 	pkgerrors "github.com/pkg/errors"
+	yaml "gopkg.in/yaml.v3"
 )
+
+// ListYamlStruct is applied when the kind is list
+type ListYamlStruct struct {
+	APIVersion string       `yaml:"apiVersion,omitempty"`
+	Kind       string       `yaml:"kind,omitempty"`
+	items      []YamlStruct `yaml:"items,omitempty"`
+}
+
+// YamlStruct represents normal parameters in a manifest file.
+// Over the course of time, Pls add more parameters as and when you require.
+type YamlStruct struct {
+	APIVersion string `yaml:"apiVersion,omitempty"`
+	Kind       string `yaml:"kind,omitempty"`
+	Metadata   struct {
+		Name      string `yaml:"name,omitempty"`
+		Namespace string `yaml:"namespace,omitempty"`
+		Labels    struct {
+			RouterDeisIoRoutable string `yaml:"router.deis.io/routable,omitempty"`
+		} `yaml:"labels"`
+		Annotations struct {
+			RouterDeisIoDomains string `yaml:"router.deis.io/domains,omitempty"`
+		} `yaml:"annotations,omitempty"`
+	} `yaml:"metadata,omitempty"`
+	Spec struct {
+		Type     string `yaml:"type,omitempty"`
+		Selector struct {
+			App string `yaml:"app,omitempty"`
+		} `yaml:"selector,omitempty"`
+		Ports []struct {
+			Name     string `yaml:"name,omitempty"`
+			Port     int    `yaml:"port,omitempty"`
+			NodePort int    `yaml:"nodePort,omitempty"`
+		} `yaml:"ports"`
+	} `yaml:"spec"`
+}
+
+func (y YamlStruct) isValid() bool {
+	if y.APIVersion == "" {
+		log.Printf("apiVersion is missing in manifest file")
+		return false
+	}
+	if y.Kind == "" {
+		log.Printf("kind is missing in manifest file")
+		return false
+	}
+	if y.Metadata.Name == "" {
+		log.Printf("metadata.name is missing in manifest file")
+		return false
+	}
+	return true
+}
+
+// ExtractYamlParameters is a method which takes in the abolute path of a manifest file
+// and returns a struct accordingly
+func ExtractYamlParameters(f string) (YamlStruct, error) {
+	filename, _ := filepath.Abs(f)
+	yamlFile, err := ioutil.ReadFile(filename)
+
+	var yamlStruct YamlStruct
+
+	err = yaml.Unmarshal(yamlFile, &yamlStruct)
+	if err != nil {
+		return YamlStruct{}, pkgerrors.New("Cant unmarshal yaml file ..")
+	}
+
+	/* This is a special case handling when the kind is "List".
+	When the kind is list and the metadata name is empty.
+	We set the metadata name as the file name. For eg:
+	if filename is "/tmp/helm-tmpl-240995533/prometheus/templates/serviceaccount.yaml-0".
+	We set metadata name as "serviceaccount.yaml-0"
+	Usually when the kind is list, the list might contains a list of
+	*/
+	if yamlStruct.Kind == "List" && yamlStruct.Metadata.Name == "" {
+		li := strings.LastIndex(filename, "/")
+		fn := string(filename[li+1:])
+		yamlStruct.Metadata.Name = fn
+		log.Printf("Setting the metadata name as :: %s", fn)
+	}
+	if yamlStruct.isValid() {
+		log.Printf("YAML parameters for file ::%s \n %v", f, yamlStruct)
+		return yamlStruct, nil
+	}
+	log.Printf("YAML file ::%s has errors", f)
+	return YamlStruct{}, pkgerrors.Errorf("Cant extract parameters from yaml file :: %s", filename)
+
+}
 
 //ExtractTarBall provides functionality to extract a tar.gz file
 //into a temporary location for later use.
@@ -114,3 +204,13 @@ func EnsureDirectory(f string) error {
 	}
 	return os.MkdirAll(base, 0755)
 }
+
+// func main() {
+// 	filename := "./test.yaml"
+// 	yamlStruct, err := ExtractYamlParameters(filename)
+// 	if err!=nil {
+// 		log.Print(err)
+// 	}
+// 	fmt.Printf("%s+%s", yamlStruct.Metadata.Name, yamlStruct.Kind)
+// 	fmt.Printf("%v", yamlStruct)
+// }

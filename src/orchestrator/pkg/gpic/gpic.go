@@ -22,14 +22,14 @@ package gpic
 */
 
 import (
-	"log"
 	ncmmodule "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
 	pkgerrors "github.com/pkg/errors"
+	"log"
 )
 
 // Clusters has 1 field - a list of ClusterNames
 type Clusters struct {
-	ClustersWithName  []ClusterWithName
+	ClustersWithName []ClusterWithName
 }
 
 // ClusterWithName has two fields - ProviderName and ClusterName
@@ -82,7 +82,7 @@ func intentResolverHelper(pn, cn, cln string, clustersWithName []ClusterWithName
 		for _, eachClusterName := range clusterNamesList {
 			eachClusterWithPN := ClusterWithName{pn, eachClusterName}
 			clustersWithName = append(clustersWithName, eachClusterWithPN)
-			log.Printf("Added Cluster: %s ", cln)
+			log.Printf("Added Cluster :: %s through its label: %s ", eachClusterName, cln)
 		}
 	}
 	return clustersWithName, nil
@@ -95,13 +95,13 @@ func IntentResolver(intent IntentStruc) (Clusters, error) {
 
 	for _, eachAllOf := range intent.AllOfArray {
 		clustersWithName, err = intentResolverHelper(eachAllOf.ProviderName, eachAllOf.ClusterName, eachAllOf.ClusterLabelName, clustersWithName)
-		if err!=nil {
+		if err != nil {
 			return Clusters{}, pkgerrors.Wrap(err, "intentResolverHelper error")
 		}
 		if len(eachAllOf.AnyOfArray) > 0 {
 			for _, eachAnyOf := range eachAllOf.AnyOfArray {
 				clustersWithName, err = intentResolverHelper(eachAnyOf.ProviderName, eachAnyOf.ClusterName, eachAnyOf.ClusterLabelName, clustersWithName)
-				if err!=nil {
+				if err != nil {
 					return Clusters{}, pkgerrors.Wrap(err, "intentResolverHelper error")
 				}
 			}
@@ -110,7 +110,7 @@ func IntentResolver(intent IntentStruc) (Clusters, error) {
 	if len(intent.AnyOfArray) > 0 {
 		for _, eachAnyOf := range intent.AnyOfArray {
 			clustersWithName, err = intentResolverHelper(eachAnyOf.ProviderName, eachAnyOf.ClusterName, eachAnyOf.ClusterLabelName, clustersWithName)
-			if err!=nil {
+			if err != nil {
 				return Clusters{}, pkgerrors.Wrap(err, "intentResolverHelper error")
 			}
 		}

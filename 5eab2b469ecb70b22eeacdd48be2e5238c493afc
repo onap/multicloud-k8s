@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f4618e56_e5cd7ed2",
+        "filename": "src/rsync/cmd/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-14T22:01:49Z",
+      "side": 1,
+      "message": "Why is this commented?",
+      "range": {
+        "startLine": 40,
+        "startChar": 1,
+        "endLine": 40,
+        "endChar": 3
+      },
+      "revId": "5eab2b469ecb70b22eeacdd48be2e5238c493afc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e1dbdfd_5588e017",
+        "filename": "src/rsync/cmd/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-14T22:01:49Z",
+      "side": 1,
+      "message": "Check for error here",
+      "range": {
+        "startLine": 59,
+        "startChar": 1,
+        "endLine": 59,
+        "endChar": 22
+      },
+      "revId": "5eab2b469ecb70b22eeacdd48be2e5238c493afc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

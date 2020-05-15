@@ -18,6 +18,7 @@ package module
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/ncm/pkg/grpc"
@@ -503,6 +504,24 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 		return pkgerrors.Wrap(err, "Error adding App to AppContext")
 	}
 
+	// Add an app order instruction
+	appinstr := struct {
+		Apporder []string `json:"apporder"`
+	}{
+		[]string{CONTEXT_CLUSTER_APP},
+	}
+	jinstr, _ := json.Marshal(appinstr)
+
+	appdepinstr := struct {
+		Appdep map[string]string `json:"appdependency"`
+	}{
+		map[string]string{CONTEXT_CLUSTER_APP: "go"},
+	}
+	jdep, _ := json.Marshal(appdepinstr)
+
+	_, err = ac.AddInstruction(handle, "app", "order", string(jinstr))
+	_, err = ac.AddInstruction(handle, "app", "dependency", string(jdep))
+
 	// Add a cluster to the app
 	clusterhandle, err := ac.AddCluster(apphandle, provider+SEPARATOR+name)
 	if err != nil {
@@ -517,7 +536,17 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 	}
 
 	// add the resources to the app context
+
+	var orderinstr struct {
+		Resorder []string `json:"resorder"`
+	}
+	var depinstr struct {
+		Resdep map[string]string `json:"resdependency"`
+	}
+	resdep := make(map[string]string)
 	for _, resource := range resources {
+		orderinstr.Resorder = append(orderinstr.Resorder, resource.name)
+		resdep[resource.name] = "go"
 		_, err = ac.AddResource(clusterhandle, resource.name, resource.value)
 		if err != nil {
 			cleanuperr := ac.DeleteCompositeApp()
@@ -531,6 +560,11 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 			return pkgerrors.Wrap(err, "Error adding Resource to AppContext")
 		}
 	}
+	jresord, _ := json.Marshal(orderinstr)
+	depinstr.Resdep = resdep
+	jresdep, _ := json.Marshal(depinstr)
+	_, err = ac.AddInstruction(clusterhandle, "resource", "order", string(jresord))
+	_, err = ac.AddInstruction(clusterhandle, "resource", "dependency", string(jresdep))
 
 	// save the context in the cluster db record
 	key := ClusterKey{

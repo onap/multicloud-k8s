@@ -152,21 +152,6 @@ function install_plugin {
     fi
 }
 
-# install_controllers() - Install ONAP Multicloud Kubernetes controllers
-function install_controllers {
-    echo "Installing multicloud/k8s onap4k8s controllers"
-    if [[ "${testing_enabled}" == "true" ]]; then
-        echo "Test controllers installation"
-        for controller_test in sdwan; do
-            pushd $kud_tests/$controller_test
-            ansible-playbook $verbose -i \
-                $kud_inventory ${controller_test}.yml | \
-                tee $cluster_log/test-${controller_test}.log
-            popd
-        done
-    fi
-}
-
 # _print_kubernetes_info() - Prints the login Kubernetes information
 function _print_kubernetes_info {
     if ! $(kubectl version &>/dev/null); then
@@ -227,8 +212,6 @@ function install_cluster {
     if ${KUD_PLUGIN_ENABLED:-false}; then
         install_plugin
         echo "installed the install_plugin"
-        install_controllers
-        echo "installed controllers"
     fi
     _print_kubernetes_info
 }

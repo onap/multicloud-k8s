@@ -1,14 +1,10 @@
 module github.com/onap/multicloud-k8s/src/ncm
 
 require (
-	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/ghodss/yaml v1.0.0
-	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.6.2
-	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20200127152046-0ee521d56061
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200515060444-c77850a75eee
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pkg/errors v0.8.1
 	google.golang.org/grpc v1.27.1
@@ -16,10 +12,7 @@ require (
 	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
 	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
 	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
-	k8s.io/kube-openapi v0.0.0-20191107075043-30be4d16710a // indirect
 	k8s.io/kubernetes v1.14.1
-	k8s.io/utils v0.0.0-20200414100711-2df71ebbae66 // indirect
-	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
 replace (

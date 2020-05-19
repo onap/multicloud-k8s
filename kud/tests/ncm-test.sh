@@ -128,7 +128,7 @@ providernetworkdata="$(cat<<EOF
       ],
       "providerNetType": "VLAN",
       "vlan": {
-          "vlanId": 100,
+          "vlanId": "100",
           "providerInterfaceName": "eth1",
           "logicalInterfaceName": "eth1.100",
           "vlanNodeSelector": "specific",

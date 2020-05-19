@@ -70,7 +70,7 @@ function _install_docker {
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     sudo apt-get update
-    sudo apt-get install -y docker-ce
+    sudo apt-get install -y docker-ce:19.03.8
 
     sudo mkdir -p /etc/systemd/system/docker.service.d
     if [ ${http_proxy:-} ]; then

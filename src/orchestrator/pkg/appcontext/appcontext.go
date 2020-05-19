@@ -217,7 +217,7 @@ func (ac *AppContext) GetClusterNames(appname string) ([]string, error) {
 }
 
 //Add resource under app and cluster
-func (ac *AppContext) AddResource(handle interface{}, resname string, value []byte) (interface{}, error) {
+func (ac *AppContext) AddResource(handle interface{}, resname string, value interface{}) (interface{}, error) {
 	h, err := ac.rtc.RtcAddResource(handle, resname, value)
 	if err != nil {
 		return nil, err
@@ -264,7 +264,7 @@ func (ac *AppContext) GetResourceHandle(appname string, clustername string, resn
 }
 
 //Update the resource value usign the given handle
-func (ac *AppContext) UpdateResourceValue(handle interface{}, value []byte) error {
+func (ac *AppContext) UpdateResourceValue(handle interface{}, value interface{}) error {
 	return ac.rtc.RtcUpdateValue(handle, value)
 }
 

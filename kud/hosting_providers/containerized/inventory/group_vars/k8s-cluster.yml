@@ -80,3 +80,6 @@ kube_pods_subnet: 10.244.64.0/18
 
 # disable localdns cache
 enable_nodelocaldns: false
+
+# docker version
+docker_version: latest

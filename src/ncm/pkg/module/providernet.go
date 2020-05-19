@@ -37,9 +37,9 @@ type ProviderNetSpec struct {
 
 // structure for the Network Custom Resource
 type CrProviderNet struct {
-	ApiVersion  string `yaml:"apiVersion"`
-	Kind        string `yaml:"kind"`
-	ProviderNet ProviderNet
+	ApiVersion  string      `yaml:"apiVersion"`
+	Kind        string      `yaml:"kind"`
+	ProviderNet ProviderNet `yaml:",inline"`
 }
 
 const PROVIDER_NETWORK_APIVERSION = "k8s.plugin.opnfv.org/v1alpha1"

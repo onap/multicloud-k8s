@@ -29,8 +29,8 @@ type Network struct {
 }
 
 type NetworkSpec struct {
-	CniType     string       `json:"cniType"`
-	Ipv4Subnets []Ipv4Subnet `json:"ipv4Subnets"`
+	CniType     string       `json:"cniType" yaml:"cniType"`
+	Ipv4Subnets []Ipv4Subnet `json:"ipv4Subnets" yaml:"ipv4Subnets"`
 }
 
 // NetworkKey is the key structure that is used in the database
@@ -42,9 +42,9 @@ type NetworkKey struct {
 
 // structure for the Network Custom Resource
 type CrNetwork struct {
-	ApiVersion string `yaml:"apiVersion"`
-	Kind       string `yaml:"kind"`
-	Network    Network
+	ApiVersion string  `yaml:"apiVersion"`
+	Kind       string  `yaml:"kind"`
+	Network    Network `yaml:",inline"`
 }
 
 const NETWORK_APIVERSION = "k8s.plugin.opnfv.org/v1alpha1"

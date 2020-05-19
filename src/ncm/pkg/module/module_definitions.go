@@ -65,7 +65,7 @@ const VLAN_NODE_SPECIFIC = "specific"
 var VLAN_NODE_SELECTORS = [...]string{VLAN_NODE_ANY, VLAN_NODE_SPECIFIC}
 
 type Vlan struct {
-	VlanId                int      `json:"vlanID" yaml:"vlanId"`
+	VlanId                string   `json:"vlanID" yaml:"vlanId"`
 	ProviderInterfaceName string   `json:"providerInterfaceName" yaml:"providerInterfaceName"`
 	LogicalInterfaceName  string   `json:"logicalInterfaceName" yaml:"logicalInterfaceName"`
 	VlanNodeSelector      string   `json:"vlanNodeSelector" yaml:"vlanNodeSelector"`

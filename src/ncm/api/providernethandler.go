@@ -80,7 +80,7 @@ func validateProviderNetInputs(p moduleLib.ProviderNet) error {
 	}
 
 	// validate the VLAN ID
-	errs = validation.IsValidNumber(p.Spec.Vlan.VlanId, 0, 4095)
+	errs = validation.IsValidNumberStr(p.Spec.Vlan.VlanId, 0, 4095)
 	if len(errs) > 0 {
 		return pkgerrors.Errorf("Invalid VlAN ID %v - error: %v", p.Spec.Vlan.VlanId, errs)
 	}

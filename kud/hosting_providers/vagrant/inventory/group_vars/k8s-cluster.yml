@@ -14,6 +14,8 @@
 # Editing those values will almost surely break something.
 system_namespace: kube-system
 
+docker_version: 'latest'
+
 # Logging directory (sysvinit systems)
 kube_log_dir: "/var/log/kubernetes"
 

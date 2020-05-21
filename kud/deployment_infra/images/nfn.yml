@@ -138,20 +138,22 @@ spec:
     status: {}
   validation:
     openAPIV3Schema:
+      description: ProviderNetwork is the Schema for the providernetworks API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
             object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
         spec:
+          description: ProviderNetworkSpec defines the desired state of ProviderNetwork
           properties:
             cniType:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -159,6 +161,20 @@ spec:
                 modifying this file Add custom validation using kubebuilder tags:
                 https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html'
               type: string
+            direct:
+              properties:
+                directNodeSelector:
+                  type: string
+                nodeLabelList:
+                  items:
+                    type: string
+                  type: array
+                providerInterfaceName:
+                  type: string
+              required:
+              - directNodeSelector
+              - providerInterfaceName
+              type: object
             dns:
               properties:
                 domain:
@@ -226,31 +242,27 @@ spec:
                 logicalInterfaceName:
                   type: string
                 nodeLabelList:
-                  description: '"all"/"any"(in which case a node will be randomly
-                    selected)/"specific"(see below)'
                   items:
                     type: string
                   type: array
                 providerInterfaceName:
-                  description: if VlanNodeSelector is value "specific" then this array
-                    provides a list of nodes labels
                   type: string
                 vlanId:
                   type: string
                 vlanNodeSelector:
                   type: string
               required:
+              - providerInterfaceName
               - vlanId
               - vlanNodeSelector
-              - providerInterfaceName
               type: object
           required:
           - cniType
           - ipv4Subnets
           - providerNetType
-          - vlan
           type: object
         status:
+          description: ProviderNetworkStatus defines the observed state of ProviderNetwork
           properties:
             state:
               description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
@@ -261,12 +273,12 @@ spec:
           required:
           - state
           type: object
+      type: object
   version: v1alpha1
   versions:
   - name: v1alpha1
     served: true
     storage: true
-
 
 
 ---
@@ -396,7 +408,7 @@ spec:
       serviceAccountName: k8s-nfn-sa
       containers:
         - name: nfn-operator
-          image: rtsood/nfn-operator:0.4
+          image: integratedcloudnative/ovn4nfv-k8s-plugin:0.9.0
           command: ["/usr/local/bin/entrypoint", "operator"]
           imagePullPolicy: IfNotPresent
           ports:
@@ -459,7 +471,8 @@ spec:
         effect: NoSchedule
       containers:
       - name: ovn4nfv
-        image: rtsood/nfn-operator:0.4
+        image: integratedcloudnative/ovn4nfv-k8s-plugin:0.9.0
+        imagePullPolicy: IfNotPresent
         command: ["/usr/local/bin/entrypoint", "cni"]
         resources:
           requests:
@@ -515,7 +528,8 @@ spec:
         effect: NoSchedule
       containers:
       - name: nfn-agent
-        image: rtsood/nfn-operator:0.4
+        image: integratedcloudnative/ovn4nfv-k8s-plugin:0.9.0
+        imagePullPolicy: IfNotPresent
         command: ["/usr/local/bin/entrypoint", "agent"]
         resources:
           requests:

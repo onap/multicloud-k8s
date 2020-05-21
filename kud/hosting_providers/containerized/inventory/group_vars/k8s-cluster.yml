@@ -53,6 +53,8 @@ kube_version: v1.14.3
 # Helm deployment
 helm_enabled: true
 
+docker_version: 'latest'
+
 # Kube-proxy proxyMode configuration.
 # NOTE: Ipvs is based on netfilter hook function, but uses hash table as the underlying data structure and
 # works in the kernel space

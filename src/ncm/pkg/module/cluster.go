@@ -512,7 +512,7 @@ func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
 
 	// add the resources to the app context
 	for _, resource := range resources {
-		_, err = context.AddResource(clusterhandle, resource.name, []byte(resource.value))
+		_, err = context.AddResource(clusterhandle, resource.name, resource.value)
 		if err != nil {
 			cleanuperr := context.DeleteCompositeApp()
 			if cleanuperr != nil {

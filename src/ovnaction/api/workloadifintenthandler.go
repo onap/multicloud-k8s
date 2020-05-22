@@ -22,7 +22,7 @@ import (
 	"io"
 	"net/http"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	pkgerrors "github.com/pkg/errors"
 
@@ -31,47 +31,67 @@ import (
 
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
-type workloadintentHandler struct {
+type workloadifintentHandler struct {
 	// Interface that implements workload intent operations
 	// We will set this variable with a mock interface for testing
-	client moduleLib.WorkloadIntentManager
+	client moduleLib.WorkloadIfIntentManager
 }
 
 // Check for valid format of input parameters
-func validateWorkloadIntentInputs(wi moduleLib.WorkloadIntent) error {
+func validateWorkloadIfIntentInputs(wif moduleLib.WorkloadIfIntent) error {
 	// validate metadata
-	err := moduleLib.IsValidMetadata(wi.Metadata)
+	err := moduleLib.IsValidMetadata(wif.Metadata)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Invalid network controller intent metadata")
 	}
 
-	errs := validation.IsValidName(wi.Spec.AppName)
+	errs := validation.IsValidName(wif.Spec.IfName)
 	if len(errs) > 0 {
-		return pkgerrors.Errorf("Invalid application name = [%v], errors: %v", wi.Spec.AppName, errs)
+		return pkgerrors.Errorf("Invalid interface name = [%v], errors: %v", wif.Spec.IfName, errs)
 	}
 
-	errs = validation.IsValidName(wi.Spec.WorkloadResource)
+	errs = validation.IsValidName(wif.Spec.NetworkName)
 	if len(errs) > 0 {
-		return pkgerrors.Errorf("Invalid workload resource = [%v], errors: %v", wi.Spec.WorkloadResource, errs)
+		return pkgerrors.Errorf("Invalid network name = [%v], errors: %v", wif.Spec.NetworkName, errs)
 	}
 
-	errs = validation.IsValidName(wi.Spec.Type)
-	if len(errs) > 0 {
-		return pkgerrors.Errorf("Invalid workload type = [%v], errors: %v", wi.Spec.Type, errs)
+	// optional - only validate if supplied
+	if len(wif.Spec.DefaultGateway) > 0 {
+		errs = validation.IsValidName(wif.Spec.DefaultGateway)
+		if len(errs) > 0 {
+			return pkgerrors.Errorf("Invalid default interface = [%v], errors: %v", wif.Spec.DefaultGateway, errs)
+		}
+	}
+
+	// optional - only validate if supplied
+	if len(wif.Spec.IpAddr) > 0 {
+		err = validation.IsIp(wif.Spec.IpAddr)
+		if err != nil {
+			return pkgerrors.Errorf("Invalid IP address = [%v], errors: %v", wif.Spec.IpAddr, err)
+		}
+	}
+
+	// optional - only validate if supplied
+	if len(wif.Spec.MacAddr) > 0 {
+		err = validation.IsMac(wif.Spec.MacAddr)
+		if err != nil {
+			return pkgerrors.Errorf("Invalid MAC address = [%v], errors: %v", wif.Spec.MacAddr, err)
+		}
 	}
 	return nil
 }
 
 // Create handles creation of the Network entry in the database
-func (h workloadintentHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var wi moduleLib.WorkloadIntent
+func (h workloadifintentHandler) createHandler(w http.ResponseWriter, r *http.Request) {
+	var wif moduleLib.WorkloadIfIntent
 	vars := mux.Vars(r)
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
 	netControlIntent := vars["net-control-intent"]
+	workloadIntent := vars["workload-intent"]
 
-	err := json.NewDecoder(r.Body).Decode(&wi)
+	err := json.NewDecoder(r.Body).Decode(&wif)
 
 	switch {
 	case err == io.EOF:
@@ -83,18 +103,23 @@ func (h workloadintentHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Name is required.
-	if wi.Metadata.Name == "" {
+	if wif.Metadata.Name == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
-	err = validateWorkloadIntentInputs(wi)
+	// set default value
+	if len(wif.Spec.DefaultGateway) == 0 {
+		wif.Spec.DefaultGateway = "false" // set default value
+	}
+
+	err = validateWorkloadIfIntentInputs(wif)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	ret, err := h.client.CreateWorkloadIntent(wi, project, compositeApp, compositeAppVersion, netControlIntent, false)
+	ret, err := h.client.CreateWorkloadIfIntent(wif, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -110,16 +135,17 @@ func (h workloadintentHandler) createHandler(w http.ResponseWriter, r *http.Requ
 }
 
 // Put handles creation/update of the Network entry in the database
-func (h workloadintentHandler) putHandler(w http.ResponseWriter, r *http.Request) {
-	var wi moduleLib.WorkloadIntent
+func (h workloadifintentHandler) putHandler(w http.ResponseWriter, r *http.Request) {
+	var wif moduleLib.WorkloadIfIntent
 	vars := mux.Vars(r)
 	name := vars["name"]
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
 	netControlIntent := vars["net-control-intent"]
+	workloadIntent := vars["workload-intent"]
 
-	err := json.NewDecoder(r.Body).Decode(&wi)
+	err := json.NewDecoder(r.Body).Decode(&wif)
 
 	switch {
 	case err == io.EOF:
@@ -131,25 +157,30 @@ func (h workloadintentHandler) putHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	// Name is required.
-	if wi.Metadata.Name == "" {
+	if wif.Metadata.Name == "" {
 		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
 		return
 	}
 
 	// Name in URL should match name in body
-	if wi.Metadata.Name != name {
-		fmt.Printf("bodyname = %v, name= %v\n", wi.Metadata.Name, name)
+	if wif.Metadata.Name != name {
+		fmt.Printf("bodyname = %v, name= %v\n", wif.Metadata.Name, name)
 		http.Error(w, "Mismatched name in PUT request", http.StatusBadRequest)
 		return
 	}
 
-	err = validateWorkloadIntentInputs(wi)
+	// set default value
+	if len(wif.Spec.DefaultGateway) == 0 {
+		wif.Spec.DefaultGateway = "false" // set default value
+	}
+
+	err = validateWorkloadIfIntentInputs(wif)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	ret, err := h.client.CreateWorkloadIntent(wi, project, compositeApp, compositeAppVersion, netControlIntent, true)
+	ret, err := h.client.CreateWorkloadIfIntent(wif, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -166,24 +197,25 @@ func (h workloadintentHandler) putHandler(w http.ResponseWriter, r *http.Request
 
 // Get handles GET operations on a particular Network Name
 // Returns a Network
-func (h workloadintentHandler) getHandler(w http.ResponseWriter, r *http.Request) {
+func (h workloadifintentHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
 	netControlIntent := vars["net-control-intent"]
+	workloadIntent := vars["workload-intent"]
 	var ret interface{}
 	var err error
 
 	if len(name) == 0 {
-		ret, err = h.client.GetWorkloadIntents(project, compositeApp, compositeAppVersion, netControlIntent)
+		ret, err = h.client.GetWorkloadIfIntents(project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
-		ret, err = h.client.GetWorkloadIntent(name, project, compositeApp, compositeAppVersion, netControlIntent)
+		ret, err = h.client.GetWorkloadIfIntent(name, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -200,15 +232,16 @@ func (h workloadintentHandler) getHandler(w http.ResponseWriter, r *http.Request
 }
 
 // Delete handles DELETE operations on a particular Network  Name
-func (h workloadintentHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
+func (h workloadifintentHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
 	netControlIntent := vars["net-control-intent"]
+	workloadIntent := vars["workload-intent"]
 
-	err := h.client.DeleteWorkloadIntent(name, project, compositeApp, compositeAppVersion, netControlIntent)
+	err := h.client.DeleteWorkloadIfIntent(name, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

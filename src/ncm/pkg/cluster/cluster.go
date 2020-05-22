@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package module
+package cluster
 
 import (
 	ncmtypes "github.com/onap/multicloud-k8s/src/ncm/pkg/module/types"

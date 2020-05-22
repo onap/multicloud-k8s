@@ -20,33 +20,43 @@ import (
 	"reflect"
 
 	"github.com/gorilla/mux"
-	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents"
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/scheduler"
 )
 
-var moduleClient *moduleLib.Client
+var moduleClient *module.Client
 
 // For the given client and testClient, if the testClient is not null and
 // implements the client manager interface corresponding to client, then
 // return the testClient, otherwise return the client.
 func setClient(client, testClient interface{}) interface{} {
 	switch cl := client.(type) {
-	case *moduleLib.ClusterClient:
-		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*moduleLib.ClusterManager)(nil)).Elem()) {
-			c, ok := testClient.(moduleLib.ClusterManager)
+	case *cluster.ClusterClient:
+		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*cluster.ClusterManager)(nil)).Elem()) {
+			c, ok := testClient.(cluster.ClusterManager)
 			if ok {
 				return c
 			}
 		}
-	case *moduleLib.NetworkClient:
-		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*moduleLib.NetworkManager)(nil)).Elem()) {
-			c, ok := testClient.(moduleLib.NetworkManager)
+	case *networkintents.NetworkClient:
+		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*networkintents.NetworkManager)(nil)).Elem()) {
+			c, ok := testClient.(networkintents.NetworkManager)
 			if ok {
 				return c
 			}
 		}
-	case *moduleLib.ProviderNetClient:
-		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*moduleLib.ProviderNetManager)(nil)).Elem()) {
-			c, ok := testClient.(moduleLib.ProviderNetManager)
+	case *networkintents.ProviderNetClient:
+		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*networkintents.ProviderNetManager)(nil)).Elem()) {
+			c, ok := testClient.(networkintents.ProviderNetManager)
+			if ok {
+				return c
+			}
+		}
+	case *scheduler.SchedulerClient:
+		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*scheduler.SchedulerManager)(nil)).Elem()) {
+			c, ok := testClient.(scheduler.SchedulerManager)
 			if ok {
 				return c
 			}
@@ -61,12 +71,12 @@ func setClient(client, testClient interface{}) interface{} {
 // testClient parameter allows unit testing for a given client
 func NewRouter(testClient interface{}) *mux.Router {
 
-	moduleClient = moduleLib.NewClient()
+	moduleClient = module.NewClient()
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
 
 	clusterHandler := clusterHandler{
-		client: setClient(moduleClient.Cluster, testClient).(moduleLib.ClusterManager),
+		client: setClient(moduleClient.Cluster, testClient).(cluster.ClusterManager),
 	}
 	router.HandleFunc("/cluster-providers", clusterHandler.createClusterProviderHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers", clusterHandler.getClusterProviderHandler).Methods("GET")
@@ -77,8 +87,6 @@ func NewRouter(testClient interface{}) *mux.Router {
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters", clusterHandler.getClusterHandler).Queries("label", "{label}")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}", clusterHandler.getClusterHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}", clusterHandler.deleteClusterHandler).Methods("DELETE")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}/apply", clusterHandler.applyClusterHandler).Methods("POST")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}/terminate", clusterHandler.terminateClusterHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels", clusterHandler.createClusterLabelHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels", clusterHandler.getClusterLabelHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels/{label}", clusterHandler.getClusterLabelHandler).Methods("GET")
@@ -89,7 +97,7 @@ func NewRouter(testClient interface{}) *mux.Router {
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.deleteClusterKvPairsHandler).Methods("DELETE")
 
 	networkHandler := networkHandler{
-		client: setClient(moduleClient.Network, testClient).(moduleLib.NetworkManager),
+		client: setClient(moduleClient.Network, testClient).(networkintents.NetworkManager),
 	}
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/networks", networkHandler.createNetworkHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/networks", networkHandler.getNetworkHandler).Methods("GET")
@@ -98,13 +106,19 @@ func NewRouter(testClient interface{}) *mux.Router {
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/networks/{name}", networkHandler.deleteNetworkHandler).Methods("DELETE")
 
 	providernetHandler := providernetHandler{
-		client: setClient(moduleClient.ProviderNet, testClient).(moduleLib.ProviderNetManager),
+		client: setClient(moduleClient.ProviderNet, testClient).(networkintents.ProviderNetManager),
 	}
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/provider-networks", providernetHandler.createProviderNetHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/provider-networks", providernetHandler.getProviderNetHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/provider-networks/{name}", providernetHandler.putProviderNetHandler).Methods("PUT")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/provider-networks/{name}", providernetHandler.getProviderNetHandler).Methods("GET")
 	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/provider-networks/{name}", providernetHandler.deleteProviderNetHandler).Methods("DELETE")
+
+	schedulerHandler := schedulerHandler{
+		client: setClient(moduleClient.Scheduler, testClient).(scheduler.SchedulerManager),
+	}
+	router.HandleFunc("/cluster-providers/{cluster-provider}/clusters/{cluster}/apply", schedulerHandler.applySchedulerHandler).Methods("POST")
+	router.HandleFunc("/cluster-providers/{cluster-provider}/clusters/{cluster}/terminate", schedulerHandler.terminateSchedulerHandler).Methods("POST")
 
 	return router
 }

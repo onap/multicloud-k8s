@@ -70,16 +70,16 @@
       ignore_errors: yes
       when: SRIOV_NODE
     - name: Get SRIOV compatible driver
-      get_url: "url={{ driver_url }}  dest=/tmp/{{ package }}.tar.gz"
+      get_url: "url={{ sriov_driver_url }}  dest=/tmp/{{ sriov_package }}.tar.gz"
       when: SRIOV_NODE
     - name: Extract sriov source code
       unarchive:
-         src: "/tmp/{{ package }}.tar.gz"
+         src: "/tmp/{{ sriov_package }}.tar.gz"
          dest: "{{ sriov_dest }}"
       when: SRIOV_NODE
     - name: Build the default target
       make:
-        chdir: "/tmp/sriov/{{ package }}/src"
+        chdir: "{{ sriov_dest }}/{{ sriov_package }}/src"
       become: yes
       when: SRIOV_NODE
 # Copy all the driver and install script into target node
@@ -99,7 +99,7 @@
         - sriov_driver
       when: _SRIOV
     - copy:
-        src: "{{ sriov_dest }}/{{ package }}/src/iavf.ko"
+        src: "{{ sriov_dest }}/{{ sriov_package }}/src/iavf.ko"
         dest: sriov_driver
         remote_src: no
       when: _SRIOV

@@ -1,0 +1,88 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+# Run the following task only if the SRIOV is set to True
+# i.e when SRIOV hardware is available
+- hosts: localhost
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create optane folder
+      file:
+        state: directory
+        path: "{{ optane_dest }}"
+      ignore_errors: yes
+
+- hosts: kube-node
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create OPTANE folder in the target destination
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - optane
+    - copy:
+        src: "{{ playbook_dir }}/setup-ca-kubernetes.sh"
+        dest: optane
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x setup-ca-kubernetes.sh"
+      args:
+        chdir: "optane"
+        warn: False
+    - copy:
+        src: "{{ playbook_dir }}/setup-ca.sh"
+        dest: optane
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x setup-ca.sh"
+      args:
+        chdir: "optane"
+        warn: False
+    - copy:
+        src: "{{ playbook_dir }}/install_optane.sh"
+        dest: optane
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x install_optane.sh"
+      args:
+        chdir: "optane"
+        warn: False
+    - copy:
+        src: "{{ playbook_dir }}/deploy_optane.sh"
+        dest: optane
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x deploy_optane.sh"
+      args:
+        chdir: "optane"
+        warn: False
+    - copy:
+        src: "{{ playbook_dir }}/../images/pmem-csi-lvm.yaml"
+        dest: optane
+    - copy:
+        src: "{{ playbook_dir }}/../images/pmem-csi-direct.yaml"
+        dest: optane
+    - name: Run the install script and Re-evaluate the variable
+      command: optane/install_optane.sh
+      register: output
+    - name: Run the ca script and Re-evaluate the variable
+      command: optane/setup-ca-kubernetes.sh
+      register: output
+    - name: restart kubelet services
+      become: yes
+      service:
+        name: kubelet
+        state: restarted
+

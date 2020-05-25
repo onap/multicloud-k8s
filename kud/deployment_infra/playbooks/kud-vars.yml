@@ -73,3 +73,9 @@ qat_driver_source_type: "tarball"
 qat_driver_version: 1.7.l.4.6.0-00025
 qat_driver_url: "https://01.org/sites/default/files/downloads/{{ qat_package }}.tar.gz"
 qat_package: qat1.7.l.4.6.0-00025
+
+optane_dest: "{{ base_dest }}/optane"
+optane_ipmctl_source_type: "tarball"
+optane_ipmctl_version: 02.00.00.3474
+optane_ipmctl_url: "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ipmctl/{{ optane_package }}.tar.xz"
+optane_ipmctl_package: ipmctl_02.00.00.3474+really01.00.00.3469.orig

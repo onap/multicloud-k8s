@@ -48,6 +48,7 @@ type Rtcontext interface {
 	RtcGetValue(handle interface{}, value interface{}) error
 	RtcUpdateValue(handle interface{}, value interface{}) error
 	RtcGetMeta() (interface{}, error)
+	RtcAddOneLevel(pl interface{}, level string, value string) (interface{}, error)
 }
 
 //Intialize context by assiging a new id
@@ -173,6 +174,30 @@ func (rtc *RunTimeContext) RtcAddLevel(handle interface{}, level string, value s
 		return nil, pkgerrors.Errorf("Error adding run time context level: %s", err.Error())
 	}
 
+	return (interface{})(key), nil
+}
+
+// RtcAddOneLevel adds one more level to the existing context prefix.RtcAddOneLevel. It takes in PreviousContentLevel as inteface, new level to be appended as string and the value to be saved of any type. It returns the updated interface and nil if no error.
+//
+func (rtc *RunTimeContext) RtcAddOneLevel(pl interface{}, level string, value string) (interface{}, error) {
+	str := fmt.Sprintf("%v", pl)
+	sid := fmt.Sprintf("%v", rtc.cid)
+	if !strings.HasPrefix(str, sid) {
+		return nil, pkgerrors.Errorf("Not a valid run time context handle")
+	}
+
+	if level == "" {
+		return nil, pkgerrors.Errorf("Not a valid run time context level")
+	}
+	if value == "" {
+		return nil, pkgerrors.Errorf("Not a valid run time context level value")
+	}
+
+	key := str + level + "/"
+	err := contextdb.Db.Put(key, value)
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error adding run time context level: %s", err.Error())
+	}
 	return (interface{})(key), nil
 }
 

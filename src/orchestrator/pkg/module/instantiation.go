@@ -19,15 +19,11 @@ package module
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-	"github.com/onap/multicloud-k8s/src/orchestrator/utils"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 	pkgerrors "github.com/pkg/errors"
-	"io/ioutil"
-	//"log"
-	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 )
 
 // ManifestFileName is the name given to the manifest file in the profile package
@@ -172,101 +168,6 @@ func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues
 	return sortedTemplates, err
 }
 
-// resource consists of name of reource
-type resource struct {
-	name        string
-	filecontent []byte
-}
-
-// getResources shall take in the sorted templates and output the resources
-// which consists of name(name+kind) and filecontent
-func getResources(st []helm.KubernetesResourceTemplate) ([]resource, error) {
-	var resources []resource
-	for _, t := range st {
-		yamlStruct, err := utils.ExtractYamlParameters(t.FilePath)
-		yamlFile, err := ioutil.ReadFile(t.FilePath)
-		if err != nil {
-			return nil, pkgerrors.Wrap(err, "Failed to get the resources..")
-		}
-		n := yamlStruct.Metadata.Name + SEPARATOR + yamlStruct.Kind
-
-		resources = append(resources, resource{name: n, filecontent: yamlFile})
-
-		log.Info(":: Added resource into resource-order ::", log.Fields{"ResourceName": n})
-	}
-	return resources, nil
-}
-
-func addResourcesToCluster(ct appcontext.AppContext, ch interface{}, resources []resource, resourceOrder []string) error {
-
-	for _, resource := range resources {
-		resourceOrder = append(resourceOrder, resource.name)
-		_, err := ct.AddResource(ch, resource.name, resource.filecontent)
-		if err != nil {
-			cleanuperr := ct.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Info(":: Error Cleaning up AppContext after add resource failure ::", log.Fields{"Resource": resource.name, "Error": cleanuperr.Error})
-			}
-			return pkgerrors.Wrapf(err, "Error adding resource ::%s to AppContext", resource.name)
-		}
-		_, err = ct.AddInstruction(ch, "resource", "order", resourceOrder)
-		if err != nil {
-			cleanuperr := ct.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Info(":: Error Cleaning up AppContext after add instruction failure ::", log.Fields{"Resource": resource.name, "Error": cleanuperr.Error})
-			}
-			return pkgerrors.Wrapf(err, "Error adding instruction for resource ::%s to AppContext", resource.name)
-		}
-	}
-	return nil
-}
-
-func addClustersToAppContext(l gpic.Clusters, ct appcontext.AppContext, appHandle interface{}, resources []resource) error {
-	for _, c := range l.ClustersWithName {
-		p := c.ProviderName
-		n := c.ClusterName
-		var resourceOrder []string
-		clusterhandle, err := ct.AddCluster(appHandle, p+SEPARATOR+n)
-		if err != nil {
-			cleanuperr := ct.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Info(":: Error Cleaning up AppContext after add cluster failure ::", log.Fields{"cluster-provider": p, "cluster-name": n, "Error": cleanuperr.Error})
-			}
-			return pkgerrors.Wrapf(err, "Error adding Cluster(provider::%s and name::%s) to AppContext", p, n)
-		}
-
-		err = addResourcesToCluster(ct, clusterhandle, resources, resourceOrder)
-		if err != nil {
-			return pkgerrors.Wrapf(err, "Error adding Resources to Cluster(provider::%s and name::%s) to AppContext", p, n)
-		}
-	}
-	return nil
-}
-
-/*
-verifyResources method is just to check if the resource handles are correctly saved.
-*/
-
-func verifyResources(l gpic.Clusters, ct appcontext.AppContext, resources []resource, appName string) error {
-	for _, c := range l.ClustersWithName {
-		p := c.ProviderName
-		n := c.ClusterName
-		cn := p + SEPARATOR + n
-		for _, res := range resources {
-
-			rh, err := ct.GetResourceHandle(appName, cn, res.name)
-			if err != nil {
-				return pkgerrors.Wrapf(err, "Error getting resoure handle for resource :: %s, app:: %s, cluster :: %s", appName, res.name, cn)
-			}
-			log.Info(":: GetResourceHandle ::", log.Fields{"ResourceHandler": rh, "appName": appName, "Cluster": cn, "Resource": res.name})
-
-		}
-
-	}
-
-	return nil
-}
-
 /*
 Instantiate methods takes in projectName, compositeAppName, compositeAppVersion,
 DeploymentIntentName. This method is responsible for template resolution, intent
@@ -295,24 +196,13 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		return pkgerrors.Wrap(err, "Not finding the apps")
 	}
 
-	// Make an app context for the compositeApp
-	context := appcontext.AppContext{}
-	ctxval, err := context.InitAppContext()
+	cca, err := makeAppContextForCompositeApp(p, ca, v, rName)
 	if err != nil {
-		return pkgerrors.Wrap(err, "Error creating AppContext CompositeApp")
+		return err
 	}
-	compositeHandle, err := context.CreateCompositeApp()
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error creating CompositeApp handle")
-	}
-	err = context.AddCompositeAppMeta(appcontext.CompositeAppMeta{Project: p, CompositeApp: ca, Version: v, Release: rName})
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error Adding CompositeAppMeta")
-	}
-
-	m, err := context.GetCompositeAppMeta()
-
-	log.Info(":: The meta data stored in the runtime context :: ", log.Fields{"Project": m.Project, "CompositeApp": m.CompositeApp, "Version": m.Version, "Release": m.Release})
+	context := cca.context
+	ctxval := cca.ctxval
+	compositeHandle := cca.compositeAppHandle
 
 	var appOrder []string
 
@@ -336,6 +226,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents for app")
 		}
+		// listOfClusters shall have both mandatoryClusters and optionalClusters where the app needs to be installed.
 		listOfClusters, err := gpic.IntentResolver(specData.Intent)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents resolved for app")

@@ -84,6 +84,13 @@ func (c *MockRunTimeContext) RtcAddLevel(handle interface{}, level string, value
 
 }
 
+func (c *MockRunTimeContext) RtcAddOneLevel(handle interface{}, level string, value interface{}) (interface{}, error) {
+	str := fmt.Sprintf("%v", handle) + level + "/"
+	c.Items[str] = value
+	return nil, c.Err
+
+}
+
 func (c *MockRunTimeContext) RtcAddResource(handle interface{}, resname string, value interface{}) (interface{}, error) {
 	str := fmt.Sprintf("%v", handle) + "resource" + "/" + resname + "/"
 	c.Items[str] = value

@@ -26,7 +26,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 	pkgerrors "github.com/pkg/errors"
 	"io/ioutil"
-	//"log"
+
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 )
 
@@ -221,8 +221,12 @@ func addResourcesToCluster(ct appcontext.AppContext, ch interface{}, resources [
 	return nil
 }
 
-func addClustersToAppContext(l gpic.Clusters, ct appcontext.AppContext, appHandle interface{}, resources []resource) error {
-	for _, c := range l.ClustersWithName {
+//addClustersToAppContext method shall add cluster details save into etcd
+func addClustersToAppContext(l gpic.ClusterList, ct appcontext.AppContext, appHandle interface{}, resources []resource) error {
+	mc := l.MandatoryClusters
+	gc := l.ClusterGroups
+
+	for _, c := range mc {
 		p := c.ProviderName
 		n := c.ClusterName
 		var resourceOrder []string
@@ -240,30 +244,84 @@ func addClustersToAppContext(l gpic.Clusters, ct appcontext.AppContext, appHandl
 			return pkgerrors.Wrapf(err, "Error adding Resources to Cluster(provider::%s and name::%s) to AppContext", p, n)
 		}
 	}
+
+	for _, eachGrp := range gc {
+		oc := eachGrp.OptionalClusters
+		gn := eachGrp.GroupNumber
+
+		for _, eachCluster := range oc {
+			p := eachCluster.ProviderName
+			n := eachCluster.ClusterName
+
+			var resourceOrder []string
+			clusterhandle, err := ct.AddCluster(appHandle, p+SEPARATOR+n)
+
+			if err != nil {
+				cleanuperr := ct.DeleteCompositeApp()
+				if cleanuperr != nil {
+					log.Info(":: Error Cleaning up AppContext after add cluster failure ::", log.Fields{"cluster-provider": p, "cluster-name": n, "GroupName": gn, "Error": cleanuperr.Error})
+				}
+				return pkgerrors.Wrapf(err, "Error adding Cluster(provider::%s and name::%s) to AppContext", p, n)
+			}
+
+			err = ct.AddClusterMeta(clusterhandle, gn)
+			if err != nil {
+				cleanuperr := ct.DeleteCompositeApp()
+				if cleanuperr != nil {
+					log.Info(":: Error Cleaning up AppContext after add cluster failure ::", log.Fields{"cluster-provider": p, "cluster-name": n, "GroupName": gn, "Error": cleanuperr.Error})
+				}
+				return pkgerrors.Wrapf(err, "Error adding Cluster(provider::%s and name::%s) to AppContext", p, n)
+			}
+
+			err = addResourcesToCluster(ct, clusterhandle, resources, resourceOrder)
+			if err != nil {
+				return pkgerrors.Wrapf(err, "Error adding Resources to Cluster(provider::%s, name::%s and groupName:: %s) to AppContext", p, n, gn)
+			}
+		}
+	}
 	return nil
 }
 
 /*
 verifyResources method is just to check if the resource handles are correctly saved.
 */
+func verifyResources(l gpic.ClusterList, ct appcontext.AppContext, resources []resource, appName string) error {
+	cnames := make([]string, 0)
+	for _, cg := range l.ClusterGroups {
+		gn := cg.GroupNumber
+		oc := cg.OptionalClusters
+		for _, eachCluster := range oc {
+			p := eachCluster.ProviderName
+			n := eachCluster.ClusterName
+			cn := p + SEPARATOR + n
+			cnames = append(cnames, cn)
+			for _, res := range resources {
+				rh, err := ct.GetResourceHandle(appName, cn, res.name)
+				if err != nil {
+					return pkgerrors.Wrapf(err, "Error getting resoure handle for resource :: %s, app:: %s, cluster :: %s, groupName :: %s", appName, res.name, cn, gn)
+				}
+				log.Info(":: GetResourceHandle ::", log.Fields{"ResourceHandler": rh, "appName": appName, "Cluster": cn, "Resource": res.name})
+			}
+		}
+		grpMap, err := ct.GetGroupMap(appName, cnames)
+		if err != nil {
+			return pkgerrors.Wrapf(err, "Error getting GetGroupMap for app:: %s, groupName :: %s", appName, gn)
+		}
+		log.Info(":: GetGroupMapReults ::", log.Fields{"GroupMap": grpMap})
+	}
 
-func verifyResources(l gpic.Clusters, ct appcontext.AppContext, resources []resource, appName string) error {
-	for _, c := range l.ClustersWithName {
-		p := c.ProviderName
-		n := c.ClusterName
+	for _, mc := range l.MandatoryClusters {
+		p := mc.ProviderName
+		n := mc.ClusterName
 		cn := p + SEPARATOR + n
 		for _, res := range resources {
-
 			rh, err := ct.GetResourceHandle(appName, cn, res.name)
 			if err != nil {
 				return pkgerrors.Wrapf(err, "Error getting resoure handle for resource :: %s, app:: %s, cluster :: %s", appName, res.name, cn)
 			}
 			log.Info(":: GetResourceHandle ::", log.Fields{"ResourceHandler": rh, "appName": appName, "Cluster": cn, "Resource": res.name})
-
 		}
-
 	}
-
 	return nil
 }
 
@@ -336,6 +394,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents for app")
 		}
+		// listOfClusters shall have both mandatoryClusters and optionalClusters where the app needs to be installed.
 		listOfClusters, err := gpic.IntentResolver(specData.Intent)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents resolved for app")

@@ -36,7 +36,7 @@ metadata:
 spec:
   containers:
   - name: pod-case-01
-    image: openssl-test:latest
+    image: integratedcloudnative/openssl-qat-engine:devel
     imagePullPolicy: IfNotPresent
     volumeMounts:
             - mountPath: /dev

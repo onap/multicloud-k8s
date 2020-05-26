@@ -17,7 +17,7 @@ spec:
       - name: intel-qat-kernel-plugin
         securityContext:
           privileged: true
-        image: akhilak/intel-qat-plugin:0.15.0
+        image: integratedcloudnative/intel-qat-plugin:0.15.0
         imagePullPolicy: IfNotPresent
         command: ["/usr/local/bin/intel_qat_device_plugin", "-mode", "kernel"]
         volumeMounts:

@@ -44,6 +44,10 @@ clusterName3="clusterName3"
 cluster_desc3="cluster_desc3"
 clusterName4="clusterName4"
 cluster_desc4="cluster_desc4"
+clusterName5="clusterName5"
+cluster_desc5="cluster_desc5"
+clusterName6="clusterName6"
+cluster_desc6="cluster_desc6"
 
 clusterLabel1="clusterLabel1"
 clusterLabel2="clusterLabel2"
@@ -54,6 +58,8 @@ clusterLabel2="clusterLabel2"
 print_msg "Deleting the clusterLabel1 and clusterLabel2, if they were existing"
 delete_resource "${base_url}/cluster-providers/${cluster_provider_name1}/clusters/${clusterName3}/labels/${clusterLabel1}"
 delete_resource "${base_url}/cluster-providers/${cluster_provider_name2}/clusters/${clusterName4}/labels/${clusterLabel2}"
+delete_resource "${base_url}/cluster-providers/${cluster_provider_name1}/clusters/${clusterName5}/labels/${clusterLabel1}"
+delete_resource "${base_url}/cluster-providers/${cluster_provider_name2}/clusters/${clusterName6}/labels/${clusterLabel2}"
 # Above statements delete the clusterLabel1 and clusterLabel2 which are linked to cluster3 and cluster4
 
 print_msg "Deleting the cluster1, cluster2, cluster3, cluster4 if they were existing"
@@ -61,6 +67,8 @@ delete_resource "${base_url}/cluster-providers/${cluster_provider_name1}/cluster
 delete_resource "${base_url}/cluster-providers/${cluster_provider_name2}/clusters/${clusterName2}"
 delete_resource "${base_url}/cluster-providers/${cluster_provider_name1}/clusters/${clusterName3}"
 delete_resource "${base_url}/cluster-providers/${cluster_provider_name2}/clusters/${clusterName4}"
+delete_resource "${base_url}/cluster-providers/${cluster_provider_name1}/clusters/${clusterName5}"
+delete_resource "${base_url}/cluster-providers/${cluster_provider_name2}/clusters/${clusterName6}"
 
 print_msg "Deleting the cluster-providers, if they were existing"
 delete_resource "${base_url}/cluster-providers/${cluster_provider_name1}"
@@ -172,6 +180,39 @@ call_api -F "metadata=$payload" \
          -F "file=@$kubeconfig_path" \
          "${base_url}/cluster-providers/${cluster_provider_name2}/clusters" >/dev/null #massive output
 
+print_msg "Registering cluster5"
+payload="$(cat <<EOF
+{
+  "metadata": {
+    "name": "${clusterName5}",
+    "description": "${cluster_desc5}",
+    "userData1": "${userData1}",
+    "userData2": "${userData2}"
+   }
+}
+EOF
+)"
+call_api -F "metadata=$payload" \
+         -F "file=@$kubeconfig_path" \
+         "${base_url}/cluster-providers/${cluster_provider_name1}/clusters" >/dev/null #massive output
+
+
+print_msg "Registering cluster6"
+payload="$(cat <<EOF
+{
+  "metadata": {
+    "name": "${clusterName6}",
+    "description": "${cluster_desc6}",
+    "userData1": "${userData1}",
+    "userData2": "${userData2}"
+   }
+}
+EOF
+)"
+call_api -F "metadata=$payload" \
+         -F "file=@$kubeconfig_path" \
+         "${base_url}/cluster-providers/${cluster_provider_name2}/clusters" >/dev/null #massive output
+
 # END : Register cluster1, cluster2, cluster3 and cluster4
 
 
@@ -185,7 +226,7 @@ EOF
 )"
 call_api -d "${payload}" "${base_url}/cluster-providers/${cluster_provider_name1}/clusters/${clusterName3}/labels"
 
-print_msg "Adding label to cluster2"
+print_msg "Adding label to cluster4"
 payload="$(cat <<EOF
 {
   "label-name" : "${clusterLabel2}"
@@ -194,3 +235,21 @@ EOF
 )"
 call_api -d "${payload}" "${base_url}/cluster-providers/${cluster_provider_name2}/clusters/${clusterName4}/labels"
 
+# BEGIN: adding labels to cluster5 and cluster6. Cluster5 to label1 and cluster6 to label2
+print_msg "Adding label to cluster5"
+payload="$(cat <<EOF
+{
+  "label-name" : "${clusterLabel1}"
+}
+EOF
+)"
+call_api -d "${payload}" "${base_url}/cluster-providers/${cluster_provider_name1}/clusters/${clusterName5}/labels"
+
+print_msg "Adding label to cluster6"
+payload="$(cat <<EOF
+{
+  "label-name" : "${clusterLabel2}"
+}
+EOF
+)"
+call_api -d "${payload}" "${base_url}/cluster-providers/${cluster_provider_name2}/clusters/${clusterName6}/labels"

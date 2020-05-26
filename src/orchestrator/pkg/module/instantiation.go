@@ -220,9 +220,14 @@ func addResourcesToCluster(ct appcontext.AppContext, ch interface{}, resources [
 	}
 	return nil
 }
+//TODO: This function shall change.
+// instead of having a separate fn at app context level like AddMandatoryClusters
+// and add a whole new level of for mandatory clusters, why not have a richer value in the addCluster in the rtc. The value shall be like clustername+groupname. Currently its just the clustername.
+func addClustersToAppContext(l gpic.ClusterList, ct appcontext.AppContext, appHandle interface{}, resources []resource) error {
+	mc := l.MandatoryClusters
+	gc := l.ClusterGroups
 
-func addClustersToAppContext(l gpic.Clusters, ct appcontext.AppContext, appHandle interface{}, resources []resource) error {
-	for _, c := range l.ClustersWithName {
+	for _, c := range mc {
 		p := c.ProviderName
 		n := c.ClusterName
 		var resourceOrder []string
@@ -239,6 +244,33 @@ func addClustersToAppContext(l gpic.Clusters, ct appcontext.AppContext, appHandl
 		if err != nil {
 			return pkgerrors.Wrapf(err, "Error adding Resources to Cluster(provider::%s and name::%s) to AppContext", p, n)
 		}
+
+	}
+
+	for _, eachGrp := range gc {
+		oc := eachGrp.OptionalClusters
+		gn := eachGrp.GroupName
+
+		for _, eachCluster := range oc {
+			p := eachCluster.ProviderName
+			n := eachCluster.ClusterName
+
+			var resourceOrder []string
+			clusterhandle, err := ct.AddCluster(appHandle, p+SEPARATOR+n+SEPARATOR+gn)
+			if err != nil {
+				cleanuperr := ct.DeleteCompositeApp()
+				if cleanuperr != nil {
+					log.Info(":: Error Cleaning up AppContext after add cluster failure ::", log.Fields{"cluster-provider": p, "cluster-name": n, "GroupName":gn, "Error": cleanuperr.Error})
+				}
+				return pkgerrors.Wrapf(err, "Error adding Cluster(provider::%s and name::%s) to AppContext", p, n)
+			}
+
+
+			err = addResourcesToCluster(ct, clusterhandle, resources, resourceOrder)
+			if err != nil {
+				return pkgerrors.Wrapf(err, "Error adding Resources to Cluster(provider::%s, name::%s and groupName:: %s) to AppContext", p, n, gn)
+			}
+		}
 	}
 	return nil
 }
@@ -247,23 +279,35 @@ func addClustersToAppContext(l gpic.Clusters, ct appcontext.AppContext, appHandl
 verifyResources method is just to check if the resource handles are correctly saved.
 */
 
-func verifyResources(l gpic.Clusters, ct appcontext.AppContext, resources []resource, appName string) error {
-	for _, c := range l.ClustersWithName {
-		p := c.ProviderName
-		n := c.ClusterName
+func verifyResources(l gpic.ClusterList, ct appcontext.AppContext, resources []resource, appName string) error {
+	for _, cg := range l.ClusterGroups {
+		gn := cg.GroupName
+		for _, eachCluster := range cg.OptionalClusters {
+			p := eachCluster.ProviderName
+			n := eachCluster.ClusterName
+			cn := p + SEPARATOR + n + SEPARATOR + gn
+			for _, res := range resources {
+				rh, err := ct.GetResourceHandle(appName, cn, res.name)
+				if err != nil {
+					return pkgerrors.Wrapf(err, "Error getting resoure handle for resource :: %s, app:: %s, cluster :: %s, groupName :: %s", appName, res.name, cn, gn)
+				}
+				log.Info(":: GetResourceHandle ::", log.Fields{"ResourceHandler": rh, "appName": appName, "Cluster": cn, "Resource": res.name})
+			}
+		}
+	}
+
+	for _, mc := range l.MandatoryClusters {
+		p := mc.ProviderName
+		n := mc.ClusterName
 		cn := p + SEPARATOR + n
 		for _, res := range resources {
-
 			rh, err := ct.GetResourceHandle(appName, cn, res.name)
 			if err != nil {
 				return pkgerrors.Wrapf(err, "Error getting resoure handle for resource :: %s, app:: %s, cluster :: %s", appName, res.name, cn)
 			}
 			log.Info(":: GetResourceHandle ::", log.Fields{"ResourceHandler": rh, "appName": appName, "Cluster": cn, "Resource": res.name})
-
 		}
-
 	}
-
 	return nil
 }
 
@@ -336,6 +380,8 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents for app")
 		}
+		// TODO: at this point IntentResolver should return listOfClusters- but this list of clusters shall be like
+		// containing the mandatoryClusters and the groupClusters. In next change shall be in the addClustersToAppContext
 		listOfClusters, err := gpic.IntentResolver(specData.Intent)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents resolved for app")

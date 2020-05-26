@@ -140,15 +140,21 @@ func (ac *AppContext) GetAppHandle(appname string) (interface{}, error) {
 	return nil, pkgerrors.Errorf("No handle was found for the given app")
 }
 
-//Add cluster to the context under app
-func (ac *AppContext) AddCluster(handle interface{}, clustername string) (interface{}, error) {
-	h, err := ac.rtc.RtcAddLevel(handle, "cluster", clustername)
+// AddCluster helps to add cluster to the context under app. It takes in the app handle and clusterMeta data
+// Clustermeta format : providerNetworkName + clusterName + groupName
+// eg : cluster_provider2+clusterName4+clusterLabel2
+// if no groupName, clustermeta: providerNetworkName + clusterName
+func (ac *AppContext) AddCluster(handle interface{}, clustermeta string) (interface{}, error) {
+	// instead of just passing the clustername, pass clustermeta, which is clustername+clusterlabel to the rtcaddLevel.
+	h, err := ac.rtc.RtcAddLevel(handle, "cluster", clustermeta)
 	if err != nil {
 		return nil, err
 	}
 	log.Info(":: Added cluster handle ::", log.Fields{"ClusterHandler": h})
 	return h, nil
 }
+
+
 
 //Delete cluster from the context and everything underneth
 func (ac *AppContext) DeleteCluster(handle interface{}) error {

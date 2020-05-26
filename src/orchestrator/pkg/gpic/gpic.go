@@ -28,9 +28,21 @@ import (
 )
 
 // Clusters has 1 field - a list of ClusterNames
-type Clusters struct {
-	ClustersWithName []ClusterWithName
+// TODO: This shall contain the mandatory cluster and group cluster.
+// Introduce two additional types - mandatoryClusterList and list of groups
+
+type ClusterGroup struct {
+	OptionalClusters []ClusterWithName
+	GroupName string
 }
+
+type ClusterList struct {
+	MandatoryClusters []ClusterWithName
+	ClusterGroups []ClusterGroup
+}
+// type Clusters struct {
+// 	ClustersWithName []ClusterWithName
+// }
 
 // ClusterWithName has two fields - ProviderName and ClusterName
 type ClusterWithName struct {
@@ -89,32 +101,41 @@ func intentResolverHelper(pn, cn, cln string, clustersWithName []ClusterWithName
 }
 
 // IntentResolver shall help to resolve the given intent into 2 lists of clusters where the app need to be deployed.
-func IntentResolver(intent IntentStruc) (Clusters, error) {
-	var clustersWithName []ClusterWithName
+// TODO: This is where the real resolution takes place, the o/p shall now be a composite data type of list of mandatory clusters and group clusters. Each group cluster shall be a string of cluster names and there should be an array of group cluster. The AppContext shall have two different methods to add mandatory cluster and add group clusters.
+func IntentResolver(intent IntentStruc) (ClusterList, error) {
+	var mc []ClusterWithName
 	var err error
+	var cg []ClusterGroup
 
 	for _, eachAllOf := range intent.AllOfArray {
-		clustersWithName, err = intentResolverHelper(eachAllOf.ProviderName, eachAllOf.ClusterName, eachAllOf.ClusterLabelName, clustersWithName)
+		mc, err = intentResolverHelper(eachAllOf.ProviderName, eachAllOf.ClusterName, eachAllOf.ClusterLabelName, mc)
 		if err != nil {
-			return Clusters{}, pkgerrors.Wrap(err, "intentResolverHelper error")
+			return ClusterList{}, pkgerrors.Wrap(err, "intentResolverHelper error")
 		}
 		if len(eachAllOf.AnyOfArray) > 0 {
+
 			for _, eachAnyOf := range eachAllOf.AnyOfArray {
-				clustersWithName, err = intentResolverHelper(eachAnyOf.ProviderName, eachAnyOf.ClusterName, eachAnyOf.ClusterLabelName, clustersWithName)
+				var opc []ClusterWithName
+				opc, err = intentResolverHelper(eachAnyOf.ProviderName, eachAnyOf.ClusterName, eachAnyOf.ClusterLabelName, opc)
 				if err != nil {
-					return Clusters{}, pkgerrors.Wrap(err, "intentResolverHelper error")
+					return ClusterList{}, pkgerrors.Wrap(err, "intentResolverHelper error")
 				}
+				eachClustergroup := ClusterGroup{OptionalClusters:opc, GroupName:eachAnyOf.ClusterLabelName}
+				cg = append(cg, eachClustergroup)
 			}
 		}
 	}
 	if len(intent.AnyOfArray) > 0 {
+		var opc []ClusterWithName
 		for _, eachAnyOf := range intent.AnyOfArray {
-			clustersWithName, err = intentResolverHelper(eachAnyOf.ProviderName, eachAnyOf.ClusterName, eachAnyOf.ClusterLabelName, clustersWithName)
+			opc, err = intentResolverHelper(eachAnyOf.ProviderName, eachAnyOf.ClusterName, eachAnyOf.ClusterLabelName, opc)
 			if err != nil {
-				return Clusters{}, pkgerrors.Wrap(err, "intentResolverHelper error")
+				return ClusterList{}, pkgerrors.Wrap(err, "intentResolverHelper error")
 			}
+			eachClustergroup := ClusterGroup{OptionalClusters:opc, GroupName:eachAnyOf.ClusterLabelName}
+			cg = append(cg, eachClustergroup)
 		}
 	}
-	clusters := Clusters{clustersWithName}
-	return clusters, nil
+	clusterList := ClusterList{MandatoryClusters:mc, ClusterGroups:cg}
+	return clusterList, nil
 }

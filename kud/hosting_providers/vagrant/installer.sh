@@ -161,7 +161,7 @@ function install_addons {
     done
     echo "Run the test cases if testing_enabled is set to true."
     if [[ "${testing_enabled}" == "true" ]]; then
-        for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov qat cmk}; do
+        for addon in ${KUD_ADDONS:-multus virtlet ovn4nfv nfd sriov qat cmk}; do
             pushd $kud_tests
             bash ${addon}.sh
             popd

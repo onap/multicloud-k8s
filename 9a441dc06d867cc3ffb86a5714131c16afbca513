@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6c3a7fcb_1acbd0e4",
+        "filename": "kud/deployment_infra/playbooks/configure-optane.yml",
+        "patchSetId": 12
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-26T20:55:39Z",
+      "side": 1,
+      "message": "There should be when condition to check whether the optane is in the cluster are not, If the pmem is not avaiable it should not run.\n\nIf it not possible. pmem csi daomonset should not go in to the crashloopbackoff",
+      "range": {
+        "startLine": 15,
+        "startChar": 13,
+        "endLine": 15,
+        "endChar": 14
+      },
+      "revId": "9a441dc06d867cc3ffb86a5714131c16afbca513",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce5dfce7_2fb3a65a",
+        "filename": "kud/tests/optane.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-26T20:55:39Z",
+      "side": 1,
+      "message": "how to confirm the Optane is available in the Baremetal.\n\nSee the examples\nhttps://github.com/onap/multicloud-k8s/blob/master/kud/tests/qat.sh#L13-#L24\nhttps://github.com/onap/multicloud-k8s/blob/master/kud/tests/sriov.sh#L13-#L24",
+      "revId": "9a441dc06d867cc3ffb86a5714131c16afbca513",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

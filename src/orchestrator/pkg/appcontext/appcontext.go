@@ -18,13 +18,14 @@ package appcontext
 
 import (
 	"fmt"
-	"strings"
-
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/rtcontext"
 	pkgerrors "github.com/pkg/errors"
-
-	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"strings"
 )
+
+// metaPrefix used for denoting clusterMeta level
+const metaGrpPREFIX = "!@#metaGrp"
 
 type AppContext struct {
 	initDone bool
@@ -140,7 +141,7 @@ func (ac *AppContext) GetAppHandle(appname string) (interface{}, error) {
 	return nil, pkgerrors.Errorf("No handle was found for the given app")
 }
 
-//Add cluster to the context under app
+// AddCluster helps to add cluster to the context under app. It takes in the app handle and clusterName as value.
 func (ac *AppContext) AddCluster(handle interface{}, clustername string) (interface{}, error) {
 	h, err := ac.rtc.RtcAddLevel(handle, "cluster", clustername)
 	if err != nil {
@@ -148,6 +149,41 @@ func (ac *AppContext) AddCluster(handle interface{}, clustername string) (interf
 	}
 	log.Info(":: Added cluster handle ::", log.Fields{"ClusterHandler": h})
 	return h, nil
+}
+
+// AddClusterMetaGrp adds the meta info of groupNumber to which a cluster belongs.
+// It takes in cluster handle and groupNumber as arguments
+func (ac *AppContext) AddClusterMetaGrp(ch interface{}, gn string) error {
+	mh, err := ac.rtc.RtcAddOneLevel(ch, metaGrpPREFIX, gn)
+	if err != nil {
+		return err
+	}
+	log.Info(":: Added cluster meta handle ::", log.Fields{"ClusterMetaHandler": mh})
+	return nil
+}
+
+// DeleteClusterMetaGrp deletes the group number to which the cluster belongs, it takes in the cluster handle.
+func (ac *AppContext) DeleteClusterMetaGrp(ch interface{}) error {
+	mh := fmt.Sprintf("%v", ch) + metaGrpPREFIX + "/"
+	err := ac.rtc.RtcDeletePrefix(mh)
+	if err != nil {
+		return err
+	}
+	log.Info(":: Deleted cluster meta handle ::", log.Fields{"ClusterMetaHandler": mh})
+	return nil
+
+}
+
+// GetClusterMetaGrp returns the the group number to which the cluster belongs, it takes in the cluster handler.
+func (ac *AppContext) GetClusterMetaGrp(ch interface{}) (string, error) {
+	mh := fmt.Sprintf("%v", ch) + metaGrpPREFIX + "/"
+	var v string
+	err := ac.rtc.RtcGetValue(mh, &v)
+	if err != nil {
+		return "", err
+	}
+	gn := fmt.Sprintf("%v", v)
+	return gn, nil
 }
 
 //Delete cluster from the context and everything underneth
@@ -372,4 +408,41 @@ func (ac *AppContext) GetCompositeAppMeta() (CompositeAppMeta, error) {
 	rn := fmt.Sprintf("%v", datamap["Release"])
 
 	return CompositeAppMeta{Project: p, CompositeApp: ca, Version: v, Release: rn}, nil
+}
+
+/*
+GetClusterGroupMap shall take in appName and return a map showing the grouping among the clusters.
+sample output of "GroupMap" :{"1":["cluster_provider1+clusterName3","cluster_provider1+clusterName5"],"2":["cluster_provider2+clusterName4","cluster_provider2+clusterName6"]}
+*/
+func (ac *AppContext) GetClusterGroupMap(an string) (map[string][]string, error) {
+	cl, err := ac.GetClusterNames(an)
+	if err != nil {
+		log.Info(":: Unable to fetch clusterList for app ::", log.Fields{"AppName ": an})
+		return nil, err
+	}
+	rh, err := ac.rtc.RtcGet()
+	if err != nil {
+		return nil, err
+	}
+
+	var gmap = make(map[string][]string)
+	for _, cn := range cl {
+		s := fmt.Sprintf("%v", rh) + "app/" + an + "/cluster/" + cn + "/" + metaGrpPREFIX + "/"
+		var v string
+		err = ac.rtc.RtcGetValue(s, &v)
+		if err != nil {
+			log.Info(":: No group number for cluster  ::", log.Fields{"cluster": cn, "Reason": err})
+			continue
+		}
+		gn := fmt.Sprintf("%v", v)
+		log.Info(":: GroupNumber retrieved  ::", log.Fields{"GroupNumber": gn})
+
+		cl, found := gmap[gn]
+		if found == false {
+			cl = make([]string, 0)
+		}
+		cl = append(cl, cn)
+		gmap[gn] = cl
+	}
+	return gmap, nil
 }

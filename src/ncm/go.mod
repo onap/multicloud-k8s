@@ -2,17 +2,10 @@ module github.com/onap/multicloud-k8s/src/ncm
 
 require (
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/handlers v1.3.0
-	github.com/gorilla/mux v1.6.2
+	github.com/gorilla/mux v1.7.3
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20200127152046-0ee521d56061
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200527175204-ef27eb4d63f1
-	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200529003854-0a7bf256bde5
-	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
-	github.com/xdg/stringprep v1.0.0 // indirect
 	google.golang.org/grpc v1.27.1
 	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
@@ -23,6 +16,7 @@ require (
 )
 
 replace (
+	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
 	github.com/onap/multicloud-k8s/src/rsync => ../rsync
 	k8s.io/api => k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b

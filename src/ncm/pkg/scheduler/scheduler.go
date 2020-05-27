@@ -21,9 +21,9 @@ import (
 	"encoding/json"
 	"time"
 
+	clusterPkg "github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
 	"github.com/onap/multicloud-k8s/src/ncm/internal/grpc"
 	oc "github.com/onap/multicloud-k8s/src/ncm/internal/ovncontroller"
-	clusterPkg "github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
 	ncmtypes "github.com/onap/multicloud-k8s/src/ncm/pkg/module/types"
 	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"

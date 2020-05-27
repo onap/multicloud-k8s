@@ -27,7 +27,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
+	"github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	types "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 

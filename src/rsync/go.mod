@@ -4,16 +4,19 @@ go 1.13
 
 require (
 	github.com/golang/protobuf v1.3.4
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200527175204-ef27eb4d63f1
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4
 	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3 // indirect
 	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/grpc v1.27.1
 	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
+	github.com/googleapis/gnostic v0.4.0
+	k8s.io/kubernetes v1.14.1
 )
 
 replace (
-	github.com/onap/multicloud-k8s/src/ncm => ../ncm
+	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
+	github.com/onap/multicloud-k8s/src/rsync => ../rsync
 	k8s.io/api => k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190409022649-727a075fdec8
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d

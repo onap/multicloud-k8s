@@ -20,7 +20,6 @@ import (
 	"reflect"
 
 	"github.com/gorilla/mux"
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
 	"github.com/onap/multicloud-k8s/src/ncm/pkg/module"
 	"github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents"
 	"github.com/onap/multicloud-k8s/src/ncm/pkg/scheduler"
@@ -33,13 +32,6 @@ var moduleClient *module.Client
 // return the testClient, otherwise return the client.
 func setClient(client, testClient interface{}) interface{} {
 	switch cl := client.(type) {
-	case *cluster.ClusterClient:
-		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*cluster.ClusterManager)(nil)).Elem()) {
-			c, ok := testClient.(cluster.ClusterManager)
-			if ok {
-				return c
-			}
-		}
 	case *networkintents.NetworkClient:
 		if testClient != nil && reflect.TypeOf(testClient).Implements(reflect.TypeOf((*networkintents.NetworkManager)(nil)).Elem()) {
 			c, ok := testClient.(networkintents.NetworkManager)
@@ -74,27 +66,6 @@ func NewRouter(testClient interface{}) *mux.Router {
 	moduleClient = module.NewClient()
 
 	router := mux.NewRouter().PathPrefix("/v2").Subrouter()
-
-	clusterHandler := clusterHandler{
-		client: setClient(moduleClient.Cluster, testClient).(cluster.ClusterManager),
-	}
-	router.HandleFunc("/cluster-providers", clusterHandler.createClusterProviderHandler).Methods("POST")
-	router.HandleFunc("/cluster-providers", clusterHandler.getClusterProviderHandler).Methods("GET")
-	router.HandleFunc("/cluster-providers/{name}", clusterHandler.getClusterProviderHandler).Methods("GET")
-	router.HandleFunc("/cluster-providers/{name}", clusterHandler.deleteClusterProviderHandler).Methods("DELETE")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters", clusterHandler.createClusterHandler).Methods("POST")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters", clusterHandler.getClusterHandler).Methods("GET")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters", clusterHandler.getClusterHandler).Queries("label", "{label}")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}", clusterHandler.getClusterHandler).Methods("GET")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{name}", clusterHandler.deleteClusterHandler).Methods("DELETE")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels", clusterHandler.createClusterLabelHandler).Methods("POST")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels", clusterHandler.getClusterLabelHandler).Methods("GET")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels/{label}", clusterHandler.getClusterLabelHandler).Methods("GET")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/labels/{label}", clusterHandler.deleteClusterLabelHandler).Methods("DELETE")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs", clusterHandler.createClusterKvPairsHandler).Methods("POST")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs", clusterHandler.getClusterKvPairsHandler).Methods("GET")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.getClusterKvPairsHandler).Methods("GET")
-	router.HandleFunc("/cluster-providers/{provider-name}/clusters/{cluster-name}/kv-pairs/{kvpair}", clusterHandler.deleteClusterKvPairsHandler).Methods("DELETE")
 
 	networkHandler := networkHandler{
 		client: setClient(moduleClient.Network, testClient).(networkintents.NetworkManager),

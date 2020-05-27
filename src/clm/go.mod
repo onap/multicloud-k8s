@@ -1,27 +1,20 @@
-module github.com/onap/multicloud-k8s/src/orchestrator
+module github.com/onap/multicloud-k8s/src/ncm
 
 require (
-	github.com/chai2010/gettext-go v0.0.0-20170215093142-bf70f2a70fb1
-	github.com/coreos/etcd v3.3.12+incompatible
 	github.com/ghodss/yaml v1.0.0
-	github.com/golang/protobuf v1.3.4
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.6.2
-	github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee
+	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20200127152046-0ee521d56061
 	github.com/pkg/errors v0.8.1
-	github.com/russross/blackfriday v1.5.2
-	github.com/sirupsen/logrus v1.4.2
-	go.etcd.io/etcd v3.3.12+incompatible
-	go.mongodb.org/mongo-driver v1.0.0
-	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
 	google.golang.org/grpc v1.27.1
-	gopkg.in/yaml.v3 v3.0.0-20200506231410-2ff61e1afc86
+	gopkg.in/yaml.v2 v2.2.8
+	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
 	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
-	k8s.io/helm v2.14.3+incompatible
+	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
+	k8s.io/kubernetes v1.14.1
 )
 
 replace (
-	github.com/onap/multicloud-k8s/src/clm => ../clm
 	k8s.io/api => k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190409022649-727a075fdec8
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d
@@ -29,6 +22,7 @@ replace (
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.0.0-20190409023024-d644b00f3b79
 	k8s.io/client-go => k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.0.0-20190409023720-1bc0c81fa51d
+
 )
 
 go 1.13

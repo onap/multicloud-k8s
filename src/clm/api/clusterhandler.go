@@ -27,7 +27,7 @@ import (
 	"net/http"
 	"net/textproto"
 
-	clusterPkg "github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
+	clusterPkg "github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
 
 	"github.com/gorilla/mux"
 )

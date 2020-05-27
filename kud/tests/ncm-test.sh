@@ -5,7 +5,8 @@ set -o pipefail
 
 source _functions.sh
 
-base_url=${base_url:-"http://localhost:9016/v2"}
+base_url_clm=${base_url:-"http://localhost:9019/v2"}
+base_url_ncm=${base_url:-"http://localhost:9016/v2"}
 
 # ncm data samples
 clusterprovidername="cluster-provider-a"
@@ -144,41 +145,41 @@ EOF
 
 
 function createNcmData {
-    call_api -d "${clusterproviderdata}" "${base_url}/cluster-providers"
-    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata" -F "file=@$kubeconfigfile" "${base_url}/cluster-providers/${clusterprovidername}/clusters"
-    call_api -d "${labeldata}" "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels"
-    call_api -d "${kvdata}" "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/kv-pairs"
-    call_api -d "${providernetworkdata}" "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/provider-networks"
-    call_api -d "${networkdata}" "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/networks"
+    call_api -d "${clusterproviderdata}" "${base_url_clm}/cluster-providers"
+    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata" -F "file=@$kubeconfigfile" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
+    call_api -d "${labeldata}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels"
+    call_api -d "${kvdata}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/kv-pairs"
+    call_api -d "${providernetworkdata}" "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/provider-networks"
+    call_api -d "${networkdata}" "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/networks"
 }
 
 # apply the network and providernetwork to an appcontext and instantiate with resource synchronizer (when implemented)
 function applyNcmData {
-    call_api -d "{ }" "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/apply"
+    call_api -d "{ }" "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/apply"
 }
 
 # deletes the appcontext (eventually will terminate from resource synchronizer when that funcationality is ready)
 function terminateNcmData {
-    call_api -d "{ }" "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/terminate"
+    call_api -d "{ }" "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/terminate"
 }
 
 function getNcmData {
-    call_api "${base_url}/cluster-providers/${clusterprovidername}" | jq .
-    call_api -H "Accept: application/json" "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}" | jq .
-    call_api "${base_url}/cluster-providers/${clusterprovidername}/clusters?label=${labelname}" | jq .
-    call_api "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/kv-pairs/${kvname}" | jq .
-    call_api "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/networks/${networkname}" | jq .
-    call_api "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/provider-networks/${providernetworkname}" | jq .
+    call_api "${base_url_clm}/cluster-providers/${clusterprovidername}" | jq .
+    call_api -H "Accept: application/json" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}" | jq .
+    call_api "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters?label=${labelname}" | jq .
+    call_api "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/kv-pairs/${kvname}" | jq .
+    call_api "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/networks/${networkname}" | jq .
+    call_api "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/provider-networks/${providernetworkname}" | jq .
 
 }
 
 function deleteNcmData {
-    call_api -X DELETE "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/networks/${networkname}"
-    call_api -X DELETE "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/provider-networks/${providernetworkname}"
-    call_api -X DELETE "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
-    call_api -X DELETE "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}/kv-pairs/${kvname}"
-    call_api -X DELETE "${base_url}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
-    call_api -X DELETE "${base_url}/cluster-providers/${clusterprovidername}"
+    call_api -X DELETE "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/networks/${networkname}"
+    call_api -X DELETE "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/provider-networks/${providernetworkname}"
+    call_api -X DELETE "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
+    call_api -X DELETE "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/kv-pairs/${kvname}"
+    call_api -X DELETE "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
+    call_api -X DELETE "${base_url_clm}/cluster-providers/${clusterprovidername}"
 }
 
 function usage {

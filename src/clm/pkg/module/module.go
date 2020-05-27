@@ -17,24 +17,19 @@
 package module
 
 import (
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents"
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/scheduler"
+	"github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
 )
 
 // Client for using the services in the ncm
 type Client struct {
-	Network     *networkintents.NetworkClient
-	ProviderNet *networkintents.ProviderNetClient
-	Scheduler   *scheduler.SchedulerClient
+	Cluster *cluster.ClusterClient
 	// Add Clients for API's here
 }
 
 // NewClient creates a new client for using the services
 func NewClient() *Client {
 	c := &Client{}
-	c.Network = networkintents.NewNetworkClient()
-	c.ProviderNet = networkintents.NewProviderNetClient()
-	c.Scheduler = scheduler.NewSchedulerClient()
+	c.Cluster = cluster.NewClusterClient()
 	// Add Client API handlers here
 	return c
 }

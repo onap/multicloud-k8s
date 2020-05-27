@@ -19,7 +19,8 @@ import (
 	"strings"
 
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
-	module "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+	controller "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
+	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 )
 
 const default_host = "localhost"
@@ -70,18 +71,18 @@ func RegisterGrpcServer(host string, port int) error {
 		})
 	}
 
-	client := module.NewControllerClient()
+	client := controller.NewControllerClient()
 
 	// Create or update the controller entry
-	controller := module.Controller{
-		Metadata: module.Metadata{
+	controller := controller.Controller{
+		Metadata: mtypes.Metadata{
 			Name: serviceName,
 		},
-		Spec: module.ControllerSpec{
+		Spec: controller.ControllerSpec{
 			Host:     host,
 			Port:     port,
-			Type:     module.CONTROLLER_TYPE_ACTION,
-			Priority: module.MinControllerPriority,
+			Type:     controller.CONTROLLER_TYPE_ACTION,
+			Priority: controller.MinControllerPriority,
 		},
 	}
 	_, err := client.CreateController(controller, true)

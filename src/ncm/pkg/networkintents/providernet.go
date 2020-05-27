@@ -17,7 +17,7 @@
 package networkintents
 
 import (
-	clusterPkg "github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
+	clusterPkg "github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
 	ncmtypes "github.com/onap/multicloud-k8s/src/ncm/pkg/module/types"
 	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"

@@ -22,7 +22,7 @@ package gpic
 */
 
 import (
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
+	"github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
 	pkgerrors "github.com/pkg/errors"
 	"log"
 )

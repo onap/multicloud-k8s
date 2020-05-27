@@ -27,8 +27,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	"github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
+	mtypes "github.com/onap/multicloud-k8s/src/ncm/pkg/module/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 
 	pkgerrors "github.com/pkg/errors"
@@ -211,7 +211,7 @@ func TestClusterProviderCreateHandler(t *testing.T) {
 					}
 				}`)),
 			expected: cluster.ClusterProvider{
-				Metadata: module.Metadata{
+				Metadata: mtypes.Metadata{
 					Name:        "clusterProviderTest",
 					Description: "testClusterProvider",
 					UserData1:   "some user data 1",
@@ -222,7 +222,7 @@ func TestClusterProviderCreateHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				ClusterProviderItems: []cluster.ClusterProvider{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "clusterProviderTest",
 							Description: "testClusterProvider",
 							UserData1:   "some user data 1",
@@ -284,7 +284,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 			expectedCode: http.StatusOK,
 			expected: []cluster.ClusterProvider{
 				{
-					Metadata: module.Metadata{
+					Metadata: mtypes.Metadata{
 						Name:        "testClusterProvider1",
 						Description: "testClusterProvider 1 description",
 						UserData1:   "some user data 1",
@@ -292,7 +292,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 					},
 				},
 				{
-					Metadata: module.Metadata{
+					Metadata: mtypes.Metadata{
 						Name:        "testClusterProvider2",
 						Description: "testClusterProvider 2 description",
 						UserData1:   "some user data A",
@@ -304,7 +304,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				ClusterProviderItems: []cluster.ClusterProvider{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "testClusterProvider1",
 							Description: "testClusterProvider 1 description",
 							UserData1:   "some user data 1",
@@ -312,7 +312,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 						},
 					},
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "testClusterProvider2",
 							Description: "testClusterProvider 2 description",
 							UserData1:   "some user data A",
@@ -361,7 +361,7 @@ func TestClusterProviderGetHandler(t *testing.T) {
 			label:        "Get Cluster Provider",
 			expectedCode: http.StatusOK,
 			expected: cluster.ClusterProvider{
-				Metadata: module.Metadata{
+				Metadata: mtypes.Metadata{
 					Name:        "testClusterProvider",
 					Description: "testClusterProvider description",
 					UserData1:   "some user data 1",
@@ -373,7 +373,7 @@ func TestClusterProviderGetHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				ClusterProviderItems: []cluster.ClusterProvider{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "testClusterProvider",
 							Description: "testClusterProvider description",
 							UserData1:   "some user data 1",
@@ -488,7 +488,7 @@ to the creation
 of clusterTest
 `,
 			expected: cluster.Cluster{
-				Metadata: module.Metadata{
+				Metadata: mtypes.Metadata{
 					Name:        "clusterTest",
 					Description: "testCluster",
 					UserData1:   "some user data 1",
@@ -499,7 +499,7 @@ of clusterTest
 				//Items that will be returned by the mocked Client
 				ClusterProviderItems: []cluster.ClusterProvider{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "clusterProvider1",
 							Description: "ClusterProvider 1 description",
 							UserData1:   "some user data 1",
@@ -509,7 +509,7 @@ of clusterTest
 				},
 				ClusterItems: []cluster.Cluster{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "clusterTest",
 							Description: "testCluster",
 							UserData1:   "some user data 1",
@@ -593,7 +593,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 			expectedCode: http.StatusOK,
 			expected: []cluster.Cluster{
 				{
-					Metadata: module.Metadata{
+					Metadata: mtypes.Metadata{
 						Name:        "testCluster1",
 						Description: "testCluster 1 description",
 						UserData1:   "some user data 1",
@@ -601,7 +601,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 					},
 				},
 				{
-					Metadata: module.Metadata{
+					Metadata: mtypes.Metadata{
 						Name:        "testCluster2",
 						Description: "testCluster 2 description",
 						UserData1:   "some user data A",
@@ -613,7 +613,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				ClusterItems: []cluster.Cluster{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "testCluster1",
 							Description: "testCluster 1 description",
 							UserData1:   "some user data 1",
@@ -621,7 +621,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 						},
 					},
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "testCluster2",
 							Description: "testCluster 2 description",
 							UserData1:   "some user data A",
@@ -681,7 +681,7 @@ func TestClusterGetHandler(t *testing.T) {
 			accept:       "application/json",
 			expectedCode: http.StatusOK,
 			expected: cluster.Cluster{
-				Metadata: module.Metadata{
+				Metadata: mtypes.Metadata{
 					Name:        "testCluster",
 					Description: "testCluster description",
 					UserData1:   "some user data 1",
@@ -693,7 +693,7 @@ func TestClusterGetHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				ClusterItems: []cluster.Cluster{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "testCluster",
 							Description: "testCluster description",
 							UserData1:   "some user data 1",
@@ -1118,7 +1118,7 @@ func TestClusterKvPairsCreateHandler(t *testing.T) {
 					}
 				}`)),
 			expected: cluster.ClusterKvPairs{
-				Metadata: module.Metadata{
+				Metadata: mtypes.Metadata{
 					Name:        "ClusterKvPair1",
 					Description: "test cluster kv pairs",
 					UserData1:   "some user data 1",
@@ -1139,7 +1139,7 @@ func TestClusterKvPairsCreateHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				ClusterKvPairsItems: []cluster.ClusterKvPairs{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "ClusterKvPair1",
 							Description: "test cluster kv pairs",
 							UserData1:   "some user data 1",
@@ -1199,7 +1199,7 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 			expectedCode: http.StatusOK,
 			expected: []cluster.ClusterKvPairs{
 				{
-					Metadata: module.Metadata{
+					Metadata: mtypes.Metadata{
 						Name:        "ClusterKvPair1",
 						Description: "test cluster kv pairs",
 						UserData1:   "some user data 1",
@@ -1217,7 +1217,7 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 					},
 				},
 				{
-					Metadata: module.Metadata{
+					Metadata: mtypes.Metadata{
 						Name:        "ClusterKvPair2",
 						Description: "test cluster kv pairs",
 						UserData1:   "some user data A",
@@ -1239,7 +1239,7 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				ClusterKvPairsItems: []cluster.ClusterKvPairs{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "ClusterKvPair1",
 							Description: "test cluster kv pairs",
 							UserData1:   "some user data 1",
@@ -1257,7 +1257,7 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 						},
 					},
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "ClusterKvPair2",
 							Description: "test cluster kv pairs",
 							UserData1:   "some user data A",
@@ -1316,7 +1316,7 @@ func TestClusterKvPairsGetHandler(t *testing.T) {
 			label:        "Get Cluster KV Pairs",
 			expectedCode: http.StatusOK,
 			expected: cluster.ClusterKvPairs{
-				Metadata: module.Metadata{
+				Metadata: mtypes.Metadata{
 					Name:        "ClusterKvPair2",
 					Description: "test cluster kv pairs",
 					UserData1:   "some user data A",
@@ -1338,7 +1338,7 @@ func TestClusterKvPairsGetHandler(t *testing.T) {
 				//Items that will be returned by the mocked Client
 				ClusterKvPairsItems: []cluster.ClusterKvPairs{
 					{
-						Metadata: module.Metadata{
+						Metadata: mtypes.Metadata{
 							Name:        "ClusterKvPair2",
 							Description: "test cluster kv pairs",
 							UserData1:   "some user data A",

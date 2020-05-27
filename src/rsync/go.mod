@@ -1,4 +1,4 @@
-module rsync
+module github.com/onap/multicloud-k8s/src/rsync
 
 go 1.13
 

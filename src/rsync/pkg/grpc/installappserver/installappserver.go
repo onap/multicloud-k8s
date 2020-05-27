@@ -18,7 +18,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"rsync/pkg/grpc/installapp"
+	"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
 	//"google.golang.org/grpc/codes"
 	//"google.golang.org/grpc/status"
 )

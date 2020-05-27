@@ -18,9 +18,9 @@ import (
 	"log"
 	"math/rand"
 	"net"
-	register "rsync/pkg/grpc"
-	installpb "rsync/pkg/grpc/installapp"
-	"rsync/pkg/grpc/installappserver"
+	register "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc"
+	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
+	"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installappserver"
 	"strings"
 	"time"
 

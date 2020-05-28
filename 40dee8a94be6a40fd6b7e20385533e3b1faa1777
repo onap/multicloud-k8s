@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d651cef5_9f71f54e",
+        "filename": "src/ncm/pkg/module/cluster.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-28T23:23:36Z",
+      "side": 1,
+      "message": "Is this still valid comment?",
+      "range": {
+        "startLine": 552,
+        "startChar": 4,
+        "endLine": 552,
+        "endChar": 74
+      },
+      "revId": "40dee8a94be6a40fd6b7e20385533e3b1faa1777",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

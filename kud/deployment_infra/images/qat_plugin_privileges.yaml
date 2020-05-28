@@ -13,6 +13,15 @@ spec:
       labels:
         app: intel-qat-kernel-plugin
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/pci-0b40_8086.present
+                operator: In
+                values:
+                - true
       containers:
       - name: intel-qat-kernel-plugin
         securityContext:

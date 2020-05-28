@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b8d519d4_7a3acdd0",
+        "filename": "src/orchestrator/go.mod",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-28T16:54:54Z",
+      "side": 1,
+      "message": "Are we using some code from K8splugin in orchestrator? If not this can be removed.",
+      "range": {
+        "startLine": 23,
+        "startChar": 36,
+        "endLine": 23,
+        "endChar": 45
+      },
+      "revId": "f4362c8cebeeb719ca61ca28f2f3f6a5ce96faa0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

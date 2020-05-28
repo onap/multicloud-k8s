@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e7abfb18_1fa8b537",
+        "filename": "kud/deployment_infra/playbooks/deploy_optane.sh",
+        "patchSetId": 16
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-28T00:34:21Z",
+      "side": 1,
+      "message": "+1",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 2
+      },
+      "revId": "88669b33038642374377ee8ebc395a0293c5a206",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "11ff05a4_91f90fe1",
+        "filename": "kud/tests/optane.sh",
+        "patchSetId": 16
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-28T00:34:21Z",
+      "side": 1,
+      "message": "+1",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 2
+      },
+      "revId": "88669b33038642374377ee8ebc395a0293c5a206",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

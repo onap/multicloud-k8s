@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "bd01c2d7_1e930b17",
+        "filename": "kud/deployment_infra/playbooks/preconfigure-optane.yml",
+        "patchSetId": 16
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-05-28T03:44:59Z",
+      "side": 1,
+      "message": "Can we skip the tasks, when the Optane is not in the baremetal server. \nhttps://github.com/onap/multicloud-k8s/blob/master/kud/deployment_infra/playbooks/preconfigure-qat.yml#L52-#L75",
+      "range": {
+        "startLine": 32,
+        "startChar": 2,
+        "endLine": 32,
+        "endChar": 7
+      },
+      "revId": "88669b33038642374377ee8ebc395a0293c5a206",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "11ff05a4_91f90fe1",
         "filename": "kud/tests/optane.sh",
         "patchSetId": 16

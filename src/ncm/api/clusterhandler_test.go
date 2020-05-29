@@ -27,8 +27,9 @@ import (
 	"reflect"
 	"testing"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	types "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -39,35 +40,35 @@ import (
 type mockClusterManager struct {
 	// Items and err will be used to customize each test
 	// via a localized instantiation of mockClusterManager
-	ClusterProviderItems []moduleLib.ClusterProvider
-	ClusterItems         []moduleLib.Cluster
-	ClusterContentItems  []moduleLib.ClusterContent
+	ClusterProviderItems []cluster.ClusterProvider
+	ClusterItems         []cluster.Cluster
+	ClusterContentItems  []cluster.ClusterContent
 	ClusterContextItems  []appcontext.AppContext
-	ClusterLabelItems    []moduleLib.ClusterLabel
-	ClusterKvPairsItems  []moduleLib.ClusterKvPairs
+	ClusterLabelItems    []cluster.ClusterLabel
+	ClusterKvPairsItems  []cluster.ClusterKvPairs
 	ClusterList          []string
 	Err                  error
 }
 
-func (m *mockClusterManager) CreateClusterProvider(inp moduleLib.ClusterProvider) (moduleLib.ClusterProvider, error) {
+func (m *mockClusterManager) CreateClusterProvider(inp cluster.ClusterProvider) (cluster.ClusterProvider, error) {
 	if m.Err != nil {
-		return moduleLib.ClusterProvider{}, m.Err
+		return cluster.ClusterProvider{}, m.Err
 	}
 
 	return m.ClusterProviderItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusterProvider(name string) (moduleLib.ClusterProvider, error) {
+func (m *mockClusterManager) GetClusterProvider(name string) (cluster.ClusterProvider, error) {
 	if m.Err != nil {
-		return moduleLib.ClusterProvider{}, m.Err
+		return cluster.ClusterProvider{}, m.Err
 	}
 
 	return m.ClusterProviderItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusterProviders() ([]moduleLib.ClusterProvider, error) {
+func (m *mockClusterManager) GetClusterProviders() ([]cluster.ClusterProvider, error) {
 	if m.Err != nil {
-		return []moduleLib.ClusterProvider{}, m.Err
+		return []cluster.ClusterProvider{}, m.Err
 	}
 
 	return m.ClusterProviderItems, nil
@@ -77,25 +78,25 @@ func (m *mockClusterManager) DeleteClusterProvider(name string) error {
 	return m.Err
 }
 
-func (m *mockClusterManager) CreateCluster(provider string, inp moduleLib.Cluster, inq moduleLib.ClusterContent) (moduleLib.Cluster, error) {
+func (m *mockClusterManager) CreateCluster(provider string, inp cluster.Cluster, inq cluster.ClusterContent) (cluster.Cluster, error) {
 	if m.Err != nil {
-		return moduleLib.Cluster{}, m.Err
+		return cluster.Cluster{}, m.Err
 	}
 
 	return m.ClusterItems[0], nil
 }
 
-func (m *mockClusterManager) GetCluster(provider, name string) (moduleLib.Cluster, error) {
+func (m *mockClusterManager) GetCluster(provider, name string) (cluster.Cluster, error) {
 	if m.Err != nil {
-		return moduleLib.Cluster{}, m.Err
+		return cluster.Cluster{}, m.Err
 	}
 
 	return m.ClusterItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusterContent(provider, name string) (moduleLib.ClusterContent, error) {
+func (m *mockClusterManager) GetClusterContent(provider, name string) (cluster.ClusterContent, error) {
 	if m.Err != nil {
-		return moduleLib.ClusterContent{}, m.Err
+		return cluster.ClusterContent{}, m.Err
 	}
 
 	return m.ClusterContentItems[0], nil
@@ -109,9 +110,9 @@ func (m *mockClusterManager) GetClusterContext(provider, name string) (appcontex
 	return m.ClusterContextItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusters(provider string) ([]moduleLib.Cluster, error) {
+func (m *mockClusterManager) GetClusters(provider string) ([]cluster.Cluster, error) {
 	if m.Err != nil {
-		return []moduleLib.Cluster{}, m.Err
+		return []cluster.Cluster{}, m.Err
 	}
 
 	return m.ClusterItems, nil
@@ -129,67 +130,59 @@ func (m *mockClusterManager) DeleteCluster(provider, name string) error {
 	return m.Err
 }
 
-func (m *mockClusterManager) ApplyNetworkIntents(provider, name string) error {
-	return m.Err
-}
-
-func (m *mockClusterManager) TerminateNetworkIntents(provider, name string) error {
-	return m.Err
-}
-
-func (m *mockClusterManager) CreateClusterLabel(provider, cluster string, inp moduleLib.ClusterLabel) (moduleLib.ClusterLabel, error) {
+func (m *mockClusterManager) CreateClusterLabel(provider, clusterName string, inp cluster.ClusterLabel) (cluster.ClusterLabel, error) {
 	if m.Err != nil {
-		return moduleLib.ClusterLabel{}, m.Err
+		return cluster.ClusterLabel{}, m.Err
 	}
 
 	return m.ClusterLabelItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusterLabel(provider, cluster, label string) (moduleLib.ClusterLabel, error) {
+func (m *mockClusterManager) GetClusterLabel(provider, clusterName, label string) (cluster.ClusterLabel, error) {
 	if m.Err != nil {
-		return moduleLib.ClusterLabel{}, m.Err
+		return cluster.ClusterLabel{}, m.Err
 	}
 
 	return m.ClusterLabelItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusterLabels(provider, cluster string) ([]moduleLib.ClusterLabel, error) {
+func (m *mockClusterManager) GetClusterLabels(provider, clusterName string) ([]cluster.ClusterLabel, error) {
 	if m.Err != nil {
-		return []moduleLib.ClusterLabel{}, m.Err
+		return []cluster.ClusterLabel{}, m.Err
 	}
 
 	return m.ClusterLabelItems, nil
 }
 
-func (m *mockClusterManager) DeleteClusterLabel(provider, cluster, label string) error {
+func (m *mockClusterManager) DeleteClusterLabel(provider, clusterName, label string) error {
 	return m.Err
 }
 
-func (m *mockClusterManager) CreateClusterKvPairs(provider, cluster string, inp moduleLib.ClusterKvPairs) (moduleLib.ClusterKvPairs, error) {
+func (m *mockClusterManager) CreateClusterKvPairs(provider, clusterName string, inp cluster.ClusterKvPairs) (cluster.ClusterKvPairs, error) {
 	if m.Err != nil {
-		return moduleLib.ClusterKvPairs{}, m.Err
+		return cluster.ClusterKvPairs{}, m.Err
 	}
 
 	return m.ClusterKvPairsItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusterKvPairs(provider, cluster, kvpair string) (moduleLib.ClusterKvPairs, error) {
+func (m *mockClusterManager) GetClusterKvPairs(provider, clusterName, kvpair string) (cluster.ClusterKvPairs, error) {
 	if m.Err != nil {
-		return moduleLib.ClusterKvPairs{}, m.Err
+		return cluster.ClusterKvPairs{}, m.Err
 	}
 
 	return m.ClusterKvPairsItems[0], nil
 }
 
-func (m *mockClusterManager) GetAllClusterKvPairs(provider, cluster string) ([]moduleLib.ClusterKvPairs, error) {
+func (m *mockClusterManager) GetAllClusterKvPairs(provider, clusterName string) ([]cluster.ClusterKvPairs, error) {
 	if m.Err != nil {
-		return []moduleLib.ClusterKvPairs{}, m.Err
+		return []cluster.ClusterKvPairs{}, m.Err
 	}
 
 	return m.ClusterKvPairsItems, nil
 }
 
-func (m *mockClusterManager) DeleteClusterKvPairs(provider, cluster, kvpair string) error {
+func (m *mockClusterManager) DeleteClusterKvPairs(provider, clusterName, kvpair string) error {
 	return m.Err
 }
 
@@ -197,7 +190,7 @@ func TestClusterProviderCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string
 		reader        io.Reader
-		expected      moduleLib.ClusterProvider
+		expected      cluster.ClusterProvider
 		expectedCode  int
 		clusterClient *mockClusterManager
 	}{
@@ -217,8 +210,8 @@ func TestClusterProviderCreateHandler(t *testing.T) {
 						"userData2": "some user data 2"
 					}
 				}`)),
-			expected: moduleLib.ClusterProvider{
-				Metadata: moduleLib.Metadata{
+			expected: cluster.ClusterProvider{
+				Metadata: types.Metadata{
 					Name:        "clusterProviderTest",
 					Description: "testClusterProvider",
 					UserData1:   "some user data 1",
@@ -227,9 +220,9 @@ func TestClusterProviderCreateHandler(t *testing.T) {
 			},
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterProviderItems: []moduleLib.ClusterProvider{
+				ClusterProviderItems: []cluster.ClusterProvider{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "clusterProviderTest",
 							Description: "testClusterProvider",
 							UserData1:   "some user data 1",
@@ -265,7 +258,7 @@ func TestClusterProviderCreateHandler(t *testing.T) {
 
 			//Check returned body only if statusCreated
 			if resp.StatusCode == http.StatusCreated {
-				got := moduleLib.ClusterProvider{}
+				got := cluster.ClusterProvider{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -281,7 +274,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      []moduleLib.ClusterProvider
+		expected      []cluster.ClusterProvider
 		name, version string
 		expectedCode  int
 		clusterClient *mockClusterManager
@@ -289,9 +282,9 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 		{
 			label:        "Get Cluster Provider",
 			expectedCode: http.StatusOK,
-			expected: []moduleLib.ClusterProvider{
+			expected: []cluster.ClusterProvider{
 				{
-					Metadata: moduleLib.Metadata{
+					Metadata: types.Metadata{
 						Name:        "testClusterProvider1",
 						Description: "testClusterProvider 1 description",
 						UserData1:   "some user data 1",
@@ -299,7 +292,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 					},
 				},
 				{
-					Metadata: moduleLib.Metadata{
+					Metadata: types.Metadata{
 						Name:        "testClusterProvider2",
 						Description: "testClusterProvider 2 description",
 						UserData1:   "some user data A",
@@ -309,9 +302,9 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 			},
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterProviderItems: []moduleLib.ClusterProvider{
+				ClusterProviderItems: []cluster.ClusterProvider{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "testClusterProvider1",
 							Description: "testClusterProvider 1 description",
 							UserData1:   "some user data 1",
@@ -319,7 +312,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 						},
 					},
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "testClusterProvider2",
 							Description: "testClusterProvider 2 description",
 							UserData1:   "some user data A",
@@ -343,7 +336,7 @@ func TestClusterProviderGetAllHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := []moduleLib.ClusterProvider{}
+				got := []cluster.ClusterProvider{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -359,7 +352,7 @@ func TestClusterProviderGetHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      moduleLib.ClusterProvider
+		expected      cluster.ClusterProvider
 		name, version string
 		expectedCode  int
 		clusterClient *mockClusterManager
@@ -367,8 +360,8 @@ func TestClusterProviderGetHandler(t *testing.T) {
 		{
 			label:        "Get Cluster Provider",
 			expectedCode: http.StatusOK,
-			expected: moduleLib.ClusterProvider{
-				Metadata: moduleLib.Metadata{
+			expected: cluster.ClusterProvider{
+				Metadata: types.Metadata{
 					Name:        "testClusterProvider",
 					Description: "testClusterProvider description",
 					UserData1:   "some user data 1",
@@ -378,9 +371,9 @@ func TestClusterProviderGetHandler(t *testing.T) {
 			name: "testClusterProvider",
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterProviderItems: []moduleLib.ClusterProvider{
+				ClusterProviderItems: []cluster.ClusterProvider{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "testClusterProvider",
 							Description: "testClusterProvider description",
 							UserData1:   "some user data 1",
@@ -395,7 +388,7 @@ func TestClusterProviderGetHandler(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 			name:         "nonexistingclusterprovider",
 			clusterClient: &mockClusterManager{
-				ClusterProviderItems: []moduleLib.ClusterProvider{},
+				ClusterProviderItems: []cluster.ClusterProvider{},
 				Err:                  pkgerrors.New("Internal Error"),
 			},
 		},
@@ -413,7 +406,7 @@ func TestClusterProviderGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := moduleLib.ClusterProvider{}
+				got := cluster.ClusterProvider{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -468,7 +461,7 @@ func TestClusterCreateHandler(t *testing.T) {
 		label         string
 		metadata      string
 		kubeconfig    string
-		expected      moduleLib.Cluster
+		expected      cluster.Cluster
 		expectedCode  int
 		clusterClient *mockClusterManager
 	}{
@@ -494,8 +487,8 @@ of a file attached
 to the creation
 of clusterTest
 `,
-			expected: moduleLib.Cluster{
-				Metadata: moduleLib.Metadata{
+			expected: cluster.Cluster{
+				Metadata: types.Metadata{
 					Name:        "clusterTest",
 					Description: "testCluster",
 					UserData1:   "some user data 1",
@@ -504,9 +497,9 @@ of clusterTest
 			},
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterProviderItems: []moduleLib.ClusterProvider{
+				ClusterProviderItems: []cluster.ClusterProvider{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "clusterProvider1",
 							Description: "ClusterProvider 1 description",
 							UserData1:   "some user data 1",
@@ -514,9 +507,9 @@ of clusterTest
 						},
 					},
 				},
-				ClusterItems: []moduleLib.Cluster{
+				ClusterItems: []cluster.Cluster{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "clusterTest",
 							Description: "testCluster",
 							UserData1:   "some user data 1",
@@ -524,7 +517,7 @@ of clusterTest
 						},
 					},
 				},
-				ClusterContentItems: []moduleLib.ClusterContent{
+				ClusterContentItems: []cluster.ClusterContent{
 					{
 						Kubeconfig: "dGVzdCBjb250ZW50cwpvZiBhIGZpbGUgYXR0YWNoZWQKdG8gdGhlIGNyZWF0aW9uCm9mIGNsdXN0ZXJUZXN0Cg==",
 					},
@@ -574,7 +567,7 @@ of clusterTest
 
 			//Check returned body only if statusCreated
 			if resp.StatusCode == http.StatusCreated {
-				got := moduleLib.Cluster{}
+				got := cluster.Cluster{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -590,7 +583,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      []moduleLib.Cluster
+		expected      []cluster.Cluster
 		name, version string
 		expectedCode  int
 		clusterClient *mockClusterManager
@@ -598,9 +591,9 @@ func TestClusterGetAllHandler(t *testing.T) {
 		{
 			label:        "Get Clusters",
 			expectedCode: http.StatusOK,
-			expected: []moduleLib.Cluster{
+			expected: []cluster.Cluster{
 				{
-					Metadata: moduleLib.Metadata{
+					Metadata: types.Metadata{
 						Name:        "testCluster1",
 						Description: "testCluster 1 description",
 						UserData1:   "some user data 1",
@@ -608,7 +601,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 					},
 				},
 				{
-					Metadata: moduleLib.Metadata{
+					Metadata: types.Metadata{
 						Name:        "testCluster2",
 						Description: "testCluster 2 description",
 						UserData1:   "some user data A",
@@ -618,9 +611,9 @@ func TestClusterGetAllHandler(t *testing.T) {
 			},
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterItems: []moduleLib.Cluster{
+				ClusterItems: []cluster.Cluster{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "testCluster1",
 							Description: "testCluster 1 description",
 							UserData1:   "some user data 1",
@@ -628,7 +621,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 						},
 					},
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "testCluster2",
 							Description: "testCluster 2 description",
 							UserData1:   "some user data A",
@@ -636,7 +629,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 						},
 					},
 				},
-				ClusterContentItems: []moduleLib.ClusterContent{
+				ClusterContentItems: []cluster.ClusterContent{
 					// content here doesn't matter - just needs to be present
 					{
 						Kubeconfig: "dGVzdCBjb250ZW50cwpvZiBhIGZpbGUgYXR0YWNoZWQKdG8gdGhlIGNyZWF0aW9uCm9mIGNsdXN0ZXJUZXN0Cg==",
@@ -661,7 +654,7 @@ func TestClusterGetAllHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := []moduleLib.Cluster{}
+				got := []cluster.Cluster{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -677,7 +670,7 @@ func TestClusterGetHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      moduleLib.Cluster
+		expected      cluster.Cluster
 		name, version string
 		accept        string
 		expectedCode  int
@@ -687,8 +680,8 @@ func TestClusterGetHandler(t *testing.T) {
 			label:        "Get Cluster with Accept: application/json",
 			accept:       "application/json",
 			expectedCode: http.StatusOK,
-			expected: moduleLib.Cluster{
-				Metadata: moduleLib.Metadata{
+			expected: cluster.Cluster{
+				Metadata: types.Metadata{
 					Name:        "testCluster",
 					Description: "testCluster description",
 					UserData1:   "some user data 1",
@@ -698,9 +691,9 @@ func TestClusterGetHandler(t *testing.T) {
 			name: "testCluster",
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterItems: []moduleLib.Cluster{
+				ClusterItems: []cluster.Cluster{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "testCluster",
 							Description: "testCluster description",
 							UserData1:   "some user data 1",
@@ -708,7 +701,7 @@ func TestClusterGetHandler(t *testing.T) {
 						},
 					},
 				},
-				ClusterContentItems: []moduleLib.ClusterContent{
+				ClusterContentItems: []cluster.ClusterContent{
 					{
 						Kubeconfig: "dGVzdCBjb250ZW50cwpvZiBhIGZpbGUgYXR0YWNoZWQKdG8gdGhlIGNyZWF0aW9uCm9mIGNsdXN0ZXJUZXN0Cg==",
 					},
@@ -721,7 +714,7 @@ func TestClusterGetHandler(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 			name:         "nonexistingcluster",
 			clusterClient: &mockClusterManager{
-				ClusterItems: []moduleLib.Cluster{},
+				ClusterItems: []cluster.Cluster{},
 				Err:          pkgerrors.New("Internal Error"),
 			},
 		},
@@ -742,7 +735,7 @@ func TestClusterGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := moduleLib.Cluster{}
+				got := cluster.Cluster{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -776,9 +769,9 @@ of clusterTest
 			name: "testCluster",
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterItems: []moduleLib.Cluster{
+				ClusterItems: []cluster.Cluster{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "testCluster",
 							Description: "testCluster description",
 							UserData1:   "some user data 1",
@@ -786,7 +779,7 @@ of clusterTest
 						},
 					},
 				},
-				ClusterContentItems: []moduleLib.ClusterContent{
+				ClusterContentItems: []cluster.ClusterContent{
 					{
 						Kubeconfig: "dGVzdCBjb250ZW50cwpvZiBhIGZpbGUgYXR0YWNoZWQKdG8gdGhlIGNyZWF0aW9uCm9mIGNsdXN0ZXJUZXN0Cg==",
 					},
@@ -799,7 +792,7 @@ of clusterTest
 			expectedCode: http.StatusInternalServerError,
 			name:         "nonexistingcluster",
 			clusterClient: &mockClusterManager{
-				ClusterItems: []moduleLib.Cluster{},
+				ClusterItems: []cluster.Cluster{},
 				Err:          pkgerrors.New("Internal Error"),
 			},
 		},
@@ -875,7 +868,7 @@ func TestClusterLabelCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string
 		reader        io.Reader
-		expected      moduleLib.ClusterLabel
+		expected      cluster.ClusterLabel
 		expectedCode  int
 		clusterClient *mockClusterManager
 	}{
@@ -890,12 +883,12 @@ func TestClusterLabelCreateHandler(t *testing.T) {
 			reader: bytes.NewBuffer([]byte(`{
 					"label-name": "test-label"
 				}`)),
-			expected: moduleLib.ClusterLabel{
+			expected: cluster.ClusterLabel{
 				LabelName: "test-label",
 			},
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterLabelItems: []moduleLib.ClusterLabel{
+				ClusterLabelItems: []cluster.ClusterLabel{
 					{
 						LabelName: "test-label",
 					},
@@ -916,7 +909,7 @@ func TestClusterLabelCreateHandler(t *testing.T) {
 
 			//Check returned body only if statusCreated
 			if resp.StatusCode == http.StatusCreated {
-				got := moduleLib.ClusterLabel{}
+				got := cluster.ClusterLabel{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -932,7 +925,7 @@ func TestClusterLabelsGetHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      []moduleLib.ClusterLabel
+		expected      []cluster.ClusterLabel
 		name, version string
 		expectedCode  int
 		clusterClient *mockClusterManager
@@ -940,7 +933,7 @@ func TestClusterLabelsGetHandler(t *testing.T) {
 		{
 			label:        "Get Cluster Labels",
 			expectedCode: http.StatusOK,
-			expected: []moduleLib.ClusterLabel{
+			expected: []cluster.ClusterLabel{
 				{
 					LabelName: "test-label1",
 				},
@@ -953,7 +946,7 @@ func TestClusterLabelsGetHandler(t *testing.T) {
 			},
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterLabelItems: []moduleLib.ClusterLabel{
+				ClusterLabelItems: []cluster.ClusterLabel{
 					{
 						LabelName: "test-label1",
 					},
@@ -980,7 +973,7 @@ func TestClusterLabelsGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := []moduleLib.ClusterLabel{}
+				got := []cluster.ClusterLabel{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -996,7 +989,7 @@ func TestClusterLabelGetHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      moduleLib.ClusterLabel
+		expected      cluster.ClusterLabel
 		name, version string
 		expectedCode  int
 		clusterClient *mockClusterManager
@@ -1004,13 +997,13 @@ func TestClusterLabelGetHandler(t *testing.T) {
 		{
 			label:        "Get Cluster Label",
 			expectedCode: http.StatusOK,
-			expected: moduleLib.ClusterLabel{
+			expected: cluster.ClusterLabel{
 				LabelName: "testlabel",
 			},
 			name: "testlabel",
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterLabelItems: []moduleLib.ClusterLabel{
+				ClusterLabelItems: []cluster.ClusterLabel{
 					{
 						LabelName: "testlabel",
 					},
@@ -1022,7 +1015,7 @@ func TestClusterLabelGetHandler(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 			name:         "nonexistingclusterlabel",
 			clusterClient: &mockClusterManager{
-				ClusterLabelItems: []moduleLib.ClusterLabel{},
+				ClusterLabelItems: []cluster.ClusterLabel{},
 				Err:               pkgerrors.New("Internal Error"),
 			},
 		},
@@ -1040,7 +1033,7 @@ func TestClusterLabelGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := moduleLib.ClusterLabel{}
+				got := cluster.ClusterLabel{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -1094,7 +1087,7 @@ func TestClusterKvPairsCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string
 		reader        io.Reader
-		expected      moduleLib.ClusterKvPairs
+		expected      cluster.ClusterKvPairs
 		expectedCode  int
 		clusterClient *mockClusterManager
 	}{
@@ -1124,14 +1117,14 @@ func TestClusterKvPairsCreateHandler(t *testing.T) {
 						]
 					}
 				}`)),
-			expected: moduleLib.ClusterKvPairs{
-				Metadata: moduleLib.Metadata{
+			expected: cluster.ClusterKvPairs{
+				Metadata: types.Metadata{
 					Name:        "ClusterKvPair1",
 					Description: "test cluster kv pairs",
 					UserData1:   "some user data 1",
 					UserData2:   "some user data 2",
 				},
-				Spec: moduleLib.ClusterKvSpec{
+				Spec: cluster.ClusterKvSpec{
 					Kv: []map[string]interface{}{
 						{
 							"key1": "value1",
@@ -1144,15 +1137,15 @@ func TestClusterKvPairsCreateHandler(t *testing.T) {
 			},
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterKvPairsItems: []moduleLib.ClusterKvPairs{
+				ClusterKvPairsItems: []cluster.ClusterKvPairs{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "ClusterKvPair1",
 							Description: "test cluster kv pairs",
 							UserData1:   "some user data 1",
 							UserData2:   "some user data 2",
 						},
-						Spec: moduleLib.ClusterKvSpec{
+						Spec: cluster.ClusterKvSpec{
 							Kv: []map[string]interface{}{
 								{
 									"key1": "value1",
@@ -1180,7 +1173,7 @@ func TestClusterKvPairsCreateHandler(t *testing.T) {
 
 			//Check returned body only if statusCreated
 			if resp.StatusCode == http.StatusCreated {
-				got := moduleLib.ClusterKvPairs{}
+				got := cluster.ClusterKvPairs{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -1196,7 +1189,7 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      []moduleLib.ClusterKvPairs
+		expected      []cluster.ClusterKvPairs
 		name, version string
 		expectedCode  int
 		clusterClient *mockClusterManager
@@ -1204,15 +1197,15 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 		{
 			label:        "Get Cluster KvPairs",
 			expectedCode: http.StatusOK,
-			expected: []moduleLib.ClusterKvPairs{
+			expected: []cluster.ClusterKvPairs{
 				{
-					Metadata: moduleLib.Metadata{
+					Metadata: types.Metadata{
 						Name:        "ClusterKvPair1",
 						Description: "test cluster kv pairs",
 						UserData1:   "some user data 1",
 						UserData2:   "some user data 2",
 					},
-					Spec: moduleLib.ClusterKvSpec{
+					Spec: cluster.ClusterKvSpec{
 						Kv: []map[string]interface{}{
 							{
 								"key1": "value1",
@@ -1224,13 +1217,13 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 					},
 				},
 				{
-					Metadata: moduleLib.Metadata{
+					Metadata: types.Metadata{
 						Name:        "ClusterKvPair2",
 						Description: "test cluster kv pairs",
 						UserData1:   "some user data A",
 						UserData2:   "some user data B",
 					},
-					Spec: moduleLib.ClusterKvSpec{
+					Spec: cluster.ClusterKvSpec{
 						Kv: []map[string]interface{}{
 							{
 								"keyA": "valueA",
@@ -1244,15 +1237,15 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 			},
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterKvPairsItems: []moduleLib.ClusterKvPairs{
+				ClusterKvPairsItems: []cluster.ClusterKvPairs{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "ClusterKvPair1",
 							Description: "test cluster kv pairs",
 							UserData1:   "some user data 1",
 							UserData2:   "some user data 2",
 						},
-						Spec: moduleLib.ClusterKvSpec{
+						Spec: cluster.ClusterKvSpec{
 							Kv: []map[string]interface{}{
 								{
 									"key1": "value1",
@@ -1264,13 +1257,13 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 						},
 					},
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "ClusterKvPair2",
 							Description: "test cluster kv pairs",
 							UserData1:   "some user data A",
 							UserData2:   "some user data B",
 						},
-						Spec: moduleLib.ClusterKvSpec{
+						Spec: cluster.ClusterKvSpec{
 							Kv: []map[string]interface{}{
 								{
 									"keyA": "valueA",
@@ -1298,7 +1291,7 @@ func TestClusterKvPairsGetAllHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := []moduleLib.ClusterKvPairs{}
+				got := []cluster.ClusterKvPairs{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
@@ -1314,7 +1307,7 @@ func TestClusterKvPairsGetHandler(t *testing.T) {
 
 	testCases := []struct {
 		label         string
-		expected      moduleLib.ClusterKvPairs
+		expected      cluster.ClusterKvPairs
 		name, version string
 		expectedCode  int
 		clusterClient *mockClusterManager
@@ -1322,14 +1315,14 @@ func TestClusterKvPairsGetHandler(t *testing.T) {
 		{
 			label:        "Get Cluster KV Pairs",
 			expectedCode: http.StatusOK,
-			expected: moduleLib.ClusterKvPairs{
-				Metadata: moduleLib.Metadata{
+			expected: cluster.ClusterKvPairs{
+				Metadata: types.Metadata{
 					Name:        "ClusterKvPair2",
 					Description: "test cluster kv pairs",
 					UserData1:   "some user data A",
 					UserData2:   "some user data B",
 				},
-				Spec: moduleLib.ClusterKvSpec{
+				Spec: cluster.ClusterKvSpec{
 					Kv: []map[string]interface{}{
 						{
 							"keyA": "valueA",
@@ -1343,15 +1336,15 @@ func TestClusterKvPairsGetHandler(t *testing.T) {
 			name: "ClusterKvPair2",
 			clusterClient: &mockClusterManager{
 				//Items that will be returned by the mocked Client
-				ClusterKvPairsItems: []moduleLib.ClusterKvPairs{
+				ClusterKvPairsItems: []cluster.ClusterKvPairs{
 					{
-						Metadata: moduleLib.Metadata{
+						Metadata: types.Metadata{
 							Name:        "ClusterKvPair2",
 							Description: "test cluster kv pairs",
 							UserData1:   "some user data A",
 							UserData2:   "some user data B",
 						},
-						Spec: moduleLib.ClusterKvSpec{
+						Spec: cluster.ClusterKvSpec{
 							Kv: []map[string]interface{}{
 								{
 									"keyA": "valueA",
@@ -1370,7 +1363,7 @@ func TestClusterKvPairsGetHandler(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 			name:         "nonexistingclusterkvpairs",
 			clusterClient: &mockClusterManager{
-				ClusterKvPairsItems: []moduleLib.ClusterKvPairs{},
+				ClusterKvPairsItems: []cluster.ClusterKvPairs{},
 				Err:                 pkgerrors.New("Internal Error"),
 			},
 		},
@@ -1388,7 +1381,7 @@ func TestClusterKvPairsGetHandler(t *testing.T) {
 
 			//Check returned body only if statusOK
 			if resp.StatusCode == http.StatusOK {
-				got := moduleLib.ClusterKvPairs{}
+				got := cluster.ClusterKvPairs{}
 				json.NewDecoder(resp.Body).Decode(&got)
 
 				if reflect.DeepEqual(testCase.expected, got) == false {

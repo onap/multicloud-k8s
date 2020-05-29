@@ -22,7 +22,7 @@ package gpic
 */
 
 import (
-	ncmmodule "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	"github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
 	pkgerrors "github.com/pkg/errors"
 	"log"
 	"strconv"
@@ -82,7 +82,7 @@ func intentResolverHelper(pn, cn, cln string, clustersWithName []ClusterWithName
 	}
 	if cn == "" && cln != "" {
 		//Finding cluster names for the clusterlabel
-		clusterNamesList, err := ncmmodule.NewClusterClient().GetClustersWithLabel(pn, cln)
+		clusterNamesList, err := cluster.NewClusterClient().GetClustersWithLabel(pn, cln)
 		if err != nil {
 			return []ClusterWithName{}, pkgerrors.Wrap(err, "Error getting clusterLabels")
 		}

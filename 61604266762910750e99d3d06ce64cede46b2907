@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "732e3f87_e810e8f1",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-29T20:37:49Z",
+      "side": 1,
+      "message": "Update comment",
+      "range": {
+        "startLine": 390,
+        "startChar": 46,
+        "endLine": 390,
+        "endChar": 67
+      },
+      "revId": "61604266762910750e99d3d06ce64cede46b2907",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "78e4c6ca_40ab236c",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-29T20:37:49Z",
+      "side": 1,
+      "message": "?",
+      "range": {
+        "startLine": 397,
+        "startChar": 0,
+        "endLine": 397,
+        "endChar": 2
+      },
+      "revId": "61604266762910750e99d3d06ce64cede46b2907",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

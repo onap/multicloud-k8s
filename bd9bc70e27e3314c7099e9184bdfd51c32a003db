@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "60b69d8d_70db748e",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-05-29T15:54:31Z",
+      "side": 1,
+      "message": "This is not being used.",
+      "revId": "bd9bc70e27e3314c7099e9184bdfd51c32a003db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "12d22d6e_bcb48369",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-05-29T15:54:31Z",
+      "side": 1,
+      "message": "remove this to make it consistent with other comments.",
+      "revId": "bd9bc70e27e3314c7099e9184bdfd51c32a003db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f1430e59_37d15fc4",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-05-29T15:54:31Z",
+      "side": 1,
+      "message": "This interface is a specific to cluster grouping and should be part of cluster API.",
+      "revId": "bd9bc70e27e3314c7099e9184bdfd51c32a003db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6690174_a5345ae2",
+        "filename": "src/orchestrator/pkg/rtcontext/rtcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-05-29T15:54:31Z",
+      "side": 1,
+      "message": "This interface is exactly like RtcAddLevel including the signature. Why is this new interface required and how is this different?",
+      "revId": "bd9bc70e27e3314c7099e9184bdfd51c32a003db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -22,7 +22,8 @@ import (
 	"io"
 	"net/http"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	netintents "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents"
+	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	pkgerrors "github.com/pkg/errors"
 
@@ -34,11 +35,11 @@ import (
 type networkHandler struct {
 	// Interface that implements Cluster operations
 	// We will set this variable with a mock interface for testing
-	client moduleLib.NetworkManager
+	client netintents.NetworkManager
 }
 
 // Check for valid format of input parameters
-func validateNetworkInputs(p moduleLib.Network) error {
+func validateNetworkInputs(p netintents.Network) error {
 	// validate name
 	errs := validation.IsValidName(p.Metadata.Name)
 	if len(errs) > 0 {
@@ -47,7 +48,7 @@ func validateNetworkInputs(p moduleLib.Network) error {
 
 	// validate cni type
 	found := false
-	for _, val := range moduleLib.CNI_TYPES {
+	for _, val := range nettypes.CNI_TYPES {
 		if p.Spec.CniType == val {
 			found = true
 			break
@@ -59,7 +60,7 @@ func validateNetworkInputs(p moduleLib.Network) error {
 
 	subnets := p.Spec.Ipv4Subnets
 	for _, subnet := range subnets {
-		err := moduleLib.ValidateSubnet(subnet)
+		err := nettypes.ValidateSubnet(subnet)
 		if err != nil {
 			return pkgerrors.Wrap(err, "invalid subnet")
 		}
@@ -69,7 +70,7 @@ func validateNetworkInputs(p moduleLib.Network) error {
 
 // Create handles creation of the Network entry in the database
 func (h networkHandler) createNetworkHandler(w http.ResponseWriter, r *http.Request) {
-	var p moduleLib.Network
+	var p netintents.Network
 	vars := mux.Vars(r)
 	clusterProvider := vars["provider-name"]
 	cluster := vars["cluster-name"]
@@ -114,7 +115,7 @@ func (h networkHandler) createNetworkHandler(w http.ResponseWriter, r *http.Requ
 
 // Put handles creation/update of the Network entry in the database
 func (h networkHandler) putNetworkHandler(w http.ResponseWriter, r *http.Request) {
-	var p moduleLib.Network
+	var p netintents.Network
 	vars := mux.Vars(r)
 	clusterProvider := vars["provider-name"]
 	cluster := vars["cluster-name"]

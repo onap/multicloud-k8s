@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package module
+package networkintents
 
 import (
+	clusterPkg "github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
+	ncmtypes "github.com/onap/multicloud-k8s/src/ncm/pkg/module/types"
+	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 
 	pkgerrors "github.com/pkg/errors"
 )
 
 // Network contains the parameters needed for dynamic networks
 type Network struct {
-	Metadata Metadata    `json:"metadata" yaml:"metadata"`
-	Spec     NetworkSpec `json:"spec" yaml:"spec"`
+	Metadata mtypes.Metadata `json:"metadata" yaml:"metadata"`
+	Spec     NetworkSpec     `json:"spec" yaml:"spec"`
 }
 
 type NetworkSpec struct {
-	CniType     string       `json:"cniType" yaml:"cniType"`
-	Ipv4Subnets []Ipv4Subnet `json:"ipv4Subnets" yaml:"ipv4Subnets"`
+	CniType     string                `json:"cniType" yaml:"cniType"`
+	Ipv4Subnets []nettypes.Ipv4Subnet `json:"ipv4Subnets" yaml:"ipv4Subnets"`
 }
 
 // NetworkKey is the key structure that is used in the database
@@ -61,16 +65,16 @@ type NetworkManager interface {
 // NetworkClient implements the Manager
 // It will also be used to maintain some localized state
 type NetworkClient struct {
-	db ClientDbInfo
+	db ncmtypes.ClientDbInfo
 }
 
 // NewNetworkClient returns an instance of the NetworkClient
 // which implements the Manager
 func NewNetworkClient() *NetworkClient {
 	return &NetworkClient{
-		db: ClientDbInfo{
-			storeName: "cluster",
-			tagMeta:   "networkmetadata",
+		db: ncmtypes.ClientDbInfo{
+			StoreName: "cluster",
+			TagMeta:   "networkmetadata",
 		},
 	}
 }
@@ -86,7 +90,7 @@ func (v *NetworkClient) CreateNetwork(p Network, clusterProvider, cluster string
 	}
 
 	//Check if cluster exists
-	_, err := NewClusterClient().GetCluster(clusterProvider, cluster)
+	_, err := clusterPkg.NewClusterClient().GetCluster(clusterProvider, cluster)
 	if err != nil {
 		return Network{}, pkgerrors.New("Unable to find the cluster")
 	}
@@ -97,7 +101,7 @@ func (v *NetworkClient) CreateNetwork(p Network, clusterProvider, cluster string
 		return Network{}, pkgerrors.New("Network already exists")
 	}
 
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagMeta, p)
 	if err != nil {
 		return Network{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -115,7 +119,7 @@ func (v *NetworkClient) GetNetwork(name, clusterProvider, cluster string) (Netwo
 		NetworkName:         name,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	value, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return Network{}, pkgerrors.Wrap(err, "Get Network")
 	}
@@ -144,7 +148,7 @@ func (v *NetworkClient) GetNetworks(clusterProvider, cluster string) ([]Network,
 	}
 
 	var resp []Network
-	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	values, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return []Network{}, pkgerrors.Wrap(err, "Get Networks")
 	}
@@ -171,7 +175,7 @@ func (v *NetworkClient) DeleteNetwork(name, clusterProvider, cluster string) err
 		NetworkName:         name,
 	}
 
-	err := db.DBconn.Remove(v.db.storeName, key)
+	err := db.DBconn.Remove(v.db.StoreName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Network Entry;")
 	}

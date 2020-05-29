@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package module
+package networkintents
 
 import (
+	clusterPkg "github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
+	ncmtypes "github.com/onap/multicloud-k8s/src/ncm/pkg/module/types"
+	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 
 	pkgerrors "github.com/pkg/errors"
 )
 
 // ProviderNet contains the parameters needed for dynamic networks
 type ProviderNet struct {
-	Metadata Metadata        `json:"metadata"`
+	Metadata mtypes.Metadata `json:"metadata"`
 	Spec     ProviderNetSpec `json:"spec"`
 }
 
 type ProviderNetSpec struct {
-	CniType         string       `json:"cniType" yaml:"cniType"`
-	Ipv4Subnets     []Ipv4Subnet `json:"ipv4Subnets" yaml:"ipv4Subnets"`
-	ProviderNetType string       `json:"providerNetType" yaml:"providerNetType"`
-	Vlan            Vlan         `json:"vlan" yaml:"vlan"`
+	CniType         string                `json:"cniType" yaml:"cniType"`
+	Ipv4Subnets     []nettypes.Ipv4Subnet `json:"ipv4Subnets" yaml:"ipv4Subnets"`
+	ProviderNetType string                `json:"providerNetType" yaml:"providerNetType"`
+	Vlan            nettypes.Vlan         `json:"vlan" yaml:"vlan"`
 }
 
 // structure for the Network Custom Resource
@@ -63,16 +67,16 @@ type ProviderNetManager interface {
 // ProviderNetClient implements the Manager
 // It will also be used to maintain some localized state
 type ProviderNetClient struct {
-	db ClientDbInfo
+	db ncmtypes.ClientDbInfo
 }
 
 // NewProviderNetClient returns an instance of the ProviderNetClient
 // which implements the Manager
 func NewProviderNetClient() *ProviderNetClient {
 	return &ProviderNetClient{
-		db: ClientDbInfo{
-			storeName: "cluster",
-			tagMeta:   "networkmetadata",
+		db: ncmtypes.ClientDbInfo{
+			StoreName: "cluster",
+			TagMeta:   "networkmetadata",
 		},
 	}
 }
@@ -88,7 +92,7 @@ func (v *ProviderNetClient) CreateProviderNet(p ProviderNet, clusterProvider, cl
 	}
 
 	//Check if cluster exists
-	_, err := NewClusterClient().GetCluster(clusterProvider, cluster)
+	_, err := clusterPkg.NewClusterClient().GetCluster(clusterProvider, cluster)
 	if err != nil {
 		return ProviderNet{}, pkgerrors.New("Unable to find the cluster")
 	}
@@ -99,7 +103,7 @@ func (v *ProviderNetClient) CreateProviderNet(p ProviderNet, clusterProvider, cl
 		return ProviderNet{}, pkgerrors.New("ProviderNet already exists")
 	}
 
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagMeta, p)
 	if err != nil {
 		return ProviderNet{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -117,7 +121,7 @@ func (v *ProviderNetClient) GetProviderNet(name, clusterProvider, cluster string
 		ProviderNetName:     name,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	value, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return ProviderNet{}, pkgerrors.Wrap(err, "Get ProviderNet")
 	}
@@ -146,7 +150,7 @@ func (v *ProviderNetClient) GetProviderNets(clusterProvider, cluster string) ([]
 	}
 
 	var resp []ProviderNet
-	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	values, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return []ProviderNet{}, pkgerrors.Wrap(err, "Get ProviderNets")
 	}
@@ -173,7 +177,7 @@ func (v *ProviderNetClient) DeleteProviderNet(name, clusterProvider, cluster str
 		ProviderNetName:     name,
 	}
 
-	err := db.DBconn.Remove(v.db.storeName, key)
+	err := db.DBconn.Remove(v.db.StoreName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ProviderNet Entry;")
 	}

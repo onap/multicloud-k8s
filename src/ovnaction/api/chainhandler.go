@@ -23,7 +23,7 @@ import (
 	"net/http"
 	"strings"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	pkgerrors "github.com/pkg/errors"
 

@@ -1,4 +1,4 @@
-module github.com/onap/multicloud-k8s/src/ncm
+module github.com/onap/multicloud-k8s/src/ovnaction
 
 require (
 	github.com/ghodss/yaml v1.0.0
@@ -7,8 +7,8 @@ require (
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.6.2
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20200127152046-0ee521d56061
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200527175204-ef27eb4d63f1
-	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200529003854-0a7bf256bde5
+	github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-00010101000000-000000000000
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
@@ -19,12 +19,10 @@ require (
 	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
 	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 	k8s.io/kubernetes v1.14.1
-	k8s.io/utils v0.0.0-20200520001619-278ece378a50 // indirect
 )
 
 replace (
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
-	github.com/onap/multicloud-k8s/src/rsync => ../rsync
 	k8s.io/api => k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190409022649-727a075fdec8
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d

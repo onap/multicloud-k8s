@@ -18,18 +18,20 @@ package module
 
 // Client for using the services in the ncm
 type Client struct {
-	Cluster          *ClusterClient
-	Network          *NetworkClient
-	ProviderNet      *ProviderNetClient
+	NetControlIntent *NetControlIntentClient
+	WorkloadIntent   *WorkloadIntentClient
+	WorkloadIfIntent *WorkloadIfIntentClient
+	Chain            *ChainClient
 	// Add Clients for API's here
 }
 
 // NewClient creates a new client for using the services
 func NewClient() *Client {
 	c := &Client{}
-	c.Cluster = NewClusterClient()
-	c.Network = NewNetworkClient()
-	c.ProviderNet = NewProviderNetClient()
+	c.NetControlIntent = NewNetControlIntentClient()
+	c.WorkloadIntent = NewWorkloadIntentClient()
+	c.WorkloadIfIntent = NewWorkloadIfIntentClient()
+	c.Chain = NewChainClient()
 	// Add Client API handlers here
 	return c
 }

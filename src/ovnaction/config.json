@@ -1,0 +1,10 @@
+{
+    "database-ip": "172.18.0.2",
+    "database-type": "mongo",
+    "plugin-dir": "plugins",
+    "service-port": "9018",
+    "grpc-server-cert": "/home/ewmulta/onap/frankfort/orchestrator/ca/ncm.crt",
+    "grpc-server-key": "/home/ewmulta/onap/frankfort/orchestrator/ca/ncm.key",
+    "grpc-enable-tls": "disable",
+    "grpc-server-name-override": ""
+}

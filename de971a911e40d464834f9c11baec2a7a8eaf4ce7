@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef1f8c73_6c464eab",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-05-29T23:33:45Z",
+      "side": 1,
+      "message": "Does it make sense to keep all the functions related to Group together for readability",
+      "range": {
+        "startLine": 417,
+        "startChar": 0,
+        "endLine": 417,
+        "endChar": 82
+      },
+      "revId": "de971a911e40d464834f9c11baec2a7a8eaf4ce7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

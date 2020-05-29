@@ -59,6 +59,30 @@
     },
     {
       "key": {
+        "uuid": "2014da31_bc8cc8c6",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-05-29T20:05:48Z",
+      "side": 1,
+      "message": "You can also get the handle from GetClusterHandle, and then get the metadata from that handle. This way you can do it outside the appcontext.",
+      "parentUuid": "fcd4e036_12bd50ff",
+      "range": {
+        "startLine": 396,
+        "startChar": 45,
+        "endLine": 396,
+        "endChar": 60
+      },
+      "revId": "bd9bc70e27e3314c7099e9184bdfd51c32a003db",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f1430e59_37d15fc4",
         "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
         "patchSetId": 3

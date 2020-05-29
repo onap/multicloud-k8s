@@ -23,7 +23,8 @@ import (
 	"net/http"
 	"strings"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	netintents "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents"
+	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	pkgerrors "github.com/pkg/errors"
 
@@ -35,11 +36,11 @@ import (
 type providernetHandler struct {
 	// Interface that implements Cluster operations
 	// We will set this variable with a mock interface for testing
-	client moduleLib.ProviderNetManager
+	client netintents.ProviderNetManager
 }
 
 // Check for valid format of input parameters
-func validateProviderNetInputs(p moduleLib.ProviderNet) error {
+func validateProviderNetInputs(p netintents.ProviderNet) error {
 	// validate name
 	errs := validation.IsValidName(p.Metadata.Name)
 	if len(errs) > 0 {
@@ -48,7 +49,7 @@ func validateProviderNetInputs(p moduleLib.ProviderNet) error {
 
 	// validate cni type
 	found := false
-	for _, val := range moduleLib.CNI_TYPES {
+	for _, val := range nettypes.CNI_TYPES {
 		if p.Spec.CniType == val {
 			found = true
 			break
@@ -60,7 +61,7 @@ func validateProviderNetInputs(p moduleLib.ProviderNet) error {
 
 	// validate the provider network type
 	found = false
-	for _, val := range moduleLib.PROVIDER_NET_TYPES {
+	for _, val := range nettypes.PROVIDER_NET_TYPES {
 		if strings.ToUpper(p.Spec.ProviderNetType) == val {
 			found = true
 			break
@@ -73,7 +74,7 @@ func validateProviderNetInputs(p moduleLib.ProviderNet) error {
 	// validate the subnets
 	subnets := p.Spec.Ipv4Subnets
 	for _, subnet := range subnets {
-		err := moduleLib.ValidateSubnet(subnet)
+		err := nettypes.ValidateSubnet(subnet)
 		if err != nil {
 			return pkgerrors.Wrap(err, "invalid subnet")
 		}
@@ -88,10 +89,10 @@ func validateProviderNetInputs(p moduleLib.ProviderNet) error {
 	// validate the VLAN Node Selector value
 	expectLabels := false
 	found = false
-	for _, val := range moduleLib.VLAN_NODE_SELECTORS {
+	for _, val := range nettypes.VLAN_NODE_SELECTORS {
 		if strings.ToLower(p.Spec.Vlan.VlanNodeSelector) == val {
 			found = true
-			if val == moduleLib.VLAN_NODE_SPECIFIC {
+			if val == nettypes.VLAN_NODE_SPECIFIC {
 				expectLabels = true
 			}
 			break
@@ -114,7 +115,7 @@ func validateProviderNetInputs(p moduleLib.ProviderNet) error {
 	// Need at least one label if node selector value was "specific"
 	// (if selector is "any" - don't care if labels were supplied or not
 	if expectLabels && !gotLabels {
-		return pkgerrors.Errorf("Node Labels required for VlAN node selector \"%v\"", moduleLib.VLAN_NODE_SPECIFIC)
+		return pkgerrors.Errorf("Node Labels required for VlAN node selector \"%v\"", nettypes.VLAN_NODE_SPECIFIC)
 	}
 
 	return nil
@@ -122,7 +123,7 @@ func validateProviderNetInputs(p moduleLib.ProviderNet) error {
 
 // Create handles creation of the ProviderNet entry in the database
 func (h providernetHandler) createProviderNetHandler(w http.ResponseWriter, r *http.Request) {
-	var p moduleLib.ProviderNet
+	var p netintents.ProviderNet
 	vars := mux.Vars(r)
 	clusterProvider := vars["provider-name"]
 	cluster := vars["cluster-name"]
@@ -167,7 +168,7 @@ func (h providernetHandler) createProviderNetHandler(w http.ResponseWriter, r *h
 
 // Put handles creation/update of the ProviderNet entry in the database
 func (h providernetHandler) putProviderNetHandler(w http.ResponseWriter, r *http.Request) {
-	var p moduleLib.ProviderNet
+	var p netintents.ProviderNet
 	vars := mux.Vars(r)
 	clusterProvider := vars["provider-name"]
 	cluster := vars["cluster-name"]

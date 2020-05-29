@@ -14,31 +14,24 @@
  * limitations under the License.
  */
 
-package module
+package cluster
 
 import (
-	"context"
-	"encoding/json"
-	"time"
-
-	"github.com/onap/multicloud-k8s/src/ncm/pkg/grpc"
+	ncmtypes "github.com/onap/multicloud-k8s/src/ncm/pkg/module/types"
 	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
-	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
-	"gopkg.in/yaml.v2"
+	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 
 	pkgerrors "github.com/pkg/errors"
 )
 
 // ClusterProvider contains the parameters needed for ClusterProviders
 type ClusterProvider struct {
-	Metadata Metadata `json:"metadata"`
+	Metadata mtypes.Metadata `json:"metadata"`
 }
 
 type Cluster struct {
-	Metadata Metadata `json:"metadata"`
+	Metadata mtypes.Metadata `json:"metadata"`
 }
 
 type ClusterContent struct {
@@ -50,8 +43,8 @@ type ClusterLabel struct {
 }
 
 type ClusterKvPairs struct {
-	Metadata Metadata      `json:"metadata"`
-	Spec     ClusterKvSpec `json:"spec"`
+	Metadata mtypes.Metadata `json:"metadata"`
+	Spec     ClusterKvSpec   `json:"spec"`
 }
 
 type ClusterKvSpec struct {
@@ -106,8 +99,6 @@ type ClusterManager interface {
 	GetClusters(provider string) ([]Cluster, error)
 	GetClustersWithLabel(provider, label string) ([]string, error)
 	DeleteCluster(provider, name string) error
-	ApplyNetworkIntents(provider, name string) error
-	TerminateNetworkIntents(provider, name string) error
 	CreateClusterLabel(provider, cluster string, pr ClusterLabel) (ClusterLabel, error)
 	GetClusterLabel(provider, cluster, label string) (ClusterLabel, error)
 	GetClusterLabels(provider, cluster string) ([]ClusterLabel, error)
@@ -121,18 +112,18 @@ type ClusterManager interface {
 // ClusterClient implements the Manager
 // It will also be used to maintain some localized state
 type ClusterClient struct {
-	db ClientDbInfo
+	db ncmtypes.ClientDbInfo
 }
 
 // NewClusterClient returns an instance of the ClusterClient
 // which implements the Manager
 func NewClusterClient() *ClusterClient {
 	return &ClusterClient{
-		db: ClientDbInfo{
-			storeName:  "cluster",
-			tagMeta:    "clustermetadata",
-			tagContent: "clustercontent",
-			tagContext: "clustercontext",
+		db: ncmtypes.ClientDbInfo{
+			StoreName:  "cluster",
+			TagMeta:    "clustermetadata",
+			TagContent: "clustercontent",
+			TagContext: "clustercontext",
 		},
 	}
 }
@@ -151,7 +142,7 @@ func (v *ClusterClient) CreateClusterProvider(p ClusterProvider) (ClusterProvide
 		return ClusterProvider{}, pkgerrors.New("ClusterProvider already exists")
 	}
 
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagMeta, p)
 	if err != nil {
 		return ClusterProvider{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -167,7 +158,7 @@ func (v *ClusterClient) GetClusterProvider(name string) (ClusterProvider, error)
 		ClusterProviderName: name,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	value, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return ClusterProvider{}, pkgerrors.Wrap(err, "Get ClusterProvider")
 	}
@@ -194,7 +185,7 @@ func (v *ClusterClient) GetClusterProviders() ([]ClusterProvider, error) {
 	}
 
 	var resp []ClusterProvider
-	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	values, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return []ClusterProvider{}, pkgerrors.Wrap(err, "Get ClusterProviders")
 	}
@@ -219,7 +210,7 @@ func (v *ClusterClient) DeleteClusterProvider(name string) error {
 		ClusterProviderName: name,
 	}
 
-	err := db.DBconn.Remove(v.db.storeName, key)
+	err := db.DBconn.Remove(v.db.StoreName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ClusterProvider Entry;")
 	}
@@ -248,11 +239,11 @@ func (v *ClusterClient) CreateCluster(provider string, p Cluster, q ClusterConte
 		return Cluster{}, pkgerrors.New("Cluster already exists")
 	}
 
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagMeta, p)
 	if err != nil {
 		return Cluster{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagContent, q)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagContent, q)
 	if err != nil {
 		return Cluster{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -268,7 +259,7 @@ func (v *ClusterClient) GetCluster(provider, name string) (Cluster, error) {
 		ClusterName:         name,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	value, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return Cluster{}, pkgerrors.Wrap(err, "Get Cluster")
 	}
@@ -294,7 +285,7 @@ func (v *ClusterClient) GetClusterContent(provider, name string) (ClusterContent
 		ClusterName:         name,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagContent)
+	value, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagContent)
 	if err != nil {
 		return ClusterContent{}, pkgerrors.Wrap(err, "Get Cluster Content")
 	}
@@ -320,7 +311,7 @@ func (v *ClusterClient) GetClusterContext(provider, name string) (appcontext.App
 		ClusterName:         name,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagContext)
+	value, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagContext)
 	if err != nil {
 		return appcontext.AppContext{}, pkgerrors.Wrap(err, "Get Cluster Context")
 	}
@@ -347,7 +338,7 @@ func (v *ClusterClient) GetClusters(provider string) ([]Cluster, error) {
 		ClusterName:         "",
 	}
 
-	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	values, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return []Cluster{}, pkgerrors.Wrap(err, "Get Clusters")
 	}
@@ -375,7 +366,7 @@ func (v *ClusterClient) GetClustersWithLabel(provider, label string) ([]string, 
 		ClusterLabelName:    label,
 	}
 
-	values, err := db.DBconn.Find(v.db.storeName, key, "cluster")
+	values, err := db.DBconn.Find(v.db.StoreName, key, "cluster")
 	if err != nil {
 		return []string{}, pkgerrors.Wrap(err, "Get Clusters by label")
 	}
@@ -401,248 +392,11 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		return pkgerrors.Errorf("Cannot delete cluster until context is deleted: %v, %v", provider, name)
 	}
 
-	err = db.DBconn.Remove(v.db.storeName, key)
+	err = db.DBconn.Remove(v.db.StoreName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Cluster Entry;")
 	}
 
-	return nil
-}
-
-// Apply Network Intents associated with a cluster
-func (v *ClusterClient) ApplyNetworkIntents(provider, name string) error {
-
-	_, err := v.GetClusterContext(provider, name)
-	if err == nil {
-		return pkgerrors.Errorf("Cluster network intents have already been applied: %v, %v", provider, name)
-	}
-
-	type resource struct {
-		name  string
-		value string
-	}
-
-	var resources []resource
-
-	// Find all Network Intents for this cluster
-	networkIntents, err := NewNetworkClient().GetNetworks(provider, name)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error finding Network Intents")
-	}
-	for _, intent := range networkIntents {
-		var crNetwork = CrNetwork{
-			ApiVersion: NETWORK_APIVERSION,
-			Kind:       NETWORK_KIND,
-		}
-		crNetwork.Network = intent
-		// Produce the yaml CR document for each intent
-		y, err := yaml.Marshal(&crNetwork)
-		if err != nil {
-			log.Info("Error marshalling network intent to yaml", log.Fields{
-				"error":  err,
-				"intent": intent,
-			})
-			continue
-		}
-		resources = append(resources, resource{
-			name:  intent.Metadata.Name + SEPARATOR + NETWORK_KIND,
-			value: string(y),
-		})
-	}
-
-	// Find all Provider Network Intents for this cluster
-	providerNetworkIntents, err := NewProviderNetClient().GetProviderNets(provider, name)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error finding Provider Network Intents")
-	}
-	for _, intent := range providerNetworkIntents {
-		var crProviderNet = CrProviderNet{
-			ApiVersion: PROVIDER_NETWORK_APIVERSION,
-			Kind:       PROVIDER_NETWORK_KIND,
-		}
-		crProviderNet.ProviderNet = intent
-		// Produce the yaml CR document for each intent
-		y, err := yaml.Marshal(&crProviderNet)
-		if err != nil {
-			log.Info("Error marshalling provider network intent to yaml", log.Fields{
-				"error":  err,
-				"intent": intent,
-			})
-			continue
-		}
-		resources = append(resources, resource{
-			name:  intent.Metadata.Name + SEPARATOR + PROVIDER_NETWORK_KIND,
-			value: string(y),
-		})
-	}
-
-	if len(resources) == 0 {
-		return nil
-	}
-
-	// Make an app context for the network intent resources
-	ac := appcontext.AppContext{}
-	ctxVal, err := ac.InitAppContext()
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error creating AppContext")
-	}
-	handle, err := ac.CreateCompositeApp()
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error creating AppContext CompositeApp")
-	}
-
-	// Add an app (fixed value) to the app context
-	apphandle, err := ac.AddApp(handle, CONTEXT_CLUSTER_APP)
-	if err != nil {
-		cleanuperr := ac.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext CompositeApp create failure", log.Fields{
-				"cluster-provider": provider,
-				"cluster":          name,
-			})
-		}
-		return pkgerrors.Wrap(err, "Error adding App to AppContext")
-	}
-
-	// Add an app order instruction
-	appinstr := struct {
-		Apporder []string `json:"apporder"`
-	}{
-		[]string{CONTEXT_CLUSTER_APP},
-	}
-	jinstr, _ := json.Marshal(appinstr)
-
-	appdepinstr := struct {
-		Appdep map[string]string `json:"appdependency"`
-	}{
-		map[string]string{CONTEXT_CLUSTER_APP: "go"},
-	}
-	jdep, _ := json.Marshal(appdepinstr)
-
-	_, err = ac.AddInstruction(handle, "app", "order", string(jinstr))
-	_, err = ac.AddInstruction(handle, "app", "dependency", string(jdep))
-
-	// Add a cluster to the app
-	clusterhandle, err := ac.AddCluster(apphandle, provider+SEPARATOR+name)
-	if err != nil {
-		cleanuperr := ac.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext after add cluster failure", log.Fields{
-				"cluster-provider": provider,
-				"cluster":          name,
-			})
-		}
-		return pkgerrors.Wrap(err, "Error adding Cluster to AppContext")
-	}
-
-	// add the resources to the app context
-
-	var orderinstr struct {
-		Resorder []string `json:"resorder"`
-	}
-	var depinstr struct {
-		Resdep map[string]string `json:"resdependency"`
-	}
-	resdep := make(map[string]string)
-	for _, resource := range resources {
-		orderinstr.Resorder = append(orderinstr.Resorder, resource.name)
-		resdep[resource.name] = "go"
-		_, err = ac.AddResource(clusterhandle, resource.name, resource.value)
-		if err != nil {
-			cleanuperr := ac.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add resource failure", log.Fields{
-					"cluster-provider": provider,
-					"cluster":          name,
-					"resource":         resource.name,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding Resource to AppContext")
-		}
-	}
-	jresord, _ := json.Marshal(orderinstr)
-	depinstr.Resdep = resdep
-	jresdep, _ := json.Marshal(depinstr)
-	_, err = ac.AddInstruction(clusterhandle, "resource", "order", string(jresord))
-	_, err = ac.AddInstruction(clusterhandle, "resource", "dependency", string(jresdep))
-
-	// save the context in the cluster db record
-	key := ClusterKey{
-		ClusterProviderName: provider,
-		ClusterName:         name,
-	}
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagContext, ctxVal)
-	if err != nil {
-		cleanuperr := ac.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
-				"cluster-provider": provider,
-				"cluster":          name,
-			})
-		}
-		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
-	}
-
-	// call resource synchronizer to instantiate the CRs in the cluster
-	conn := rpc.GetRpcConn(grpc.RsyncName)
-	if conn == nil {
-		grpc.InitRsyncClient()
-		conn = rpc.GetRpcConn(grpc.RsyncName)
-	}
-
-	var rpcClient installpb.InstallappClient
-	var installRes *installpb.InstallAppResponse
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	if conn != nil {
-		rpcClient = installpb.NewInstallappClient(conn)
-		installReq := new(installpb.InstallAppRequest)
-		installReq.AppContext = ctxVal.(string)
-		installRes, err = rpcClient.InstallApp(ctx, installReq)
-		if err == nil {
-			log.Info("Response from InstappApp GRPC call", log.Fields{
-				"Succeeded": installRes.AppContextInstalled,
-				"Message":   installRes.AppContextInstallMessage,
-			})
-		}
-	} else {
-		return pkgerrors.Errorf("InstallApp Failed - Could not get InstallAppClient: %v", grpc.RsyncName)
-	}
-
-	return nil
-}
-
-// Terminate Network Intents associated with a cluster
-func (v *ClusterClient) TerminateNetworkIntents(provider, name string) error {
-	context, err := v.GetClusterContext(provider, name)
-	if err != nil {
-		return pkgerrors.Wrapf(err, "Error finding AppContext for cluster: %v, %v", provider, name)
-	}
-
-	// TODO: call resource synchronizer to terminate the CRs in the cluster
-
-	// remove the app context
-	cleanuperr := context.DeleteCompositeApp()
-	if cleanuperr != nil {
-		log.Warn("Error deleted AppContext", log.Fields{
-			"cluster-provider": provider,
-			"cluster":          name,
-		})
-	}
-
-	// remove the app context field from the cluster db record
-	key := ClusterKey{
-		ClusterProviderName: provider,
-		ClusterName:         name,
-	}
-	err = db.DBconn.RemoveTag(v.db.storeName, key, v.db.tagContext)
-	if err != nil {
-		log.Warn("Error removing AppContext from Cluster document", log.Fields{
-			"cluster-provider": provider,
-			"cluster":          name,
-		})
-	}
 	return nil
 }
 
@@ -667,7 +421,7 @@ func (v *ClusterClient) CreateClusterLabel(provider string, cluster string, p Cl
 		return ClusterLabel{}, pkgerrors.New("Cluster Label already exists")
 	}
 
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagMeta, p)
 	if err != nil {
 		return ClusterLabel{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -684,7 +438,7 @@ func (v *ClusterClient) GetClusterLabel(provider, cluster, label string) (Cluste
 		ClusterLabelName:    label,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	value, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return ClusterLabel{}, pkgerrors.Wrap(err, "Get Cluster")
 	}
@@ -711,7 +465,7 @@ func (v *ClusterClient) GetClusterLabels(provider, cluster string) ([]ClusterLab
 		ClusterLabelName:    "",
 	}
 
-	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	values, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return []ClusterLabel{}, pkgerrors.Wrap(err, "Get Cluster Labels")
 	}
@@ -739,7 +493,7 @@ func (v *ClusterClient) DeleteClusterLabel(provider, cluster, label string) erro
 		ClusterLabelName:    label,
 	}
 
-	err := db.DBconn.Remove(v.db.storeName, key)
+	err := db.DBconn.Remove(v.db.StoreName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ClusterLabel Entry;")
 	}
@@ -767,7 +521,7 @@ func (v *ClusterClient) CreateClusterKvPairs(provider string, cluster string, p 
 		return ClusterKvPairs{}, pkgerrors.New("Cluster KV Pair already exists")
 	}
 
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagMeta, p)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagMeta, p)
 	if err != nil {
 		return ClusterKvPairs{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -784,7 +538,7 @@ func (v *ClusterClient) GetClusterKvPairs(provider, cluster, kvpair string) (Clu
 		ClusterKvPairsName:  kvpair,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	value, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return ClusterKvPairs{}, pkgerrors.Wrap(err, "Get Cluster")
 	}
@@ -811,7 +565,7 @@ func (v *ClusterClient) GetAllClusterKvPairs(provider, cluster string) ([]Cluste
 		ClusterKvPairsName:  "",
 	}
 
-	values, err := db.DBconn.Find(v.db.storeName, key, v.db.tagMeta)
+	values, err := db.DBconn.Find(v.db.StoreName, key, v.db.TagMeta)
 	if err != nil {
 		return []ClusterKvPairs{}, pkgerrors.Wrap(err, "Get Cluster KV Pairs")
 	}
@@ -839,7 +593,7 @@ func (v *ClusterClient) DeleteClusterKvPairs(provider, cluster, kvpair string) e
 		ClusterKvPairsName:  kvpair,
 	}
 
-	err := db.DBconn.Remove(v.db.storeName, key)
+	err := db.DBconn.Remove(v.db.StoreName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ClusterKvPairs Entry;")
 	}

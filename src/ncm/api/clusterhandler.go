@@ -27,7 +27,7 @@ import (
 	"net/http"
 	"net/textproto"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	clusterPkg "github.com/onap/multicloud-k8s/src/ncm/pkg/cluster"
 
 	"github.com/gorilla/mux"
 )
@@ -37,12 +37,12 @@ import (
 type clusterHandler struct {
 	// Interface that implements Cluster operations
 	// We will set this variable with a mock interface for testing
-	client moduleLib.ClusterManager
+	client clusterPkg.ClusterManager
 }
 
 // Create handles creation of the ClusterProvider entry in the database
 func (h clusterHandler) createClusterProviderHandler(w http.ResponseWriter, r *http.Request) {
-	var p moduleLib.ClusterProvider
+	var p clusterPkg.ClusterProvider
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 
@@ -125,8 +125,8 @@ func (h clusterHandler) deleteClusterProviderHandler(w http.ResponseWriter, r *h
 func (h clusterHandler) createClusterHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	provider := vars["provider-name"]
-	var p moduleLib.Cluster
-	var q moduleLib.ClusterContent
+	var p clusterPkg.Cluster
+	var q clusterPkg.ClusterContent
 
 	// Implemenation using multipart form
 	// Review and enable/remove at a later date
@@ -213,7 +213,7 @@ func (h clusterHandler) getClusterHandler(w http.ResponseWriter, r *http.Request
 
 	// handle the get all clusters case - return a list of only the json parts
 	if len(name) == 0 {
-		var retList []moduleLib.Cluster
+		var retList []clusterPkg.Cluster
 
 		ret, err := h.client.GetClusters(provider)
 		if err != nil {
@@ -222,7 +222,7 @@ func (h clusterHandler) getClusterHandler(w http.ResponseWriter, r *http.Request
 		}
 
 		for _, cl := range ret {
-			retList = append(retList, moduleLib.Cluster{Metadata: cl.Metadata})
+			retList = append(retList, clusterPkg.Cluster{Metadata: cl.Metadata})
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -324,42 +324,12 @@ func (h clusterHandler) deleteClusterHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusNoContent)
 }
 
-//  apply network intents associated with the cluster
-func (h clusterHandler) applyClusterHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	provider := vars["provider-name"]
-	name := vars["name"]
-
-	err := h.client.ApplyNetworkIntents(provider, name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
-//  terminate network intents associated with the cluster
-func (h clusterHandler) terminateClusterHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	provider := vars["provider-name"]
-	name := vars["name"]
-
-	err := h.client.TerminateNetworkIntents(provider, name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
 // Create handles creation of the ClusterLabel entry in the database
 func (h clusterHandler) createClusterLabelHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	provider := vars["provider-name"]
 	cluster := vars["cluster-name"]
-	var p moduleLib.ClusterLabel
+	var p clusterPkg.ClusterLabel
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 
@@ -439,7 +409,7 @@ func (h clusterHandler) createClusterKvPairsHandler(w http.ResponseWriter, r *ht
 	vars := mux.Vars(r)
 	provider := vars["provider-name"]
 	cluster := vars["cluster-name"]
-	var p moduleLib.ClusterKvPairs
+	var p clusterPkg.ClusterKvPairs
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 

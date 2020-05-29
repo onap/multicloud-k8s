@@ -22,7 +22,8 @@ import (
 	"io"
 	"net/http"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ncm/pkg/module"
+	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	pkgerrors "github.com/pkg/errors"
 
 	"github.com/gorilla/mux"
@@ -30,31 +31,67 @@ import (
 
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
-type netcontrolintentHandler struct {
-	// Interface that implements Cluster operations
+type workloadifintentHandler struct {
+	// Interface that implements workload intent operations
 	// We will set this variable with a mock interface for testing
-	client moduleLib.NetControlIntentManager
+	client moduleLib.WorkloadIfIntentManager
 }
 
 // Check for valid format of input parameters
-func validateNetControlIntentInputs(nci moduleLib.NetControlIntent) error {
+func validateWorkloadIfIntentInputs(wif moduleLib.WorkloadIfIntent) error {
 	// validate metadata
-	err := moduleLib.IsValidMetadata(nci.Metadata)
+	err := moduleLib.IsValidMetadata(wif.Metadata)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Invalid network controller intent metadata")
+	}
+
+	errs := validation.IsValidName(wif.Spec.IfName)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid interface name = [%v], errors: %v", wif.Spec.IfName, errs)
+	}
+
+	errs = validation.IsValidName(wif.Spec.NetworkName)
+	if len(errs) > 0 {
+		return pkgerrors.Errorf("Invalid network name = [%v], errors: %v", wif.Spec.NetworkName, errs)
+	}
+
+	// optional - only validate if supplied
+	if len(wif.Spec.DefaultGateway) > 0 {
+		errs = validation.IsValidName(wif.Spec.DefaultGateway)
+		if len(errs) > 0 {
+			return pkgerrors.Errorf("Invalid default interface = [%v], errors: %v", wif.Spec.DefaultGateway, errs)
+		}
+	}
+
+	// optional - only validate if supplied
+	if len(wif.Spec.IpAddr) > 0 {
+		err = validation.IsIp(wif.Spec.IpAddr)
+		if err != nil {
+			return pkgerrors.Errorf("Invalid IP address = [%v], errors: %v", wif.Spec.IpAddr, err)
+		}
+	}
+
+	// optional - only validate if supplied
+	if len(wif.Spec.MacAddr) > 0 {
+		err = validation.IsMac(wif.Spec.MacAddr)
+		if err != nil {
+			return pkgerrors.Errorf("Invalid MAC address = [%v], errors: %v", wif.Spec.MacAddr, err)
+		}
 	}
 	return nil
 }
 
-// Create handles creation of the NetControlIntent entry in the database
-func (h netcontrolintentHandler) createHandler(w http.ResponseWriter, r *http.Request) {
-	var nci moduleLib.NetControlIntent
+// Create handles creation of the Network entry in the database
+func (h workloadifintentHandler) createHandler(w http.ResponseWriter, r *http.Request) {
+	var wif moduleLib.WorkloadIfIntent
 	vars := mux.Vars(r)
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	netControlIntent := vars["net-control-intent"]
+	workloadIntent := vars["workload-intent"]
 
-	err := json.NewDecoder(r.Body).Decode(&nci)
+	err := json.NewDecoder(r.Body).Decode(&wif)
 
 	switch {
 	case err == io.EOF:
@@ -66,18 +103,23 @@ func (h netcontrolintentHandler) createHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	// Name is required.
-	if nci.Metadata.Name == "" {
+	if wif.Metadata.Name == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
-	err = validateNetControlIntentInputs(nci)
+	// set default value
+	if len(wif.Spec.DefaultGateway) == 0 {
+		wif.Spec.DefaultGateway = "false" // set default value
+	}
+
+	err = validateWorkloadIfIntentInputs(wif)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	ret, err := h.client.CreateNetControlIntent(nci, project, compositeApp, compositeAppVersion, false)
+	ret, err := h.client.CreateWorkloadIfIntent(wif, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -92,16 +134,18 @@ func (h netcontrolintentHandler) createHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
-// Put handles creation/update of the NetControlIntent entry in the database
-func (h netcontrolintentHandler) putHandler(w http.ResponseWriter, r *http.Request) {
-	var nci moduleLib.NetControlIntent
+// Put handles creation/update of the Network entry in the database
+func (h workloadifintentHandler) putHandler(w http.ResponseWriter, r *http.Request) {
+	var wif moduleLib.WorkloadIfIntent
 	vars := mux.Vars(r)
 	name := vars["name"]
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	netControlIntent := vars["net-control-intent"]
+	workloadIntent := vars["workload-intent"]
 
-	err := json.NewDecoder(r.Body).Decode(&nci)
+	err := json.NewDecoder(r.Body).Decode(&wif)
 
 	switch {
 	case err == io.EOF:
@@ -113,25 +157,30 @@ func (h netcontrolintentHandler) putHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Name is required.
-	if nci.Metadata.Name == "" {
+	if wif.Metadata.Name == "" {
 		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
 		return
 	}
 
 	// Name in URL should match name in body
-	if nci.Metadata.Name != name {
-		fmt.Printf("bodyname = %v, name= %v\n", nci.Metadata.Name, name)
+	if wif.Metadata.Name != name {
+		fmt.Printf("bodyname = %v, name= %v\n", wif.Metadata.Name, name)
 		http.Error(w, "Mismatched name in PUT request", http.StatusBadRequest)
 		return
 	}
 
-	err = validateNetControlIntentInputs(nci)
+	// set default value
+	if len(wif.Spec.DefaultGateway) == 0 {
+		wif.Spec.DefaultGateway = "false" // set default value
+	}
+
+	err = validateWorkloadIfIntentInputs(wif)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	ret, err := h.client.CreateNetControlIntent(nci, project, compositeApp, compositeAppVersion, true)
+	ret, err := h.client.CreateWorkloadIfIntent(wif, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -146,25 +195,27 @@ func (h netcontrolintentHandler) putHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-// Get handles GET operations on a particular NetControlIntent Name
-// Returns a NetControlIntent
-func (h netcontrolintentHandler) getHandler(w http.ResponseWriter, r *http.Request) {
+// Get handles GET operations on a particular Network Name
+// Returns a Network
+func (h workloadifintentHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	netControlIntent := vars["net-control-intent"]
+	workloadIntent := vars["workload-intent"]
 	var ret interface{}
 	var err error
 
 	if len(name) == 0 {
-		ret, err = h.client.GetNetControlIntents(project, compositeApp, compositeAppVersion)
+		ret, err = h.client.GetWorkloadIfIntents(project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
-		ret, err = h.client.GetNetControlIntent(name, project, compositeApp, compositeAppVersion)
+		ret, err = h.client.GetWorkloadIfIntent(name, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -180,47 +231,17 @@ func (h netcontrolintentHandler) getHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-// Delete handles DELETE operations on a particular NetControlIntent  Name
-func (h netcontrolintentHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
+// Delete handles DELETE operations on a particular Network  Name
+func (h workloadifintentHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	netControlIntent := vars["net-control-intent"]
+	workloadIntent := vars["workload-intent"]
 
-	err := h.client.DeleteNetControlIntent(name, project, compositeApp, compositeAppVersion)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
-// Apply handles POST operations to Apply a particular NetControlIntent to the App Context
-func (h netcontrolintentHandler) applyHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	name := vars["name"]
-	project := vars["project"]
-	compositeApp := vars["composite-app-name"]
-	compositeAppVersion := vars["version"]
-
-	var aci struct {
-		AppContextId string `json:"appContextId"`
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&aci)
-
-	switch {
-	case err == io.EOF:
-		http.Error(w, "Empty body", http.StatusBadRequest)
-		return
-	case err != nil:
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
-		return
-	}
-
-	err = h.client.ApplyNetControlIntent(name, project, compositeApp, compositeAppVersion, aci.AppContextId)
+	err := h.client.DeleteWorkloadIfIntent(name, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

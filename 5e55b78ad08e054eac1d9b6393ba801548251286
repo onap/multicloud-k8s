@@ -63,6 +63,30 @@
       "revId": "5e55b78ad08e054eac1d9b6393ba801548251286",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee131ddc_5449027b",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-05-30T00:38:23Z",
+      "side": 1,
+      "message": "The library will be called from different context. This call assumes that caller will have handle. What if the app just wants to get the metadata without creating it.",
+      "parentUuid": "003b4b79_80fc4ba3",
+      "range": {
+        "startLine": 178,
+        "startChar": 22,
+        "endLine": 178,
+        "endChar": 39
+      },
+      "revId": "5e55b78ad08e054eac1d9b6393ba801548251286",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d76f3abb_59facfe9",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-05-30T00:08:17Z",
+      "side": 1,
+      "message": "Move these new interfaces after cluster related interfaces for readability.",
+      "revId": "5e55b78ad08e054eac1d9b6393ba801548251286",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3266c59b_db81c8c9",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-05-30T00:08:17Z",
+      "side": 1,
+      "message": "All the other ( app, cluster, resource etc..) implements get handle and use GetValue to get the value using that handle. To be consistent, add GetClusterMetaGrpHandle and get the value using the handle returned. That way it would work from any application context.",
+      "range": {
+        "startLine": 178,
+        "startChar": 22,
+        "endLine": 178,
+        "endChar": 39
+      },
+      "revId": "5e55b78ad08e054eac1d9b6393ba801548251286",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

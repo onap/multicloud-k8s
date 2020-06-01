@@ -87,6 +87,30 @@
       "revId": "5e55b78ad08e054eac1d9b6393ba801548251286",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef5a6814_a8db7af1",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-01T16:53:38Z",
+      "side": 1,
+      "message": "Wouldn\u0027t get handle for this case be exactly same as the GetClusterHandle?",
+      "parentUuid": "ee131ddc_5449027b",
+      "range": {
+        "startLine": 178,
+        "startChar": 22,
+        "endLine": 178,
+        "endChar": 39
+      },
+      "revId": "5e55b78ad08e054eac1d9b6393ba801548251286",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

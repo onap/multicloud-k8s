@@ -70,7 +70,7 @@ kubectl apply -f $HOME/$pod_pvc_01.yaml
 kubectl apply -f $HOME/$pod_app_01.yaml
 
 echo "Sleep for several minutes ..."
-sleep 300
+sleep 1800
 
 pvc_meta="$(kubectl get pvc -o jsonpath='{.items[0].metadata.name}')"
 pvc_status="$(kubectl get pvc -o jsonpath='{.items[0].status.phase}')"
@@ -79,9 +79,6 @@ if [[ $pvc_meta == "pmem-csi-pvc-ext4" ]] && [[ $pvc_status == "Bound" ]] ; then
 else
     echo "[OPTANE] FAILED: cannot create PMEM-CSI volume!"
 fi
-
-echo "Wait and remove the test resource ..."
-sleep 60
 
 kubectl delete -f $HOME/$pod_sc_01.yaml
 kubectl delete -f $HOME/$pod_pvc_01.yaml

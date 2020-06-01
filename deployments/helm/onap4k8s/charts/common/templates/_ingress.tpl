@@ -29,7 +29,7 @@
 {{- define "common.ingress" -}}
 {{- if .Values.ingress -}}
 {{- if .Values.ingress.enabled -}}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ include "common.fullname" . }}-ingress

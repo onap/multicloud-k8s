@@ -9,5 +9,6 @@
 set -x -e -o pipefail
 
 curr_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
+cp ${curr_dir}/k8s-cluster.yml ${curr_dir}/../hosting_providers/vagrant/inventory/group_vars/k8s-cluster.yml
 cd ${curr_dir}/../hosting_providers/baremetal
 ./aio.sh

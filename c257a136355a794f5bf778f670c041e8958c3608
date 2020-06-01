@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "33e41ae9_37175a11",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-01T19:40:35Z",
+      "side": 1,
+      "message": "For delete handle is required any way. You can remove this for delete to be consistent with other interfaces.",
+      "range": {
+        "startLine": 166,
+        "startChar": 42,
+        "endLine": 166,
+        "endChar": 48
+      },
+      "revId": "c257a136355a794f5bf778f670c041e8958c3608",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

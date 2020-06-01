@@ -111,6 +111,30 @@
       "revId": "5e55b78ad08e054eac1d9b6393ba801548251286",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e7e84f21_d43c0a98",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-01T17:06:46Z",
+      "side": 1,
+      "message": "That would get the cluster handle not the cluster metadata handle.",
+      "parentUuid": "ef5a6814_a8db7af1",
+      "range": {
+        "startLine": 178,
+        "startChar": 22,
+        "endLine": 178,
+        "endChar": 39
+      },
+      "revId": "5e55b78ad08e054eac1d9b6393ba801548251286",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

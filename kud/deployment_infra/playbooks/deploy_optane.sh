@@ -6,5 +6,5 @@ if [[ $ndctl_region == "" ]] ; then
     echo "No Optane Hardware!"
 else
     echo "Optane Plugin start .."
-    /usr/local/bin/kubectl apply -f $work_path/pmem-csi-lvm.yaml
+    /usr/local/bin/kubectl apply -f $work_path/pmem-csi-direct.yaml
 fi

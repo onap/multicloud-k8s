@@ -38,6 +38,17 @@ func (cs *installappServer) InstallApp(ctx context.Context, req *installapp.Inst
 	return &installapp.InstallAppResponse{AppContextInstalled: true}, nil
 }
 
+func (cs *installappServer) UninstallApp(ctx context.Context, req *installapp.UninstallAppRequest) (*installapp.UninstallAppResponse, error) {
+	uninstallAppReq, _ := json.Marshal(req)
+	log.Println("GRPC Server received uninstallAppRequest: ", string(uninstallAppReq))
+
+	// Try terminating the comp app here
+	//
+	//
+
+	return &installapp.UninstallAppResponse{AppContextUninstalled: true}, nil
+}
+
 // NewInstallAppServer exported
 func NewInstallAppServer() *installappServer {
 	s := &installappServer{}

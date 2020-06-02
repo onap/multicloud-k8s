@@ -1,0 +1,87 @@
+# Resources to create Databases used by ONAP4K8s v2 Microservices
+---
+#Etcd Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: etcd
+  name: etcd
+spec:
+  ports:
+  - name: "2379"
+    port: 2379
+    targetPort: 2379
+  - name: "2380"
+    port: 2380
+    targetPort: 2380
+  selector:
+    app: etcd
+
+---
+#Mongo Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo
+  name: mongo
+spec:
+  ports:
+  - name: "27017"
+    port: 27017
+    targetPort: 27017
+  selector:
+    app: mongo
+
+---
+#Etcd Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etcd
+  template:
+    metadata:
+      labels:
+        app: etcd
+    spec:
+      containers:
+      - image: bitnami/etcd:3
+        imagePullPolicy: IfNotPresent
+        name: etcd
+        env:
+          - name: "ALLOW_NONE_AUTHENTICATION"
+            value: "yes"
+        ports:
+        - containerPort: 2379
+        - containerPort: 2380
+
+---
+#Mongo Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongo
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - image: mongo
+        imagePullPolicy: IfNotPresent
+        name: mongo
+        ports:
+        - containerPort: 27017

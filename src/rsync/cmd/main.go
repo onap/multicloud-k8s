@@ -43,9 +43,9 @@ func startGrpcServer() error {
 	certFile := config.GetConfiguration().GrpcServerCert
 	keyFile := config.GetConfiguration().GrpcServerKey
 
-	host, port := register.GetServerHostPort()
+	_, port := register.GetServerHostPort()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatalf("Could not listen to port: %v", err)
 	}

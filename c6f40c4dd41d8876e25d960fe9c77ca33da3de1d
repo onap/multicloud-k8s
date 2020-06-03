@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3aca7804_13841d9a",
+        "filename": "src/clm/config.json",
+        "patchSetId": 12
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-03T23:56:46Z",
+      "side": 1,
+      "message": "Remove the hardcoding",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 8,
+        "endChar": 33
+      },
+      "revId": "c6f40c4dd41d8876e25d960fe9c77ca33da3de1d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "417e3374_31c57c07",
+        "filename": "src/clm/go.mod.ewm",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-03T23:56:46Z",
+      "side": 1,
+      "message": "File not required",
+      "revId": "c6f40c4dd41d8876e25d960fe9c77ca33da3de1d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46874d3c_24b8fdc3",
+        "filename": "src/clm/tests/certs/auth_test_certificate.pem",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-03T23:56:46Z",
+      "side": 1,
+      "message": "Where this file being used?",
+      "revId": "c6f40c4dd41d8876e25d960fe9c77ca33da3de1d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9568dcdc_318cec34",
+        "filename": "src/clm/tests/certs/auth_test_key.pem",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-03T23:56:46Z",
+      "side": 1,
+      "message": "Ditto",
+      "revId": "c6f40c4dd41d8876e25d960fe9c77ca33da3de1d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d85af9b_298f6345",
+        "filename": "src/rsync/go.mod",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-03T23:56:46Z",
+      "side": 1,
+      "message": "Why is this change required?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 12
+      },
+      "revId": "c6f40c4dd41d8876e25d960fe9c77ca33da3de1d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

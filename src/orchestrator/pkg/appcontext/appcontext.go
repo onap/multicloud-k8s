@@ -172,7 +172,6 @@ func (ac *AppContext) DeleteClusterMetaGrpHandle(ch interface{}) error {
 	return nil
 }
 
-
 /*
 GetClusterMetaHandle takes in appName and ClusterName as string arguments and return the ClusterMetaHandle as string
 */
@@ -188,7 +187,7 @@ func (ac *AppContext) GetClusterMetaHandle(app string, cluster string) (string, 
 	if err != nil {
 		return "", err
 	}
-	cmh := fmt.Sprintf("%v", ch)  + metaGrpPREFIX + "/"
+	cmh := fmt.Sprintf("%v", ch) + metaGrpPREFIX + "/"
 	return cmh, nil
 
 }

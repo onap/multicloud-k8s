@@ -30,7 +30,7 @@ import (
 const ManifestFileName = "manifest.yaml"
 
 // GenericPlacementIntentName denotes the generic placement intent name
-const GenericPlacementIntentName = "generic-placement-intent"
+const GenericPlacementIntentName = "genericPlacementIntent"
 
 // SEPARATOR used while creating clusternames to store in etcd
 const SEPARATOR = "+"
@@ -100,22 +100,18 @@ and returns the name of the genericPlacementIntentName. Returns empty value if s
 */
 func findGenericPlacementIntent(p, ca, v, di string) (string, error) {
 	var gi string
-	var found bool
 	iList, err := NewIntentClient().GetAllIntents(p, ca, v, di)
 	if err != nil {
 		return gi, err
 	}
 	for _, eachMap := range iList.ListOfIntents {
 		if gi, found := eachMap[GenericPlacementIntentName]; found {
-			log.Info(":: Name of the generic-placement-intent ::", log.Fields{"GenPlmtIntent": gi})
-			return gi, err
+			log.Info(":: Name of the generic-placement-intent found ::", log.Fields{"GenPlmtIntent": gi})
+			return gi, nil
 		}
 	}
-	if found == false {
-		fmt.Println("generic-placement-intent not found !")
-	}
+	log.Info(":: generic-placement-intent not found ! ::", log.Fields{"Searched for GenPlmtIntent": GenericPlacementIntentName })
 	return gi, pkgerrors.New("Generic-placement-intent not found")
-
 }
 
 // GetSortedTemplateForApp returns the sorted templates.
@@ -276,6 +272,14 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
 	}
 	// END:: save the context in the orchestrator db record
+
+	// BEGIN: scheduler code
+
+	pl, err := getPrioritizedControllerList(p, ca, v, di)
+	log.Info("Priority Based List ", log.Fields{"PlacementControllers::": pl.pPlaCont,
+		"ActionControllers::": pl.pActCont})
+
+	// END: Scheduler code
 
 	log.Info(":: Done with instantiation... ::", log.Fields{"CompositeAppName": ca})
 	return err

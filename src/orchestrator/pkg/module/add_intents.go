@@ -224,7 +224,6 @@ func (c IntentClient) GetAllIntents(p string, ca string, v string, di string) (L
 			if err != nil {
 				return ListOfIntents{}, pkgerrors.Wrap(err, "Unmarshalling Intent")
 			}
-			//mapOfIntents := ListOfIntents{a.Spec.Intent.ListOfIntents}
 			listOfMapOfIntents = append(listOfMapOfIntents, a.Spec.Intent)
 		}
 		return ListOfIntents{listOfMapOfIntents}, nil

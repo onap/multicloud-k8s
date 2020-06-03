@@ -30,7 +30,7 @@ import (
 const ManifestFileName = "manifest.yaml"
 
 // GenericPlacementIntentName denotes the generic placement intent name
-const GenericPlacementIntentName = "generic-placement-intent"
+const GenericPlacementIntentName = "genericPlacementIntent"
 
 // SEPARATOR used while creating clusternames to store in etcd
 const SEPARATOR = "+"
@@ -276,6 +276,14 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
 	}
 	// END:: save the context in the orchestrator db record
+
+	// BEGIN: scheduler code
+
+	pl, err := getPrioritizedControllerList(p, ca, v, di)
+	log.Info("Priority Based List ", log.Fields{"PlacementControllers::": pl.pPlaCont,
+		"ActionControllers::": pl.pActCont})
+
+	// END: Scheduler code
 
 	log.Info(":: Done with instantiation... ::", log.Fields{"CompositeAppName": ca})
 	return err

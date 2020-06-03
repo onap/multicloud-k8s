@@ -82,6 +82,8 @@ deploymentIntentGroupNameDesc="test_deployment_intent_group_desc"
 releaseName="test"
 intentToBeAddedinDeploymentIntentGroup="name_of_intent_to_be_added_in_deployment_group"
 intentToBeAddedinDeploymentIntentGroupDesc="desc_of_intent_to_be_added_in_deployment_group"
+hpaIntentName="hpaIntentName"
+trafficIntentName="trafficIntentName"
 
 chart_name="edgex"
 profile_name="test_profile"
@@ -90,6 +92,28 @@ namespace="plugin-tests-namespace"
 cloud_region_id="kud"
 cloud_region_owner="localhost"
 
+
+# Controllers
+genericPlacementIntent="genericPlacementIntent"
+OVNintent="OVNintent"
+OVNintentName="OVNintentName"
+OVNHostName="OVNHostName"
+OVNPort="9027"
+CostBasedIntent="costBasedIntent"
+CostBasedIntentName="CostBasedIntentName"
+CostBasedHostName="OVNHostName"
+CostBasedPort="9028"
+hpaIntent="hpaIntent"
+trafficIntent="trafficIntent"
+gpcHostName="gpcHostName"
+gpcPort="9029"
+hpaControllerIntentName="hpaControllerIntentName"
+hpaHostName="hpaHostName"
+hpaPort="9030"
+trafficControllerIntentName="trafficControllerIntentName"
+trafficHostName="trafficHostName"
+trafficPort="9031"
+
 # Setup
 install_deps
 populate_CSAR_composite_app_helm "$csar_id"
@@ -97,7 +121,20 @@ populate_CSAR_composite_app_helm "$csar_id"
 # BEGIN :: Delete statements are issued so that we clean up the 'orchestrator' collection
 # and freshly populate the documents, also it serves as a direct test
 # for all our DELETE APIs and an indirect test for all GET APIs
+print_msg "Deleting controller ${genericPlacementIntent}"
+delete_resource "${base_url}/controllers/${genericPlacementIntent}"
 
+print_msg "Deleting controller ${hpaIntent}"
+delete_resource "${base_url}/controllers/${hpaIntent}"
+
+print_msg "Deleting controller ${trafficIntent}"
+delete_resource "${base_url}/controllers/${trafficIntent}"
+
+print_msg "Deleting controller ${CostBasedIntent}"
+delete_resource "${base_url}/controllers/${CostBasedIntent}"
+
+print_msg "Deleting controller ${OVNintent}"
+delete_resource "${base_url}/controllers/${OVNintent}"
 
 print_msg "Deleting intentToBeAddedinDeploymentIntentGroup"
 delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/intents/${intentToBeAddedinDeploymentIntentGroup}"
@@ -134,6 +171,9 @@ delete_resource "${base_url}/projects/${project_name}/composite-apps/${composite
 
 print_msg "Deleting ${project_name}"
 delete_resource "${base_url}/projects/${project_name}"
+
+
+
 
 # END :: Delete statements were issued so that we clean up the db
 # and freshly populate the documents, also it serves as a direct test
@@ -415,7 +455,7 @@ call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${
 # END: Registering DeploymentIntentGroup in the database
 
 # BEGIN: Adding intents to an intent group
-print_msg "Adding the genericPlacement intent to the deploymentIntent group"
+print_msg "Adding all the intents to the deploymentIntent group"
 payload="$(cat <<EOF
 {
    "metadata":{
@@ -426,7 +466,11 @@ payload="$(cat <<EOF
    },
    "spec":{
       "intent":{
-         "generic-placement-intent":"${genericPlacementIntentName}"
+         "${genericPlacementIntent}":"${genericPlacementIntentName}",
+         "${hpaIntent}" : "${hpaControllerIntentName}", 
+         "${trafficIntent}" : "${trafficControllerIntentName}",
+         "${CostBasedIntent}" : "${CostBasedIntentName}",
+         "${OVNintent}" : "${OVNintentName}"
       }
    }
 }
@@ -435,8 +479,89 @@ EOF
 call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/intents"
 # END: Adding intents to an intent group
 
+# BEGIN: Adding controllers
+print_msg "Adding CostBased placement contoller"
+payload="$(cat <<EOF
+{
+   "metadata":{
+      "name":"${CostBasedIntent}",
+      "description":"${CostBasedIntentName}",
+      "userData1":"${userData1}",
+      "userData2":"${userData2}"
+   },
+   "spec":{
+      "host": "${CostBasedHostName}",
+      "port": ${CostBasedPort},
+      "type": "placement",
+      "priority": 3
+   }
+}
+EOF
+)"
+call_api -d "${payload}" "${base_url}/controllers"
+
+print_msg "Adding HPA contoller"
+payload="$(cat <<EOF
+{
+   "metadata":{
+      "name":"${hpaIntent}",
+      "description":"${hpaControllerIntentName}",
+      "userData1":"${userData1}",
+      "userData2":"${userData2}"
+   },
+   "spec":{
+      "host": "${hpaHostName}",
+      "port": ${hpaPort},
+      "type": "placement",
+      "priority": 2
+   }
+}
+EOF
+)"
+call_api -d "${payload}" "${base_url}/controllers"
+
+print_msg "Adding traffic contoller"
+payload="$(cat <<EOF
+{
+   "metadata":{
+      "name":"${trafficIntent}",
+      "description":"${trafficControllerIntentName}",
+      "userData1":"${userData1}",
+      "userData2":"${userData2}"
+   },
+   "spec":{
+      "host": "${trafficHostName}",
+      "port": ${trafficPort},
+      "type": "action",
+      "priority": 3
+   }
+}
+EOF
+)"
+call_api -d "${payload}" "${base_url}/controllers"
+
+print_msg "Adding OVN action contoller"
+payload="$(cat <<EOF
+{
+   "metadata":{
+      "name":"${OVNintent}",
+      "description":"${OVNintentName}",
+      "userData1":"${userData1}",
+      "userData2":"${userData2}"
+   },
+   "spec":{
+      "host": "${OVNHostName}",
+      "port": ${OVNPort},
+      "type": "action",
+      "priority": 2
+   }
+}
+EOF
+)"
+call_api -d "${payload}" "${base_url}/controllers"
+# END: Adding controllers
+
 #BEGIN: Instantiation
 print_msg "Getting the sorted templates for each of the apps.."
 call_api -d "" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/instantiate"
 # END: Instantiation
-

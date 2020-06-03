@@ -277,6 +277,14 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	}
 	// END:: save the context in the orchestrator db record
 
+	// BEGIN: scheduler code
+
+	pl, err := getPrioritisedControllerList(p, ca, v, di)
+	log.Info("Priority Based List ", log.Fields{"PlaCont::": pl.pPlaCont,
+		"ActCont::": pl.pActCont})
+
+	// END: Scheduler code
+
 	log.Info(":: Done with instantiation... ::", log.Fields{"CompositeAppName": ca})
 	return err
 }

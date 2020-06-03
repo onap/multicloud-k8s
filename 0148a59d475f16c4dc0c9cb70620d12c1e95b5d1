@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c954747_55000906",
+        "filename": "src/orchestrator/pkg/module/instantiation_scheduler_helper.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-03T23:20:00Z",
+      "side": 1,
+      "message": "typos - Controller",
+      "revId": "0148a59d475f16c4dc0c9cb70620d12c1e95b5d1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91f27884_de8e1add",
+        "filename": "src/orchestrator/pkg/module/instantiation_scheduler_helper.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-03T23:20:00Z",
+      "side": 1,
+      "message": "it seems a little odd to basically duplicate the Controller structure from the controller package just to add the Index.\n\nthe comment mentions internal field Index - shouldn\u0027t it be lower case ?\n\nwhy not something like this?\ntype ControllerElement struct {\n      controller.Controller\n      index int\n}",
+      "revId": "0148a59d475f16c4dc0c9cb70620d12c1e95b5d1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d5326d4_ebace0a2",
+        "filename": "src/orchestrator/pkg/module/instantiation_scheduler_helper.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-03T23:20:00Z",
+      "side": 1,
+      "message": "typo - prioritized",
+      "revId": "0148a59d475f16c4dc0c9cb70620d12c1e95b5d1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

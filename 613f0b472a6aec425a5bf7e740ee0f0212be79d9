@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59e5a0d9_ab96cd97",
+        "filename": "kud/tests/plugin_collection_v2.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-04T21:36:42Z",
+      "side": 1,
+      "message": "Generic Placement controller is internal to orchestrator shouldn\u0027t require registration",
+      "range": {
+        "startLine": 468,
+        "startChar": 1,
+        "endLine": 484,
+        "endChar": 4
+      },
+      "revId": "613f0b472a6aec425a5bf7e740ee0f0212be79d9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "df9e39b6_5c43034f",
+        "filename": "kud/tests/plugin_collection_v2.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-04T21:36:42Z",
+      "side": 1,
+      "message": "Remove whitespaces from this file",
+      "range": {
+        "startLine": 521,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 6
+      },
+      "revId": "613f0b472a6aec425a5bf7e740ee0f0212be79d9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

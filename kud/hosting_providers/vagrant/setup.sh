@@ -178,9 +178,9 @@ ${INSTALLER_CMD} "${packages[@]}"
 if ! which pip; then
     curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
 else
-    sudo -H -E pip install --upgrade pip
+    sudo -H -E pip install --no-cache-dir --upgrade pip
 fi
-sudo -H -E pip install tox
+sudo -H -E pip install --no-cache-dir tox
 if [[ ${http_proxy+x} ]]; then
     vagrant plugin install vagrant-proxyconf
 fi

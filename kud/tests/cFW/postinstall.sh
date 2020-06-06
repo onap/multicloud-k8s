@@ -57,8 +57,8 @@ function install_docker_compose {
     if ! which pip; then
         curl -sL https://bootstrap.pypa.io/get-pip.py | python
     fi
-    pip install --upgrade pip
-    pip install docker-compose
+    pip install --no-cache-dir --upgrade pip
+    pip install --no-cache-dir docker-compose
 }
 
 echo 'vm.nr_hugepages = 1024' >> /etc/sysctl.conf

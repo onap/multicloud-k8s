@@ -41,7 +41,7 @@ function _install_go {
 # _install_pip() - Install Python Package Manager
 function _install_pip {
     if $(pip --version &>/dev/null); then
-        sudo -E pip install --upgrade pip
+        sudo -E pip install --no-cache-dir --upgrade pip
     else
         sudo apt-get install -y python-dev
         curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
@@ -56,7 +56,7 @@ function _install_ansible {
     _install_pip
     local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
     sudo mkdir -p /etc/ansible/
-    sudo -E pip install ansible==$version
+    sudo -E pip install --no-cache-dir ansible==$version
 }
 
 # _install_docker() - Download and install docker-engine
@@ -123,7 +123,7 @@ function install_k8s {
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/
-    sudo -E pip install -r ./requirements.txt
+    sudo -E pip install --no-cache-dir -r ./requirements.txt
     make mitogen
     popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
@@ -175,7 +175,7 @@ function install_plugin {
     echo "Installing multicloud/k8s plugin"
     _install_go
     _install_docker
-    sudo -E pip install docker-compose
+    sudo -E pip install --no-cache-dir docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
     sudo cp $HOME/.kube/config /opt/kubeconfig/kud

@@ -33,7 +33,7 @@ function _install_ansible {
     local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml |
         awk -F ': ' '{print $2}')
     mkdir -p /etc/ansible/
-    pip install ansible==$version
+    pip install --no-cache-dir ansible==$version
 }
 
 # install_k8s() - Install Kubernetes using kubespray tool
@@ -56,7 +56,7 @@ function install_kubespray {
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/
-    pip install -r ./requirements.txt
+    pip install --no-cache-dir -r ./requirements.txt
     make mitogen
     popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null

@@ -276,10 +276,31 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	// BEGIN: scheduler code
 
 	pl, mapOfControllers, err := getPrioritizedControllerList(p, ca, v, di)
+	if err != nil {
+		return err
+	}
 	log.Info("Priority Based List ", log.Fields{"PlacementControllers::": pl.pPlaCont,
 		"ActionControllers::": pl.pActCont, "mapOfControllers::": mapOfControllers})
 
+	err = callGrpcForControllerList(pl.pPlaCont, mapOfControllers, ctxval)
+	if err != nil {
+		return err
+	}
+
+	err = deleteExtraClusters(allApps, context)
+	if err != nil {
+		return err
+	}
+
+	err = callGrpcForControllerList(pl.pActCont, mapOfControllers, ctxval)
+	if err != nil {
+		return err
+	}
+
 	// END: Scheduler code
+
+	// BEGIN : Rsync code
+	// END : Rsyc code
 
 	log.Info(":: Done with instantiation... ::", log.Fields{"CompositeAppName": ca})
 	return err

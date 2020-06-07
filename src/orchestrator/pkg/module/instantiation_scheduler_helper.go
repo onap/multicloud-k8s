@@ -18,6 +18,11 @@ package module
 
 import (
 	"container/heap"
+
+	"fmt"
+
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	client "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/contextupdateclient"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
@@ -166,4 +171,52 @@ func getPrioritizedControllerList(p, ca, v, di string) (PrioritizedControlList, 
 
 	return prioritizedControlList, mapOfControllers, nil
 
+}
+
+/*
+callGrpcForControllerList method shall take in a list of controllers, a map of contollers to controllerIntentNames and contextID. It invokes the context
+updation through the grpc client for the given list of controllers.
+*/
+func callGrpcForControllerList(cl []controller.Controller, mc map[string]string, contextid interface{}) error {
+	for _, c := range cl {
+		controller := c.Metadata.Name
+		controllerIntentName := mc[controller]
+		appContextID := fmt.Sprintf("%v", contextid)
+		err := client.InvokeContextUpdate(controller, controllerIntentName, appContextID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*
+deleteExtraClusters method shall delete the extra cluster handles for each AnyOf cluster present in the etcd after the grpc call for context updation.
+*/
+func deleteExtraClusters(apps []App, ct appcontext.AppContext) error {
+	for _, app := range apps {
+		an := app.Metadata.Name
+		gmap, err := ct.GetClusterGroupMap(an)
+		if err != nil {
+			return err
+		}
+		for gr, cl := range gmap {
+			for i, cn := range cl {
+				// avoids deleting the first cluster
+				if i > 0 {
+					ch, err := ct.GetClusterHandle(an, cn)
+					if err != nil {
+						return err
+					}
+					err = ct.DeleteCluster(ch)
+					if err != nil {
+						return err
+					}
+					log.Info("::Deleted cluster for::", log.Fields{"appName": an, "GroupNumber": gr, "ClusterName": cn})
+				}
+			}
+
+		}
+	}
+	return nil
 }

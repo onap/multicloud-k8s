@@ -1,0 +1,359 @@
+# Resources to create ONAP4K8s v2 Microservices
+---
+# Orchestrator Config Map
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: orchestrator
+  labels:
+    app: orchestrator
+data:
+  config.json: |
+          {
+          "database-type": "mongo",
+          "database-ip": "mongo",
+          "etcd-ip": "etcd",
+          "service-port": "9015"
+          }
+
+---
+# Orchestrator Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestrator
+  labels:
+    app: orchestrator
+spec:
+  selector:
+    app: orchestrator
+  type: NodePort
+  ports:
+  - name: http
+    port: 9015
+    protocol: TCP
+    targetPort: 9015
+
+---
+# Orchestrator Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orchestrator
+  template:
+    metadata:
+      labels:
+        app: orchestrator
+    spec:
+      containers:
+        - name: orchestrator
+          image: rtsood/mco:0.0.1
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/mco/entrypoint", "mco"]
+          workingDir: /opt/mco
+          ports:
+          - containerPort: 9015
+          volumeMounts:
+          - name: config
+            mountPath: /opt/mco/config.json
+            subPath: config.json
+      volumes:
+        - name: config
+          configMap:
+            name: orchestrator
+            items:
+            - key: config.json
+              path: config.json
+
+---
+# NCM Config Map
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ncm
+  labels:
+    app: ncm
+data:
+  config.json: |
+          {
+          "database-type": "mongo",
+          "database-ip": "mongo",
+          "etcd-ip": "etcd",
+          "service-port": "9031"
+          }
+
+---
+# NCM Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: ncm
+  labels:
+    app: ncm
+spec:
+  selector:
+    app: ncm
+  type: NodePort
+  ports:
+  - name: http
+    port: 9031
+    protocol: TCP
+    targetPort: 9031
+
+---
+# NCM Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ncm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ncm
+  template:
+    metadata:
+      labels:
+        app: ncm
+    spec:
+      containers:
+        - name: ncm
+          image: rtsood/mco:0.0.1
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/mco/entrypoint", "ncm"]
+          workingDir: /opt/mco
+          ports:
+          - containerPort: 9031
+          volumeMounts:
+          - name: config
+            mountPath: /opt/mco/config.json
+            subPath: config.json
+      volumes:
+        - name: config
+          configMap:
+            name: ncm
+            items:
+            - key: config.json
+              path: config.json
+
+---
+# RSYNC ConfigMap
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rsync
+  labels:
+    app: rsync
+data:
+  config.json: |
+          {
+          "database-type": "mongo",
+          "database-ip": "mongo",
+          "etcd-ip": "etcd"
+          }
+
+---
+# RSYNC Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: rsync
+  labels:
+    app: rsync
+spec:
+  selector:
+    app: rsync
+  type: NodePort
+  ports:
+  - name: internal
+    port: 9041
+    protocol: TCP
+    targetPort: 9041
+
+---
+# RSYNC Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rsync
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rsync
+  template:
+    metadata:
+      labels:
+        app: rsync
+    spec:
+      containers:
+        - name: rsync
+          image: rtsood/mco:0.0.1
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/mco/entrypoint", "rsync"]
+          workingDir: /opt/mco
+          ports:
+          - containerPort: 9041
+          volumeMounts:
+          - name: config
+            mountPath: /opt/mco/config.json
+            subPath: config.json
+      volumes:
+        - name: config
+          configMap:
+            name: rsync
+            items:
+            - key: config.json
+              path: config.json
+---
+# Ovnaction Config Map
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ovnaction
+  labels:
+    app: ovnaction
+data:
+  config.json: |
+          {
+          "database-type": "mongo",
+          "database-ip": "mongo",
+          "etcd-ip": "etcd",
+          "service-port": "9051"
+          }
+
+---
+# Ovnaction Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: ovnaction
+  labels:
+    app: ovnaction
+spec:
+  selector:
+    app: ovnaction
+  type: NodePort
+  ports:
+  - name: internal
+    port: 9053
+    protocol: TCP
+    targetPort: 9053
+  - name: http
+    port: 9051
+    protocol: TCP
+    targetPort: 9051
+
+---
+# Ovnaction Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ovnaction
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ovnaction
+  template:
+    metadata:
+      labels:
+        app: ovnaction
+    spec:
+      containers:
+        - name: ovnaction
+          image: rtsood/mco:0.0.1
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/mco/entrypoint", "ovnaction"]
+          workingDir: /opt/mco
+          ports:
+          - containerPort: 9053
+          - containerPort: 9051
+          volumeMounts:
+          - name: config
+            mountPath: /opt/mco/config.json
+            subPath: config.json
+      volumes:
+        - name: config
+          configMap:
+            name: ovnaction
+            items:
+            - key: config.json
+              path: config.json
+
+---
+# Clm Config Map
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: clm
+  labels:
+    app: clm
+data:
+  config.json: |
+          {
+          "database-type": "mongo",
+          "database-ip": "mongo",
+          "etcd-ip": "etcd",
+          "service-port": "9061"
+          }
+
+---
+# Clm Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: clm
+  labels:
+    app: clm
+spec:
+  selector:
+    app: clm
+  type: NodePort
+  ports:
+  - name: http
+    port: 9061
+    protocol: TCP
+    targetPort: 9061
+
+---
+# Clm Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clm
+  template:
+    metadata:
+      labels:
+        app: clm
+    spec:
+      containers:
+        - name: clm
+          image: rtsood/mco:0.0.1
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/mco/entrypoint", "clm"]
+          workingDir: /opt/mco
+          ports:
+          - containerPort: 9061
+          volumeMounts:
+          - name: config
+            mountPath: /opt/mco/config.json
+            subPath: config.json
+      volumes:
+        - name: config
+          configMap:
+            name: clm
+            items:
+            - key: config.json
+              path: config.json
+

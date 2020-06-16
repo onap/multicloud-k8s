@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8c1e40db_288db0b4",
+        "filename": "deployments/helm/onap4k8s/README.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-16T19:00:53Z",
+      "side": 1,
+      "message": "Perhaps clarify that user should cd into deployments/helm/v2/onap4k8s.",
+      "revId": "e4a4cfeadec638638f305b96b018cbf1078f6b54",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6ddc0423_d8c63293",
+        "filename": "deployments/helm/onap4k8s/README.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-16T19:00:53Z",
+      "side": 1,
+      "message": "2",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 1
+      },
+      "revId": "e4a4cfeadec638638f305b96b018cbf1078f6b54",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6dde3b25_3e5e4833",
+        "filename": "deployments/helm/onap4k8s/README.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-16T19:00:53Z",
+      "side": 1,
+      "message": "3",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 1
+      },
+      "revId": "e4a4cfeadec638638f305b96b018cbf1078f6b54",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3608ed9_317cb7c2",
+        "filename": "deployments/helm/v2/onap4k8s/etcd/Chart.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-16T19:00:53Z",
+      "side": 1,
+      "message": "apiVersion is missing here",
+      "revId": "e4a4cfeadec638638f305b96b018cbf1078f6b54",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

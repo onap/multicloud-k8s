@@ -36,7 +36,7 @@ function install_ipcalc {
 function install_ovn_deps {
     if ! $(yq --version &>/dev/null); then
         install_deps # jq needed as it's dependency of yq
-        sudo -E pip install yq
+        sudo -E pip install --no-cache-dir yq
     fi
     if ! $(ovn-nbctl --version &>/dev/null); then
         function ovn_ubuntu_deps {

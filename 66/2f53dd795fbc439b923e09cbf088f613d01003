@@ -1,0 +1,9 @@
+Code-Review+1: Kuralamudhan Ramakrishnan <kuralamudhan.ramakrishnan@intel.com>
+Code-Review+1: Victor Morales <v.morales@samsung.com>
+Code-Review+2: Ritu Sood <Ritu.Sood@intel.com>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Submitted-by: Ritu Sood <Ritu.Sood@intel.com>
+Submitted-at: Wed, 17 Jun 2020 05:06:40 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/108861
+Project: multicloud/k8s
+Branch: refs/heads/master

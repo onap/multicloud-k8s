@@ -1,38 +1,70 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2020
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
 version: '3'
 
 services:
   packetgen:
+    image: packetgen:1.6.0
     privileged: true
-    network_mode: "host"
-    image: electrocucaracha/packetgen
+    environment:
+      - PROTECTED_NET_CIDR=192.168.20.0/24
+      - FW_IPADDR=192.168.10.100
+      - SINK_IPADDR=192.168.20.250
+    ports:
+      - 8083:8183
     build:
       context: ./packetgen
-      args:
-        HTTP_PROXY: $HTTP_PROXY
-        HTTPS_PROXY: $HTTPS_PROXY
+    networks:
+      unprotected:
+        ipv4_address: 192.168.10.200
   firewall:
+    image: firewall:1.6.0
     privileged: true
-    network_mode: "host"
-    image: electrocucaracha/firewall
+    environment:
+      - DCAE_COLLECTOR_IP=""
+      - DCAE_COLLECTOR_PORT=""
+    ports:
+      - 8083
     build:
       context: ./firewall
-      args:
-        HTTP_PROXY: $HTTP_PROXY
-        HTTPS_PROXY: $HTTPS_PROXY
+    networks:
+      unprotected:
+        ipv4_address: 192.168.10.100
+      protected:
+        ipv4_address: 192.168.20.100
   sink:
-    privileged: true
-    network_mode: "host"
-    image: electrocucaracha/sink
+    image: sink:1.6.0
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - UNPROTECTED_NET=192.168.10.0/24
+      - PROTECTED_NET_GW=192.168.20.100
+    ports:
+      - 8080:667
     build:
       context: ./sink
-      args:
-        HTTP_PROXY: $HTTP_PROXY
-        HTTPS_PROXY: $HTTPS_PROXY
-  darkstat:
-    network_mode: "host"
-    image: electrocucaracha/darkstat
-    build:
-      context: ./darkstat
-      args:
-        HTTP_PROXY: $HTTP_PROXY
-        HTTPS_PROXY: $HTTPS_PROXY
+    networks:
+      protected:
+        ipv4_address: 192.168.20.250
+
+networks:
+  unprotected:
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.10.0/24
+  protected:
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.20.0/24

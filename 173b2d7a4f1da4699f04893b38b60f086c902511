@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1d8d4db6_c7e4e28e",
+        "filename": "deployments/helm/v2/onap4k8s/README.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-18T17:01:37Z",
+      "side": 1,
+      "message": "whitespaces",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 4
+      },
+      "revId": "173b2d7a4f1da4699f04893b38b60f086c902511",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

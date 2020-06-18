@@ -70,7 +70,6 @@ volumes:
 collectd_prometheus:
   service:
     type: ClusterIP
-    name: collectd
     port: 9103
     targetPort: 9103
     selector:

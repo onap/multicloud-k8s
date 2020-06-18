@@ -1,0 +1,145 @@
+8a9,12
+> ## Override the deployment namespace
+> ##
+> namespaceOverride: ""
+> 
+33a38
+>     kubeApiserverSlos: true
+96c101
+<   enabled: false
+---
+>   enabled: true
+107a113
+>     annotations: {}
+168c174
+<   #           {{ range .Labels.SortedPairs }} â€¢ *{{ .Name }}:* `{{ .Value }}`
+---
+>   #           {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+169a176,177
+>   #       {{ end }}
+>   #       {{ end }}
+317c325
+<     ## Standard objectâ€™s metadata. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata
+---
+>     ## Standard object’s metadata. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata
+443a452
+>       runAsGroup: 2000
+473c482,483
+<   enabled: false
+---
+>   enabled: true
+>   namespaceOverride: ""
+539c549
+<   ## Configure additional grafana datasources
+---
+>   ## Configure additional grafana datasources (passed through tpl)
+552c562
+<   #   url: https://prometheus.svc:9090
+---
+>   #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
+641a652,660
+>     ## Enable scraping /metrics/probes from kubelet's service
+>     ##
+>     probes: true
+> 
+>     ## Enable scraping /metrics/resource from kubelet's service
+>     ##
+>     resource: true
+>     # From kubernetes 1.18, /metrics/resource/v1alpha1 renamed to /metrics/resource
+>     resourcePath: "/metrics/resource/v1alpha1"
+655a675,688
+>     ## Metric relabellings to apply to samples before ingestion
+>     ##
+>     probesMetricRelabelings: []
+>     # - sourceLabels: [__name__, image]
+>     #   separator: ;
+>     #   regex: container_([a-z_]+);
+>     #   replacement: $1
+>     #   action: drop
+>     # - sourceLabels: [__name__]
+>     #   separator: ;
+>     #   regex: container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)
+>     #   replacement: $1
+>     #   action: drop
+> 
+668a702,721
+>     probesRelabelings:
+>       - sourceLabels: [__metrics_path__]
+>         targetLabel: metrics_path
+>     # - sourceLabels: [__meta_kubernetes_pod_node_name]
+>     #   separator: ;
+>     #   regex: ^(.*)$
+>     #   targetLabel: nodename
+>     #   replacement: $1
+>     #   action: replace
+> 
+>     resourceRelabelings:
+>       - sourceLabels: [__metrics_path__]
+>         targetLabel: metrics_path
+>     # - sourceLabels: [__meta_kubernetes_pod_node_name]
+>     #   separator: ;
+>     #   regex: ^(.*)$
+>     #   targetLabel: nodename
+>     #   replacement: $1
+>     #   action: replace
+> 
+986c1039
+<   enabled: false
+---
+>   enabled: true
+1011a1065
+>   namespaceOverride: ""
+1020c1074
+<   enabled: false
+---
+>   enabled: true
+1056a1111
+>   namespaceOverride: ""
+1070a1126
+>   # Only for prometheusOperator.image.tag < v0.39.0
+1094c1150
+<         tag: v1.2.0
+---
+>         tag: v1.2.1
+1165c1221
+<   cleanupCustomResource: true
+---
+>   cleanupCustomResource: false
+1255a1312,1313
+>     fsGroup: 65534
+>     runAsGroup: 65534
+1340c1398
+<     type: NodePort
+---
+>     type: ClusterIP
+1510c1568
+<       tag: v2.16.0
+---
+>       tag: v2.18.1
+1686c1744
+<     ## Standard objectâ€™s metadata. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata
+---
+>     ## Standard object’s metadata. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata
+1750a1809,1813
+>     # Additional volumes on the output StatefulSet definition.
+>     volumes: []
+>     # Additional VolumeMounts on the output StatefulSet definition.
+>     volumeMounts: []
+> 
+1828a1892
+>       runAsGroup: 2000
+1868,1879c1932
+<   additionalServiceMonitors: 
+<     - name: service-monitor-cadvisor
+<       additionalLabels:
+<         collector: cadvisor
+<       jobLabel: cadvisor
+<       selector:
+<         matchLabels:
+<           app: cadvisor
+<       endpoints:
+<         - port: cadvisor-prometheus
+<           interval: 10s
+<           path: /metrics
+---
+>   additionalServiceMonitors: []

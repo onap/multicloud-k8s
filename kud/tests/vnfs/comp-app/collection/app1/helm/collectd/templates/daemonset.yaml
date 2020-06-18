@@ -25,6 +25,11 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
 spec:
+  selector:
+    matchLabels:
+      app: {{ template "name" . }}
+      collector: collectd
+      release: {{ .Release.Name }}
   replicas: {{ .Values.replicaCount }}
   updateStrategy:
     type: RollingUpdate

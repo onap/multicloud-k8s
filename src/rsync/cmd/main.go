@@ -81,7 +81,6 @@ func main() {
 	// Initialize the mongodb
 	err := db.InitializeDatabaseConnection("mco")
 	if err != nil {
-		fmt.Println(" Exiting mongod ")
 		log.Println("Unable to initialize database connection...")
 		log.Println(err)
 		log.Fatalln("Exiting...")
@@ -90,14 +89,13 @@ func main() {
 	// Initialize contextdb
 	err = contextDb.InitializeContextDatabase()
 	if err != nil {
-		fmt.Println(" Exiting etcd")
 		log.Println("Unable to initialize database connection...")
 		log.Println(err)
 		log.Fatalln("Exiting...")
 	}
 
 	// Start grpc
-	fmt.Println("starting rsync GRPC server..")
+	log.Println("starting rsync GRPC server..")
 	err = startGrpcServer()
 	if err != nil {
 		log.Fatalf("GRPC server failed to start")

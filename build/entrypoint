@@ -3,7 +3,7 @@
 cmd=${1:-""}
 
 case ${cmd} in
-   "mco")
+   "orchestrator")
       ./orchestrator
       ;;
 

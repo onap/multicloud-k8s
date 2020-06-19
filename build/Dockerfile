@@ -20,18 +20,18 @@ RUN cd src/clm && make all
 
 FROM ubuntu:16.04
 
-WORKDIR /opt/mco
-RUN groupadd -r mco && useradd -r -g mco mco
-RUN chown mco:mco /opt/mco -R
-COPY --chown=mco --from=0 /go/src/github.com/onap/multicloud-k8s/src/orchestrator/orchestrator ./
-COPY --chown=mco --from=0 /go/src/github.com/onap/multicloud-k8s/src/ncm/ncm ./
-COPY --chown=mco --from=0 /go/src/github.com/onap/multicloud-k8s/src/dcm/dcm ./
-COPY --chown=mco --from=0 /go/src/github.com/onap/multicloud-k8s/src/rsync/rsync ./
-COPY --chown=mco --from=0 /go/src/github.com/onap/multicloud-k8s/src/ovnaction/ovnaction ./
-COPY --chown=mco --from=0 /go/src/github.com/onap/multicloud-k8s/src/clm/clm ./
-COPY --chown=mco --from=0 /go/src/github.com/onap/multicloud-k8s/build/entrypoint ./
+WORKDIR /opt/emco
+RUN groupadd -r emco && useradd -r -g emco emco
+RUN chown emco:emco /opt/emco -R
+COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/orchestrator/orchestrator ./
+COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/ncm/ncm ./
+COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/dcm/dcm ./
+COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/rsync/rsync ./
+COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/ovnaction/ovnaction ./
+COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/clm/clm ./
+COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/build/entrypoint ./
 
-USER mco
+USER emco
 
 ENTRYPOINT ["./entrypoint"]
 

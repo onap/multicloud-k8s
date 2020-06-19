@@ -52,15 +52,15 @@ spec:
     spec:
       containers:
         - name: orchestrator
-          image: rtsood/mco:0.0.1
+          image: rtsood/emco:0.0.1
           imagePullPolicy: IfNotPresent
-          command: ["/opt/mco/entrypoint", "mco"]
-          workingDir: /opt/mco
+          command: ["/opt/emco/entrypoint", "orchestrator"]
+          workingDir: /opt/emco
           ports:
           - containerPort: 9015
           volumeMounts:
           - name: config
-            mountPath: /opt/mco/config.json
+            mountPath: /opt/emco/config.json
             subPath: config.json
       volumes:
         - name: config
@@ -123,15 +123,15 @@ spec:
     spec:
       containers:
         - name: ncm
-          image: rtsood/mco:0.0.1
+          image: rtsood/emco:0.0.1
           imagePullPolicy: IfNotPresent
-          command: ["/opt/mco/entrypoint", "ncm"]
-          workingDir: /opt/mco
+          command: ["/opt/emco/entrypoint", "ncm"]
+          workingDir: /opt/emco
           ports:
           - containerPort: 9031
           volumeMounts:
           - name: config
-            mountPath: /opt/mco/config.json
+            mountPath: /opt/emco/config.json
             subPath: config.json
       volumes:
         - name: config
@@ -193,15 +193,15 @@ spec:
     spec:
       containers:
         - name: rsync
-          image: rtsood/mco:0.0.1
+          image: rtsood/emco:0.0.1
           imagePullPolicy: IfNotPresent
-          command: ["/opt/mco/entrypoint", "rsync"]
-          workingDir: /opt/mco
+          command: ["/opt/emco/entrypoint", "rsync"]
+          workingDir: /opt/emco
           ports:
           - containerPort: 9041
           volumeMounts:
           - name: config
-            mountPath: /opt/mco/config.json
+            mountPath: /opt/emco/config.json
             subPath: config.json
       volumes:
         - name: config
@@ -267,16 +267,16 @@ spec:
     spec:
       containers:
         - name: ovnaction
-          image: rtsood/mco:0.0.1
+          image: rtsood/emco:0.0.1
           imagePullPolicy: IfNotPresent
-          command: ["/opt/mco/entrypoint", "ovnaction"]
-          workingDir: /opt/mco
+          command: ["/opt/emco/entrypoint", "ovnaction"]
+          workingDir: /opt/emco
           ports:
           - containerPort: 9053
           - containerPort: 9051
           volumeMounts:
           - name: config
-            mountPath: /opt/mco/config.json
+            mountPath: /opt/emco/config.json
             subPath: config.json
       volumes:
         - name: config
@@ -339,15 +339,15 @@ spec:
     spec:
       containers:
         - name: clm
-          image: rtsood/mco:0.0.1
+          image: rtsood/emco:0.0.1
           imagePullPolicy: IfNotPresent
-          command: ["/opt/mco/entrypoint", "clm"]
-          workingDir: /opt/mco
+          command: ["/opt/emco/entrypoint", "clm"]
+          workingDir: /opt/emco
           ports:
           - containerPort: 9061
           volumeMounts:
           - name: config
-            mountPath: /opt/mco/config.json
+            mountPath: /opt/emco/config.json
             subPath: config.json
       volumes:
         - name: config

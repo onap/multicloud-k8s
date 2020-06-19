@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "26514aa8_4c7e0459",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-19T23:18:58Z",
+      "side": 1,
+      "message": "This chunk of code is present in instantiateResources. Seems repeated.\nCan it be refactored?",
+      "revId": "901d3091cb9c7745fa22831972f86cacf705189c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a43f5d77_e35270e7",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-19T23:18:58Z",
+      "side": 1,
+      "message": "Is there a need for print statements in the for loop below and here? Can we go with log statements?",
+      "revId": "901d3091cb9c7745fa22831972f86cacf705189c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3097c571_0af54afe",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-19T23:18:58Z",
+      "side": 1,
+      "message": "This chunk of code is present in instantiateResources. Seems repeated.\nCan it be refactored?",
+      "revId": "901d3091cb9c7745fa22831972f86cacf705189c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cbfcb7bf_8136f2c6",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-19T23:18:58Z",
+      "side": 1,
+      "message": "This for loop is present in InstantiateComApp, seems repeated. Can it be refactored ?",
+      "revId": "901d3091cb9c7745fa22831972f86cacf705189c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

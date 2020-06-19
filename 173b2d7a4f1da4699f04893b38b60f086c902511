@@ -22,6 +22,30 @@
       "revId": "173b2d7a4f1da4699f04893b38b60f086c902511",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "019195cd_4718738c",
+        "filename": "deployments/helm/v2/onap4k8s/README.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-19T17:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d8d4db6_c7e4e28e",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 4
+      },
+      "revId": "173b2d7a4f1da4699f04893b38b60f086c902511",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

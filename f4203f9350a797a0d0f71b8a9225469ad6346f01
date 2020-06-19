@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2eefa469_aea9e49c",
+        "filename": "deployments/helm/v2/onap4k8s/clm/values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-19T20:38:57Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "f4203f9350a797a0d0f71b8a9225469ad6346f01",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0c48c728_a7c73d99",
+        "filename": "deployments/helm/v2/onap4k8s/fluentd/templates/NOTES.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-19T20:38:57Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "f4203f9350a797a0d0f71b8a9225469ad6346f01",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f1066b3_55d04010",
+        "filename": "deployments/helm/v2/onap4k8s/orchestrator/values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-19T20:38:57Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "f4203f9350a797a0d0f71b8a9225469ad6346f01",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f8ccd97c_a0262e8a",
+        "filename": "deployments/helm/v2/onap4k8s/rsync/values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-06-19T20:38:57Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "f4203f9350a797a0d0f71b8a9225469ad6346f01",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

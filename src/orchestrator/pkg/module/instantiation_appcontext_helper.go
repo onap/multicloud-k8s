@@ -22,19 +22,21 @@ It contains methods for creating appContext, saving cluster and resource details
 
 */
 import (
+	"encoding/json"
+	"io/ioutil"
+
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 	pkgerrors "github.com/pkg/errors"
-	"io/ioutil"
 )
 
 // resource consists of name of reource
 type resource struct {
 	name        string
-	filecontent []byte
+	filecontent string
 }
 
 type contextForCompositeApp struct {
@@ -81,17 +83,27 @@ func getResources(st []helm.KubernetesResourceTemplate) ([]resource, error) {
 		}
 		n := yamlStruct.Metadata.Name + SEPARATOR + yamlStruct.Kind
 
-		resources = append(resources, resource{name: n, filecontent: yamlFile})
+		resources = append(resources, resource{name: n, filecontent: string(yamlFile)})
 
 		log.Info(":: Added resource into resource-order ::", log.Fields{"ResourceName": n})
 	}
 	return resources, nil
 }
 
-func addResourcesToCluster(ct appcontext.AppContext, ch interface{}, resources []resource, resourceOrder []string) error {
+func addResourcesToCluster(ct appcontext.AppContext, ch interface{}, resources []resource) error {
+
+	var resOrderInstr struct {
+		Resorder []string `json:"resorder"`
+	}
+
+	var resDepInstr struct {
+		Resdep map[string]string `json:"resdependency"`
+	}
+	resdep := make(map[string]string)
 
 	for _, resource := range resources {
-		resourceOrder = append(resourceOrder, resource.name)
+		resOrderInstr.Resorder = append(resOrderInstr.Resorder, resource.name)
+		resdep[resource.name] = "go"
 		_, err := ct.AddResource(ch, resource.name, resource.filecontent)
 		if err != nil {
 			cleanuperr := ct.DeleteCompositeApp()
@@ -100,7 +112,11 @@ func addResourcesToCluster(ct appcontext.AppContext, ch interface{}, resources [
 			}
 			return pkgerrors.Wrapf(err, "Error adding resource ::%s to AppContext", resource.name)
 		}
-		_, err = ct.AddInstruction(ch, "resource", "order", resourceOrder)
+		jresOrderInstr, _ := json.Marshal(resOrderInstr)
+		resDepInstr.Resdep = resdep
+		jresDepInstr, _ := json.Marshal(resDepInstr)
+		_, err = ct.AddInstruction(ch, "resource", "order", string(jresOrderInstr))
+		_, err = ct.AddInstruction(ch, "resource", "dependency", string(jresDepInstr))
 		if err != nil {
 			cleanuperr := ct.DeleteCompositeApp()
 			if cleanuperr != nil {
@@ -120,7 +136,6 @@ func addClustersToAppContext(l gpic.ClusterList, ct appcontext.AppContext, appHa
 	for _, c := range mc {
 		p := c.ProviderName
 		n := c.ClusterName
-		var resourceOrder []string
 		clusterhandle, err := ct.AddCluster(appHandle, p+SEPARATOR+n)
 		if err != nil {
 			cleanuperr := ct.DeleteCompositeApp()
@@ -130,7 +145,7 @@ func addClustersToAppContext(l gpic.ClusterList, ct appcontext.AppContext, appHa
 			return pkgerrors.Wrapf(err, "Error adding Cluster(provider::%s and name::%s) to AppContext", p, n)
 		}
 
-		err = addResourcesToCluster(ct, clusterhandle, resources, resourceOrder)
+		err = addResourcesToCluster(ct, clusterhandle, resources)
 		if err != nil {
 			return pkgerrors.Wrapf(err, "Error adding Resources to Cluster(provider::%s and name::%s) to AppContext", p, n)
 		}
@@ -144,7 +159,6 @@ func addClustersToAppContext(l gpic.ClusterList, ct appcontext.AppContext, appHa
 			p := eachCluster.ProviderName
 			n := eachCluster.ClusterName
 
-			var resourceOrder []string
 			clusterhandle, err := ct.AddCluster(appHandle, p+SEPARATOR+n)
 
 			if err != nil {
@@ -164,7 +178,7 @@ func addClustersToAppContext(l gpic.ClusterList, ct appcontext.AppContext, appHa
 				return pkgerrors.Wrapf(err, "Error adding Cluster(provider::%s and name::%s) to AppContext", p, n)
 			}
 
-			err = addResourcesToCluster(ct, clusterhandle, resources, resourceOrder)
+			err = addResourcesToCluster(ct, clusterhandle, resources)
 			if err != nil {
 				return pkgerrors.Wrapf(err, "Error adding Resources to Cluster(provider::%s, name::%s and groupName:: %s) to AppContext", p, n, gn)
 			}

@@ -1,0 +1,97 @@
+#/* Copyright 2020 Intel Corporation, Inc
+# *
+# * Licensed under the Apache License, Version 2.0 (the "License");
+# * you may not use this file except in compliance with the License.
+# * You may obtain a copy of the License at
+# *
+# *     http://www.apache.org/licenses/LICENSE-2.0
+# *
+# * Unless required by applicable law or agreed to in writing, software
+# * distributed under the License is distributed on an "AS IS" BASIS,
+# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# * See the License for the specific language governing permissions and
+# * limitations under the License.
+# */
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.matadata.name }}
+  namespace: {{ .Values.metadate.namespace }}
+  labels:
+    sdewanPurpose: {{ .Values.matadata.labels.sdewanPurpose }}
+spec:
+  progressDeadlineSeconds: {{ .Values.spec.progressDeadlineSeconds }}
+  replicas: {{ .Values.spec.replicas }}
+  selector:
+    matchLabels:
+      sdewanPurpose: {{ .Values.spec.selector.matchLabels.sdewanPurpose }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.spec.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.spec.strategy.rollingUpdate.maxUnavailable }}
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        k8s.plugin.opnfv.org/nfn-network: |-
+          { "type": "ovn4nfv", "interface": [
+            {
+              "defaultGateway": "false",
+              "interface": "net1",
+              "name": "ovn-net1"
+            },
+            {
+              "defaultGateway": "false",
+              "interface": "net2",
+              "name": "ovn-net2"
+            }
+          ]}
+        k8s.v1.cni.cncf.io/networks: '[{ "name": "ovn-networkobj"}]'
+      labels:
+        sdewanPurpose: cnf1
+    spec:
+      containers:
+      - command:
+              #- sleep
+              #- "3600"
+        - /bin/sh
+        - /tmp/sdewan/entrypoint.sh
+        image: {{ .Values.spec.template.spec.containers.image }} 
+        imagePullPolicy: {{ .Values.spec.template.spec.containers.imagePullPolicy }}
+        name: {{ .Values.spec.template.spec.containers.name }}
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+        securityContext:
+          privileged: {{ .Values.spec.template.spec.containers.securityContext.privileged }}
+          procMount: {{ .Values.spec.template.spec.containers.securityContext.procMount }}
+        volumeMounts:
+        - mountPath: /tmp/sdewan
+          name: sdewan-sh
+          readOnly: true
+        - mountPath: /tmp/podinfo
+          name: podinfo
+          readOnly: true
+      nodeSelector:
+        node-role.kubernetes.io/master: {{ .Values.spec.template.spec.nodeSelector.node-role.kubernetes.io/master }}
+      restartPolicy: {{ .Values.spec.template.spec.restartPolicy }}
+      volumes:
+      - configMap:
+          defaultMode: {{ .Values.spec.template.spec.volumes.configMap.defaultMode }}
+          name: sdewan-sh
+        name: sdewan-sh
+      - name: podinfo
+        downwardAPI:
+          items:
+            - path: "annotations"
+              fieldRef:
+                fieldPath: metadata.annotations
+

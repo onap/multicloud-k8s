@@ -1,0 +1,67 @@
+# Default values for cnf.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+net1:
+  name: ovn-net1
+  ipv4Subnets:
+    subnet: 172.16.44.0/24
+    name: subnet1
+    gateway: 172.16.44.1/24
+
+net2:
+  name: ovn-net2
+  ipv4Subnets:
+    subnet: 172.16.45.0/24
+    name: subnet1
+    gateway: 172.16.45.1/24
+
+metadata:
+  name: cnf1
+  namespace: default
+  labels:
+    sdewanPurpose: cnf1
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  selector:
+    matchLabels:
+      sdewanPurpose: cnf1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      annotations:
+        k8s.plugin.opnfv.org/nfn-network: |-
+          { "type": "ovn4nfv", "interface": [
+            {
+              "defaultGateway": "false",
+              "interface": "net1",
+              "name": "ovn-net1"
+            },
+            {
+              "defaultGateway": "false",
+              "interface": "net2",
+              "name": "ovn-net2"
+            }
+          ]}
+        k8s.v1.cni.cncf.io/networks: '[{ "name": "ovn-networkobj"}]'
+      labels:
+        sdewanPurpose: cnf1
+    spec:
+      containers:
+        image: integratedcloudnative/openwrt:dev
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          procMount: Default
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      restartPolicy: Always
+      volumes:
+      - configMap:
+          defaultMode: 420
+      - name: podinfo
+

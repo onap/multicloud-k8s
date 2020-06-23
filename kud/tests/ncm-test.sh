@@ -5,8 +5,27 @@ set -o pipefail
 
 source _functions.sh
 
-base_url_clm=${base_url:-"http://localhost:9019/v2"}
-base_url_ncm=${base_url:-"http://localhost:9016/v2"}
+base_url_clm=${base_url:-"http://10.10.10.6:31044/v2"}
+base_url_ncm=${base_url:-"http://10.10.10.6:31983/v2"}
+base_url_orchestrator=${base_url:-"http://10.10.10.6:30186/v2"}
+
+# add the rsync controller entry
+rsynccontrollername="rsync"
+rsynccontrollerdata="$(cat<<EOF
+{
+  "metadata": {
+    "name": "rsync",
+    "description": "description of $rsynccontrollername controller",
+    "userData1": "$rsynccontrollername user data 1",
+    "userData2": "$rsynccontrollername user data 2"
+  },
+  "spec": {
+    "host": "${rsynccontrollername}",
+    "port": 9041 
+  }
+}
+EOF
+)"
 
 # ncm data samples
 clusterprovidername="cluster-provider-a"
@@ -22,7 +41,7 @@ clusterproviderdata="$(cat<<EOF
 EOF
 )"
 
-clustername="cluster-a"
+clustername="edge01"
 clusterdata="$(cat<<EOF
 {
   "metadata": {
@@ -143,6 +162,9 @@ providernetworkdata="$(cat<<EOF
 EOF
 )"
 
+function createOrchData {
+    call_api -d "${rsynccontrollerdata}" "${base_url_orchestrator}/controllers"
+}
 
 function createNcmData {
     call_api -d "${clusterproviderdata}" "${base_url_clm}/cluster-providers"
@@ -163,14 +185,22 @@ function terminateNcmData {
     call_api -d "{ }" "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/terminate"
 }
 
-function getNcmData {
-    call_api "${base_url_clm}/cluster-providers/${clusterprovidername}" | jq .
-    call_api -H "Accept: application/json" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}" | jq .
-    call_api "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters?label=${labelname}" | jq .
-    call_api "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/kv-pairs/${kvname}" | jq .
-    call_api "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/networks/${networkname}" | jq .
-    call_api "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/provider-networks/${providernetworkname}" | jq .
+function getOrchData {
+    call_api_nox "${base_url_orchestrator}/controllers"
+}
 
+function getNcmData {
+    call_api_nox "${base_url_clm}/cluster-providers/${clusterprovidername}"
+    call_api_nox -H "Accept: application/json" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
+    call_api_nox "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters?label=${labelname}"
+    call_api_nox "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/kv-pairs/${kvname}"
+    call_api_nox "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/networks/${networkname}"
+    call_api_nox "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/provider-networks/${providernetworkname}"
+
+}
+
+function deleteOrchData {
+    call_api -X DELETE "${base_url_orchestrator}/controllers/${rsynccontrollername}" | jq .
 }
 
 function deleteNcmData {
@@ -183,7 +213,7 @@ function deleteNcmData {
 }
 
 function usage {
-    echo "Usage: $0  create|apply|get|terminate|delete"
+    echo "Usage: $0  create|creatersync|apply|get|getrsync|terminate|delete|deletersync"
     exit
 }
 
@@ -193,10 +223,13 @@ if [ "$#" -ne 1 ] ; then
 fi
 
 case "$1" in
+    "creatersync" ) createOrchData ;;
     "create" ) createNcmData ;;
     "apply" ) applyNcmData ;;
     "terminate" ) terminateNcmData ;;
     "get" )    getNcmData ;;
+    "getrsync" )    getOrchData ;;
     "delete" ) deleteNcmData ;;
+    "deletersync" ) deleteOrchData ;;
     *) usage ;;
 esac

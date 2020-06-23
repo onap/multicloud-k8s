@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sink.fullname" . }}
+  labels:
+    release: {{ .Release.Name }}
+    app: {{ include "sink.name" . }}
+    chart: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "sink.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "sink.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.sinkrepo }}:{{ .Values.image.sinktag }}"
+        envFrom:
+        - configMapRef:
+            name: {{ include "sink.name" . }}-configmap
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        tty: true
+        stdin: true
+        securityContext:
+          privileged: true
+      - name: darkstat
+        image:  "{{ .Values.image.darkstatrepo }}:{{ .Values.image.darkstattag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        tty: true
+        stdin: true
+        ports:
+          - containerPort: {{ .Values.service.ports.port }}

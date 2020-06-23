@@ -1,0 +1,3147 @@
+
+openapi: 3.0.2
+info:
+  version: '2.0.0'
+
+  title: EMCO
+
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  x-logo:
+    url: 'https://redocly.github.io/openapi-template/logo.png'
+
+  description: |
+    EMCO - Edge Multi Cluster Orchestrator
+    # Introduction
+    Application Orchestration - For applications and services delivered across multiple administrative infrastructures
+
+externalDocs:
+  description: Wiki for the API's.
+  url: 'https://wiki.onap.org/display/DW/V2+API+Specification'
+
+tags:
+  - name: v2
+    description: |
+     V2 API's
+
+paths:
+  ############################ Project API'S #################################################
+  /projects:
+    post:
+      tags:
+        - Projects
+      summary: Project
+      description: Add a new `project`
+      operationId: addProject
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Metadata'
+        description: Project data
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Projects
+      summary: Get all projects
+
+      description: |
+        Get all `projects`
+
+      operationId: getAllProjects
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/MetadataArray'
+        '404':
+          description: No Project found
+          content: {}
+
+  /projects/{project-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Projects
+      summary: Get project by project name
+
+      description: |
+        Get `project`
+
+      operationId: getProjectByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Project not found
+          content: {}
+    put:
+      tags:
+        - Projects
+      summary: Update project
+      description: Update `project`
+      operationId: updateProject
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Project not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        description: Update project object
+        required: true
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Projects
+      summary: Delete project by project name
+
+      description: |
+        Delete `project`
+
+      operationId: deleteProjectByName
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Project not found
+          content: {}
+
+  ############################ Application API'S #################################################
+  /projects/{project-name}/composite-apps:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+    post:
+      tags:
+        - Composite Application
+      summary: Add Composite Application
+      description: Add a new `composite application`
+      operationId: addCompositeApplication
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompositeAppVersion'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompositeAppVersion'
+        description: Composite application definition
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Application
+      summary: Get all Composite Applications
+
+      description: |
+        Get all `composite applications`
+
+      operationId: getAllCompositeApplications
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/CompositeAppVersionArray'
+        '404':
+          description: No Composite App found
+          content: {}
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Application
+      summary: Get Composite Application
+
+      description: |
+        Get `composite application`
+
+      operationId: getCompositeApplicationByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/CompositeAppVersion'
+        '404':
+          description: Composite Application not found
+          content: {}
+    put:
+      tags:
+        - Composite Application
+      summary: Update a Composite Application
+      description: Update a `Composite Application`
+      operationId: updateCompositeApplication
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/CompositeAppVersion'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Composite Application not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompositeAppVersion'
+        description: Composite application definition
+        required: true
+
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Composite Application
+      summary: Delete Composite Application
+
+      description: |
+        Delete `Composite Application`
+
+      operationId: deleteCompositeAppByName
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Composite Application not found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/apps:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+    post:
+      tags:
+        - Composite Application
+      summary: Add app to Composite Application
+      description: Add a new  `app to composite application`
+      operationId: addAppToCompositeApplication
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '405':
+          description: Invalid Input
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/AppData'
+        required: true
+
+    put:
+      tags:
+        - Composite Application
+      summary: Update app in Composite Application
+      description: Update app in `Composite Application`
+      operationId: updateAppToCompositeApplication
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Application not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/AppData'
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Application
+      summary: Get all apps in Composite Application
+
+      description: |
+        Get all `apps in composite application`
+
+      operationId: getAllAppsInCompositeApplication
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/MetadataArray'
+        '404':
+          description: No Apps found in Composite Application  found
+          content: {}
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/apps/{app-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/appName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Application
+      summary: Get Application
+
+      description: |
+        Get `application`
+
+      operationId: getAppCompositeApplication
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+            application/octet-stream: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/File'
+            multipart/form-data: # Media type
+              schema:            # Request payload
+                $ref: '#/components/schemas/AppData'
+
+        '404':
+          description: Application not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Composite Application
+      summary: Delete Application
+
+      description: |
+        Delete `application`
+
+      operationId: deleteAppToCompositeApplication
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Application not found
+          content: {}
+
+############################ PROFILE API'S #################################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+    post:
+      tags:
+        - Composite Profile
+      summary: Add Composite Profile
+      description: Add a new `composite profile`
+      operationId: addCompositeProfile
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        description: Composite Profile definition
+        required: true
+
+    put:
+      tags:
+        - Composite Profile
+      summary: Update Composite Profile
+      description: Update `Composite Profile`
+      operationId: updateCompositeProfile
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Composite Profile not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        description: Composite Profile definition
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Profile
+      summary: Get all Composite Profiles
+
+      description: |
+        Get all `profiles in a composite application`
+
+      operationId: getAllProfilesInCompositeApplication
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/MetadataArray'
+        '404':
+          description: No composite profile found
+          content: {}
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/composite-profile/{composite-profile-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/compositeProfileName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Profile
+      summary: Get Composite Application
+
+      description: |
+        Get `composite profile`
+
+      operationId: getCompositeProfileByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Composite Profile not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Composite Profile
+      summary: Delete Composite Profile
+
+      description: |
+        Delete `Composite Profile`
+
+      operationId: deleteCompositeProfileByName
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Composite Profile not found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profile/{composite-profile-name}/profiles:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/compositeProfileName'
+    post:
+      tags:
+        - Composite Profile
+      summary: Add app profile to Composite Profile
+      description: Add a `profile for application`
+      operationId: addProfileToCompositeProfile
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ProfileAppSpec'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/AppData'
+    put:
+      tags:
+        - Composite Profile
+      summary: Update Composite Profile for an app
+      description: Update `Profile`
+      operationId: updateProfile
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ProfileAppSpec'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Profile not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/AppData'
+        required: true
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Profile
+      summary: Get all app profiles in Composite Profiles
+
+      description: |
+        Get all `app profiles in a composite Profile`
+
+      operationId: getAllProfilesInCompositeProfile
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ProfileAppSpecArray'
+        '404':
+          description: No profile found
+          content: {}
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/composite-profile/{composite-profile-name}/profiles/{profile-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/compositeProfileName'
+      - $ref: '#/components/parameters/profileName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Profile
+      summary: Get profile from Composite Profile
+
+      description: |
+        Get `profile from composite profile`
+
+      operationId: getProfile
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ProfileAppSpec'
+            application/octet-stream: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/File'
+            multipart/form-data: # Media type
+              schema:            # Request payload
+                $ref: '#/components/schemas/AppData'
+
+        '404':
+          description: Profile not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Composite Profile
+      summary: Delete Profile
+
+      description: |
+        Delete `profile in Composite Profile`
+
+      operationId: deleteProfile
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Profile not found
+          content: {}
+
+  # Qurey for Profile - Get profile for app-name
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/composite-profile/{composite-profile-name}/profiles:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/compositeProfileName'
+      - in: query
+        name: app-name
+        schema:
+          type: string
+          maxLength: 128
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Profile
+      summary: Query profile for an application
+
+      description: |
+        Query `profile for an application`
+
+      operationId: queryProfileForApp
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ProfileAppSpec'
+            application/octet-stream: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/File'
+            multipart/form-data: # Media type
+              schema:            # Request payload
+                $ref: '#/components/schemas/AppData'
+        '404':
+          description: Profile for application not found
+          content: {}
+
+
+############################ GENERIC PLACEMENT INTENT API'S #################################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+    post:
+      tags:
+        - Generic Placement Intent
+      summary: Add Generic Placement Intent
+      description: Add a new `generic placement intent`
+      operationId: addGenericPlacementIntent
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntent'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericPlacementIntent'
+        description: Generic Placement Intent definition
+        required: true
+
+    put:
+      tags:
+        - Generic Placement Intent
+      summary: Update Generic Placement Intent
+      description: Update `Generic Placement Intent`
+      operationId: updateGenericPlacementIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericPlacementIntent'
+        description: Generic Placement Intent definition
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get all Generic Placement Intents
+
+      description: |
+        Get all `Generic Placement Intents`
+
+      operationId: getAllGenericPlacementIntents
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntentArray'
+        '404':
+          description: No Generic Placement Intent found
+          content: {}
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get Generic Placement Intent
+
+      description: |
+        Get `generic placement intent`
+
+      operationId: getGenericPlacementIntentByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntent'
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Delete Generic Placement Intent
+
+      description: |
+        Delete `Generic Placement Intent`
+
+      operationId: deleteGenericPlacementIntentByName
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+    post:
+      tags:
+        - Generic Placement Intent
+      summary: Add intent for an application
+      description: Add a `intent for application`
+      operationId: addIntentToGenericPlacementIntent
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/GenericPlacementAppIntent'
+    put:
+      tags:
+        - Generic Placement Intent
+      summary: Update intent for an application
+      description: Update `generic placement intent for application`
+      operationId: updateIntentToGenericPlacementIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic placement intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+         application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/GenericPlacementAppIntent'
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get all Intents in Generic Placement
+
+      description: |
+        Get all ` Intents in Generic Placement Intent`
+
+      operationId: getAllIntentsInGenericPlacementIntents
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntentArray'
+        '404':
+          description: No Generic Placement Intent found
+          content: {}
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/{intent-name}:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - $ref: '#/components/parameters/intentName'
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get intent
+
+      description: |
+        Get `generic placement intent`
+
+      operationId: getIntentfromGenericPlacementIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+
+        '404':
+          description: Intent  not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Delete intent
+
+      description: |
+        Delete `generic placement intent`
+
+      operationId: deleteIntentFromGenericPlacementIntent
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Intent not found
+          content: {}
+
+  # Qurey for Intent - Get intent for app-name
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - in: query
+        name: app-name
+        schema:
+          type: string
+          maxLength: 128
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Query intent for an application
+
+      description: |
+        Query `generic placement intent for application`
+
+      operationId: queryIntentfromGenericPlacementIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+        '404':
+          description: Generic Placement Intent for application not found
+          content: {}
+
+############################ Deployment Intent Group API'S #################################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+    post:
+      tags:
+        - Deployment Intent Group
+      summary: Add Deployment Intent Group
+      description: Add a new `deployment intent group`
+      operationId: addDeploymentIntentGroup
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentGroupIntent'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeploymentGroupIntent'
+        description: Deployment Intent Group definition
+        required: true
+
+    put:
+      tags:
+        - Deployment Intent Group
+      summary: Update Deployment Intent Group
+      description: Update `Deployment Intent Group`
+      operationId: updateDeploymentIntentGroup
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentGroupIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Deployment Intent Group not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeploymentGroupIntent'
+        description: Deployment Intent Group definition
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Get all Deployment Intent Group
+
+      description: |
+        Get all `Deployment Intent Group`
+
+      operationId: getAllDeploymentIntentGroup
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentGroupIntentArray'
+        '404':
+          description: No Deployment Intent Group found
+          content: {}
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Get Deployment Intent Group
+
+      description: |
+        Get `Deployment Intent Group`
+
+      operationId: getDeploymentIntentGroupByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentGroupIntent'
+        '404':
+          description: Deployment Intent Group not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Delete Deployment Intent Group
+
+      description: |
+        Delete `Deployment Intent Group`
+
+      operationId: deleteDeploymentIntentGroupByName
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Deployment Intent Group not found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+    post:
+      tags:
+        - Deployment Intent Group
+      summary: Add Intent
+      description: Add `deployment Intent`
+      operationId: addIntentToDeploymentIntentGroup
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentIntent'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/DeploymentIntent'
+    put:
+      tags:
+        - Deployment Intent Group
+      summary: Update intent
+      description: Update `deployment intent`
+      operationId: updateIntentToDeploymentIntentGroup
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+         application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/DeploymentIntent'
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Get all intents in Deployment Intent Group
+
+      description: |
+        Get all `intents in deployment intent group`
+
+      operationId: getAllIntentsInDeploymentIntentGroup
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentGroupIntentArray'
+        '404':
+          description: No Deployment Intent Group found
+          content: {}
+
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/{intent-name}:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: '#/components/parameters/intentName'
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Get intent for an application
+
+      description: |
+        Get `Deployment Intent`
+
+      operationId: getIntentForDeploymentIntentGroup
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentIntent'
+
+        '404':
+          description: Deployment Intent not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Delete intent
+
+      description: |
+        Delete `intent`
+
+      operationId: deleteIntentFromDeploymentIntentGroup
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Deployment intent not found
+          content: {}
+   #Query
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - in: query
+        name: intent
+        schema:
+          type: string
+          maxLength: 128
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Query intent
+
+      description: |
+        Query `Deployment Intent`
+
+      operationId: queryIntentForDeploymentIntentGroup
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentIntent'
+        '404':
+          description: Deployment Intent not found
+          content: {}
+
+####################Lifecycle Management#######################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/approve:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+    post:
+      tags:
+        - Deployment Lifecycle
+      summary: Approve a Deployment
+      description: Approve a  Deployment
+      operationId: approveDeploymentIntentGroup
+      responses:
+        '201':
+          description: Success
+          content: {}
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/instantiate:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+    post:
+      tags:
+        - Deployment Lifecycle
+      summary: Instantiate a Deployment
+      description: Instantiate a  Deployment
+      operationId: instantiateDeploymentIntentGroup
+      responses:
+        '201':
+          description: Success
+          content: {}
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/destroy:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+    post:
+      tags:
+        - Deployment Lifecycle
+      summary: Destroy a Deployment
+      description: Destroy a  Deployment
+      operationId: destroyDeploymentIntentGroup
+      responses:
+        '200':
+          description: Success
+          content: {}
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/status:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+    post:
+      tags:
+        - Deployment Lifecycle
+      summary: Status of Deployment
+      description: Status of  Deployment
+      operationId: statusDeploymentIntentGroup
+      responses:
+        '200':
+          description: Success
+          content: {}
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content: {}
+
+############################ Controller Registration API'S #################################################
+  /controllers:
+    post:
+      tags:
+        - Controller Registration
+      summary: Controller Registration
+      description: Add a new `controller`
+      operationId: addController
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Controller'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Controller'
+        description: Controller Info
+        required: true
+    put:
+      tags:
+        - Controller Registration
+      summary: Update controller
+      description: Update `controller`
+      operationId: updateController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Controller'
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Controller not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Controller'
+        description: Update controllers object
+        required: true
+
+    get: # documentation for GET operation for this path
+          tags:
+            - Controller Registration
+          summary: Get all controllers
+
+          description: |
+            Get all `controllers`
+
+          operationId: getControllers
+          responses: # list of responses
+            '200':
+              description: Success
+              content:
+                application/json: # operation response mime type
+                  schema:
+                    $ref: '#/components/schemas/ControllerArray'
+            '404':
+              description: No controllers found
+              content: {}
+
+  /controllers/{controller-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+    - $ref: '#/components/parameters/controllerName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Controller Registration
+      summary: Get controller by name
+
+      description: |
+        Get `controller`
+
+      operationId: getController
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Controller'
+        '404':
+          description: Controller not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Controller Registration
+      summary: Delete controller
+
+      description: |
+        Delete `controller`
+
+      operationId: deleteController
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Controller not found
+          content: {}
+
+############################ Cluster Provider API'S #################################################
+  /cluster-providers:
+    post:
+      tags:
+        - Cluster Providers
+      summary: Cluster Providers
+      description: Add a new `cluster provider`
+      operationId: addClusterProvider
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Metadata'
+        description: Cluster Providers Info
+        required: true
+    put:
+      tags:
+        - Cluster Providers
+      summary: Update cluster provider
+      description: Update `cluster providers`
+      operationId: updateClusterProviders
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Cluster Provider not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        description: Update cluster provider object
+        required: true
+
+    get: # documentation for GET operation for this path
+          tags:
+            - Cluster Providers
+          summary: Get all cluster providers
+
+          description: |
+            Get all `cluster providers`
+
+          operationId: getAllClusterProviders
+          responses: # list of responses
+            '200':
+              description: Success
+              content:
+                application/json: # operation response mime type
+                  schema:
+                    $ref: '#/components/schemas/Metadata'
+            '404':
+              description: No cluster provider found
+              content: {}
+
+  /cluster-providers/{cluster-providers-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+    - $ref: '#/components/parameters/clusterProviderName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Cluster Providers
+      summary: Get cluster provider by name
+
+      description: |
+        Get `cluster provider`
+
+      operationId: getClusterProviderByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Cluster Provider not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Cluster Providers
+      summary: Delete cluster provider by name
+
+      description: |
+        Delete `cluster provider`
+
+      operationId: deleteClusterProviderByName
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Cluster Provider not found
+          content: {}
+
+  /cluster-providers/{cluster-providers-name}/clusters:
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+    post:
+      tags:
+        - Clusters
+      summary: Add Cluster
+      description: Add a new `cluster`
+      operationId: addClusterToClusterProvider
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/AppData'
+    put:
+      tags:
+        - Clusters
+      summary: Update Cluster
+      description: Update `cluster`
+      operationId: updateClusterToClusterProvider
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Cluster not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/AppData'
+        required: true
+
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Clusters
+      summary: Get Cluster
+
+      description: |
+        Get `cluster`
+
+      operationId: getClusterForClusterProvider
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+            application/octet-stream: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/File'
+            multipart/form-data: # Media type
+              schema:            # Request payload
+                $ref: '#/components/schemas/AppData'
+
+        '404':
+          description: Cluster not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Clusters
+      summary: Delete cluster
+
+      description: |
+        Delete `cluster`
+
+      operationId: deleteClusterFromClusterProvider
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Cluster not found
+          content: {}
+
+############################ Cluster Labels API'S #################################################
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/labels:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+    post:
+      tags:
+        - Clusters
+      summary: Add label to Cluster
+      description: Add a new label to `cluster`
+      operationId: addLabelToCluster
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ClusterLabel'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ClusterLabel'
+        description: Cluster Label
+        required: true
+    get: # documentation for GET operation for this path
+          tags:
+            - Clusters
+          summary: Get all Labels
+
+          description: |
+            Get all `labels`
+
+          operationId: getAllLabelsForCluster
+          responses: # list of responses
+            '200':
+              description: Success
+              content:
+                application/json: # operation response mime type
+                  schema:
+                    $ref: '#/components/schemas/ClusterLabel'
+            '404':
+              description: No labels found
+              content: {}
+
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/labels/{cluster-label-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+      - $ref: '#/components/parameters/clusterLabelName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Clusters
+      summary: Get label
+
+      description: |
+        Get `cluster label`
+
+      operationId: getLabelForCluster
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ClusterLabel'
+        '404':
+          description: label not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Clusters
+      summary: Delete cluster label
+
+      description: |
+        Delete `label`
+
+      operationId: deleteLabelForCluster
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Label not found
+          content: {}
+
+# Qurey for label - Get clusters for label
+  /cluster-providers/{cluster-providers-name}/clusters/:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - in: query
+        name: label
+        schema:
+          type: string
+          maxLength: 128
+        required: true
+    get: # documentation for GET operation for this path
+      tags:
+        - Clusters
+      summary: Get clusters for label
+
+      description: |
+        Get `clusters for label`
+      operationId: getClustersForLabel
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/MetadataArray'
+        '404':
+          description: label not found
+          content: {}
+
+############################ Cluster Key Value API'S #################################################
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/kv-pairs:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+    post:
+      tags:
+        - Clusters
+      summary: Add kv pair to Cluster
+      description: Add kv pair to `cluster`
+      operationId: addKvpairToCluster
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ClusterKv'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ClusterKv'
+        description: Cluster KV Pair
+        required: true
+    get: # documentation for GET operation for this path
+          tags:
+            - Clusters
+          summary: Get all KV Pairs
+
+          description: |
+            Get all `KV Pairs`
+
+          operationId: getAllKvpairForCluster
+          responses: # list of responses
+            '200':
+              description: Success
+              content:
+                application/json: # operation response mime type
+                  schema:
+                    $ref: '#/components/schemas/ClusterKv'
+            '404':
+              description: No labels found
+              content: {}
+
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/kv-pairs/{kv-pair-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+      - $ref: '#/components/parameters/clusterKvpairName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Clusters
+      summary: Get KV Pair
+
+      description: |
+        Get `KV pair` for cluster
+
+      operationId: getKvpairForCluster
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ClusterKv'
+        '404':
+          description: KV pair not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Clusters
+      summary: Delete cluster KV pair
+
+      description: |
+        Delete `KV pair`
+
+      operationId: deleteKvpairForCluster
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: KV pair not found
+          content: {}
+
+  #Query Key Value
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/kv-pairs/{kv-pair-name}/:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+      - $ref: '#/components/parameters/clusterKvpairName'
+      - in: query
+        name: key
+        schema:
+          type: string
+          maxLength: 128
+        required: true
+    get: # documentation for GET operation for this path
+      tags:
+        - Clusters
+      summary: Query KV Pair
+
+      description: |
+        Query `KV pair` for cluster
+
+      operationId: queryKvpairForCluster
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Kv'
+        '404':
+          description: KV pair not found
+          content: {}
+
+############################ Cluster Virtual Networks API'S #################################################
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/networks:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+    post:
+      tags:
+        - Networks
+      summary: Add virtual network in cluster
+      description: Add a `virtual network in cluster`
+      operationId: addVirtualNetworkToCluster
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/VirtualNetwork'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/VirtualNetwork'
+        description: Add virtual network
+        required: true
+    get: # documentation for GET operation for this path
+          tags:
+            - Networks
+          summary: Get all cluster virtual networks
+
+          description: |
+            Get all `virtual networks for a cluster`
+
+          operationId: getAllVirtualNetworksForCluster
+          responses: # list of responses
+            '200':
+              description: Success
+              content:
+                application/json: # operation response mime type
+                  schema:
+                    $ref: '#/components/schemas/VirtualNetwork'
+            '404':
+              description: No virtual networks found
+              content: {}
+
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/networks/{network-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+      - $ref: '#/components/parameters/clusterNetworkName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Networks
+      summary: Get virtual network
+
+      description: |
+        Get `virtual network`
+
+      operationId: getVirtualNetworkForCluster
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/VirtualNetwork'
+        '404':
+          description: Network not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Networks
+      summary: Delete virtual network
+
+      description: |
+        Delete `virtual network`
+
+      operationId: deleteVirtualNetworkForCluster
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network not found
+          content: {}
+
+############################ Cluster Provider  Networks API'S #################################################
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/provider-networks:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+    post:
+      tags:
+        - Networks
+      summary: Add provider network in cluster
+      description: Add a `provider network in cluster`
+      operationId: addProviderNetworkToCluster
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ProviderNetwork'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ProviderNetwork'
+        description: Add provider network
+        required: true
+    get: # documentation for GET operation for this path
+          tags:
+            - Networks
+          summary: Get all cluster provider networks
+
+          description: |
+            Get all `provider networks for a cluster`
+
+          operationId: getAllProviderNetworksForCluster
+          responses: # list of responses
+            '200':
+              description: Success
+              content:
+                application/json: # operation response mime type
+                  schema:
+                    $ref: '#/components/schemas/ProviderNetwork'
+            '404':
+              description: No provider networks found
+              content: {}
+
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/provider-networks/{network-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+      - $ref: '#/components/parameters/clusterNetworkName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Networks
+      summary: Get Provider Network
+
+      description: |
+        Get `provider network`
+
+      operationId: getProviderNetworkForCluster
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ProviderNetwork'
+        '404':
+          description: Provider network not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Networks
+      summary: Delete Provider Network
+
+      description: |
+        Delete `Provider Network`
+
+      operationId: deleteProviderNetworkForCluster
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Name not found
+          content: {}
+
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/apply:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+    post:
+      tags:
+        - Networks
+      summary: Apply configuration for the cluster
+      description: Apply configuration for the cluster to create networks
+      operationId: applyNetworksForCluster
+      responses:
+        '201':
+          description: Success
+          content: {}
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content: {}
+
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/terminate:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+    post:
+      tags:
+        - Networks
+      summary: Apply configuration for the cluster
+      description: Apply configuration for the cluster to create networks
+      operationId: terminateNetworksForCluster
+      responses:
+        '201':
+          description: Success
+          content: {}
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content: {}
+
+######################## Network Controller Intent API's##########################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+    post:
+      tags:
+        - Network Controller Intent
+      summary: Network Controller Intent API's
+      description: Add a new `network controller intent`
+      operationId: addNetworkControllerIntent
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+    put:
+      tags:
+        - Network Controller Intent
+      summary: Update Network Controller Intent
+      description: Update `Network Controller Intent`
+      operationId: updateNetworkControllerIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network Controller Intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json: # operation response mime type
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        required: true
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/netControlIntent'
+    get: # documentation for GET operation for this path
+      tags:
+        - Network Controller Intent
+      summary: Get Network Controller Intent
+
+      description: |
+        Get `network controller intent`
+
+      operationId: getNetworkControllerIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Network Controller Intent not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Network Controller Intent
+      summary: Delete Network Controller Intent
+
+      description: |
+        Delete `Network Controller Intent`
+
+      operationId: deleteNetworkControllerIntent
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network Controller Intent not found
+          content: {}
+################## Workload Intents##################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/netControlIntent'
+    post:
+      tags:
+        - Network Controller Intent
+      summary: Network Controller Workload Intent API's
+      description: Add a new `network controller workload intent`
+      operationId: addNetworkControllerWorkloadIntent
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadSpec'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadSpec'
+    put:
+      tags:
+        - Network Controller Intent
+      summary: Update Network Controller Workload Intent
+      description: Update `Network Controller Workload Intent`
+      operationId: updateNetworkControllerWorkloadIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadSpec'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network Controller Workload Intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json: # operation response mime type
+            schema:
+              $ref: '#/components/schemas/NetworkWorloadSpec'
+        required: true
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/netControlIntent'
+      - $ref: '#/components/parameters/netControlWorkloadIntent'
+    get: # documentation for GET operation for this path
+      tags:
+        - Network Controller Intent
+      summary: Get Network Controller Workload Intent
+
+      description: |
+        Get `network controller workload intent`
+
+      operationId: getNetworkControllerWorkloadIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadSpec'
+        '404':
+          description: Network Controller Workload Intent not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Network Controller Intent
+      summary: Delete Network Controller Workload Intent
+
+      description: |
+        Delete `Network Controller Workload Intent`
+
+      operationId: deleteNetworkControllerWorkloadIntent
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network Controller Workload Intent not found
+          content: {}
+
+################## Workload Intents Interfaces ##################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/netControlIntent'
+      - $ref: '#/components/parameters/netControlWorkloadIntent'
+    post:
+      tags:
+        - Network Controller Intent
+      summary: Network Controller Workload Interface API's
+      description: Add a new `network controller workload interface`
+      operationId: addNetworkControllerWorkloadInterface
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadInterface'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadInterface'
+    put:
+      tags:
+        - Network Controller Intent
+      summary: Update Network Controller Workload Interface
+      description: Update `Network Controller Workload Interface`
+      operationId: updateNetworkControllerWorkloadInterface
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadInterface'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network Controller Workload Interface not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json: # operation response mime type
+            schema:
+              $ref: '#/components/schemas/NetworkWorloadInterface'
+        required: true
+
+  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces/{interface-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/netControlIntent'
+      - $ref: '#/components/parameters/netControlWorkloadIntent'
+      - $ref: '#/components/parameters/netControlWorkloadInterface'
+    get: # documentation for GET operation for this path
+      tags:
+        - Network Controller Intent
+      summary: Get Network Controller Workload Interface
+
+      description: |
+        Get `network controller workload interface`
+
+      operationId: getNetworkControllerWorkloadInterface
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadInterface'
+        '404':
+          description: Network Controller Workload Interface not found
+          content: {}
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Network Controller Intent
+      summary: Delete Network Controller Workload Interface
+
+      description: |
+        Delete `Network Controller Workload Interface`
+
+      operationId: deleteNetworkControllerWorkloadInterface
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network Controller Workload Interface not found
+          content: {}
+
+
+#########################SCHEMAS####################################################
+# An object to hold reusable parts that can be used across the definition
+components:
+  schemas:
+    MetadataBase:
+      type: object
+      properties:
+        name:
+          description: Name of the resource
+          type: string
+          maxLength: 128
+          example: "ResName"
+        description:
+          description: Description for the resource
+          type: string
+          maxLength: 1024
+          example: "Resource description"
+        userData1:
+          description: User relevant data for the resource
+          type: string
+          maxLength: 512
+          example: "Some data"
+        userData2:
+          description: User relevant data for the resource
+          type: string
+          maxLength: 512
+          example: "Some more data"
+    Metadata:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+    MetadataArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Metadata'
+    VersionSpec:
+      type: object
+      properties:
+        version:
+          description: Composite Application Version
+          type: string
+          maxLength: 128
+          example: "v1"
+    CompositeAppVersion:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          $ref: '#/components/schemas/VersionSpec'
+    CompositeAppVersionArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/CompositeAppVersion'
+    File:
+      type: string
+      format: binary
+      maxLength: 1073741824
+    AppData:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        file: # Part 2 (Helm chart in tar.gz format)
+          $ref: '#/components/schemas/File'
+    ProfileAppSpec:
+      type: object
+      properties:
+        spec:
+          type: object
+          description: AppProfileSpec contains the Spec for AppProfiles
+          properties:
+            metadata:
+              $ref: '#/components/schemas/MetadataBase'
+            app-name:
+              type: string
+              description: Application Name
+              maxLength: 128
+              example: "Application1"
+              required:
+              - app-name
+    ProfileAppSpecArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProfileAppSpec'
+    ProfileAppData:
+      type: object
+      properties:
+        file: # Part 2 (Helm chart in tar.gz format)
+          $ref: '#/components/schemas/File'
+        metadata:
+            $ref: '#/components/schemas/ProfileAppSpec'
+    GenericPlacementIntent:
+      type: object
+      properties:
+        spec:
+          type: object
+          description: Spec
+          properties:
+            logical-cloud:
+              type: string
+              description: Logical Cloud to use for this intent
+              maxLength: 128
+              example: "cloud1"
+              required:
+              - logical-cloud
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+    GenericPlacementIntentArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/GenericPlacementIntent'
+    GenericPlacementAppIntentSpec:
+      type: object
+      description: ''
+      properties:
+        app-name:
+          type: string
+          maxLength: 128
+          example: "appl"
+        allOf:
+          items:
+            description: AllOf ProviderName, ClusterName, ClusterLabelName and AnyOfArray
+            properties:
+              anyOf:
+                items:
+                  description: AnyOf consists of Array of ProviderName & ClusterLabelNames
+                  properties:
+                    cluster-label-name:
+                      type: string
+                      maxLength: 128
+                      example: "east"
+                    cluster-name:
+                      type: string
+                      maxLength: 128
+                      example: "cluster1"
+                    provider-name:
+                      type: string
+                      maxLength: 128
+                      example: "provider1"
+                  type: object
+                type: array
+              cluster-label-name:
+                type: string
+                maxLength: 128
+                example: "west"
+              cluster-name:
+                type: string
+                maxLength: 128
+                example: "cluster2"
+              provider-name:
+                type: string
+                maxLength: 128
+                example: "provider2"
+            type: object
+          type: array
+        anyOf:
+          items:
+            description: AnyOf consists of Array of ProviderName & ClusterLabelNames
+            properties:
+              cluster-label-name:
+                type: string
+                maxLength: 128
+                example: "east"
+              cluster-name:
+                type: string
+                maxLength: 128
+                example: "cluster1"
+              provider-name:
+                type: string
+                maxLength: 128
+                example: "provider1"
+            type: object
+          type: array
+    GenericPlacementAppIntent:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          $ref: '#/components/schemas/GenericPlacementAppIntentSpec'
+    GenericPlacementAppIntentArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/GenericPlacementAppIntent'
+    DeploymentIntentSpec:
+      type: object
+      description: DepSpecData has profile, version, OverrideValuesObj
+      properties:
+        override-values:
+          items:
+            description: OverrideValues has appName and ValuesObj
+            properties:
+              app-name:
+                type: string
+              values:
+                additionalProperties:
+                  type: string
+                  maxLength: 128
+                type: object
+            required:
+            - app-name
+            - values
+            type: object
+          type: array
+        profile:
+          type: string
+          maxLength: 128
+        version:
+          type: string
+          maxLength: 128
+      required:
+      - profile
+      - version
+    DeploymentGroupIntent:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          $ref: '#/components/schemas/DeploymentIntentSpec'
+    DeploymentGroupIntentArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeploymentGroupIntent'
+    DeploymentIntent:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          type: object
+          description: IntentSpecData has Intent
+          properties:
+            intent:
+              additionalProperties:
+                type: string
+                maxLength: 128
+              example:
+                generic-placement-intent: gpi-name
+              type: object
+          required:
+          - intent
+    DeploymentIntentArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeploymentIntent'
+    Controller:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          type: object
+          properties:
+            host:
+              type: string
+              description: Controller reachibility information
+              maxLength: 128
+              example: "10.7.100.4"
+            port:
+              type: string
+              description: Port for controller
+              maxLength: 128
+              example: "9029"
+            type:
+              type: string
+              description: Type of controller (placement, action are 2 types supported)
+              maxLength: 48
+              example: "placement"
+            priority:
+              type: string
+              description: Priority of controller to be called
+              maxLength: 128
+              example: "4"
+          required:
+            - host
+            - port
+            - type
+            - priority
+    ControllerArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Controller'
+    ClusterLabel:
+      type: object
+      properties:
+        label-name:
+          type: string
+          description: Logical Cloud to use for this intent
+          maxLength: 128
+          example: "cluster-label-1"
+    ClusterKv:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          properties:
+            kv:
+              items:
+                additionalProperties:
+                  type: string
+                  maxLength: 128
+                type: object
+              type: array
+          required:
+          - kv
+          type: object
+      required:
+      - metadata
+      - spec
+    Kv:
+      type: object
+      properties:
+        value:
+          type: string
+          maxLength: 128
+
+    VirtualNetwork:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          properties:
+            cniType:
+              type: string
+              maxLength: 128
+            ipv4Subnets:
+              items:
+                properties:
+                  excludeIps:
+                    type: string
+                    maxLength: 1024
+                  gateway:
+                    type: string
+                    maxLength: 128
+                  name:
+                    type: string
+                    maxLength: 128
+                  subnet:
+                    type: string
+                    maxLength: 128
+                required:
+                - excludeIps
+                - gateway
+                - name
+                - subnet
+                type: object
+              type: array
+    ProviderNetwork:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          properties:
+            cniType:
+              type: string
+              maxLength: 128
+            ipv4Subnets:
+              items:
+                properties:
+                  excludeIps:
+                    type: string
+                    maxLength: 128
+                  gateway:
+                    type: string
+                    maxLength: 128
+                  name:
+                    type: string
+                    maxLength: 128
+                  subnet:
+                    type: string
+                    maxLength: 128
+                required:
+                - excludeIps
+                - gateway
+                - name
+                - subnet
+                type: object
+              type: array
+            providerNetType:
+              type: string
+              maxLength: 128
+            vlan:
+              properties:
+                logicalInterfaceName:
+                  type: string
+                  maxLength: 128
+                nodeLabelList:
+                  items:
+                    type: string
+                    maxLength: 128
+                  type: array
+                providerInterfaceName:
+                  type: string
+                  maxLength: 128
+                vlanID:
+                  type: string
+                  maxLength: 128
+                vlanNodeSelector:
+                  type: string
+                  maxLength: 128
+              required:
+              - logicalInterfaceName
+              - nodeLabelList
+              - providerInterfaceName
+              - vlanID
+              - vlanNodeSelector
+              type: object
+          required:
+          - cniType
+          - ipv4Subnets
+          - providerNetType
+          - vlan
+          type: object
+    RouteBasedChain:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          properties:
+            chainType:
+              type: string
+              maxLength: 128
+            routingSpec:
+              properties:
+                leftNetwork:
+                  items:
+                    properties:
+                      gatewayIp:
+                        type: string
+                        maxLength: 128
+                      networkName:
+                        type: string
+                        maxLength: 128
+                      subnet:
+                        type: string
+                        maxLength: 128
+                    required:
+                    - gatewayIp
+                    - networkName
+                    - subnet
+                    type: object
+                  type: array
+                namespace:
+                  type: string
+                  maxLength: 128
+                networkChain:
+                  type: string
+                  maxLength: 128
+                rightNetwork:
+                  items:
+                    properties:
+                      gatewayIp:
+                        type: string
+                        maxLength: 128
+                      networkName:
+                        type: string
+                        maxLength: 128
+                      subnet:
+                        type: string
+                        maxLength: 128
+                    required:
+                    - gatewayIp
+                    - networkName
+                    - subnet
+                    type: object
+                  type: array
+              required:
+              - leftNetwork
+              - namespace
+              - networkChain
+              - rightNetwork
+              type: object
+          required:
+          - chainType
+          - routingSpec
+          type: object
+    NetworkWorloadSpec:
+      type: object
+      properties:
+        spec:
+          type: object
+          description: Newtwork Workload Intent
+          properties:
+            metadata:
+              $ref: '#/components/schemas/MetadataBase'
+            spec:
+              type: object
+              properties:
+                application-name:
+                  type: string
+                  description: Application Name
+                  maxLength: 128
+                  example: "Application1"
+                workload-resource:
+                  type: string
+                  description: Name of the workload
+                  maxLength: 254
+                  example: "firewall"
+                type:
+                  type: string
+                  description: Type of the workload
+                  maxLength: 128
+                  example: "deployment"
+    NetworkWorloadInterface:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/MetadataBase'
+        spec:
+          type: object
+          properties:
+            interface:
+              type: string
+              description: interface Name
+              maxLength: 128
+              example: "eth0"
+            name:
+              type: string
+              description: Name of the network
+              maxLength: 128
+              example: "provider-1"
+            defaultGateway:
+              type: boolean
+              description: Is this interface default gateway
+              maxLength: 128
+              example: "false"
+            ipAddress:
+              type: string
+              description: Name of the network
+              maxLength: 128
+              example: "0.0.0.0"
+            macAddress:
+              type: string
+              description: Name of the network
+              maxLength: 128
+              example: "x.x.x.x"
+          required:
+            - interface
+            - name
+  parameters:
+    projectName:
+      name: project-name
+      in: path
+      description: Name of the project
+      required: true
+      schema:
+        type: string
+    compositeAppName:
+      name: composite-app-name
+      in: path
+      description: Name of the Composite Application
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    compositeAppVersion:
+      name: composite-app-version
+      in: path
+      description: Version of the Composite Application
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    appName:
+      name: app-name
+      in: path
+      description: Name of the Application
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    compositeProfileName:
+      name: composite-profile-name
+      in: path
+      description: Name of the Composite Profile
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    profileName:
+      name: profile-name
+      in: path
+      description: Name of the Profile
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    genericPlacementIntentName:
+      name: generic-placement-intent-name
+      in: path
+      description: Name of Generic Placement Intent
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    intentName:
+      name: intent-name
+      in: path
+      description: Name of Generic Placement Intent for application
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    deploymentIntentGroupName:
+      name: deployment-intent-group-name
+      in: path
+      description: Name of Generic Placement Intent for application
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    clusterProviderName:
+      name: cluster-providers-name
+      in: path
+      description: Name of the cluster provider
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    clusterName:
+      name: cluster-name
+      in: path
+      description: Name of the cluster
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    clusterLabelName:
+      name: cluster-label-name
+      in: path
+      description: Name of the cluster
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    clusterKvpairName:
+      name: kv-pair-name
+      in: path
+      description: Name of the cluster
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    clusterNetworkName:
+      name: network-name
+      in: path
+      description: Name of the network
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    netControlIntent:
+      name: net-control-intent
+      in: path
+      description: Name of the network
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    netControlWorkloadIntent:
+      name: workload-intent-name
+      in: path
+      description: Name of the network
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    netControlWorkloadInterface:
+      name: interface-name
+      in: path
+      description: Name of the network
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    controllerName:
+      name: controller-name
+      in: path
+      description: Controller name
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+

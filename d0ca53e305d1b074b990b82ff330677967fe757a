@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "bc0b06be_dd03f546",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-23T23:53:50Z",
+      "side": 1,
+      "message": "Yes",
+      "parentUuid": "4d64c835_43c8e81f",
+      "range": {
+        "startLine": 49,
+        "startChar": 1,
+        "endLine": 49,
+        "endChar": 23
+      },
+      "revId": "d0ca53e305d1b074b990b82ff330677967fe757a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6cdc4fd0_38f2da8d",
         "filename": "src/rsync/pkg/context/context.go",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2020-06-23T23:30:33Z",
       "side": 1,
       "message": "Can the resource be created without creating a file?",
+      "range": {
+        "startLine": 197,
+        "startChar": 2,
+        "endLine": 213,
+        "endChar": 3
+      },
+      "revId": "d0ca53e305d1b074b990b82ff330677967fe757a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "969fdd94_7a427009",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-23T23:53:50Z",
+      "side": 1,
+      "message": "The current interface and client requires file path to be passed.",
+      "parentUuid": "6cdc4fd0_38f2da8d",
       "range": {
         "startLine": 197,
         "startChar": 2,

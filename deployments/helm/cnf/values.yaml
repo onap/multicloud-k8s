@@ -1,0 +1,35 @@
+# Default values for cnf.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+metadata:
+  name: cnf1
+  namespace: default
+  labels: cnf1
+
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+
+strategy:
+  maxSurge: 25%
+  maxUnavailable: 25%
+
+nfn:
+  - defaultGateway: false
+    interface: net1
+    name: ovn-net1
+    separate: ","
+  - defaultGateway: false
+    interface: net2
+    name: ovn-net2
+    separate: ""
+
+containers:
+  image: integratedcloudnative/openwrt:dev
+  imagePullPolicy: IfNotPresent
+  name: sdewan
+
+nodeSelector: ""
+
+restartPolicy: Always

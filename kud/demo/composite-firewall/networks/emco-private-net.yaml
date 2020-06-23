@@ -1,0 +1,18 @@
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: ProviderNetwork
+metadata:
+  name: emco-private-net
+spec:
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - name: subnet1
+    subnet: 10.10.20.0/24
+    gateway: 10.10.20.1/24
+  providerNetType: VLAN
+  vlan:
+    vlanId: "102"
+    providerInterfaceName: eth1
+    logicalInterfaceName: eth1.102
+    vlanNodeSelector: specific
+    nodeLabelList:
+    - kubernetes.io/hostname=localhost

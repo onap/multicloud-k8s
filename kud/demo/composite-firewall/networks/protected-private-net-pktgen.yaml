@@ -1,0 +1,19 @@
+apiVersion: k8s.plugin.opnfv.org/v1alpha1
+kind: ProviderNetwork
+metadata:
+  name: protected-private-net
+spec:
+  cniType : ovn4nfv
+  ipv4Subnets:
+  - name: subnet1
+    subnet: 192.168.20.0/24
+    gateway: 192.168.20.100/24
+    excludeIps: 192.168.20.1..192.168.20.99
+  providerNetType: VLAN
+  vlan:
+    vlanId: "101"
+    providerInterfaceName: eth1
+    logicalInterfaceName: eth1.101
+    vlanNodeSelector: specific
+    nodeLabelList:
+    - kubernetes.io/hostname=localhost

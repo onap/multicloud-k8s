@@ -21,11 +21,8 @@ global:
   #Networks
   unprotectedNetworkName: unprotected-private-net
   protectedPrivateNetCidr: 192.168.10.0/24
-  protectedPrivateNetGw: 192.168.10.1/24
 
-  onapPrivateNetworkName: onap-private-net
-  onapPrivateNetCidr: 10.10.20.0/24
-  onapPrivateNetGw: 10.10.20.1/24
+  emcoPrivateNetworkName: emco-private-net
 
   protectedNetworkName: protected-private-net
   protectedNetCidr: 192.168.20.0/24
@@ -35,13 +32,15 @@ global:
   #vFirewall container
   vfwPrivateIp0: 192.168.10.3
   vfwPrivateIp1: 192.168.20.2
-  vfwPrivateIp2: 10.10.100.3
+  vfwPrivateIp2: 10.10.20.3
+
   #Packetgen container
-  vpgPrivateIp0: 192.168.10.2
-  vpgPrivateIp1: 10.0.100.2
+  vpgPrivateIp0: 192.168.10.200
+  vpgPrivateIp1: 10.10.20.200
+
   #Sink container
   vsnPrivateIp0: 192.168.20.3
-  vsnPrivateIp1: 10.10.100.4
+  vsnPrivateIp1: 10.10.20.4
 
   #########
   ovnMultusNetworkName: ovn-networkobj

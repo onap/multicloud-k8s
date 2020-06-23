@@ -1,19 +1,31 @@
-# Default values for firewall.
+# Default values for sink.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  repository: virtlet.cloud/ubuntu/16.04
-  tag: latest
+  sinkrepo: rtsood/onap-vfw-demo-sink
+  sinktag: 0.2.0
   pullPolicy: IfNotPresent
+  darkstatrepo: electrocucaracha/darkstat
+  darkstattag: latest
 
 nameOverride: ""
 fullnameOverride: ""
 
-resources:
-  memory: 4Gi
+service:
+#serivce port value for sink service
+  type: NodePort
+  ports:
+    port: 667
+    nodePort: 30667
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
 
 #global vars for parent and subcharts.
 global:
@@ -21,11 +33,8 @@ global:
   #Networks
   unprotectedNetworkName: unprotected-private-net
   protectedPrivateNetCidr: 192.168.10.0/24
-  protectedPrivateNetGw: 192.168.10.1/24
 
-  onapPrivateNetworkName: onap-private-net
-  onapPrivateNetCidr: 10.10.20.0/24
-  onapPrivateNetGw: 10.10.20.1/24
+  emcoPrivateNetworkName: emco-private-net
 
   protectedNetworkName: protected-private-net
   protectedNetCidr: 192.168.20.0/24
@@ -35,17 +44,18 @@ global:
   #vFirewall container
   vfwPrivateIp0: 192.168.10.3
   vfwPrivateIp1: 192.168.20.2
-  vfwPrivateIp2: 10.10.100.3
+  vfwPrivateIp2: 10.10.20.3
+
   #Packetgen container
-  vpgPrivateIp0: 192.168.10.2
-  vpgPrivateIp1: 10.0.100.2
+  vpgPrivateIp0: 192.168.10.200
+  vpgPrivateIp1: 10.10.20.200
+
   #Sink container
   vsnPrivateIp0: 192.168.20.3
-  vsnPrivateIp1: 10.10.100.4
+  vsnPrivateIp1: 10.10.20.4
 
   #########
   ovnMultusNetworkName: ovn-networkobj
   demoArtifactsVersion: 1.5.0
   dcaeCollectorIp: 10.0.4.1
   dcaeCollectorPort: 8081
-

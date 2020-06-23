@@ -88,6 +88,37 @@ function call_api {
     fi
 }
 
+function call_api_nox {
+    # this version doesn't exit the script if there's
+    # an error.
+
+    #Runs curl with passed flags and provides
+    #additional error handling and debug information
+
+    #Function outputs server response body
+    #and performs validation of http_code
+
+    local status
+    local curl_response_file="$(mktemp -p /tmp)"
+    local curl_common_flags=(-s -w "%{http_code}" -o "${curl_response_file}")
+    local command=(curl "${curl_common_flags[@]}" "$@")
+
+    echo "[INFO] Running '${command[@]}'" >&2
+    if ! status="$("${command[@]}")"; then
+        echo "[ERROR] Internal curl error! '$status'" >&2
+        cat "${curl_response_file}"
+        rm "${curl_response_file}"
+    else
+        echo "[INFO] Server replied with status: ${status}" >&2
+        if [[ "${status:0:1}" =~ [45] ]]; then
+            cat "${curl_response_file}"
+        else
+            cat "${curl_response_file}" | jq .
+        fi
+        rm "${curl_response_file}"
+    fi
+}
+
 function delete_resource {
     #Issues DELETE http call to provided endpoint
     #and further validates by following GET request

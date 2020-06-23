@@ -21,7 +21,7 @@ OVN_CENTRAL_IP_ADDRESS=${OVN_CENTRAL_IP_ADDRESS:-$(hostname -I | cut -d ' ' -f 1
 echo "Preparing inventory for ansible"
 cat <<EOL > inventory/hosts.ini
 [all]
-localhost ansible_ssh_host=${OVN_CENTRAL_IP_ADDRESS} ansible_ssh_port=22
+localhost ansible_ssh_host=${OVN_CENTRAL_IP_ADDRESS} ansible_ssh_port=22 download_run_once=False download_localhost=False download_cache_dir=/tmp/kubespray_cache retry_stagger=10
 
 [kube-master]
 localhost

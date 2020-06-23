@@ -24,8 +24,8 @@ global:
   protectedPrivateNetGw: 192.168.10.1/24
 
   onapPrivateNetworkName: onap-private-net
-  onapPrivateNetCidr: 10.10.0.0/16
-  onapPrivateNetGw: 10.10.0.1/16
+  onapPrivateNetCidr: 10.10.20.0/24
+  onapPrivateNetGw: 10.10.20.1/24
 
   protectedNetworkName: protected-private-net
   protectedNetCidr: 192.168.20.0/24

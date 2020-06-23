@@ -23,6 +23,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	client "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/contextupdateclient"
+	rsyncclient "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installappclient"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
@@ -182,10 +183,23 @@ func callGrpcForControllerList(cl []controller.Controller, mc map[string]string,
 		controller := c.Metadata.Name
 		controllerIntentName := mc[controller]
 		appContextID := fmt.Sprintf("%v", contextid)
+                fmt.Printf("GETTING ready to call controller: %v intent: %v appcontextid: %v\n", controller, controllerIntentName, appContextID)
 		err := client.InvokeContextUpdate(controller, controllerIntentName, appContextID)
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+/*
+callRsync method shall take in the app context id and invokes the rsync service via grpc
+*/
+func callRsync(contextid interface{}) error {
+	appContextID := fmt.Sprintf("%v", contextid)
+	err := rsyncclient.InvokeInstallApp(appContextID)
+	if err != nil {
+		return err
 	}
 	return nil
 }

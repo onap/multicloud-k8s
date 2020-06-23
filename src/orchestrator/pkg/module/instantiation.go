@@ -18,6 +18,7 @@ package module
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
@@ -200,11 +201,20 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	ctxval := cca.ctxval
 	compositeHandle := cca.compositeAppHandle
 
-	var appOrder []string
+	var appOrderInstr struct {
+		Apporder [] string `json:"apporder"`
+	}
+
+	var appDepInstr struct {
+		Appdep map[string]string `json:"appdependency"`
+	}
+	appdep := make(map[string]string)
 
 	// Add composite app using appContext
 	for _, eachApp := range allApps {
-		appOrder = append(appOrder, eachApp.Metadata.Name)
+		appOrderInstr.Apporder = append(appOrderInstr.Apporder, eachApp.Metadata.Name)
+		appdep[eachApp.Metadata.Name] = "go"
+
 		sortedTemplates, err := GetSortedTemplateForApp(eachApp.Metadata.Name, p, ca, v, rName, cp, overrideValues)
 
 		if err != nil {
@@ -250,7 +260,11 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		}
 
 	}
-	context.AddInstruction(compositeHandle, "app", "order", appOrder)
+	jappOrderInstr, _ := json.Marshal(appOrderInstr)
+	appDepInstr.Appdep = appdep
+	jappDepInstr, _ := json.Marshal(appDepInstr)
+	context.AddInstruction(compositeHandle, "app", "order", string(jappOrderInstr))
+	context.AddInstruction(compositeHandle, "app", "dependency", string(jappDepInstr))
 	//END: storing into etcd
 
 	// BEGIN:: save the context in the orchestrator db record
@@ -282,16 +296,19 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	log.Info("Priority Based List ", log.Fields{"PlacementControllers::": pl.pPlaCont,
 		"ActionControllers::": pl.pActCont, "mapOfControllers::": mapOfControllers})
 
+        fmt.Printf("\n ready to call placement controllers \n")
 	err = callGrpcForControllerList(pl.pPlaCont, mapOfControllers, ctxval)
 	if err != nil {
 		return err
 	}
 
+        fmt.Printf("\n ready to call delete extra clusters \n")
 	err = deleteExtraClusters(allApps, context)
 	if err != nil {
 		return err
 	}
 
+        fmt.Printf("\n ready to call action controllers \n")
 	err = callGrpcForControllerList(pl.pActCont, mapOfControllers, ctxval)
 	if err != nil {
 		return err
@@ -300,6 +317,10 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	// END: Scheduler code
 
 	// BEGIN : Rsync code
+	err = callRsync(ctxval)
+	if err != nil {
+		return err
+	}
 	// END : Rsyc code
 
 	log.Info(":: Done with instantiation... ::", log.Fields{"CompositeAppName": ca})

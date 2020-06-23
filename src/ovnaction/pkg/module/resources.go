@@ -36,7 +36,7 @@ import (
 )
 
 type NfnAnnotation struct {
-	CniType   string
+	CniType   string `json:"type"`
 	Interface []WorkloadIfIntentSpec
 }
 

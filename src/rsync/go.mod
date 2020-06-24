@@ -5,12 +5,7 @@ go 1.13
 require (
 	github.com/golang/protobuf v1.4.1
 	github.com/googleapis/gnostic v0.4.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.9.5 // indirect
-	github.com/mattn/go-isatty v0.0.4 // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4
-	go.etcd.io/bbolt v1.3.3 // indirect
 	google.golang.org/grpc v1.27.1
 	k8s.io/kubernetes v1.14.1
 )

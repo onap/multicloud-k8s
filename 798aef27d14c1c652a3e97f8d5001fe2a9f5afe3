@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "0dbe6b63_2a0cb30a",
+        "filename": "src/rsync/pkg/app/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:52:06Z",
+      "side": 1,
+      "message": "no changes?",
+      "parentUuid": "50df0165_fe2b5db9",
+      "revId": "798aef27d14c1c652a3e97f8d5001fe2a9f5afe3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d71fc28b_8b358c8d",
         "filename": "src/rsync/pkg/internal/utils.go",
         "patchSetId": 6

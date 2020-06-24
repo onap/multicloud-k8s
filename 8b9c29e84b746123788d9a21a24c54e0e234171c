@@ -36,6 +36,363 @@
     },
     {
       "key": {
+        "uuid": "06281eff_b592fee5",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "typo - profile not application",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06254846_bb413e1c",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "is it possible to show the query parameter here?",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b64fbf56_83d0c9b8",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 933,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "is it possible to show the query parameter here?",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4dc38bec_3ff787f3",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1213,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "is it possible to show the query parameter here?",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "16fcb197_b111ec2c",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1319,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "does the need to be POST instead of GET ?  (seems odd, but maybe there\u0027s a reason?)",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "69e5834c_f9fe0757",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1617,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "Missing get all clusters",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bddb5d64_3e8b6aee",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1724,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "missing PUT label",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "edac5981_6ea092f8",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1764,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "is it possible to show the query parameter here?\n\nAlso, drop the trailing \u0027/\u0027",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "55213c87_7884adca",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1782,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "the reponse to this query as currently implemented is a list of cluster names:  e.g. \n[ \"cluster1\", \"cluster2\" ]",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b1388a08_772ffd38",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1842,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "missing PUT kv-pair",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8b20ecbe_8e428472",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1887,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "is it possible to show the query parameter here?",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "16039dd9_b2d422fc",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1888,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "drop the trailing \u0027/\u0027",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c47a169a_883b2871",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1958,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "get all is going to return an array of objects:  [ {}, {} ]\n(I may not have caught this in every case)",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cf1410c8_af32ecfa",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1969,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "mising PUT network",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dc29aa3e_08f0d830",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2052,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "get all will return an array",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68261921_ab64d615",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2063,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "mising PUT provider-network",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68826d9b_c9e2f921",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2202,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "missing GET all",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1091e8c2_eb254bc7",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2302,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "missing GET all",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d599bcc8_770576c8",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2404,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "missing GET all",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93a9a16c_16cbb43f",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2466,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "current name validation (for the ones implmented) validate against kubernetes \u0027is a valid label value\u0027 - which as length of 63 max",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d91e9c03_8a8d3b38",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2476,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-24T23:36:02Z",
+      "side": 1,
+      "message": "current implmeneted length is 4096 (can be changed)",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "120cc548_4eddde2b",
         "filename": "docs/emco_apis.yaml",
         "patchSetId": 1

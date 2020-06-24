@@ -1,0 +1,5 @@
+dependencies:
+  - name: etcd-operator
+    condition: etcd-operator.enabled
+  # - name: visualization-operator
+  #   condition: visualization-operator.enabled

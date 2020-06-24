@@ -1,0 +1,52 @@
+m3dbCluster:
+  name: m3db-cluster
+  image:
+    repository: quay.io/m3db/m3dbnode
+    tag: v0.10.2
+  replicationFactor: 3
+  numberOfShards: 256
+  isolationGroups:
+    - name: us-west1-a
+      numInstances: 1
+    - name: us-west1-b
+      numInstances: 1
+    - name: us-west1-c
+      numInstances: 1
+  namespaces:
+    - name: collectd
+      preset: 10s:2d
+  configMapName: m3-configuration
+  tolerations: {}
+
+etcdCluster:
+  name: etcd
+  size: 3
+  version: 3.4.3
+  image:
+    repository: quay.io/coreos/etcd
+    tag: v3.4.3
+    pullPolicy: Always
+  enableTLS: false
+  # TLS configs
+  tls:
+    static:
+      member:
+        peerSecret: etcd-peer-tls
+        serverSecret: etcd-server-tls
+      operatorSecret: etcd-client-tls
+  ## etcd cluster pod specific values
+  ## Ref: https://github.com/coreos/etcd-operator/blob/master/doc/user/spec_examples.md#three-members-cluster-with-resource-requirement
+  pod:
+    ## Antiaffinity for etcd pod assignment
+    ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    antiAffinity: false
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    ## Node labels for etcd pod assignment
+    ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+    nodeSelector: {}

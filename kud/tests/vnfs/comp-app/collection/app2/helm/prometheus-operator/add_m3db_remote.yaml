@@ -1,0 +1,6 @@
+spec:
+  remoteWrite:
+  - url: "http://m3coordinator-m3db-cluster.training.svc.cluster.local:7201/api/v1/prom/remote/write"
+    writeRelabelConfigs:
+      - targetLabel: metrics_storage
+        replacement: m3db_remote

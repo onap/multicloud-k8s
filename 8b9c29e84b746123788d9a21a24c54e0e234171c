@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "007ee4f0_70084f13",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-24T22:14:12Z",
+      "side": 1,
+      "message": "\u0027/\u0027 missing at {project-name}composite-apps}.\nThis is missing in 14 places in the file.",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d866e530_d2267619",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-24T22:14:12Z",
+      "side": 1,
+      "message": "I think its \"composite-profiles\" not \"composite-profile\" , below reference from script.\nThis might be there in multiple places.\n\nprint_msg \"Deleting ${main_composite_profile_name}\"\ndelete_resource \"${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/composite-profiles/${main_composite_profile_name}\"",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "120cc548_4eddde2b",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2542,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-24T22:14:12Z",
+      "side": 1,
+      "message": "seems ProfileAppData is unused",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25ebbcc1_57eb256b",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2700,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-24T22:14:12Z",
+      "side": 1,
+      "message": "This seems unused.",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d92896af_1fb9a511",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2875,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-24T22:14:12Z",
+      "side": 1,
+      "message": "Seems unused.",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79e7a968_c8ad4216",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2988,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-06-24T22:14:12Z",
+      "side": 1,
+      "message": "Quotes can be removed as its boolean",
+      "revId": "8b9c29e84b746123788d9a21a24c54e0e234171c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

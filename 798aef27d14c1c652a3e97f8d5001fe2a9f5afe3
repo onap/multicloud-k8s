@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "50df0165_fe2b5db9",
+        "filename": "src/rsync/pkg/app/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-24T22:14:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a536cd4a_d069abe6",
+      "revId": "798aef27d14c1c652a3e97f8d5001fe2a9f5afe3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d71fc28b_8b358c8d",
         "filename": "src/rsync/pkg/internal/utils.go",
         "patchSetId": 6
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "caff3abc_b3b5f358",
+        "filename": "src/rsync/pkg/internal/utils.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-24T22:14:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d71fc28b_8b358c8d",
+      "revId": "798aef27d14c1c652a3e97f8d5001fe2a9f5afe3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1481e207_19970de6",
         "filename": "src/rsync/pkg/plugin/helpers.go",
         "patchSetId": 6
@@ -50,6 +86,24 @@
       "revId": "798aef27d14c1c652a3e97f8d5001fe2a9f5afe3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "990b3fd8_a56521e5",
+        "filename": "src/rsync/pkg/plugin/helpers.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-24T22:14:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1481e207_19970de6",
+      "revId": "798aef27d14c1c652a3e97f8d5001fe2a9f5afe3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -93,6 +93,30 @@
       "revId": "d0ca53e305d1b074b990b82ff330677967fe757a",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad71dc0c_f1c9b3aa",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-24T18:11:19Z",
+      "side": 1,
+      "message": "This is an expensive operation to store each resource on local storage and then read from local storage. The interface can be changed or new function can be added that doesn\u0027t require this step.",
+      "parentUuid": "969fdd94_7a427009",
+      "range": {
+        "startLine": 197,
+        "startChar": 2,
+        "endLine": 213,
+        "endChar": 3
+      },
+      "revId": "d0ca53e305d1b074b990b82ff330677967fe757a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

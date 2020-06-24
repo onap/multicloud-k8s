@@ -117,6 +117,30 @@
       "revId": "d0ca53e305d1b074b990b82ff330677967fe757a",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c358c4ae_57f7fc46",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-24T18:17:25Z",
+      "side": 1,
+      "message": "Yes, but this is a performance enhancement request and current phase is demo/poc work. We can revisit that in next phase..",
+      "parentUuid": "ad71dc0c_f1c9b3aa",
+      "range": {
+        "startLine": 197,
+        "startChar": 2,
+        "endLine": 213,
+        "endChar": 3
+      },
+      "revId": "d0ca53e305d1b074b990b82ff330677967fe757a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

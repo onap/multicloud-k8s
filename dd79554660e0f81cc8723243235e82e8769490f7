@@ -22,6 +22,30 @@
       "revId": "dd79554660e0f81cc8723243235e82e8769490f7",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eea44cbd_79bb7b08",
+        "filename": "kud/tests/cFW/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 947
+      },
+      "writtenOn": "2020-06-25T16:55:22Z",
+      "side": 1,
+      "message": "These values have been defined in the same file, e.g PROTECTED_NET_CIDR is declared in line 70. These values weren\u0027t defined before because their were using their default value declared in Dockerfile.",
+      "parentUuid": "154859dd_98778579",
+      "range": {
+        "startLine": 18,
+        "startChar": 27,
+        "endLine": 20,
+        "endChar": 34
+      },
+      "revId": "dd79554660e0f81cc8723243235e82e8769490f7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

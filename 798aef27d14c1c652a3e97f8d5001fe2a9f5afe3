@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "136a9220_92962c1a",
+        "filename": "src/rsync/pkg/app/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-06-25T01:13:46Z",
+      "side": 1,
+      "message": "Changed to clustername in patch set 8",
+      "parentUuid": "0dbe6b63_2a0cb30a",
+      "revId": "798aef27d14c1c652a3e97f8d5001fe2a9f5afe3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d71fc28b_8b358c8d",
         "filename": "src/rsync/pkg/internal/utils.go",
         "patchSetId": 6

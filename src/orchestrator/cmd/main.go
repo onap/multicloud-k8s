@@ -72,7 +72,7 @@ func main() {
 
 	tlsConfig, err := auth.GetTLSConfig("ca.cert", "server.cert", "server.key")
 	if err != nil {
-		log.Println("Error Getting TLS Configuration. Starting without TLS...")
+		log.Println("WARNING :: Getting TLS Configuration failed. Starting without TLS...")
 		log.Fatal(httpServer.ListenAndServe())
 	} else {
 		httpServer.TLSConfig = tlsConfig

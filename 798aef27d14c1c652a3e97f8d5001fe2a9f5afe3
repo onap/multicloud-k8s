@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "c5105428_fcd3889c",
+        "filename": "src/rsync/pkg/app/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-06-25T03:39:22Z",
+      "side": 1,
+      "message": "ah - my mistake - i was looking at the diff between patch 7 \u0026 8 insteead of 6 \u0026 8.",
+      "parentUuid": "136a9220_92962c1a",
+      "revId": "798aef27d14c1c652a3e97f8d5001fe2a9f5afe3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d71fc28b_8b358c8d",
         "filename": "src/rsync/pkg/internal/utils.go",
         "patchSetId": 6

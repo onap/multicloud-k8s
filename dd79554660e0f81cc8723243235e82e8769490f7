@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "154859dd_98778579",
+        "filename": "kud/tests/cFW/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-25T01:45:04Z",
+      "side": 1,
+      "message": "Why are the addresses being hard coded here?",
+      "range": {
+        "startLine": 18,
+        "startChar": 27,
+        "endLine": 20,
+        "endChar": 34
+      },
+      "revId": "dd79554660e0f81cc8723243235e82e8769490f7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

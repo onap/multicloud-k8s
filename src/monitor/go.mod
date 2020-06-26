@@ -1,18 +1,21 @@
 module github.com/onap/multicloud-k8s/src/monitor
 
+go 1.14
+
 require (
-	github.com/NYTimes/gziphandler v1.0.1 // indirect
-	github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30 // indirect
-	github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20190808131943-845cdd2aa5d7 // indirect
+	github.com/emicklei/go-restful v2.9.5+incompatible // indirect
+	github.com/go-openapi/spec v0.19.2
+	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d // indirect
+	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/operator-framework/operator-sdk v0.9.1-0.20190729152335-7a35cfc9a7cf
-	github.com/operator-framework/operator-sdk-samples v0.0.0-20190529081445-bd30254f3a7e
-	github.com/pkg/errors v0.8.1
 	github.com/spf13/pflag v1.0.3
+	golang.org/x/net v0.0.0-20190812203447-cdfb69ac37fc // indirect
 	k8s.io/api v0.0.0-20190814101207-0772a1bdf941
-	k8s.io/apiextensions-apiserver v0.0.0-20190228180357-d002e88f6236
 	k8s.io/apimachinery v0.0.0-20190814100815-533d101be9a6
 	k8s.io/client-go v11.0.0+incompatible
-	k8s.io/sample-controller v0.0.0-20190814141925-f27ac7da6c3e // indirect
+	k8s.io/gengo v0.0.0-20190813173942-955ffa8fcfc9 // indirect
+	k8s.io/klog v0.4.0 // indirect
+	k8s.io/kube-openapi v0.0.0-20190709113604-33be087ad058
 	sigs.k8s.io/controller-runtime v0.1.12
 	sigs.k8s.io/controller-tools v0.1.10
 )
@@ -33,8 +36,4 @@ replace (
 )
 
 // Remove hg dependency using this mirror
-replace bitbucket.org/ww/goautoneg => github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30
-
 replace github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.9.0
-
-replace git.apache.org/thrift.git => github.com/apache/thrift v0.12.0

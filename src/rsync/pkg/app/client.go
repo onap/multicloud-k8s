@@ -30,7 +30,6 @@ import (
 	"github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
 )
 
-const basePath string = "/tmp/rsync/"
 
 // KubernetesClient encapsulates the different clients' interfaces
 // we need when interacting with a Kubernetes cluster
@@ -44,45 +43,25 @@ type KubernetesClient struct {
 
 // getKubeConfig uses the connectivity client to get the kubeconfig based on the name
 // of the clustername. This is written out to a file.
-func (k *KubernetesClient) getKubeConfig(clustername string, id string) (string, error) {
+func (k *KubernetesClient) getKubeConfig(clustername string, id string) ([]byte, error) {
 
 	if !strings.Contains(clustername, "+") {
-		return "", pkgerrors.New("Not a valid cluster name")
+		return nil, pkgerrors.New("Not a valid cluster name")
 	}
 	strs := strings.Split(clustername, "+")
 	if len(strs) != 2 {
-		return "", pkgerrors.New("Not a valid cluster name")
+		return nil, pkgerrors.New("Not a valid cluster name")
 	}
 	kubeConfig, err := cluster.NewClusterClient().GetClusterContent(strs[0], strs[1])
 	if err != nil {
-		return "", pkgerrors.New("Get kubeconfig failed")
+		return nil, pkgerrors.New("Get kubeconfig failed")
 	}
 
-	var kubeConfigPath string = basePath + id + "/" + clustername + "/"
-
-	if _, err := os.Stat(kubeConfigPath); os.IsNotExist(err) {
-		err = os.MkdirAll(kubeConfigPath, 0755)
-			if err != nil {
-				return "", err
-			}
-	}
-	kubeConfigPath = kubeConfigPath + "config"
-
-	f, err := os.Create(kubeConfigPath)
-	defer f.Close()
-	if err != nil {
-		return "", err
-	}
 	dec, err := base64.StdEncoding.DecodeString(kubeConfig.Kubeconfig)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	_, err = f.Write(dec)
-	if err != nil {
-		return "", err
-	}
-
-	return kubeConfigPath, nil
+	return dec, nil
 }
 
 // init loads the Kubernetes configuation values stored into the local configuration file
@@ -97,15 +76,12 @@ func (k *KubernetesClient) Init(clustername string, iid string) error {
 
 	k.instanceID = iid
 
-	configPath, err := k.getKubeConfig(clustername, iid)
+	configData, err := k.getKubeConfig(clustername, iid)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get kubeconfig file")
 	}
 
-	//Remove kubeconfigfile after the clients are created
-	defer os.Remove(configPath)
-
-	config, err := clientcmd.BuildConfigFromFlags("", configPath)
+	config, err := clientcmd.RESTConfigFromKubeConfig(configData)
 	if err != nil {
 		return pkgerrors.Wrap(err, "setConfig: Build config from flags raised an error")
 	}

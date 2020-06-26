@@ -474,7 +474,7 @@ alertmanager:
 ## Using default values from https://github.com/helm/charts/blob/master/stable/grafana/values.yaml
 ##
 grafana:
-  enabled: false
+  enabled: true
 
   ## Deploy default dashboards.
   ##
@@ -1723,15 +1723,21 @@ prometheus:
     ## The remote_read spec configuration for Prometheus.
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotereadspec
     remoteRead: []
-    # - url: http://remote1/read
+    # # - url: http://remote1/read
+    #   - url: "http://m3coordinator-m3db-cluster.training.svc.cluster.local:7201/api/v1/prom/remote/read"
+    #     read_recent: true
 
     ## The remote_write spec configuration for Prometheus.
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotewritespec
-    remoteWrite: []
+    remoteWrite: 
     # - url: http://remote1/push
+      - url: "http://m3coordinator-m3db-cluster.training.svc.cluster.local:7201/api/v1/prom/remote/write"
+        writeRelabelConfigs:
+          - targetLabel: metrics_storage
+            replacement: m3db_remote
 
     ## Enable/Disable Grafana dashboards provisioning for prometheus remote write feature
-    remoteWriteDashboards: false
+    remoteWriteDashboards: true
 
     ## Resource limits & requests
     ##
@@ -1763,7 +1769,13 @@ prometheus:
     ## The scrape configuraiton example below will find master nodes, provided they have the name .*mst.*, relabel the
     ## port to 2379 and allow etcd scraping provided it is running on all Kubernetes master nodes
     ##
-    additionalScrapeConfigs: []
+    additionalScrapeConfigs: 
+      - job_name: 'm3db'
+        static_configs:
+          - targets: ['m3db-cluster-rep0-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004','m3db-cluster-rep1-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004', 'm3db-cluster-rep2-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004']
+      - job_name: 'm3coordinator'
+        static_configs:
+          - targets: ['m3db-cluster-rep0-0.m3dbnode-m3db-cluster.training.svc.cluster.local:7203']
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
     #     - role: node

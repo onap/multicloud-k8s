@@ -1,0 +1,7 @@
+kubectl label node/otconap6 failure-domain.beta.kubernetes.io/region=us-west1
+kubectl label node/otconap11 failure-domain.beta.kubernetes.io/region=us-west1
+kubectl label node/otccloud02 failure-domain.beta.kubernetes.io/region=us-west1
+
+kubectl label node/otconap6 failure-domain.beta.kubernetes.io/zone=us-west1-a --overwrite=true
+kubectl label node/otconap11 failure-domain.beta.kubernetes.io/zone=us-west1-b --overwrite=true
+kubectl label node/otccloud02 failure-domain.beta.kubernetes.io/zone=us-west1-c --overwrite=true

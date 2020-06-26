@@ -33,8 +33,5 @@ replace (
 )
 
 // Remove hg dependency using this mirror
-replace bitbucket.org/ww/goautoneg => github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30
-
 replace github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.9.0
 
-replace git.apache.org/thrift.git => github.com/apache/thrift v0.12.0

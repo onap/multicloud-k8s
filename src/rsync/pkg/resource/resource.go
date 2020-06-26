@@ -29,7 +29,7 @@ type Resource struct {
 }
 
 // Create deployment object in a specific Kubernetes cluster
-func (r Resource) Create(yamlFilePath string, namespace string, client connector.KubernetesConnector) (string, error) {
+func (r Resource) Create(data string, namespace string, client connector.KubernetesConnector) (string, error) {
 	if namespace == "" {
 		namespace = "default"
 	}
@@ -37,7 +37,7 @@ func (r Resource) Create(yamlFilePath string, namespace string, client connector
 	//Decode the yaml file to create a runtime.Object
 	unstruct := &unstructured.Unstructured{}
 	//Ignore the returned obj as we expect the data in unstruct
-	_, err := utils.DecodeYAML(yamlFilePath, unstruct)
+	_, err := utils.DecodeYAMLData(data, unstruct)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Decode deployment object error")
 	}
@@ -85,7 +85,7 @@ func (r Resource) Create(yamlFilePath string, namespace string, client connector
 }
 
 // Delete an existing resource hosted in a specific Kubernetes cluster
-func (r Resource) Delete(yamlFilePath string, resname string, namespace string, client connector.KubernetesConnector) error {
+func (r Resource) Delete(data string, resname string, namespace string, client connector.KubernetesConnector) error {
         if namespace == "" {
                 namespace = "default"
         }
@@ -93,7 +93,7 @@ func (r Resource) Delete(yamlFilePath string, resname string, namespace string, 
         //Decode the yaml file to create a runtime.Object
         unstruct := &unstructured.Unstructured{}
         //Ignore the returned obj as we expect the data in unstruct
-        _, err := utils.DecodeYAML(yamlFilePath, unstruct)
+        _, err := utils.DecodeYAMLData(data, unstruct)
         if err != nil {
                 return pkgerrors.Wrap(err, "Decode deployment object error")
         }

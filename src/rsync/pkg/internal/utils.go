@@ -23,8 +23,8 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 )
 
-// DecodeYAML reads a YAMl file to extract the Kubernetes object definition
-func DecodeYAML(path string, into runtime.Object) (runtime.Object, error) {
+// DecodeYAMLFile reads a YAMl file to extract the Kubernetes object definition
+func DecodeYAMLFile(path string, into runtime.Object) (runtime.Object, error) {
 	if _, err := os.Stat(path); err != nil {
 		if os.IsNotExist(err) {
 			return nil, pkgerrors.New("File " + path + " not found")
@@ -40,6 +40,17 @@ func DecodeYAML(path string, into runtime.Object) (runtime.Object, error) {
 
 	decode := scheme.Codecs.UniversalDeserializer().Decode
 	obj, _, err := decode(rawBytes, nil, into)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Deserialize YAML error")
+	}
+
+	return obj, nil
+}
+
+// DecodeYAMLData reads a string to extract the Kubernetes object definition
+func DecodeYAMLData(data string, into runtime.Object) (runtime.Object, error) {
+	decode := scheme.Codecs.UniversalDeserializer().Decode
+	obj, _, err := decode([]byte(data), nil, into)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Deserialize YAML error")
 	}

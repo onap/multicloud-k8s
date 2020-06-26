@@ -20,7 +20,6 @@ import (
 	"encoding/json"
         "fmt"
         "log"
-        "os"
         "sync"
         "strings"
         "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
@@ -49,8 +48,6 @@ type instMap struct {
 	rerr    error
 	clusters []clusterInfo
 }
-
-const basePath string = "/tmp/rsync/"
 
 func getInstMap(order string, dependency string, level string) ([]instMap, error) {
 
@@ -97,10 +94,10 @@ func deleteResource(clustername string, resname string, respath string) error {
 	var gp res.Resource
 	err = gp.Delete(respath, resname, "default", c)
 	if err != nil {
-		log.Println("Delete resource failed: " +  err.Error())
+		log.Println("Delete resource failed: " +  err.Error() + resname)
 		return err
 	}
-	log.Println("Resource succesfully deleted")
+	log.Println("Resource succesfully deleted", resname)
 	return nil
 
 }
@@ -118,16 +115,16 @@ func createResource(clustername string, resname string, respath string) error {
 	var gp res.Resource
 	_, err = gp.Create(respath,"default", c)
 	if err != nil {
-		log.Println("Create failed: " +  err.Error())
+		log.Println("Create failed: " +  err.Error() + resname)
 		return err
 	}
-	log.Println("Resource succesfully created")
+	log.Println("Resource succesfully created", resname)
 	return nil
 
 }
 
 func terminateResource(ac appcontext.AppContext, resmap instMap, appname string, clustername string) error {
-	var resPath string = basePath + appname + "/" + clustername + "/resources/"
+
 	rh, err := ac.GetResourceHandle(appname, clustername, resmap.name)
 	if err != nil {
 		return err
@@ -139,31 +136,14 @@ func terminateResource(ac appcontext.AppContext, resmap instMap, appname string,
 	}
 
 	if resval != "" {
-		if _, err := os.Stat(resPath); os.IsNotExist(err) {
-			err = os.MkdirAll(resPath, 0755)
-			if err != nil {
-				return err
-			}
-		}
-		resPath := resPath + resmap.name + ".yaml"
-		f, err := os.Create(resPath)
-		defer f.Close()
-		if err != nil {
-			return err
-		}
-		_, err = f.WriteString(resval.(string))
-		if err != nil {
-			return err
-		}
 		result := strings.Split(resmap.name, "+")
 		if result[0] == "" {
 			return pkgerrors.Errorf("Resource name is nil")
 		}
-		err = deleteResource(clustername, result[0], resPath)
+		err = deleteResource(clustername, result[0], resval.(string))
 		if err != nil {
 			return err
 		}
-		//defer os.Remove(resPath)
 	} else {
 		return pkgerrors.Errorf("Resource value is nil")
 	}
@@ -173,7 +153,6 @@ func terminateResource(ac appcontext.AppContext, resmap instMap, appname string,
 }
 
 func instantiateResource(ac appcontext.AppContext, resmap instMap, appname string, clustername string) error {
-	var resPath string = basePath + appname + "/" + clustername + "/resources/"
 	rh, err := ac.GetResourceHandle(appname, clustername, resmap.name)
 	if err != nil {
 		return err
@@ -185,31 +164,14 @@ func instantiateResource(ac appcontext.AppContext, resmap instMap, appname strin
 	}
 
 	if resval != "" {
-		if _, err := os.Stat(resPath); os.IsNotExist(err) {
-			err = os.MkdirAll(resPath, 0755)
-			if err != nil {
-				return err
-			}
-		}
-		resPath := resPath + resmap.name + ".yaml"
-		f, err := os.Create(resPath)
-		defer f.Close()
-		if err != nil {
-			return err
-		}
-		_, err = f.WriteString(resval.(string))
-		if err != nil {
-			return err
-		}
 		result := strings.Split(resmap.name, "+")
 		if result[0] == "" {
 			return pkgerrors.Errorf("Resource name is nil")
 		}
-		err = createResource(clustername, result[0], resPath)
+		err = createResource(clustername, result[0], resval.(string))
 		if err != nil {
 			return err
 		}
-		//defer os.Remove(resPath)
 	} else {
 		return pkgerrors.Errorf("Resource value is nil")
 	}

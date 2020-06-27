@@ -10,4 +10,5 @@ set -x -e -o pipefail
 
 curr_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 cd ${curr_dir}/../hosting_providers/baremetal
+export KUD_ADDONS="virtlet ovn4nfv"
 ./aio.sh

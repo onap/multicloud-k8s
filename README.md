@@ -16,7 +16,7 @@ MultiCloud Kubernetes plugin for ONAP multicloud.
 # Installation
 
 Requirements:
-* Go 1.12.4
+* Go 1.14.4
 
 Steps:
 
@@ -35,12 +35,3 @@ Steps:
 * Run the plugin:
     * `cd k8s/deployments && ./start.sh`
 
-# Architecture
-
-Create Virtual Network Function
-
-![Create VNF](./docs/create_vnf.png)
-
-Create Virtual Link
-
-![Create VL](./docs/create_vl.png)

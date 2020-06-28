@@ -1,0 +1,78 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: kube-node
+  tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+
+    - name: setting KUBELET_EXTRA_ARGS
+      lineinfile:
+        path: "{{ kubernetes_env_file }}"
+        regexp: "^KUBELET_EXTRA_ARGS="
+        line: "KUBELET_EXTRA_ARGS=--config /usr/lib/systemd/system/kubelet.service.d/kubelet_config.yml"
+      notify:
+      - enable and restart kubelet
+
+    - name: creating kubelet config
+      blockinfile:
+        path: "{{ kubernetes_config_file }}"
+        marker: "# {mark} OpenNESS configuration - General"
+        create: yes
+        block: |
+          apiVersion: kubelet.config.k8s.io/v1beta1
+          kind: KubeletConfiguration
+          KubeletCgroups: "/systemd/system.slice"
+          authentication:
+            x509:
+              clientCAFile: /etc/kubernetes/pki/ca.crt
+          clusterDNS:
+            - 10.96.0.10
+          clusterDomain: cluster.local
+          featureGates:
+            TopologyManager: {{ False if topology_manager.policy == 'none' else True }}
+          podPidsLimit: 2048
+      notify:
+      - enable and restart kubelet
+
+    - name: customize kubelet config - CPU Manager
+      blockinfile:
+        path: "{{ kubernetes_config_file }}"
+        marker: "# {mark} OpenNESS configuration - CPU Manager"
+        block: |
+          cpuManagerPolicy: {{ cpu_manager.policy }}
+          kubeReserved:
+            cpu: "{{ cpu_manager.reserved_cpus }}"
+        state: "{{ 'present' if cpu_manager.policy == 'static' else 'absent' }}"
+      notify:
+      - enable and restart kubelet
+
+    - name: customize kubelet config - Topology Manager
+      blockinfile:
+        path: "{{ kubernetes_config_file }}"
+        marker: "# {mark} OpenNESS configuration - Topology Manager"
+        block: |
+          topologyManagerPolicy: {{ topology_manager.policy }}
+        state: "{{ 'absent' if topology_manager.policy == 'none' else 'present' }}"
+      notify:
+      - enable and restart kubelet
+
+    - name: restart kubelet
+      meta: flush_handlers
+
+  handlers:
+    - name: enable and restart kubelet
+      systemd:
+        name: kubelet
+        daemon_reload: yes
+        enabled: yes
+        masked: no
+        state: restarted

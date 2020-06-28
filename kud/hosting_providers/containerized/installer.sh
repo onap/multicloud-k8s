@@ -119,6 +119,7 @@ function install_addons {
     ansible-playbook $verbose -i \
         $kud_inventory $kud_playbooks/configure-kud.yml | \
         tee $cluster_log/setup-kud.log
+    # for addon in ${KUD_ADDONS:-topology-manager virtlet ovn4nfv nfd sriov cmk $plugins_name}; do
     for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov cmk $plugins_name}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i \
@@ -128,6 +129,7 @@ function install_addons {
 
     echo "Run the test cases if testing_enabled is set to true."
     if [[ "${testing_enabled}" == "true" ]]; then
+        # for addon in ${KUD_ADDONS:-topology-manager virtlet ovn4nfv nfd sriov cmk $plugins_name}; do
         for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov cmk $plugins_name}; do
             pushd $kud_tests
             bash ${addon}.sh

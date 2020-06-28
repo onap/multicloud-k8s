@@ -1,0 +1,114 @@
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: orchestrator-gateway
+  namespace: emco
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
+    hosts:
+    - "*"
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: orchestrator
+  namespace: emco
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - orchestrator-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /v2/oauth
+    - uri:
+        prefix: /v2
+    route:
+    - destination:
+        port:
+          number: 9015
+        host: orchestrator
+
+---
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: "emco-authn-policy"
+  namespace: istio-system
+spec:
+  origins:
+    - jwt:
+        issuer: "https://x.x.x.x:30209/auth/realms/target"
+        jwksUri: "http://x.x.x.x:32431/auth/realms/target/protocol/openid-connect/certs"
+  principalBinding: USE_ORIGIN
+
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "AuthorizationPolicy"
+metadata:
+  name: "deny"
+  namespace: emco
+spec:
+  selector:
+    matchLabels:
+      app: orchestrator
+  action: DENY
+  rules:
+  - from:
+    - source:
+        notRequestPrincipals: ["*"]
+
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "AuthorizationPolicy"
+metadata:
+  name: "allow-manager"
+  namespace: emco
+spec:
+  selector:
+    matchLabels:
+      app: orchestrator
+  action: ALLOW
+  rules:
+  - when:
+    - key: request.auth.claims[role]
+      values: ["ADMIN"]
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-user
+  namespace: emco
+spec:
+  selector:
+    matchLabels:
+      app: orchestrator
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        paths: ["/v2/projects/xxxx4/*"]
+    when:
+    - key: request.auth.claims[role]
+      values: ["USER"]

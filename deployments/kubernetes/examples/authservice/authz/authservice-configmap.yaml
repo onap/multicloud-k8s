@@ -1,0 +1,42 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+name: emco-authservice-configmap
+namespace: istio-system
+data:
+config.json: |
+  {
+    "listen_address": "127.0.0.1",
+    "listen_port": "10003",
+    "log_level": "trace",
+    "threads": 8,
+    "chains": [
+      {
+        "name": "idp_filter_chain",
+        "filters": [
+        {
+          "oidc":
+            {
+              "authorization_uri": "https://x.x.x.x:30209/auth/realms/istio2/protocol/openid-connect/auth",
+              "token_uri": "https://x.x.x.x:30209/auth/realms/istio2/protocol/openid-connect/token",
+              "callback_uri": "https://x.x.x.x:31063/v2/oauth/callback",
+              "jwks": "{\"keys\":[{\"kid\":\"xxxxx\",\"kty\":\"RSA\",\"alg\":\"RS256\",\"use\":\"sig\",\"n\":\"xxx",\"e\":\"AQAB\",\"x5c\":[\"xxxx"],\"x5t\":\"xxx\",\"x5t#S256\":\"xxxx\"}]}",
+              "client_id": "istio2",
+              "client_secret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+              "trusted_certificate_authority": "-----BEGIN CERTIFICATE-----\r\nXXXXXXXXX\r\n-----END CERTIFICATE-----\r\n",
+              "scopes": [],
+              "id_token": {
+                "preamble": "Bearer",
+                "header": "Authorization"
+              },
+              "access_token": {
+                "preamble": "Bearer",
+                "header": "Authorization"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }

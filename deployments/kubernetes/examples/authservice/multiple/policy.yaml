@@ -1,0 +1,72 @@
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: orchestrator-gateway
+  namespace: emco
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
+    hosts:
+    - "*"
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: orchestrator
+  namespace: test
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - orchestrator-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /v2/oauth
+    - uri:
+        prefix: /v2
+    - uri:
+        prefix: /v2/projects/enterprise1/oauth
+    -uri:
+        prefix: /v2/projects/enterprise2/oauth
+    route:
+    - destination:
+        port:
+          number: 9015
+        host: orchestrator
+
+---
+  apiVersion: "authentication.istio.io/v1alpha1"
+  kind: "Policy"
+  metadata:
+    name: "orchestrator-authn-policy"
+    namespace: istio-system
+  spec:
+    origins:
+      - jwt:
+          issuer: "https://x.x.x.x:31567/auth/realms/enterprise1"
+          jwksUri: "http://x.x.x.x:32431/auth/realms/enterprise1/protocol/openid-connect/certs"
+      - jwt:
+          issuer: "https://x.x.x.x:31567/auth/realms/enterprise2"
+          jwksUri: "http://x.x.x.x:32431/auth/realms/enterprise2/protocol/openid-connect/certs"
+    principalBinding: USE_ORIGIN
+

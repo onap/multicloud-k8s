@@ -1,0 +1,77 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+name: emco-authservice-configmap
+namespace: istio-system
+data:
+config.json: |
+  {
+    "listen_address": "127.0.0.1",
+    "listen_port": "10003",
+    "log_level": "trace",
+    "threads": 8,
+    "chains": [
+      {
+        "name": "idp_filter_chain_1",
+        "match": {
+          "header": ":path",
+          "prefix": "/v2/projects/enterprise1"
+        },
+        "filters": [
+        {
+          "oidc":
+            {
+              "authorization_uri": "https://x.x.x.x:31567/auth/realms/enterprise1/protocol/openid-connect/auth",
+              "token_uri": "https://x.x.x.x:31567/auth/realms/enterprise1/protocol/openid-connect/token",
+              "callback_uri": "https://x.x.x.x:31063/v2/projects/enterprise1/oauth/callback",
+              "jwks": "{\"keys\":[{\"kid\":\"xxxxx\",\"kty\":\"RSA\",\"alg\":\"RS256\",\"use\":\"sig\",\"n\":\"zzzzzzz\",\"e\":\"AQAB\",\"x5c\":[\"xxxxxx\"],\"x5t\":\"z7Qrc2nAlK8EVmkiKtz0bOWxugE\",\"x5t#S256\":\"xxxxxxxxx\"}]}",
+              "client_id": "emco",
+              "client_secret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+              "trusted_certificate_authority": "-----BEGIN CERTIFICATE-----\r\nxxxxxxxx\r\n-----END CERTIFICATE-----\r\n",
+              "scopes": [],
+              "id_token": {
+                "preamble": "Bearer",
+                "header": "Authorization"
+              },
+              "access_token": {
+                "preamble": "Bearer",
+                "header": "Authorization"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "idp_filter_chain_2",
+        "match": {
+          "header": ":path",
+          "prefix": "/v2/projects/enterprise2"
+        },
+        "filters": [
+        {
+          "oidc":
+            {
+              "authorization_uri": "https://x.x.x.x:31567/auth/realms/enterprise2/protocol/openid-connect/auth",
+              "token_uri": "https://x.x.x.x:31567/auth/realms/enterprise2/protocol/openid-connect/token",
+              "callback_uri": "https://x.x.x.x:31063/v2/projects/enterprise2/oauth/callback",
+              "jwks": "{\"keys\":[{\"kid\":\"xxxx\",\"kty\":\"RSA\",\"alg\":\"RS256\",\"use\":\"sig\",\"n\":\"xxxx\",\"e\":\"AQAB\",\"x5c\":[\"xxxxxx\"],\"x5t\":\"xxxxxxx\",\"x5t#S256\":\"xxxxxxx\"}]}",
+              "client_id": "emco",
+              "client_secret": "aca173e9-ab7f-4446-87e5-c554392a231f",
+              "trusted_certificate_authority": "-----BEGIN CERTIFICATE-----\r\nxxxxxxxx\r\n-----END CERTIFICATE-----\r\n",
+              "scopes": [],
+              "id_token": {
+                "preamble": "Bearer",
+                "header": "Authorization"
+              },
+              "access_token": {
+                "preamble": "Bearer",
+                "header": "Authorization"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+

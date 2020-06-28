@@ -79,3 +79,10 @@ optane_ipmctl_source_type: "tarball"
 optane_ipmctl_version: 02.00.00.3474
 optane_ipmctl_url: "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ipmctl/{{ optane_package }}.tar.xz"
 optane_ipmctl_package: ipmctl_02.00.00.3474+really01.00.00.3469.orig
+
+kubernetes_config_file: "/etc/kubernetes/kubelet-config.yaml"
+cpu_manager:
+  policy: "static" # Options: none (disabled), static (default)
+  checkpoint_file: "/var/lib/kubelet/cpu_manager_state"
+topology_manager:
+  policy: "best-effort" # Options: none (disabled), best-effort (default), restricted, single-numa-node

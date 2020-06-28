@@ -2,7 +2,7 @@ module github.com/onap/multicloud-k8s/src/monitor
 
 require (
 	github.com/NYTimes/gziphandler v1.0.1 // indirect
-	github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30 // indirect
+	github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30
 	github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20190808131943-845cdd2aa5d7 // indirect
 	github.com/operator-framework/operator-sdk v0.9.1-0.20190729152335-7a35cfc9a7cf
 	github.com/operator-framework/operator-sdk-samples v0.0.0-20190529081445-bd30254f3a7e
@@ -33,8 +33,5 @@ replace (
 )
 
 // Remove hg dependency using this mirror
-replace bitbucket.org/ww/goautoneg => github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30
-
 replace github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.9.0
 
-replace git.apache.org/thrift.git => github.com/apache/thrift v0.12.0

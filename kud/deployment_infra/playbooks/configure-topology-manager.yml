@@ -1,0 +1,66 @@
+---
+# SPDX-license-identifier: Apache-2.0
+##############################################################################
+# Copyright (c) 2018
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+- hosts: kube-node
+  tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+
+    - name: creating kubelet config
+      become: yes
+      blockinfile:
+        path: "{{ kubernetes_config_file }}"
+        marker: "# {mark} OpenNESS configuration - General"
+        create: yes
+        block: |
+          featureGates:
+            TopologyManager: {{ False if topology_manager.policy == 'none' else True }}
+      notify:
+      - enable and restart kubelet
+
+    - name: customize kubelet config - CPU Manager
+      become: yes
+      blockinfile:
+        path: "{{ kubernetes_config_file }}"
+        marker: "# {mark} OpenNESS configuration - CPU Manager"
+        block: |
+          cpuManagerPolicy: {{ cpu_manager.policy }}
+        state: "{{ 'present' if cpu_manager.policy == 'static' else 'absent' }}"
+      notify:
+      - remove cpu manager checkpoint file
+      - enable and restart kubelet
+
+    - name: customize kubelet config - Topology Manager
+      become: yes
+      blockinfile:
+        path: "{{ kubernetes_config_file }}"
+        marker: "# {mark} OpenNESS configuration - Topology Manager"
+        block: |
+          topologyManagerPolicy: {{ topology_manager.policy }}
+        state: "{{ 'absent' if topology_manager.policy == 'none' else 'present' }}"
+      notify:
+      - enable and restart kubelet
+
+  handlers:
+    - name: enable and restart kubelet
+      become: yes
+      systemd:
+        name: kubelet
+        daemon_reload: yes
+        enabled: yes
+        masked: no
+        state: restarted
+
+    - name: remove cpu manager checkpoint file
+      become: yes
+      file:
+        path: "{{ cpu_manager.checkpoint_file }}"
+        state: absent

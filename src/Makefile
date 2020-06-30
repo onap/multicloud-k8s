@@ -1,5 +1,5 @@
 build:
-	$(MAKE) -C monitor build
+#	$(MAKE) -C monitor build
 	$(MAKE) -C k8splugin build
 	$(MAKE) -C orchestrator build
 	$(MAKE) -C ncm build
@@ -9,7 +9,7 @@ build:
 	$(MAKE) -C ovnaction build
 
 deploy:
-	$(MAKE) -C monitor deploy
+#	$(MAKE) -C monitor deploy
 	$(MAKE) -C k8splugin deploy
 	$(MAKE) -C orchestrator deploy
 	$(MAKE) -C ncm deploy
@@ -19,7 +19,7 @@ deploy:
 	$(MAKE) -C ovnaction deploy
 
 all:
-	$(MAKE) -C monitor all
+#	$(MAKE) -C monitor all
 	$(MAKE) -C k8splugin all
 	$(MAKE) -C orchestrator all
 	$(MAKE) -C ncm all

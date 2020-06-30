@@ -190,7 +190,7 @@ paths:
           description: No Composite App found
           content: {}
 
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}:
     # parameters list that are used with each operation for this path
     parameters:
       - $ref: '#/components/parameters/projectName'
@@ -292,33 +292,6 @@ paths:
               $ref: '#/components/schemas/AppData'
         required: true
 
-    put:
-      tags:
-        - Composite Application
-      summary: Update app in Composite Application
-      description: Update app in `Composite Application`
-      operationId: updateAppToCompositeApplication
-      responses:
-        '200':
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Application not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-          multipart/form-data: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/AppData'
-        required: true
-
     get: # documentation for GET operation for this path
       tags:
         - Composite Application
@@ -336,10 +309,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/MetadataArray'
         '404':
-          description: No Apps found in Composite Application  found
+          description: No Apps found in Composite Application
           content: {}
 
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/apps/{app-name}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/apps/{app-name}:
     # parameters list that are used with each operation for this path
     parameters:
       - $ref: '#/components/parameters/projectName'
@@ -372,6 +345,32 @@ paths:
         '404':
           description: Application not found
           content: {}
+    put:
+      tags:
+        - Composite Application
+      summary: Update app in Composite Application
+      description: Update app in `Composite Application`
+      operationId: updateAppToCompositeApplication
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Application not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/AppData'
+        required: true
     delete: # documentation for DELETE operation for this path
       tags:
         - Composite Application
@@ -422,6 +421,52 @@ paths:
         description: Composite Profile definition
         required: true
 
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Profile
+      summary: Get all Composite Profiles
+
+      description: |
+        Get all `profiles in a composite application`
+
+      operationId: getAllProfilesInCompositeApplication
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/MetadataArray'
+        '404':
+          description: No composite profile found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/compositeProfileName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Composite Profile
+      summary: Get Composite Profile
+
+      description: |
+        Get `composite profile`
+
+      operationId: getCompositeProfileByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Composite Profile not found
+          content: {}
     put:
       tags:
         - Composite Profile
@@ -449,53 +494,6 @@ paths:
               $ref: '#/components/schemas/Metadata'
         description: Composite Profile definition
         required: true
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Composite Profile
-      summary: Get all Composite Profiles
-
-      description: |
-        Get all `profiles in a composite application`
-
-      operationId: getAllProfilesInCompositeApplication
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/MetadataArray'
-        '404':
-          description: No composite profile found
-          content: {}
-
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/composite-profile/{composite-profile-name}:
-    # parameters list that are used with each operation for this path
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/compositeProfileName'
-    get: # documentation for GET operation for this path
-      tags:
-        - Composite Profile
-      summary: Get Composite Application
-
-      description: |
-        Get `composite profile`
-
-      operationId: getCompositeProfileByName
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-        '404':
-          description: Composite Profile not found
-          content: {}
     delete: # documentation for DELETE operation for this path
       tags:
         - Composite Profile
@@ -516,7 +514,7 @@ paths:
           description: Composite Profile not found
           content: {}
 
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profile/{composite-profile-name}/profiles:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
@@ -542,33 +540,7 @@ paths:
         content:
           multipart/form-data: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/AppData'
-    put:
-      tags:
-        - Composite Profile
-      summary: Update Composite Profile for an app
-      description: Update `Profile`
-      operationId: updateProfile
-      responses:
-        '200':
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/ProfileAppSpec'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Profile not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-          multipart/form-data: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/AppData'
-        required: true
+              $ref: '#/components/schemas/ProfileAppData'
     get: # documentation for GET operation for this path
       tags:
         - Composite Profile
@@ -589,7 +561,7 @@ paths:
           description: No profile found
           content: {}
 
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/composite-profile/{composite-profile-name}/profiles/{profile-name}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{profile-name}:
     # parameters list that are used with each operation for this path
     parameters:
       - $ref: '#/components/parameters/projectName'
@@ -618,11 +590,37 @@ paths:
                 $ref: '#/components/schemas/File'
             multipart/form-data: # Media type
               schema:            # Request payload
-                $ref: '#/components/schemas/AppData'
+                $ref: '#/components/schemas/ProfileAppData'
 
         '404':
           description: Profile not found
           content: {}
+    put:
+      tags:
+        - Composite Profile
+      summary: Update Composite Profile for an app
+      description: Update `Profile`
+      operationId: updateProfile
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ProfileAppSpec'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Profile not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/ProfileAppData'
+        required: true
     delete: # documentation for DELETE operation for this path
       tags:
         - Composite Profile
@@ -644,7 +642,7 @@ paths:
           content: {}
 
   # Qurey for Profile - Get profile for app-name
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/composite-profile/{composite-profile-name}/profiles:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
@@ -678,7 +676,7 @@ paths:
                 $ref: '#/components/schemas/File'
             multipart/form-data: # Media type
               schema:            # Request payload
-                $ref: '#/components/schemas/AppData'
+                $ref: '#/components/schemas/ProfileAppData'
         '404':
           description: Profile for application not found
           content: {}
@@ -714,6 +712,52 @@ paths:
         description: Generic Placement Intent definition
         required: true
 
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get all Generic Placement Intents
+
+      description: |
+        Get all `Generic Placement Intents`
+
+      operationId: getAllGenericPlacementIntents
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntentArray'
+        '404':
+          description: No Generic Placement Intent found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get Generic Placement Intent
+
+      description: |
+        Get `generic placement intent`
+
+      operationId: getGenericPlacementIntentByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntent'
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
     put:
       tags:
         - Generic Placement Intent
@@ -741,53 +785,6 @@ paths:
               $ref: '#/components/schemas/GenericPlacementIntent'
         description: Generic Placement Intent definition
         required: true
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get all Generic Placement Intents
-
-      description: |
-        Get all `Generic Placement Intents`
-
-      operationId: getAllGenericPlacementIntents
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementIntentArray'
-        '404':
-          description: No Generic Placement Intent found
-          content: {}
-
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}:
-    # parameters list that are used with each operation for this path
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get Generic Placement Intent
-
-      description: |
-        Get `generic placement intent`
-
-      operationId: getGenericPlacementIntentByName
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementIntent'
-        '404':
-          description: Generic Placement Intent not found
-          content: {}
     delete: # documentation for DELETE operation for this path
       tags:
         - Generic Placement Intent
@@ -835,33 +832,6 @@ paths:
           application/json: # Media type
             schema:            # Request payload
               $ref: '#/components/schemas/GenericPlacementAppIntent'
-    put:
-      tags:
-        - Generic Placement Intent
-      summary: Update intent for an application
-      description: Update `generic placement intent for application`
-      operationId: updateIntentToGenericPlacementIntent
-      responses:
-        '200':
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Generic placement intent not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-         application/json: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/GenericPlacementAppIntent'
-        required: true
-
     get: # documentation for GET operation for this path
       tags:
         - Generic Placement Intent
@@ -882,7 +852,7 @@ paths:
           description: No Generic Placement Intent found
           content: {}
 
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/{intent-name}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/{intent-name}:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
@@ -910,6 +880,33 @@ paths:
         '404':
           description: Intent  not found
           content: {}
+    put:
+      tags:
+        - Generic Placement Intent
+      summary: Update intent for an application
+      description: Update `generic placement intent for application`
+      operationId: updateIntentToGenericPlacementIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic placement intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+         application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/GenericPlacementAppIntent'
+        required: true
+
     delete: # documentation for DELETE operation for this path
       tags:
         - Generic Placement Intent
@@ -931,7 +928,7 @@ paths:
           content: {}
 
   # Qurey for Intent - Get intent for app-name
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
@@ -993,7 +990,52 @@ paths:
               $ref: '#/components/schemas/DeploymentGroupIntent'
         description: Deployment Intent Group definition
         required: true
+    get: # documentation for GET operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Get all Deployment Intent Group
 
+      description: |
+        Get all `Deployment Intent Group`
+
+      operationId: getAllDeploymentIntentGroup
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentGroupIntentArray'
+        '404':
+          description: No Deployment Intent Group found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Deployment Intent Group
+      summary: Get Deployment Intent Group
+
+      description: |
+        Get `Deployment Intent Group`
+
+      operationId: getDeploymentIntentGroupByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentGroupIntent'
+        '404':
+          description: Deployment Intent Group not found
+          content: {}
     put:
       tags:
         - Deployment Intent Group
@@ -1022,52 +1064,6 @@ paths:
         description: Deployment Intent Group definition
         required: true
 
-    get: # documentation for GET operation for this path
-      tags:
-        - Deployment Intent Group
-      summary: Get all Deployment Intent Group
-
-      description: |
-        Get all `Deployment Intent Group`
-
-      operationId: getAllDeploymentIntentGroup
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/DeploymentGroupIntentArray'
-        '404':
-          description: No Deployment Intent Group found
-          content: {}
-
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}:
-    # parameters list that are used with each operation for this path
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
-    get: # documentation for GET operation for this path
-      tags:
-        - Deployment Intent Group
-      summary: Get Deployment Intent Group
-
-      description: |
-        Get `Deployment Intent Group`
-
-      operationId: getDeploymentIntentGroupByName
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/DeploymentGroupIntent'
-        '404':
-          description: Deployment Intent Group not found
-          content: {}
     delete: # documentation for DELETE operation for this path
       tags:
         - Deployment Intent Group
@@ -1088,7 +1084,7 @@ paths:
           description: Deployment Intent Group not found
           content: {}
 
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
@@ -1115,33 +1111,6 @@ paths:
           application/json: # Media type
             schema:            # Request payload
               $ref: '#/components/schemas/DeploymentIntent'
-    put:
-      tags:
-        - Deployment Intent Group
-      summary: Update intent
-      description: Update `deployment intent`
-      operationId: updateIntentToDeploymentIntentGroup
-      responses:
-        '200':
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/DeploymentIntent'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Intent not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-         application/json: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/DeploymentIntent'
-        required: true
-
     get: # documentation for GET operation for this path
       tags:
         - Deployment Intent Group
@@ -1157,13 +1126,13 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentGroupIntentArray'
+                $ref: '#/components/schemas/DeploymentIntentArray'
         '404':
           description: No Deployment Intent Group found
           content: {}
 
 
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/{intent-name}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/{intent-name}:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
@@ -1191,6 +1160,32 @@ paths:
         '404':
           description: Deployment Intent not found
           content: {}
+    put:
+      tags:
+        - Deployment Intent Group
+      summary: Update intent
+      description: Update `deployment intent`
+      operationId: updateIntentToDeploymentIntentGroup
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/DeploymentIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+         application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/DeploymentIntent'
+        required: true
     delete: # documentation for DELETE operation for this path
       tags:
         - Deployment Intent Group
@@ -1211,7 +1206,7 @@ paths:
           description: Deployment intent not found
           content: {}
    #Query
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
@@ -1317,7 +1312,7 @@ paths:
       - $ref: '#/components/parameters/compositeAppName'
       - $ref: '#/components/parameters/compositeAppVersion'
       - $ref: '#/components/parameters/deploymentIntentGroupName'
-    post:
+    get:
       tags:
         - Deployment Lifecycle
       summary: Status of Deployment
@@ -1327,11 +1322,9 @@ paths:
         '200':
           description: Success
           content: {}
-        '405':
-          description: Invalid Input
+        '404':
+          description: No Status found
           content: {}
-      requestBody:
-        content: {}
 
 ############################ Controller Registration API'S #################################################
   /controllers:
@@ -1358,34 +1351,6 @@ paths:
                 $ref: '#/components/schemas/Controller'
         description: Controller Info
         required: true
-    put:
-      tags:
-        - Controller Registration
-      summary: Update controller
-      description: Update `controller`
-      operationId: updateController
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Controller'
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Controller not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Controller'
-        description: Update controllers object
-        required: true
-
     get: # documentation for GET operation for this path
           tags:
             - Controller Registration
@@ -1429,6 +1394,33 @@ paths:
         '404':
           description: Controller not found
           content: {}
+    put:
+      tags:
+        - Controller Registration
+      summary: Update controller
+      description: Update `controller`
+      operationId: updateController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Controller'
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Controller not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Controller'
+        description: Update controllers object
+        required: true
     delete: # documentation for DELETE operation for this path
       tags:
         - Controller Registration
@@ -1474,34 +1466,6 @@ paths:
                 $ref: '#/components/schemas/Metadata'
         description: Cluster Providers Info
         required: true
-    put:
-      tags:
-        - Cluster Providers
-      summary: Update cluster provider
-      description: Update `cluster providers`
-      operationId: updateClusterProviders
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Cluster Provider not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Metadata'
-        description: Update cluster provider object
-        required: true
-
     get: # documentation for GET operation for this path
           tags:
             - Cluster Providers
@@ -1545,6 +1509,33 @@ paths:
         '404':
           description: Cluster Provider not found
           content: {}
+    put:
+      tags:
+        - Cluster Providers
+      summary: Update cluster provider
+      description: Update `cluster providers`
+      operationId: updateClusterProviders
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Cluster Provider not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        description: Update cluster provider object
+        required: true
     delete: # documentation for DELETE operation for this path
       tags:
         - Cluster Providers
@@ -1589,33 +1580,25 @@ paths:
           multipart/form-data: # Media type
             schema:            # Request payload
               $ref: '#/components/schemas/AppData'
-    put:
+    get: # documentation for GET operation for this path
       tags:
         - Clusters
-      summary: Update Cluster
-      description: Update `cluster`
-      operationId: updateClusterToClusterProvider
-      responses:
+      summary: Get all clusters for cluster provider
+
+      description: |
+        Get all `clusters for cluster provider`
+
+      operationId: getAllClusterForClusterProvider
+      responses: # list of responses
         '200':
+          description: Success
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
+                $ref: '#/components/schemas/MetadataArray'
         '404':
-          description: Cluster not found
+          description: No clusters found in cluster provider
           content: {}
-      # request body documentation
-      requestBody:
-        content:
-          multipart/form-data: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/AppData'
-        required: true
-
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}:
     # parameters list that are used with each operation for this path
     parameters:
@@ -1647,6 +1630,33 @@ paths:
         '404':
           description: Cluster not found
           content: {}
+    put:
+      tags:
+        - Clusters
+      summary: Update Cluster
+      description: Update `cluster`
+      operationId: updateClusterToClusterProvider
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Cluster not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/AppData'
+        required: true
+
     delete: # documentation for DELETE operation for this path
       tags:
         - Clusters
@@ -1741,6 +1751,32 @@ paths:
         '404':
           description: label not found
           content: {}
+    put:
+      tags:
+        - Clusters
+      summary: Update label
+      description: Update label for `cluster`
+      operationId: updateLabelForCluster
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ClusterLabel'
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Label not found
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ClusterLabel'
+        description: Cluster Label
+        required: true
     delete: # documentation for DELETE operation for this path
       tags:
         - Clusters
@@ -1865,6 +1901,32 @@ paths:
         '404':
           description: KV pair not found
           content: {}
+    put:
+      tags:
+        - Clusters
+      summary: Update KV Pair
+      description: Update KV Pair for `cluster`
+      operationId: updateKvPairForCluster
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/ClusterKv'
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: KV Pair not found
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ClusterKv'
+        description: Cluster Label
+        required: true
     delete: # documentation for DELETE operation for this path
       tags:
         - Clusters
@@ -2175,6 +2237,51 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/Metadata'
+    get: # documentation for GET operation for this path
+      tags:
+        - Network Controller Intent
+      summary: Get all Network Controller Intent
+
+      description: |
+        Get all `network controller intent`
+
+      operationId: getAllNetworkControllerIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/MetadataArray'
+        '404':
+          description: No Network Controller Intent found
+          content: {}
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/netControlIntent'
+    get: # documentation for GET operation for this path
+      tags:
+        - Network Controller Intent
+      summary: Get Network Controller Intent
+
+      description: |
+        Get `network controller intent`
+
+      operationId: getNetworkControllerIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Network Controller Intent not found
+          content: {}
     put:
       tags:
         - Network Controller Intent
@@ -2201,33 +2308,6 @@ paths:
             schema:
               $ref: '#/components/schemas/Metadata'
         required: true
-
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}:
-    # parameters list that are used with each operation for this path
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/netControlIntent'
-    get: # documentation for GET operation for this path
-      tags:
-        - Network Controller Intent
-      summary: Get Network Controller Intent
-
-      description: |
-        Get `network controller intent`
-
-      operationId: getNetworkControllerIntent
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-        '404':
-          description: Network Controller Intent not found
-          content: {}
     delete: # documentation for DELETE operation for this path
       tags:
         - Network Controller Intent
@@ -2275,34 +2355,27 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/NetworkWorloadSpec'
-    put:
+    get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
-      summary: Update Network Controller Workload Intent
-      description: Update `Network Controller Workload Intent`
-      operationId: updateNetworkControllerWorkloadIntent
-      responses:
+      summary: Get Network Controller Workload Intent
+
+      description: |
+        Get all `network controller workload intent`
+
+      operationId: getAllNetworkControllerWorkloadIntent
+      responses: # list of responses
         '200':
+          description: Success
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadSpec'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
+                $ref: '#/components/schemas/NetworkWorloadSpecArray'
         '404':
-          description: Network Controller Workload Intent not found
+          description: No Network Controller Workload Intent found
           content: {}
-      # request body documentation
-      requestBody:
-        content:
-          application/json: # operation response mime type
-            schema:
-              $ref: '#/components/schemas/NetworkWorloadSpec'
-        required: true
 
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}:
     # parameters list that are used with each operation for this path
     parameters:
       - $ref: '#/components/parameters/projectName'
@@ -2329,6 +2402,32 @@ paths:
         '404':
           description: Network Controller Workload Intent not found
           content: {}
+    put:
+      tags:
+        - Network Controller Intent
+      summary: Update Network Controller Workload Intent
+      description: Update `Network Controller Workload Intent`
+      operationId: updateNetworkControllerWorkloadIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadSpec'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network Controller Workload Intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json: # operation response mime type
+            schema:
+              $ref: '#/components/schemas/NetworkWorloadSpec'
+        required: true
     delete: # documentation for DELETE operation for this path
       tags:
         - Network Controller Intent
@@ -2378,34 +2477,26 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/NetworkWorloadInterface'
-    put:
+    get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
-      summary: Update Network Controller Workload Interface
-      description: Update `Network Controller Workload Interface`
-      operationId: updateNetworkControllerWorkloadInterface
-      responses:
+      summary: Get all Network Controller Workload Interface
+
+      description: |
+        Get all `network controller workload interface`
+
+      operationId: getAllNetworkControllerWorkloadInterface
+      responses: # list of responses
         '200':
+          description: Success
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadInterface'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
+                $ref: '#/components/schemas/NetworkWorloadInterfaceArray'
         '404':
-          description: Network Controller Workload Interface not found
+          description: No Network Controller Workload Interface found
           content: {}
-      # request body documentation
-      requestBody:
-        content:
-          application/json: # operation response mime type
-            schema:
-              $ref: '#/components/schemas/NetworkWorloadInterface'
-        required: true
-
-  /projects/{project-name}composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces/{interface-name}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces/{interface-name}:
     # parameters list that are used with each operation for this path
     parameters:
       - $ref: '#/components/parameters/projectName'
@@ -2433,6 +2524,33 @@ paths:
         '404':
           description: Network Controller Workload Interface not found
           content: {}
+    put:
+      tags:
+        - Network Controller Intent
+      summary: Update Network Controller Workload Interface
+      description: Update `Network Controller Workload Interface`
+      operationId: updateNetworkControllerWorkloadInterface
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/NetworkWorloadInterface'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Network Controller Workload Interface not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json: # operation response mime type
+            schema:
+              $ref: '#/components/schemas/NetworkWorloadInterface'
+        required: true
+
     delete: # documentation for DELETE operation for this path
       tags:
         - Network Controller Intent
@@ -2806,6 +2924,10 @@ components:
                 - subnet
                 type: object
               type: array
+    VirtualNetworkArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/VirtualNetwork'
     ProviderNetwork:
       type: object
       properties:
@@ -2873,6 +2995,10 @@ components:
           - providerNetType
           - vlan
           type: object
+    ProviderNetworkArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProviderNetwork'
     RouteBasedChain:
       type: object
       properties:
@@ -2964,6 +3090,10 @@ components:
                   description: Type of the workload
                   maxLength: 128
                   example: "deployment"
+    NetworkWorloadSpecArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/NetworkWorloadSpec'
     NetworkWorloadInterface:
       type: object
       properties:
@@ -2986,7 +3116,7 @@ components:
               type: boolean
               description: Is this interface default gateway
               maxLength: 128
-              example: "false"
+              example: false
             ipAddress:
               type: string
               description: Name of the network
@@ -3000,6 +3130,10 @@ components:
           required:
             - interface
             - name
+    NetworkWorloadInterfaceArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/NetworkWorloadInterface'
   parameters:
     projectName:
       name: project-name
@@ -3144,4 +3278,3 @@ components:
       schema:
         type: string
         maxLength: 128
-

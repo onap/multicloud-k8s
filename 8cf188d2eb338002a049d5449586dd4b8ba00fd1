@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7fcc5592_63403e05",
+        "filename": "deployments/kubernetes/Readme.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-06-30T00:17:55Z",
+      "side": 1,
+      "message": "This is only for installing and not generating",
+      "range": {
+        "startLine": 3,
+        "startChar": 13,
+        "endLine": 3,
+        "endChar": 25
+      },
+      "revId": "8cf188d2eb338002a049d5449586dd4b8ba00fd1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -958,10 +958,21 @@ function applyNcmData {
     call_api -d "{ }" "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername2}/apply"
 }
 
-# deletes the appcontext (eventually will terminate from resource synchronizer when that funcationality is ready)
+# deletes the network resources from the clusters and the associated appcontext entries
 function terminateNcmData {
     call_api -d "{ }" "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/terminate"
     call_api -d "{ }" "${base_url_ncm}/cluster-providers/${clusterprovidername}/clusters/${clustername2}/terminate"
+}
+
+# terminates the vfw resources
+function terminateOrchData {
+    call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/terminate"
+}
+
+# terminates the vfw and ncm resources
+function terminateVfw {
+    terminateOrchData
+    terminateNcmData
 }
 
 function instantiateVfw {
@@ -990,13 +1001,14 @@ function usage {
     echo "    apply - applys the network intents - e.g. networks created in ncm"
     echo "    instantiate - approves and instantiates the composite app via the generic deployment intent"
     echo "    status - get status of deployed resources"
-    echo "    terminate - remove the network inents created by ncm"
+    echo "    terminate - remove the vFW composite app resources and network resources create by 'instantiate' and 'apply'"
     echo ""
     echo "    a reasonable test sequence:"
     echo "    1.  create"
     echo "    2.  apply"
     echo "    3.  instantiate"
     echo "    4.  status"
+    echo "    5.  terminate"
 
     exit
 }
@@ -1053,8 +1065,8 @@ case "$1" in
     "get" )    getData ;;
     "delete" ) deleteData ;;
     "apply" ) applyNcmData ;;
-    "terminate" ) terminateNcmData ;;
     "instantiate" ) instantiateVfw ;;
+    "terminate" ) terminateVfw ;;
     "status" ) statusVfw ;;
     *) usage ;;
 esac

@@ -192,11 +192,23 @@ func callGrpcForControllerList(cl []controller.Controller, mc map[string]string,
 }
 
 /*
-callRsync method shall take in the app context id and invokes the rsync service via grpc
+callRsyncInstall method shall take in the app context id and invokes the rsync service via grpc
 */
-func callRsync(contextid interface{}) error {
+func callRsyncInstall(contextid interface{}) error {
 	appContextID := fmt.Sprintf("%v", contextid)
 	err := rsyncclient.InvokeInstallApp(appContextID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
+callRsyncUninstall method shall take in the app context id and invokes the rsync service via grpc
+*/
+func callRsyncUninstall(contextid interface{}) error {
+	appContextID := fmt.Sprintf("%v", contextid)
+	err := rsyncclient.InvokeUninstallApp(appContextID)
 	if err != nil {
 		return err
 	}

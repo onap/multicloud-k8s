@@ -62,7 +62,7 @@ type OverrideValues struct {
 type DeploymentIntentGroupManager interface {
 	CreateDeploymentIntentGroup(d DeploymentIntentGroup, p string, ca string, v string) (DeploymentIntentGroup, error)
 	GetDeploymentIntentGroup(di string, p string, ca string, v string) (DeploymentIntentGroup, error)
-	GetDeploymentIntentGroupContext(di string, p string, ca string, v string) (appcontext.AppContext, error)
+	GetDeploymentIntentGroupContext(di string, p string, ca string, v string) (appcontext.AppContext, string, error)
 	DeleteDeploymentIntentGroup(di string, p string, ca string, v string) error
 }
 
@@ -165,7 +165,7 @@ func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroup(di string, p stri
 }
 
 // GetDeploymentIntentGroup returns the DeploymentIntentGroup with a given name, project, compositeApp and version of compositeApp
-func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroupContext(di string, p string, ca string, v string) (appcontext.AppContext, error) {
+func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroupContext(di string, p string, ca string, v string) (appcontext.AppContext, string, error) {
 
 	key := DeploymentIntentGroupKey{
 		Name:         di,
@@ -176,7 +176,7 @@ func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroupContext(di string,
 
 	result, err := db.DBconn.Find(c.storeName, key, c.tagContext)
 	if err != nil {
-		return appcontext.AppContext{}, pkgerrors.Wrap(err, "Get DeploymentIntentGroup Context error")
+		return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Get DeploymentIntentGroup Context error")
 	}
 
 	if result != nil {
@@ -184,12 +184,12 @@ func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroupContext(di string,
 		var cc appcontext.AppContext
 		_, err = cc.LoadAppContext(ctxVal)
 		if err != nil {
-			return appcontext.AppContext{}, pkgerrors.Wrap(err, "Error loading DeploymentIntentGroup Appcontext")
+			return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Error loading DeploymentIntentGroup Appcontext")
 		}
-		return cc, nil
+		return cc, ctxVal, nil
 	}
 
-	return appcontext.AppContext{}, pkgerrors.New("Error getting DeploymentIntentGroup AppContext")
+	return appcontext.AppContext{}, "", pkgerrors.New("Error getting DeploymentIntentGroup AppContext")
 }
 
 // DeleteDeploymentIntentGroup deletes a DeploymentIntentGroup
@@ -200,10 +200,14 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 		CompositeApp: ca,
 		Version:      v,
 	}
+	_, _, err := c.GetDeploymentIntentGroupContext(di, p, ca, v)
+	if err == nil {
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup must be terminated before it can be deleted "+di)
+	}
 
-	err := db.DBconn.Remove(c.storeName, k)
+	err = db.DBconn.Remove(c.storeName, k)
 	if err != nil {
-		return pkgerrors.Wrap(err, "Delete DeploymentIntentGroup entry;")
+		return pkgerrors.Wrap(err, "Error deleting DeploymentIntentGroup entry")
 	}
 	return nil
 

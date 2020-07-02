@@ -19,8 +19,6 @@ package connector
 import (
 	"log"
 
-	"github.com/onap/multicloud-k8s/src/rsync/pkg/internal/config"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -52,7 +50,7 @@ type KubernetesConnector interface {
 // Reference is the interface that is implemented
 type Reference interface {
 	//Create a kubernetes resource described by the yaml in yamlFilePath
-	Create(yamlFilePath string, namespace string, client KubernetesConnector) (string, error)
+	Create(yamlFilePath string, namespace string, label string, client KubernetesConnector) (string, error)
 	//Delete a kubernetes resource described in the provided namespace
 	Delete(yamlFilePath string, resname string, namespace string, client KubernetesConnector) error
 }
@@ -86,7 +84,7 @@ func TagPodsIfPresent(unstruct *unstructured.Unstructured, tag string) {
 	if labels == nil {
 		labels = map[string]string{}
 	}
-	labels[config.GetConfiguration().KubernetesLabelName] = tag
+	labels["emco/deployment-id"] = tag
 	podTemplateSpec.SetLabels(labels)
 
 	updatedTemplate, err := runtime.DefaultUnstructuredConverter.ToUnstructured(podTemplateSpec)

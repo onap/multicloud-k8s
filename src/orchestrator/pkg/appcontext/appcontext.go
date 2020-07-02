@@ -18,10 +18,11 @@ package appcontext
 
 import (
 	"fmt"
+	"strings"
+
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/rtcontext"
 	pkgerrors "github.com/pkg/errors"
-	"strings"
 )
 
 // metaPrefix used for denoting clusterMeta level
@@ -411,6 +412,59 @@ func (ac *AppContext) GetResourceInstruction(appname string, clustername string,
 		return nil, err
 	}
 	return v, nil
+}
+
+//AddStatus for holding status of all resources under app and cluster
+// handle should be a cluster handle
+func (ac *AppContext) AddStatus(handle interface{}, value interface{}) (interface{}, error) {
+	h, err := ac.rtc.RtcAddStatus(handle, value)
+	if err != nil {
+		return nil, err
+	}
+	log.Info(":: Added status handle ::", log.Fields{"StatusHandler": h})
+
+	return h, nil
+}
+
+//DeleteStatus for the given the handle
+func (ac *AppContext) DeleteStatus(handle interface{}) error {
+	err := ac.rtc.RtcDeletePair(handle)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//Return the handle for status for a given app and cluster
+func (ac *AppContext) GetStatusHandle(appname string, clustername string) (interface{}, error) {
+	if appname == "" {
+		return nil, pkgerrors.Errorf("Not a valid run time context app name")
+	}
+	if clustername == "" {
+		return nil, pkgerrors.Errorf("Not a valid run time context cluster name")
+	}
+
+	rh, err := ac.rtc.RtcGet()
+	if err != nil {
+		return nil, err
+	}
+
+	acrh := fmt.Sprintf("%v", rh) + "app/" + appname + "/cluster/" + clustername + "/status/"
+	hs, err := ac.rtc.RtcGetHandles(acrh)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range hs {
+		if v == acrh {
+			return v, nil
+		}
+	}
+	return nil, pkgerrors.Errorf("No handle was found for the given resource")
+}
+
+//UpdateStatusValue updates the status value with the given handle
+func (ac *AppContext) UpdateStatusValue(handle interface{}, value interface{}) error {
+	return ac.rtc.RtcUpdateValue(handle, value)
 }
 
 //Return all the handles under the composite app

@@ -145,6 +145,22 @@ func (c *MockRunTimeContext) RtcUpdateValue(handle interface{}, value interface{
 	return c.Err
 }
 
+func (c *MockRunTimeContext) AddStatus(handle interface{}, value interface{}) (interface{}, error) {
+	return nil, nil
+}
+
+func (c *MockRunTimeContext) DeleteStatus(handle interface{}) error {
+	return nil
+}
+
+func (c *MockRunTimeContext) GetStatusHandle(appname string, clustername string) (interface{}, error) {
+	return nil, nil
+}
+
+func (c *MockRunTimeContext) UpdateStatusValue(handle interface{}, value interface{}) error {
+	return nil
+}
+
 func TestCreateCompositeApp(t *testing.T) {
 	var ac = AppContext{}
 	testCases := []struct {

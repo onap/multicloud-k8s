@@ -127,18 +127,24 @@ The rest of the data needed for the test is present in the script.
     This will instantiate the vFW on the two edge clusters (as defined by the generic
     placement intent).
 
+5. Status query
 
-# Removing resources (until termination sequences are completed)
+   vfw-test.sh status
 
-1. Run the cleanup script (or equivalent) in the edge clusters.
-   (once the terminate flow via EMCO is complete, this step will not be necessary)
+6. Terminate
+   Terminate will remove the resources from the clusters and delete the internal
+   composite application information in the etcd base AppContext.
+   The script will do it for both the deployment intent group (i.e. the vfW composite
+   app) and the network intents.
 
-   bash cleanup-composite-vfw.sh
-
-2. Terminate the network intents
+   In principle, after runnin terminate, the 'apply' and 'instantiate' commands could
+   be invoked again to re-insantiate the networks and the vFW composite app.
 
    vfw-test.sh terminate
 
-3. Delete everything from the Mongo DB
+7. Delete the data
+   After running 'terminate', the 'delete' command can be invoked to remove all
+   the data created.  This should leave the system back in the starting state -
+   begin with point #1 above to start again.
 
    vfw-test.sh delete

@@ -101,7 +101,7 @@ type ClusterManager interface {
 	CreateCluster(provider string, pr Cluster, qr ClusterContent) (Cluster, error)
 	GetCluster(provider, name string) (Cluster, error)
 	GetClusterContent(provider, name string) (ClusterContent, error)
-	GetClusterContext(provider, name string) (appcontext.AppContext, error)
+	GetClusterContext(provider, name string) (appcontext.AppContext, string, error)
 	GetClusters(provider string) ([]Cluster, error)
 	GetClustersWithLabel(provider, label string) ([]string, error)
 	DeleteCluster(provider, name string) error
@@ -310,7 +310,7 @@ func (v *ClusterClient) GetClusterContent(provider, name string) (ClusterContent
 }
 
 // GetClusterContext returns the AppContext for corresponding provider and name
-func (v *ClusterClient) GetClusterContext(provider, name string) (appcontext.AppContext, error) {
+func (v *ClusterClient) GetClusterContext(provider, name string) (appcontext.AppContext, string, error) {
 	//Construct key and tag to select the entry
 	key := ClusterKey{
 		ClusterProviderName: provider,
@@ -319,7 +319,7 @@ func (v *ClusterClient) GetClusterContext(provider, name string) (appcontext.App
 
 	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagContext)
 	if err != nil {
-		return appcontext.AppContext{}, pkgerrors.Wrap(err, "Get Cluster Context")
+		return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Get Cluster Context")
 	}
 
 	//value is a byte array
@@ -328,12 +328,12 @@ func (v *ClusterClient) GetClusterContext(provider, name string) (appcontext.App
 		var cc appcontext.AppContext
 		_, err = cc.LoadAppContext(ctxVal)
 		if err != nil {
-			return appcontext.AppContext{}, pkgerrors.Wrap(err, "Reinitializing Cluster AppContext")
+			return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Reinitializing Cluster AppContext")
 		}
-		return cc, nil
+		return cc, ctxVal, nil
 	}
 
-	return appcontext.AppContext{}, pkgerrors.New("Error getting Cluster AppContext")
+	return appcontext.AppContext{}, "", pkgerrors.New("Error getting Cluster AppContext")
 }
 
 // GetClusters returns all the Clusters for corresponding provider
@@ -393,7 +393,7 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		ClusterProviderName: provider,
 		ClusterName:         name,
 	}
-	_, err := v.GetClusterContext(provider, name)
+	_, _, err := v.GetClusterContext(provider, name)
 	if err == nil {
 		return pkgerrors.Errorf("Cannot delete cluster until context is deleted: %v, %v", provider, name)
 	}

@@ -188,6 +188,12 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	if err != nil {
 		return pkgerrors.Wrap(err, "Not finding the deploymentIntentGroup")
 	}
+
+	_, _, err = NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
+	if err == nil {
+		return pkgerrors.Errorf("DeploymentIntentGroup has already been instantiated: " + di)
+	}
+
 	rName := dIGrp.Spec.Version //rName is releaseName
 	overrideValues := dIGrp.Spec.OverrideValuesObj
 	cp := dIGrp.Spec.Profile
@@ -331,7 +337,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	// END: Scheduler code
 
 	// BEGIN : Rsync code
-	err = callRsync(ctxval)
+	err = callRsyncInstall(ctxval)
 	if err != nil {
 		return err
 	}
@@ -348,9 +354,9 @@ the deployment, which is made available in the appcontext.
 */
 func (c InstantiationClient) Status(p string, ca string, v string, di string) (StatusData, error) {
 
-	ac, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
+	ac, _, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
 	if err != nil {
-		return StatusData{}, pkgerrors.Wrap(err, "deploymentIntentGroup not found "+di)
+		return StatusData{}, pkgerrors.Wrap(err, "deploymentIntentGroup not found: "+di)
 	}
 
 	// Get all apps in this composite app
@@ -409,15 +415,32 @@ DeploymentIntentName and calls rsync to terminate.
 */
 func (c InstantiationClient) Terminate(p string, ca string, v string, di string) error {
 
-	//ac, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
-	_, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
+	ac, ctxval, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
 	if err != nil {
-		return pkgerrors.Wrap(err, "deploymentIntentGroup not found "+di)
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup has no app context: "+di)
 	}
 
-	// TODO - make call to rsync to terminate the composite app deployment
-	//        will leave the appcontext in place for clean up later
-	//        so monitoring status can be performed
+	err = callRsyncUninstall(ctxval)
+	if err != nil {
+		return err
+	}
+
+	err = ac.DeleteCompositeApp()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error deleting the app context for DeploymentIntentGroup: "+di)
+	}
+
+	key := DeploymentIntentGroupKey{
+		Name:         di,
+		Project:      p,
+		CompositeApp: ca,
+		Version:      v,
+	}
+
+	err = db.DBconn.RemoveTag(c.db.storeName, key, c.db.tagContext)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error removing the app context tag from DeploymentIntentGroup: "+di)
+	}
 
 	return nil
 }

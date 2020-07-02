@@ -102,12 +102,12 @@ func (m *mockClusterManager) GetClusterContent(provider, name string) (cluster.C
 	return m.ClusterContentItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusterContext(provider, name string) (appcontext.AppContext, error) {
+func (m *mockClusterManager) GetClusterContext(provider, name string) (appcontext.AppContext, string, error) {
 	if m.Err != nil {
-		return appcontext.AppContext{}, m.Err
+		return appcontext.AppContext{}, "", m.Err
 	}
 
-	return m.ClusterContextItems[0], nil
+	return m.ClusterContextItems[0], "", nil
 }
 
 func (m *mockClusterManager) GetClusters(provider string) ([]cluster.Cluster, error) {

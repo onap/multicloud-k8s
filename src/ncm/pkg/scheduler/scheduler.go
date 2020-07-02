@@ -17,20 +17,16 @@
 package scheduler
 
 import (
-	"context"
 	"encoding/json"
-	"time"
 
 	clusterPkg "github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
-	"github.com/onap/multicloud-k8s/src/ncm/internal/grpc"
 	oc "github.com/onap/multicloud-k8s/src/ncm/internal/ovncontroller"
 	ncmtypes "github.com/onap/multicloud-k8s/src/ncm/pkg/module/types"
 	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installappclient"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
-	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -63,7 +59,7 @@ func NewSchedulerClient() *SchedulerClient {
 // Apply Network Intents associated with a cluster
 func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) error {
 
-	_, err := clusterPkg.NewClusterClient().GetClusterContext(clusterProvider, cluster)
+	_, _, err := clusterPkg.NewClusterClient().GetClusterContext(clusterProvider, cluster)
 	if err == nil {
 		return pkgerrors.Errorf("Cluster network intents have already been applied: %v, %v", clusterProvider, cluster)
 	}
@@ -157,30 +153,9 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 	}
 
 	// call resource synchronizer to instantiate the CRs in the cluster
-	conn := rpc.GetRpcConn(grpc.RsyncName)
-	if conn == nil {
-		grpc.InitRsyncClient()
-		conn = rpc.GetRpcConn(grpc.RsyncName)
-	}
-
-	var rpcClient installpb.InstallappClient
-	var installRes *installpb.InstallAppResponse
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	if conn != nil {
-		rpcClient = installpb.NewInstallappClient(conn)
-		installReq := new(installpb.InstallAppRequest)
-		installReq.AppContext = ctxVal.(string)
-		installRes, err = rpcClient.InstallApp(ctx, installReq)
-		if err == nil {
-			log.Info("Response from InstappApp GRPC call", log.Fields{
-				"Succeeded": installRes.AppContextInstalled,
-				"Message":   installRes.AppContextInstallMessage,
-			})
-		}
-	} else {
-		return pkgerrors.Errorf("InstallApp Failed - Could not get InstallAppClient: %v", grpc.RsyncName)
+	err = installappclient.InvokeInstallApp(ctxVal.(string))
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -188,12 +163,16 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 
 // Terminate Network Intents associated with a cluster
 func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster string) error {
-	context, err := clusterPkg.NewClusterClient().GetClusterContext(clusterProvider, cluster)
+	context, ctxVal, err := clusterPkg.NewClusterClient().GetClusterContext(clusterProvider, cluster)
 	if err != nil {
 		return pkgerrors.Wrapf(err, "Error finding AppContext for cluster: %v, %v", clusterProvider, cluster)
 	}
 
-	// TODO: call resource synchronizer to terminate the CRs in the cluster
+	// call resource synchronizer to terminate the CRs in the cluster
+	err = installappclient.InvokeUninstallApp(ctxVal)
+	if err != nil {
+		return err
+	}
 
 	// remove the app context
 	cleanuperr := context.DeleteCompositeApp()

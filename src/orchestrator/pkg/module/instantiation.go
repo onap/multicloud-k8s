@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	rb "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
@@ -42,17 +43,25 @@ type InstantiationClient struct {
 	db InstantiationClientDbInfo
 }
 
+type ClusterAppStatus struct {
+	Cluster string
+	App     string
+	Status  rb.ResourceBundleStatus
+}
+
+type StatusData struct {
+	Data []ClusterAppStatus
+}
+
 /*
 InstantiationKey used in storing the contextid in the momgodb
 It consists of
-GenericPlacementIntentName,
 ProjectName,
 CompositeAppName,
 CompositeAppVersion,
 DeploymentIntentGroup
 */
 type InstantiationKey struct {
-	IntentName            string
 	Project               string
 	CompositeApp          string
 	Version               string
@@ -64,6 +73,8 @@ type InstantiationKey struct {
 type InstantiationManager interface {
 	//ApproveInstantiation(p string, ca string, v string, di string) (error)
 	Instantiate(p string, ca string, v string, di string) error
+	Status(p string, ca string, v string, di string) (StatusData, error)
+	Terminate(p string, ca string, v string, di string) error
 }
 
 // InstantiationClientDbInfo consists of storeName and tagContext
@@ -229,6 +240,12 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 			return pkgerrors.Wrapf(err, "Unable to get the resources for app :: %s", eachApp.Metadata.Name)
 		}
 
+		statusResource, err := getStatusResource(ctxval.(string), eachApp.Metadata.Name)
+		if err != nil {
+			return pkgerrors.Wrapf(err, "Unable to generate the status resource for app :: %s", eachApp.Metadata.Name)
+		}
+		resources = append(resources, statusResource)
+
 		specData, err := NewAppIntentClient().GetAllIntentsByApp(eachApp.Metadata.Name, p, ca, v, gIntent)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents for app")
@@ -269,12 +286,11 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	//END: storing into etcd
 
 	// BEGIN:: save the context in the orchestrator db record
-	key := InstantiationKey{
-		IntentName:            gIntent,
-		Project:               p,
-		CompositeApp:          ca,
-		Version:               v,
-		DeploymentIntentGroup: di,
+	key := DeploymentIntentGroupKey{
+		Name:         di,
+		Project:      p,
+		CompositeApp: ca,
+		Version:      v,
 	}
 
 	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagContext, ctxval)
@@ -323,4 +339,85 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 
 	log.Info(":: Done with instantiation... ::", log.Fields{"CompositeAppName": ca})
 	return err
+}
+
+/*
+Status takes in projectName, compositeAppName, compositeAppVersion,
+DeploymentIntentName. This method is responsible obtaining the status of
+the deployment, which is made available in the appcontext.
+*/
+func (c InstantiationClient) Status(p string, ca string, v string, di string) (StatusData, error) {
+
+	ac, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
+	if err != nil {
+		return StatusData{}, pkgerrors.Wrap(err, "deploymentIntentGroup not found "+di)
+	}
+
+	// Get all apps in this composite app
+	allApps, err := NewAppClient().GetApps(p, ca, v)
+	if err != nil {
+		return StatusData{}, pkgerrors.Wrap(err, "Not finding the apps")
+	}
+
+	var diStatus StatusData
+	diStatus.Data = make([]ClusterAppStatus, 0)
+
+	// Loop through each app and get the status data for each cluster in the app
+	for _, app := range allApps {
+		// Get the clusters in the appcontext for this app
+		clusters, err := ac.GetClusterNames(app.Metadata.Name)
+		if err != nil {
+			log.Info(":: No clusters for app ::", log.Fields{"AppName": app.Metadata.Name})
+			continue
+		}
+
+		for _, cluster := range clusters {
+			handle, err := ac.GetStatusHandle(app.Metadata.Name, cluster)
+			if err != nil {
+				log.Info(":: No status handle for cluster, app ::",
+					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})
+				continue
+			}
+			statusValue, err := ac.GetValue(handle)
+			if err != nil {
+				log.Info(":: No status value for cluster, app ::",
+					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})
+				continue
+			}
+			log.Info(":: STATUS VALUE ::", log.Fields{"statusValue": statusValue})
+			var statusData ClusterAppStatus
+			err = json.Unmarshal([]byte(statusValue.(string)), &statusData.Status)
+			if err != nil {
+				log.Info(":: Error unmarshaling status value for cluster, app ::",
+					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})
+				continue
+			}
+			statusData.Cluster = cluster
+			statusData.App = app.Metadata.Name
+			log.Info(":: STATUS DATA ::", log.Fields{"status": statusData})
+
+			diStatus.Data = append(diStatus.Data, statusData)
+		}
+	}
+
+	return diStatus, nil
+}
+
+/*
+Terminate takes in projectName, compositeAppName, compositeAppVersion,
+DeploymentIntentName and calls rsync to terminate.
+*/
+func (c InstantiationClient) Terminate(p string, ca string, v string, di string) error {
+
+	//ac, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
+	_, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
+	if err != nil {
+		return pkgerrors.Wrap(err, "deploymentIntentGroup not found "+di)
+	}
+
+	// TODO - make call to rsync to terminate the composite app deployment
+	//        will leave the appcontext in place for clean up later
+	//        so monitoring status can be performed
+
+	return nil
 }

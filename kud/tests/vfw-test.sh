@@ -969,6 +969,9 @@ function instantiateVfw {
     call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/instantiate"
 }
 
+function statusVfw {
+    call_api "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/status"
+}
 
 function usage {
     echo "Usage: $0  create|get|delete|apply|terminate|instantiate"
@@ -986,12 +989,14 @@ function usage {
     echo "    delete - deletes all resources in ncm, ovnaction, clm resources created for vfw"
     echo "    apply - applys the network intents - e.g. networks created in ncm"
     echo "    instantiate - approves and instantiates the composite app via the generic deployment intent"
+    echo "    status - get status of deployed resources"
     echo "    terminate - remove the network inents created by ncm"
     echo ""
     echo "    a reasonable test sequence:"
     echo "    1.  create"
     echo "    2.  apply"
     echo "    3.  instantiate"
+    echo "    4.  status"
 
     exit
 }
@@ -1050,5 +1055,6 @@ case "$1" in
     "apply" ) applyNcmData ;;
     "terminate" ) terminateNcmData ;;
     "instantiate" ) instantiateVfw ;;
+    "status" ) statusVfw ;;
     *) usage ;;
 esac

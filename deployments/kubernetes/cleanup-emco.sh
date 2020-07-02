@@ -14,8 +14,3 @@ kubectl -n onap4k8s delete configmap orchestrator
 kubectl -n onap4k8s delete configmap ncm
 kubectl -n onap4k8s delete configmap ovnaction
 kubectl -n onap4k8s delete configmap rsync
-
-# delete the networks
-kubectl delete network protected-private-net
-kubectl delete providernetwork emco-private-net
-kubectl delete providernetwork unprotected-private-net

@@ -145,6 +145,10 @@ func (c *MockRunTimeContext) RtcUpdateValue(handle interface{}, value interface{
 	return c.Err
 }
 
+func (rtc *MockRunTimeContext) RtcAddStatus(handle interface{}, value interface{}) (interface{}, error) {
+	return nil, nil
+}
+
 func TestCreateCompositeApp(t *testing.T) {
 	var ac = AppContext{}
 	testCases := []struct {

@@ -1197,3 +1197,15 @@ function populate_CSAR_composite_app_helm {
     popd
 }
 
+
+function populate_CSAR_operator_helm {
+    _checks_args "$1"
+    pushd "${CSAR_DIR}/$1"
+    print_msg "Create Helm Chart Archives for operators"
+    rm -f *.tar.gz
+    tar -czf operator.tar.gz -C $test_folder/vnfs/comp-app/collection/operators/helm .
+    tar -czf operator_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/operators/profile .
+    export operator_helm_path="${CSAR_DIR}/$1/operator.tar.gz"
+    popd
+}
+

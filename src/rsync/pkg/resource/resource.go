@@ -20,16 +20,15 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	utils "github.com/onap/multicloud-k8s/src/rsync/pkg/internal"
-	"github.com/onap/multicloud-k8s/src/rsync/pkg/internal/config"
 	"github.com/onap/multicloud-k8s/src/rsync/pkg/connector"
+	utils "github.com/onap/multicloud-k8s/src/rsync/pkg/internal"
 )
 
 type Resource struct {
 }
 
 // Create deployment object in a specific Kubernetes cluster
-func (r Resource) Create(data string, namespace string, client connector.KubernetesConnector) (string, error) {
+func (r Resource) Create(data string, namespace string, label string, client connector.KubernetesConnector) (string, error) {
 	if namespace == "" {
 		namespace = "default"
 	}
@@ -57,13 +56,15 @@ func (r Resource) Create(data string, namespace string, client connector.Kuberne
 	if labels == nil {
 		labels = map[string]string{}
 	}
-	labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
+	//labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
+	labels["emco/deployment-id"] = label
 	unstruct.SetLabels(labels)
 
 	// This checks if the resource we are creating has a podSpec in it
 	// Eg: Deployment, StatefulSet, Job etc..
 	// If a PodSpec is found, the label will be added to it too.
-	connector.TagPodsIfPresent(unstruct, client.GetInstanceID())
+	//connector.TagPodsIfPresent(unstruct, client.GetInstanceID())
+	connector.TagPodsIfPresent(unstruct, label)
 
 	gvr := mapping.Resource
 	var createdObj *unstructured.Unstructured
@@ -86,44 +87,44 @@ func (r Resource) Create(data string, namespace string, client connector.Kuberne
 
 // Delete an existing resource hosted in a specific Kubernetes cluster
 func (r Resource) Delete(data string, resname string, namespace string, client connector.KubernetesConnector) error {
-        if namespace == "" {
-                namespace = "default"
-        }
+	if namespace == "" {
+		namespace = "default"
+	}
 
-        //Decode the yaml file to create a runtime.Object
-        unstruct := &unstructured.Unstructured{}
-        //Ignore the returned obj as we expect the data in unstruct
-        _, err := utils.DecodeYAMLData(data, unstruct)
-        if err != nil {
-                return pkgerrors.Wrap(err, "Decode deployment object error")
-        }
+	//Decode the yaml file to create a runtime.Object
+	unstruct := &unstructured.Unstructured{}
+	//Ignore the returned obj as we expect the data in unstruct
+	_, err := utils.DecodeYAMLData(data, unstruct)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Decode deployment object error")
+	}
 
-        dynClient := client.GetDynamicClient()
-        mapper := client.GetMapper()
+	dynClient := client.GetDynamicClient()
+	mapper := client.GetMapper()
 
-        gvk := unstruct.GroupVersionKind()
-        mapping, err := mapper.RESTMapping(schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}, gvk.Version)
-        if err != nil {
-                return pkgerrors.Wrap(err, "Mapping kind to resource error")
-        }
+	gvk := unstruct.GroupVersionKind()
+	mapping, err := mapper.RESTMapping(schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}, gvk.Version)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Mapping kind to resource error")
+	}
 
-        gvr := mapping.Resource
-        deletePolicy := metav1.DeletePropagationForeground
-        opts := &metav1.DeleteOptions{
-                PropagationPolicy: &deletePolicy,
-        }
+	gvr := mapping.Resource
+	deletePolicy := metav1.DeletePropagationForeground
+	opts := &metav1.DeleteOptions{
+		PropagationPolicy: &deletePolicy,
+	}
 
-        switch mapping.Scope.Name() {
-        case meta.RESTScopeNameNamespace:
-                err = dynClient.Resource(gvr).Namespace(namespace).Delete(resname, opts)
-        case meta.RESTScopeNameRoot:
-                err = dynClient.Resource(gvr).Delete(resname, opts)
-        default:
-                return pkgerrors.New("Got an unknown RESTSCopeName for mappin")
-        }
+	switch mapping.Scope.Name() {
+	case meta.RESTScopeNameNamespace:
+		err = dynClient.Resource(gvr).Namespace(namespace).Delete(resname, opts)
+	case meta.RESTScopeNameRoot:
+		err = dynClient.Resource(gvr).Delete(resname, opts)
+	default:
+		return pkgerrors.New("Got an unknown RESTSCopeName for mappin")
+	}
 
-        if err != nil {
-                return pkgerrors.Wrap(err, "Delete object error")
-        }
-        return nil
+	if err != nil {
+		return pkgerrors.Wrap(err, "Delete object error")
+	}
+	return nil
 }

@@ -1189,9 +1189,26 @@ function populate_CSAR_composite_app_helm {
     print_msg "Create Helm Chart Archives for compositeApp"
     rm -f *.tar.gz
     tar -czf collectd.tar.gz -C $test_folder/vnfs/comp-app/collection/app1/helm .
-    tar -czf prometheus.tar.gz -C $test_folder/vnfs/comp-app/collection/app2/helm .
+    tar -czf prometheus-operator.tar.gz -C $test_folder/vnfs/comp-app/collection/app2/helm .
+    tar -czf m3db.tar.gz -C $test_folder/vnfs/comp-app/collection/app3/helm .
     tar -czf collectd_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app1/profile .
-    tar -czf prometheus_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app2/profile .
+    tar -czf prometheus-operator_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app2/profile .
+    tar -czf m3db_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app3/profile .
+    export prometheus_helm_path="${CSAR_DIR}/$1/prometheus-operator.tar.gz"
+    export collectd_helm_path="${CSAR_DIR}/$1/collectd.tar.gz"
+    export m3db_helm_path="${CSAR_DIR}/$1/m3db.tar.gz"
+    popd
+}
+
+
+function populate_CSAR_operator_helm {
+    _checks_args "$1"
+    pushd "${CSAR_DIR}/$1"
+    print_msg "Create Helm Chart Archives for operators"
+    rm -f *.tar.gz
+    tar -czf operator.tar.gz -C $test_folder/vnfs/comp-app/collection/operators/helm .
+    tar -czf operator_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/operators/profile .
+    export operator_helm_path="${CSAR_DIR}/$1/operator.tar.gz"
     popd
 }
 

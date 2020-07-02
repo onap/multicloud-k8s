@@ -1,15 +1,16 @@
-FROM registry.access.redhat.com/ubi7/ubi-minimal:latest
+FROM golang:1.14.1
 
-ENV OPERATOR=/usr/local/bin/monitor \
-    USER_UID=1001 \
-    USER_NAME=monitor
+WORKDIR /go/src/github.com/onap/multicloud-k8s/src/monitor
+COPY ./ ./
+RUN make all
 
-# install operator binary
-COPY _output/bin/monitor ${OPERATOR}
+FROM ubuntu:16.04
 
-COPY bin /usr/local/bin
-RUN  /usr/local/bin/user_setup
+WORKDIR /opt/monitor
+RUN groupadd -r monitor && useradd -r -g monitor monitor
+RUN chown monitor:monitor /opt/monitor -R
+COPY --chown=monitor --from=0 /go/src/github.com/onap/multicloud-k8s/src/monitor/monitor ./
 
-ENTRYPOINT ["/usr/local/bin/entrypoint"]
+USER monitor
+ENTRYPOINT ["/opt/monitor/monitor"]
 
-USER ${USER_UID}

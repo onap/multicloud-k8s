@@ -7,7 +7,29 @@ As written, the vfw-test.sh script assumes 3 clusters
 
 The edge cluster in which vFW will be instantiated should be KUD clusters.
 
-# Preparations
+# Edge cluster preparation
+
+For status monitoring support, the 'monitor' docker image must be built and
+deployed.
+
+In multicloud-k8s repo:
+	cd multicloud-k8s/src/monitor
+ 	docker build -f build/Dockerfile . -t monitor
+	<tag and push docker image to dockerhub ...>
+
+Deploy monitor program in each cluster (assumes multicloud-k8s repo is present in cloud)
+	# one time setup per cluster - install the CRD
+	cd multicloud-k8s/src/monitor/deploy/crds
+	kubectl apply -f crds/k8splugin_v1alpha1_resourcebundlestate_crd.yaml
+	
+	# one time setup per cluster
+	# update yaml files with correct image
+	# (cleanup first, if monitor was already installed - see monitor-cleanup.sh)
+	cd multicloud-k8s/src/monitor/deploy
+	monitor-deploy.sh
+
+
+# Preparation of the vFW Composit Application
 
 ## Prepare the Composite vFW Application Charts and Profiles
 

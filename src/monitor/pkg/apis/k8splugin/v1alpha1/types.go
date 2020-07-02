@@ -15,8 +15,8 @@ import (
 // +kubebuilder:subresource:status
 // +genclient
 type ResourceBundleState struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	metav1.TypeMeta   `json:",inline" yaml:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata" yaml:"metadata"`
 
 	Spec   ResourceBundleStateSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 	Status ResourceBundleStatus    `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`

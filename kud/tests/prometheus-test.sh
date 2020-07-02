@@ -43,16 +43,23 @@ composite_app_description="test_project_description"
 composite_app_version="test_composite_app_version"
 app1_helm_path="$CSAR_DIR/$csar_id/prometheus-operator.tar.gz"
 app1_profile_path="$CSAR_DIR/$csar_id/prometheus-operator_profile.tar.gz"
+app2_helm_path="$CSAR_DIR/$csar_id/collectd.tar.gz"
+app2_profile_path="$CSAR_DIR/$csar_id/collectd_profile.tar.gz"
 
 
+
+app2_name="collectd"
+app2_desc="collectd_desc"
 app1_name="prometheus-operator"
 app1_desc="prometheus_desc"
 
 main_composite_profile_name="main_composite_profile"
 sub_composite_profile_name1="test_composite_profile1"
+sub_composite_profile_name2="test_composite_profile2"
 
 main_composite_profile_description="main_composite_profile_description"
 sub_composite_profile_description="sub_composite_profile_description"
+sub_composite_profile_description2="sub_composite_profile_description2"
 
 genericPlacementIntentName="test_gen_placement_intent1"
 genericPlacementIntentDesc="test_gen_placement_intent_desc"
@@ -190,6 +197,24 @@ prometheus_app_data="$(cat <<EOF
 EOF
 )"
 
+# add app entries for the collectd app into
+# compositeApp
+
+collectd_app_name="collectd"
+collectd_helm_chart=${app2_helm_path}
+
+collectd_app_data="$(cat <<EOF
+{
+  "metadata": {
+    "name": "${collectd_app_name}",
+    "description": "description for app ${collectd_app_name}",
+    "userData1": "user data 2 for ${collectd_app_name}",
+    "userData2": "user data 2 for ${collectd_app_name}"
+   }
+}
+EOF
+)"
+
 # Add the composite profile
 collection_composite_profile_name="collection_composite-profile"
 collection_composite_profile_data="$(cat <<EOF
@@ -217,6 +242,24 @@ prometheus_profile_data="$(cat <<EOF
    },
    "spec":{
       "app-name":  "${prometheus_app_name}"
+   }
+}
+EOF
+)"
+
+# Add the collectd profile data into collection profile data
+collectd_profile_name="collectd-profile"
+collectd_profile_file=$app2_profile_path
+collectd_profile_data="$(cat <<EOF
+{
+   "metadata":{
+      "name":"${collectd_profile_name}",
+      "description":"description of ${collectd_profile_name}",
+      "userData1":"user data 1 for ${collectd_profile_name}",
+      "userData2":"user data 2 for ${collectd_profile_name}"
+   },
+   "spec":{
+      "app-name":  "${collectd_app_name}"
    }
 }
 EOF
@@ -251,6 +294,30 @@ prometheus_placement_intent_data="$(cat <<EOF
    },
    "spec":{
       "app-name":"${prometheus_app_name}",
+      "intent":{
+         "allOf":[
+            {  "provider-name":"${clusterprovidername}",
+               "cluster-label-name":"${labelname}"
+            }
+         ]
+      }
+   }
+}
+EOF
+)"
+
+# define app placement intent for collectd
+collectd_placement_intent_name="collectd-placement-intent"
+collectd_placement_intent_data="$(cat <<EOF
+{
+   "metadata":{
+      "name":"${collectd_placement_intent_name}",
+      "description":"description of ${collectd_placement_intent_name}",
+      "userData1":"user data 1 for ${collectd_placement_intent_name}",
+      "userData2":"user data 2 for ${collectd_placement_intent_name}"
+   },
+   "spec":{
+      "app-name":"${collectd_app_name}",
       "intent":{
          "allOf":[
             {  "provider-name":"${clusterprovidername}",
@@ -323,12 +390,22 @@ function createOrchestratorData {
              -F "file=@${prometheus_helm_chart}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps"
 
+   print_msg "adding collectd app to the composite app"
+    call_api -F "metadata=${collectd_app_data}" \
+             -F "file=@${collectd_helm_chart}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps"
+
     print_msg "creating collection composite profile entry"
     call_api -d "${collection_composite_profile_data}" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles"
 
    print_msg "adding prometheus app profiles to the composite profile"
     call_api -F "metadata=${prometheus_profile_data}" \
              -F "file=@${prometheus_profile_file}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles"
+
+   print_msg "adding collectd app profiles to the composite profile"
+    call_api -F "metadata=${collectd_profile_data}" \
+             -F "file=@${collectd_profile_file}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles"
 
    print_msg "create the generic placement intent"
@@ -338,6 +415,12 @@ function createOrchestratorData {
    print_msg "add the prometheus app placement intent to the generic placement intent"
     call_api -d "${prometheus_placement_intent_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
+
+   print_msg "add the collectd app placement intent to the generic placement intent"
+    call_api -d "${collectd_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
+
+
    print_msg "create the deployment intent group"
     call_api -d "${deployment_intent_group_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups"
@@ -352,17 +435,28 @@ function deleteOrchestratorData {
 
    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
+   
 
    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
+
+   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
+
    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}"
+
 
    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${prometheus_profile_name}"
 
+   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${collectd_profile_name}"
+
    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}"
+
 
    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${prometheus_app_name}"
 
+   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${collectd_app_name}"
+
    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}"
+   
 
    delete_resource "${base_url_orchestrator}/projects/${projectname}"
 }

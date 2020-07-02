@@ -3,30 +3,28 @@ kind: Deployment
 metadata:
   name: monitor
   labels:
-    "emco/deployment-id": "bionic-beaver"
+    "emco/deployment-id": "monitor"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      "emco/deployment-id": "bionic-beaver"
+      "emco/deployment-id": "monitor"
   template:
     metadata:
       labels:
-        "emco/deployment-id": "bionic-beaver"
+        "emco/deployment-id": "monitor"
     spec:
       serviceAccountName: monitor
       containers:
         - name: monitor
           # Replace this with the built image name
-          image: k8splugin.io/monitor:latest
+          image: ewmduck/monitor:latest
           command:
-          - monitor
+          - /opt/monitor/monitor
           imagePullPolicy: IfNotPresent
           env:
             - name: WATCH_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
+              value: ""
             - name: POD_NAME
               valueFrom:
                 fieldRef:

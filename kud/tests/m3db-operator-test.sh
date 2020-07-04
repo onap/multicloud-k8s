@@ -1,3 +1,21 @@
+# /*
+#  * Copyright 2020 Intel Corporation, Inc
+#  *
+#  * Licensed under the Apache License, Version 2.0 (the "License");
+#  * you may not use this file except in compliance with the License.
+#  * You may obtain a copy of the License at
+#  *
+#  *     http://www.apache.org/licenses/LICENSE-2.0
+#  *
+#  * Unless required by applicable law or agreed to in writing, software
+#  * distributed under the License is distributed on an "AS IS" BASIS,
+#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  * See the License for the specific language governing permissions and
+#  * limitations under the License.
+#  */
+
+
+
 set -o errexit
 set -o nounset
 set -o pipefail
@@ -256,9 +274,8 @@ EOF
 
 function createOrchestratorData {
 
-   print_msg "creating controller entries"
+    print_msg "creating controller entries"
     call_api -d "${rsynccontrollerdata}" "${base_url_orchestrator}/controllers"
-    
 
     print_msg "creating project entry"
     call_api -d "${projectdata}" "${base_url_orchestrator}/projects"
@@ -275,22 +292,21 @@ function createOrchestratorData {
     print_msg "creating operators composite profile entry"
     call_api -d "${operators_composite_profile_data}" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/composite-profiles"
 
-   print_msg "adding operator sub-app profile to the composite profile"
+    print_msg "adding operator sub-app profile to the composite profile"
     call_api -F "metadata=${operator_profile_data}" \
              -F "file=@${operator_profile_file}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/composite-profiles/${operators_composite_profile_name}/profiles"
 
 
-   print_msg "create the generic placement intent"
+    print_msg "create the generic placement intent"
     call_api -d "${generic_placement_intent_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/generic-placement-intents"
-   
-   print_msg "add the operator app placement intent to the generic placement intent"
+    print_msg "add the operator app placement intent to the generic placement intent"
     call_api -d "${operator_placement_intent_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
 
 
-   print_msg "create the deployment intent group"
+    print_msg "create the deployment intent group"
     call_api -d "${deployment_intent_group_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/deployment-intent-groups"
     call_api -d "${deployment_intents_in_group_data}" \
@@ -300,31 +316,29 @@ function createOrchestratorData {
 
 function deleteOrchestratorData {
    # TODO- delete rsync controller and any other controller
-   delete_resource "${base_url_orchestrator}/controllers/${rsynccontrollername}"
+    delete_resource "${base_url_orchestrator}/controllers/${rsynccontrollername}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
-   
-
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${operator_placement_intent_name}"
-
-
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
+ 
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${operator_placement_intent_name}"
 
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/composite-profiles/${operators_composite_profile_name}/profiles/${operator_profile_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}"
 
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/composite-profiles/${operators_composite_profile_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/composite-profiles/${operators_composite_profile_name}/profiles/${operator_profile_name}"
 
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/apps/${operator_app_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/composite-profiles/${operators_composite_profile_name}"
 
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}"
-   
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/apps/${operator_app_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}"
+
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}"
+
+    delete_resource "${base_url_orchestrator}/projects/${projectname}"
 }
 
 
@@ -338,25 +352,18 @@ function createClmData {
 }
 
 function deleteClmData {
-
-   delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
-   delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
-
+    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
+    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
     delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}"
 }
-
 function createData {
     createClmData
     createOrchestratorData  
 }
-
 function deleteData {
     deleteClmData
     deleteOrchestratorData
 }
-
-
-
 function instantiate {
     # call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/approve"
     call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/instantiate"

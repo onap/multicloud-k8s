@@ -1,0 +1,6 @@
+service:
+    type: ClusterIP
+    nameOfPort: webPort
+    annotations: {}
+    labels: {}
+    clusterIP: ""

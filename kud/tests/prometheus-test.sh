@@ -33,37 +33,13 @@ CSAR_DIR="/opt/csar"
 csar_id="cb009bfe-bbee-11e8-9766-525400435678"
 
 
-project_name="test_project"
-project_description="test_project_description"
-userData1="user1"
-userData2="user2"
-
-composite_app_name="test_composite_app_collection"
-composite_app_description="test_project_description"
-composite_app_version="test_composite_app_version"
 app1_helm_path="$CSAR_DIR/$csar_id/prometheus-operator.tar.gz"
 app1_profile_path="$CSAR_DIR/$csar_id/prometheus-operator_profile.tar.gz"
 app2_helm_path="$CSAR_DIR/$csar_id/collectd.tar.gz"
 app2_profile_path="$CSAR_DIR/$csar_id/collectd_profile.tar.gz"
+app3_helm_path="$CSAR_DIR/$csar_id/m3db.tar.gz"
+app3_profile_path="$CSAR_DIR/$csar_id/m3db_profile.tar.gz"
 
-
-
-app2_name="collectd"
-app2_desc="collectd_desc"
-app1_name="prometheus-operator"
-app1_desc="prometheus_desc"
-
-main_composite_profile_name="main_composite_profile"
-sub_composite_profile_name1="test_composite_profile1"
-sub_composite_profile_name2="test_composite_profile2"
-
-main_composite_profile_description="main_composite_profile_description"
-sub_composite_profile_description="sub_composite_profile_description"
-sub_composite_profile_description2="sub_composite_profile_description2"
-
-genericPlacementIntentName="test_gen_placement_intent1"
-genericPlacementIntentDesc="test_gen_placement_intent_desc"
-logicalCloud="logical_cloud_name"
 
 # ---------BEGIN: SET CLM DATA---------------
 
@@ -118,7 +94,28 @@ kubeconfigedge2="/opt/kud/multi-cluster/edge2/artifacts/admin.conf"
 
 labelname2="LabelA"
 labeldata2="$(cat<<EOF
-{"label-name": "$labelname"}
+{"label-name": "$labelname2"}
+EOF
+)"
+
+clustername3="cluster1"
+clusterdata3="$(cat<<EOF
+{
+  "metadata": {
+    "name": "$clustername3",
+    "description": "description of $clustername3",
+    "userData1": "$clustername3 user data 1",
+    "userData2": "$clustername3 user data 2"
+  }
+}
+EOF
+)"
+
+kubeconfigcluster1="/opt/kud/multi-cluster/cluster1/artifacts/admin.conf"
+
+labelname3="LabelForCluster1"
+labeldata3="$(cat<<EOF
+{"label-name": "$labelname3"}
 EOF
 )"
 
@@ -215,6 +212,24 @@ collectd_app_data="$(cat <<EOF
 EOF
 )"
 
+# add app entries for the m3db app into
+# compositeApp
+
+m3db_app_name="m3db"
+m3db_helm_chart=${app3_helm_path}
+
+m3db_app_data="$(cat <<EOF
+{
+  "metadata": {
+    "name": "${m3db_app_name}",
+    "description": "description for app ${m3db_app_name}",
+    "userData1": "user data 2 for ${m3db_app_name}",
+    "userData2": "user data 2 for ${m3db_app_name}"
+   }
+}
+EOF
+)"
+
 # Add the composite profile
 collection_composite_profile_name="collection_composite-profile"
 collection_composite_profile_data="$(cat <<EOF
@@ -260,6 +275,24 @@ collectd_profile_data="$(cat <<EOF
    },
    "spec":{
       "app-name":  "${collectd_app_name}"
+   }
+}
+EOF
+)"
+
+# Add the m3db profile data into collection profile data
+m3db_profile_name="m3db-profile"
+m3db_profile_file=$app3_profile_path
+m3db_profile_data="$(cat <<EOF
+{
+   "metadata":{
+      "name":"${m3db_profile_name}",
+      "description":"description of ${m3db_profile_name}",
+      "userData1":"user data 1 for ${m3db_profile_name}",
+      "userData2":"user data 2 for ${m3db_profile_name}"
+   },
+   "spec":{
+      "app-name":  "${m3db_app_name}"
    }
 }
 EOF
@@ -330,6 +363,30 @@ collectd_placement_intent_data="$(cat <<EOF
 EOF
 )"
 
+# define app placement intent for m3db
+m3db_placement_intent_name="m3db-placement-intent"
+m3db_placement_intent_data="$(cat <<EOF
+{
+   "metadata":{
+      "name":"${m3db_placement_intent_name}",
+      "description":"description of ${m3db_placement_intent_name}",
+      "userData1":"user data 1 for ${m3db_placement_intent_name}",
+      "userData2":"user data 2 for ${m3db_placement_intent_name}"
+   },
+   "spec":{
+      "app-name":"${m3db_app_name}",
+      "intent":{
+         "allOf":[
+            {  "provider-name":"${clusterprovidername}",
+               "cluster-label-name":"${labelname3}"
+            }
+         ]
+      }
+   }
+}
+EOF
+)"
+
 # define a deployment intent group
 release="collection"
 deployment_intent_group_name="collection_deployment_intent_group"
@@ -375,10 +432,9 @@ EOF
 
 function createOrchestratorData {
 
-   print_msg "creating controller entries"
+    print_msg "creating controller entries"
     call_api -d "${rsynccontrollerdata}" "${base_url_orchestrator}/controllers"
     
-
     print_msg "creating project entry"
     call_api -d "${projectdata}" "${base_url_orchestrator}/projects"
 
@@ -390,38 +446,53 @@ function createOrchestratorData {
              -F "file=@${prometheus_helm_chart}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps"
 
-   print_msg "adding collectd app to the composite app"
+    print_msg "adding collectd app to the composite app"
     call_api -F "metadata=${collectd_app_data}" \
              -F "file=@${collectd_helm_chart}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps"
+
+
+    print_msg "adding m3db app to the composite app"
+    call_api -F "metadata=${m3db_app_data}" \
+             -F "file=@${m3db_helm_chart}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps"
 
     print_msg "creating collection composite profile entry"
     call_api -d "${collection_composite_profile_data}" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles"
 
-   print_msg "adding prometheus app profiles to the composite profile"
+    print_msg "adding prometheus app profiles to the composite profile"
     call_api -F "metadata=${prometheus_profile_data}" \
              -F "file=@${prometheus_profile_file}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles"
 
-   print_msg "adding collectd app profiles to the composite profile"
+    print_msg "adding collectd app profiles to the composite profile"
     call_api -F "metadata=${collectd_profile_data}" \
              -F "file=@${collectd_profile_file}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles"
 
-   print_msg "create the generic placement intent"
+    print_msg "adding m3db app profiles to the composite profile"
+    call_api -F "metadata=${m3db_profile_data}" \
+             -F "file=@${m3db_profile_file}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles"
+
+    print_msg "create the generic placement intent"
     call_api -d "${generic_placement_intent_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents"
-   
-   print_msg "add the prometheus app placement intent to the generic placement intent"
+
+    print_msg "add the prometheus app placement intent to the generic placement intent"
     call_api -d "${prometheus_placement_intent_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
 
-   print_msg "add the collectd app placement intent to the generic placement intent"
+    print_msg "add the collectd app placement intent to the generic placement intent"
     call_api -d "${collectd_placement_intent_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
 
+    print_msg "add the collectd app placement intent to the generic placement intent"
+    call_api -d "${m3db_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
 
-   print_msg "create the deployment intent group"
+
+    print_msg "create the deployment intent group"
     call_api -d "${deployment_intent_group_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups"
     call_api -d "${deployment_intents_in_group_data}" \
@@ -431,64 +502,71 @@ function createOrchestratorData {
 
 function deleteOrchestratorData {
    # TODO- delete rsync controller and any other controller
-   delete_resource "${base_url_orchestrator}/controllers/${rsynccontrollername}"
+    delete_resource "${base_url_orchestrator}/controllers/${rsynccontrollername}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
-   
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
+ 
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${m3db_placement_intent_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}"
 
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${prometheus_profile_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${collectd_profile_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${prometheus_profile_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${m3db_profile_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${collectd_profile_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${prometheus_app_name}"
 
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${collectd_app_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${prometheus_app_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${m3db_app_name}"
 
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${collectd_app_name}"
-
-   delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}"
-   
-
-   delete_resource "${base_url_orchestrator}/projects/${projectname}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}"
+ 
+    delete_resource "${base_url_orchestrator}/projects/${projectname}"
 }
-
-
-
 
 
 function createClmData {
     print_msg "Creating cluster provider and cluster"
     call_api -d "${clusterproviderdata}" "${base_url_clm}/cluster-providers"
-    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata" -F "file=@$kubeconfigedge1" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
-    call_api -d "${labeldata}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels"
-    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata2" -F "file=@$kubeconfigedge2" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
-    call_api -d "${labeldata}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername2}/labels"
 
-   #--TODO--call Creating provider network and network intents----
+    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata" -F "file=@$kubeconfigedge1" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
+
+    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata2" -F "file=@$kubeconfigedge2" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
+
+    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata3" -F "file=@$kubeconfigcluster1" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
+
+    call_api -d "${labeldata}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels"
+
+    call_api -d "${labeldata2}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername2}/labels"
+
+    call_api -d "${labeldata3}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername3}/labels"
 }
 
 function deleteClmData {
-   #--TODO ---deleting provider network intents for cluster1----
-   delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
-   delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
-   #--TODO ---deleting provider network intents for cluster2----
-   delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername2}/labels/${labelname}"
-   delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername2}"
+
+    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
+    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername2}/labels/${labelname2}"
+    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername3}/labels/${labelname3}"
+
+    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
+    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername2}"
+    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername3}"
+
     delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}"
 }
 
 function createData {
     createClmData
-    createOrchestratorData  
+    createOrchestratorData 
 }
 
 function deleteData {

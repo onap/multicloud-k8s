@@ -24,6 +24,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-00010101000000-000000000000
 	github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee
+	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200707034937-2ac132c002e4
 	github.com/pkg/errors v0.8.1
 	github.com/rubenv/sql-migrate v0.0.0-20200429072036-ae26b214fa43 // indirect
 	github.com/russross/blackfriday v1.5.2

@@ -9,9 +9,15 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.9.5 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/onap/multicloud-k8s/src/clm v0.0.0-00010101000000-000000000000
 	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4
+	github.com/pkg/errors v0.8.1
 	go.etcd.io/bbolt v1.3.3 // indirect
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	google.golang.org/grpc v1.27.1
+	k8s.io/api v0.0.0-20190831074750-7364b6bdad65
+	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
+	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 	k8s.io/kubernetes v1.14.1
 )
 

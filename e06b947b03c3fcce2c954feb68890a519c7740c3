@@ -46,6 +46,30 @@
       "revId": "e06b947b03c3fcce2c954feb68890a519c7740c3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9bf8a86_68e4a09b",
+        "filename": "src/orchestrator/pkg/rtcontext/rtcontext.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-07-08T21:27:02Z",
+      "side": 1,
+      "message": "AddResource also appends resource name to the new handle, this api is differing with that.",
+      "parentUuid": "abe87115_516d0bcd",
+      "range": {
+        "startLine": 219,
+        "startChar": 1,
+        "endLine": 219,
+        "endChar": 34
+      },
+      "revId": "e06b947b03c3fcce2c954feb68890a519c7740c3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

@@ -1,35 +1,80 @@
 module github.com/onap/multicloud-k8s/src/monitor
 
+go 1.14
+
 require (
-	github.com/NYTimes/gziphandler v1.0.1 // indirect
-	github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30 // indirect
-	github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20190808131943-845cdd2aa5d7 // indirect
+	dmitri.shuralyov.com/gpu/mtl v0.0.0-20191203043605-d42048ed14fd // indirect
+	github.com/NYTimes/gziphandler v1.1.1 // indirect
+	github.com/ajstarks/svgo v0.0.0-20191124160048-bd5c74aaa11c // indirect
+	github.com/containernetworking/cni v0.7.1
+	github.com/containernetworking/plugins v0.8.1
+	github.com/coreos/go-iptables v0.4.2 // indirect
+	github.com/creack/pty v1.1.9 // indirect
+	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
+	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484 // indirect
+	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484 // indirect
+	github.com/emicklei/go-restful v2.11.1+incompatible // indirect
+	github.com/fogleman/gg v1.3.0 // indirect
+	github.com/go-logr/logr v0.1.0
+	github.com/go-openapi/spec v0.19.5
+	github.com/go-openapi/swag v0.19.6 // indirect
+	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7 // indirect
+	github.com/golang/protobuf v1.3.5
+	github.com/google/btree v1.0.0 // indirect
+	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
+	github.com/hashicorp/golang-lru v0.5.3 // indirect
+	github.com/json-iterator/go v1.1.9 // indirect
+	github.com/jung-kurt/gofpdf v1.16.2 // indirect
+	github.com/kr/pty v1.1.8 // indirect
+	github.com/mitchellh/mapstructure v1.1.2
+	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
+	github.com/onsi/ginkgo v1.12.0
+	github.com/onsi/gomega v1.9.0
+	github.com/operator-framework/operator-sdk v0.19.0
+	github.com/phpdave11/gofpdi v1.0.8 // indirect
+	github.com/rogpeppe/go-charset v0.0.0-20190617161244-0dc95cdf6f31 // indirect
+	github.com/safchain/ethtool v0.0.0-20190326074333-42ed695e3de8 // indirect
+	github.com/sirupsen/logrus v1.5.0
+	github.com/spf13/pflag v1.0.5
+	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
+	github.com/urfave/cli v1.20.0
+	github.com/vishvananda/netlink v1.0.0
+	github.com/vishvananda/netns v0.0.0-20190625233234-7109fa855b0f // indirect
+	github.com/zmb3/gogetdoc v0.0.0-20190228002656-b37376c5da6a // indirect
+	golang.org/x/exp v0.0.0-20191227195350-da58074b4299 // indirect
+	golang.org/x/image v0.0.0-20191214001246-9130b4cfad52 // indirect
+	golang.org/x/mobile v0.0.0-20191210151939-1a1fef82734d // indirect
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
+	golang.org/x/tools/gopls v0.1.3 // indirect
+	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
+	gonum.org/v1/gonum v0.6.2 // indirect
+	gonum.org/v1/netlib v0.0.0-20191031114514-eccb95939662 // indirect
+	gonum.org/v1/plot v0.0.0-20191107103940-ca91d9d40d0a // indirect
+	google.golang.org/genproto v0.0.0-20200325114520-5b2d0af7952b // indirect
+	google.golang.org/grpc v1.28.0
+	gopkg.in/gcfg.v1 v1.2.3
+	gopkg.in/warnings.v0 v0.1.2 // indirect
+	k8s.io/api v0.18.2
+	k8s.io/apimachinery v0.18.2
+	//k8s.io/apimachinery v0.0.0-20190612125636-6a5db36e93ad
+	k8s.io/client-go v12.0.0+incompatible
+	k8s.io/kube-openapi v0.0.0-20200121204235-bf4fb3bd569c
+	k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89
+	sigs.k8s.io/controller-runtime v0.6.0
+	sigs.k8s.io/controller-tools v0.3.0
+	sigs.k8s.io/structured-merge-diff v1.0.1 // indirect
 	github.com/operator-framework/operator-sdk v0.9.1-0.20190729152335-7a35cfc9a7cf
 	github.com/operator-framework/operator-sdk-samples v0.0.0-20190529081445-bd30254f3a7e
-	github.com/pkg/errors v0.8.1
-	github.com/spf13/pflag v1.0.3
-	k8s.io/api v0.0.0-20190814101207-0772a1bdf941
-	k8s.io/apiextensions-apiserver v0.0.0-20190228180357-d002e88f6236
-	k8s.io/apimachinery v0.0.0-20190814100815-533d101be9a6
-	k8s.io/client-go v11.0.0+incompatible
-	k8s.io/sample-controller v0.0.0-20190814141925-f27ac7da6c3e // indirect
-	sigs.k8s.io/controller-runtime v0.1.12
-	sigs.k8s.io/controller-tools v0.1.10
 )
 
 // Pinned to kubernetes-1.13.4
 replace (
-	k8s.io/api => k8s.io/api v0.0.0-20190222213804-5cb15d344471
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190228180357-d002e88f6236
-	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
-	k8s.io/client-go => k8s.io/client-go v0.0.0-20190228174230-b40b2a5939e4
+	k8s.io/api => k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190918161926-8f644eb6e783
+	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190913080033-27d36303b655
+	k8s.io/client-go => k8s.io/client-go v0.0.0-20190918160344-1fbdaa4c8d90
+	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.4.0
+	sigs.k8s.io/controller-tools => sigs.k8s.io/controller-tools v0.2.4
+	github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.9.0
 )
-
-replace (
-	github.com/coreos/prometheus-operator => github.com/coreos/prometheus-operator v0.29.0
-	k8s.io/kube-state-metrics => k8s.io/kube-state-metrics v1.6.0
-	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.1.12
-	sigs.k8s.io/controller-tools => sigs.k8s.io/controller-tools v0.1.11-0.20190411181648-9d55346c2bde
-)
-
-replace github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.9.0

@@ -34,7 +34,7 @@ require (
 	gopkg.in/yaml.v2 v2.2.8
 	gopkg.in/yaml.v3 v3.0.0-20200506231410-2ff61e1afc86
 	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
-	k8s.io/cloud-provider v0.0.0-00010101000000-000000000000 // indirect
+	k8s.io/cloud-provider v0.0.0-20190409023720-1bc0c81fa51d // indirect
 	k8s.io/helm v2.14.3+incompatible
 	sigs.k8s.io/kustomize v2.0.3+incompatible // indirect
 )

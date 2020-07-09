@@ -1,94 +1,111 @@
 /*
- * Copyright 2019 Intel Corporation, Inc
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+Copyright 2020 Intel Corporation.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package connector
 
 import (
+	"encoding/base64"
+	"fmt"
 	"log"
+	"os"
+	"strings"
+	"sync"
 
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/kubernetes"
+	"github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
+	kubeclient "github.com/onap/multicloud-k8s/src/rsync/pkg/client"
+	pkgerrors "github.com/pkg/errors"
 )
 
-// KubernetesConnector is an interface that is expected to be implemented
-// by any code that calls the plugin framework functions.
-// It implements methods that are needed by the plugins to get Kubernetes
-// clients and other information needed to interface with Kubernetes
-type KubernetesConnector interface {
-	//GetMapper returns the RESTMapper that was created for this client
-	GetMapper() meta.RESTMapper
-
-	//GetDynamicClient returns the dynamic client that is needed for
-	//unstructured REST calls to the apiserver
-	GetDynamicClient() dynamic.Interface
-
-	// GetStandardClient returns the standard client that can be used to handle
-	// standard kubernetes kinds
-	GetStandardClient() kubernetes.Interface
-
-	//GetInstanceID returns the InstanceID for tracking during creation
-	GetInstanceID() string
+type Connector struct {
+	cid     string
+	Clients map[string]*kubeclient.Client
+	sync.Mutex
 }
 
-// Reference is the interface that is implemented
-type Reference interface {
-	//Create a kubernetes resource described by the yaml in yamlFilePath
-	Create(yamlFilePath string, namespace string, label string, client KubernetesConnector) (string, error)
-	//Delete a kubernetes resource described in the provided namespace
-	Delete(yamlFilePath string, resname string, namespace string, client KubernetesConnector) error
+const basePath string = "/tmp/rsync/"
+
+// Init connector for an app context
+func Init(id interface{}) *Connector {
+	c := make(map[string]*kubeclient.Client)
+	str := fmt.Sprintf("%v", id)
+	return &Connector{
+		Clients: c,
+		cid:     str,
+	}
 }
 
-// TagPodsIfPresent finds the PodTemplateSpec from any workload
-// object that contains it and changes the spec to include the tag label
-func TagPodsIfPresent(unstruct *unstructured.Unstructured, tag string) {
-
-	spec, ok := unstruct.Object["spec"].(map[string]interface{})
-	if !ok {
-		log.Println("Error converting spec to map")
-		return
+// getKubeConfig uses the connectivity client to get the kubeconfig based on the name
+// of the clustername.
+func getKubeConfig(clustername string) ([]byte, error) {
+	if !strings.Contains(clustername, "+") {
+		return nil, pkgerrors.New("Not a valid cluster name")
 	}
-
-	template, ok := spec["template"].(map[string]interface{})
-	if !ok {
-		log.Println("Error converting template to map")
-		return
+	strs := strings.Split(clustername, "+")
+	if len(strs) != 2 {
+		return nil, pkgerrors.New("Not a valid cluster name")
 	}
-
-	//Attempt to convert the template to a podtemplatespec.
-	//This is to check if we have any pods being created.
-	podTemplateSpec := &corev1.PodTemplateSpec{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(template, podTemplateSpec)
+	kubeConfig, err := cluster.NewClusterClient().GetClusterContent(strs[0], strs[1])
 	if err != nil {
-		log.Println("Did not find a podTemplateSpec: " + err.Error())
-		return
+		return nil, pkgerrors.New("Get kubeconfig failed")
 	}
-
-	labels := podTemplateSpec.GetLabels()
-	if labels == nil {
-		labels = map[string]string{}
+	dec, err := base64.StdEncoding.DecodeString(kubeConfig.Kubeconfig)
+	if err != nil {
+		return nil, err
 	}
-	labels["emco/deployment-id"] = tag
-	podTemplateSpec.SetLabels(labels)
+	return dec, nil
+}
 
-	updatedTemplate, err := runtime.DefaultUnstructuredConverter.ToUnstructured(podTemplateSpec)
+// GetClient returns client for the cluster
+func (c *Connector) GetClient(cluster string) (*kubeclient.Client, error) {
+	c.Lock()
+	defer c.Unlock()
 
-	//Set the label
-	spec["template"] = updatedTemplate
+	client, ok := c.Clients[cluster]
+	if !ok {
+		// Get file from DB
+		dec, err := getKubeConfig(cluster)
+		if err != nil {
+			return nil, err
+		}
+		var kubeConfigPath string = basePath + c.cid + "/" + cluster + "/"
+		if _, err := os.Stat(kubeConfigPath); os.IsNotExist(err) {
+			err = os.MkdirAll(kubeConfigPath, 0755)
+			if err != nil {
+				return nil, err
+			}
+		}
+		kubeConfig := kubeConfigPath + "config"
+		f, err := os.Create(kubeConfig)
+		if err != nil {
+			return nil, err
+		}
+		_, err = f.Write(dec)
+		if err != nil {
+			return nil, err
+		}
+		client = kubeclient.New("", kubeConfig)
+		if client != nil {
+			c.Clients[cluster] = client
+		}
+	}
+	return client, nil
+}
+
+func (c *Connector) RemoveClient() {
+	c.Lock()
+	defer c.Unlock()
+	err := os.RemoveAll(basePath + "/" + c.cid)
+	if err != nil {
+		log.Printf("Warning: Deleting kubepath %s", err)
+	}
 }

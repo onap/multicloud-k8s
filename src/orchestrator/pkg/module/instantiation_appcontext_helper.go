@@ -86,6 +86,11 @@ func getResources(st []helm.KubernetesResourceTemplate) ([]resource, error) {
 			return nil, pkgerrors.Wrap(err, "Failed to get the resources..")
 		}
 		n := yamlStruct.Metadata.Name + SEPARATOR + yamlStruct.Kind
+		// This might happen when the rendered file just has some comments inside, no real k8s object.
+		if n == SEPARATOR {
+			log.Info(":: Ignoring, Unable to render the template ::", log.Fields{"YAML PATH": t.FilePath})
+			continue;
+		}
 
 		resources = append(resources, resource{name: n, filecontent: string(yamlFile)})
 

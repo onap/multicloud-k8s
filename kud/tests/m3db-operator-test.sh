@@ -25,11 +25,15 @@ source _common_test.sh
 source _functions.sh
 source _common.sh
 
+# base_url_orchestrator=${base_url_orchestrator:-"http://localhost:9015/v2"}
+# base_url_clm=${base_url_clm:-"http://localhost:9019/v2"}
+# base_url_ncm=${base_url_ncm:-"http://localhost:9016/v2"}
 
+base_url_orchestrator=${base_url_orchestrator:-"http://192.168.121.29:30356/v2"}
 base_url_clm=${base_url_clm:-"http://192.168.121.29:32551/v2"}
 base_url_ncm=${base_url_ncm:-"http://192.168.121.29:31406/v2"}
-base_url_orchestrator=${base_url_orchestrator:-"http://192.168.121.29:30356/v2"}
-base_url_rysnc=${base_url_orchestrator:-"http://192.168.121.29:31751/v2"}
+base_url_rysnc=${base_url_rysnc:-"http://192.168.121.29:31751/v2"}
+
 CSAR_DIR="/opt/csar"
 csar_id="operators-cb009bfe-bbee-11e8-9766-525400435678"
 

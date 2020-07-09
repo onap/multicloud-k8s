@@ -44,7 +44,7 @@ func listResources(cli client.Client, namespace string,
 		LabelSelector: labels.SelectorFromSet(labelSelector),
 	}
 
-	err := cli.List(context.TODO(), listOptions, returnData)
+	err := cli.List(context.TODO(), returnData, listOptions)
 	if err != nil {
 		log.Printf("Failed to list CRs: %v", err)
 		return err

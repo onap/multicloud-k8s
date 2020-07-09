@@ -1,5 +1,5 @@
 /*
-Copyright 2018 Intel Corporation.
+Copyright 2020 Intel Corporation.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -15,10 +15,14 @@ package utils
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 
+	corev1 "k8s.io/api/core/v1"
+
 	pkgerrors "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 )
@@ -67,4 +71,42 @@ func EnsureDirectory(f string) error {
 		return err
 	}
 	return os.MkdirAll(base, 0755)
+}
+
+// TagPodsIfPresent finds the PodTemplateSpec from any workload
+// object that contains it and changes the spec to include the tag label
+func TagPodsIfPresent(unstruct *unstructured.Unstructured, tag string) {
+
+	spec, ok := unstruct.Object["spec"].(map[string]interface{})
+	if !ok {
+		log.Println("Error converting spec to map")
+		return
+	}
+
+	template, ok := spec["template"].(map[string]interface{})
+	if !ok {
+		//log.Println("Error converting template to map")
+		return
+	}
+	log.Println("Apply label in template")
+	//Attempt to convert the template to a podtemplatespec.
+	//This is to check if we have any pods being created.
+	podTemplateSpec := &corev1.PodTemplateSpec{}
+	err := runtime.DefaultUnstructuredConverter.FromUnstructured(template, podTemplateSpec)
+	if err != nil {
+		log.Println("Did not find a podTemplateSpec: " + err.Error())
+		return
+	}
+
+	labels := podTemplateSpec.GetLabels()
+	if labels == nil {
+		labels = map[string]string{}
+	}
+	labels["emco/deployment-id"] = tag
+	podTemplateSpec.SetLabels(labels)
+
+	updatedTemplate, err := runtime.DefaultUnstructuredConverter.ToUnstructured(podTemplateSpec)
+
+	//Set the label
+	spec["template"] = updatedTemplate
 }

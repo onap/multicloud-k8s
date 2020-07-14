@@ -12,3 +12,12 @@
 **3. create ONAP4K8s v2 Microservices**
 
 `$ kubectl apply -f onap4k8s.yaml -n onap4k8s`
+
+### Steps to cleanup  packages
+**1. Run "cleanup-emco.sh" to clenaup v2 Microservies**
+
+`$ ./cleanup-emco.sh`
+
+**2. Cleanup v2 Microservices for Etcd and Mongo**
+
+`$ kubectl delete -f onap4k8sdb.yaml -n onap4k8s`

@@ -129,9 +129,63 @@ func instantiateResource(ac appcontext.AppContext, c *kubeclient.Client, name st
 	return nil
 }
 
+func addStatusTracker(c *kubeclient.Client, app string, cluster string, label string) error {
+
+	b, err := status.GetStatusCR(label)
+	if err != nil {
+		logutils.Error("Failed to get status CR for installing", logutils.Fields{
+			"error": err,
+			"label": label,
+		})
+		return err
+	}
+	if err = c.Apply(b); err != nil {
+		logutils.Error("Failed to apply status tracker", logutils.Fields{
+			"error":   err,
+			"cluster": cluster,
+			"app":     app,
+			"label":   label,
+		})
+		return err
+	}
+	logutils.Info("Status tracker installed::", logutils.Fields{
+		"cluster": cluster,
+		"app":     app,
+		"label":   label,
+	})
+	return nil
+}
+
+func deleteStatusTracker(c *kubeclient.Client, app string, cluster string, label string) error {
+	b, err := status.GetStatusCR(label)
+	if err != nil {
+		logutils.Error("Failed to get status CR for deleting", logutils.Fields{
+			"error": err,
+			"label": label,
+		})
+		return err
+	}
+	if err = c.Delete(b); err != nil {
+		logutils.Error("Failed to delete res", logutils.Fields{
+			"error": err,
+			"app":   app,
+			"label": label,
+		})
+		return err
+	}
+	logutils.Info("Status tracker deleted::", logutils.Fields{
+		"cluster": cluster,
+		"app":     app,
+		"label":   label,
+	})
+	return nil
+}
+
 type fn func(ac appcontext.AppContext, client *kubeclient.Client, res string, app string, cluster string, label string) error
 
-func applyFnComApp(cid interface{}, con *connector.Connector, f fn, breakonError bool) error {
+type statusfn func(client *kubeclient.Client, app string, cluster string, label string) error
+
+func applyFnComApp(cid interface{}, con *connector.Connector, f fn, sfn statusfn, breakonError bool) error {
 	ac := appcontext.AppContext{}
 	g, _ := errgroup.WithContext(context.Background())
 	_, err := ac.LoadAppContext(cid)
@@ -184,7 +238,7 @@ func applyFnComApp(cid interface{}, con *connector.Connector, f fn, breakonError
 					}
 					var aov map[string][]string
 					json.Unmarshal([]byte(resorder.(string)), &aov)
-					for _, res := range aov["resorder"] {
+					for i, res := range aov["resorder"] {
 						err = f(ac, c, res, appName, cluster, label)
 						if err != nil {
 							logutils.Error("Error in resource %s: %v", logutils.Fields{
@@ -193,9 +247,20 @@ func applyFnComApp(cid interface{}, con *connector.Connector, f fn, breakonError
 								"resource": res,
 							})
 							if breakonError {
+								// handle status tracking before exiting if at least one resource got handled
+								if i > 0 {
+									serr := sfn(c, appName, cluster, label)
+									if serr != nil {
+										logutils.Warn("Error handling status tracker", logutils.Fields{"error": serr})
+									}
+								}
 								return err
 							}
 						}
+					}
+					serr := sfn(c, appName, cluster, label)
+					if serr != nil {
+						logutils.Warn("Error handling status tracker", logutils.Fields{"error": serr})
 					}
 					return nil
 				})
@@ -221,7 +286,7 @@ func applyFnComApp(cid interface{}, con *connector.Connector, f fn, breakonError
 // InstantiateComApp Instantiate Apps in Composite App
 func (instca *CompositeAppContext) InstantiateComApp(cid interface{}) error {
 	con := connector.Init(cid)
-	err := applyFnComApp(cid, con, instantiateResource, true)
+	err := applyFnComApp(cid, con, instantiateResource, addStatusTracker, true)
 	if err != nil {
 		logutils.Error("InstantiateComApp unsuccessful", logutils.Fields{"error": err})
 		return err
@@ -234,7 +299,7 @@ func (instca *CompositeAppContext) InstantiateComApp(cid interface{}) error {
 // TerminateComApp Terminates Apps in Composite App
 func (instca *CompositeAppContext) TerminateComApp(cid interface{}) error {
 	con := connector.Init(cid)
-	err := applyFnComApp(cid, con, terminateResource, false)
+	err := applyFnComApp(cid, con, terminateResource, deleteStatusTracker, false)
 	if err != nil {
 		logutils.Error("TerminateComApp unsuccessful", logutils.Fields{
 			"error": err,

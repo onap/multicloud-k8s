@@ -23,6 +23,7 @@ import (
 	"strings"
 	"sync"
 
+	yaml "github.com/ghodss/yaml"
 	pkgerrors "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -31,6 +32,8 @@ import (
 	clientset "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned"
 	informers "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/informers/externalversions"
 	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -219,4 +222,34 @@ func getKubeConfig(clustername string) ([]byte, error) {
 		return nil, err
 	}
 	return dec, nil
+}
+
+// GetStatusCR returns a status monitoring customer resource
+func GetStatusCR(label string) ([]byte, error) {
+
+	var statusCr v1alpha1.ResourceBundleState
+
+	statusCr.TypeMeta.APIVersion = "k8splugin.io/v1alpha1"
+	statusCr.TypeMeta.Kind = "ResourceBundleState"
+	statusCr.SetName(label)
+
+	labels := make(map[string]string)
+	labels["emco/deployment-id"] = label
+	statusCr.SetLabels(labels)
+
+	labelSelector, err := metav1.ParseToLabelSelector("emco/deployment-id = " + label)
+	if err != nil {
+		log.Info(":: ERROR Parsing Label Selector ::", log.Fields{"Error": err})
+	} else {
+		statusCr.Spec.Selector = labelSelector
+	}
+
+	// Marshaling to json then convert to yaml works better than marshaling to yaml
+	// The 'apiVersion' attribute was marshaling to 'apiversion'
+	//	y, _ := yaml.Marshal(&statusCr)
+	j, _ := json.Marshal(&statusCr)
+	y, _ := yaml.JSONToYAML(j)
+	log.Info(":: RESULTING STATUS CR ::", log.Fields{"StatusCR": y})
+
+	return y, nil
 }

@@ -246,12 +246,6 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 			return pkgerrors.Wrapf(err, "Unable to get the resources for app :: %s", eachApp.Metadata.Name)
 		}
 
-		statusResource, err := getStatusResource(ctxval.(string), eachApp.Metadata.Name)
-		if err != nil {
-			return pkgerrors.Wrapf(err, "Unable to generate the status resource for app :: %s", eachApp.Metadata.Name)
-		}
-		resources = append(resources, statusResource)
-
 		specData, err := NewAppIntentClient().GetAllIntentsByApp(eachApp.Metadata.Name, p, ca, v, gIntent)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Unable to get the intents for app")

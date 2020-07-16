@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1015dd_8baa5d2c",
+        "filename": "kud/tests/topology-manager.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-07-16T17:37:45Z",
+      "side": 1,
+      "message": "The test shell script only work in AIO setup right ? it won\u0027t work in the containerized env.",
+      "revId": "a287ca44a91e473fa67ce7e8ea53e87e66999018",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

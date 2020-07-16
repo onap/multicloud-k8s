@@ -23,6 +23,7 @@ import (
 	"strings"
 	"sync"
 
+	yaml "github.com/ghodss/yaml"
 	pkgerrors "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -31,6 +32,7 @@ import (
 	clientset "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned"
 	informers "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/informers/externalversions"
 	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -45,11 +47,7 @@ var channelData channelManager
 const monitorLabel = "emco/deployment-id"
 
 // HandleStatusUpdate for an application in a cluster
-// TODO: Add code for specific handling
 func HandleStatusUpdate(clusterId string, id string, v *v1alpha1.ResourceBundleState) {
-	//status := v.Status.ServiceStatuses
-	//podStatus := v.Status.PodStatuses
-
 	// Get the contextId from the label (id)
 	result := strings.SplitN(id, "-", 2)
 	if result[0] == "" {
@@ -84,18 +82,12 @@ func HandleStatusUpdate(clusterId string, id string, v *v1alpha1.ResourceBundleS
 	}
 
 	// Get the handle for the context/app/cluster status object
-	handle, err := ac.GetStatusHandle(result[1], clusterId)
-	if err != nil {
-		// Expected first time
-		logrus.Info(clusterId, "::Status context handle not found::", id, "::Error::", err)
-	}
+	handle, _ := ac.GetStatusHandle(result[1], clusterId)
 
 	// If status handle was not found, then create the status object in the appcontext
 	if handle == nil {
 		chandle, err := ac.GetClusterHandle(result[1], clusterId)
-		if err != nil {
-			logrus.Info(clusterId, "::Cluster context handle not found::", id, "::Error::", err)
-		} else {
+		if err == nil {
 			ac.AddStatus(chandle, string(vjson))
 		}
 	} else {
@@ -219,4 +211,37 @@ func getKubeConfig(clustername string) ([]byte, error) {
 		return nil, err
 	}
 	return dec, nil
+}
+
+// GetStatusCR returns a status monitoring customer resource
+func GetStatusCR(label string) ([]byte, error) {
+
+	var statusCr v1alpha1.ResourceBundleState
+
+	statusCr.TypeMeta.APIVersion = "k8splugin.io/v1alpha1"
+	statusCr.TypeMeta.Kind = "ResourceBundleState"
+	statusCr.SetName(label)
+
+	labels := make(map[string]string)
+	labels["emco/deployment-id"] = label
+	statusCr.SetLabels(labels)
+
+	labelSelector, err := metav1.ParseToLabelSelector("emco/deployment-id = " + label)
+	if err != nil {
+		return nil, err
+	}
+	statusCr.Spec.Selector = labelSelector
+
+	// Marshaling to json then convert to yaml works better than marshaling to yaml
+	// The 'apiVersion' attribute was marshaling to 'apiversion'
+	j, err := json.Marshal(&statusCr)
+	if err != nil {
+		return nil, err
+	}
+	y, err := yaml.JSONToYAML(j)
+	if err != nil {
+		return nil, err
+	}
+
+	return y, nil
 }

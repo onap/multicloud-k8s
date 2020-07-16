@@ -74,7 +74,7 @@ func terminateResource(ac appcontext.AppContext, c *kubeclient.Client, name stri
 	}
 	logutils.Info("Deleted::", logutils.Fields{
 		"cluster":  cluster,
-		"resource": res,
+		"resource": name,
 	})
 	return nil
 }
@@ -124,7 +124,7 @@ func instantiateResource(ac appcontext.AppContext, c *kubeclient.Client, name st
 	}
 	logutils.Info("Installed::", logutils.Fields{
 		"cluster":  cluster,
-		"resource": res,
+		"resource": name,
 	})
 	return nil
 }

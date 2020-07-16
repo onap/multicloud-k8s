@@ -53,8 +53,8 @@ spec:
     spec:
       containers:
         - name: orchestrator
-          image: rtsood/emco:0.0.1
-          imagePullPolicy: IfNotPresent
+          image: rtsood/emco:stable
+          imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "orchestrator"]
           workingDir: /opt/emco
           ports:
@@ -125,8 +125,8 @@ spec:
     spec:
       containers:
         - name: ncm
-          image: rtsood/emco:0.0.1
-          imagePullPolicy: IfNotPresent
+          image: rtsood/emco:stable
+          imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "ncm"]
           workingDir: /opt/emco
           ports:
@@ -195,8 +195,8 @@ spec:
     spec:
       containers:
         - name: rsync
-          image: rtsood/emco:0.0.1
-          imagePullPolicy: IfNotPresent
+          image: rtsood/emco:stable
+          imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "rsync"]
           workingDir: /opt/emco
           ports:
@@ -270,8 +270,8 @@ spec:
     spec:
       containers:
         - name: ovnaction
-          image: rtsood/emco:0.0.1
-          imagePullPolicy: IfNotPresent
+          image: rtsood/emco:stable
+          imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "ovnaction"]
           workingDir: /opt/emco
           ports:
@@ -343,8 +343,8 @@ spec:
     spec:
       containers:
         - name: clm
-          image: rtsood/emco:0.0.1
-          imagePullPolicy: IfNotPresent
+          image: rtsood/emco:stable
+          imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "clm"]
           workingDir: /opt/emco
           ports:

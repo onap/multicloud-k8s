@@ -23,8 +23,8 @@ global:
 #################################################################
 # application image
 repository: registry.hub.docker.com
-image: rtsood/emco:0.0.1
-pullPolicy: IfNotPresent
+image: rtsood/emco:stable
+pullPolicy: Always
 command: "/opt/emco/entrypoint"
 args: "ovnaction"
 workingDir: /opt/emco

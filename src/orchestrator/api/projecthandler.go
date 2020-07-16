@@ -75,6 +75,31 @@ func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["project-name"]
 
+	// handle for get all projects
+	if len(name) == 0 {
+		var pList []moduleLib.Project
+
+		projects, err := h.client.GetAllProjects()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for _, p := range projects {
+			pList = append(pList, moduleLib.Project{MetaData: p.MetaData})
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(w).Encode(pList)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		return
+
+	}
+
 	ret, err := h.client.GetProject(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

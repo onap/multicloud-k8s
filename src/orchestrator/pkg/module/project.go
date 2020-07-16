@@ -58,6 +58,7 @@ type ProjectManager interface {
 	CreateProject(pr Project) (Project, error)
 	GetProject(name string) (Project, error)
 	DeleteProject(name string) error
+	GetAllProjects() ([]Project, error)
 }
 
 // ProjectClient implements the ProjectManager
@@ -121,6 +122,29 @@ func (v *ProjectClient) GetProject(name string) (Project, error) {
 	}
 
 	return Project{}, pkgerrors.New("Error getting Project")
+}
+
+// GetAllProjects returns all the projects
+func (v *ProjectClient) GetAllProjects() ([]Project, error) {
+	key := ProjectKey{
+		ProjectName: "",
+	}
+
+	var res []Project
+	values, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	if err != nil {
+
+	}
+
+	for _, value := range values {
+		p := Project{}
+		err = db.DBconn.Unmarshal(value, &p)
+		if err != nil {
+			return []Project{}, pkgerrors.Wrap(err, "Unmarshaling Project")
+		}
+		res = append(res, p)
+	}
+	return res, nil
 }
 
 // DeleteProject the  Project from database

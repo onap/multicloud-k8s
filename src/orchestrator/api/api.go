@@ -57,6 +57,7 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	}
 	router.HandleFunc("/projects", projHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}", projHandler.getHandler).Methods("GET")
+	router.HandleFunc("/projects", projHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}", projHandler.deleteHandler).Methods("DELETE")
 
 	//setting routes for compositeApp

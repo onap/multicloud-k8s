@@ -60,6 +60,10 @@ func (m *mockProjectManager) DeleteProject(name string) error {
 	return m.Err
 }
 
+func (m *mockProjectManager) GetAllProjects() ([]moduleLib.Project, error) {
+	return []moduleLib.Project{}, m.Err
+}
+
 func TestProjectCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string

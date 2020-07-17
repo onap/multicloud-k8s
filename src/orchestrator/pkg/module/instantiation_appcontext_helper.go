@@ -25,16 +25,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	jyaml "github.com/ghodss/yaml"
-
-	rb "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 	pkgerrors "github.com/pkg/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // resource consists of name of reource
@@ -97,45 +93,6 @@ func getResources(st []helm.KubernetesResourceTemplate) ([]resource, error) {
 		log.Info(":: Added resource into resource-order ::", log.Fields{"ResourceName": n})
 	}
 	return resources, nil
-}
-
-// addStatusResource adds a status monitoring resource to the app
-// which consists of name(name+kind) and content
-func getStatusResource(id, app string) (resource, error) {
-
-	var statusCr rb.ResourceBundleState
-
-	label := id + "-" + app
-	name := app + "-" + id
-
-	statusCr.TypeMeta.APIVersion = "k8splugin.io/v1alpha1"
-	statusCr.TypeMeta.Kind = "ResourceBundleState"
-	statusCr.SetName(name)
-
-	labels := make(map[string]string)
-	labels["emco/deployment-id"] = label
-	statusCr.SetLabels(labels)
-
-	labelSelector, err := metav1.ParseToLabelSelector("emco/deployment-id = " + label)
-	if err != nil {
-		log.Info(":: ERROR Parsing Label Selector ::", log.Fields{"Error": err})
-	} else {
-		statusCr.Spec.Selector = labelSelector
-	}
-
-	// Marshaling to json then convert to yaml works better than marshaling to yaml
-	// The 'apiVersion' attribute was marshaling to 'apiversion'
-	//	y, _ := yaml.Marshal(&statusCr)
-	j, _ := json.Marshal(&statusCr)
-	y, _ := jyaml.JSONToYAML(j)
-	log.Info(":: RESULTING STATUS CR ::", log.Fields{"StatusCR": y})
-
-	statusResource := resource{
-		name:        name + "+" + "ResourceBundleState",
-		filecontent: string(y),
-	}
-
-	return statusResource, nil
 }
 
 func addResourcesToCluster(ct appcontext.AppContext, ch interface{}, resources []resource) error {

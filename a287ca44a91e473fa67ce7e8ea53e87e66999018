@@ -16,6 +16,24 @@
       "revId": "a287ca44a91e473fa67ce7e8ea53e87e66999018",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "723a05e3_2c86ac47",
+        "filename": "kud/tests/topology-manager.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 6484
+      },
+      "writtenOn": "2020-07-17T03:11:19Z",
+      "side": 1,
+      "message": "Hi Kural,\nThis test should work for containerized env. Because this test uses the same NIC as the test script for SR-IOV. And I notice sriov.sh has been executed in the containerized env as below:\nhttps://github.com/onap/multicloud-k8s/blob/master/kud/tests/sriov.sh#L19\nhttps://github.com/onap/multicloud-k8s/blob/master/kud/hosting_providers/containerized/installer.sh#L131",
+      "parentUuid": "7a1015dd_8baa5d2c",
+      "revId": "a287ca44a91e473fa67ce7e8ea53e87e66999018",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

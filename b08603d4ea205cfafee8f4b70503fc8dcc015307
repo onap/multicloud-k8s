@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d6a40cc7_31c39e74",
+        "filename": "src/orchestrator/api/api.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-07-17T20:24:54Z",
+      "side": 1,
+      "message": "Remove white space",
+      "revId": "b08603d4ea205cfafee8f4b70503fc8dcc015307",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

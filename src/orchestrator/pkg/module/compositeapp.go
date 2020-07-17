@@ -64,6 +64,7 @@ func (cK CompositeAppKey) String() string {
 type CompositeAppManager interface {
 	CreateCompositeApp(c CompositeApp, p string) (CompositeApp, error)
 	GetCompositeApp(name string, version string, p string) (CompositeApp, error)
+	GetAllCompositeApps(p string) ([]CompositeApp, error)
 	DeleteCompositeApp(name string, version string, p string) error
 }
 
@@ -138,6 +139,38 @@ func (v *CompositeAppClient) GetCompositeApp(name string, version string, p stri
 	}
 
 	return CompositeApp{}, pkgerrors.New("Error getting composite application")
+}
+
+// GetAllCompositeApps returns all the compositeApp for a given project
+func (v *CompositeAppClient) GetAllCompositeApps(p string) ([]CompositeApp, error) {
+
+	_, err := NewProjectClient().GetProject(p)
+	if err != nil {
+		return []CompositeApp{}, pkgerrors.New("Unable to find the project")
+	}
+
+	key := CompositeAppKey{
+		CompositeAppName: "",
+		Version:          "",
+		Project:          p,
+	}
+
+	var caList []CompositeApp
+	values, err := db.DBconn.Find(v.storeName, key, v.tagMeta)
+	if err != nil {
+		return []CompositeApp{}, pkgerrors.Wrap(err, "Getting CompositeApps")
+	}
+
+	for _, value := range values {
+		ca := CompositeApp{}
+		err = db.DBconn.Unmarshal(value, &ca)
+		if err != nil {
+			return []CompositeApp{}, pkgerrors.Wrap(err, "Unmarshaling CompositeApp")
+		}
+		caList = append(caList, ca)
+	}
+
+	return caList, nil
 }
 
 // DeleteCompositeApp deletes the  CompositeApp from database

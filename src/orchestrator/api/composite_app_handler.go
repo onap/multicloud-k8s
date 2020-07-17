@@ -95,6 +95,32 @@ func (h compositeAppHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// getAllCompositeAppsHandler handles the GetAllComppositeApps, returns a list of compositeApps under a project
+func (h compositeAppHandler) getAllCompositeAppsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pName := vars["project-name"]
+
+	var caList []moduleLib.CompositeApp
+
+	cApps, err := h.client.GetAllCompositeApps(pName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	for _, cApp := range cApps {
+		caList = append(caList, moduleLib.CompositeApp{Metadata: cApp.Metadata, Spec: cApp.Spec})
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(caList)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	return
+}
+
 // deleteHandler handles DELETE operations on a particular CompositeApp Name
 func (h compositeAppHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

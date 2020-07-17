@@ -107,7 +107,7 @@ case ${ID,,} in
 
     case $VAGRANT_DEFAULT_PROVIDER in
         virtualbox)
-        echo "deb http://download.virtualbox.org/virtualbox/debian trusty contrib" >> /etc/apt/sources.list
+        echo "deb http://download.virtualbox.org/virtualbox/debian bionic contrib" >> /etc/apt/sources.list
         wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
         wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
         packages+=(virtualbox-5.1 dkms)

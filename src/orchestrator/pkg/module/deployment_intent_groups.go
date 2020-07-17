@@ -64,6 +64,7 @@ type DeploymentIntentGroupManager interface {
 	GetDeploymentIntentGroup(di string, p string, ca string, v string) (DeploymentIntentGroup, error)
 	GetDeploymentIntentGroupContext(di string, p string, ca string, v string) (appcontext.AppContext, string, error)
 	DeleteDeploymentIntentGroup(di string, p string, ca string, v string) error
+	GetAllDeploymentIntentGroups(p string, ca string, v string) ([]DeploymentIntentGroup, error)
 }
 
 // DeploymentIntentGroupKey consists of Name of the deployment group, project name, CompositeApp name, CompositeApp version
@@ -106,7 +107,7 @@ func (c *DeploymentIntentGroupClient) CreateDeploymentIntentGroup(d DeploymentIn
 
 	res, err := c.GetDeploymentIntentGroup(d.MetaData.Name, p, ca, v)
 	if !reflect.DeepEqual(res, DeploymentIntentGroup{}) {
-		return DeploymentIntentGroup{}, pkgerrors.New("AppIntent already exists")
+		return DeploymentIntentGroup{}, pkgerrors.New("DeploymentIntent already exists")
 	}
 
 	//Check if project exists
@@ -164,7 +165,47 @@ func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroup(di string, p stri
 
 }
 
-// GetDeploymentIntentGroup returns the DeploymentIntentGroup with a given name, project, compositeApp and version of compositeApp
+// GetAllDeploymentIntentGroups returns all the deploymentIntentGroups under a specific project, compositeApp and version
+func (c *DeploymentIntentGroupClient) GetAllDeploymentIntentGroups(p string, ca string, v string) ([]DeploymentIntentGroup, error) {
+
+	key := DeploymentIntentGroupKey{
+		Name:         "",
+		Project:      p,
+		CompositeApp: ca,
+		Version:      v,
+	}
+
+	//Check if project exists
+	_, err := NewProjectClient().GetProject(p)
+	if err != nil {
+		return []DeploymentIntentGroup{}, pkgerrors.Wrap(err, "Unable to find the project")
+	}
+
+	//check if compositeApp exists
+	_, err = NewCompositeAppClient().GetCompositeApp(ca, v, p)
+	if err != nil {
+		return []DeploymentIntentGroup{}, pkgerrors.Wrap(err, "Unable to find the composite-app, check CompositeAppName and Version")
+	}
+	var diList []DeploymentIntentGroup
+	result, err := db.DBconn.Find(c.storeName, key, c.tagMetaData)
+	if err != nil {
+		return []DeploymentIntentGroup{}, pkgerrors.Wrap(err, "Get DeploymentIntentGroup error")
+	}
+
+	for _, value := range result {
+		di := DeploymentIntentGroup{}
+		err = db.DBconn.Unmarshal(value, &di)
+		if err != nil {
+			return []DeploymentIntentGroup{}, pkgerrors.Wrap(err, "Unmarshaling DeploymentIntentGroup")
+		}
+		diList = append(diList, di)
+	}
+
+	return diList, nil
+
+}
+
+// GetDeploymentIntentGroupContext returns the AppContent with a given DeploymentIntentname, project, compositeAppName and version of compositeApp
 func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroupContext(di string, p string, ca string, v string) (appcontext.AppContext, string, error) {
 
 	key := DeploymentIntentGroupKey{

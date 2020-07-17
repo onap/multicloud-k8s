@@ -21,6 +21,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 
 	"github.com/gorilla/mux"
@@ -109,6 +110,31 @@ func (h genericPlacementIntentHandler) getGenericPlacementHandler(w http.Respons
 	err = json.NewEncoder(w).Encode(gPIntent)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h genericPlacementIntentHandler) getAllGenericPlacementIntentsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pList := []string{"project-name", "composite-app-name", "composite-app-version"}
+	err := validation.IsValidParameterPresent(vars, pList)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	p := vars["project-name"]
+	ca := vars["composite-app-name"]
+	v := vars["composite-app-version"]
+
+	gpList, err := h.client.GetAllGenericPlacementIntents(p, ca, v)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(gpList)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 }

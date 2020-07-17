@@ -50,6 +50,8 @@ type GenericPlacementIntentManager interface {
 		compositeAppName string, version string) (GenericPlacementIntent, error)
 	DeleteGenericPlacementIntent(intentName string, projectName string,
 		compositeAppName string, version string) error
+
+	GetAllGenericPlacementIntents(p string, ca string, v string) ([]GenericPlacementIntent, error)
 }
 
 // GenericPlacementIntentKey is used as the primary key
@@ -145,6 +147,47 @@ func (c *GenericPlacementIntentClient) GetGenericPlacementIntent(i string, p str
 	}
 
 	return GenericPlacementIntent{}, pkgerrors.New("Error getting GenericPlacementIntent")
+
+}
+
+// GetAllGenericPlacementIntents returns all the generic placement intents for a given compsoite app name, composite app version and project.
+func (c *GenericPlacementIntentClient) GetAllGenericPlacementIntents(p string, ca string, v string) ([]GenericPlacementIntent, error) {
+
+	//Check if project exists
+	_, err := NewProjectClient().GetProject(p)
+	if err != nil {
+		return []GenericPlacementIntent{}, pkgerrors.Wrap(err, "Unable to find the project")
+	}
+
+	// check if compositeApp exists
+	_, err = NewCompositeAppClient().GetCompositeApp(ca, v, p)
+	if err != nil {
+		return []GenericPlacementIntent{}, pkgerrors.Wrap(err, "Unable to find the composite-app, check compositeApp name and version")
+	}
+
+	key := GenericPlacementIntentKey{
+		Name:         "",
+		Project:      p,
+		CompositeApp: ca,
+		Version:      v,
+	}
+
+	var gpList []GenericPlacementIntent
+	values, err := db.DBconn.Find(c.storeName, key, c.tagMetaData)
+	if err != nil {
+		return []GenericPlacementIntent{}, pkgerrors.Wrap(err, "Getting GenericPlacementIntent")
+	}
+
+	for _, value := range values {
+		gp := GenericPlacementIntent{}
+		err = db.DBconn.Unmarshal(value, &gp)
+		if err != nil {
+			return []GenericPlacementIntent{}, pkgerrors.Wrap(err, "Unmarshaling GenericPlacementIntent")
+		}
+		gpList = append(gpList, gp)
+	}
+
+	return gpList, nil
 
 }
 

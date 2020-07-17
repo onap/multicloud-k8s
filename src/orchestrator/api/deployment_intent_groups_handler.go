@@ -22,6 +22,7 @@ import (
 	"net/http"
 
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 
 	"github.com/gorilla/mux"
 )
@@ -114,6 +115,31 @@ func (h deploymentIntentGroupHandler) getDeploymentIntentGroupHandler(w http.Res
 		return
 	}
 
+}
+
+func (h deploymentIntentGroupHandler) getAllDeploymentIntentGroupsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pList := []string{"project-name", "composite-app-name", "composite-app-version"}
+	err := validation.IsValidParameterPresent(vars, pList)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	p := vars["project-name"]
+	ca := vars["composite-app-name"]
+	v := vars["composite-app-version"]
+
+	diList, err := h.client.GetAllDeploymentIntentGroups(p, ca, v)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(diList)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
 }
 
 func (h deploymentIntentGroupHandler) deleteDeploymentIntentGroupHandler(w http.ResponseWriter, r *http.Request) {

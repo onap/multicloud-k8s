@@ -23,6 +23,14 @@ its usage. This script supports two Virtualization technologies
 
     $ sudo ./setup.sh -p libvirt
 
+There is a `default.yml` in the `./config` directory which creates multiple controllers and nodes.
+There are also sample configurations in the `./config/samples` directory.  To use one of the samples,
+copy it into the `./config` directory as `pdf.yml`.  If a `pdf.yml` exists in the `./config`
+directory it overrides the `default.yml` when the `vagrant up` command (in the next step) is run.
+For example:
+
+    $ cp ./config/samples/pdf.yml.aio ./config/pdf.yml
+
 Once Vagrant is installed, it's possible to provision a cluster using
 the following instructions:
 

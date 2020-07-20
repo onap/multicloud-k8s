@@ -18,6 +18,8 @@
 project="test-project"
 description="test-description"
 logical_cloud_name="lc1"
+cluster_1_name="lc-cl-1"
+cluster_2_name="lc-cl-2"
 logical_cloud_url="http://localhost:9015/v2/projects/${project}/logical-clouds"
 quota_name="quota-1"
 quota_url="${logical_cloud_url}/${logical_cloud_name}/cluster-quotas"
@@ -53,7 +55,7 @@ EOF
 cluster_1_data="$(cat << EOF
 {
  "metadata" : {
-    "name": "lc-cl-1",
+    "name": "${cluster_1_name}",
     "description": "${test-description}",
     "userData1":"<user data>",
     "userData2":"<user data>"
@@ -71,7 +73,7 @@ EOF
 cluster_2_data="$(cat << EOF
 {
  "metadata" : {
-    "name": "lc-cl-2",
+    "name": "${cluster_2_name}",
     "description": "${test-description}",
     "userData1":"<user data>",
     "userData2":"<user data>"
@@ -127,7 +129,7 @@ printf "\n\nCreating logical cloud data\n\n"
 curl -d "${logical_cloud_data}" -X POST ${logical_cloud_url}
 
 # Associate two clusters with the logical cloud
-printf "\n\nAdding two clusters to logical cloud\n\n"
+printf "\n\nAdding two clusters to logical cloud\n\n"3yy
 curl -d "${cluster_1_data}" -X POST ${cluster_url}
 curl -d "${cluster_2_data}" -X POST ${cluster_url}
 
@@ -143,5 +145,24 @@ curl -X GET "${logical_cloud_url}/${logical_cloud_name}"
 printf "\n\nGetting clusters info for logical cloud\n\n"
 curl -X GET ${cluster_url}
 
+printf "\n\nGetting first cluster of logical cloud\n"
+curl -X GET ${cluster_url}/${cluster_1_name}
+
+printf "\n\nGetting second cluster of logical cloud\n"
+curl -X GET ${cluster_url}/${cluster_2_name}
+
 printf "\n\nGetting Quota info for the logical cloud\n\n"
 curl -X GET "${quota_url}/${quota_name}"
+
+# Cleanup (delete created resources)
+if [ "$1" == "clean" ]; then
+    printf "\n\nDeleting Quota info for the logical cloud\n\n"
+    curl -X DELETE "${quota_url}/${quota_name}"
+
+    printf "\n\nDeleting the two clusters from logical cloud\n\n"3yy
+    curl -X DELETE ${cluster_url}/${cluster_1_name}
+    curl -X DELETE ${cluster_url}/${cluster_2_name}
+
+    printf "\n\nDeleting logical cloud data\n\n"
+    curl -X DELETE ${logical_cloud_url}/${logical_cloud_name}
+fi

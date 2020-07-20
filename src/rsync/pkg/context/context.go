@@ -184,6 +184,14 @@ func applyFnComApp(cid interface{}, con *connector.Connector, f fn, breakonError
 					}
 					var aov map[string][]string
 					json.Unmarshal([]byte(resorder.(string)), &aov)
+					// reverse the order for terminate
+				        if ( fmt.Sprintf("%v", f) == fmt.Sprintf("%v",  terminateResource) ) {
+						s := aov["resorder"]
+						l := len(s) - 1
+						for i := 0; i < len(s)/2; i++ {
+							s[i], s[l-i] = s[l-i], s[i]
+						}
+					}
 					for _, res := range aov["resorder"] {
 						err = f(ac, c, res, appName, cluster, label)
 						if err != nil {

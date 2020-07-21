@@ -56,6 +56,7 @@ func (pk ProjectKey) String() string {
 // ProjectManager is an interface exposes the Project functionality
 type ProjectManager interface {
 	CreateProject(pr Project) (Project, error)
+	UpdateProject(pr Project) (Project, error)
 	GetProject(name string) (Project, error)
 	DeleteProject(name string) error
 	GetAllProjects() ([]Project, error)
@@ -94,6 +95,28 @@ func (v *ProjectClient) CreateProject(p Project) (Project, error) {
 	err = db.DBconn.Insert(v.storeName, key, nil, v.tagMeta, p)
 	if err != nil {
 		return Project{}, pkgerrors.Wrap(err, "Creating DB Entry")
+	}
+
+	return p, nil
+}
+
+// UpdateProject updates the Project
+func (v *ProjectClient) UpdateProject(p Project) (Project, error) {
+
+	//Construct the composite key to select the entry
+	key := ProjectKey{
+		ProjectName: p.MetaData.Name,
+	}
+
+	//Check if this Project already exists
+	_, err := v.GetProject(p.MetaData.Name)
+	if err != nil {
+		return Project{}, pkgerrors.New("Project does not exist")
+	}
+
+	err = db.DBconn.Update(v.storeName, key, v.tagMeta, p)
+	if err != nil {
+		return Project{}, pkgerrors.Wrap(err, "Updating DB Entry")
 	}
 
 	return p, nil

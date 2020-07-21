@@ -86,6 +86,85 @@ func TestCreateProject(t *testing.T) {
 	}
 }
 
+func TestUpdateProject(t *testing.T) {
+	testCases := []struct {
+		label         string
+		inp           Project
+		expectedError string
+		mockdb        *db.MockDB
+		expected      Project
+	}{
+		{
+			label: "Update Project",
+			inp: Project{
+				MetaData: ProjectMetaData{
+					Name:        "testProject",
+					Description: "Test project for unit testing",
+					UserData1:   "update userData1",
+					UserData2:   "update userData2",
+				},
+			},
+			expected: Project{
+				MetaData: ProjectMetaData{
+					Name:        "testProject",
+					Description: "Test project for unit testing",
+					UserData1:   "update userData1",
+					UserData2:   "update userData2",
+				},
+			},
+			expectedError: "",
+			mockdb: &db.MockDB{
+				Items: map[string]map[string][]byte{
+					ProjectKey{ProjectName: "testProject"}.String(): {
+						"projectmetadata": []byte(
+							"{" +
+								"\"metadata\" : {" +
+								"\"Name\":\"testProject\"," +
+								"\"Description\":\"Test project for unit testing\"," +
+								"\"UserData1\":\"userData1\"," +
+								"\"UserData2\":\"userData2\"}" +
+								"}"),
+					},
+				},
+			},
+		},
+		{
+			label: "Failed Update Project",
+			inp: Project{
+				MetaData: ProjectMetaData{
+					Name:        "unknownProject",
+					Description: "Unknown project for unit testing",
+				},
+			},
+			expectedError: "Project does not exist",
+			mockdb: &db.MockDB{
+				Err: pkgerrors.New("Error Updating Project"),
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			db.DBconn = testCase.mockdb
+			impl := NewProjectClient()
+			got, err := impl.UpdateProject(testCase.inp)
+			if err != nil {
+				if testCase.expectedError == "" {
+					t.Fatalf("Update returned an unexpected error %s", err)
+				}
+				if strings.Contains(err.Error(), testCase.expectedError) == false {
+					t.Fatalf("Update returned an unexpected error %s", err)
+				}
+			} else {
+				if reflect.DeepEqual(testCase.expected, got) == false {
+					t.Errorf("Update returned unexpected body: got %v;"+
+						" expected %v", got, testCase.expected)
+				}
+			}
+		})
+	}
+}
+
 func TestGetProject(t *testing.T) {
 
 	testCases := []struct {

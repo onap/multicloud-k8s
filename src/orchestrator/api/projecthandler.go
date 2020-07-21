@@ -69,6 +69,47 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Update handles updating the Project entry in the database
+func (h projectHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+	var p moduleLib.Project
+
+	err := json.NewDecoder(r.Body).Decode(&p)
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Name is required.
+	if p.MetaData.Name == "" {
+		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
+		return
+	}
+
+	proj, err := h.client.GetProject(p.MetaData.Name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ret, err := h.client.UpdateProject(proj)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // Get handles GET operations on a particular Project Name
 // Returns a Project
 func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {

@@ -48,6 +48,14 @@ func (m *mockProjectManager) CreateProject(inp moduleLib.Project) (moduleLib.Pro
 	return m.Items[0], nil
 }
 
+func (m *mockProjectManager) UpdateProject(inp moduleLib.Project) (moduleLib.Project, error) {
+	if m.Err != nil {
+		return moduleLib.Project{}, m.Err
+	}
+
+	return m.Items[0], nil
+}
+
 func (m *mockProjectManager) GetProject(name string) (moduleLib.Project, error) {
 	if m.Err != nil {
 		return moduleLib.Project{}, m.Err
@@ -137,6 +145,87 @@ func TestProjectCreateHandler(t *testing.T) {
 
 				if reflect.DeepEqual(testCase.expected, got) == false {
 					t.Errorf("createHandler returned unexpected body: got %v;"+
+						" expected %v", got, testCase.expected)
+				}
+			}
+		})
+	}
+}
+
+func TestProjectUpdateHandler(t *testing.T) {
+	testCases := []struct {
+		label, name   string
+		reader        io.Reader
+		expected      moduleLib.Project
+		expectedCode  int
+		projectClient *mockProjectManager
+	}{
+		{
+			label: "Missing Project Name in Request Body",
+			name:  "testProject",
+			reader: bytes.NewBuffer([]byte(`{
+				"description":"test description"
+				}`)),
+			expectedCode:  http.StatusBadRequest,
+			projectClient: &mockProjectManager{},
+		},
+		{
+			label:         "Missing Body Failure",
+			name:          "testProject",
+			expectedCode:  http.StatusBadRequest,
+			projectClient: &mockProjectManager{},
+		},
+		{
+			label:        "Update Project",
+			name:         "testProject",
+			expectedCode: http.StatusOK,
+			reader: bytes.NewBuffer([]byte(`{
+				"metadata" : {
+					"name": "testProject",
+					"description": "Test Project used for unit testing"
+				}
+			}`)),
+			expected: moduleLib.Project{
+				MetaData: moduleLib.ProjectMetaData{
+					Name:        "testProject",
+					Description: "Test Project used for unit testing",
+					UserData1:   "update data1",
+					UserData2:   "update data2",
+				},
+			},
+			projectClient: &mockProjectManager{
+				//Items that will be returned by the mocked Client
+				Items: []moduleLib.Project{
+					{
+						MetaData: moduleLib.ProjectMetaData{
+							Name:        "testProject",
+							Description: "Test Project used for unit testing",
+							UserData1:   "update data1",
+							UserData2:   "update data2",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			request := httptest.NewRequest("PUT", "/v2/projects/"+testCase.name, testCase.reader)
+			resp := executeRequest(request, NewRouter(testCase.projectClient, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil))
+
+			//Check returned code
+			if resp.StatusCode != testCase.expectedCode {
+				t.Fatalf("Expected %d; Got: %d", testCase.expectedCode, resp.StatusCode)
+			}
+
+			//Check returned body only if statusOK
+			if resp.StatusCode == http.StatusOK {
+				got := moduleLib.Project{}
+				json.NewDecoder(resp.Body).Decode(&got)
+
+				if reflect.DeepEqual(testCase.expected, got) == false {
+					t.Errorf("updateHandler returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}

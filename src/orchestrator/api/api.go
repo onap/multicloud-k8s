@@ -56,6 +56,7 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 		client: ControllerClient,
 	}
 	router.HandleFunc("/projects", projHandler.createHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}", projHandler.updateHandler).Methods("PUT")
 	router.HandleFunc("/projects/{project-name}", projHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects", projHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}", projHandler.deleteHandler).Methods("DELETE")

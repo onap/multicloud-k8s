@@ -31,7 +31,14 @@ func ExampleClient_Project() {
 		return
 	}
 	// Perform operations on Project Module
-	_, err := c.Project.CreateProject(moduleLib.Project{MetaData: moduleLib.ProjectMetaData{Name: "test", Description: "test", UserData1: "userData1", UserData2: "userData2"}})
+	// POST request (exists == false)
+	_, err := c.Project.CreateProject(moduleLib.Project{MetaData: moduleLib.ProjectMetaData{Name: "test", Description: "test", UserData1: "userData1", UserData2: "userData2"}}, false)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	// PUT request (exists == true)
+	_, err = c.Project.CreateProject(moduleLib.Project{MetaData: moduleLib.ProjectMetaData{Name: "test", Description: "test", UserData1: "userData1", UserData2: "userData2"}}, true)
 	if err != nil {
 		log.Println(err)
 		return

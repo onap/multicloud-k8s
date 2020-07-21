@@ -54,7 +54,7 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.CreateProject(p)
+	ret, err := h.client.CreateProject(p, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -62,6 +62,50 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// Update handles updating the Project entry in the database
+func (h projectHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["project-name"]
+
+	var p moduleLib.Project
+
+	err := json.NewDecoder(r.Body).Decode(&p)
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Name is required.
+	if p.MetaData.Name == "" {
+		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
+		return
+	}
+
+	// Name in URL should match name in body
+	if p.MetaData.Name != name {
+		http.Error(w, "Mismatched name in PUT request", http.StatusBadRequest)
+		return
+	}
+
+	ret, err := h.client.CreateProject(p, true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

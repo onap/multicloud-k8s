@@ -1,0 +1,110 @@
+# /*
+#  * Copyright 2020 Intel Corporation, Inc
+#  *
+#  * Licensed under the Apache License, Version 2.0 (the "License");
+#  * you may not use this file except in compliance with the License.
+#  * You may obtain a copy of the License at
+#  *
+#  *     http://www.apache.org/licenses/LICENSE-2.0
+#  *
+#  * Unless required by applicable law or agreed to in writing, software
+#  * distributed under the License is distributed on an "AS IS" BASIS,
+#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  * See the License for the specific language governing permissions and
+#  * limitations under the License.
+#  */
+
+#Script name: ./test_project.sh
+#Purpose: To ascertain whether or not the POST/DELETE/GET API is able to register a null name
+#Description, userdata1, and userdata2 have values that I have assigned.
+#Expected Results: POST api should fail and return code as documented (example:400)
+#Actual Results: Error 400 is observed and project is not registered as seen below.
+#Aditya Sharoff 6/25/2020
+
+set -o errexit
+set -o nounset
+set -o pipefail
+#set -o xtrace
+
+source _common_test.sh
+source _functions.sh
+source _test_functions.sh
+source _common.sh
+
+if [ ${1:+1} ]; then
+    if [ "$1" == "--external" ]; then
+        master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
+            awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
+        onap_svc_node_port=30498
+        base_url="http://$master_ip:$onap_svc_node_port/v1"
+    fi
+fi
+
+base_url=${base_url:-"http://localhost:9015/v2"}
+
+kubeconfig_path="$HOME/.kube/config"
+csar_id=cb009bfe-bbee-11e8-9766-525400435678
+
+
+## TEST-1
+## Registering with various data , vlaid and invlaid cases test
+# BEGIN: Register project
+print_msg "Registering project with null project_name"
+project_name=""
+project_description="test_project_description"
+userData1="user1"
+userData2="user2"
+
+payload="$(cat <<EOF
+{
+  "metadata": {
+    "name": "${project_name}",
+    "description": "${project_description}",
+    "userData1": "${userData1}",
+    "userData2": "${userData2}"
+   }
+}
+EOF
+)"
+call_api_negative -d "${payload}" "${base_url}/projects"
+if [ $return_status == 400 ]
+then
+	print_msg "Test:project-post with null project name. Expected = 400, Actual = $return_status PASSED"
+else
+	print_msg "Test:project-post with null project name. Expected = 400, Actual = $return_status FAILED"
+fi
+#print_msg "ending null name test case"
+# END: Register project
+
+#TEST-2
+#try to delete a null project should return error code 400 or 500
+project_name=""
+print_msg "Deleting ${project_name}"
+delete_resource_negative "${base_url}/projects/${project_name}"
+if [ $return_status == 404 ]
+then
+	print_msg "Test:project-delete-1 with null project name. Expected = 404, Actual = $return_status PASSED"
+else
+	print_msg "Test:project-delete-1 with null project name. Expected = 404, Actual = $return_status FAILED"
+fi
+
+project_name="foo"
+print_msg "Deleting ${project_name}"
+delete_resource_negative "${base_url}/projects/${project_name}"
+if [ $return_status == 404 ]
+then
+	print_msg "Test:project-delete-2 with invalid project name. Expected = 404, Actual = $return_status PASSED"
+else
+	print_msg "Test:project-delete-2 with invalid project name. Expected = 404, Actual = $return_status FAILED"
+fi
+
+#TEST-2
+#try to get an invalid project should return error code 400 or 500
+project_name="foo"
+get_resource_negative "${base_url}/projects/${project_name}"
+if [ $return_status == 404 ]
+then
+	print_msg "Test:project-get with null project name. Expected = 404, Actual = $return_status PASSED"
+else
+	print_msg "Test:project-get with null project name. Expected = 404, Actual = $return_status FAILED"
+fi

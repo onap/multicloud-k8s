@@ -22,6 +22,7 @@ import (
 	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -84,17 +85,31 @@ func NewProviderNetClient() *ProviderNetClient {
 // CreateProviderNet - create a new ProviderNet
 func (v *ProviderNetClient) CreateProviderNet(p ProviderNet, clusterProvider, cluster string, exists bool) (ProviderNet, error) {
 
+	// verify cluster exists and in state to add provider networks
+	s, err := clusterPkg.NewClusterClient().GetClusterState(clusterProvider, cluster)
+	if err != nil {
+		return ProviderNet{}, pkgerrors.New("Unable to find the cluster")
+	}
+	switch s.State {
+	case state.StateEnum.Approved:
+		return ProviderNet{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
+	case state.StateEnum.Terminated:
+		break
+	case state.StateEnum.Created:
+		break
+	case state.StateEnum.Applied:
+		return ProviderNet{}, pkgerrors.Wrap(err, "Existing cluster provider network intents must be terminated before creating: "+cluster)
+	case state.StateEnum.Instantiated:
+		return ProviderNet{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
+	default:
+		return ProviderNet{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
+	}
+
 	//Construct key and tag to select the entry
 	key := ProviderNetKey{
 		ClusterProviderName: clusterProvider,
 		ClusterName:         cluster,
 		ProviderNetName:     p.Metadata.Name,
-	}
-
-	//Check if cluster exists
-	_, err := clusterPkg.NewClusterClient().GetCluster(clusterProvider, cluster)
-	if err != nil {
-		return ProviderNet{}, pkgerrors.New("Unable to find the cluster")
 	}
 
 	//Check if this ProviderNet already exists
@@ -169,6 +184,25 @@ func (v *ProviderNetClient) GetProviderNets(clusterProvider, cluster string) ([]
 
 // Delete the  ProviderNet from database
 func (v *ProviderNetClient) DeleteProviderNet(name, clusterProvider, cluster string) error {
+	// verify cluster is in a state where provider network intent can be deleted
+	s, err := clusterPkg.NewClusterClient().GetClusterState(clusterProvider, cluster)
+	if err != nil {
+		return pkgerrors.New("Unable to find the cluster")
+	}
+	switch s.State {
+	case state.StateEnum.Approved:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
+	case state.StateEnum.Terminated:
+		break
+	case state.StateEnum.Created:
+		break
+	case state.StateEnum.Applied:
+		return pkgerrors.Wrap(err, "Cluster provider network intents must be terminated before deleting: "+cluster)
+	case state.StateEnum.Instantiated:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
+	default:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
+	}
 
 	//Construct key and tag to select the entry
 	key := ProviderNetKey{
@@ -177,7 +211,7 @@ func (v *ProviderNetClient) DeleteProviderNet(name, clusterProvider, cluster str
 		ProviderNetName:     name,
 	}
 
-	err := db.DBconn.Remove(v.db.StoreName, key)
+	err = db.DBconn.Remove(v.db.StoreName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ProviderNet Entry;")
 	}

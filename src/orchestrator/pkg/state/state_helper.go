@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package types
 
-// TODO - should move to common module types location - e.g. in orchestrator
-type ClientDbInfo struct {
-	StoreName  string // name of the mongodb collection to use for client documents
-	TagMeta    string // attribute key name for the json data of a client document
-	TagContent string // attribute key name for the file data of a client document
-	TagState   string // attribute key name for context object in App Context
+package state
+
+import "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+
+// GetAppContextFromStateInfo loads the appcontext present in the StateInfo input
+func GetAppContextFromStateInfo(s StateInfo) (appcontext.AppContext, error) {
+	var cc appcontext.AppContext
+	_, err := cc.LoadAppContext(s.ContextId)
+	if err != nil {
+		return appcontext.AppContext{}, err
+	}
+	return cc, nil
 }

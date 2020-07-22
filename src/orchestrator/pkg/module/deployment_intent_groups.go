@@ -20,8 +20,8 @@ import (
 	"encoding/json"
 	"reflect"
 
-	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -62,7 +62,7 @@ type OverrideValues struct {
 type DeploymentIntentGroupManager interface {
 	CreateDeploymentIntentGroup(d DeploymentIntentGroup, p string, ca string, v string) (DeploymentIntentGroup, error)
 	GetDeploymentIntentGroup(di string, p string, ca string, v string) (DeploymentIntentGroup, error)
-	GetDeploymentIntentGroupContext(di string, p string, ca string, v string) (appcontext.AppContext, string, error)
+	GetDeploymentIntentGroupState(di string, p string, ca string, v string) (state.StateInfo, error)
 	DeleteDeploymentIntentGroup(di string, p string, ca string, v string) error
 	GetAllDeploymentIntentGroups(p string, ca string, v string) ([]DeploymentIntentGroup, error)
 }
@@ -89,7 +89,7 @@ func (dk DeploymentIntentGroupKey) String() string {
 type DeploymentIntentGroupClient struct {
 	storeName   string
 	tagMetaData string
-	tagContext  string
+	tagState    string
 }
 
 // NewDeploymentIntentGroupClient return an instance of DeploymentIntentGroupClient which implements DeploymentIntentGroupManager
@@ -97,7 +97,7 @@ func NewDeploymentIntentGroupClient() *DeploymentIntentGroupClient {
 	return &DeploymentIntentGroupClient{
 		storeName:   "orchestrator",
 		tagMetaData: "deploymentintentgroupmetadata",
-		tagContext:  "contextid",
+		tagState:    "stateInfo",
 	}
 }
 
@@ -132,6 +132,17 @@ func (c *DeploymentIntentGroupClient) CreateDeploymentIntentGroup(d DeploymentIn
 	err = db.DBconn.Insert(c.storeName, gkey, nil, c.tagMetaData, d)
 	if err != nil {
 		return DeploymentIntentGroup{}, pkgerrors.Wrap(err, "Create DB entry error")
+	}
+
+	// Add the stateInfo record
+	stateInfo := state.StateInfo{
+		State:     state.StateEnum.Created,
+		ContextId: "",
+	}
+
+	err = db.DBconn.Insert(c.storeName, gkey, nil, c.tagState, stateInfo)
+	if err != nil {
+		return DeploymentIntentGroup{}, pkgerrors.Wrap(err, "Error updating the stateInfo of the DeploymentIntentGroup: "+d.MetaData.Name)
 	}
 
 	return d, nil
@@ -205,8 +216,8 @@ func (c *DeploymentIntentGroupClient) GetAllDeploymentIntentGroups(p string, ca 
 
 }
 
-// GetDeploymentIntentGroupContext returns the AppContent with a given DeploymentIntentname, project, compositeAppName and version of compositeApp
-func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroupContext(di string, p string, ca string, v string) (appcontext.AppContext, string, error) {
+// GetDeploymentIntentGroupState returns the AppContent with a given DeploymentIntentname, project, compositeAppName and version of compositeApp
+func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroupState(di string, p string, ca string, v string) (state.StateInfo, error) {
 
 	key := DeploymentIntentGroupKey{
 		Name:         di,
@@ -215,22 +226,21 @@ func (c *DeploymentIntentGroupClient) GetDeploymentIntentGroupContext(di string,
 		Version:      v,
 	}
 
-	result, err := db.DBconn.Find(c.storeName, key, c.tagContext)
+	result, err := db.DBconn.Find(c.storeName, key, c.tagState)
 	if err != nil {
-		return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Get DeploymentIntentGroup Context error")
+		return state.StateInfo{}, pkgerrors.Wrap(err, "Get DeploymentIntentGroup StateInfo error")
 	}
 
 	if result != nil {
-		ctxVal := string(result[0])
-		var cc appcontext.AppContext
-		_, err = cc.LoadAppContext(ctxVal)
+		s := state.StateInfo{}
+		err = db.DBconn.Unmarshal(result[0], &s)
 		if err != nil {
-			return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Error loading DeploymentIntentGroup Appcontext")
+			return state.StateInfo{}, pkgerrors.Wrap(err, "Unmarshalling DeploymentIntentGroup StateInfo")
 		}
-		return cc, ctxVal, nil
+		return s, nil
 	}
 
-	return appcontext.AppContext{}, "", pkgerrors.New("Error getting DeploymentIntentGroup AppContext")
+	return state.StateInfo{}, pkgerrors.New("Error getting DeploymentIntentGroup StateInfo")
 }
 
 // DeleteDeploymentIntentGroup deletes a DeploymentIntentGroup
@@ -241,9 +251,9 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 		CompositeApp: ca,
 		Version:      v,
 	}
-	_, _, err := c.GetDeploymentIntentGroupContext(di, p, ca, v)
-	if err == nil {
-		return pkgerrors.New("DeploymentIntentGroup must be terminated before it can be deleted " + di)
+	s, err := c.GetDeploymentIntentGroupState(di, p, ca, v)
+	if err == nil && s.State == state.StateEnum.Instantiated {
+		return pkgerrors.Errorf("DeploymentIntentGroup must be terminated before it can be deleted " + di)
 	}
 
 	err = db.DBconn.Remove(c.storeName, k)

@@ -1284,7 +1284,7 @@ paths:
       requestBody:
         content: {}
 
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/destroy:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/terminate:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
@@ -1293,9 +1293,9 @@ paths:
     post:
       tags:
         - Deployment Lifecycle
-      summary: Destroy a Deployment
-      description: Destroy a  Deployment
-      operationId: destroyDeploymentIntentGroup
+      summary: Terminate a Deployment
+      description: Terminate a  Deployment
+      operationId: terminateDeploymentIntentGroup
       responses:
         '200':
           description: Success

@@ -27,6 +27,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installappclient"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -51,7 +52,7 @@ func NewSchedulerClient() *SchedulerClient {
 			StoreName:  "cluster",
 			TagMeta:    "clustermetadata",
 			TagContent: "clustercontent",
-			TagContext: "clustercontext",
+			TagState:   "stateInfo",
 		},
 	}
 }
@@ -59,9 +60,23 @@ func NewSchedulerClient() *SchedulerClient {
 // Apply Network Intents associated with a cluster
 func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) error {
 
-	_, _, err := clusterPkg.NewClusterClient().GetClusterContext(clusterProvider, cluster)
-	if err == nil {
-		return pkgerrors.Errorf("Cluster network intents have already been applied: %v, %v", clusterProvider, cluster)
+	s, err := clusterPkg.NewClusterClient().GetClusterState(clusterProvider, cluster)
+	if err != nil {
+		return pkgerrors.Errorf("Error finding cluster: %v %v", clusterProvider, cluster)
+	}
+	switch s.State {
+	case state.StateEnum.Approved:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
+	case state.StateEnum.Terminated:
+		break
+	case state.StateEnum.Created:
+		break
+	case state.StateEnum.Applied:
+		return nil
+	case state.StateEnum.Instantiated:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
+	default:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
 	}
 
 	// Make an app context for the network intent resources
@@ -135,12 +150,17 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 		return pkgerrors.Wrap(err, "Error adding Cluster to AppContext")
 	}
 
-	// save the context in the cluster db record
+	// update the StateInfo in the cluster db record
 	key := clusterPkg.ClusterKey{
 		ClusterProviderName: clusterProvider,
 		ClusterName:         cluster,
 	}
-	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagContext, ctxVal)
+	stateInfo := state.StateInfo{
+		State:     state.StateEnum.Applied,
+		ContextId: ctxVal.(string),
+	}
+
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagState, stateInfo)
 	if err != nil {
 		cleanuperr := ac.DeleteCompositeApp()
 		if cleanuperr != nil {
@@ -149,7 +169,7 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 				"cluster":          cluster,
 			})
 		}
-		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
+		return pkgerrors.Wrap(err, "Error updating the stateInfo of cluster: "+cluster)
 	}
 
 	// call resource synchronizer to instantiate the CRs in the cluster
@@ -163,37 +183,55 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 
 // Terminate Network Intents associated with a cluster
 func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster string) error {
-	context, ctxVal, err := clusterPkg.NewClusterClient().GetClusterContext(clusterProvider, cluster)
+	s, err := clusterPkg.NewClusterClient().GetClusterState(clusterProvider, cluster)
 	if err != nil {
-		return pkgerrors.Wrapf(err, "Error finding AppContext for cluster: %v, %v", clusterProvider, cluster)
+		return pkgerrors.Wrapf(err, "Error finding StateInfo for cluster: %v, %v", clusterProvider, cluster)
+	}
+	switch s.State {
+	case state.StateEnum.Approved:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
+	case state.StateEnum.Terminated:
+		return nil
+	case state.StateEnum.Created:
+		return pkgerrors.Wrap(err, "Cluster network intents have not been applied: "+cluster)
+	case state.StateEnum.Applied:
+		break
+	case state.StateEnum.Instantiated:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
+	default:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
 	}
 
 	// call resource synchronizer to terminate the CRs in the cluster
-	err = installappclient.InvokeUninstallApp(ctxVal)
+	err = installappclient.InvokeUninstallApp(s.ContextId)
 	if err != nil {
 		return err
 	}
 
 	// remove the app context
-	cleanuperr := context.DeleteCompositeApp()
-	if cleanuperr != nil {
-		log.Warn("Error deleted AppContext", log.Fields{
-			"cluster-provider": clusterProvider,
-			"cluster":          cluster,
-		})
+	context, err := state.GetAppContextFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error getting appcontext from cluster StateInfo : "+clusterProvider+" "+cluster)
+	}
+	err = context.DeleteCompositeApp()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error deleting appcontext of cluster : "+clusterProvider+" "+cluster)
 	}
 
-	// remove the app context field from the cluster db record
+	// update StateInfo
 	key := clusterPkg.ClusterKey{
 		ClusterProviderName: clusterProvider,
 		ClusterName:         cluster,
 	}
-	err = db.DBconn.RemoveTag(v.db.StoreName, key, v.db.TagContext)
-	if err != nil {
-		log.Warn("Error removing AppContext from Cluster document", log.Fields{
-			"cluster-provider": clusterProvider,
-			"cluster":          cluster,
-		})
+	stateInfo := state.StateInfo{
+		State:     state.StateEnum.Terminated,
+		ContextId: "",
 	}
+
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagState, stateInfo)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error updating the stateInfo of cluster: "+cluster)
+	}
+
 	return nil
 }

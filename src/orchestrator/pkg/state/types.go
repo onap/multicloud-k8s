@@ -13,12 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package types
 
-// TODO - should move to common module types location - e.g. in orchestrator
-type ClientDbInfo struct {
-	StoreName  string // name of the mongodb collection to use for client documents
-	TagMeta    string // attribute key name for the json data of a client document
-	TagContent string // attribute key name for the file data of a client document
-	TagState   string // attribute key name for context object in App Context
+package state
+
+// StateInfo struct is used to maintain the values for state, contextid, (and other)
+// information about resources which can be instantiated via rsync.
+type StateInfo struct {
+	State     StateValue
+	ContextId string
+}
+
+type StateValue = string
+
+type states struct {
+	Created      StateValue
+	Approved     StateValue
+	Applied      StateValue
+	Instantiated StateValue
+	Terminated   StateValue
+}
+
+var StateEnum = &states{
+	Created:      "Created",
+	Approved:     "Approved",
+	Applied:      "Applied",
+	Instantiated: "Instantiated",
+	Terminated:   "Terminated",
 }

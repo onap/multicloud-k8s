@@ -28,8 +28,8 @@ import (
 	"testing"
 
 	"github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	types "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -43,7 +43,7 @@ type mockClusterManager struct {
 	ClusterProviderItems []cluster.ClusterProvider
 	ClusterItems         []cluster.Cluster
 	ClusterContentItems  []cluster.ClusterContent
-	ClusterContextItems  []appcontext.AppContext
+	ClusterStateInfo     []state.StateInfo
 	ClusterLabelItems    []cluster.ClusterLabel
 	ClusterKvPairsItems  []cluster.ClusterKvPairs
 	ClusterList          []string
@@ -102,12 +102,12 @@ func (m *mockClusterManager) GetClusterContent(provider, name string) (cluster.C
 	return m.ClusterContentItems[0], nil
 }
 
-func (m *mockClusterManager) GetClusterContext(provider, name string) (appcontext.AppContext, string, error) {
+func (m *mockClusterManager) GetClusterState(provider, name string) (state.StateInfo, error) {
 	if m.Err != nil {
-		return appcontext.AppContext{}, "", m.Err
+		return state.StateInfo{}, m.Err
 	}
 
-	return m.ClusterContextItems[0], "", nil
+	return m.ClusterStateInfo[0], nil
 }
 
 func (m *mockClusterManager) GetClusters(provider string) ([]cluster.Cluster, error) {

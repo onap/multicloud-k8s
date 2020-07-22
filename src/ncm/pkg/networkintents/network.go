@@ -22,6 +22,7 @@ import (
 	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -89,10 +90,24 @@ func (v *NetworkClient) CreateNetwork(p Network, clusterProvider, cluster string
 		NetworkName:         p.Metadata.Name,
 	}
 
-	//Check if cluster exists
-	_, err := clusterPkg.NewClusterClient().GetCluster(clusterProvider, cluster)
+	//Check if cluster exists and in a state for adding network intents
+	s, err := clusterPkg.NewClusterClient().GetClusterState(clusterProvider, cluster)
 	if err != nil {
 		return Network{}, pkgerrors.New("Unable to find the cluster")
+	}
+	switch s.State {
+	case state.StateEnum.Approved:
+		return Network{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
+	case state.StateEnum.Terminated:
+		break
+	case state.StateEnum.Created:
+		break
+	case state.StateEnum.Applied:
+		return Network{}, pkgerrors.Wrap(err, "Existing cluster network intents must be terminated before creating: "+cluster)
+	case state.StateEnum.Instantiated:
+		return Network{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
+	default:
+		return Network{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
 	}
 
 	//Check if this Network already exists
@@ -167,6 +182,25 @@ func (v *NetworkClient) GetNetworks(clusterProvider, cluster string) ([]Network,
 
 // Delete the  Network from database
 func (v *NetworkClient) DeleteNetwork(name, clusterProvider, cluster string) error {
+	// verify cluster is in a state where network intent can be deleted
+	s, err := clusterPkg.NewClusterClient().GetClusterState(clusterProvider, cluster)
+	if err != nil {
+		return pkgerrors.New("Unable to find the cluster")
+	}
+	switch s.State {
+	case state.StateEnum.Approved:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
+	case state.StateEnum.Terminated:
+		break
+	case state.StateEnum.Created:
+		break
+	case state.StateEnum.Applied:
+		return pkgerrors.Wrap(err, "Cluster network intents must be terminated before deleting: "+cluster)
+	case state.StateEnum.Instantiated:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
+	default:
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
+	}
 
 	//Construct key and tag to select the entry
 	key := NetworkKey{
@@ -175,7 +209,7 @@ func (v *NetworkClient) DeleteNetwork(name, clusterProvider, cluster string) err
 		NetworkName:         name,
 	}
 
-	err := db.DBconn.Remove(v.db.StoreName, key)
+	err = db.DBconn.Remove(v.db.StoreName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Network Entry;")
 	}

@@ -563,5 +563,6 @@ call_api -d "${payload}" "${base_url}/controllers"
 
 #BEGIN: Instantiation
 print_msg "Getting the sorted templates for each of the apps.."
+call_api -d "" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/approve"
 call_api -d "" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/instantiate"
 # END: Instantiation

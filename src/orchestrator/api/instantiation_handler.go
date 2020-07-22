@@ -31,6 +31,23 @@ type instantiationHandler struct {
 	client moduleLib.InstantiationManager
 }
 
+func (h instantiationHandler) approveHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	p := vars["project-name"]
+	ca := vars["composite-app-name"]
+	v := vars["composite-app-version"]
+	di := vars["deployment-intent-group-name"]
+
+	iErr := h.client.Approve(p, ca, v, di)
+	if iErr != nil {
+		http.Error(w, iErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+
+}
+
 func (h instantiationHandler) instantiateHandler(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)

@@ -25,6 +25,7 @@ import (
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 	pkgerrors "github.com/pkg/errors"
 )
@@ -71,32 +72,67 @@ type InstantiationKey struct {
 // InstantiationManager is an interface which exposes the
 // InstantiationManager functionalities
 type InstantiationManager interface {
-	//ApproveInstantiation(p string, ca string, v string, di string) (error)
+	Approve(p string, ca string, v string, di string) error
 	Instantiate(p string, ca string, v string, di string) error
 	Status(p string, ca string, v string, di string) (StatusData, error)
 	Terminate(p string, ca string, v string, di string) error
 }
 
-// InstantiationClientDbInfo consists of storeName and tagContext
+// InstantiationClientDbInfo consists of storeName and tagState
 type InstantiationClientDbInfo struct {
-	storeName  string // name of the mongodb collection to use for Instantiationclient documents
-	tagContext string // attribute key name for context object in App Context
+	storeName string // name of the mongodb collection to use for Instantiationclient documents
+	tagState  string // attribute key name for context object in App Context
 }
 
 // NewInstantiationClient returns an instance of InstantiationClient
 func NewInstantiationClient() *InstantiationClient {
 	return &InstantiationClient{
 		db: InstantiationClientDbInfo{
-			storeName:  "orchestrator",
-			tagContext: "contextid",
+			storeName: "orchestrator",
+			tagState:  "stateInfo",
 		},
 	}
 }
 
-// TODO
-//ApproveInstantiation approves an instantiation
-// func (c InstantiationClient) ApproveInstantiation(p string, ca string, v string, di string) (error){
-// }
+//Approve approves an instantiation
+func (c InstantiationClient) Approve(p string, ca string, v string, di string) error {
+	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
+	if err != nil {
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup has no state info: "+di)
+	}
+	switch s.State {
+	case state.StateEnum.Approved:
+		return nil
+	case state.StateEnum.Terminated:
+		break
+	case state.StateEnum.Created:
+		break
+	case state.StateEnum.Applied:
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup is in an invalid state"+s.State)
+	case state.StateEnum.Instantiated:
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup has already been instantiated"+di)
+	default:
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup is in an unknown state"+s.State)
+	}
+
+	key := DeploymentIntentGroupKey{
+		Name:         di,
+		Project:      p,
+		CompositeApp: ca,
+		Version:      v,
+	}
+	stateInfo := state.StateInfo{
+		State:     state.StateEnum.Approved,
+		ContextId: "",
+	}
+
+	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, stateInfo)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error updating the stateInfo of the DeploymentIntentGroup: "+di)
+	}
+
+	return nil
+}
 
 func getOverrideValuesByAppName(ov []OverrideValues, a string) map[string]string {
 	for _, eachOverrideVal := range ov {
@@ -189,9 +225,23 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		return pkgerrors.Wrap(err, "Not finding the deploymentIntentGroup")
 	}
 
-	_, _, err = NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
-	if err == nil {
-		return pkgerrors.Errorf("DeploymentIntentGroup has already been instantiated: " + di)
+	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
+	if err != nil {
+		return pkgerrors.Errorf("Error retrieving DeploymentIntentGroup stateInfo: " + di)
+	}
+	switch s.State {
+	case state.StateEnum.Approved:
+		break
+	case state.StateEnum.Terminated:
+		break // TODO - ideally, should check that all resources have completed being terminated
+	case state.StateEnum.Created:
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup must be Approved before instantiating"+di)
+	case state.StateEnum.Applied:
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup is in an invalid state"+di)
+	case state.StateEnum.Instantiated:
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup has already been instantiated"+di)
+	default:
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup is in an unknown state"+s.State)
 	}
 
 	rName := dIGrp.Spec.Version //rName is releaseName
@@ -292,8 +342,11 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		CompositeApp: ca,
 		Version:      v,
 	}
-
-	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagContext, ctxval)
+	stateInfo := state.StateInfo{
+		State:     state.StateEnum.Instantiated,
+		ContextId: ctxval.(string),
+	}
+	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, stateInfo)
 	if err != nil {
 		cleanuperr := context.DeleteCompositeApp()
 		if cleanuperr != nil {
@@ -348,9 +401,14 @@ the deployment, which is made available in the appcontext.
 */
 func (c InstantiationClient) Status(p string, ca string, v string, di string) (StatusData, error) {
 
-	ac, _, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
+	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
 	if err != nil {
 		return StatusData{}, pkgerrors.Wrap(err, "deploymentIntentGroup not found: "+di)
+	}
+
+	ac, err := state.GetAppContextFromStateInfo(s)
+	if err != nil {
+		return StatusData{}, pkgerrors.Wrap(err, "AppContext for deploymentIntentGroup not found: "+di)
 	}
 
 	// Get all apps in this composite app
@@ -409,12 +467,19 @@ DeploymentIntentName and calls rsync to terminate.
 */
 func (c InstantiationClient) Terminate(p string, ca string, v string, di string) error {
 
-	ac, ctxval, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupContext(di, p, ca, v)
+	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
 	if err != nil {
-		return pkgerrors.Wrap(err, "DeploymentIntentGroup has no app context: "+di)
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup has no state info: "+di)
+	} else if s.State != state.StateEnum.Instantiated {
+		return pkgerrors.Wrap(err, "DeploymentIntentGroup is not instantiated"+di)
 	}
 
-	err = callRsyncUninstall(ctxval)
+	ac, err := state.GetAppContextFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Wrap(err, "AppContext for deploymentIntentGroup not found: "+di)
+	}
+
+	err = callRsyncUninstall(s.ContextId)
 	if err != nil {
 		return err
 	}
@@ -430,10 +495,14 @@ func (c InstantiationClient) Terminate(p string, ca string, v string, di string)
 		CompositeApp: ca,
 		Version:      v,
 	}
+	stateInfo := state.StateInfo{
+		State:     state.StateEnum.Terminated,
+		ContextId: "",
+	}
 
-	err = db.DBconn.RemoveTag(c.db.storeName, key, c.db.tagContext)
+	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, stateInfo)
 	if err != nil {
-		return pkgerrors.Wrap(err, "Error removing the app context tag from DeploymentIntentGroup: "+di)
+		return pkgerrors.Wrap(err, "Error updating the stateInfo of the DeploymentIntentGroup: "+di)
 	}
 
 	return nil

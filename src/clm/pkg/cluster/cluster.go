@@ -17,9 +17,9 @@
 package cluster
 
 import (
-	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -28,7 +28,7 @@ type clientDbInfo struct {
 	storeName  string // name of the mongodb collection to use for client documents
 	tagMeta    string // attribute key name for the json data of a client document
 	tagContent string // attribute key name for the file data of a client document
-	tagContext string // attribute key name for context object in App Context
+	tagState   string // attribute key name for StateInfo object in the cluster
 }
 
 // ClusterProvider contains the parameters needed for ClusterProviders
@@ -101,7 +101,7 @@ type ClusterManager interface {
 	CreateCluster(provider string, pr Cluster, qr ClusterContent) (Cluster, error)
 	GetCluster(provider, name string) (Cluster, error)
 	GetClusterContent(provider, name string) (ClusterContent, error)
-	GetClusterContext(provider, name string) (appcontext.AppContext, string, error)
+	GetClusterState(provider, name string) (state.StateInfo, error)
 	GetClusters(provider string) ([]Cluster, error)
 	GetClustersWithLabel(provider, label string) ([]string, error)
 	DeleteCluster(provider, name string) error
@@ -129,7 +129,7 @@ func NewClusterClient() *ClusterClient {
 			storeName:  "cluster",
 			tagMeta:    "clustermetadata",
 			tagContent: "clustercontent",
-			tagContext: "clustercontext",
+			tagState:   "stateInfo",
 		},
 	}
 }
@@ -254,6 +254,17 @@ func (v *ClusterClient) CreateCluster(provider string, p Cluster, q ClusterConte
 		return Cluster{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
 
+	// Add the stateInfo record
+	stateInfo := state.StateInfo{
+		State:     state.StateEnum.Created,
+		ContextId: "",
+	}
+
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagState, stateInfo)
+	if err != nil {
+		return Cluster{}, pkgerrors.Wrap(err, "Creating cluster StateInfo")
+	}
+
 	return p, nil
 }
 
@@ -309,31 +320,29 @@ func (v *ClusterClient) GetClusterContent(provider, name string) (ClusterContent
 	return ClusterContent{}, pkgerrors.New("Error getting Cluster Content")
 }
 
-// GetClusterContext returns the AppContext for corresponding provider and name
-func (v *ClusterClient) GetClusterContext(provider, name string) (appcontext.AppContext, string, error) {
+// GetClusterState returns the StateInfo structure for corresponding cluster provider and cluster
+func (v *ClusterClient) GetClusterState(provider, name string) (state.StateInfo, error) {
 	//Construct key and tag to select the entry
 	key := ClusterKey{
 		ClusterProviderName: provider,
 		ClusterName:         name,
 	}
 
-	value, err := db.DBconn.Find(v.db.storeName, key, v.db.tagContext)
+	result, err := db.DBconn.Find(v.db.storeName, key, v.db.tagState)
 	if err != nil {
-		return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Get Cluster Context")
+		return state.StateInfo{}, pkgerrors.Wrap(err, "Get Cluster StateInfo")
 	}
 
-	//value is a byte array
-	if value != nil {
-		ctxVal := string(value[0])
-		var cc appcontext.AppContext
-		_, err = cc.LoadAppContext(ctxVal)
+	if result != nil {
+		s := state.StateInfo{}
+		err = db.DBconn.Unmarshal(result[0], &s)
 		if err != nil {
-			return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Reinitializing Cluster AppContext")
+			return state.StateInfo{}, pkgerrors.Wrap(err, "Unmarshalling Cluster StateInfo")
 		}
-		return cc, ctxVal, nil
+		return s, nil
 	}
 
-	return appcontext.AppContext{}, "", pkgerrors.New("Error getting Cluster AppContext")
+	return state.StateInfo{}, pkgerrors.New("Error getting Cluster StateInfo")
 }
 
 // GetClusters returns all the Clusters for corresponding provider
@@ -393,9 +402,9 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		ClusterProviderName: provider,
 		ClusterName:         name,
 	}
-	_, _, err := v.GetClusterContext(provider, name)
-	if err == nil {
-		return pkgerrors.Errorf("Cannot delete cluster until context is deleted: %v, %v", provider, name)
+	s, err := v.GetClusterState(provider, name)
+	if err == nil && s.State == state.StateEnum.Applied {
+		return pkgerrors.Errorf("Cluster network intents must be terminated before it can be deleted: " + name)
 	}
 
 	err = db.DBconn.Remove(v.db.storeName, key)

@@ -5,6 +5,7 @@ go 1.13
 require (
 	//client
 	github.com/evanphx/json-patch v4.5.0+incompatible // indirect
+	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.1
 	github.com/googleapis/gnostic v0.4.0
 	github.com/jonboulle/clockwork v0.1.0
@@ -29,8 +30,8 @@ require (
 
 replace (
 	github.com/onap/multicloud-k8s/src/clm => ../clm
-	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
+	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
 	k8s.io/api => k8s.io/api v0.17.3
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.17.3
 	k8s.io/apimachinery => k8s.io/apimachinery v0.17.3

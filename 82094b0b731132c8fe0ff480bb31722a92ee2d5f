@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b58a5241_45913a01",
+        "filename": "kud/tests/test_generic_placement_intent.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-07-23T21:19:51Z",
+      "side": 1,
+      "message": "Is this comment required here ?",
+      "revId": "82094b0b731132c8fe0ff480bb31722a92ee2d5f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

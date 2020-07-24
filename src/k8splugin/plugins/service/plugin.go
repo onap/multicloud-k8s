@@ -137,3 +137,9 @@ func (p servicePlugin) Get(resource helm.KubernetesResource, namespace string, c
 
 	return service.Name, nil
 }
+
+func (p servicePlugin) Update(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
+
+        return "", nil
+
+}

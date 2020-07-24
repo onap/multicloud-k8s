@@ -68,6 +68,9 @@ type Reference interface {
 
 	//Delete a kubernetes resource described in the provided namespace
 	Delete(resource helm.KubernetesResource, namespace string, client KubernetesConnector) error
+
+        //Update kubernetes resource based on the groupVersionKind and resourceName provided in resource
+        Update(yamlFilePath string, namespace string, client KubernetesConnector) (string, error)
 }
 
 // GetPluginByKind returns a plugin by the kind name

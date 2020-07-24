@@ -363,8 +363,13 @@ func scheduleResources(c chan configResourceList) {
 				data.createdResources, err = k8sClient.createResources(data.resourceTemplates, inst.Namespace)
 				if err != nil {
 					log.Printf("Error Creating resources: %s", err.Error())
-					continue
+					//continue
 				}
+                                data.createdResources, err = k8sClient.updateResources(data.resourceTemplates, inst.Namespace)
+                                if err != nil {
+                                        log.Printf("Error Updating resources: %s", err.Error())
+                                        continue
+                                }
 			}
 			//TODO: Needs to add code to call Kubectl create
 		case data.action == "PUT":

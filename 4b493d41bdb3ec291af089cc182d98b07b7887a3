@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e23ef36d_0e3da646",
+        "filename": "src/orchestrator/api/projecthandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-07-24T20:48:05Z",
+      "side": 1,
+      "message": "We should delete these kinds of debugging fmt.Printf lines - and either log when appropriate or nothing (this case was likely a debugging line that should have been removed - i.e. looks like this slipped through in the example in ovnaction)",
+      "revId": "4b493d41bdb3ec291af089cc182d98b07b7887a3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

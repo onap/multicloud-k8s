@@ -54,7 +54,7 @@ readiness:
   periodSeconds: 30
 
 service:
-  type: ClusterIP
+  type: NodePort
   name: ncm
   portName: ncm
   internalPort: 9031

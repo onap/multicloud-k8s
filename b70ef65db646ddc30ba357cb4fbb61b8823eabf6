@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "676fce43_8386ac33",
+        "filename": "src/orchestrator/api/projecthandler.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-07-24T17:25:37Z",
+      "side": 1,
+      "message": "does this work?  An updated project body would be passed in and ends up in the var p (on line 76).  It looks like all that\u0027s happening is the project is looked up on line 92 from the db and then sent back to be updated on line 98.  Whatever changes were provided in var p are not being used.",
+      "revId": "b70ef65db646ddc30ba357cb4fbb61b8823eabf6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6fe58a7_6c91c8b9",
+        "filename": "src/orchestrator/pkg/module/project.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-07-24T17:25:37Z",
+      "side": 1,
+      "message": "(you wouldn\u0027t have know this, but) - don\u0027t use the Update call here.  Instead use Insert.  (see src/orchestrator/pkg/infra/db/README.md for more info)\n\nWe need to clean up the mongo.go and store.go to remove the older functions that shouldn\u0027t be used anymore.",
+      "revId": "b70ef65db646ddc30ba357cb4fbb61b8823eabf6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

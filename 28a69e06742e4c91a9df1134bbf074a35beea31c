@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3042a13a_59d8c51b",
+        "filename": "kud/tests/_test_functions.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-07-24T18:12:58Z",
+      "side": 1,
+      "message": "would it make sense to just add these functions to _functions.sh ?",
+      "revId": "28a69e06742e4c91a9df1134bbf074a35beea31c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d8b1bb2b_015657e2",
+        "filename": "kud/tests/test_project.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-07-24T18:12:58Z",
+      "side": 1,
+      "message": "these two variables are used anywhere else in the script (\u0027kubeconfig_path\u0027 and \u0027csar_id\u0027).\nlooks like they could be deleted.",
+      "revId": "28a69e06742e4c91a9df1134bbf074a35beea31c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7ba56825_c4fcd965",
+        "filename": "kud/tests/test_project.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-07-24T18:12:58Z",
+      "side": 1,
+      "message": "3",
+      "revId": "28a69e06742e4c91a9df1134bbf074a35beea31c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

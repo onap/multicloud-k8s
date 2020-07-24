@@ -360,7 +360,8 @@ func scheduleResources(c chan configResourceList) {
 					//Move onto the next cloud region
 					continue
 				}
-				data.createdResources, err = k8sClient.createResources(data.resourceTemplates, inst.Namespace)
+				//data.createdResources, err = k8sClient.createResources(data.resourceTemplates, inst.Namespace)
+                                data.createdResources, err = k8sClient.updateResources(data.resourceTemplates, inst.Namespace)
 				if err != nil {
 					log.Printf("Error Creating resources: %s", err.Error())
 					continue

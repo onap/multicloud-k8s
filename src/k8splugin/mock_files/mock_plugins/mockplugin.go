@@ -54,3 +54,10 @@ func (p mockPlugin) Delete(resource helm.KubernetesResource, namespace string, c
 func (p mockPlugin) Get(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) (string, error) {
 	return resource.Name, nil
 }
+
+// Update existing resources
+func (p mockPlugin) Update(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
+
+        return "", nil
+}
+

@@ -107,3 +107,8 @@ func (p namespacePlugin) List(gvk schema.GroupVersionKind, namespace string, cli
 
 	return result, nil
 }
+
+func (p namespacePlugin) Update(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
+
+   return "", nil
+}

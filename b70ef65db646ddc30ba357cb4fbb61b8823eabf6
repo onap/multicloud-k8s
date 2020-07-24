@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0c9ed326_5df4d9f1",
+        "filename": "src/orchestrator/api/projecthandler.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 6745
+      },
+      "writtenOn": "2020-07-24T20:38:57Z",
+      "side": 1,
+      "message": "this code now follows the pattern for PUT in ovnaction",
+      "parentUuid": "676fce43_8386ac33",
+      "revId": "b70ef65db646ddc30ba357cb4fbb61b8823eabf6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d6fe58a7_6c91c8b9",
         "filename": "src/orchestrator/pkg/module/project.go",
         "patchSetId": 3
@@ -33,6 +51,24 @@
       "revId": "b70ef65db646ddc30ba357cb4fbb61b8823eabf6",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de0e45a5_f14cf2e6",
+        "filename": "src/orchestrator/pkg/module/project.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 6745
+      },
+      "writtenOn": "2020-07-24T20:38:57Z",
+      "side": 1,
+      "message": "this code now follows the pattern for PUT in ovnaction",
+      "parentUuid": "d6fe58a7_6c91c8b9",
+      "revId": "b70ef65db646ddc30ba357cb4fbb61b8823eabf6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

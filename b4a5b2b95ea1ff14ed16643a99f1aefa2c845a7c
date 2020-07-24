@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "338ef295_77635c45",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-07-24T17:45:04Z",
+      "side": 1,
+      "message": "This function is getting over loaded consider splitting them to multiple func",
+      "revId": "b4a5b2b95ea1ff14ed16643a99f1aefa2c845a7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6f8be0db_55f86c6e",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-07-24T17:45:04Z",
+      "side": 1,
+      "message": "What about the dependency with in the apps?",
+      "revId": "b4a5b2b95ea1ff14ed16643a99f1aefa2c845a7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f524ccf6_ea4159f4",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-07-24T17:45:04Z",
+      "side": 1,
+      "message": "What about the dependency with in the resource?",
+      "revId": "b4a5b2b95ea1ff14ed16643a99f1aefa2c845a7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "071d6298_adf4b9b1",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-07-24T17:45:04Z",
+      "side": 1,
+      "message": "Current proposed design is to retry forever. This error condition will not be hit?",
+      "range": {
+        "startLine": 269,
+        "startChar": 6,
+        "endLine": 269,
+        "endChar": 20
+      },
+      "revId": "b4a5b2b95ea1ff14ed16643a99f1aefa2c845a7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ebb196dc_59931c03",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-07-24T17:45:04Z",
+      "side": 1,
+      "message": "Current proposal we are handling instantiate and terminate differently.",
+      "range": {
+        "startLine": 277,
+        "startChar": 7,
+        "endLine": 277,
+        "endChar": 21
+      },
+      "revId": "b4a5b2b95ea1ff14ed16643a99f1aefa2c845a7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

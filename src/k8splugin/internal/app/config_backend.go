@@ -360,10 +360,17 @@ func scheduleResources(c chan configResourceList) {
 					//Move onto the next cloud region
 					continue
 				}
+				//assuming - the resource is not exist already
 				data.createdResources, err = k8sClient.createResources(data.resourceTemplates, inst.Namespace)
+                                errCreate := err
 				if err != nil {
-					log.Printf("Error Creating resources: %s", err.Error())
-					continue
+					// assuming - the err represent the resource is already exist, so going for update
+					data.createdResources, err = k8sClient.updateResources(data.resourceTemplates, inst.Namespace)
+					if err != nil {
+                                                log.Printf("Error Creating resources: %s", errCreate.Error())
+						log.Printf("Error Updating resources: %s", err.Error())
+						continue
+					}
 				}
 			}
 			//TODO: Needs to add code to call Kubectl create

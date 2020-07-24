@@ -181,6 +181,43 @@ func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
 	}, nil
 }
 
+func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
+        namespace string) (helm.KubernetesResource, error) {
+
+        if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
+                return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
+        }
+
+        log.Info("Processing Kubernetes Resource", log.Fields{
+                "filepath": resTempl.FilePath,
+        })
+
+        pluginImpl, err := plugin.GetPluginByKind(resTempl.GVK.Kind)
+        if err != nil {
+                return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error loading plugin")
+        }
+
+        updatedResourceName, err := pluginImpl.Update(resTempl.FilePath, namespace, k)
+        if err != nil {
+                log.Error("Error Updating Resource", log.Fields{
+                        "error":    err,
+                        "gvk":      resTempl.GVK,
+                        "filepath": resTempl.FilePath,
+                })
+                return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
+        }
+
+        log.Info("Updated Kubernetes Resource", log.Fields{
+                "resource": updatedResourceName,
+                "gvk":      resTempl.GVK,
+        })
+
+        return helm.KubernetesResource{
+                GVK:  resTempl.GVK,
+                Name: updatedResourceName,
+        }, nil
+}
+
 func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesResourceTemplate,
 	namespace string) ([]helm.KubernetesResource, error) {
 
@@ -199,6 +236,26 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 	}
 
 	return createdResources, nil
+}
+
+func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesResourceTemplate,
+        namespace string) ([]helm.KubernetesResource, error) {
+
+        err := k.ensureNamespace(namespace)
+        if err != nil {
+                return nil, pkgerrors.Wrap(err, "Creating Namespace")
+        }
+
+        var updatedResources []helm.KubernetesResource
+        for _, resTempl := range sortedTemplates {
+                resUpdated, err := k.updateKind(resTempl, namespace)
+                if err != nil {
+                        return nil, pkgerrors.Wrapf(err, "Error updating kind: %+v", resTempl.GVK)
+                }
+                updatedResources = append(updatedResources, resUpdated)
+        }
+
+        return updatedResources, nil
 }
 
 func (k *KubernetesClient) deleteKind(resource helm.KubernetesResource, namespace string) error {

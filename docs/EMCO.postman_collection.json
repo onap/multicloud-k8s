@@ -14834,7 +14834,7 @@
 											"formdata": [
 												{
 													"key": "metadata",
-													"value": "{\"name\":\"<string>\",\"description\":\"<string>\",\"userData1\":\"<string>\",\"userData2\":\"<string>\"}",
+													"value": "{\"metadata\":{\"name\":\"<string>\",\"description\":\"<string>\",\"userData1\":\"<string>\",\"userData2\":\"<string>\"}}",
 													"type": "text"
 												},
 												{

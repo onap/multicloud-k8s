@@ -58,16 +58,16 @@ service:
   type: NodePort
   name: ovnaction
   portName: ovnaction
-  internalPort: 9071
-  externalPort: 9071
+  internalPort: 9051
+  externalPort: 9051
   nodePort: 71
 
 serviceInternal:
   type: NodePort
   name: internal
   portName: internal
-  internalPort: 9073
-  externalPort: 9073
+  internalPort: 9053
+  externalPort: 9053
   nodePort: 73
 
 ingress:

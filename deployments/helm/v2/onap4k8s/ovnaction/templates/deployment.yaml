@@ -43,8 +43,8 @@ spec:
         args: [{{ .Values.args }}]
         workingDir: {{ .Values.workingDir }}
         ports:
-        - containerPort: {{ .Values.service.internalPort }}
         - containerPort: {{ .Values.serviceInternal.internalPort }}
+        - containerPort: {{ .Values.service.internalPort }}
         {{- if eq .Values.liveness.enabled true }}
         livenessProbe:
           tcpSocket:

@@ -28,6 +28,8 @@ import (
 	"strings"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installappclient"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	pkgerrors "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -152,7 +154,7 @@ func createRoleBinding(logicalcloud LogicalCloud) (string, error) {
 
 func createQuota(quota []Quota, namespace string) (string, error) {
 	lcQuota := quota[0]
-
+	fmt.Printf("lcQuota: %+v\n", lcQuota)
 	q := Resource{
 		ApiVersion: "v1",
 		Kind:       "ResourceQuota",
@@ -166,6 +168,7 @@ func createQuota(quota []Quota, namespace string) (string, error) {
 	}
 
 	qData, err := yaml.Marshal(&q)
+	fmt.Printf("qData: %v\n", string(qData))
 	if err != nil {
 		return "", err
 	}
@@ -226,12 +229,12 @@ func createUserCSR(logicalcloud LogicalCloud) (string, error) {
 // kubectl get csr lc1-user-cert -o jsonpath='{.status.certificate}' | base64 --decode > user.crt
 // kubectl config set-credentials user --client-certificate=<user.crt>  --client-key=<user.key>
 // kubectl config set-context user-context --cluster=cluster-name --namespace=lc1 --user=user
-
 func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 	quotaList []Quota) error {
 
 	APP := "logical-cloud"
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
+	project := "test-project" // FIXME(igordc): temporary, need to do some rework in the LC structs
 
 	//Resource Names
 	namespaceName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+namespace"}, "")
@@ -382,10 +385,16 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating resource order JSON")
 		}
-
 		resDependency, err := json.Marshal(map[string]map[string]string{"resdependency": map[string]string{namespaceName: "go",
 			quotaName: strings.Join([]string{"wait on ", namespaceName}, ""), csrName: strings.Join([]string{"wait on ", quotaName}, ""),
 			roleName: strings.Join([]string{"wait on ", csrName}, ""), roleBindingName: strings.Join([]string{"wait on ", roleName}, "")}})
+
+		// Add App Order and App Dependency
+		appOrder, err := json.Marshal(map[string][]string{"apporder": []string{APP}})
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error creating resource order JSON")
+		}
+		appDependency, err := json.Marshal(map[string]map[string]string{"appdependency": map[string]string{APP: "go"}})
 
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating resource dependency JSON")
@@ -417,8 +426,78 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 			return pkgerrors.Wrap(err, "Error adding instruction dependency to AppContext")
 		}
 
+		// Add App-level Order and Dependency
+		_, err = context.AddInstruction(handle, "app", "order", string(appOrder))
+		_, err = context.AddInstruction(handle, "app", "dependency", string(appDependency))
+	}
+	// save the context in the cluster db record
+	// FIXME(igordc): code below only works if there's only 1 cluster.
+	// This will be a bit of a problem, so:
+	// - are appcontexts tied to individual clusters?
+	// - should I create one appcontext per cluster in the apply?
+	// - should some rework be done somewhere to allow appcontext per logical cloud?
+	// need feedback, thanks
+	key := LogicalCloudKey{
+		LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
+		Project:          project,
+	}
+	// TODO(igordc): yeah a logical cloud context in the db is probably the right thing
+	err = db.DBconn.Insert("orchestrator", key, nil, "lccontext", ctxVal)
+	if err != nil {
+		cleanuperr := context.DeleteCompositeApp()
+		if cleanuperr != nil {
+			log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
+				"logical-cloud": logicalcloud.MetaData.LogicalCloudName,
+			})
+		}
+		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
+	}
+
+	// call resource synchronizer to instantiate the CRs in the cluster
+	err = installappclient.InvokeInstallApp(ctxVal.(string))
+	if err != nil {
+		return err
 	}
 
 	return nil
 
+}
+
+// DestroyEtcdContext remove from rsync then delete appcontext and all resources
+func DestroyEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
+	quotaList []Quota) error {
+
+	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
+	project := "test-project" // FIXME(igordc): temporary, need to do some rework in the LC structs
+
+	context, ctxVal, err := NewLogicalCloudClient().GetLogicalCloudContext(logicalCloudName)
+	if err != nil {
+		return pkgerrors.Wrapf(err, "Error finding AppContext for Logical Cloud: %v", logicalCloudName)
+	}
+
+	// call resource synchronizer to delete the CRs from every cluster of the logical cloud
+	err = installappclient.InvokeUninstallApp(ctxVal)
+	if err != nil {
+		return err
+	}
+
+	// remove the app context
+	err = context.DeleteCompositeApp()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error deleting AppContext CompositeApp")
+	}
+
+	// remove the app context field from the cluster db record
+	key := LogicalCloudKey{
+		LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
+		Project:          project,
+	}
+	err = db.DBconn.RemoveTag("orchestrator", key, "lccontext")
+	if err != nil {
+		log.Warn("Error removing AppContext from Logical Cloud", log.Fields{
+			"logical-cloud": logicalCloudName,
+		})
+	}
+
+	return nil
 }

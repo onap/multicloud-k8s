@@ -14,143 +14,142 @@ limitations under the License.
 package api
 
 import (
+	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
 
-    "github.com/onap/multicloud-k8s/src/dcm/pkg/module"
-
-    "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
 // NewRouter creates a router that registers the various urls that are
 // supported
 
 func NewRouter(
-    logicalCloudClient module.LogicalCloudManager,
-    clusterClient module.ClusterManager,
-    userPermissionClient module.UserPermissionManager,
-    quotaClient module.QuotaManager,
-    keyValueClient module.KeyValueManager) *mux.Router {
+	logicalCloudClient module.LogicalCloudManager,
+	clusterClient module.ClusterManager,
+	userPermissionClient module.UserPermissionManager,
+	quotaClient module.QuotaManager,
+	keyValueClient module.KeyValueManager) *mux.Router {
 
-    router := mux.NewRouter()
+	router := mux.NewRouter()
 
-    // Set up Logical Cloud handler routes
-    if logicalCloudClient == nil {
-        logicalCloudClient = module.NewLogicalCloudClient()
-    }
+	// Set up Logical Cloud handler routes
+	if logicalCloudClient == nil {
+		logicalCloudClient = module.NewLogicalCloudClient()
+	}
 
-    if clusterClient == nil {
-        clusterClient = module.NewClusterClient()
-    }
+	if clusterClient == nil {
+		clusterClient = module.NewClusterClient()
+	}
 
-    if quotaClient == nil {
-        quotaClient = module.NewQuotaClient()
-    }
+	if quotaClient == nil {
+		quotaClient = module.NewQuotaClient()
+	}
 
-    logicalCloudHandler := logicalCloudHandler{client: logicalCloudClient,
-        clusterClient: clusterClient,
-        quotaClient: quotaClient,
-    }
-    lcRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
-    lcRouter.HandleFunc(
-        "/logical-clouds",
-        logicalCloudHandler.createHandler).Methods("POST")
-    lcRouter.HandleFunc(
-        "/logical-clouds",
-        logicalCloudHandler.getHandler).Methods("GET")
-    lcRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}",
-        logicalCloudHandler.getHandler).Methods("GET")
-    lcRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}",
-        logicalCloudHandler.deleteHandler).Methods("DELETE")
-    lcRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}",
-        logicalCloudHandler.updateHandler).Methods("PUT")
-    lcRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/apply",
-        logicalCloudHandler.applyHandler).Methods("POST")
-    // To Do
-    // get kubeconfig
-    /*lcRouter.HandleFunc(
-         "/logical-clouds/{name}/kubeconfig?cluster-reference={cluster}",
-         logicalCloudHandler.getConfigHandler).Methods("GET")
-    //get status
-    lcRouter.HandleFunc(
-        "/logical-clouds/{name}/cluster-references/",
-        logicalCloudHandler.associateHandler).Methods("GET")*/
+	logicalCloudHandler := logicalCloudHandler{client: logicalCloudClient,
+		clusterClient: clusterClient,
+		quotaClient:   quotaClient,
+	}
+	lcRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
+	lcRouter.HandleFunc(
+		"/logical-clouds",
+		logicalCloudHandler.createHandler).Methods("POST")
+	lcRouter.HandleFunc(
+		"/logical-clouds",
+		logicalCloudHandler.getHandler).Methods("GET")
+	lcRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}",
+		logicalCloudHandler.getHandler).Methods("GET")
+	lcRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}",
+		logicalCloudHandler.deleteHandler).Methods("DELETE")
+	lcRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}",
+		logicalCloudHandler.updateHandler).Methods("PUT")
+	lcRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/apply",
+		logicalCloudHandler.applyHandler).Methods("POST")
+	// To Do
+	// get kubeconfig
+	/*lcRouter.HandleFunc(
+	       "/logical-clouds/{name}/kubeconfig?cluster-reference={cluster}",
+	       logicalCloudHandler.getConfigHandler).Methods("GET")
+	  //get status
+	  lcRouter.HandleFunc(
+	      "/logical-clouds/{name}/cluster-references/",
+	      logicalCloudHandler.associateHandler).Methods("GET")*/
 
-    // Set up Cluster API
-    
-    clusterHandler := clusterHandler{client: clusterClient}
-    clusterRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
-    clusterRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-references",
-        clusterHandler.createHandler).Methods("POST")
-    clusterRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-references",
-        clusterHandler.getHandler).Methods("GET")
-    clusterRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
-        clusterHandler.getHandler).Methods("GET")
-    clusterRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
-        clusterHandler.updateHandler).Methods("PUT")
-    clusterRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
-        clusterHandler.deleteHandler).Methods("DELETE")
+	// Set up Cluster API
 
-    // Set up User Permission API
-    if userPermissionClient == nil {
-        userPermissionClient = module.NewUserPermissionClient()
-    }
-    userPermissionHandler := userPermissionHandler{client: userPermissionClient}
-    upRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
-    upRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/user-permissions",
-        userPermissionHandler.createHandler).Methods("POST")
-    upRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/user-permissions/{permission-name}",
-        userPermissionHandler.getHandler).Methods("GET")
-    upRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/user-permissions/{permission-name}",
-        userPermissionHandler.updateHandler).Methods("PUT")
-    upRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/user-permissions/{permission-name}",
-        userPermissionHandler.deleteHandler).Methods("DELETE")
+	clusterHandler := clusterHandler{client: clusterClient}
+	clusterRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
+	clusterRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-references",
+		clusterHandler.createHandler).Methods("POST")
+	clusterRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-references",
+		clusterHandler.getHandler).Methods("GET")
+	clusterRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
+		clusterHandler.getHandler).Methods("GET")
+	clusterRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
+		clusterHandler.updateHandler).Methods("PUT")
+	clusterRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
+		clusterHandler.deleteHandler).Methods("DELETE")
 
-    // Set up Quota API
-    
-    quotaHandler := quotaHandler{client: quotaClient}
-    quotaRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
-    quotaRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-quotas",
-        quotaHandler.createHandler).Methods("POST")
-    quotaRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-quotas/{quota-name}",
-        quotaHandler.getHandler).Methods("GET")
-    quotaRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-quotas/{quota-name}",
-        quotaHandler.updateHandler).Methods("PUT")
-    quotaRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/cluster-quotas/{quota-name}",
-        quotaHandler.deleteHandler).Methods("DELETE")
+	// Set up User Permission API
+	if userPermissionClient == nil {
+		userPermissionClient = module.NewUserPermissionClient()
+	}
+	userPermissionHandler := userPermissionHandler{client: userPermissionClient}
+	upRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
+	upRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/user-permissions",
+		userPermissionHandler.createHandler).Methods("POST")
+	upRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/user-permissions/{permission-name}",
+		userPermissionHandler.getHandler).Methods("GET")
+	upRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/user-permissions/{permission-name}",
+		userPermissionHandler.updateHandler).Methods("PUT")
+	upRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/user-permissions/{permission-name}",
+		userPermissionHandler.deleteHandler).Methods("DELETE")
 
-    // Set up Key Value API
-    if keyValueClient == nil {
-        keyValueClient = module.NewKeyValueClient()
-    }
-    keyValueHandler := keyValueHandler{client: keyValueClient}
-    kvRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
-    kvRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/kv-pairs",
-        keyValueHandler.createHandler).Methods("POST")
-    kvRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/kv-pairs/{kv-pair-name}",
-        keyValueHandler.getHandler).Methods("GET")
-    kvRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/kv-pairs/{kv-pair-name}",
-        keyValueHandler.updateHandler).Methods("PUT")
-    kvRouter.HandleFunc(
-        "/logical-clouds/{logical-cloud-name}/kv-pairs/{kv-pair-name}",
-        keyValueHandler.deleteHandler).Methods("DELETE")
-        return router
+	// Set up Quota API
+
+	quotaHandler := quotaHandler{client: quotaClient}
+	quotaRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
+	quotaRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-quotas",
+		quotaHandler.createHandler).Methods("POST")
+	quotaRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-quotas/{quota-name}",
+		quotaHandler.getHandler).Methods("GET")
+	quotaRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-quotas/{quota-name}",
+		quotaHandler.updateHandler).Methods("PUT")
+	quotaRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-quotas/{quota-name}",
+		quotaHandler.deleteHandler).Methods("DELETE")
+
+	// Set up Key Value API
+	if keyValueClient == nil {
+		keyValueClient = module.NewKeyValueClient()
+	}
+	keyValueHandler := keyValueHandler{client: keyValueClient}
+	kvRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
+	kvRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/kv-pairs",
+		keyValueHandler.createHandler).Methods("POST")
+	kvRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/kv-pairs/{kv-pair-name}",
+		keyValueHandler.getHandler).Methods("GET")
+	kvRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/kv-pairs/{kv-pair-name}",
+		keyValueHandler.updateHandler).Methods("PUT")
+	kvRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/kv-pairs/{kv-pair-name}",
+		keyValueHandler.deleteHandler).Methods("DELETE")
+	return router
 }

@@ -124,7 +124,7 @@ func (v *UserPermissionClient) GetUserPerm(project, logicalCloud, userPermName s
 		return up, nil
 	}
 
-	return UserPermission{}, pkgerrors.New("Error getting User Permission")
+	return UserPermission{}, pkgerrors.New("User Permission does not exist")
 }
 
 // GetAll lists all user permissions
@@ -184,7 +184,7 @@ func (v *UserPermissionClient) UpdateUserPerm(project, logicalCloud, userPermNam
 	_, err := v.GetUserPerm(project, logicalCloud, userPermName)
 	if err != nil {
 		return UserPermission{}, pkgerrors.New(
-			"Update Error - User Permission doesn't exist")
+			"User Permission does not exist")
 	}
 	err = v.util.DBInsert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {

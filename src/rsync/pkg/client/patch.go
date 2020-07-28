@@ -15,6 +15,7 @@ package client
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jonboulle/clockwork"
@@ -58,7 +59,6 @@ func patch(info *resource.Info, current runtime.Object) error {
 	if err != nil {
 		return fmt.Errorf("retrieving modified configuration. %s", err)
 	}
-
 	metadata, _ := meta.Accessor(current)
 	annotationMap := metadata.GetAnnotations()
 	if _, ok := annotationMap[corev1.LastAppliedConfigAnnotation]; !ok {
@@ -164,10 +164,16 @@ func patchSimple(currentObj runtime.Object, modified []byte, info *resource.Info
 		}
 	}
 
-	if string(patch) == "{}" {
+	var body = string(patch)
+	if body == "{}" {
 		return patch, currentObj, nil
 	}
 
+	// address corner case: detect csr approval request:
+	if strings.Contains(body, "CertificateSigningRequest") && strings.Contains(body, "ApprovedForDCM") {
+		// don't use normal Patch from cli-runtime, instead use client-go to fetch CSR from k8s and then approve it
+		fmt.Printf("Detected CSR Approval request for DCM...\n")
+	}
 	patchedObj, err := resource.NewHelper(info.Client, info.Mapping).Patch(info.Namespace, info.Name, patchType, patch, nil)
 	return patch, patchedObj, err
 }

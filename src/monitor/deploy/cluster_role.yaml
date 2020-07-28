@@ -70,3 +70,9 @@ rules:
   - '*'
   verbs:
   - '*'
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - '*'
+  verbs:
+  - '*'

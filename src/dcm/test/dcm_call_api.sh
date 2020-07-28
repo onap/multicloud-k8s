@@ -52,7 +52,7 @@ logical_cloud_data="$(cat << EOF
     "type" : "certificate",
     "user-permissions" : [
        { "permission-name" : "${permission}",
-         "apiGroups" : ["stable.example.com"],
+         "apiGroups" : [""],
          "resources" : ["secrets", "pods"],
          "verbs" : ["get", "watch", "list", "create"]
        }
@@ -99,28 +99,7 @@ cluster_2_data="$(cat << EOF
 EOF
 )"
 
-# removed all special chars from quota spec keys
-# due to loss of data when unmarshalling from json
 quota_data="$(cat << EOF
-{
-    "metadata" : {
-      "name" : "${quota_name}",
-      "description": "${description}"
-     },
-    "spec" : {
-      "persistentvolumeclaims" : "10",
-      "pods": "500",
-      "configmaps" : "10",
-      "replicationcontrollers": "10",
-      "resourcequotas" : "10",
-      "services": "10",
-      "secrets" : "10"
-     }
-}
-EOF
-)"
-
-quota_data_original="$(cat << EOF
 {
     "metadata" : {
       "name" : "${quota_name}",
@@ -132,24 +111,24 @@ quota_data_original="$(cat << EOF
       "requests.cpu": "300",
       "requests.memory": "900Gi",
       "requests.storage" : "500Gi",
-      "requests.ephemeral-storage": "",
-      "limits.ephemeral-storage": "",
-      "persistentvolumeclaims" : " ",
+      "requests.ephemeral-storage": "500",
+      "limits.ephemeral-storage": "500",
+      "persistentvolumeclaims" : "500",
       "pods": "500",
-      "configmaps" : "",
-      "replicationcontrollers": "",
-      "resourcequotas" : "",
-      "services": "",
-      "services.loadbalancers" : "",
-      "services.nodeports" : "",
-      "secrets" : "",
-      "count/replicationcontrollers" : "",
-      "count/deployments.apps" : "",
-      "count/replicasets.apps" : "",
-      "count/statefulsets.apps" : "",
-      "count/jobs.batch" : "",
-      "count/cronjobs.batch" : "",
-      "count/deployments.extensions" : ""
+      "configmaps" : "1000",
+      "replicationcontrollers": "500",
+      "resourcequotas" : "500",
+      "services": "500",
+      "services.loadbalancers" : "500",
+      "services.nodeports" : "500",
+      "secrets" : "500",
+      "count/replicationcontrollers" : "500",
+      "count/deployments.apps" : "500",
+      "count/replicasets.apps" : "500",
+      "count/statefulsets.apps" : "500",
+      "count/jobs.batch" : "500",
+      "count/cronjobs.batch" : "500",
+      "count/deployments.extensions" : "500"
     }
 }
 EOF
@@ -170,21 +149,21 @@ printf "\n\nAdding resource quota for the logical cloud\n\n"
 curl -d "${quota_data}" -X POST ${quota_url}
 
 
-# Get logical cloud data
-printf "\n\nGetting logical cloud\n\n"
-curl -X GET "${logical_cloud_url}/${logical_cloud_name}"
+# # Get logical cloud data
+# printf "\n\nGetting logical cloud\n\n"
+# curl -X GET "${logical_cloud_url}/${logical_cloud_name}"
 
-printf "\n\nGetting clusters info for logical cloud\n\n"
-curl -X GET ${cluster_url}
+# printf "\n\nGetting clusters info for logical cloud\n\n"
+# curl -X GET ${cluster_url}
 
-printf "\n\nGetting first cluster of logical cloud\n"
-curl -X GET ${cluster_url}/${lc_cluster_1_name}
+# printf "\n\nGetting first cluster of logical cloud\n"
+# curl -X GET ${cluster_url}/${lc_cluster_1_name}
 
-printf "\n\nGetting second cluster of logical cloud\n"
-curl -X GET ${cluster_url}/${lc_cluster_2_name}
+# printf "\n\nGetting second cluster of logical cloud\n"
+# curl -X GET ${cluster_url}/${lc_cluster_2_name}
 
-printf "\n\nGetting Quota info for the logical cloud\n\n"
-curl -X GET "${quota_url}/${quota_name}"
+# printf "\n\nGetting Quota info for the logical cloud\n\n"
+# curl -X GET "${quota_url}/${quota_name}"
 
 # Cleanup (delete created resources)
 if [ "$1" == "clean" ]; then

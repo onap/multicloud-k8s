@@ -8,6 +8,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/stretchr/testify v1.4.0
 	gopkg.in/yaml.v2 v2.2.8
+	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
 )
 
 replace (

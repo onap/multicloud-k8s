@@ -15,9 +15,11 @@ package client
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jonboulle/clockwork"
+	certificatesv1beta1 "k8s.io/api/certificates/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -30,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/cli-runtime/pkg/resource"
+	"k8s.io/client-go/kubernetes"
 	oapi "k8s.io/kube-openapi/pkg/util/proto"
 	"k8s.io/kubectl/pkg/scheme"
 	"k8s.io/kubectl/pkg/util"
@@ -53,13 +56,18 @@ const (
 
 // patch tries to patch an OpenAPI resource
 func patch(info *resource.Info, current runtime.Object) error {
+	//debug.PrintStack()
+	//fmt.Println("info: %v", info)
+	//fmt.Println("current: %v", current)
+
 	// From: k8s.io/kubectl/pkg/cmd/apply/apply.go & patcher.go
 	modified, err := util.GetModifiedConfiguration(info.Object, true, unstructured.UnstructuredJSONScheme)
 	if err != nil {
 		return fmt.Errorf("retrieving modified configuration. %s", err)
 	}
-
+	//fmt.Println("modified: %v", string(modified))
 	metadata, _ := meta.Accessor(current)
+	//fmt.Println("metadata: %v", metadata)
 	annotationMap := metadata.GetAnnotations()
 	if _, ok := annotationMap[corev1.LastAppliedConfigAnnotation]; !ok {
 		// TODO: Find what to do with the warnings, they should not be printed
@@ -90,6 +98,7 @@ func patch(info *resource.Info, current runtime.Object) error {
 
 func patchSimple(currentObj runtime.Object, modified []byte, info *resource.Info) ([]byte, runtime.Object, error) {
 	// Serialize the current configuration of the object from the server.
+	//debug.PrintStack()
 	current, err := runtime.Encode(unstructured.UnstructuredJSONScheme, currentObj)
 	if err != nil {
 		return nil, nil, fmt.Errorf("serializing current configuration. %s", err)
@@ -105,6 +114,10 @@ func patchSimple(currentObj runtime.Object, modified []byte, info *resource.Info
 	var patch []byte
 	var lookupPatchMeta strategicpatch.LookupPatchMeta
 	var schema oapi.Schema
+	// var getpath, _ = json.Marshal(*(schema.GetPath()))
+	// fmt.Printf("schema.GetPath(): %#v\n", string(getpath))
+
+	//fmt.Printf("schema.GetPath(): %#v\n", schema.GetPath().String())
 
 	// Create the versioned struct from the type defined in the restmapping
 	// (which is the API version we'll be submitting the patch to)
@@ -114,7 +127,7 @@ func patchSimple(currentObj runtime.Object, modified []byte, info *resource.Info
 	// fmt.Printf("Modified: %v\n", string(modified))
 	// fmt.Printf("Current: %v\n", string(current))
 	// fmt.Printf("Original: %v\n", string(original))
-	// fmt.Printf("versionedObj: %v\n", versionedObject)
+	fmt.Printf("versionedObj: %v\n", versionedObject)
 	// fmt.Printf("Error: %+v\nIsNotRegisteredError: %t\n", err, runtime.IsNotRegisteredError(err))
 
 	switch {
@@ -164,10 +177,36 @@ func patchSimple(currentObj runtime.Object, modified []byte, info *resource.Info
 		}
 	}
 
-	if string(patch) == "{}" {
+	var body = string(patch)
+	if body == "{}" {
 		return patch, currentObj, nil
 	}
 
+	// address corner case: detect csr approval request:
+	if strings.Contains(body, "CertificateSigningRequest") && strings.Contains(body, "ApprovedForDCM") {
+		// don't use normal Patch from cli-runtime, instead use client-go to fetch CSR from k8s and then approve it
+		fmt.Printf("Detected CSR Approval request for DCM...\n")
+		fmt.Printf("CLIENT: %v\n", info.Client)
+
+		clientset, err := kubernetes.NewForConfig(nil)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		// 1st. need a copy of existing CSR
+		csr, err := clientset.CertificatesV1beta1().CertificateSigningRequests().Get("lc1-user-csr", metav1.GetOptions{})
+
+		csr.Status.Conditions = append(csr.Status.Conditions, certificatesv1beta1.CertificateSigningRequestCondition{
+			Type:           certificatesv1beta1.CertificateApproved,
+			Reason:         "ApprovedForDCM",
+			Message:        "Approved for DCM",
+			LastUpdateTime: metav1.Now(),
+		})
+
+		// 2nd. approve CSR using UpdateApproval()
+		//newcsr, err := clientset.CertificatesV1beta1().CertificateSigningRequests().UpdateApproval(csr)
+	}
+	fmt.Printf("YYYYY\n")
 	patchedObj, err := resource.NewHelper(info.Client, info.Mapping).Patch(info.Namespace, info.Name, patchType, patch, nil)
 	return patch, patchedObj, err
 }

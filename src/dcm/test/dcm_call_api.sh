@@ -52,7 +52,7 @@ logical_cloud_data="$(cat << EOF
     "type" : "certificate",
     "user-permissions" : [
        { "permission-name" : "${permission}",
-         "apiGroups" : ["stable.example.com"],
+         "apiGroups" : [""],
          "resources" : ["secrets", "pods"],
          "verbs" : ["get", "watch", "list", "create"]
        }

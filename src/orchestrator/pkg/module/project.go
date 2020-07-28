@@ -55,7 +55,7 @@ func (pk ProjectKey) String() string {
 
 // ProjectManager is an interface exposes the Project functionality
 type ProjectManager interface {
-	CreateProject(pr Project) (Project, error)
+	CreateProject(pr Project, exists bool) (Project, error)
 	GetProject(name string) (Project, error)
 	DeleteProject(name string) error
 	GetAllProjects() ([]Project, error)
@@ -78,7 +78,7 @@ func NewProjectClient() *ProjectClient {
 }
 
 // CreateProject a new collection based on the project
-func (v *ProjectClient) CreateProject(p Project) (Project, error) {
+func (v *ProjectClient) CreateProject(p Project, exists bool) (Project, error) {
 
 	//Construct the composite key to select the entry
 	key := ProjectKey{
@@ -87,7 +87,7 @@ func (v *ProjectClient) CreateProject(p Project) (Project, error) {
 
 	//Check if this Project already exists
 	_, err := v.GetProject(p.MetaData.Name)
-	if err == nil {
+	if err == nil && !exists {
 		return Project{}, pkgerrors.New("Project already exists")
 	}
 

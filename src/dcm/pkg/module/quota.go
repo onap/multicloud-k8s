@@ -17,6 +17,8 @@
 package module
 
 import (
+	"fmt"
+
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -34,28 +36,28 @@ type QMetaDataList struct {
 
 // Spec contains the parameters needed for spec
 type QSpec struct {
-	LimitsCPU                   string `json:"limits.cpu"`
-	LimitsMemory                string `json:"limits.memory"`
-	RequestsCPU                 string `json:"requests.cpu"`
-	RequestsMemory              string `json:"requests.memory"`
-	RequestsStorage             string `json:"requests.storage"`
-	LimitsEphemeralStorage      string `json:"limits.ephemeral.storage"`
+	// LimitsCPU                   string `json:"limits.cpu"`
+	// LimitsMemory                string `json:"limits.memory"`
+	// RequestsCPU                 string `json:"requests.cpu"`
+	// RequestsMemory              string `json:"requests.memory"`
+	// RequestsStorage             string `json:"requests.storage"`
+	// LimitsEphemeralStorage      string `json:"limits.ephemeral.storage"`
 	PersistentVolumeClaims      string `json:"persistentvolumeclaims"`
 	Pods                        string `json:"pods"`
 	ConfigMaps                  string `json:"configmaps"`
 	ReplicationControllers      string `json:"replicationcontrollers"`
 	ResourceQuotas              string `json:"resourcequotas"`
 	Services                    string `json:"services"`
-	ServicesLoadBalancers       string `json:"services.loadbalancers"`
-	ServicesNodePorts           string `json:"services.nodeports"`
+	// ServicesLoadBalancers       string `json:"services.loadbalancers"`
+	// ServicesNodePorts           string `json:"services.nodeports"`
 	Secrets                     string `json:"secrets"`
-	CountReplicationControllers string `json:"count/replicationcontrollers"`
-	CountDeploymentsApps        string `json:"count/deployments.apps"`
-	CountReplicasetsApps        string `json:"count/replicasets.apps"`
-	CountStatefulSets           string `json:"count/statefulsets.apps"`
-	CountJobsBatch              string `json:"count/jobs.batch"`
-	CountCronJobsBatch          string `json:"count/cronjobs.batch"`
-	CountDeploymentsExtensions  string `json:"count/deployments.extensions"`
+	// CountReplicationControllers string `json:"count/replicationcontrollers"`
+	// CountDeploymentsApps        string `json:"count/deployments.apps"`
+	// CountReplicasetsApps        string `json:"count/replicasets.apps"`
+	// CountStatefulSets           string `json:"count/statefulsets.apps"`
+	// CountJobsBatch              string `json:"count/jobs.batch"`
+	// CountCronJobsBatch          string `json:"count/cronjobs.batch"`
+	// CountDeploymentsExtensions  string `json:"count/deployments.extensions"`
 }
 
 // QuotaKey is the key structure that is used in the database
@@ -170,13 +172,17 @@ func (v *QuotaClient) GetAllQuotas(project, logicalCloud string) ([]Quota, error
 	}
 
 	for _, value := range values {
+		fmt.Printf("value=%v\n", value)
 		q := Quota{}
 		err = v.util.DBUnmarshal(value, &q)
 		if err != nil {
 			return []Quota{}, pkgerrors.Wrap(err, "Unmarshaling value")
 		}
 		resp = append(resp, q)
+		fmt.Printf("q=%v\n", q)
 	}
+
+	fmt.Println("Quota: %v", resp)
 
 	return resp, nil
 }

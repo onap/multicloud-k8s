@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94f1efb4_f55bc786",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-07-28T03:24:06Z",
+      "side": 1,
+      "message": "Team, read this please -",
+      "revId": "c21d5ba4e3e111034d6b4cdd6ad0c172433be41c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

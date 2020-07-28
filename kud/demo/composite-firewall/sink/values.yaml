@@ -56,6 +56,6 @@ global:
 
   #########
   ovnMultusNetworkName: ovn-networkobj
-  demoArtifactsVersion: 1.5.0
+  demoArtifactsVersion: 1.6.0
   dcaeCollectorIp: 10.0.4.1
   dcaeCollectorPort: 8081

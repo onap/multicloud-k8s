@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "dc9b596b_c99cda28",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-07-28T16:46:45Z",
+      "side": 1,
+      "message": "Is there a means to cancel waiting/retrying of instantiation once a terminate has been issued?",
+      "revId": "b4a5b2b95ea1ff14ed16643a99f1aefa2c845a7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "338ef295_77635c45",
         "filename": "src/rsync/pkg/context/context.go",
         "patchSetId": 1

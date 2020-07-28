@@ -67,6 +67,9 @@ func NewRouter(
 	lcRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/apply",
 		logicalCloudHandler.applyHandler).Methods("POST")
+	lcRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/terminate",
+		logicalCloudHandler.terminateHandler).Methods("POST")
 	// To Do
 	// get kubeconfig
 	/*lcRouter.HandleFunc(

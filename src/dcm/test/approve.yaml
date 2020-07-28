@@ -1,0 +1,11 @@
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
+metadata:
+  name: lc1-user-csr
+  namespace: ns1
+status:
+  conditions:
+  - lastUpdateTime: 2020-08-04T00:21:35Z
+    message: ApprovedForDCM
+    reason: ApprovedForDCM
+    type: Approved

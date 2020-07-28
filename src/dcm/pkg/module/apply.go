@@ -28,9 +28,12 @@ import (
 	"strings"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installappclient"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	pkgerrors "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type Resource struct {
@@ -41,6 +44,7 @@ type Resource struct {
 	Rules         []RoleRules    `yaml:"rules,omitempty"`
 	Subjects      []RoleSubjects `yaml:"subjects,omitempty"`
 	RoleRefs      RoleRef        `yaml:"roleRef,omitempty"`
+	Status        Stat           `yaml:"status,omitempty"`
 }
 
 type MetaDatas struct {
@@ -49,10 +53,20 @@ type MetaDatas struct {
 }
 
 type Specs struct {
-	Request string   `yaml:"request,omitempty"`
-	Usages  []string `yaml:"usages,omitempty"`
-	//Hard           logicalcloud.QSpec    `yaml:"hard,omitempty"`
-	Hard QSpec `yaml:"hard,omitempty"`
+	Request string            `yaml:"request,omitempty"`
+	Usages  []string          `yaml:"usages,omitempty"`
+	Hard    map[string]string `yaml:"hard,omitempty"`
+}
+
+type Stat struct {
+	Conditions []Condition `yaml:"conditions,omitempty"`
+}
+
+type Condition struct {
+	LastUpdateTime string `yaml:"lastUpdateTime,omitempty"`
+	Message        string `yaml:"message,omitempty"`
+	Reason         string `yaml:"reason,omitempty"`
+	Type           string `yaml:"type,omitempty"`
 }
 
 type RoleRules struct {
@@ -147,12 +161,10 @@ func createRoleBinding(logicalcloud LogicalCloud) (string, error) {
 	}
 
 	return string(rBData), nil
-
 }
 
 func createQuota(quota []Quota, namespace string) (string, error) {
 	lcQuota := quota[0]
-
 	q := Resource{
 		ApiVersion: "v1",
 		Kind:       "ResourceQuota",
@@ -171,23 +183,22 @@ func createQuota(quota []Quota, namespace string) (string, error) {
 	}
 
 	return string(qData), nil
-
 }
 
-func createUserCSR(logicalcloud LogicalCloud) (string, error) {
+func createUserCSR(logicalcloud LogicalCloud) (string, string, error) {
 	KEYSIZE := 4096
 	userName := logicalcloud.Specification.User.UserName
 
 	key, err := rsa.GenerateKey(rand.Reader, KEYSIZE)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	csrTemplate := x509.CertificateRequest{Subject: pkix.Name{CommonName: userName}}
 
 	csrCert, err := x509.CreateCertificateRequest(rand.Reader, &csrTemplate, key)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	//Encode csr
@@ -211,11 +222,43 @@ func createUserCSR(logicalcloud LogicalCloud) (string, error) {
 
 	csrData, err := yaml.Marshal(&csrObj)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return string(csrData), nil
+	keyData := pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: x509.MarshalPKCS1PrivateKey(key),
+		},
+	)
+	if err != nil {
+		return "", "", err
+	}
 
+	return string(csrData), string(keyData), nil
+}
+
+func approveUserCSR(logicalcloud LogicalCloud) (string, error) {
+	csrObj := Resource{
+		ApiVersion: "certificates.k8s.io/v1beta1",
+		Kind:       "CertificateSigningRequest",
+		MetaData: MetaDatas{
+			Name:      strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "-user-csr"}, ""),
+			Namespace: logicalcloud.Specification.NameSpace,
+		},
+		Status: Stat{
+			Conditions: []Condition{
+				Condition{
+					Message:        "Approved for DCM",
+					Reason:         "ApprovedForDCM",
+					Type:           "Approved",
+					LastUpdateTime: metav1.Now().Format("2006-01-02T15:04:05Z"),
+				},
+			},
+		},
+	}
+	csrData, err := yaml.Marshal(&csrObj)
+	return string(csrData), err
 }
 
 // TODO:
@@ -226,12 +269,12 @@ func createUserCSR(logicalcloud LogicalCloud) (string, error) {
 // kubectl get csr lc1-user-cert -o jsonpath='{.status.certificate}' | base64 --decode > user.crt
 // kubectl config set-credentials user --client-certificate=<user.crt>  --client-key=<user.key>
 // kubectl config set-context user-context --cluster=cluster-name --namespace=lc1 --user=user
-
 func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 	quotaList []Quota) error {
 
 	APP := "logical-cloud"
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
+	project := "test-project" // FIXME(igordc): temporary, need to do some rework in the LC structs
 
 	//Resource Names
 	namespaceName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+namespace"}, "")
@@ -239,6 +282,7 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 	roleBindingName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+roleBinding"}, "")
 	quotaName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+quota"}, "")
 	csrName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+CertificateSigningRequest"}, "")
+	approvedCsrName := strings.Join([]string{csrName, "+approval"}, "") // workaround since rsync only executes 1 thing per resource and csr approval requires 2 ops
 
 	// Get resources to be added
 	namespace, err := createNamespace(logicalcloud)
@@ -261,10 +305,12 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 		return pkgerrors.Wrap(err, "Error Creating Quota YAML for logical cloud")
 	}
 
-	csr, err := createUserCSR(logicalcloud)
+	csr, key, err := createUserCSR(logicalcloud)
 	if err != nil {
-		return pkgerrors.Wrap(err, "Error Creating User CSR for logical cloud")
+		return pkgerrors.Wrap(err, "Error Creating User CSR and Key for logical cloud")
 	}
+
+	approvedCsr, err := approveUserCSR(logicalcloud)
 
 	context := appcontext.AppContext{}
 	ctxVal, err := context.InitAppContext()
@@ -335,6 +381,36 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 			return pkgerrors.Wrap(err, "Error adding CSR Resource to AppContext")
 		}
 
+		// Add csr approval resource to each cluster
+		_, err = context.AddResource(clusterHandle, approvedCsrName, approvedCsr)
+		if err != nil {
+			cleanuperr := context.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Warn("Error cleaning AppContext after add CSR approval failure", log.Fields{
+					"cluster-provider": cluster.Specification.ClusterProvider,
+					"cluster":          cluster.Specification.ClusterName,
+					"logical-cloud":    logicalCloudName,
+				})
+			}
+			return pkgerrors.Wrap(err, "Error approving CSR via AppContext")
+		}
+
+		// Add private key to MongoDB
+		lckey := LogicalCloudKey{
+			LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
+			Project:          project,
+		}
+		err = db.DBconn.Insert("orchestrator", lckey, nil, "privatekey", key)
+		if err != nil {
+			cleanuperr := context.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
+					"logical-cloud": logicalcloud.MetaData.LogicalCloudName,
+				})
+			}
+			return pkgerrors.Wrap(err, "Error adding private key to DB")
+		}
+
 		// Add Role resource to each cluster
 		_, err = context.AddResource(clusterHandle, roleName, role)
 		if err != nil {
@@ -378,14 +454,20 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 		}
 
 		// Add Resource Order and Resource Dependency
-		resOrder, err := json.Marshal(map[string][]string{"resorder": []string{namespaceName, quotaName, csrName, roleName, roleBindingName}})
+		resOrder, err := json.Marshal(map[string][]string{"resorder": []string{namespaceName, quotaName, csrName, approvedCsrName, roleName, roleBindingName}})
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating resource order JSON")
 		}
-
 		resDependency, err := json.Marshal(map[string]map[string]string{"resdependency": map[string]string{namespaceName: "go",
 			quotaName: strings.Join([]string{"wait on ", namespaceName}, ""), csrName: strings.Join([]string{"wait on ", quotaName}, ""),
-			roleName: strings.Join([]string{"wait on ", csrName}, ""), roleBindingName: strings.Join([]string{"wait on ", roleName}, "")}})
+			roleName: strings.Join([]string{"wait on ", csrName}, ""), approvedCsrName: strings.Join([]string{"wait on ", csrName}, ""), roleBindingName: strings.Join([]string{"wait on ", roleName}, "")}})
+
+		// Add App Order and App Dependency
+		appOrder, err := json.Marshal(map[string][]string{"apporder": []string{APP}})
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error creating resource order JSON")
+		}
+		appDependency, err := json.Marshal(map[string]map[string]string{"appdependency": map[string]string{APP: "go"}})
 
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating resource dependency JSON")
@@ -417,8 +499,71 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 			return pkgerrors.Wrap(err, "Error adding instruction dependency to AppContext")
 		}
 
+		// Add App-level Order and Dependency
+		_, err = context.AddInstruction(handle, "app", "order", string(appOrder))
+		_, err = context.AddInstruction(handle, "app", "dependency", string(appDependency))
+	}
+	// save the context in the logicalcloud db record
+	lckey := LogicalCloudKey{
+		LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
+		Project:          project,
+	}
+	err = db.DBconn.Insert("orchestrator", lckey, nil, "lccontext", ctxVal)
+	if err != nil {
+		cleanuperr := context.DeleteCompositeApp()
+		if cleanuperr != nil {
+			log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
+				"logical-cloud": logicalcloud.MetaData.LogicalCloudName,
+			})
+		}
+		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
+	}
+
+	// call resource synchronizer to instantiate the CRs in the cluster
+	err = installappclient.InvokeInstallApp(ctxVal.(string))
+	if err != nil {
+		return err
 	}
 
 	return nil
 
+}
+
+// DestroyEtcdContext remove from rsync then delete appcontext and all resources
+func DestroyEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
+	quotaList []Quota) error {
+
+	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
+	project := "test-project" // FIXME(igordc): temporary, need to do some rework in the LC structs
+
+	context, ctxVal, err := NewLogicalCloudClient().GetLogicalCloudContext(logicalCloudName)
+	if err != nil {
+		return pkgerrors.Wrapf(err, "Error finding AppContext for Logical Cloud: %v", logicalCloudName)
+	}
+
+	// call resource synchronizer to delete the CRs from every cluster of the logical cloud
+	err = installappclient.InvokeUninstallApp(ctxVal)
+	if err != nil {
+		return err
+	}
+
+	// remove the app context
+	err = context.DeleteCompositeApp()
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error deleting AppContext CompositeApp")
+	}
+
+	// remove the app context field from the cluster db record
+	lckey := LogicalCloudKey{
+		LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
+		Project:          project,
+	}
+	err = db.DBconn.RemoveTag("orchestrator", lckey, "lccontext")
+	if err != nil {
+		log.Warn("Error removing AppContext from Logical Cloud", log.Fields{
+			"logical-cloud": logicalCloudName,
+		})
+	}
+
+	return nil
 }

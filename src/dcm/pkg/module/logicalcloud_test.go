@@ -78,7 +78,7 @@ func TestCreateLogicalCloud(t *testing.T) {
 	myMocks.On("DBInsert", "test_dcm", key, nil, "test_meta", lc).Return(nil)
 	myMocks.On("DBFind", "test_dcm", key, "test_meta").Return(data1, err1)
 
-	lcClient := LogicalCloudClient{"test_dcm", "test_meta", myMocks}
+	lcClient := LogicalCloudClient{"test_dcm", "test_meta", "test_context", myMocks}
 	_, err := lcClient.Create("test_project", lc)
 	if err != nil {
 		t.Errorf("Some error occured!")
@@ -101,7 +101,7 @@ func TestGetLogicalCloud(t *testing.T) {
 
 	myMocks.On("DBFind", "test_dcm", key, "test_meta").Return(data1, nil)
 	myMocks.On("DBUnmarshal", data2).Return(nil)
-	lcClient := LogicalCloudClient{"test_dcm", "test_meta", myMocks}
+	lcClient := LogicalCloudClient{"test_dcm", "test_meta", "test_context", myMocks}
 	_, err := lcClient.Get("test_project", "test_asdf")
 	if err != nil {
 		t.Errorf("Some error occured!")
@@ -117,9 +117,17 @@ func TestDeleteLogicalCloud(t *testing.T) {
 
 	myMocks := new(mockValues)
 
-	myMocks.On("DBRemove", "test_dcm", key).Return(nil)
+	data1 := [][]byte{
+		[]byte("abc"),
+	}
+	data2 := []byte("abc")
 
-	lcClient := LogicalCloudClient{"test_dcm", "test_meta", myMocks}
+	myMocks.On("DBRemove", "test_dcm", key).Return(nil)
+	myMocks.On("DBFind", "test_dcm", key, "test_meta").Return(data1, nil)
+	myMocks.On("DBUnmarshal", data2).Return(nil)
+	// TODO also test for when the logical cloud doesn't exist
+
+	lcClient := LogicalCloudClient{"test_dcm", "test_meta", "test_context", myMocks}
 	err := lcClient.Delete("test_project", "test_asdf")
 	if err != nil {
 		t.Errorf("Some error occured!")
@@ -148,7 +156,7 @@ func TestUpdateLogicalCloud(t *testing.T) {
 	myMocks.On("DBInsert", "test_dcm", key, nil, "test_meta", lc).Return(nil)
 	myMocks.On("DBFind", "test_dcm", key, "test_meta").Return(data1, nil)
 	myMocks.On("DBUnmarshal", data2).Return(nil)
-	lcClient := LogicalCloudClient{"test_dcm", "test_meta", myMocks}
+	lcClient := LogicalCloudClient{"test_dcm", "test_meta", "test_context", myMocks}
 	_, err := lcClient.Update("test_project", "test_asdf", lc)
 	if err != nil {
 		t.Errorf("Some error occured!")

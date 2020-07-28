@@ -90,6 +90,10 @@ func (h keyValueHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		ret, err = h.client.GetKVPair(project, logicalCloud, name)
 		if err != nil {
+			if err.Error() == "KV Pair does not exist" {
+				http.Error(w, err.Error(), http.StatusNotFound)
+				return
+			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -130,12 +134,16 @@ func (h keyValueHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.UpdateKVPair(project, logicalCloud, name, v)
 	if err != nil {
+		if err.Error() == "KV Pair does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(),
 			http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
 		http.Error(w, err.Error(),

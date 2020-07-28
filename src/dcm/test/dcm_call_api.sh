@@ -26,7 +26,7 @@ user="user-1"
 permission="permission-1"
 cluster_provider_name="cp-1"
 cluster_1_name="c1"
-cluster_1_name="c2"
+cluster_2_name="c2"
 lc_cluster_1_name="lc-cl-1"
 lc_cluster_2_name="lc-cl-2"
 quota_name="quota-1"
@@ -141,7 +141,7 @@ curl -d "${logical_cloud_data}" -X POST ${logical_cloud_url}
 # Associate two clusters with the logical cloud
 printf "\n\nAdding two clusters to logical cloud\n\n"
 curl -d "${cluster_1_data}" -X POST ${cluster_url}
-curl -d "${cluster_2_data}" -X POST ${cluster_url}
+#curl -d "${cluster_2_data}" -X POST ${cluster_url}
 
 # Add resource quota for the logical cloud
 printf "\n\nAdding resource quota for the logical cloud\n\n"

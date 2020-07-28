@@ -1,0 +1,6 @@
+{
+    "database-type": "mongo",
+    "database-ip": "172.18.0.2",
+    "etcd-ip": "172.18.0.3",
+    "service-port": "9041"
+}

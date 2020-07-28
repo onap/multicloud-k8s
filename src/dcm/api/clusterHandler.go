@@ -160,3 +160,28 @@ func (h clusterHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// getConfigHandler handles GET operations on kubeconfigs
+// Returns a kubeconfig file
+func (h clusterHandler) getConfigHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	project := vars["project-name"]
+	logicalCloud := vars["logical-cloud-name"]
+	name := vars["cluster-reference"]
+	var ret interface{}
+	var err error
+
+	ret, err = h.client.GetClusterConfig(project, logicalCloud, name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/yaml")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}

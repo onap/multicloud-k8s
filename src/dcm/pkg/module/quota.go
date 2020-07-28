@@ -22,40 +22,14 @@ import (
 
 // Quota contains the parameters needed for a Quota
 type Quota struct {
-	MetaData      QMetaDataList `json:"metadata"`
-	Specification QSpec         `json:"spec"`
+	MetaData      QMetaDataList     `json:"metadata"`
+	Specification map[string]string `json:"spec"`
 }
 
 // MetaData contains the parameters needed for metadata
 type QMetaDataList struct {
 	QuotaName   string `json:"name"`
 	Description string `json:"description"`
-}
-
-// Spec contains the parameters needed for spec
-type QSpec struct {
-	LimitsCPU                   string `json:"limits.cpu"`
-	LimitsMemory                string `json:"limits.memory"`
-	RequestsCPU                 string `json:"requests.cpu"`
-	RequestsMemory              string `json:"requests.memory"`
-	RequestsStorage             string `json:"requests.storage"`
-	LimitsEphemeralStorage      string `json:"limits.ephemeral.storage"`
-	PersistentVolumeClaims      string `json:"persistentvolumeclaims"`
-	Pods                        string `json:"pods"`
-	ConfigMaps                  string `json:"configmaps"`
-	ReplicationControllers      string `json:"replicationcontrollers"`
-	ResourceQuotas              string `json:"resourcequotas"`
-	Services                    string `json:"services"`
-	ServicesLoadBalancers       string `json:"services.loadbalancers"`
-	ServicesNodePorts           string `json:"services.nodeports"`
-	Secrets                     string `json:"secrets"`
-	CountReplicationControllers string `json:"count/replicationcontrollers"`
-	CountDeploymentsApps        string `json:"count/deployments.apps"`
-	CountReplicasetsApps        string `json:"count/replicasets.apps"`
-	CountStatefulSets           string `json:"count/statefulsets.apps"`
-	CountJobsBatch              string `json:"count/jobs.batch"`
-	CountCronJobsBatch          string `json:"count/cronjobs.batch"`
-	CountDeploymentsExtensions  string `json:"count/deployments.extensions"`
 }
 
 // QuotaKey is the key structure that is used in the database
@@ -152,7 +126,7 @@ func (v *QuotaClient) GetQuota(project, logicalCloud, quotaName string) (Quota, 
 		return q, nil
 	}
 
-	return Quota{}, pkgerrors.New("Error getting Quota")
+	return Quota{}, pkgerrors.New("Cluster Quota does not exist")
 }
 
 // GetAll returns all cluster quotas in the logical cloud
@@ -211,7 +185,7 @@ func (v *QuotaClient) UpdateQuota(project, logicalCloud, quotaName string, c Quo
 	//Check if this Quota exists
 	_, err := v.GetQuota(project, logicalCloud, quotaName)
 	if err != nil {
-		return Quota{}, pkgerrors.New("Update Error - Quota doesn't exist")
+		return Quota{}, pkgerrors.New("Cluster Quota does not exist")
 	}
 	err = v.util.DBInsert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {

@@ -14,65 +14,65 @@ limitations under the License.
 package main
 
 import (
-        "context"
-        "log"
-        "math/rand"
-        "net/http"
-        "os"
-        "os/signal"
-        "time"
+	"context"
+	"log"
+	"math/rand"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
-        "github.com/onap/multicloud-k8s/src/dcm/api"
-        "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
-        "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
-        "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
-        contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
-        "github.com/gorilla/handlers"
+	"github.com/gorilla/handlers"
+	"github.com/onap/multicloud-k8s/src/dcm/api"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/auth"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
+	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 )
 
 func main() {
 
-        rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
-        err := db.InitializeDatabaseConnection("mco")
-        if err != nil {
-                log.Println("Unable to initialize database connection...")
-                log.Println(err)
-                log.Fatalln("Exiting...")
-        }
+	err := db.InitializeDatabaseConnection("mco")
+	if err != nil {
+		log.Println("Unable to initialize database connection...")
+		log.Println(err)
+		log.Fatalln("Exiting...")
+	}
 
-        err = contextDb.InitializeContextDatabase()
-        if err != nil {
-                log.Println("Unable to initialize database connection...")
-                log.Println(err)
-                log.Fatalln("Exiting...")
-        }
+	err = contextDb.InitializeContextDatabase()
+	if err != nil {
+		log.Println("Unable to initialize database connection...")
+		log.Println(err)
+		log.Fatalln("Exiting...")
+	}
 
-        httpRouter := api.NewRouter(nil, nil, nil, nil, nil)
-        loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
-        log.Println("Starting Distributed Cloud Manager API")
+	httpRouter := api.NewRouter(nil, nil, nil, nil, nil)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
+	log.Println("Starting Distributed Cloud Manager API")
 
-        httpServer := &http.Server{
-                Handler:    loggedRouter,
-                Addr:       ":" + config.GetConfiguration().ServicePort,
-        }
+	httpServer := &http.Server{
+		Handler: loggedRouter,
+		Addr:    ":" + config.GetConfiguration().ServicePort,
+	}
 
-        connectionsClose := make(chan struct{})
-        go func() {
-                c := make(chan os.Signal, 1)
-                signal.Notify(c, os.Interrupt)
-                <-c
-                httpServer.Shutdown(context.Background())
-                close(connectionsClose)
-        }()
+	connectionsClose := make(chan struct{})
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		<-c
+		httpServer.Shutdown(context.Background())
+		close(connectionsClose)
+	}()
 
-        tlsConfig, err := auth.GetTLSConfig("ca.cert", "server.cert", "server.key")
-        if err != nil {
-            log.Println("Error Getting TLS Configuration. Starting without TLS...")
-            log.Fatal(httpServer.ListenAndServe())
-        } else {
-                httpServer.TLSConfig = tlsConfig
+	tlsConfig, err := auth.GetTLSConfig("ca.cert", "server.cert", "server.key")
+	if err != nil {
+		log.Println("Error Getting TLS Configuration. Starting without TLS...")
+		log.Fatal(httpServer.ListenAndServe())
+	} else {
+		httpServer.TLSConfig = tlsConfig
 
-                err = httpServer.ListenAndServeTLS("", "")
-          }
+		err = httpServer.ListenAndServeTLS("", "")
+	}
 }

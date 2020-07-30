@@ -47,12 +47,12 @@ composite_app_name="test_composite_app_collection"
 composite_app_description="test_project_description"
 composite_app_version="test_composite_app_version"
 app1_helm_path="$CSAR_DIR/$csar_id/collectd.tar.gz"
-app2_helm_path="$CSAR_DIR/$csar_id/prometheus.tar.gz"
+app2_helm_path="$CSAR_DIR/$csar_id/prometheus-operator.tar.gz"
 app1_profile_path="$CSAR_DIR/$csar_id/collectd_profile.tar.gz"
-app2_profile_path="$CSAR_DIR/$csar_id/prometheus_profile.tar.gz"
+app2_profile_path="$CSAR_DIR/$csar_id/prometheus-operator_profile.tar.gz"
 
 app1_name="collectd"
-app2_name="prometheus"
+app2_name="prometheus-operator"
 app1_desc="collectd_desc"
 app2_desc="prometheus_desc"
 
@@ -467,7 +467,7 @@ payload="$(cat <<EOF
    "spec":{
       "intent":{
          "${genericPlacementIntent}":"${genericPlacementIntentName}",
-         "${hpaIntent}" : "${hpaControllerIntentName}", 
+         "${hpaIntent}" : "${hpaControllerIntentName}",
          "${trafficIntent}" : "${trafficControllerIntentName}",
          "${CostBasedIntent}" : "${CostBasedIntentName}",
          "${OVNintent}" : "${OVNintentName}"

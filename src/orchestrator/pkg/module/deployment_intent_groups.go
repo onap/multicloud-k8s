@@ -243,7 +243,7 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 	}
 	_, _, err := c.GetDeploymentIntentGroupContext(di, p, ca, v)
 	if err == nil {
-		return pkgerrors.Wrap(err, "DeploymentIntentGroup must be terminated before it can be deleted "+di)
+		return pkgerrors.New("DeploymentIntentGroup must be terminated before it can be deleted " + di)
 	}
 
 	err = db.DBconn.Remove(c.storeName, k)

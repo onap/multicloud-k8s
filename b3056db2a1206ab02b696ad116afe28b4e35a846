@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b06e7e70_bec8812a",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 13
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-07-30T15:26:59Z",
+      "side": 1,
+      "message": "Is this removed ?",
+      "range": {
+        "startLine": 122,
+        "startChar": 4,
+        "endLine": 132,
+        "endChar": 102
+      },
+      "revId": "b3056db2a1206ab02b696ad116afe28b4e35a846",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

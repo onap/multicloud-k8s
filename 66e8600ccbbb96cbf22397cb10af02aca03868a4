@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9282dd7d_6c99ba4f",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-07-31T18:38:54Z",
+      "side": 1,
+      "message": "Do we really need state and status since state looks like it can be logically derived from status?",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 34
+      },
+      "revId": "66e8600ccbbb96cbf22397cb10af02aca03868a4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25d9cfb5_8472d32a",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-07-31T18:38:54Z",
+      "side": 1,
+      "message": "Is AppContext becoming tied to the cluster?\n\n(currently I\u0027m creating an AppContext for a logical cloud in DCM)",
+      "range": {
+        "startLine": 408,
+        "startChar": 22,
+        "endLine": 408,
+        "endChar": 97
+      },
+      "revId": "66e8600ccbbb96cbf22397cb10af02aca03868a4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

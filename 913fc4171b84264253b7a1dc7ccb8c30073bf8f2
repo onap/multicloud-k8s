@@ -45,6 +45,74 @@
       "revId": "913fc4171b84264253b7a1dc7ccb8c30073bf8f2",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1604796e_e26623bf",
+        "filename": "kud/tests/_test_functions.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-07-31T21:42:56Z",
+      "side": 1,
+      "message": "2020",
+      "revId": "913fc4171b84264253b7a1dc7ccb8c30073bf8f2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4b8b3f01_d6d76b67",
+        "filename": "kud/tests/_test_functions.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-07-31T21:42:56Z",
+      "side": 1,
+      "message": "there is no such practice of including email. \nIf u commit a file, ur name shall anyways be there on git/gerrit.",
+      "revId": "913fc4171b84264253b7a1dc7ccb8c30073bf8f2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7675a84f_345cb86d",
+        "filename": "kud/tests/test_all_intents.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-07-31T21:42:56Z",
+      "side": 1,
+      "message": "i think the name is changed to prometheus-operator, this shall not work",
+      "revId": "913fc4171b84264253b7a1dc7ccb8c30073bf8f2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71cb7a1c_bc58ec51",
+        "filename": "kud/tests/test_generic_placement_intent.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-07-31T21:42:56Z",
+      "side": 1,
+      "message": "How is this comment relevant here ? Pls remove all the comments which are not relevant for ur scripts .",
+      "revId": "913fc4171b84264253b7a1dc7ccb8c30073bf8f2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

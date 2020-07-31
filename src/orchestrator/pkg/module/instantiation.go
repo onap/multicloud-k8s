@@ -376,6 +376,11 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		return err
 	}
 
+	err = applyInitialResourceStatus(context)
+	if err != nil {
+		return err
+	}
+
 	err = callGrpcForControllerList(pl.pActCont, mapOfControllers, ctxval)
 	if err != nil {
 		return err
@@ -430,7 +435,7 @@ func (c InstantiationClient) Status(p string, ca string, v string, di string) (S
 		}
 
 		for _, cluster := range clusters {
-			handle, err := ac.GetStatusHandle(app.Metadata.Name, cluster)
+			handle, err := ac.GetClusterStatusHandle(app.Metadata.Name, cluster)
 			if err != nil {
 				log.Info(":: No status handle for cluster, app ::",
 					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})

@@ -23,6 +23,7 @@ import (
 	nettypes "github.com/onap/multicloud-k8s/src/ncm/pkg/networkintents/types"
 	appcontext "github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/resourcestatus"
 	"gopkg.in/yaml.v2"
 
 	pkgerrors "github.com/pkg/errors"
@@ -38,10 +39,22 @@ func Apply(ctxVal interface{}, clusterProvider, cluster string) error {
 	}
 	var resources []resource
 
+	status := resourcestatus.ResourceStatus{
+		Status: resourcestatus.RsyncStatusEnum.Pending,
+	}
+
 	var ac appcontext.AppContext
-	_, err := ac.LoadAppContext(ctxVal)
+	handle, err := ac.LoadAppContext(ctxVal)
 	if err != nil {
 		return pkgerrors.Wrapf(err, "Error getting AppContext with Id: %v for %v/%v", ctxVal, clusterProvider, cluster)
+	}
+	_, err = ac.AddLevelValue(handle, "state", appcontext.AppContextState{State: appcontext.AppContextStateEnum.Init})
+	if err != nil {
+		return pkgerrors.Wrapf(err, "Error setting AppContext State: %v for %v/%v", ctxVal, clusterProvider, cluster)
+	}
+	_, err = ac.AddLevelValue(handle, "status", appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Pending})
+	if err != nil {
+		return pkgerrors.Wrapf(err, "Error setting AppContext Status: %v for %v/%v", ctxVal, clusterProvider, cluster)
 	}
 
 	// Find all Network Intents for this cluster
@@ -100,7 +113,8 @@ func Apply(ctxVal interface{}, clusterProvider, cluster string) error {
 		return nil
 	}
 
-	clusterhandle, _ := ac.GetClusterHandle(nettypes.CONTEXT_CLUSTER_APP, clusterProvider+nettypes.SEPARATOR+cluster)
+	acCluster := clusterProvider + nettypes.SEPARATOR + cluster
+	clusterhandle, _ := ac.GetClusterHandle(nettypes.CONTEXT_CLUSTER_APP, acCluster)
 
 	var orderinstr struct {
 		Resorder []string `json:"resorder"`
@@ -112,7 +126,7 @@ func Apply(ctxVal interface{}, clusterProvider, cluster string) error {
 	for _, resource := range resources {
 		orderinstr.Resorder = append(orderinstr.Resorder, resource.name)
 		resdep[resource.name] = "go"
-		_, err = ac.AddResource(clusterhandle, resource.name, resource.value)
+		rh, err := ac.AddResource(clusterhandle, resource.name, resource.value)
 		if err != nil {
 			cleanuperr := ac.DeleteCompositeApp()
 			if cleanuperr != nil {
@@ -123,6 +137,18 @@ func Apply(ctxVal interface{}, clusterProvider, cluster string) error {
 				})
 			}
 			return pkgerrors.Wrap(err, "Error adding Resource to AppContext")
+		}
+		_, err = ac.AddLevelValue(rh, "status", status)
+		if err != nil {
+			cleanuperr := ac.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Warn("Error cleaning AppContext after add resource status failure", log.Fields{
+					"cluster-provider": clusterProvider,
+					"cluster":          cluster,
+					"resource":         resource.name,
+				})
+			}
+			return pkgerrors.Wrap(err, "Error adding initial Resource Status to AppContext")
 		}
 	}
 	jresord, _ := json.Marshal(orderinstr)

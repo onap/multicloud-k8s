@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9acc7ba2_b5d9ef15",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-07-31T21:19:43Z",
+      "side": 1,
+      "message": "Still not compliant\"\nhttps://wiki.onap.org/display/DW/Commit+Messages\n\n- \"Don\u0027t terminate the summary line with a period - it\u0027s a title and titles don\u0027t end with a period.\"\n- \"Keep the summary line shorter than 50 characters.\"",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 69
+      },
+      "revId": "913fc4171b84264253b7a1dc7ccb8c30073bf8f2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3b251585_b7b895f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-07-31T21:19:43Z",
+      "side": 1,
+      "message": "- \"Keep the body line around 72 characters. Make as much paragraph as you need.\"",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 91
+      },
+      "revId": "913fc4171b84264253b7a1dc7ccb8c30073bf8f2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -20,11 +20,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/resourcestatus"
 	kubeclient "github.com/onap/multicloud-k8s/src/rsync/pkg/client"
 	connector "github.com/onap/multicloud-k8s/src/rsync/pkg/connector"
 	utils "github.com/onap/multicloud-k8s/src/rsync/pkg/internal"
@@ -38,40 +38,49 @@ type CompositeAppContext struct {
 	cid interface{}
 }
 
-func getRes(ac appcontext.AppContext, name string, app string, cluster string) ([]byte, error) {
+func getRes(ac appcontext.AppContext, name string, app string, cluster string) ([]byte, interface{}, error) {
 	var byteRes []byte
 	rh, err := ac.GetResourceHandle(app, cluster, name)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	sh, err := ac.GetLevelHandle(rh, "status")
+	if err != nil {
+		return nil, nil, err
 	}
 	resval, err := ac.GetValue(rh)
 	if err != nil {
-		return nil, err
+		return nil, sh, err
 	}
 	if resval != "" {
 		result := strings.Split(name, "+")
 		if result[0] == "" {
-			return nil, pkgerrors.Errorf("Resource name is nil %s:", name)
+			return nil, sh, pkgerrors.Errorf("Resource name is nil %s:", name)
 		}
 		byteRes = []byte(fmt.Sprintf("%v", resval.(interface{})))
 	} else {
-		return nil, pkgerrors.Errorf("Resource value is nil %s", name)
+		return nil, sh, pkgerrors.Errorf("Resource value is nil %s", name)
 	}
-	return byteRes, nil
+	return byteRes, sh, nil
 }
 
 func terminateResource(ac appcontext.AppContext, c *kubeclient.Client, name string, app string, cluster string, label string) error {
-	res, err := getRes(ac, name, app, cluster)
+	res, sh, err := getRes(ac, name, app, cluster)
 	if err != nil {
+		if sh != nil {
+			ac.UpdateStatusValue(sh, resourcestatus.ResourceStatus{Status: resourcestatus.RsyncStatusEnum.Failed})
+		}
 		return err
 	}
 	if err := c.Delete(res); err != nil {
+		ac.UpdateStatusValue(sh, resourcestatus.ResourceStatus{Status: resourcestatus.RsyncStatusEnum.Failed})
 		logutils.Error("Failed to delete res", logutils.Fields{
 			"error":    err,
 			"resource": name,
 		})
 		return err
 	}
+	ac.UpdateStatusValue(sh, resourcestatus.ResourceStatus{Status: resourcestatus.RsyncStatusEnum.Deleted})
 	logutils.Info("Deleted::", logutils.Fields{
 		"cluster":  cluster,
 		"resource": name,
@@ -80,8 +89,11 @@ func terminateResource(ac appcontext.AppContext, c *kubeclient.Client, name stri
 }
 
 func instantiateResource(ac appcontext.AppContext, c *kubeclient.Client, name string, app string, cluster string, label string) error {
-	res, err := getRes(ac, name, app, cluster)
+	res, sh, err := getRes(ac, name, app, cluster)
 	if err != nil {
+		if sh != nil {
+			ac.UpdateStatusValue(sh, resourcestatus.ResourceStatus{Status: resourcestatus.RsyncStatusEnum.Failed})
+		}
 		return err
 	}
 	//Decode the yaml to create a runtime.Object
@@ -116,12 +128,14 @@ func instantiateResource(ac appcontext.AppContext, c *kubeclient.Client, name st
 		return err
 	}
 	if err := c.Apply(b); err != nil {
+		ac.UpdateStatusValue(sh, resourcestatus.ResourceStatus{Status: resourcestatus.RsyncStatusEnum.Failed})
 		logutils.Error("Failed to apply res", logutils.Fields{
 			"error":    err,
 			"resource": name,
 		})
 		return err
 	}
+	ac.UpdateStatusValue(sh, resourcestatus.ResourceStatus{Status: resourcestatus.RsyncStatusEnum.Applied})
 	logutils.Info("Installed::", logutils.Fields{
 		"cluster":  cluster,
 		"resource": name,
@@ -181,14 +195,70 @@ func deleteStatusTracker(c *kubeclient.Client, app string, cluster string, label
 	return nil
 }
 
+func updateStartingAppContextStatus(ac appcontext.AppContext, handle interface{}, state appcontext.AppContextState) error {
+	var status appcontext.AppContextStatus
+
+	switch state.State {
+	case appcontext.AppContextStateEnum.Instantiate:
+		status = appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Instantiating}
+	case appcontext.AppContextStateEnum.Terminate:
+		status = appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Terminating}
+	default:
+		return pkgerrors.Errorf("Invalid AppContextState %v", state)
+	}
+	statushandle, err := ac.GetLevelHandle(handle, "status")
+	if err != nil {
+		return err
+	}
+	err = ac.UpdateStatusValue(statushandle, status)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func updateEndingAppContextStatus(ac appcontext.AppContext, handle interface{}, state appcontext.AppContextState) error {
+	var status appcontext.AppContextStatus
+
+	switch state.State {
+	case appcontext.AppContextStateEnum.Instantiate:
+		status = appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Instantiated}
+	case appcontext.AppContextStateEnum.Terminate:
+		status = appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Terminated}
+	default:
+		return pkgerrors.Errorf("Invalid AppContextState %v", state)
+	}
+	statushandle, err := ac.GetLevelHandle(handle, "status")
+	if err != nil {
+		return err
+	}
+	err = ac.UpdateStatusValue(statushandle, status)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 type fn func(ac appcontext.AppContext, client *kubeclient.Client, res string, app string, cluster string, label string) error
 
 type statusfn func(client *kubeclient.Client, app string, cluster string, label string) error
 
-func applyFnComApp(cid interface{}, con *connector.Connector, f fn, sfn statusfn, breakonError bool) error {
+func applyFnComApp(cid interface{}, con *connector.Connector, state appcontext.AppContextState, f fn, sfn statusfn, breakonError bool) error {
 	ac := appcontext.AppContext{}
 	g, _ := errgroup.WithContext(context.Background())
-	_, err := ac.LoadAppContext(cid)
+	h, err := ac.LoadAppContext(cid)
+	if err != nil {
+		return err
+	}
+	statehandle, err := ac.GetLevelHandle(h, "state")
+	if err != nil {
+		return err
+	}
+	err = ac.UpdateStateValue(statehandle, state)
+	if err != nil {
+		return err
+	}
+	err = updateStartingAppContextStatus(ac, h, state)
 	if err != nil {
 		return err
 	}
@@ -219,7 +289,10 @@ func applyFnComApp(cid interface{}, con *connector.Connector, f fn, sfn statusfn
 				cluster := clusterNames[k]
 				err = status.StartClusterWatcher(cluster)
 				if err != nil {
-					log.Printf("Error starting Cluster Watcher %v: %v\n", cluster, err)
+					logutils.Error("Error starting Cluster Watcher", logutils.Fields{
+						"error":   err,
+						"cluster": cluster,
+					})
 				}
 				rg.Go(func() error {
 					c, err := con.GetClient(cluster)
@@ -280,13 +353,17 @@ func applyFnComApp(cid interface{}, con *connector.Connector, f fn, sfn statusfn
 		})
 		return err
 	}
+	err = updateEndingAppContextStatus(ac, h, state)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // InstantiateComApp Instantiate Apps in Composite App
 func (instca *CompositeAppContext) InstantiateComApp(cid interface{}) error {
 	con := connector.Init(cid)
-	err := applyFnComApp(cid, con, instantiateResource, addStatusTracker, true)
+	err := applyFnComApp(cid, con, appcontext.AppContextState{State: appcontext.AppContextStateEnum.Instantiate}, instantiateResource, addStatusTracker, true)
 	if err != nil {
 		logutils.Error("InstantiateComApp unsuccessful", logutils.Fields{"error": err})
 		return err
@@ -299,7 +376,7 @@ func (instca *CompositeAppContext) InstantiateComApp(cid interface{}) error {
 // TerminateComApp Terminates Apps in Composite App
 func (instca *CompositeAppContext) TerminateComApp(cid interface{}) error {
 	con := connector.Init(cid)
-	err := applyFnComApp(cid, con, terminateResource, deleteStatusTracker, false)
+	err := applyFnComApp(cid, con, appcontext.AppContextState{State: appcontext.AppContextStateEnum.Terminate}, terminateResource, deleteStatusTracker, false)
 	if err != nil {
 		logutils.Error("TerminateComApp unsuccessful", logutils.Fields{
 			"error": err,

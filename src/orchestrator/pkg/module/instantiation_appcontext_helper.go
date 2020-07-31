@@ -27,7 +27,9 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/resourcestatus"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 	pkgerrors "github.com/pkg/errors"
@@ -59,6 +61,14 @@ func makeAppContextForCompositeApp(p, ca, v, rName string) (contextForCompositeA
 	err = context.AddCompositeAppMeta(appcontext.CompositeAppMeta{Project: p, CompositeApp: ca, Version: v, Release: rName})
 	if err != nil {
 		return contextForCompositeApp{}, pkgerrors.Wrap(err, "Error Adding CompositeAppMeta")
+	}
+	_, err = context.AddLevelValue(compositeHandle, "state", appcontext.AppContextState{State: appcontext.AppContextStateEnum.Init})
+	if err != nil {
+		return contextForCompositeApp{}, pkgerrors.Wrapf(err, "Error setting initial AppContext State")
+	}
+	_, err = context.AddLevelValue(compositeHandle, "status", appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Pending})
+	if err != nil {
+		return contextForCompositeApp{}, pkgerrors.Wrapf(err, "Error setting initial AppContext Status")
 	}
 
 	m, err := context.GetCompositeAppMeta()
@@ -230,6 +240,63 @@ func verifyResources(l gpic.ClusterList, ct appcontext.AppContext, resources []r
 				return pkgerrors.Wrapf(err, "Error getting resoure handle for resource :: %s, app:: %s, cluster :: %s", appName, res.name, cn)
 			}
 			log.Info(":: GetResourceHandle ::", log.Fields{"ResourceHandler": rh, "appName": appName, "Cluster": cn, "Resource": res.name})
+		}
+	}
+	return nil
+}
+
+// applyInitialResourceStatus sets the initial status of every resource in the appcontext to Pending
+func applyInitialResourceStatus(ac appcontext.AppContext) error {
+	status := resourcestatus.ResourceStatus{
+		Status: resourcestatus.RsyncStatusEnum.Pending,
+	}
+
+	appsOrder, err := ac.GetAppInstruction("order")
+	if err != nil {
+		return err
+	}
+	var appList map[string][]string
+	json.Unmarshal([]byte(appsOrder.(string)), &appList)
+
+	for _, app := range appList["apporder"] {
+		clusterNames, err := ac.GetClusterNames(app)
+		if err != nil {
+			return err
+		}
+		for k := 0; k < len(clusterNames); k++ {
+			cluster := clusterNames[k]
+			resorder, err := ac.GetResourceInstruction(app, cluster, "order")
+			if err != nil {
+				logutils.Error("Initial resource status resorder error", logutils.Fields{
+					"error":   err,
+					"app":     app,
+					"cluster": cluster,
+				})
+				return err
+			}
+			var aov map[string][]string
+			json.Unmarshal([]byte(resorder.(string)), &aov)
+			for _, res := range aov["resorder"] {
+				rh, err := ac.GetResourceHandle(app, cluster, res)
+				if err != nil {
+					return err
+				}
+				sh, err := ac.GetLevelHandle(rh, "status")
+				if sh == nil {
+					_, err = ac.AddLevelValue(rh, "status", status)
+				} else {
+					err = ac.UpdateStatusValue(sh, status)
+				}
+				if err != nil {
+					logutils.Error("Set initial resource status error", logutils.Fields{
+						"error":    err,
+						"app":      app,
+						"cluster":  cluster,
+						"resource": res,
+					})
+					return err
+				}
+			}
 		}
 	}
 	return nil

@@ -494,8 +494,9 @@ fi
 
 case "$1" in
     "start" )
+        setup
         deleteData
-        print_msg "deleting the data success"
+        print_msg "Before creating, deleting the data success"
         createData
         print_msg "creating the data success"
         instantiate
@@ -504,6 +505,8 @@ case "$1" in
     "stop" )
         terminateOrchData
         print_msg "terminated the resources"
+        deleteData
+        print_msg "deleting the data success"
         ;;
     *) usage ;;
 esac

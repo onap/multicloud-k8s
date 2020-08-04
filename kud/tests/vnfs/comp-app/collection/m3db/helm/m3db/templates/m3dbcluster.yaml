@@ -1,0 +1,23 @@
+apiVersion: operator.m3db.io/v1alpha1
+kind: M3DBCluster
+metadata:
+  name: m3db-cluster
+spec:
+  image: {{ .Values.m3dbCluster.image.repository }}:{{ .Values.m3dbCluster.image.tag }}
+  replicationFactor: {{ .Values.m3dbCluster.replicationFactor }}
+  numberOfShards: {{ .Values.m3dbCluster.numberOfShards }}
+  isolationGroups:
+{{ toYaml .Values.m3dbCluster.isolationGroups | indent 4 }}
+  namespaces:
+{{ toYaml .Values.m3dbCluster.namespaces | indent 4 }}  
+  etcdEndpoints:
+  - http://etcd-0.etcd:2379
+  - http://etcd-1.etcd:2379
+  - http://etcd-2.etcd:2379
+  containerResources:
+    requests:
+      memory: 4Gi
+      cpu: '1'
+    limits:
+      memory: 32Gi
+      cpu: '4'

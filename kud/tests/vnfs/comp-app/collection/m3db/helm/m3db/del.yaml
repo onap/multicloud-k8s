@@ -1,0 +1,49 @@
+---
+# Source: m3db/templates/m3dbcluster.yaml
+apiVersion: operator.m3db.io/v1alpha1
+kind: M3DBCluster
+metadata:
+  name: m3db-cluster
+spec:
+  image: quay.io/m3db/m3dbnode:latest
+  replicationFactor: 3
+  numberOfShards: 256
+  isolationGroups:
+    - name: us-west1-a
+      nodeAffinityTerms:
+      - key: failure-domain.beta.kubernetes.io/region
+        values:
+        - us-west1-a
+      numInstances: 1
+    - name: us-west1-b
+      nodeAffinityTerms:
+      - key: failure-domain.beta.kubernetes.io/region
+        values:
+        - us-west1-b
+      numInstances: 1
+    - name: us-west1-c
+      nodeAffinityTerms:
+      - key: failure-domain.beta.kubernetes.io/region
+        values:
+        - us-west1-c
+      numInstances: 1
+    
+  tolerations:
+    {}
+    
+  namespaces:
+    - name: collectd
+      preset: 10s:2d
+      
+  etcdEndpoints:
+  - http://etcd-0.etcd:2379
+  - http://etcd-1.etcd:2379
+  - http://etcd-2.etcd:2379
+  containerResources:
+    requests:
+      memory: 4Gi
+      cpu: '1'
+    limits:
+      memory: 32Gi
+      cpu: '4'
+

@@ -21,8 +21,8 @@ import (
 	"io"
 	"net/http"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
+	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 
 	"github.com/gorilla/mux"
 )
@@ -49,8 +49,11 @@ func (h deploymentIntentGroupHandler) createDeploymentIntentGroupHandler(w http.
 		return
 	}
 
-	if d.MetaData.Name == "" {
-		http.Error(w, "Missing deploymentIntentGroupName in POST request", http.StatusBadRequest)
+	jsonFile := "json-schemas/deployment-group-intent.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, d)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 

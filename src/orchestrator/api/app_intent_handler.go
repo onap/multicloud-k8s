@@ -48,8 +48,11 @@ func (h appIntentHandler) createAppIntentHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	if a.MetaData.Name == "" {
-		http.Error(w, "Missing AppIntentName in POST request", http.StatusBadRequest)
+	jsonFile := "json-schemas/generic-placement-intent-app.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, a)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 

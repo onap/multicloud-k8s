@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+      "spec": {
+        "required": [
+            "profile",
+            "version"
+          ],
+          "type": "object",
+          "description": "DepSpecData has profile, version, OverrideValuesObj",
+          "properties": {
+            "override-values": {
+              "items": {
+                "required": [
+                  "app-name",
+                  "values"
+                ],
+                "type": "object",
+                "description": "OverrideValues has appName and ValuesObj",
+                "properties": {
+                  "app-name": {
+                    "type": "string"
+                  },
+                  "values": {
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "type": "object"
+                  }
+                }
+              },
+              "type": "array"
+            },
+            "profile": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "[-_0-9a-zA-Z]+$"
+            },
+            "version": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "[-_0-9a-zA-Z]+$"
+            }
+          }
+      },
+      "metadata": {
+        "required": ["name"],
+        "properties": {
+          "userData2": {
+            "description": "User relevant data for the resource",
+            "type": "string",
+            "example": "Some more data",
+            "maxLength": 512
+          },
+          "userData1": {
+            "description": "User relevant data for the resource",
+            "type": "string",
+            "example": "Some data",
+            "maxLength": 512
+          },
+          "name": {
+            "description": "Name of the resource",
+            "type": "string",
+            "example": "ResName",
+            "maxLength": 128,
+            "pattern": "[-_0-9a-zA-Z]+$"
+          },
+          "description": {
+            "description": "Description for the resource",
+            "type": "string",
+            "example": "Resource description",
+            "maxLength": 1024
+          }
+        }
+      }
+    }
+  }

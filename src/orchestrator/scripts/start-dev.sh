@@ -13,7 +13,7 @@ set -o nounset
 set -o pipefail
 
 source _functions.sh
-
+k8s_path="$(git rev-parse --show-toplevel)"
 #
 # Start from compiled binaries to foreground. This is usable for development use.
 #
@@ -28,5 +28,6 @@ echo "Compiling source code"
 pushd $opath
 generate_config
 make all
+cp -r $k8s_path/src/orchestrator/api/json-schemas $k8s_path/src/orchestrator
 ./orchestrator
 popd

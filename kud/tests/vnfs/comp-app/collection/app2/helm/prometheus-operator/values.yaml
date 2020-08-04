@@ -474,7 +474,7 @@ alertmanager:
 ## Using default values from https://github.com/helm/charts/blob/master/stable/grafana/values.yaml
 ##
 grafana:
-  enabled: false 
+  enabled: true 
 
   ## Deploy default dashboards.
   ##
@@ -589,7 +589,7 @@ grafana:
 ## Component scraping the kube api server
 ##
 kubeApiServer:
-  enabled: false
+  enabled: true
   tlsConfig:
     serverName: kubernetes
     insecureSkipVerify: false
@@ -626,7 +626,7 @@ kubeApiServer:
 ## Component scraping the kubelet and kubelet-hosted cAdvisor
 ##
 kubelet:
-  enabled: false
+  enabled: true
   namespace: kube-system
 
   serviceMonitor:
@@ -698,7 +698,7 @@ kubelet:
 ## Component scraping the kube controller manager
 ##
 kubeControllerManager:
-  enabled: false
+  enabled: true
 
   ## If your kube controller manager is not deployed as a pod, specify IPs it can be found on
   ##
@@ -751,7 +751,7 @@ kubeControllerManager:
 ## Component scraping coreDns. Use either this or kubeDns
 ##
 coreDns:
-  enabled: false
+  enabled: true
   service:
     port: 9153
     targetPort: 9153
@@ -831,7 +831,7 @@ kubeDns:
 ## Component scraping etcd
 ##
 kubeEtcd:
-  enabled: false
+  enabled: true
 
   ## If your etcd is not deployed as a pod, specify IPs it can be found on
   ##
@@ -891,7 +891,7 @@ kubeEtcd:
 ## Component scraping kube scheduler
 ##
 kubeScheduler:
-  enabled: false
+  enabled: true
 
   ## If your kube scheduler is not deployed as a pod, specify IPs it can be found on
   ##
@@ -944,7 +944,7 @@ kubeScheduler:
 ## Component scraping kube proxy
 ##
 kubeProxy:
-  enabled: false
+  enabled: true
 
   ## If your kube proxy is not deployed as a pod, specify IPs it can be found on
   ##
@@ -1731,7 +1731,7 @@ prometheus:
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotewritespec
     remoteWrite: 
     # - url: http://remote1/push
-      - url: "http://m3coordinator-m3db-cluster.training.svc.cluster.local:7201/api/v1/prom/remote/write"
+      - url: "http://192.168.121.15:32701/api/v1/prom/remote/write"
         writeRelabelConfigs:
           - targetLabel: metrics_storage
             replacement: m3db_remote
@@ -1769,13 +1769,16 @@ prometheus:
     ## The scrape configuraiton example below will find master nodes, provided they have the name .*mst.*, relabel the
     ## port to 2379 and allow etcd scraping provided it is running on all Kubernetes master nodes
     ##
-    additionalScrapeConfigs: 
-      - job_name: 'm3db'
+    additionalScrapeConfigs:
+      - job_name: 'm3'
         static_configs:
-          - targets: ['m3db-cluster-rep0-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004','m3db-cluster-rep1-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004', 'm3db-cluster-rep2-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004']
-      - job_name: 'm3coordinator'
-        static_configs:
-          - targets: ['m3db-cluster-rep0-0.m3dbnode-m3db-cluster.training.svc.cluster.local:7203']
+          - targets: ['192.168.121.15:32701'] 
+            #- job_name: 'm3db'
+            #static_configs:
+            #- targets: ['m3db-cluster-rep0-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004','m3db-cluster-rep1-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004', 'm3db-cluster-rep2-0.m3dbnode-m3db-cluster.training.svc.cluster.local:9004']
+            #- job_name: 'm3coordinator'
+            #static_configs:
+            #- targets: ['m3db-cluster-rep0-0.m3dbnode-m3db-cluster.training.svc.cluster.local:7203']
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
     #     - role: node

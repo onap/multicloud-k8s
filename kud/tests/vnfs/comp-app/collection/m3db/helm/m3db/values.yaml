@@ -1,0 +1,29 @@
+m3dbCluster:
+  name: m3db-cluster
+  image:
+    repository: quay.io/m3db/m3dbnode
+    tag: latest 
+  replicationFactor: 3
+  numberOfShards: 256
+  isolationGroups:
+    - name: us-west1-a
+      numInstances: 1
+      nodeAffinityTerms:
+      - key: failure-domain.beta.kubernetes.io/region
+        values:
+        - us-west1-a
+    - name: us-west1-b
+      numInstances: 1
+      nodeAffinityTerms:
+      - key: failure-domain.beta.kubernetes.io/region
+        values:
+        - us-west1-b
+    - name: us-west1-c
+      numInstances: 1
+      nodeAffinityTerms:
+      - key: failure-domain.beta.kubernetes.io/region
+        values:
+        - us-west1-c
+  namespaces:
+    - name: collectd
+      preset: 10s:2d

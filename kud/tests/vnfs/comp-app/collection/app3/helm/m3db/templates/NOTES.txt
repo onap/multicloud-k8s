@@ -1,1 +1,0 @@
-M3DB Cluster  {{ .Values.m3dbCluster.name }} has been created

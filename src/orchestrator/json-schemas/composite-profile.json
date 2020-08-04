@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+      "app-name": {
+        "description": "Application Name",
+        "required": [
+          "app-name"
+        ],
+        "type": "string",
+        "example": "Application1",
+        "maxLength": 128,
+        "pattern": "[-_0-9a-zA-Z]+$"
+      },
+      "metadata": {
+        "required": ["name"],
+        "properties": {
+          "userData2": {
+            "description": "User relevant data for the resource",
+            "type": "string",
+            "example": "Some more data",
+            "maxLength": 512
+          },
+          "userData1": {
+            "description": "User relevant data for the resource",
+            "type": "string",
+            "example": "Some data",
+            "maxLength": 512
+          },
+          "name": {
+            "description": "Name of the resource",
+            "type": "string",
+            "example": "ResName",
+            "maxLength": 128,
+            "pattern": "[-_0-9a-zA-Z]+$"
+          },
+          "description": {
+            "description": "Description for the resource",
+            "type": "string",
+            "example": "Resource description",
+            "maxLength": 1024
+          }
+        }
+      }
+    }
+  }

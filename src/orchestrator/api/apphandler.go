@@ -70,9 +70,11 @@ func (h appHandler) createAppHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Name is required.
-	if a.Metadata.Name == "" {
-		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+	jsonFile := "json-schemas/metadata.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, a)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 
@@ -84,14 +86,17 @@ func (h appHandler) createAppHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer file.Close()
-
 	//Convert the file content to base64 for storage
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		http.Error(w, "Unable to read file", http.StatusUnprocessableEntity)
 		return
 	}
-
+	// Limit file Size to 1 GB
+	if len(content) > 1073741824 {
+		http.Error(w, "File Size Exceeds 1 GB", http.StatusUnprocessableEntity)
+		return
+	}
 	err = validation.IsTarGz(bytes.NewBuffer(content))
 	if err != nil {
 		http.Error(w, "Error in file format", http.StatusUnprocessableEntity)

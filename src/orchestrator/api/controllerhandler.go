@@ -87,9 +87,11 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Name is required.
-	if m.Metadata.Name == "" {
-		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+	jsonFile := "json-schemas/controller.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, m)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 

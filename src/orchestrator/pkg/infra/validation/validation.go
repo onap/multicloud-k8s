@@ -19,14 +19,20 @@ package validation
 import (
 	"archive/tar"
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
+	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	pkgerrors "github.com/pkg/errors"
+	"github.com/xeipuuv/gojsonschema"
 	"k8s.io/apimachinery/pkg/util/validation"
 )
 
@@ -320,4 +326,51 @@ func IsValidParameterPresent(vars map[string]string, sp []string) error {
 	}
 	return nil
 
+}
+
+// ValidateJsonSchemaData function validates the document against the Json Schema
+func ValidateJsonSchemaData(jsonSchemaFile string, jsonData interface{}) (error, int) {
+
+	// Read the Json Schema File
+	if _, err := os.Stat(jsonSchemaFile); err != nil {
+		if os.IsNotExist(err) {
+			err = pkgerrors.New("JsonSchemaValidation: File " + jsonSchemaFile + " not found")
+		} else {
+			err = pkgerrors.Wrap(err, "JsonSchemaValidation: Stat file error")
+		}
+		return err, http.StatusInternalServerError
+	}
+	rawBytes, err := ioutil.ReadFile(jsonSchemaFile)
+	if err != nil {
+		return pkgerrors.Wrap(err, "JsonSchemaValidation: Read JSON file error"), http.StatusInternalServerError
+	}
+
+	// Json encode the data
+	req, err := json.Marshal(jsonData)
+	if err != nil {
+		return pkgerrors.Wrap(err, "JsonSchemaValidation, Request Body error"), http.StatusBadRequest
+	}
+
+	// Load schema and document
+	schemaLoader := gojsonschema.NewStringLoader(string(rawBytes))
+	s, err := gojsonschema.NewSchema(schemaLoader)
+	if err != nil {
+		return pkgerrors.Wrap(err, "JsonSchemaValidation: Validation error"), http.StatusInternalServerError
+	}
+	documentLoader := gojsonschema.NewStringLoader(string(req))
+	result, err := s.Validate(documentLoader)
+	if err != nil {
+		return pkgerrors.Wrap(err, "JsonSchemaValidation: Validation error"), http.StatusInternalServerError
+	}
+	// Validate document against Json Schema
+	if !result.Valid() {
+		for _, desc := range result.Errors() {
+			log.Error("The document is not valid", log.Fields{
+				"Error": desc.Description(),
+			})
+		}
+		return pkgerrors.New("JsonSchemaValidation: Document Validation failed"), http.StatusBadRequest
+	}
+
+	return nil, 0
 }

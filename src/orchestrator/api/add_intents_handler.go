@@ -31,6 +31,7 @@ type intentHandler struct {
 	client moduleLib.IntentManager
 }
 
+// Add Intent in Deployment Group
 func (h intentHandler) addIntentHandler(w http.ResponseWriter, r *http.Request) {
 	var i moduleLib.Intent
 
@@ -45,8 +46,11 @@ func (h intentHandler) addIntentHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if i.MetaData.Name == "" {
-		http.Error(w, "Missing Intent in POST request", http.StatusBadRequest)
+	jsonFile := "json-schemas/deployment-intent.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, i)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 

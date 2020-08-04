@@ -21,9 +21,9 @@ import (
 	"io"
 	"net/http"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
-
 	"github.com/gorilla/mux"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
+	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 )
 
 // compositeAppHandler to store backend implementations objects
@@ -47,10 +47,11 @@ func (h compositeAppHandler) createHandler(w http.ResponseWriter, r *http.Reques
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-
-	// Name is required.
-	if c.Metadata.Name == "" {
-		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+	jsonFile := "json-schemas/composite-app.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, c)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 

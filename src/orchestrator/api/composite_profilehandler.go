@@ -21,6 +21,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 
 	"github.com/gorilla/mux"
@@ -48,8 +49,11 @@ func (h compositeProfileHandler) createHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if cpf.Metadata.Name == "" {
-		http.Error(w, "Missing compositeProfileName in POST request", http.StatusBadRequest)
+	jsonFile := "json-schemas/metadata.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, cpf)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 

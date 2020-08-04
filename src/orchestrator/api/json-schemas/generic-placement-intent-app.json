@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "spec": {
+      "properties": {
+          "app-name": {
+            "type": "string",
+            "example": "appl",
+            "maxLength": 128
+          },
+          "anyOf": {
+            "items": {
+              "type": "object",
+              "description": "AnyOf consists of Array of ProviderName & ClusterLabelNames",
+              "properties": {
+                "cluster-label-name": {
+                  "type": "string",
+                  "example": "east",
+                  "maxLength": 128
+                },
+                "provider-name": {
+                  "type": "string",
+                  "example": "provider1",
+                  "maxLength": 128
+                },
+                "cluster-name": {
+                  "type": "string",
+                  "example": "cluster1",
+                  "maxLength": 128
+                }
+              }
+            },
+            "type": "array"
+          },
+          "allOf": {
+            "items": {
+              "type": "object",
+              "description": "AllOf ProviderName, ClusterName, ClusterLabelName and AnyOfArray",
+              "properties": {
+                "provider-name": {
+                  "type": "string",
+                  "example": "provider2",
+                  "maxLength": 128
+                },
+                "cluster-label-name": {
+                  "type": "string",
+                  "example": "west",
+                  "maxLength": 128
+                },
+                "anyOf": {
+                  "items": {
+                    "type": "object",
+                    "description": "AnyOf consists of Array of ProviderName & ClusterLabelNames",
+                    "properties": {
+                      "cluster-label-name": {
+                        "type": "string",
+                        "example": "east",
+                        "maxLength": 128
+                      },
+                      "provider-name": {
+                        "type": "string",
+                        "example": "provider1",
+                        "maxLength": 128
+                      },
+                      "cluster-name": {
+                        "type": "string",
+                        "example": "cluster1",
+                        "maxLength": 128
+                      }
+                    }
+                  },
+                  "type": "array"
+                },
+                "cluster-name": {
+                  "type": "string",
+                  "example": "cluster2",
+                  "maxLength": 128
+                }
+              }
+            },
+            "type": "array"
+          }
+        }
+    },
+    "metadata": {
+      "required": ["name"],
+      "properties": {
+        "userData2": {
+          "description": "User relevant data for the resource",
+          "type": "string",
+          "example": "Some more data",
+          "maxLength": 512
+        },
+        "userData1": {
+          "description": "User relevant data for the resource",
+          "type": "string",
+          "example": "Some data",
+          "maxLength": 512
+        },
+        "name": {
+          "description": "Name of the resource",
+          "type": "string",
+          "example": "ResName",
+          "maxLength": 128,
+          "pattern": "[-_0-9a-zA-Z]+$"
+        },
+        "description": {
+          "description": "Description for the resource",
+          "type": "string",
+          "example": "Resource description",
+          "maxLength": 1024
+        }
+      }
+    }
+  }
+}

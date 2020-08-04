@@ -73,6 +73,13 @@ func (h appProfileHandler) createAppProfileHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
+	jsonFile := "json-schemas/metadata.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, ap)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
+		return
+	}
 	//Read the file section and ignore the header
 	file, _, err := r.FormFile("file")
 	if err != nil {
@@ -88,7 +95,11 @@ func (h appProfileHandler) createAppProfileHandler(w http.ResponseWriter, r *htt
 		http.Error(w, "Unable to read file", http.StatusUnprocessableEntity)
 		return
 	}
-
+	// Limit file Size to 1 GB
+	if len(content) > 1073741824 {
+		http.Error(w, "File Size Exceeds 1 GB", http.StatusUnprocessableEntity)
+		return
+	}
 	err = validation.IsTarGz(bytes.NewBuffer(content))
 	if err != nil {
 		http.Error(w, "Error in file format", http.StatusUnprocessableEntity)

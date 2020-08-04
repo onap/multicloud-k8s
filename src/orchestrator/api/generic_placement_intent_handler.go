@@ -49,8 +49,11 @@ func (h genericPlacementIntentHandler) createGenericPlacementIntentHandler(w htt
 		return
 	}
 
-	if g.MetaData.Name == "" {
-		http.Error(w, "Missing genericPlacementIntentName in POST request", http.StatusBadRequest)
+	jsonFile := "json-schemas/generic-placement-intent.json"
+	// Verify JSON Body
+	err, httpError := validation.ValidateJsonSchemaData(jsonFile, g)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 

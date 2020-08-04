@@ -1,0 +1,67 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "spec": {
+            "type": "object",
+            "description": "Newtwork Workload Intent",
+            "properties": {
+                "spec": {
+                    "type": "object",
+                    "properties": {
+                        "workload-resource": {
+                            "description": "Name of the workload",
+                            "type": "string",
+                            "example": "firewall",
+                            "maxLength": 254,
+                            "pattern": "[-_0-9a-zA-Z]+$"
+                        },
+                        "type": {
+                            "description": "Type of the workload",
+                            "type": "string",
+                            "example": "deployment",
+                            "maxLength": 128
+                        },
+                        "application-name": {
+                            "description": "Application Name",
+                            "type": "string",
+                            "example": "Application1",
+                            "maxLength": 128,
+                            "pattern": "[-_0-9a-zA-Z]+$"
+                        }
+                    }
+                },
+                "metadata": {
+                    "required": ["name"],
+                    "properties": {
+                        "userData2": {
+                            "description": "User relevant data for the resource",
+                            "type": "string",
+                            "example": "Some more data",
+                            "maxLength": 512
+                        },
+                        "userData1": {
+                            "description": "User relevant data for the resource",
+                            "type": "string",
+                            "example": "Some data",
+                            "maxLength": 512
+                        },
+                        "name": {
+                            "description": "Name of the resource",
+                            "type": "string",
+                            "example": "ResName",
+                            "maxLength": 128,
+                            "pattern": "[-_0-9a-zA-Z]+$"
+                        },
+                        "description": {
+                            "description": "Description for the resource",
+                            "type": "string",
+                            "example": "Resource description",
+                            "maxLength": 1024
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

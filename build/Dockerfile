@@ -30,6 +30,7 @@ COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/rsync/rsyn
 COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/ovnaction/ovnaction ./
 COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/src/clm/clm ./
 COPY --chown=emco --from=0 /go/src/github.com/onap/multicloud-k8s/build/entrypoint ./
+COPY --chown=emco --from=0  /go/src/github.com/onap/multicloud-k8s/src/orchestrator/json-schemas ./
 
 USER emco
 

@@ -1,0 +1,16 @@
+apiVersion: v1
+appVersion: '>0.4.7'
+description: Kubernetes operator for M3DB timeseries database
+home: https://github.com/m3db/m3db-operator
+icon: https://raw.githubusercontent.com/m3db/m3/master/docs/theme/assets/images/M3-logo.png
+keywords:
+- operator
+- m3
+maintainers:
+- email: m3db@googlegroups.com
+  name: m3 Authors
+  url: https://operator.m3db.io/
+name: m3db-operator
+sources:
+- https://github.com/m3db/m3db-operator
+version: 0.8.0

@@ -1186,17 +1186,14 @@ function populate_CSAR_eaa_sample_app_rbdefinition {
 function populate_CSAR_composite_app_helm {
     _checks_args "$1"
     pushd "${CSAR_DIR}/$1"
-    print_msg "Create Helm Chart Archives for compositeApp"
+    print_msg "Create Helm Chart Archives for compositeAppi with collectd and prometheus-grafana helm charts"
     rm -f *.tar.gz
     tar -czf collectd.tar.gz -C $test_folder/vnfs/comp-app/collection/app1/helm .
     tar -czf prometheus-operator.tar.gz -C $test_folder/vnfs/comp-app/collection/app2/helm .
-    tar -czf m3db.tar.gz -C $test_folder/vnfs/comp-app/collection/app3/helm .
     tar -czf collectd_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app1/profile .
     tar -czf prometheus-operator_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app2/profile .
-    tar -czf m3db_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app3/profile .
     export prometheus_helm_path="${CSAR_DIR}/$1/prometheus-operator.tar.gz"
     export collectd_helm_path="${CSAR_DIR}/$1/collectd.tar.gz"
-    export m3db_helm_path="${CSAR_DIR}/$1/m3db.tar.gz"
     popd
 }
 
@@ -1206,9 +1203,24 @@ function populate_CSAR_operator_helm {
     pushd "${CSAR_DIR}/$1"
     print_msg "Create Helm Chart Archives for operators"
     rm -f *.tar.gz
+    #tar -czf operator.tar.gz -C $test_folder/vnfs/comp-app/collection/operators-latest/helm .
+    #tar -czf operator_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/operators-latest/profile .
     tar -czf operator.tar.gz -C $test_folder/vnfs/comp-app/collection/operators/helm .
     tar -czf operator_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/operators/profile .
     export operator_helm_path="${CSAR_DIR}/$1/operator.tar.gz"
     popd
 }
 
+
+function populate_CSAR_m3db_helm {
+    _checks_args "$1"
+    pushd "${CSAR_DIR}/$1"
+    print_msg "Create Helm Chart Archives for m3db"
+    rm -f *.tar.gz
+   #tar -czf m3db.tar.gz -C $test_folder/vnfs/comp-app/collection/app3-latest/helm .
+   #tar -czf m3db_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app3-latest/profile .
+    tar -czf m3db.tar.gz -C $test_folder/vnfs/comp-app/collection/m3db/helm .
+    tar -czf m3db_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/m3db/profile .
+    export m3db_helm_path="${CSAR_DIR}/$1/m3db.tar.gz"
+    popd
+}

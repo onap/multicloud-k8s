@@ -28,9 +28,9 @@ Pacakges helm charts in tar.gz format. All packages are in **dist/packages** dir
 
 **3. Deploy EMCO Packages for Databases and Services**
 
-`$ helm install dist/packages/emco-db-0.1.0.tgz --name rel-db --namespace emco`
+`$ helm install dist/packages/emco-db-0.1.0.tgz --name emco-db --namespace emco`
 
-`$ helm install dist/packages/emco-services-0.1.0.tgz --name rel-services --namespace emco`
+`$ helm install dist/packages/emco-services-0.1.0.tgz --name emco-services --namespace emco`
 
 **4. Deploy tools (Optional)**
 
@@ -65,10 +65,11 @@ Optional if tools were installed
 
 After deleting the db package and before installing the package again following error happens:
 
-        `Error: release rel01 failed: object is being deleted: persistentvolumes "rel-emco-etcd-data-0" already exists`
+        `Error: release emco-db failed: object is being deleted: persistentvolumes "emco-db-emco-etcd-data-0" already exists`
 
 Workaround :
 
-    `kubectl edit persistentvolumes rel01-emco-etcd-data-0`
+    `kubectl edit persistentvolumes emco-db-emco-etcd-data-0 -n emco`
 
     and remover finalizers section
+

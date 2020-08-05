@@ -26,22 +26,22 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-  - name: {{ .Values.service.name }}
-    {{if eq .Values.service.type "NodePort" -}}
-    port: {{ .Values.service.internalPort }}
-    nodePort: {{ .Values.global.nodePortPrefixExt | default "302" }}{{ .Values.service.nodePort }}
-    {{- else -}}
-    port: {{ .Values.service.externalPort }}
-    targetPort: {{ .Values.service.internalPort }}
-    {{- end}}
-    protocol: TCP
-  - name: {{ .Values.serviceInternal.name }}
+  - name: {{ .Values.serviceInternal.portName }}
     {{if eq .Values.serviceInternal.type "NodePort" -}}
     port: {{ .Values.serviceInternal.internalPort }}
     nodePort: {{ .Values.global.nodePortPrefixExt | default "302" }}{{ .Values.serviceInternal.nodePort }}
     {{- else -}}
     port: {{ .Values.serviceInternal.externalPort }}
     targetPort: {{ .Values.serviceInternal.internalPort }}
+    {{- end}}
+    protocol: TCP
+  - name: {{ .Values.service.portName }}
+    {{if eq .Values.service.type "NodePort" -}}
+    port: {{ .Values.service.internalPort }}
+    nodePort: {{ .Values.global.nodePortPrefixExt | default "302" }}{{ .Values.service.nodePort }}
+    {{- else -}}
+    port: {{ .Values.service.externalPort }}
+    targetPort: {{ .Values.service.internalPort }}
     {{- end}}
     protocol: TCP
   selector:

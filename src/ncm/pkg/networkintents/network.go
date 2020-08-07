@@ -95,7 +95,11 @@ func (v *NetworkClient) CreateNetwork(p Network, clusterProvider, cluster string
 	if err != nil {
 		return Network{}, pkgerrors.New("Unable to find the cluster")
 	}
-	switch s.State {
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return Network{}, pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+	}
+	switch stateVal {
 	case state.StateEnum.Approved:
 		return Network{}, pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Approved)
 	case state.StateEnum.Terminated:
@@ -107,7 +111,7 @@ func (v *NetworkClient) CreateNetwork(p Network, clusterProvider, cluster string
 	case state.StateEnum.Instantiated:
 		return Network{}, pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Instantiated)
 	default:
-		return Network{}, pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + s.State)
+		return Network{}, pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + stateVal)
 	}
 
 	//Check if this Network already exists
@@ -187,7 +191,11 @@ func (v *NetworkClient) DeleteNetwork(name, clusterProvider, cluster string) err
 	if err != nil {
 		return pkgerrors.New("Unable to find the cluster")
 	}
-	switch s.State {
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+	}
+	switch stateVal {
 	case state.StateEnum.Approved:
 		return pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Approved)
 	case state.StateEnum.Terminated:
@@ -199,7 +207,7 @@ func (v *NetworkClient) DeleteNetwork(name, clusterProvider, cluster string) err
 	case state.StateEnum.Instantiated:
 		return pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Instantiated)
 	default:
-		return pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + s.State)
+		return pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + stateVal)
 	}
 
 	//Construct key and tag to select the entry

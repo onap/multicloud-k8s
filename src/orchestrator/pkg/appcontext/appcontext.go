@@ -34,6 +34,35 @@ type AppContext struct {
 	rtc      rtcontext.Rtcontext
 }
 
+// AppContextStatus represents the current status of the appcontext
+//	Instantiating - instantiate has been invoked and is still in progress
+//	Instantiated - instantiate has completed
+//	PreTerminate - terminate has been invoked when in Instantiating status - need to clean up first
+//	Terminating - terminate has been invoked and is still in progress
+//	Terminated - terminate has completed
+//	Failed - the instantiate or terminate action has failed
+type AppContextStatus struct {
+	Status StatusValue
+}
+type StatusValue string
+type statuses struct {
+	Instantiating StatusValue
+	Instantiated  StatusValue
+	PreTerminate  StatusValue
+	Terminating   StatusValue
+	Terminated    StatusValue
+	Failed        StatusValue
+}
+
+var AppContextStatusEnum = &statuses{
+	Instantiating: "Instantiating",
+	Instantiated:  "Instantiated",
+	PreTerminate:  "PreTerminate",
+	Terminating:   "Terminating",
+	Terminated:    "Terminated",
+	Failed:        "Failed",
+}
+
 // CompositeAppMeta consists of projectName, CompositeAppName,
 // CompositeAppVersion, ReleaseName. This shall be used for
 // instantiation of a compositeApp
@@ -97,6 +126,22 @@ func (ac *AppContext) GetCompositeAppHandle() (interface{}, error) {
 		return nil, err
 	}
 	return h, nil
+}
+
+// GetLevelHandle returns the handle for the supplied level at the given handle.
+// For example, to get the handle of the 'status' level at a given handle.
+func (ac *AppContext) GetLevelHandle(handle interface{}, level string) (interface{}, error) {
+	ach := fmt.Sprintf("%v%v/", handle, level)
+	hs, err := ac.rtc.RtcGetHandles(ach)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range hs {
+		if v == ach {
+			return v, nil
+		}
+	}
+	return nil, pkgerrors.Errorf("No handle was found for level %v", level)
 }
 
 //Add app to the context under composite app
@@ -307,16 +352,7 @@ func (ac *AppContext) AddResource(handle interface{}, resname string, value inte
 	return h, nil
 }
 
-//Delete resource given the handle
-func (ac *AppContext) DeleteResource(handle interface{}) error {
-	err := ac.rtc.RtcDeletePair(handle)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//Return the hanlde for given app, cluster and resource name
+//Return the handle for given app, cluster and resource name
 func (ac *AppContext) GetResourceHandle(appname string, clustername string, resname string) (interface{}, error) {
 	if appname == "" {
 		return nil, pkgerrors.Errorf("Not a valid run time context app name")
@@ -343,9 +379,39 @@ func (ac *AppContext) GetResourceHandle(appname string, clustername string, resn
 	return nil, pkgerrors.Errorf("No handle was found for the given resource")
 }
 
-//Update the resource value usign the given handle
+//Update the resource value using the given handle
 func (ac *AppContext) UpdateResourceValue(handle interface{}, value interface{}) error {
 	return ac.rtc.RtcUpdateValue(handle, value)
+}
+
+//Return the handle for given app, cluster and resource name
+func (ac *AppContext) GetResourceStatusHandle(appname string, clustername string, resname string) (interface{}, error) {
+	if appname == "" {
+		return nil, pkgerrors.Errorf("Not a valid run time context app name")
+	}
+	if clustername == "" {
+		return nil, pkgerrors.Errorf("Not a valid run time context cluster name")
+	}
+	if resname == "" {
+		return nil, pkgerrors.Errorf("Not a valid run time context resource name")
+	}
+
+	rh, err := ac.rtc.RtcGet()
+	if err != nil {
+		return nil, err
+	}
+
+	acrh := fmt.Sprintf("%v", rh) + "app/" + appname + "/cluster/" + clustername + "/resource/" + resname + "/status/"
+	hs, err := ac.rtc.RtcGetHandles(acrh)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range hs {
+		if v == acrh {
+			return v, nil
+		}
+	}
+	return nil, pkgerrors.Errorf("No handle was found for the given resource")
 }
 
 //Add instruction under given handle and type
@@ -364,7 +430,7 @@ func (ac *AppContext) AddInstruction(handle interface{}, level string, insttype 
 	return h, nil
 }
 
-//Delete instruction under gievn handle
+//Delete instruction under given handle
 func (ac *AppContext) DeleteInstruction(handle interface{}) error {
 	err := ac.rtc.RtcDeletePair(handle)
 	if err != nil {
@@ -414,29 +480,20 @@ func (ac *AppContext) GetResourceInstruction(appname string, clustername string,
 	return v, nil
 }
 
-//AddStatus for holding status of all resources under app and cluster
-// handle should be a cluster handle
-func (ac *AppContext) AddStatus(handle interface{}, value interface{}) (interface{}, error) {
-	h, err := ac.rtc.RtcAddStatus(handle, value)
+// AddLevelValue for holding a state object at a given level
+// will make a handle with an appended "<level>/" to the key
+func (ac *AppContext) AddLevelValue(handle interface{}, level string, value interface{}) (interface{}, error) {
+	h, err := ac.rtc.RtcAddOneLevel(handle, level, value)
 	if err != nil {
 		return nil, err
 	}
-	log.Info(":: Added status handle ::", log.Fields{"StatusHandler": h})
+	log.Info(":: Added handle ::", log.Fields{"Handle": h})
 
 	return h, nil
 }
 
-//DeleteStatus for the given the handle
-func (ac *AppContext) DeleteStatus(handle interface{}) error {
-	err := ac.rtc.RtcDeletePair(handle)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//Return the handle for status for a given app and cluster
-func (ac *AppContext) GetStatusHandle(appname string, clustername string) (interface{}, error) {
+// GetClusterStatusHandle returns the handle for cluster status for a given app and cluster
+func (ac *AppContext) GetClusterStatusHandle(appname string, clustername string) (interface{}, error) {
 	if appname == "" {
 		return nil, pkgerrors.Errorf("Not a valid run time context app name")
 	}
@@ -467,6 +524,11 @@ func (ac *AppContext) UpdateStatusValue(handle interface{}, value interface{}) e
 	return ac.rtc.RtcUpdateValue(handle, value)
 }
 
+//UpdateValue updates the state value with the given handle
+func (ac *AppContext) UpdateValue(handle interface{}, value interface{}) error {
+	return ac.rtc.RtcUpdateValue(handle, value)
+}
+
 //Return all the handles under the composite app
 func (ac *AppContext) GetAllHandles(handle interface{}) ([]interface{}, error) {
 	hs, err := ac.rtc.RtcGetHandles(handle)
@@ -478,7 +540,7 @@ func (ac *AppContext) GetAllHandles(handle interface{}) ([]interface{}, error) {
 
 //Returns the value for a given handle
 func (ac *AppContext) GetValue(handle interface{}) (interface{}, error) {
-	var v string
+	var v interface{}
 	err := ac.rtc.RtcGetValue(handle, &v)
 	if err != nil {
 		return nil, err

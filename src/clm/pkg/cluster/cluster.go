@@ -17,6 +17,8 @@
 package cluster
 
 import (
+	"time"
+
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
@@ -255,12 +257,15 @@ func (v *ClusterClient) CreateCluster(provider string, p Cluster, q ClusterConte
 	}
 
 	// Add the stateInfo record
-	stateInfo := state.StateInfo{
+	s := state.StateInfo{}
+	a := state.ActionEntry{
 		State:     state.StateEnum.Created,
 		ContextId: "",
+		TimeStamp: time.Now(),
 	}
+	s.Actions = append(s.Actions, a)
 
-	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagState, stateInfo)
+	err = db.DBconn.Insert(v.db.storeName, key, nil, v.db.tagState, s)
 	if err != nil {
 		return Cluster{}, pkgerrors.Wrap(err, "Creating cluster StateInfo")
 	}
@@ -403,8 +408,31 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		ClusterName:         name,
 	}
 	s, err := v.GetClusterState(provider, name)
-	if err == nil && s.State == state.StateEnum.Applied {
-		return pkgerrors.Errorf("Cluster network intents must be terminated before it can be deleted: " + name)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from Cluster: " + name)
+	}
+
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + name)
+	}
+
+	if stateVal == state.StateEnum.Applied {
+		return pkgerrors.Errorf("Cluster network intents must be terminated before it can be deleted " + name)
+	}
+
+	// remove the app contexts associated with this cluster
+	if stateVal == state.StateEnum.Terminated {
+		for _, id := range state.GetContextIdsFromStateInfo(s) {
+			context, err := state.GetAppContextFromId(id)
+			if err != nil {
+				return pkgerrors.Wrap(err, "Error getting appcontext from Cluster StateInfo")
+			}
+			err = context.DeleteCompositeApp()
+			if err != nil {
+				return pkgerrors.Wrap(err, "Error deleting appcontext for Cluster")
+			}
+		}
 	}
 
 	err = db.DBconn.Remove(v.db.storeName, key)

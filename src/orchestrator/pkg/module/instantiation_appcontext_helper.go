@@ -71,6 +71,16 @@ func makeAppContextForCompositeApp(p, ca, v, rName string) (contextForCompositeA
 
 }
 
+// deleteAppContext removes an appcontext
+func deleteAppContext(ct appcontext.AppContext) error {
+	err := ct.DeleteCompositeApp()
+	if err != nil {
+		log.Warn(":: Error deleting AppContext ::", log.Fields{"Error": err})
+		return pkgerrors.Wrapf(err, "Error Deleteing AppContext")
+	}
+	return nil
+}
+
 // getResources shall take in the sorted templates and output the resources
 // which consists of name(name+kind) and filecontent
 func getResources(st []helm.KubernetesResourceTemplate) ([]resource, error) {
@@ -208,7 +218,7 @@ func verifyResources(l gpic.ClusterList, ct appcontext.AppContext, resources []r
 			for _, res := range resources {
 				rh, err := ct.GetResourceHandle(appName, cn, res.name)
 				if err != nil {
-					return pkgerrors.Wrapf(err, "Error getting resoure handle for resource :: %s, app:: %s, cluster :: %s, groupName :: %s", appName, res.name, cn, gn)
+					return pkgerrors.Wrapf(err, "Error getting resource handle for resource :: %s, app:: %s, cluster :: %s, groupName :: %s", appName, res.name, cn, gn)
 				}
 				log.Info(":: GetResourceHandle ::", log.Fields{"ResourceHandler": rh, "appName": appName, "Cluster": cn, "Resource": res.name})
 			}

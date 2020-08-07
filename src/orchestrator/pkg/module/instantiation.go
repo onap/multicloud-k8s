@@ -20,6 +20,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	rb "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
@@ -100,7 +101,11 @@ func (c InstantiationClient) Approve(p string, ca string, v string, di string) e
 	if err != nil {
 		return pkgerrors.Wrap(err, "DeploymentIntentGroup has no state info: "+di)
 	}
-	switch s.State {
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
+	}
+	switch stateVal {
 	case state.StateEnum.Approved:
 		return nil
 	case state.StateEnum.Terminated:
@@ -108,11 +113,11 @@ func (c InstantiationClient) Approve(p string, ca string, v string, di string) e
 	case state.StateEnum.Created:
 		break
 	case state.StateEnum.Applied:
-		return pkgerrors.Errorf("DeploymentIntentGroup is in an invalid state" + s.State)
+		return pkgerrors.Errorf("DeploymentIntentGroup is in an invalid state" + stateVal)
 	case state.StateEnum.Instantiated:
 		return pkgerrors.Errorf("DeploymentIntentGroup has already been instantiated" + di)
 	default:
-		return pkgerrors.Errorf("DeploymentIntentGroup is in an unknown state" + s.State)
+		return pkgerrors.Errorf("DeploymentIntentGroup is in an unknown state" + stateVal)
 	}
 
 	key := DeploymentIntentGroupKey{
@@ -121,12 +126,14 @@ func (c InstantiationClient) Approve(p string, ca string, v string, di string) e
 		CompositeApp: ca,
 		Version:      v,
 	}
-	stateInfo := state.StateInfo{
+	a := state.ActionEntry{
 		State:     state.StateEnum.Approved,
 		ContextId: "",
+		TimeStamp: time.Now(),
 	}
+	s.Actions = append(s.Actions, a)
 
-	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, stateInfo)
+	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, s)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error updating the stateInfo of the DeploymentIntentGroup: "+di)
 	}
@@ -229,7 +236,11 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	if err != nil {
 		return pkgerrors.Errorf("Error retrieving DeploymentIntentGroup stateInfo: " + di)
 	}
-	switch s.State {
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
+	}
+	switch stateVal {
 	case state.StateEnum.Approved:
 		break
 	case state.StateEnum.Terminated:
@@ -241,7 +252,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	case state.StateEnum.Instantiated:
 		return pkgerrors.Errorf("DeploymentIntentGroup has already been instantiated" + di)
 	default:
-		return pkgerrors.Errorf("DeploymentIntentGroup is in an unknown state" + s.State)
+		return pkgerrors.Errorf("DeploymentIntentGroup is in an unknown state" + stateVal)
 	}
 
 	rName := dIGrp.Spec.Version //rName is releaseName
@@ -286,6 +297,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		sortedTemplates, err := GetSortedTemplateForApp(eachApp.Metadata.Name, p, ca, v, rName, cp, overrideValues)
 
 		if err != nil {
+			deleteAppContext(context)
 			return pkgerrors.Wrap(err, "Unable to get the sorted templates for app")
 		}
 
@@ -293,16 +305,19 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 
 		resources, err := getResources(sortedTemplates)
 		if err != nil {
+			deleteAppContext(context)
 			return pkgerrors.Wrapf(err, "Unable to get the resources for app :: %s", eachApp.Metadata.Name)
 		}
 
 		specData, err := NewAppIntentClient().GetAllIntentsByApp(eachApp.Metadata.Name, p, ca, v, gIntent)
 		if err != nil {
+			deleteAppContext(context)
 			return pkgerrors.Wrap(err, "Unable to get the intents for app")
 		}
 		// listOfClusters shall have both mandatoryClusters and optionalClusters where the app needs to be installed.
 		listOfClusters, err := gpic.IntentResolver(specData.Intent)
 		if err != nil {
+			deleteAppContext(context)
 			return pkgerrors.Wrap(err, "Unable to get the intents resolved for app")
 		}
 
@@ -312,28 +327,78 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		// Add an app to the app context
 		apphandle, err := context.AddApp(compositeHandle, eachApp.Metadata.Name)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Info(":: Error Cleaning up AppContext compositeApp failure ::", log.Fields{"Error": cleanuperr.Error(), "AppName": eachApp.Metadata.Name})
-			}
+			deleteAppContext(context)
 			return pkgerrors.Wrap(err, "Error adding App to AppContext")
 		}
 		err = addClustersToAppContext(listOfClusters, context, apphandle, resources)
 		if err != nil {
-			log.Info(":: Error while adding cluster and resources to app ::", log.Fields{"Error": err.Error(), "AppName": eachApp.Metadata.Name})
+			deleteAppContext(context)
+			return pkgerrors.Wrap(err, "Error while adding cluster and resources to app")
 		}
 		err = verifyResources(listOfClusters, context, resources, eachApp.Metadata.Name)
 		if err != nil {
-			log.Info(":: Error while verifying resources in app ::", log.Fields{"Error": err.Error(), "AppName": eachApp.Metadata.Name})
+			deleteAppContext(context)
+			return pkgerrors.Wrap(err, "Error while verifying resources in app: ")
 		}
-
 	}
-	jappOrderInstr, _ := json.Marshal(appOrderInstr)
+	jappOrderInstr, err := json.Marshal(appOrderInstr)
+	if err != nil {
+		deleteAppContext(context)
+		return pkgerrors.Wrap(err, "Error marshalling app order instruction")
+	}
 	appDepInstr.Appdep = appdep
-	jappDepInstr, _ := json.Marshal(appDepInstr)
-	context.AddInstruction(compositeHandle, "app", "order", string(jappOrderInstr))
-	context.AddInstruction(compositeHandle, "app", "dependency", string(jappDepInstr))
+	jappDepInstr, err := json.Marshal(appDepInstr)
+	if err != nil {
+		deleteAppContext(context)
+		return pkgerrors.Wrap(err, "Error marshalling app dependency instruction")
+	}
+	_, err = context.AddInstruction(compositeHandle, "app", "order", string(jappOrderInstr))
+	if err != nil {
+		deleteAppContext(context)
+		return pkgerrors.Wrap(err, "Error adding app dependency instruction")
+	}
+	_, err = context.AddInstruction(compositeHandle, "app", "dependency", string(jappDepInstr))
+	if err != nil {
+		deleteAppContext(context)
+		return pkgerrors.Wrap(err, "Error adding app dependency instruction")
+	}
 	//END: storing into etcd
+
+	// BEGIN: scheduler code
+
+	pl, mapOfControllers, err := getPrioritizedControllerList(p, ca, v, di)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error adding getting prioritized controller list")
+	}
+	log.Info("Priority Based List ", log.Fields{"PlacementControllers::": pl.pPlaCont,
+		"ActionControllers::": pl.pActCont, "mapOfControllers::": mapOfControllers})
+
+	err = callGrpcForControllerList(pl.pPlaCont, mapOfControllers, ctxval)
+	if err != nil {
+		deleteAppContext(context)
+		return pkgerrors.Wrap(err, "Error calling gRPC for placement controller list")
+	}
+
+	err = deleteExtraClusters(allApps, context)
+	if err != nil {
+		deleteAppContext(context)
+		return pkgerrors.Wrap(err, "Error deleting extra clusters")
+	}
+
+	err = callGrpcForControllerList(pl.pActCont, mapOfControllers, ctxval)
+	if err != nil {
+		deleteAppContext(context)
+		return pkgerrors.Wrap(err, "Error calling gRPC for action controller list")
+	}
+	// END: Scheduler code
+
+	// BEGIN : Rsync code
+	err = callRsyncInstall(ctxval)
+	if err != nil {
+		deleteAppContext(context)
+		return pkgerrors.Wrap(err, "Error calling rsync")
+	}
+	// END : Rsyc code
 
 	// BEGIN:: save the context in the orchestrator db record
 	key := DeploymentIntentGroupKey{
@@ -342,55 +407,20 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		CompositeApp: ca,
 		Version:      v,
 	}
-	stateInfo := state.StateInfo{
+	a := state.ActionEntry{
 		State:     state.StateEnum.Instantiated,
 		ContextId: ctxval.(string),
+		TimeStamp: time.Now(),
 	}
-	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, stateInfo)
+	s.Actions = append(s.Actions, a)
+	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, s)
 	if err != nil {
-		cleanuperr := context.DeleteCompositeApp()
-		if cleanuperr != nil {
-
-			log.Info(":: Error Cleaning up AppContext while saving context in the db for GPIntent ::", log.Fields{"Error": cleanuperr.Error(), "GPIntent": gIntent, "DeploymentIntentGroup": di, "CompositeApp": ca, "CompositeAppVersion": v, "Project": p})
-		}
-		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
+		log.Warn(":: Error updating DeploymentIntentGroup state in DB ::", log.Fields{"Error": err.Error(), "GPIntent": gIntent, "DeploymentIntentGroup": di, "CompositeApp": ca, "CompositeAppVersion": v, "Project": p, "AppContext": ctxval.(string)})
+		return pkgerrors.Wrap(err, "Error adding DeploymentIntentGroup state to DB")
 	}
 	// END:: save the context in the orchestrator db record
 
-	// BEGIN: scheduler code
-
-	pl, mapOfControllers, err := getPrioritizedControllerList(p, ca, v, di)
-	if err != nil {
-		return err
-	}
-	log.Info("Priority Based List ", log.Fields{"PlacementControllers::": pl.pPlaCont,
-		"ActionControllers::": pl.pActCont, "mapOfControllers::": mapOfControllers})
-
-	err = callGrpcForControllerList(pl.pPlaCont, mapOfControllers, ctxval)
-	if err != nil {
-		return err
-	}
-
-	err = deleteExtraClusters(allApps, context)
-	if err != nil {
-		return err
-	}
-
-	err = callGrpcForControllerList(pl.pActCont, mapOfControllers, ctxval)
-	if err != nil {
-		return err
-	}
-
-	// END: Scheduler code
-
-	// BEGIN : Rsync code
-	err = callRsyncInstall(ctxval)
-	if err != nil {
-		return err
-	}
-	// END : Rsyc code
-
-	log.Info(":: Done with instantiation... ::", log.Fields{"CompositeAppName": ca})
+	log.Info(":: Done with instantiation call to rsync... ::", log.Fields{"CompositeAppName": ca})
 	return err
 }
 
@@ -406,7 +436,8 @@ func (c InstantiationClient) Status(p string, ca string, v string, di string) (S
 		return StatusData{}, pkgerrors.Wrap(err, "deploymentIntentGroup not found: "+di)
 	}
 
-	ac, err := state.GetAppContextFromStateInfo(s)
+	currentCtxId := state.GetLastContextIdFromStateInfo(s)
+	ac, err := state.GetAppContextFromId(currentCtxId)
 	if err != nil {
 		return StatusData{}, pkgerrors.Wrap(err, "AppContext for deploymentIntentGroup not found: "+di)
 	}
@@ -430,7 +461,7 @@ func (c InstantiationClient) Status(p string, ca string, v string, di string) (S
 		}
 
 		for _, cluster := range clusters {
-			handle, err := ac.GetStatusHandle(app.Metadata.Name, cluster)
+			handle, err := ac.GetClusterStatusHandle(app.Metadata.Name, cluster)
 			if err != nil {
 				log.Info(":: No status handle for cluster, app ::",
 					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})
@@ -470,23 +501,21 @@ func (c InstantiationClient) Terminate(p string, ca string, v string, di string)
 	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
 	if err != nil {
 		return pkgerrors.Wrap(err, "DeploymentIntentGroup has no state info: "+di)
-	} else if s.State != state.StateEnum.Instantiated {
+	}
+
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
+	}
+
+	if stateVal != state.StateEnum.Instantiated {
 		return pkgerrors.Errorf("DeploymentIntentGroup is not instantiated" + di)
 	}
 
-	ac, err := state.GetAppContextFromStateInfo(s)
-	if err != nil {
-		return pkgerrors.Wrap(err, "AppContext for deploymentIntentGroup not found: "+di)
-	}
-
-	err = callRsyncUninstall(s.ContextId)
+	currentCtxId := state.GetLastContextIdFromStateInfo(s)
+	err = callRsyncUninstall(currentCtxId)
 	if err != nil {
 		return err
-	}
-
-	err = ac.DeleteCompositeApp()
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error deleting the app context for DeploymentIntentGroup: "+di)
 	}
 
 	key := DeploymentIntentGroupKey{
@@ -495,12 +524,14 @@ func (c InstantiationClient) Terminate(p string, ca string, v string, di string)
 		CompositeApp: ca,
 		Version:      v,
 	}
-	stateInfo := state.StateInfo{
+	a := state.ActionEntry{
 		State:     state.StateEnum.Terminated,
-		ContextId: "",
+		ContextId: currentCtxId,
+		TimeStamp: time.Now(),
 	}
+	s.Actions = append(s.Actions, a)
 
-	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, stateInfo)
+	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, s)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error updating the stateInfo of the DeploymentIntentGroup: "+di)
 	}

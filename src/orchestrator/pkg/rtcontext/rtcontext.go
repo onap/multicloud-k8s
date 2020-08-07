@@ -41,7 +41,6 @@ type Rtcontext interface {
 	RtcAddMeta(meta interface{}) error
 	RtcGet() (interface{}, error)
 	RtcAddLevel(handle interface{}, level string, value string) (interface{}, error)
-	RtcAddStatus(handle interface{}, value interface{}) (interface{}, error)
 	RtcAddResource(handle interface{}, resname string, value interface{}) (interface{}, error)
 	RtcAddInstruction(handle interface{}, level string, insttype string, value interface{}) (interface{}, error)
 	RtcDeletePair(handle interface{}) error
@@ -201,26 +200,6 @@ func (rtc *RunTimeContext) RtcAddOneLevel(pl interface{}, level string, value in
 		return nil, pkgerrors.Errorf("Error adding run time context level: %s", err.Error())
 	}
 	return (interface{})(key), nil
-}
-
-// Add status under the given level and return new handle
-func (rtc *RunTimeContext) RtcAddStatus(handle interface{}, value interface{}) (interface{}, error) {
-
-	str := fmt.Sprintf("%v", handle)
-	sid := fmt.Sprintf("%v", rtc.cid)
-	if !strings.HasPrefix(str, sid) {
-		return nil, pkgerrors.Errorf("Not a valid run time context handle")
-	}
-	if value == nil {
-		return nil, pkgerrors.Errorf("Not a valid run time context resource value")
-	}
-
-	k := str + "status" + "/"
-	err := contextdb.Db.Put(k, value)
-	if err != nil {
-		return nil, pkgerrors.Errorf("Error adding run time context status: %s", err.Error())
-	}
-	return (interface{})(k), nil
 }
 
 // Add a resource under the given level and return new handle

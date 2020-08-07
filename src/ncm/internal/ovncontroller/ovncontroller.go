@@ -100,7 +100,8 @@ func Apply(ctxVal interface{}, clusterProvider, cluster string) error {
 		return nil
 	}
 
-	clusterhandle, _ := ac.GetClusterHandle(nettypes.CONTEXT_CLUSTER_APP, clusterProvider+nettypes.SEPARATOR+cluster)
+	acCluster := clusterProvider + nettypes.SEPARATOR + cluster
+	clusterhandle, _ := ac.GetClusterHandle(nettypes.CONTEXT_CLUSTER_APP, acCluster)
 
 	var orderinstr struct {
 		Resorder []string `json:"resorder"`
@@ -112,7 +113,7 @@ func Apply(ctxVal interface{}, clusterProvider, cluster string) error {
 	for _, resource := range resources {
 		orderinstr.Resorder = append(orderinstr.Resorder, resource.name)
 		resdep[resource.name] = "go"
-		_, err = ac.AddResource(clusterhandle, resource.name, resource.value)
+		_, err := ac.AddResource(clusterhandle, resource.name, resource.value)
 		if err != nil {
 			cleanuperr := ac.DeleteCompositeApp()
 			if cleanuperr != nil {

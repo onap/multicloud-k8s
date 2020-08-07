@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2ce0461c_ce539ea3",
+        "filename": "src/k8splugin/internal/app/config_backend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-08-07T14:52:43Z",
+      "side": 1,
+      "message": "Does this work with creating of new resources?",
+      "range": {
+        "startLine": 364,
+        "startChar": 32,
+        "endLine": 364,
+        "endChar": 126
+      },
+      "revId": "cdb6dd4231f54327fdf8306bc1f354308d5b6aae",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

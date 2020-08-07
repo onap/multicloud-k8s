@@ -15,28 +15,28 @@
         file: kud-vars.yml
 
     - name: Change the onap4k8s directory and run helm delete
-      command: /usr/local/bin/helm delete --purge multicloud-onap8ks
+      command: /usr/local/bin/helm delete --purge emco
       register: helm_delete
       args:
-        chdir: /opt/multicloud/deployments/helm/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
 
     - debug:
         var: helm_delete.stdout_lines
 
-    - name: Change the onap4k8s directory and delete the onap4k8s-ns namespace
-      command: /usr/local/bin/kubectl delete ns onap4k8s-ns
-      register: delete_onap_ns
+    - name: Change the onap4k8s directory and delete the emco namespace
+      command: /usr/local/bin/kubectl delete ns emco
+      register: delete_emco_ns
       args:
-        chdir: /opt/multicloud/deployments/helm/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
 
     - debug:
-        var: delete_onap_ns.stdout_lines
+        var: delete_emco_ns.stdout_lines
 
     - name: Change the onap4k8s directory and make clean
       command: /usr/bin/make clean
       register: make_clean
       args:
-        chdir: /opt/multicloud/deployments/helm/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
 
     - debug:
         var: make_clean.stdout_lines
@@ -45,7 +45,7 @@
       command: /usr/bin/make repo-stop
       register: make_repo_stop
       args:
-        chdir: /opt/multicloud/deployments/helm/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
 
     - debug:
         var: make_repo_stop.stdout_lines

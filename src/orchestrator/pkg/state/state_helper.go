@@ -17,6 +17,8 @@
 package state
 
 import (
+	"encoding/json"
+
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	pkgerrors "github.com/pkg/errors"
 )
@@ -68,4 +70,31 @@ func GetContextIdsFromStateInfo(s StateInfo) []string {
 	}
 
 	return ids
+}
+
+func GetAppContextStatus(ctxid string) (appcontext.AppContextStatus, error) {
+
+	ac, err := GetAppContextFromId(ctxid)
+	if err != nil {
+		return appcontext.AppContextStatus{}, err
+	}
+
+	h, err := ac.GetCompositeAppHandle()
+	if err != nil {
+		return appcontext.AppContextStatus{}, err
+	}
+	sh, err := ac.GetLevelHandle(h, "status")
+	if err != nil {
+		return appcontext.AppContextStatus{}, err
+	}
+	s, err := ac.GetValue(sh)
+	if err != nil {
+		return appcontext.AppContextStatus{}, err
+	}
+	acStatus := appcontext.AppContextStatus{}
+	js, _ := json.Marshal(s)
+	json.Unmarshal(js, &acStatus)
+
+	return acStatus, nil
+
 }

@@ -18,10 +18,12 @@ package context
 
 import (
 	"context"
+	"time"
 	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
@@ -37,6 +39,9 @@ import (
 type CompositeAppContext struct {
 	cid interface{}
 }
+
+var chans = []chan bool{}
+var mutex = &sync.Mutex{}
 
 func getRes(ac appcontext.AppContext, name string, app string, cluster string) ([]byte, error) {
 	var byteRes []byte
@@ -185,6 +190,71 @@ type fn func(ac appcontext.AppContext, client *kubeclient.Client, res string, ap
 
 type statusfn func(client *kubeclient.Client, app string, cluster string, label string) error
 
+func addChan() chan bool {
+
+        mutex.Lock()
+        c := make(chan bool)
+        chans = append(chans, c)
+        mutex.Unlock()
+
+        return c
+}
+
+func deleteChan(c chan bool) error {
+
+        var i int
+        mutex.Lock()
+        for i =0; i< len(chans); i++ {
+                if chans[i] == c {
+                        break
+                }
+        }
+
+        if i == len(chans) {
+		mutex.Unlock()
+                return pkgerrors.Errorf("Given channel was not found:")
+        }
+        chans[i] = chans[len(chans)-1]
+        chans = chans[:len(chans)-1]
+        mutex.Unlock()
+
+        return nil
+}
+
+
+func kickoffRetryWatcher(g *errgroup.Group) {
+
+	g.Go(func() error {
+
+		var stop string
+		var count int
+
+		count = 0
+                for {
+                        time.Sleep(1 * time.Second)
+			count++
+			if ( count == 60*60) {
+				log.Printf("Retry Watcher running..\n")
+				count = 0
+			}
+			//Read the signal value from the terminate path
+                        if ( stop == "stop retrying" ) {
+
+                                mutex.Lock()
+                                for i :=0; i< len(chans); i++ {
+                                        chans[i] <- true
+                                }
+                                mutex.Unlock()
+                                break
+			}
+
+		}
+		return nil
+	})
+
+
+}
+
 func applyFnComApp(cid interface{}, con *connector.Connector, f fn, sfn statusfn, breakonError bool) error {
 	ac := appcontext.AppContext{}
 	g, _ := errgroup.WithContext(context.Background())
@@ -204,6 +274,7 @@ func applyFnComApp(cid interface{}, con *connector.Connector, f fn, sfn statusfn
 	})
 	id, _ := ac.GetCompositeAppHandle()
 
+	kickoffRetryWatcher(g)
 	for _, app := range appList["apporder"] {
 
 		appName := app

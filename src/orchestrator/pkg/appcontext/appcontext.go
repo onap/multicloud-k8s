@@ -46,21 +46,22 @@ type AppContextStatus struct {
 }
 type StatusValue string
 type statuses struct {
-	Instantiating StatusValue
-	Instantiated  StatusValue
-	PreTerminate  StatusValue
-	Terminating   StatusValue
-	Terminated    StatusValue
-	Failed        StatusValue
+	Instantiating     StatusValue
+	Instantiated      StatusValue
+	PreTerminate      StatusValue
+	Terminating       StatusValue
+	Terminated        StatusValue
+	InstantiateFailed StatusValue
+	TerminateFailed   StatusValue
 }
 
 var AppContextStatusEnum = &statuses{
-	Instantiating: "Instantiating",
-	Instantiated:  "Instantiated",
-	PreTerminate:  "PreTerminate",
-	Terminating:   "Terminating",
-	Terminated:    "Terminated",
-	Failed:        "Failed",
+	Instantiating:     "Instantiating",
+	Instantiated:      "Instantiated",
+	Terminating:       "Terminating",
+	Terminated:        "Terminated",
+	InstantiateFailed: "InstantiateFailed",
+	TerminateFailed:   "TerminateFailed",
 }
 
 // CompositeAppMeta consists of projectName, CompositeAppName,

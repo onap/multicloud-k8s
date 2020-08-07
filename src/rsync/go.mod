@@ -27,6 +27,7 @@ require (
 replace (
 	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
+	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
 	k8s.io/api => k8s.io/api v0.17.3
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.17.3
 	k8s.io/apimachinery => k8s.io/apimachinery v0.17.3

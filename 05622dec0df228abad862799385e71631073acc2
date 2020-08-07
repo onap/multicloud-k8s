@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3126ffa4_868f91fd",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-07T23:32:22Z",
+      "side": 0,
+      "message": "Oops,\nShould I put the blank line back?",
+      "revId": "05622dec0df228abad862799385e71631073acc2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

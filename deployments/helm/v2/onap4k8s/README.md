@@ -2,7 +2,7 @@
 # EMCO v2 helm charts
 #################################################################
 
-EMCO Helm charts include charts for EMCO microservices along with MongoDb, etcd, Flutend
+EMCO Helm charts include charts for EMCO microservices along with MongoDb, etcd, Fluentd
 
 
 ### Steps to generate and install packages
@@ -36,25 +36,29 @@ Pacakges helm charts in tar.gz format. All packages are in **dist/packages** dir
 
 `$ helm install dist/packages/emco-tools-0.1.0.tgz --name rel-tools --namespace emco`
 
-    NOTE: Deploy the Chart emco-0.1.0.tgz to deploy all packages including database, services and tools.
+NOTE: Deploy the Chart emco-0.1.0.tgz to deploy all packages including database, services and tools.
 
-    `$ helm install dist/packages/emco-0.1.0.tgz --name rel --namespace emco`
+`$ helm install dist/packages/emco-0.1.0.tgz --name rel --namespace emco`
 
 
 **5. To check logs of the different Microservices check fluentd logs**
 
-`kubectl logs emco-fluentd-0 -n test | grep orchestrator`
+`kubectl logs rel-fluentd-0 -n emco | grep orchestrator`
 
 
 **6. Delete all packages**
 
-`$helm delete emco-services --purge`
+`$ helm delete rel-services --purge`
 
-`$helm delete emco-db --purge`
+`$ helm delete rel-db --purge`
 
 Optional if tools were installed
 
-`$helm delete emco-tools --purge`
+`$ helm delete rel-tools --purge`
+
+NOTE: If the Chart emco-0.1.0.tgz was deployed
+
+`$ helm delete rel --purge`
 
 
 **7. Delete local helm repo**
@@ -65,11 +69,10 @@ Optional if tools were installed
 
 After deleting the db package and before installing the package again following error happens:
 
-        `Error: release emco-db failed: object is being deleted: persistentvolumes "emco-db-emco-etcd-data-0" already exists`
+`Error: release rel-db failed: object is being deleted: persistentvolumes "rel-db-emco-etcd-data-0" already exists`
 
 Workaround :
 
-    `kubectl edit persistentvolumes emco-db-emco-etcd-data-0 -n emco`
+`kubectl edit persistentvolumes rel-db-emco-etcd-data-0`
 
-    and remover finalizers section
-
+and remover finalizers section

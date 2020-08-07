@@ -2668,6 +2668,644 @@ paths:
           description: Network Controller Workload Interface not found
           content: {}
 
+############################ Logical Cloud API's #################################################
+  /projects/{project-name}/logical-clouds:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    post:
+      tags:
+        - Logical Clouds
+      summary: Add a new Logical Cloud
+      description: Add a new Logical Cloud
+      operationId: addLogicalCloud
+      responses:
+        '201':
+          description: Logical Clouds successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Empty body or missing name
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error creating or returning Logical Cloud
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Metadata'
+        description: Logical Cloud info
+        required: true
+    get:
+      tags:
+        - Logical Clouds
+      summary: Get all Logical Clouds
+      description: Get all Logical Clouds
+      operationId: getAllLogicalCloud
+      responses:
+        '200':
+          description: List of Logical Clouds successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '500':
+          description: Internal error while looking up Logical Clouds or encoding response
+          content: {}
+
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    get:
+      tags:
+        - Logical Clouds
+      summary: Get Logical Cloud
+      description: Get Logical Cloud
+      operationId: getLogicalCloudByName
+      responses:
+        '200':
+          description: Logical Cloud successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Logical Cloud not found
+          content: {}
+        '500':
+          description: Internal error while looking up Logical Cloud or encoding response
+          content: {}
+    put:
+      tags:
+        - Logical Clouds
+      summary: Update Logical Cloud
+      description: Update Logical Cloud
+      operationId: updateLogicalClouds
+      responses:
+        '200':
+          description: Logical Cloud successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Empty body or missing name
+          content: {}
+        '404':
+          description: Logical Cloud not found
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error while updating up Logical Cloud or encoding response
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        description: Update Logical Cloud object
+        required: true
+    delete:
+      tags:
+        - Logical Clouds
+      summary: Delete Logical Cloud
+      description: Delete `Logical Cloud`
+      operationId: deleteLogicalCloudByName
+      responses:
+        '204':
+          description: Logical Cloud deleted
+          content: {}
+        '404':
+          description: Logical Cloud not found
+          content: {}
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/apply:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    post:
+      tags:
+        - Logical Clouds
+      summary: Apply Logical Cloud configuration
+      description: Apply Logical Cloud configuration
+      operationId: applyLogicalCloud
+      responses:
+        '200':
+          description: Logical Cloud applied over clusters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Logical Cloud lacks the necessary resources
+          content: {}
+        '404':
+          description: Logical Cloud does not exist
+          content: {}
+        '409':
+          description: Logical Cloud has already been applied
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Metadata'
+        description: Logical Cloud info
+        required: true
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/terminate:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    post:
+      tags:
+        - Logical Clouds
+      summary: Terminate Logical Cloud deployment
+      description: Terminate Logical Cloud deployment
+      operationId: terminateLogicalCloud
+      responses:
+        '200':
+          description: Logical Cloud removed from clusters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Logical Cloud does not exist
+          content: {}
+        '409':
+          description: Logical Cloud has not been applied
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Metadata'
+        description: Logical Cloud info
+        required: true
+
+############################ Logical Cloud Cluster Reference API's ###############################
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/cluster-references:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    post:
+      tags:
+        - Logical Cloud Cluster References
+      summary: Add Cluster Reference to Logical Cloud
+      description: Add Cluster Reference to Logical Cloud
+      operationId: addClusterReference
+      responses:
+        '201':
+          description: Cluster Reference successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Empty body or missing name
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppData'
+    get:
+      tags:
+        - Logical Cloud Cluster References
+      summary: Get all Cluster References for Logical Cloud
+      description: Get all Cluster References for Logical Cloud
+      operationId: getAllClusters
+      responses:
+        '200':
+          description: Cluster References successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataArray'
+        '500':
+          description: Internal error
+          content: {}
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    - $ref: '#/components/parameters/clusterReference'
+    get:
+      tags:
+        - Logical Cloud Cluster References
+      summary: Get Cluster Reference
+      description: Get Cluster Reference
+      operationId: getClusterReference
+      responses:
+        '200':
+          description: Cluster Reference successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+
+        '404':
+          description: Cluster Reference not found
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+    put:
+      tags:
+        - Logical Cloud Cluster References
+      summary: Update Cluster Reference
+      description: Update Cluster Reference
+      operationId: updateClusterReference
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Cluster Reference successfully updated
+        '400':
+          description: Invalid data or missing name
+          content: {}
+        '404':
+          description: Cluster Reference not found
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppData'
+        required: true
+    delete:
+      tags:
+        - Logical Cloud Cluster References
+      summary: Delete Cluster Reference
+      description: Delete Cluster Reference
+      operationId: deleteClusterReference
+      responses:
+        '204':
+          description: Deleted
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}/kubeconfig:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    - $ref: '#/components/parameters/clusterReference'
+    get:
+      tags:
+        - Logical Cloud Cluster References
+      summary: Get kubeconfig of Cluster Reference
+      description: Get kubeconfig of Cluster Reference
+      operationId: getClusterReferenceKubeconfig
+      responses:
+        '200':
+          description: Cluster Reference successfully returned
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/File'
+        '202':
+          description: User certificate hasn't been issued yet
+          content: {}
+        '400':
+          description: Logical Cloud hasn't been applied
+          content: {}
+        '404':
+          description: Cluster Reference not found
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+############################ Logical Cloud User Permission API's #################################
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/user-permissions:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    post:
+      tags:
+        - Logical Cloud User Permissions
+      summary: Add User Permission to Logical Cloud
+      description: Add User Permission to Logical Cloud
+      operationId: addUserPermission
+      responses:
+        '201':
+          description: User Permission successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Empty body or missing name
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppData'
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/user-permissions/{user-permission}:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    - $ref: '#/components/parameters/userPermission'
+    get:
+      tags:
+        - Logical Cloud User Permissions
+      summary: Get User Permission
+      description: Get User Permission
+      operationId: getUserPermission
+      responses:
+        '200':
+          description: User Permission successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+
+        '404':
+          description: User Permission not found
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+    put:
+      tags:
+        - Logical Cloud User Permissions
+      summary: Update User Permission
+      description: Update User Permission
+      operationId: updateUserPermission
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: User Permission successfully updated
+        '400':
+          description: Invalid data or missing name
+          content: {}
+        '404':
+          description: User Permission not found
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppData'
+        required: true
+    delete:
+      tags:
+        - Logical Cloud User Permissions
+      summary: Delete User Permission
+      description: Delete User Permission
+      operationId: deleteUserPermission
+      responses:
+        '204':
+          description: Deleted
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+############################ Logical Cloud Cluster Quota API's ###################################
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/cluster-quotas:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    post:
+      tags:
+        - Logical Cloud Cluster Quotas
+      summary: Add Cluster Quota to Logical Cloud
+      description: Add Cluster Quota to Logical Cloud
+      operationId: addClusterQuota
+      responses:
+        '201':
+          description: Cluster Quota successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Empty body or missing name
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppData'
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/cluster-quotas/{cluster-quota}:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    - $ref: '#/components/parameters/clusterQuota'
+    get:
+      tags:
+        - Logical Cloud Cluster Quotas
+      summary: Get Cluster Quota
+      description: Get Cluster Quota
+      operationId: getClusterQuota
+      responses:
+        '200':
+          description: Cluster Quota successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+
+        '404':
+          description: Cluster Quota not found
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+    put:
+      tags:
+        - Logical Cloud Cluster Quotas
+      summary: Update Cluster Quota
+      description: Update Cluster Quota
+      operationId: updateClusterQuota
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Cluster Quota successfully updated
+        '400':
+          description: Invalid data or missing name
+          content: {}
+        '404':
+          description: Cluster Quota not found
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppData'
+        required: true
+    delete:
+      tags:
+        - Logical Cloud Cluster Quotas
+      summary: Delete Cluster Quota
+      description: Delete Cluster Quota
+      operationId: deleteClusterQuota
+      responses:
+        '204':
+          description: Deleted
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+############################ Logical Cloud KV Pair API's #########################################
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/kv-pairs:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    post:
+      tags:
+        - Logical Cloud KV Pairs
+      summary: Add KV Pair to Logical Cloud
+      description: Add KV Pair to Logical Cloud
+      operationId: addKVPair
+      responses:
+        '201':
+          description: KV Pair successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '400':
+          description: Empty body or missing name
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppData'
+  /projects/{project-name}/logical-clouds/{logical-cloud-name}/kv-pairs/{kv-pair}:
+    parameters:
+    - $ref: '#/components/parameters/projectName'
+    - $ref: '#/components/parameters/logicalCloudName'
+    - $ref: '#/components/parameters/kvPair'
+    get:
+      tags:
+        - Logical Cloud KV Pairs
+      summary: Get KV Pair
+      description: Get KV Pair
+      operationId: getKVPair
+      responses:
+        '200':
+          description: KV Pair successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+
+        '404':
+          description: KV Pair not found
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+    put:
+      tags:
+        - Logical Cloud KV Pairs
+      summary: Update KV Pair
+      description: Update KV Pair
+      operationId: updateKVPair
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: KV Pair successfully updated
+        '400':
+          description: Invalid data or missing name
+          content: {}
+        '404':
+          description: KV Pair not found
+          content: {}
+        '422':
+          description: Invalid input
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppData'
+        required: true
+    delete:
+      tags:
+        - Logical Cloud KV Pairs
+      summary: Delete KV Pair
+      description: Delete KV Pair
+      operationId: deleteKVPair
+      responses:
+        '204':
+          description: Deleted
+          content: {}
+        '500':
+          description: Internal error
+          content: {}
 
 #########################SCHEMAS####################################################
 # An object to hold reusable parts that can be used across the definition
@@ -3371,6 +4009,46 @@ components:
       name: controller-name
       in: path
       description: Controller name
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    logicalCloudName:
+      name: logical-cloud-name
+      in: path
+      description: Logical Cloud name
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    clusterReference:
+      name: cluster-reference
+      in: path
+      description: Cluster Reference name
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    userPermission:
+      name: user-permission
+      in: path
+      description: User Permission name
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    clusterQuota:
+      name: cluster-quota
+      in: path
+      description: Cluster Quota name
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+    kvPair:
+      name: kv-pair
+      in: path
+      description: KV Pair name
       required: true
       schema:
         type: string

@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
@@ -38,6 +39,9 @@ import (
 type CompositeAppContext struct {
 	cid interface{}
 }
+
+var chans = []chan bool{}
+var mutex = &sync.Mutex{}
 
 func getRes(ac appcontext.AppContext, name string, app string, cluster string) ([]byte, interface{}, error) {
 	var byteRes []byte
@@ -144,22 +148,72 @@ func instantiateResource(ac appcontext.AppContext, c *kubeclient.Client, name st
 	return nil
 }
 
+func updateResourceStatus(ac appcontext.AppContext, resState resourcestatus.ResourceStatus, app string, cluster string, aov map[string][]string) error {
+
+	for _, res := range aov["resorder"] {
+
+		rh, err := ac.GetResourceHandle(app, cluster, res)
+		if err != nil {
+			return err
+		}
+		sh, err := ac.GetLevelHandle(rh, "status")
+		if err != nil {
+			return err
+		}
+		err = ac.UpdateStatusValue(sh, resState)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+
+}
+
 // Wait for 2 secs
 const waitTime = 2
 
-func waitForClusterReady(c *kubeclient.Client, cluster string) error {
-	for {
-		if err := c.IsReachable(); err != nil {
-			// TODO: Add more realistic error checking
-			// TODO: Add Incremental wait logic here
-			time.Sleep(waitTime * time.Second)
-		} else {
-			break
+func waitForClusterReady(ac appcontext.AppContext, c *kubeclient.Client, appname string, cluster string, aov map[string][]string) error {
+
+	resStateUpdated := false
+	ch := addChan()
+	Loop:
+		for {
+			if err := c.IsReachable(); err != nil {
+				if !resStateUpdated {
+					statusRetrying := resourcestatus.ResourceStatus{
+						Status: resourcestatus.RsyncStatusEnum.Retrying,
+					}
+					err := updateResourceStatus(ac, statusRetrying, appname, cluster, aov)
+					if err != nil {
+						return err
+					}
+					resStateUpdated = true
+				}
+				// TODO: Add more realistic error checking
+				// TODO: Add Incremental wait logic here
+				select {
+				case <-ch:
+					statusFailed := resourcestatus.ResourceStatus{
+						Status: resourcestatus.RsyncStatusEnum.Failed,
+					}
+					err := updateResourceStatus(ac, statusFailed, appname, cluster, aov)
+					if err != nil {
+						return err
+					}
+					break Loop
+				case <-time.After(waitTime * time.Second):
+					break
+				}
+			} else {
+				logutils.Info("Cluster is reachable::", logutils.Fields{
+				"cluster": cluster,
+				})
+				break
+			}
 		}
-	}
-	logutils.Info("Cluster is reachable::", logutils.Fields{
-		"cluster": cluster,
-	})
+
+	deleteChan(ch)
 	return nil
 }
 
@@ -337,9 +391,157 @@ func updateEndingAppContextStatus(ac appcontext.AppContext, handle interface{}, 
 	return nil
 }
 
+func getAppContextStatus(ac appcontext.AppContext) (*appcontext.AppContextStatus, error) {
+
+	h, err := ac.GetCompositeAppHandle()
+	if err != nil {
+		return nil, err
+	}
+	sh, err := ac.GetLevelHandle(h, "status")
+	if err != nil {
+		return nil, err
+	}
+	s, err := ac.GetValue(sh)
+	if err != nil {
+		return nil, err
+	}
+	acStatus := appcontext.AppContextStatus{}
+	js, _ := json.Marshal(s)
+	json.Unmarshal(js, &acStatus)
+
+	return &acStatus, nil
+
+}
+
 type fn func(ac appcontext.AppContext, client *kubeclient.Client, res string, app string, cluster string, label string) error
 
 type statusfn func(client *kubeclient.Client, app string, cluster string, label string) error
+
+func addChan() chan bool {
+
+	mutex.Lock()
+	c := make(chan bool)
+	chans = append(chans, c)
+	mutex.Unlock()
+
+	return c
+}
+
+func deleteChan(c chan bool) error {
+
+	var i int
+	mutex.Lock()
+	for i =0; i< len(chans); i++ {
+		if chans[i] == c {
+			break
+		}
+	}
+
+	if i == len(chans) {
+		mutex.Unlock()
+		return pkgerrors.Errorf("Given channel was not found:")
+	}
+	chans[i] = chans[len(chans)-1]
+	chans = chans[:len(chans)-1]
+	mutex.Unlock()
+
+	return nil
+}
+
+
+func kickoffRetryWatcher(ac appcontext.AppContext, g *errgroup.Group) {
+
+	g.Go(func() error {
+
+		var count int
+
+		count = 0
+		for {
+			time.Sleep(1 * time.Second)
+			count++
+			if ( count == 60*60) {
+				logutils.Info("Retry watcher running..",logutils.Fields{})
+				count = 0
+			}
+
+			acStatus, err := getAppContextStatus(ac)
+			if err != nil {
+				logutils.Error("Failed to get the app context status", logutils.Fields{
+				"error":    err,
+				})
+				return err
+			}
+			if acStatus.Status == appcontext.AppContextStatusEnum.Terminating {
+				flag, err := getAppContextFlag(ac)
+				if err != nil {
+					logutils.Error("Failed to get the stop flag", logutils.Fields{
+					"error":    err,
+					})
+					return err
+				} else {
+					if flag == true {
+						mutex.Lock()
+						for i :=0; i< len(chans); i++ {
+							chans[i] <- true
+						}
+						mutex.Unlock()
+						break
+					}
+				}
+			}
+			//if acStatus.Status == appcontext.AppContextStatusEnum.Instantiated ||
+			 //  acStatus.Status == appcontext.AppContextStatusEnum.InstamtiationFailed  {
+			if acStatus.Status == appcontext.AppContextStatusEnum.Instantiated {
+				break
+
+			}
+
+		}
+		return nil
+	})
+
+
+}
+
+func getAppContextFlag(ac appcontext.AppContext) (bool, error) {
+	h, err := ac.GetCompositeAppHandle()
+	if err != nil {
+		return false, err
+	}
+	sh, err := ac.GetLevelHandle(h, "stopflag")
+	if sh == nil {
+		return false, err
+	} else {
+		v, err := ac.GetValue(sh)
+		if err != nil {
+			return false, err
+		} else {
+			return v.(bool), nil
+		}
+	}
+}
+
+func updateAppContextFlag(cid interface{}, sf bool) error {
+	ac := appcontext.AppContext{}
+	_, err := ac.LoadAppContext(cid)
+	if err != nil {
+		return err
+	}
+	hc, err := ac.GetCompositeAppHandle()
+	if err != nil {
+		return err
+	}
+	sh, err := ac.GetLevelHandle(hc, "stopflag")
+	if sh == nil {
+		_, err = ac.AddLevelValue(hc, "stopflag", sf)
+	} else {
+		err = ac.UpdateValue(sh, sf)
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, sfn statusfn, breakonError bool) error {
 	con := connector.Init(cid)
@@ -375,6 +577,7 @@ func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, 
 	})
 	id, _ := ac.GetCompositeAppHandle()
 	g, _ := errgroup.WithContext(context.Background())
+	kickoffRetryWatcher(ac, g)
 	// Iterate over all the subapps
 	for _, app := range appList["apporder"] {
 		appName := app
@@ -415,7 +618,7 @@ func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, 
 					// Keep retrying for reachability
 					for {
 						// Wait for cluster to be reachable
-						err = waitForClusterReady(c, cluster)
+						err = waitForClusterReady(ac, c, appName, cluster, aov)
 						if err != nil {
 							// TODO: Add error handling
 							return err
@@ -484,6 +687,11 @@ func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, 
 
 // InstantiateComApp Instantiate Apps in Composite App
 func (instca *CompositeAppContext) InstantiateComApp(cid interface{}) error {
+	err := updateAppContextFlag(cid, false)
+	if err != nil {
+		logutils.Error("Encountered error updating AppContext flag", logutils.Fields{"error": err})
+		return err
+	}
 	go applyFnComApp(cid, appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Instantiating},
 		instantiateResource, addStatusTracker, true)
 	return nil
@@ -491,6 +699,11 @@ func (instca *CompositeAppContext) InstantiateComApp(cid interface{}) error {
 
 // TerminateComApp Terminates Apps in Composite App
 func (instca *CompositeAppContext) TerminateComApp(cid interface{}) error {
+	err := updateAppContextFlag(cid, true)
+	if err != nil {
+		logutils.Error("Encountered error updating AppContext flag", logutils.Fields{"error": err})
+		return err
+	}
 	go applyFnComApp(cid, appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Terminating},
 		terminateResource, deleteStatusTracker, false)
 	return nil

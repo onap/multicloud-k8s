@@ -18,6 +18,7 @@ package context
 
 import (
 	"context"
+	"time"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -185,6 +186,34 @@ type fn func(ac appcontext.AppContext, client *kubeclient.Client, res string, ap
 
 type statusfn func(client *kubeclient.Client, app string, cluster string, label string) error
 
+func kickoffRetryWatcher(g *errgroup.Group) {
+
+	g.Go(func() error {
+
+		var stop string
+		var count int
+
+		count = 0
+                for {
+                        time.Sleep(1 * time.Second)
+			count++
+			if ( count == 60*60) {
+				log.Printf("Retry Watcher running..\n")
+				count = 0
+			}
+			//Read the signal value from the terminate path
+                        if ( stop == "stop retrying" ) {
+                                break
+                        }
+
+                }
+
+                return nil
+	})
+
+
+}
+
 func applyFnComApp(cid interface{}, con *connector.Connector, f fn, sfn statusfn, breakonError bool) error {
 	ac := appcontext.AppContext{}
 	g, _ := errgroup.WithContext(context.Background())
@@ -204,6 +233,7 @@ func applyFnComApp(cid interface{}, con *connector.Connector, f fn, sfn statusfn
 	})
 	id, _ := ac.GetCompositeAppHandle()
 
+	kickoffRetryWatcher(g)
 	for _, app := range appList["apporder"] {
 
 		appName := app

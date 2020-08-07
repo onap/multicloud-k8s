@@ -256,6 +256,18 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 		return pkgerrors.Errorf("DeploymentIntentGroup must be terminated before it can be deleted " + di)
 	}
 
+	// remove the app context
+	if s.State == state.StateEnum.Terminated {
+		context, err := state.GetAppContextFromStateInfo(s)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error getting appcontext from Deployment Intent Group StateInfo")
+		}
+		err = context.DeleteCompositeApp()
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error deleting appcontext for Deployment Intent Group")
+		}
+	}
+
 	err = db.DBconn.Remove(c.storeName, k)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error deleting DeploymentIntentGroup entry")

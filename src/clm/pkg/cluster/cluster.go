@@ -407,6 +407,18 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		return pkgerrors.Errorf("Cluster network intents must be terminated before it can be deleted: " + name)
 	}
 
+	// remove the app context
+	if s.State == state.StateEnum.Terminated {
+		context, err := state.GetAppContextFromStateInfo(s)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error getting appcontext from cluster StateInfo")
+		}
+		err = context.DeleteCompositeApp()
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error deleting appcontext for cluster")
+		}
+	}
+
 	err = db.DBconn.Remove(v.db.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Cluster Entry;")

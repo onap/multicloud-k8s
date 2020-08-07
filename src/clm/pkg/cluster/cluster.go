@@ -19,6 +19,7 @@ package cluster
 import (
 	"time"
 
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
@@ -423,6 +424,14 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 
 	// remove the app contexts associated with this cluster
 	if stateVal == state.StateEnum.Terminated {
+		// Verify that the appcontext has completed terminating
+		ctxid := state.GetLastContextIdFromStateInfo(s)
+		acStatus, err := state.GetAppContextStatus(ctxid)
+		if err == nil &&
+			!(acStatus.Status == appcontext.AppContextStatusEnum.Terminated || acStatus.Status == appcontext.AppContextStatusEnum.TerminateFailed) {
+			return pkgerrors.Errorf("Network intents for cluster have not completed terminating " + name)
+		}
+
 		for _, id := range state.GetContextIdsFromStateInfo(s) {
 			context, err := state.GetAppContextFromId(id)
 			if err != nil {

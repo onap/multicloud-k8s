@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
@@ -38,6 +39,9 @@ import (
 type CompositeAppContext struct {
 	cid interface{}
 }
+
+var chans = []chan bool{}
+var mutex = &sync.Mutex{}
 
 func getRes(ac appcontext.AppContext, name string, app string, cluster string) ([]byte, interface{}, error) {
 	var byteRes []byte
@@ -341,6 +345,71 @@ type fn func(ac appcontext.AppContext, client *kubeclient.Client, res string, ap
 
 type statusfn func(client *kubeclient.Client, app string, cluster string, label string) error
 
+func addChan() chan bool {
+
+	mutex.Lock()
+	c := make(chan bool)
+	chans = append(chans, c)
+	mutex.Unlock()
+
+	return c
+}
+
+func deleteChan(c chan bool) error {
+
+	var i int
+	mutex.Lock()
+	for i =0; i< len(chans); i++ {
+		if chans[i] == c {
+			break
+		}
+	}
+
+	if i == len(chans) {
+		mutex.Unlock()
+		return pkgerrors.Errorf("Given channel was not found:")
+	}
+	chans[i] = chans[len(chans)-1]
+	chans = chans[:len(chans)-1]
+	mutex.Unlock()
+
+	return nil
+}
+
+
+func kickoffRetryWatcher(g *errgroup.Group) {
+
+	g.Go(func() error {
+
+		var stop string
+		var count int
+
+		count = 0
+		for {
+			time.Sleep(1 * time.Second)
+			count++
+			if ( count == 60*60) {
+				logutils.Info("Retry watcher running..",logutils.Fields{})
+				count = 0
+			}
+			//Read the signal value from the terminate path
+			if ( stop == "stop retrying" ) {
+
+				mutex.Lock()
+				for i :=0; i< len(chans); i++ {
+					chans[i] <- true
+				}
+				mutex.Unlock()
+				break
+			}
+
+		}
+		return nil
+	})
+
+
+}
+
 func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, sfn statusfn, breakonError bool) error {
 	con := connector.Init(cid)
 	//Cleanup
@@ -375,6 +444,7 @@ func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, 
 	})
 	id, _ := ac.GetCompositeAppHandle()
 	g, _ := errgroup.WithContext(context.Background())
+	kickoffRetryWatcher(g)
 	// Iterate over all the subapps
 	for _, app := range appList["apporder"] {
 		appName := app

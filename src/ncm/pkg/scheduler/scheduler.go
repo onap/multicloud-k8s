@@ -208,27 +208,13 @@ func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster strin
 		return err
 	}
 
-	// remove the app context
-	context, err := state.GetAppContextFromStateInfo(s)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error getting appcontext from cluster StateInfo : "+clusterProvider+" "+cluster)
-	}
-	err = context.DeleteCompositeApp()
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error deleting appcontext of cluster : "+clusterProvider+" "+cluster)
-	}
-
 	// update StateInfo
 	key := clusterPkg.ClusterKey{
 		ClusterProviderName: clusterProvider,
 		ClusterName:         cluster,
 	}
-	stateInfo := state.StateInfo{
-		State:     state.StateEnum.Terminated,
-		ContextId: "",
-	}
-
-	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagState, stateInfo)
+	s.State = state.StateEnum.Terminated
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagState, s)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error updating the stateInfo of cluster: "+cluster)
 	}

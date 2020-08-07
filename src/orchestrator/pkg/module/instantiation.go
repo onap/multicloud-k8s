@@ -430,7 +430,7 @@ func (c InstantiationClient) Status(p string, ca string, v string, di string) (S
 		}
 
 		for _, cluster := range clusters {
-			handle, err := ac.GetStatusHandle(app.Metadata.Name, cluster)
+			handle, err := ac.GetClusterStatusHandle(app.Metadata.Name, cluster)
 			if err != nil {
 				log.Info(":: No status handle for cluster, app ::",
 					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})
@@ -474,19 +474,9 @@ func (c InstantiationClient) Terminate(p string, ca string, v string, di string)
 		return pkgerrors.Errorf("DeploymentIntentGroup is not instantiated" + di)
 	}
 
-	ac, err := state.GetAppContextFromStateInfo(s)
-	if err != nil {
-		return pkgerrors.Wrap(err, "AppContext for deploymentIntentGroup not found: "+di)
-	}
-
 	err = callRsyncUninstall(s.ContextId)
 	if err != nil {
 		return err
-	}
-
-	err = ac.DeleteCompositeApp()
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error deleting the app context for DeploymentIntentGroup: "+di)
 	}
 
 	key := DeploymentIntentGroupKey{
@@ -495,12 +485,9 @@ func (c InstantiationClient) Terminate(p string, ca string, v string, di string)
 		CompositeApp: ca,
 		Version:      v,
 	}
-	stateInfo := state.StateInfo{
-		State:     state.StateEnum.Terminated,
-		ContextId: "",
-	}
+	s.State = state.StateEnum.Terminated
 
-	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, stateInfo)
+	err = db.DBconn.Insert(c.db.storeName, key, nil, c.db.tagState, s)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error updating the stateInfo of the DeploymentIntentGroup: "+di)
 	}

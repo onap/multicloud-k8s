@@ -81,15 +81,17 @@ func HandleStatusUpdate(clusterId string, id string, v *v1alpha1.ResourceBundleS
 		return
 	}
 
+	chandle, err := ac.GetClusterHandle(result[1], clusterId)
+	if err != nil {
+		logrus.Info(clusterId, "::Error getting cluster handle::", err)
+		return
+	}
 	// Get the handle for the context/app/cluster status object
-	handle, _ := ac.GetStatusHandle(result[1], clusterId)
+	handle, _ := ac.GetLevelHandle(chandle, "status")
 
 	// If status handle was not found, then create the status object in the appcontext
 	if handle == nil {
-		chandle, err := ac.GetClusterHandle(result[1], clusterId)
-		if err == nil {
-			ac.AddStatus(chandle, string(vjson))
-		}
+		ac.AddLevelValue(chandle, "status", string(vjson))
 	} else {
 		ac.UpdateStatusValue(handle, string(vjson))
 	}

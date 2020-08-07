@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ffc4c18_1e0c95ca",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-07T16:47:53Z",
+      "side": 1,
+      "message": "Default keys seem to be 2048bit so I changed this. Otherwise you can really notice the base64-encoded keylength in the kubeconfig file.",
+      "range": {
+        "startLine": 189,
+        "startChar": 16,
+        "endLine": 190,
+        "endChar": 1
+      },
+      "revId": "a65001656c23032c980f63ec3cd425f7d6f2b933",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

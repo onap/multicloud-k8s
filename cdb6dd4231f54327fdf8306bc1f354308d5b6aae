@@ -22,6 +22,53 @@
       "revId": "cdb6dd4231f54327fdf8306bc1f354308d5b6aae",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95289938_7acff6da",
+        "filename": "src/k8splugin/internal/app/config_backend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2020-08-10T09:03:12Z",
+      "side": 1,
+      "message": "I am wondering whether we should expose two endpoint on K8s API level. POST to explicit use it to create new resource with Configuration API, and PUT to explicit Update resource when already exist. Then we do not have to wonder whether update will create also and moreover we will keep the mechanism more transparent. Also the call\u0027er of the API will need to decide if want to create or update what all is good. With this proposed implementation we may want to update resource, and we can accidentally create a new one instead...\n\nThe other options is also to do here internally GET - to check if the resource already exists and to call k8sClient.createResources or k8sClient.updateResources respectively.",
+      "parentUuid": "2ce0461c_ce539ea3",
+      "range": {
+        "startLine": 364,
+        "startChar": 32,
+        "endLine": 364,
+        "endChar": 126
+      },
+      "revId": "cdb6dd4231f54327fdf8306bc1f354308d5b6aae",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "894fb2d7_087f023e",
+        "filename": "src/k8splugin/internal/plugin/helpers.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2020-08-10T09:03:12Z",
+      "side": 1,
+      "message": "shouldn\u0027t we have here resource helm.KubernetesResource instead?",
+      "range": {
+        "startLine": 73,
+        "startChar": 15,
+        "endLine": 73,
+        "endChar": 34
+      },
+      "revId": "cdb6dd4231f54327fdf8306bc1f354308d5b6aae",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

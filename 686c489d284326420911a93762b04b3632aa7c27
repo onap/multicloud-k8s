@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5dd18fc4_3649451d",
+        "filename": "kud/tests/topology-manager.sh",
+        "patchSetId": 14
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2020-08-10T02:33:52Z",
+      "side": 1,
+      "message": "Please change to ONAP license",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 37
+      },
+      "revId": "686c489d284326420911a93762b04b3632aa7c27",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f2392a89_1fd23098",
+        "filename": "kud/tests/topology-manager.sh",
+        "patchSetId": 14
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2020-08-10T02:33:52Z",
+      "side": 1,
+      "message": "2020",
+      "range": {
+        "startLine": 4,
+        "startChar": 1,
+        "endLine": 4,
+        "endChar": 20
+      },
+      "revId": "686c489d284326420911a93762b04b3632aa7c27",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "37960d14_a7d8f672",
+        "filename": "kud/tests/topology-manager.sh",
+        "patchSetId": 14
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2020-08-10T02:33:52Z",
+      "side": 1,
+      "message": "It is not necessary, you can just delete it.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 2
+      },
+      "revId": "686c489d284326420911a93762b04b3632aa7c27",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

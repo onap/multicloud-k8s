@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4241638a_17a1ce84",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-08-10T20:32:17Z",
+      "side": 1,
+      "message": "This call will iterate through all the apps, clusters and resources, hence very experience operation. See if you can initialize when the context is created or can be set to a default state and transition to new state as the resources are processed.",
+      "range": {
+        "startLine": 359,
+        "startChar": 7,
+        "endLine": 359,
+        "endChar": 31
+      },
+      "revId": "91618128fa1b79b6286dc1e310b43925816e7d68",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

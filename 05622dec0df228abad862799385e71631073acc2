@@ -16,6 +16,24 @@
       "revId": "05622dec0df228abad862799385e71631073acc2",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "deb5de16_8fd810b8",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:33:18Z",
+      "side": 0,
+      "message": "resolved",
+      "parentUuid": "3126ffa4_868f91fd",
+      "revId": "05622dec0df228abad862799385e71631073acc2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -1,0 +1,648 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "088ee052_82e48043",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2584,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "It is returning 201.",
+      "range": {
+        "startLine": 2584,
+        "startChar": 8,
+        "endLine": 2584,
+        "endChar": 27
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dceec92b_5bcbb3a4",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2613,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "200 as it should",
+      "range": {
+        "startLine": 2613,
+        "startChar": 0,
+        "endLine": 2613,
+        "endChar": 72
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ea4807f9_4d438d13",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2640,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2640,
+        "startChar": 0,
+        "endLine": 2640,
+        "endChar": 71
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "066ff167_ce018e3d",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2662,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2662,
+        "startChar": 0,
+        "endLine": 2662,
+        "endChar": 71
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "904ff783_0baed065",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2670,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "Both are internal errors though. The best likely is to revert original data if response failed to encode for some reason.",
+      "range": {
+        "startLine": 2670,
+        "startChar": 0,
+        "endLine": 2670,
+        "endChar": 126
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "365963d6_a51e0eff",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2690,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "I meant 404 is missing. Implemented.",
+      "range": {
+        "startLine": 2690,
+        "startChar": 0,
+        "endLine": 2690,
+        "endChar": 126
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8a352e9e_50edfd0b",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2702,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "works fine",
+      "range": {
+        "startLine": 2702,
+        "startChar": 0,
+        "endLine": 2702,
+        "endChar": 49
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1da75eef_160c6b49",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2708,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2708,
+        "startChar": 0,
+        "endLine": 2708,
+        "endChar": 87
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b60579f6_74ad0340",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2711,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2711,
+        "startChar": 0,
+        "endLine": 2711,
+        "endChar": 66
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6744df18_c738822e",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2714,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2714,
+        "startChar": 0,
+        "endLine": 2714,
+        "endChar": 75
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d1980e05_d18fd762",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2738,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "should be 200",
+      "range": {
+        "startLine": 2738,
+        "startChar": 0,
+        "endLine": 2738,
+        "endChar": 49
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fde8de3c_4ef330e0",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2744,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2744,
+        "startChar": 0,
+        "endLine": 2744,
+        "endChar": 66
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d2d090c5_e9e253fd",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2747,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2747,
+        "startChar": 0,
+        "endLine": 2747,
+        "endChar": 71
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d8040887_4d9afe9a",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2830,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2830,
+        "startChar": 0,
+        "endLine": 2830,
+        "endChar": 77
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3153fdb7_aafd2830",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2841,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "changed to 200",
+      "range": {
+        "startLine": 2841,
+        "startChar": 0,
+        "endLine": 2841,
+        "endChar": 57
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e180bf1_c9767885",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2852,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2852,
+        "startChar": 0,
+        "endLine": 2852,
+        "endChar": 77
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9b2b0829_76be4251",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2897,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented, but removed the 2nd part.\nonce we figure out the certificate approval part I\u0027ll add a new error to detect if logical cloud is still being applied",
+      "range": {
+        "startLine": 2897,
+        "startChar": 0,
+        "endLine": 2897,
+        "endChar": 77
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7679bcc_06aad1ab",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2898,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2898,
+        "startChar": 0,
+        "endLine": 2898,
+        "endChar": 52
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2eda085d_27da484f",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2901,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2901,
+        "startChar": 0,
+        "endLine": 2901,
+        "endChar": 52
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2cce7743_ba8e3701",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2958,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2958,
+        "startChar": 0,
+        "endLine": 2958,
+        "endChar": 75
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8cf0fcb7_ff1ed183",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2969,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "changed to 200",
+      "range": {
+        "startLine": 2969,
+        "startChar": 0,
+        "endLine": 2969,
+        "endChar": 57
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6db2a551_c71cdcf4",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2980,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 2980,
+        "startChar": 0,
+        "endLine": 2980,
+        "endChar": 75
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d1336ebc_e958840b",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3059,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 3059,
+        "startChar": 0,
+        "endLine": 3059,
+        "endChar": 73
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c212ffd0_6daa711b",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3070,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "changed to 200",
+      "range": {
+        "startLine": 3070,
+        "startChar": 0,
+        "endLine": 3070,
+        "endChar": 57
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d64f2c32_49bafbdd",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3081,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 3081,
+        "startChar": 0,
+        "endLine": 3081,
+        "endChar": 73
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "123e5afe_cbf46d87",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3160,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 3160,
+        "startChar": 0,
+        "endLine": 3160,
+        "endChar": 67
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa6b89d_dc429003",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3171,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "changed to 200",
+      "range": {
+        "startLine": 3171,
+        "startChar": 51,
+        "endLine": 3171,
+        "endChar": 52
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8eff0eb_8e7a17d1",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3182,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-11T23:04:24Z",
+      "side": 1,
+      "message": "implemented",
+      "range": {
+        "startLine": 3182,
+        "startChar": 0,
+        "endLine": 3182,
+        "endChar": 67
+      },
+      "revId": "b20d484404bf299dd04e6e3c7a5beaaedd5ac279",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "87e02a78_ebcae0f5",
+        "filename": "src/orchestrator/pkg/module/deployment_intent_groups.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-08-11T14:54:37Z",
+      "side": 1,
+      "message": "What happens when it is in instantiating state. Before appcontext is instantiated for some reason the deployment needs to be delete.",
+      "range": {
+        "startLine": 260,
+        "startChar": 31,
+        "endLine": 260,
+        "endChar": 42
+      },
+      "revId": "4043424b15bcd28c4b5eb13d53216347cc30df77",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "21a2df03_a70dbdf6",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-08-11T14:54:37Z",
+      "side": 1,
+      "message": "Should this function also be called before line 474 to capture status in failure case also?",
+      "range": {
+        "startLine": 476,
+        "startChar": 7,
+        "endLine": 476,
+        "endChar": 35
+      },
+      "revId": "4043424b15bcd28c4b5eb13d53216347cc30df77",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

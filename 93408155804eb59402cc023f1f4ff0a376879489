@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e3f46e9_d06f70f5",
+        "filename": "src/orchestrator/api/json-schemas/cluster-kv.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-12T17:43:51Z",
+      "side": 1,
+      "message": "Is the tool generating these whitespaces?",
+      "revId": "93408155804eb59402cc023f1f4ff0a376879489",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -22,11 +22,11 @@ import (
 	"fmt"
 	"time"
 
-	rb "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/status"
 	"github.com/onap/multicloud-k8s/src/orchestrator/utils/helm"
 	pkgerrors "github.com/pkg/errors"
 )
@@ -45,14 +45,12 @@ type InstantiationClient struct {
 	db InstantiationClientDbInfo
 }
 
-type ClusterAppStatus struct {
-	Cluster string
-	App     string
-	Status  rb.ResourceBundleStatus
-}
-
-type StatusData struct {
-	Data []ClusterAppStatus
+type DeploymentStatus struct {
+	Project              string `json:"project,omitempty"`
+	CompositeAppName     string `json:"composite-app-name,omitempty"`
+	CompositeAppVersion  string `json:"composite-app-version,omitempty"`
+	CompositeProfileName string `json:"composite-profile-name,omitempty"`
+	status.StatusResult  `json:",inline"`
 }
 
 /*
@@ -75,7 +73,7 @@ type InstantiationKey struct {
 type InstantiationManager interface {
 	Approve(p string, ca string, v string, di string) error
 	Instantiate(p string, ca string, v string, di string) error
-	Status(p string, ca string, v string, di string) (StatusData, error)
+	Status(p, ca, v, di, qInstance, qType, qOutput string, qApps, qClusters, qResources []string) (DeploymentStatus, error)
 	Terminate(p string, ca string, v string, di string) error
 }
 
@@ -429,64 +427,39 @@ Status takes in projectName, compositeAppName, compositeAppVersion,
 DeploymentIntentName. This method is responsible obtaining the status of
 the deployment, which is made available in the appcontext.
 */
-func (c InstantiationClient) Status(p string, ca string, v string, di string) (StatusData, error) {
+func (c InstantiationClient) Status(p, ca, v, di, qInstance, qType, qOutput string, qApps, qClusters, qResources []string) (DeploymentStatus, error) {
 
-	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
+	dIGrp, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroup(di, p, ca, v)
 	if err != nil {
-		return StatusData{}, pkgerrors.Wrap(err, "deploymentIntentGroup not found: "+di)
+		return DeploymentStatus{}, pkgerrors.Wrap(err, "Not finding the deploymentIntentGroup")
 	}
 
-	currentCtxId := state.GetLastContextIdFromStateInfo(s)
-	ac, err := state.GetAppContextFromId(currentCtxId)
+	diState, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
 	if err != nil {
-		return StatusData{}, pkgerrors.Wrap(err, "AppContext for deploymentIntentGroup not found: "+di)
+		return DeploymentStatus{}, pkgerrors.Wrap(err, "deploymentIntentGroup state not found: "+di)
 	}
 
 	// Get all apps in this composite app
-	allApps, err := NewAppClient().GetApps(p, ca, v)
+	apps, err := NewAppClient().GetApps(p, ca, v)
 	if err != nil {
-		return StatusData{}, pkgerrors.Wrap(err, "Not finding the apps")
+		return DeploymentStatus{}, pkgerrors.Wrap(err, "Not finding the apps")
+	}
+	allApps := make([]string, 0)
+	for _, a := range apps {
+		allApps = append(allApps, a.Metadata.Name)
 	}
 
-	var diStatus StatusData
-	diStatus.Data = make([]ClusterAppStatus, 0)
-
-	// Loop through each app and get the status data for each cluster in the app
-	for _, app := range allApps {
-		// Get the clusters in the appcontext for this app
-		clusters, err := ac.GetClusterNames(app.Metadata.Name)
-		if err != nil {
-			log.Info(":: No clusters for app ::", log.Fields{"AppName": app.Metadata.Name})
-			continue
-		}
-
-		for _, cluster := range clusters {
-			handle, err := ac.GetClusterStatusHandle(app.Metadata.Name, cluster)
-			if err != nil {
-				log.Info(":: No status handle for cluster, app ::",
-					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})
-				continue
-			}
-			statusValue, err := ac.GetValue(handle)
-			if err != nil {
-				log.Info(":: No status value for cluster, app ::",
-					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})
-				continue
-			}
-			log.Info(":: STATUS VALUE ::", log.Fields{"statusValue": statusValue})
-			var statusData ClusterAppStatus
-			err = json.Unmarshal([]byte(statusValue.(string)), &statusData.Status)
-			if err != nil {
-				log.Info(":: Error unmarshaling status value for cluster, app ::",
-					log.Fields{"Cluster": cluster, "AppName": app.Metadata.Name, "Error": err})
-				continue
-			}
-			statusData.Cluster = cluster
-			statusData.App = app.Metadata.Name
-			log.Info(":: STATUS DATA ::", log.Fields{"status": statusData})
-
-			diStatus.Data = append(diStatus.Data, statusData)
-		}
+	statusResponse, err := status.PrepareStatusResult(diState, allApps, qInstance, qType, qOutput, qApps, qClusters, qResources)
+	if err != nil {
+		return DeploymentStatus{}, err
+	}
+	statusResponse.Name = di
+	diStatus := DeploymentStatus{
+		Project:              p,
+		CompositeAppName:     ca,
+		CompositeAppVersion:  v,
+		CompositeProfileName: dIGrp.Spec.Profile,
+		StatusResult:         statusResponse,
 	}
 
 	return diStatus, nil

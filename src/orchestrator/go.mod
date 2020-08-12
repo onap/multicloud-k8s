@@ -12,11 +12,7 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
-	github.com/huandu/xstrings v1.3.1 // indirect
-	github.com/jmoiron/sqlx v1.2.0 // indirect
 	github.com/lib/pq v1.6.0 // indirect
-	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
-	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200630152613-7c20f73e7c5d
 	github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee
 	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d
@@ -36,9 +32,10 @@ require (
 	gopkg.in/yaml.v2 v2.2.8
 	gopkg.in/yaml.v3 v3.0.0-20200506231410-2ff61e1afc86
 	k8s.io/apimachinery v0.18.2
+	k8s.io/client-go v12.0.0+incompatible
 	k8s.io/cloud-provider v0.0.0-20190409023720-1bc0c81fa51d // indirect
 	k8s.io/helm v2.14.3+incompatible
-	sigs.k8s.io/kustomize v2.0.3+incompatible // indirect
+	k8s.io/kubernetes v1.14.1
 )
 
 replace (

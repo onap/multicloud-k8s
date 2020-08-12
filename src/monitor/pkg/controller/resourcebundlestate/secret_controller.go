@@ -166,6 +166,7 @@ func (r *secretReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState, sec 
 
 	// Add it to CR
 	cr.Status.SecretStatuses = append(cr.Status.SecretStatuses, corev1.Secret{
+		TypeMeta:   sec.TypeMeta,
 		ObjectMeta: sec.ObjectMeta,
 	})
 

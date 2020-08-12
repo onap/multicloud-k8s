@@ -1312,6 +1312,44 @@ paths:
       - $ref: '#/components/parameters/compositeAppName'
       - $ref: '#/components/parameters/compositeAppVersion'
       - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - in: query
+        name: type
+        description: source of status information
+        schema:
+          type: string
+          enum: [rsync, cluster]
+          default: rsync
+      - in: query
+        name: output
+        description: output format
+        schema:
+          type: string
+          enum: [summary, all, detail]
+          default: all
+      - in: query
+        name: instance
+        description: instance identifier
+        schema:
+          type: string
+          maxLength: 32
+      - in: query
+        name: app
+        description: app name
+        schema:
+          type: string
+          maxLength: 64
+      - in: query
+        name: cluster
+        description: cluster-provider+cluster
+        schema:
+          type: string
+          maxLength: 128
+      - in: query
+        name: resource
+        description: resource name
+        schema:
+          type: string
+          maxLength: 64
     get:
       tags:
         - Deployment Lifecycle
@@ -2209,6 +2247,65 @@ paths:
           content: {}
       requestBody:
         content: {}
+
+
+  /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/status:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: '#/components/parameters/clusterName'
+      - in: query
+        name: type
+        description: source of status information
+        schema:
+          type: string
+          enum: [rsync, cluster]
+          default: rsync
+      - in: query
+        name: output
+        description: output format
+        schema:
+          type: string
+          enum: [summary, all, detail]
+          default: all
+      - in: query
+        name: instance
+        description: instance identifier
+        schema:
+          type: string
+          maxLength: 32
+      - in: query
+        name: app
+        description: app name
+        schema:
+          type: string
+          maxLength: 64
+      - in: query
+        name: cluster
+        description: cluster-provider+cluster
+        schema:
+          type: string
+          maxLength: 128
+      - in: query
+        name: resource
+        description: resource name
+        schema:
+          type: string
+          maxLength: 64
+    get:
+      tags:
+        - Networks
+      summary: Query status of cluster network intents
+      description: Query status of cluster network intents
+      operationId: statusNetworksForCluster
+      responses:
+        '200':
+          description: Success
+          content: {}
+        '404':
+          description: No Status found
+          content: {}
+
 
 ######################## Network Controller Intent API's##########################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent:

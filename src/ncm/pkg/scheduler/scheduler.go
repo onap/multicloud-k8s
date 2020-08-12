@@ -29,6 +29,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/status"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -36,6 +37,7 @@ import (
 // ClusterManager is an interface exposes the Cluster functionality
 type SchedulerManager interface {
 	ApplyNetworkIntents(clusterProvider, cluster string) error
+	NetworkIntentsStatus(clusterProvider, cluster, qInstance, qType, qOutput string, qApps, qClusters, qResources []string) (ClusterStatus, error)
 	TerminateNetworkIntents(clusterProvider, cluster string) error
 }
 
@@ -56,6 +58,11 @@ func NewSchedulerClient() *SchedulerClient {
 			TagState:   "stateInfo",
 		},
 	}
+}
+
+// ClusterStatus holds the status data prepared for cluster network intent status queries
+type ClusterStatus struct {
+	status.StatusResult `json:",inline"`
 }
 
 func deleteAppContext(ac appcontext.AppContext) {
@@ -238,4 +245,32 @@ func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster strin
 	}
 
 	return nil
+}
+
+/*
+NetworkIntentsStatus takes in cluster provider, cluster and query parameters.
+This method is responsible obtaining the status of
+the cluster network intents, which is made available in the appcontext
+*/
+func (c SchedulerClient) NetworkIntentsStatus(clusterProvider, cluster, qInstance, qType, qOutput string, qApps, qClusters, qResources []string) (ClusterStatus, error) {
+
+	s, err := clusterPkg.NewClusterClient().GetClusterState(clusterProvider, cluster)
+	if err != nil {
+		return ClusterStatus{}, pkgerrors.Wrap(err, "cluster state not found")
+	}
+
+	// Prepare the apps list (just one hardcoded value)
+	allApps := make([]string, 0)
+	allApps = append(allApps, nettypes.CONTEXT_CLUSTER_APP)
+
+	statusResponse, err := status.PrepareStatusResult(s, allApps, qInstance, qType, qOutput, qApps, qClusters, qResources)
+	if err != nil {
+		return ClusterStatus{}, err
+	}
+	statusResponse.Name = clusterProvider + "+" + cluster
+	clStatus := ClusterStatus{
+		StatusResult: statusResponse,
+	}
+
+	return clStatus, nil
 }

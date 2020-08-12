@@ -145,6 +145,7 @@ func (r *reconciler) updateServices(rbstate *v1alpha1.ResourceBundleState,
 
 	for _, svc := range serviceList.Items {
 		resStatus := corev1.Service{
+			TypeMeta:   svc.TypeMeta,
 			ObjectMeta: svc.ObjectMeta,
 			Status:     svc.Status,
 		}
@@ -165,12 +166,12 @@ func (r *reconciler) updatePods(rbstate *v1alpha1.ResourceBundleState,
 		return err
 	}
 
-	rbstate.Status.PodStatuses = []v1alpha1.PodStatus{}
+	rbstate.Status.PodStatuses = []corev1.Pod{}
 
 	for _, pod := range podList.Items {
-		resStatus := v1alpha1.PodStatus{
+		resStatus := corev1.Pod{
+			TypeMeta:   pod.TypeMeta,
 			ObjectMeta: pod.ObjectMeta,
-			Ready:      false,
 			Status:     pod.Status,
 		}
 		rbstate.Status.PodStatuses = append(rbstate.Status.PodStatuses, resStatus)
@@ -194,6 +195,7 @@ func (r *reconciler) updateConfigMaps(rbstate *v1alpha1.ResourceBundleState,
 
 	for _, cm := range configMapList.Items {
 		resStatus := corev1.ConfigMap{
+			TypeMeta:   cm.TypeMeta,
 			ObjectMeta: cm.ObjectMeta,
 		}
 		rbstate.Status.ConfigMapStatuses = append(rbstate.Status.ConfigMapStatuses, resStatus)
@@ -217,6 +219,7 @@ func (r *reconciler) updateDeployments(rbstate *v1alpha1.ResourceBundleState,
 
 	for _, dep := range deploymentList.Items {
 		resStatus := appsv1.Deployment{
+			TypeMeta:   dep.TypeMeta,
 			ObjectMeta: dep.ObjectMeta,
 			Status:     dep.Status,
 		}
@@ -241,6 +244,7 @@ func (r *reconciler) updateSecrets(rbstate *v1alpha1.ResourceBundleState,
 
 	for _, sec := range secretList.Items {
 		resStatus := corev1.Secret{
+			TypeMeta:   sec.TypeMeta,
 			ObjectMeta: sec.ObjectMeta,
 		}
 		rbstate.Status.SecretStatuses = append(rbstate.Status.SecretStatuses, resStatus)
@@ -264,6 +268,7 @@ func (r *reconciler) updateDaemonSets(rbstate *v1alpha1.ResourceBundleState,
 
 	for _, ds := range daemonSetList.Items {
 		resStatus := appsv1.DaemonSet{
+			TypeMeta:   ds.TypeMeta,
 			ObjectMeta: ds.ObjectMeta,
 			Status:     ds.Status,
 		}
@@ -288,6 +293,7 @@ func (r *reconciler) updateIngresses(rbstate *v1alpha1.ResourceBundleState,
 
 	for _, ing := range ingressList.Items {
 		resStatus := v1beta1.Ingress{
+			TypeMeta:   ing.TypeMeta,
 			ObjectMeta: ing.ObjectMeta,
 			Status:     ing.Status,
 		}
@@ -312,6 +318,7 @@ func (r *reconciler) updateJobs(rbstate *v1alpha1.ResourceBundleState,
 
 	for _, job := range jobList.Items {
 		resStatus := v1.Job{
+			TypeMeta:   job.TypeMeta,
 			ObjectMeta: job.ObjectMeta,
 			Status:     job.Status,
 		}
@@ -336,6 +343,7 @@ func (r *reconciler) updateStatefulSets(rbstate *v1alpha1.ResourceBundleState,
 
 	for _, sfs := range statefulSetList.Items {
 		resStatus := appsv1.StatefulSet{
+			TypeMeta:   sfs.TypeMeta,
 			ObjectMeta: sfs.ObjectMeta,
 			Status:     sfs.Status,
 		}

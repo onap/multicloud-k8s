@@ -168,6 +168,7 @@ func (r *deploymentReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState, 
 
 	// Add it to CR
 	cr.Status.DeploymentStatuses = append(cr.Status.DeploymentStatuses, appsv1.Deployment{
+		TypeMeta:   dep.TypeMeta,
 		ObjectMeta: dep.ObjectMeta,
 		Status:     dep.Status,
 	})

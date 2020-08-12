@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e6d1d820_90ea5c30",
+        "filename": "docs/openapi/components/parameters.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-12T01:46:54Z",
+      "side": 1,
+      "message": "ws",
+      "range": {
+        "startLine": 13,
+        "startChar": 9,
+        "endLine": 13,
+        "endChar": 10
+      },
+      "revId": "c4a7bbe46b24ef9f16a03c80417e53fb15de0988",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42873037_e8a76782",
+        "filename": "docs/openapi/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-12T01:46:54Z",
+      "side": 1,
+      "message": "Replacing the definition of all methods of /projects with the specified file (projects.yaml).\n\nI will do the rest like this if this is an acceptable solution.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 31
+      },
+      "revId": "c4a7bbe46b24ef9f16a03c80417e53fb15de0988",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c0a3ac0_357d7c76",
+        "filename": "docs/openapi/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-12T01:46:54Z",
+      "side": 1,
+      "message": "Replacing the definition of all methods of /projects/{project-name} with the specified file (project.yaml).\n\nI will do the rest like this if this is an acceptable solution.",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 32
+      },
+      "revId": "c4a7bbe46b24ef9f16a03c80417e53fb15de0988",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7daab91b_a4491cbb",
+        "filename": "docs/openapi/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-12T01:46:54Z",
+      "side": 1,
+      "message": "components/parameters no longer defined in this file either, but in parameters.yaml.",
+      "revId": "c4a7bbe46b24ef9f16a03c80417e53fb15de0988",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "85ec3b8f_a4778d2c",
+        "filename": "docs/openapi/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-12T01:46:54Z",
+      "side": 1,
+      "message": "components/schemas no longer defined in this file either, but in schemas.yaml.",
+      "revId": "c4a7bbe46b24ef9f16a03c80417e53fb15de0988",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+post:
+  tags:
+    - Projects
+  summary: Project
+  description: Add a new `project`
+  operationId: addProject
+  responses:
+    '201':
+      description: Success
+      content:
+        application/json: # operation response mime type
+          schema:
+            $ref: '../components/schemas.yaml#/Metadata'
+    '405':
+      description: Invalid Input
+      content: {}
+  requestBody:
+    content:
+      application/json:
+        schema:
+            $ref: '../components/schemas.yaml#/Metadata'
+    description: Project data
+    required: true
+
+get: # documentation for GET operation for this path
+  tags:
+    - Projects
+  summary: Get all projects
+
+  description: |
+    Get all `projects`
+
+  operationId: getAllProjects
+  responses: # list of responses
+    '200':
+      description: Success
+      content:
+        application/json: # operation response mime type
+          schema:
+            $ref: '../components/schemas.yaml#/MetadataArray'
+    '404':
+      description: No Project found
+      content: {}

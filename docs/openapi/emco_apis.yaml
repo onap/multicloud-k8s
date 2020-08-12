@@ -28,124 +28,15 @@ tags:
 paths:
   ############################ Project API'S #################################################
   /projects:
-    post:
-      tags:
-        - Projects
-      summary: Project
-      description: Add a new `project`
-      operationId: addProject
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-        '405':
-          description: Invalid Input
-          content: {}
-      requestBody:
-        content:
-          application/json:
-            schema:
-                $ref: '#/components/schemas/Metadata'
-        description: Project data
-        required: true
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Projects
-      summary: Get all projects
-
-      description: |
-        Get all `projects`
-
-      operationId: getAllProjects
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/MetadataArray'
-        '404':
-          description: No Project found
-          content: {}
+    $ref: 'paths/projects.yaml'
 
   /projects/{project-name}:
-    # parameters list that are used with each operation for this path
-    parameters:
-    - $ref: '#/components/parameters/projectName'
-    get: # documentation for GET operation for this path
-      tags:
-        - Projects
-      summary: Get project by project name
-
-      description: |
-        Get `project`
-
-      operationId: getProjectByName
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-        '404':
-          description: Project not found
-          content: {}
-    put:
-      tags:
-        - Projects
-      summary: Update project
-      description: Update `project`
-      operationId: updateProject
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Project not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Metadata'
-        description: Update project object
-        required: true
-    delete: # documentation for DELETE operation for this path
-      tags:
-        - Projects
-      summary: Delete project by project name
-
-      description: |
-        Delete `project`
-
-      operationId: deleteProjectByName
-      responses: # list of responses
-        '204':
-          description: Deleted
-          content: {}
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Project not found
-          content: {}
+      $ref: 'paths/project.yaml'
 
   ############################ Application API'S #################################################
   /projects/{project-name}/composite-apps:
     parameters:
-      - $ref: '#/components/parameters/projectName'
+      - $ref: 'components/parameters.yaml#/projectName'
     post:
       tags:
         - Composite Application
@@ -158,7 +49,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CompositeAppVersion'
+                $ref: 'components/schemas.yaml#/CompositeAppVersion'
         '405':
           description: Invalid Input
           content: {}
@@ -166,7 +57,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CompositeAppVersion'
+              $ref: 'components/schemas.yaml#/CompositeAppVersion'
         description: Composite application definition
         required: true
 
@@ -185,7 +76,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/CompositeAppVersionArray'
+                $ref: 'components/schemas.yaml#/CompositeAppVersionArray'
         '404':
           description: No Composite App found
           content: {}
@@ -193,9 +84,9 @@ paths:
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
     get: # documentation for GET operation for this path
       tags:
         - Composite Application
@@ -211,7 +102,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/CompositeAppVersion'
+                $ref: 'components/schemas.yaml#/CompositeAppVersion'
         '404':
           description: Composite Application not found
           content: {}
@@ -226,7 +117,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/CompositeAppVersion'
+                $ref: 'components/schemas.yaml#/CompositeAppVersion'
           description: Success
         '400':
           description: Invalid data
@@ -239,7 +130,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CompositeAppVersion'
+              $ref: 'components/schemas.yaml#/CompositeAppVersion'
         description: Composite application definition
         required: true
 
@@ -265,9 +156,9 @@ paths:
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/apps:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
     post:
       tags:
         - Composite Application
@@ -280,7 +171,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '405':
           description: Invalid Input
           content: {}
@@ -289,7 +180,7 @@ paths:
         content:
           multipart/form-data: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/AppData'
+              $ref: 'components/schemas.yaml#/AppData'
         required: true
 
     get: # documentation for GET operation for this path
@@ -307,7 +198,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/MetadataArray'
+                $ref: 'components/schemas.yaml#/MetadataArray'
         '404':
           description: No Apps found in Composite Application
           content: {}
@@ -315,10 +206,10 @@ paths:
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/apps/{app-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/appName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/appName'
     get: # documentation for GET operation for this path
       tags:
         - Composite Application
@@ -334,13 +225,13 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
             application/octet-stream: # operation response mime type
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: 'components/schemas.yaml#/File'
             multipart/form-data: # Media type
               schema:            # Request payload
-                $ref: '#/components/schemas/AppData'
+                $ref: 'components/schemas.yaml#/AppData'
 
         '404':
           description: Application not found
@@ -356,7 +247,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
           description: Success
         '400':
           description: Invalid data
@@ -369,7 +260,7 @@ paths:
         content:
           multipart/form-data: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/AppData'
+              $ref: 'components/schemas.yaml#/AppData'
         required: true
     delete: # documentation for DELETE operation for this path
       tags:
@@ -394,9 +285,9 @@ paths:
 ############################ PROFILE API'S #################################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
     post:
       tags:
         - Composite Profile
@@ -409,7 +300,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '405':
           description: Invalid Input
           content: {}
@@ -417,7 +308,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Metadata'
+              $ref: 'components/schemas.yaml#/Metadata'
         description: Composite Profile definition
         required: true
 
@@ -436,7 +327,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/MetadataArray'
+                $ref: 'components/schemas.yaml#/MetadataArray'
         '404':
           description: No composite profile found
           content: {}
@@ -444,10 +335,10 @@ paths:
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/compositeProfileName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/compositeProfileName'
     get: # documentation for GET operation for this path
       tags:
         - Composite Profile
@@ -463,7 +354,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '404':
           description: Composite Profile not found
           content: {}
@@ -478,7 +369,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
           description: Success
         '400':
           description: Invalid data
@@ -491,7 +382,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Metadata'
+              $ref: 'components/schemas.yaml#/Metadata'
         description: Composite Profile definition
         required: true
     delete: # documentation for DELETE operation for this path
@@ -516,10 +407,10 @@ paths:
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/compositeProfileName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/compositeProfileName'
     post:
       tags:
         - Composite Profile
@@ -532,7 +423,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ProfileAppSpec'
+                $ref: 'components/schemas.yaml#/ProfileAppSpec'
         '405':
           description: Invalid Input
           content: {}
@@ -540,7 +431,7 @@ paths:
         content:
           multipart/form-data: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/ProfileAppData'
+              $ref: 'components/schemas.yaml#/ProfileAppData'
     get: # documentation for GET operation for this path
       tags:
         - Composite Profile
@@ -556,7 +447,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ProfileAppSpecArray'
+                $ref: 'components/schemas.yaml#/ProfileAppSpecArray'
         '404':
           description: No profile found
           content: {}
@@ -564,11 +455,11 @@ paths:
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/{profile-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/compositeProfileName'
-      - $ref: '#/components/parameters/profileName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/compositeProfileName'
+      - $ref: 'components/parameters.yaml#/profileName'
     get: # documentation for GET operation for this path
       tags:
         - Composite Profile
@@ -584,13 +475,13 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ProfileAppSpec'
+                $ref: 'components/schemas.yaml#/ProfileAppSpec'
             application/octet-stream: # operation response mime type
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: 'components/schemas.yaml#/File'
             multipart/form-data: # Media type
               schema:            # Request payload
-                $ref: '#/components/schemas/ProfileAppData'
+                $ref: 'components/schemas.yaml#/ProfileAppData'
 
         '404':
           description: Profile not found
@@ -606,7 +497,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ProfileAppSpec'
+                $ref: 'components/schemas.yaml#/ProfileAppSpec'
           description: Success
         '400':
           description: Invalid data
@@ -619,7 +510,7 @@ paths:
         content:
           multipart/form-data: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/ProfileAppData'
+              $ref: 'components/schemas.yaml#/ProfileAppData'
         required: true
     delete: # documentation for DELETE operation for this path
       tags:
@@ -644,10 +535,10 @@ paths:
   # Qurey for Profile - Get profile for app-name
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/composite-profiles/{composite-profile-name}/profiles/:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/compositeProfileName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/compositeProfileName'
       - in: query
         name: app-name
         schema:
@@ -670,13 +561,13 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ProfileAppSpec'
+                $ref: 'components/schemas.yaml#/ProfileAppSpec'
             application/octet-stream: # operation response mime type
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: 'components/schemas.yaml#/File'
             multipart/form-data: # Media type
               schema:            # Request payload
-                $ref: '#/components/schemas/ProfileAppData'
+                $ref: 'components/schemas.yaml#/ProfileAppData'
         '404':
           description: Profile for application not found
           content: {}
@@ -685,9 +576,9 @@ paths:
 ############################ GENERIC PLACEMENT INTENT API'S #################################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
     post:
       tags:
         - Generic Placement Intent
@@ -700,7 +591,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GenericPlacementIntent'
+                $ref: 'components/schemas.yaml#/GenericPlacementIntent'
         '405':
           description: Invalid Input
           content: {}
@@ -708,7 +599,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericPlacementIntent'
+              $ref: 'components/schemas.yaml#/GenericPlacementIntent'
         description: Generic Placement Intent definition
         required: true
 
@@ -727,7 +618,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/GenericPlacementIntentArray'
+                $ref: 'components/schemas.yaml#/GenericPlacementIntentArray'
         '404':
           description: No Generic Placement Intent found
           content: {}
@@ -735,10 +626,10 @@ paths:
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/genericPlacementIntentName'
     get: # documentation for GET operation for this path
       tags:
         - Generic Placement Intent
@@ -754,7 +645,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/GenericPlacementIntent'
+                $ref: 'components/schemas.yaml#/GenericPlacementIntent'
         '404':
           description: Generic Placement Intent not found
           content: {}
@@ -769,7 +660,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/GenericPlacementIntent'
+                $ref: 'components/schemas.yaml#/GenericPlacementIntent'
           description: Success
         '400':
           description: Invalid data
@@ -782,7 +673,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericPlacementIntent'
+              $ref: 'components/schemas.yaml#/GenericPlacementIntent'
         description: Generic Placement Intent definition
         required: true
     delete: # documentation for DELETE operation for this path
@@ -807,10 +698,10 @@ paths:
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/genericPlacementIntentName'
     post:
       tags:
         - Generic Placement Intent
@@ -823,7 +714,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
+                $ref: 'components/schemas.yaml#/GenericPlacementAppIntent'
         '405':
           description: Invalid Input
           content: {}
@@ -831,7 +722,7 @@ paths:
         content:
           application/json: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/GenericPlacementAppIntent'
+              $ref: 'components/schemas.yaml#/GenericPlacementAppIntent'
     get: # documentation for GET operation for this path
       tags:
         - Generic Placement Intent
@@ -847,18 +738,18 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntentArray'
+                $ref: 'components/schemas.yaml#/GenericPlacementAppIntentArray'
         '404':
           description: No Generic Placement Intent found
           content: {}
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/{intent-name}:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-      - $ref: '#/components/parameters/intentName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/genericPlacementIntentName'
+      - $ref: 'components/parameters.yaml#/intentName'
 
     get: # documentation for GET operation for this path
       tags:
@@ -875,7 +766,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
+                $ref: 'components/schemas.yaml#/GenericPlacementAppIntent'
 
         '404':
           description: Intent  not found
@@ -891,7 +782,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
+                $ref: 'components/schemas.yaml#/GenericPlacementAppIntent'
           description: Success
         '400':
           description: Invalid data
@@ -904,7 +795,7 @@ paths:
         content:
          application/json: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/GenericPlacementAppIntent'
+              $ref: 'components/schemas.yaml#/GenericPlacementAppIntent'
         required: true
 
     delete: # documentation for DELETE operation for this path
@@ -930,10 +821,10 @@ paths:
   # Qurey for Intent - Get intent for app-name
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/genericPlacementIntentName'
       - in: query
         name: app-name
         schema:
@@ -956,7 +847,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
+                $ref: 'components/schemas.yaml#/GenericPlacementAppIntent'
         '404':
           description: Generic Placement Intent for application not found
           content: {}
@@ -964,9 +855,9 @@ paths:
 ############################ Deployment Intent Group API'S #################################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
     post:
       tags:
         - Deployment Intent Group
@@ -979,7 +870,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeploymentGroupIntent'
+                $ref: 'components/schemas.yaml#/DeploymentGroupIntent'
         '405':
           description: Invalid Input
           content: {}
@@ -987,7 +878,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeploymentGroupIntent'
+              $ref: 'components/schemas.yaml#/DeploymentGroupIntent'
         description: Deployment Intent Group definition
         required: true
     get: # documentation for GET operation for this path
@@ -1005,7 +896,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentGroupIntentArray'
+                $ref: 'components/schemas.yaml#/DeploymentGroupIntentArray'
         '404':
           description: No Deployment Intent Group found
           content: {}
@@ -1013,10 +904,10 @@ paths:
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/deploymentIntentGroupName'
     get: # documentation for GET operation for this path
       tags:
         - Deployment Intent Group
@@ -1032,7 +923,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentGroupIntent'
+                $ref: 'components/schemas.yaml#/DeploymentGroupIntent'
         '404':
           description: Deployment Intent Group not found
           content: {}
@@ -1047,7 +938,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentGroupIntent'
+                $ref: 'components/schemas.yaml#/DeploymentGroupIntent'
           description: Success
         '400':
           description: Invalid data
@@ -1060,7 +951,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeploymentGroupIntent'
+              $ref: 'components/schemas.yaml#/DeploymentGroupIntent'
         description: Deployment Intent Group definition
         required: true
 
@@ -1086,10 +977,10 @@ paths:
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/deploymentIntentGroupName'
     post:
       tags:
         - Deployment Intent Group
@@ -1102,7 +993,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentIntent'
+                $ref: 'components/schemas.yaml#/DeploymentIntent'
         '405':
           description: Invalid Input
           content: {}
@@ -1110,7 +1001,7 @@ paths:
         content:
           application/json: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/DeploymentIntent'
+              $ref: 'components/schemas.yaml#/DeploymentIntent'
     get: # documentation for GET operation for this path
       tags:
         - Deployment Intent Group
@@ -1126,7 +1017,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentIntentArray'
+                $ref: 'components/schemas.yaml#/DeploymentIntentArray'
         '404':
           description: No Deployment Intent Group found
           content: {}
@@ -1134,11 +1025,11 @@ paths:
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents/{intent-name}:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
-      - $ref: '#/components/parameters/intentName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/deploymentIntentGroupName'
+      - $ref: 'components/parameters.yaml#/intentName'
 
     get: # documentation for GET operation for this path
       tags:
@@ -1155,7 +1046,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentIntent'
+                $ref: 'components/schemas.yaml#/DeploymentIntent'
 
         '404':
           description: Deployment Intent not found
@@ -1171,7 +1062,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentIntent'
+                $ref: 'components/schemas.yaml#/DeploymentIntent'
           description: Success
         '400':
           description: Invalid data
@@ -1184,7 +1075,7 @@ paths:
         content:
          application/json: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/DeploymentIntent'
+              $ref: 'components/schemas.yaml#/DeploymentIntent'
         required: true
     delete: # documentation for DELETE operation for this path
       tags:
@@ -1208,10 +1099,10 @@ paths:
    #Query
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/intents:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/deploymentIntentGroupName'
       - in: query
         name: intent
         schema:
@@ -1234,7 +1125,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/DeploymentIntent'
+                $ref: 'components/schemas.yaml#/DeploymentIntent'
         '404':
           description: Deployment Intent not found
           content: {}
@@ -1242,10 +1133,10 @@ paths:
 ####################Lifecycle Management#######################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/approve:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/deploymentIntentGroupName'
     post:
       tags:
         - Deployment Lifecycle
@@ -1264,10 +1155,10 @@ paths:
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/instantiate:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/deploymentIntentGroupName'
     post:
       tags:
         - Deployment Lifecycle
@@ -1286,10 +1177,10 @@ paths:
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/terminate:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/deploymentIntentGroupName'
     post:
       tags:
         - Deployment Lifecycle
@@ -1308,10 +1199,10 @@ paths:
 
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/status:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/deploymentIntentGroupName'
     get:
       tags:
         - Deployment Lifecycle
@@ -1340,7 +1231,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Controller'
+                $ref: 'components/schemas.yaml#/Controller'
         '405':
           description: Invalid Input
           content: {}
@@ -1348,7 +1239,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/Controller'
+                $ref: 'components/schemas.yaml#/Controller'
         description: Controller Info
         required: true
     get: # documentation for GET operation for this path
@@ -1366,7 +1257,7 @@ paths:
               content:
                 application/json: # operation response mime type
                   schema:
-                    $ref: '#/components/schemas/ControllerArray'
+                    $ref: 'components/schemas.yaml#/ControllerArray'
             '404':
               description: No controllers found
               content: {}
@@ -1374,7 +1265,7 @@ paths:
   /controllers/{controller-name}:
     # parameters list that are used with each operation for this path
     parameters:
-    - $ref: '#/components/parameters/controllerName'
+    - $ref: 'components/parameters.yaml#/controllerName'
     get: # documentation for GET operation for this path
       tags:
         - Controller Registration
@@ -1390,7 +1281,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Controller'
+                $ref: 'components/schemas.yaml#/Controller'
         '404':
           description: Controller not found
           content: {}
@@ -1406,7 +1297,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Controller'
+                $ref: 'components/schemas.yaml#/Controller'
         '400':
           description: Invalid data
           content: {}
@@ -1418,7 +1309,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Controller'
+              $ref: 'components/schemas.yaml#/Controller'
         description: Update controllers object
         required: true
     delete: # documentation for DELETE operation for this path
@@ -1455,7 +1346,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '405':
           description: Invalid Input
           content: {}
@@ -1463,7 +1354,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         description: Cluster Providers Info
         required: true
     get: # documentation for GET operation for this path
@@ -1481,7 +1372,7 @@ paths:
               content:
                 application/json: # operation response mime type
                   schema:
-                    $ref: '#/components/schemas/Metadata'
+                    $ref: 'components/schemas.yaml#/Metadata'
             '404':
               description: No cluster provider found
               content: {}
@@ -1489,7 +1380,7 @@ paths:
   /cluster-providers/{cluster-providers-name}:
     # parameters list that are used with each operation for this path
     parameters:
-    - $ref: '#/components/parameters/clusterProviderName'
+    - $ref: 'components/parameters.yaml#/clusterProviderName'
     get: # documentation for GET operation for this path
       tags:
         - Cluster Providers
@@ -1505,7 +1396,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '404':
           description: Cluster Provider not found
           content: {}
@@ -1521,7 +1412,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '400':
           description: Invalid data
           content: {}
@@ -1533,7 +1424,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Metadata'
+              $ref: 'components/schemas.yaml#/Metadata'
         description: Update cluster provider object
         required: true
     delete: # documentation for DELETE operation for this path
@@ -1558,7 +1449,7 @@ paths:
 
   /cluster-providers/{cluster-providers-name}/clusters:
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
     post:
       tags:
         - Clusters
@@ -1571,7 +1462,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '405':
           description: Invalid Input
           content: {}
@@ -1579,7 +1470,7 @@ paths:
         content:
           multipart/form-data: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/AppData'
+              $ref: 'components/schemas.yaml#/AppData'
     get: # documentation for GET operation for this path
       tags:
         - Clusters
@@ -1595,15 +1486,15 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/MetadataArray'
+                $ref: 'components/schemas.yaml#/MetadataArray'
         '404':
           description: No clusters found in cluster provider
           content: {}
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
     get: # documentation for GET operation for this path
       tags:
         - Clusters
@@ -1619,13 +1510,13 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
             application/octet-stream: # operation response mime type
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: 'components/schemas.yaml#/File'
             multipart/form-data: # Media type
               schema:            # Request payload
-                $ref: '#/components/schemas/AppData'
+                $ref: 'components/schemas.yaml#/AppData'
 
         '404':
           description: Cluster not found
@@ -1641,7 +1532,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
           description: Success
         '400':
           description: Invalid data
@@ -1654,7 +1545,7 @@ paths:
         content:
           multipart/form-data: # Media type
             schema:            # Request payload
-              $ref: '#/components/schemas/AppData'
+              $ref: 'components/schemas.yaml#/AppData'
         required: true
 
     delete: # documentation for DELETE operation for this path
@@ -1681,8 +1572,8 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/labels:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
     post:
       tags:
         - Clusters
@@ -1695,7 +1586,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ClusterLabel'
+                $ref: 'components/schemas.yaml#/ClusterLabel'
         '405':
           description: Invalid Input
           content: {}
@@ -1703,7 +1594,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/ClusterLabel'
+                $ref: 'components/schemas.yaml#/ClusterLabel'
         description: Cluster Label
         required: true
     get: # documentation for GET operation for this path
@@ -1721,7 +1612,7 @@ paths:
               content:
                 application/json: # operation response mime type
                   schema:
-                    $ref: '#/components/schemas/ClusterLabel'
+                    $ref: 'components/schemas.yaml#/ClusterLabel'
             '404':
               description: No labels found
               content: {}
@@ -1729,9 +1620,9 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/labels/{cluster-label-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
-      - $ref: '#/components/parameters/clusterLabelName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterLabelName'
     get: # documentation for GET operation for this path
       tags:
         - Clusters
@@ -1747,7 +1638,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ClusterLabel'
+                $ref: 'components/schemas.yaml#/ClusterLabel'
         '404':
           description: label not found
           content: {}
@@ -1763,7 +1654,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ClusterLabel'
+                $ref: 'components/schemas.yaml#/ClusterLabel'
         '400':
           description: Invalid data
           content: {}
@@ -1774,7 +1665,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/ClusterLabel'
+                $ref: 'components/schemas.yaml#/ClusterLabel'
         description: Cluster Label
         required: true
     delete: # documentation for DELETE operation for this path
@@ -1801,7 +1692,7 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
       - in: query
         name: label
         schema:
@@ -1822,7 +1713,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/MetadataArray'
+                $ref: 'components/schemas.yaml#/MetadataArray'
         '404':
           description: label not found
           content: {}
@@ -1831,8 +1722,8 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/kv-pairs:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
     post:
       tags:
         - Clusters
@@ -1845,7 +1736,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ClusterKv'
+                $ref: 'components/schemas.yaml#/ClusterKv'
         '405':
           description: Invalid Input
           content: {}
@@ -1853,7 +1744,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/ClusterKv'
+                $ref: 'components/schemas.yaml#/ClusterKv'
         description: Cluster KV Pair
         required: true
     get: # documentation for GET operation for this path
@@ -1871,7 +1762,7 @@ paths:
               content:
                 application/json: # operation response mime type
                   schema:
-                    $ref: '#/components/schemas/ClusterKv'
+                    $ref: 'components/schemas.yaml#/ClusterKv'
             '404':
               description: No labels found
               content: {}
@@ -1879,9 +1770,9 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/kv-pairs/{kv-pair-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
-      - $ref: '#/components/parameters/clusterKvpairName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterKvpairName'
     get: # documentation for GET operation for this path
       tags:
         - Clusters
@@ -1897,7 +1788,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ClusterKv'
+                $ref: 'components/schemas.yaml#/ClusterKv'
         '404':
           description: KV pair not found
           content: {}
@@ -1913,7 +1804,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ClusterKv'
+                $ref: 'components/schemas.yaml#/ClusterKv'
         '400':
           description: Invalid data
           content: {}
@@ -1924,7 +1815,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/ClusterKv'
+                $ref: 'components/schemas.yaml#/ClusterKv'
         description: Cluster Label
         required: true
     delete: # documentation for DELETE operation for this path
@@ -1951,9 +1842,9 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/kv-pairs/{kv-pair-name}/:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
-      - $ref: '#/components/parameters/clusterKvpairName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterKvpairName'
       - in: query
         name: key
         schema:
@@ -1975,7 +1866,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Kv'
+                $ref: 'components/schemas.yaml#/Kv'
         '404':
           description: KV pair not found
           content: {}
@@ -1984,8 +1875,8 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/networks:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
     post:
       tags:
         - Networks
@@ -1998,7 +1889,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/VirtualNetwork'
+                $ref: 'components/schemas.yaml#/VirtualNetwork'
         '405':
           description: Invalid Input
           content: {}
@@ -2006,7 +1897,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/VirtualNetwork'
+                $ref: 'components/schemas.yaml#/VirtualNetwork'
         description: Add virtual network
         required: true
     get: # documentation for GET operation for this path
@@ -2024,7 +1915,7 @@ paths:
               content:
                 application/json: # operation response mime type
                   schema:
-                    $ref: '#/components/schemas/VirtualNetwork'
+                    $ref: 'components/schemas.yaml#/VirtualNetwork'
             '404':
               description: No virtual networks found
               content: {}
@@ -2032,9 +1923,9 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/networks/{network-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
-      - $ref: '#/components/parameters/clusterNetworkName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterNetworkName'
     get: # documentation for GET operation for this path
       tags:
         - Networks
@@ -2050,7 +1941,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/VirtualNetwork'
+                $ref: 'components/schemas.yaml#/VirtualNetwork'
         '404':
           description: Network not found
           content: {}
@@ -2078,8 +1969,8 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/provider-networks:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
     post:
       tags:
         - Networks
@@ -2092,7 +1983,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ProviderNetwork'
+                $ref: 'components/schemas.yaml#/ProviderNetwork'
         '405':
           description: Invalid Input
           content: {}
@@ -2100,7 +1991,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/ProviderNetwork'
+                $ref: 'components/schemas.yaml#/ProviderNetwork'
         description: Add provider network
         required: true
     get: # documentation for GET operation for this path
@@ -2118,7 +2009,7 @@ paths:
               content:
                 application/json: # operation response mime type
                   schema:
-                    $ref: '#/components/schemas/ProviderNetwork'
+                    $ref: 'components/schemas.yaml#/ProviderNetwork'
             '404':
               description: No provider networks found
               content: {}
@@ -2126,9 +2017,9 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/provider-networks/{network-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
-      - $ref: '#/components/parameters/clusterNetworkName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterNetworkName'
     get: # documentation for GET operation for this path
       tags:
         - Networks
@@ -2144,7 +2035,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/ProviderNetwork'
+                $ref: 'components/schemas.yaml#/ProviderNetwork'
         '404':
           description: Provider network not found
           content: {}
@@ -2171,8 +2062,8 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/apply:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
     post:
       tags:
         - Networks
@@ -2192,8 +2083,8 @@ paths:
   /cluster-providers/{cluster-providers-name}/clusters/{cluster-name}/terminate:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/clusterProviderName'
-      - $ref: '#/components/parameters/clusterName'
+      - $ref: 'components/parameters.yaml#/clusterProviderName'
+      - $ref: 'components/parameters.yaml#/clusterName'
     post:
       tags:
         - Networks
@@ -2213,9 +2104,9 @@ paths:
 ######################## Network Controller Intent API's##########################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
     post:
       tags:
         - Network Controller Intent
@@ -2228,7 +2119,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '405':
           description: Invalid Input
           content: {}
@@ -2236,7 +2127,7 @@ paths:
         content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
     get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
@@ -2252,17 +2143,17 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/MetadataArray'
+                $ref: 'components/schemas.yaml#/MetadataArray'
         '404':
           description: No Network Controller Intent found
           content: {}
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/netControlIntent'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/netControlIntent'
     get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
@@ -2278,7 +2169,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
         '404':
           description: Network Controller Intent not found
           content: {}
@@ -2293,7 +2184,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/Metadata'
+                $ref: 'components/schemas.yaml#/Metadata'
           description: Success
         '400':
           description: Invalid data
@@ -2306,7 +2197,7 @@ paths:
         content:
           application/json: # operation response mime type
             schema:
-              $ref: '#/components/schemas/Metadata'
+              $ref: 'components/schemas.yaml#/Metadata'
         required: true
     delete: # documentation for DELETE operation for this path
       tags:
@@ -2330,10 +2221,10 @@ paths:
 ################## Workload Intents##################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/netControlIntent'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/netControlIntent'
     post:
       tags:
         - Network Controller Intent
@@ -2346,7 +2237,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadSpec'
+                $ref: 'components/schemas.yaml#/NetworkWorloadSpec'
         '405':
           description: Invalid Input
           content: {}
@@ -2354,7 +2245,7 @@ paths:
         content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadSpec'
+                $ref: 'components/schemas.yaml#/NetworkWorloadSpec'
     get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
@@ -2370,7 +2261,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadSpecArray'
+                $ref: 'components/schemas.yaml#/NetworkWorloadSpecArray'
         '404':
           description: No Network Controller Workload Intent found
           content: {}
@@ -2378,11 +2269,11 @@ paths:
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/netControlIntent'
-      - $ref: '#/components/parameters/netControlWorkloadIntent'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/netControlIntent'
+      - $ref: 'components/parameters.yaml#/netControlWorkloadIntent'
     get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
@@ -2398,7 +2289,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadSpec'
+                $ref: 'components/schemas.yaml#/NetworkWorloadSpec'
         '404':
           description: Network Controller Workload Intent not found
           content: {}
@@ -2413,7 +2304,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadSpec'
+                $ref: 'components/schemas.yaml#/NetworkWorloadSpec'
           description: Success
         '400':
           description: Invalid data
@@ -2426,7 +2317,7 @@ paths:
         content:
           application/json: # operation response mime type
             schema:
-              $ref: '#/components/schemas/NetworkWorloadSpec'
+              $ref: 'components/schemas.yaml#/NetworkWorloadSpec'
         required: true
     delete: # documentation for DELETE operation for this path
       tags:
@@ -2451,11 +2342,11 @@ paths:
 ################## Workload Intents Interfaces ##################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces:
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/netControlIntent'
-      - $ref: '#/components/parameters/netControlWorkloadIntent'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/netControlIntent'
+      - $ref: 'components/parameters.yaml#/netControlWorkloadIntent'
     post:
       tags:
         - Network Controller Intent
@@ -2468,7 +2359,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadInterface'
+                $ref: 'components/schemas.yaml#/NetworkWorloadInterface'
         '405':
           description: Invalid Input
           content: {}
@@ -2476,7 +2367,7 @@ paths:
         content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadInterface'
+                $ref: 'components/schemas.yaml#/NetworkWorloadInterface'
     get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
@@ -2492,19 +2383,19 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadInterfaceArray'
+                $ref: 'components/schemas.yaml#/NetworkWorloadInterfaceArray'
         '404':
           description: No Network Controller Workload Interface found
           content: {}
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces/{interface-name}:
     # parameters list that are used with each operation for this path
     parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/netControlIntent'
-      - $ref: '#/components/parameters/netControlWorkloadIntent'
-      - $ref: '#/components/parameters/netControlWorkloadInterface'
+      - $ref: 'components/parameters.yaml#/projectName'
+      - $ref: 'components/parameters.yaml#/compositeAppName'
+      - $ref: 'components/parameters.yaml#/compositeAppVersion'
+      - $ref: 'components/parameters.yaml#/netControlIntent'
+      - $ref: 'components/parameters.yaml#/netControlWorkloadIntent'
+      - $ref: 'components/parameters.yaml#/netControlWorkloadInterface'
     get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
@@ -2520,7 +2411,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadInterface'
+                $ref: 'components/schemas.yaml#/NetworkWorloadInterface'
         '404':
           description: Network Controller Workload Interface not found
           content: {}
@@ -2535,7 +2426,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorloadInterface'
+                $ref: 'components/schemas.yaml#/NetworkWorloadInterface'
           description: Success
         '400':
           description: Invalid data
@@ -2548,7 +2439,7 @@ paths:
         content:
           application/json: # operation response mime type
             schema:
-              $ref: '#/components/schemas/NetworkWorloadInterface'
+              $ref: 'components/schemas.yaml#/NetworkWorloadInterface'
         required: true
 
     delete: # documentation for DELETE operation for this path
@@ -2570,711 +2461,3 @@ paths:
         '404':
           description: Network Controller Workload Interface not found
           content: {}
-
-
-#########################SCHEMAS####################################################
-# An object to hold reusable parts that can be used across the definition
-components:
-  schemas:
-    MetadataBase:
-      type: object
-      properties:
-        name:
-          description: Name of the resource
-          type: string
-          maxLength: 128
-          example: "ResName"
-        description:
-          description: Description for the resource
-          type: string
-          maxLength: 1024
-          example: "Resource description"
-        userData1:
-          description: User relevant data for the resource
-          type: string
-          maxLength: 512
-          example: "Some data"
-        userData2:
-          description: User relevant data for the resource
-          type: string
-          maxLength: 512
-          example: "Some more data"
-    Metadata:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-    MetadataArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/Metadata'
-    VersionSpec:
-      type: object
-      properties:
-        version:
-          description: Composite Application Version
-          type: string
-          maxLength: 128
-          example: "v1"
-    CompositeAppVersion:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          $ref: '#/components/schemas/VersionSpec'
-    CompositeAppVersionArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/CompositeAppVersion'
-    File:
-      type: string
-      format: binary
-      maxLength: 1073741824
-    AppData:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        file: # Part 2 (Helm chart in tar.gz format)
-          $ref: '#/components/schemas/File'
-    ProfileAppSpec:
-      type: object
-      properties:
-        spec:
-          type: object
-          description: AppProfileSpec contains the Spec for AppProfiles
-          properties:
-            metadata:
-              $ref: '#/components/schemas/MetadataBase'
-            app-name:
-              type: string
-              description: Application Name
-              maxLength: 128
-              example: "Application1"
-              required:
-              - app-name
-    ProfileAppSpecArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/ProfileAppSpec'
-    ProfileAppData:
-      type: object
-      properties:
-        file: # Part 2 (Helm chart in tar.gz format)
-          $ref: '#/components/schemas/File'
-        metadata:
-            $ref: '#/components/schemas/ProfileAppSpec'
-    GenericPlacementIntent:
-      type: object
-      properties:
-        spec:
-          type: object
-          description: Spec
-          properties:
-            logical-cloud:
-              type: string
-              description: Logical Cloud to use for this intent
-              maxLength: 128
-              example: "cloud1"
-              required:
-              - logical-cloud
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-    GenericPlacementIntentArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/GenericPlacementIntent'
-    GenericPlacementAppIntentSpec:
-      type: object
-      description: ''
-      properties:
-        app-name:
-          type: string
-          maxLength: 128
-          example: "appl"
-        allOf:
-          items:
-            description: AllOf ProviderName, ClusterName, ClusterLabelName and AnyOfArray
-            properties:
-              anyOf:
-                items:
-                  description: AnyOf consists of Array of ProviderName & ClusterLabelNames
-                  properties:
-                    cluster-label-name:
-                      type: string
-                      maxLength: 128
-                      example: "east"
-                    cluster-name:
-                      type: string
-                      maxLength: 128
-                      example: "cluster1"
-                    provider-name:
-                      type: string
-                      maxLength: 128
-                      example: "provider1"
-                  type: object
-                type: array
-              cluster-label-name:
-                type: string
-                maxLength: 128
-                example: "west"
-              cluster-name:
-                type: string
-                maxLength: 128
-                example: "cluster2"
-              provider-name:
-                type: string
-                maxLength: 128
-                example: "provider2"
-            type: object
-          type: array
-        anyOf:
-          items:
-            description: AnyOf consists of Array of ProviderName & ClusterLabelNames
-            properties:
-              cluster-label-name:
-                type: string
-                maxLength: 128
-                example: "east"
-              cluster-name:
-                type: string
-                maxLength: 128
-                example: "cluster1"
-              provider-name:
-                type: string
-                maxLength: 128
-                example: "provider1"
-            type: object
-          type: array
-    GenericPlacementAppIntent:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          $ref: '#/components/schemas/GenericPlacementAppIntentSpec'
-    GenericPlacementAppIntentArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/GenericPlacementAppIntent'
-    DeploymentIntentSpec:
-      type: object
-      description: DepSpecData has profile, version, OverrideValuesObj
-      properties:
-        override-values:
-          items:
-            description: OverrideValues has appName and ValuesObj
-            properties:
-              app-name:
-                type: string
-              values:
-                additionalProperties:
-                  type: string
-                  maxLength: 128
-                type: object
-            required:
-            - app-name
-            - values
-            type: object
-          type: array
-        profile:
-          type: string
-          maxLength: 128
-        version:
-          type: string
-          maxLength: 128
-      required:
-      - profile
-      - version
-    DeploymentGroupIntent:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          $ref: '#/components/schemas/DeploymentIntentSpec'
-    DeploymentGroupIntentArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/DeploymentGroupIntent'
-    DeploymentIntent:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          type: object
-          description: IntentSpecData has Intent
-          properties:
-            intent:
-              additionalProperties:
-                type: string
-                maxLength: 128
-              example:
-                generic-placement-intent: gpi-name
-              type: object
-          required:
-          - intent
-    DeploymentIntentArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/DeploymentIntent'
-    Controller:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          type: object
-          properties:
-            host:
-              type: string
-              description: Controller reachibility information
-              maxLength: 128
-              example: "10.7.100.4"
-            port:
-              type: string
-              description: Port for controller
-              maxLength: 128
-              example: "9029"
-            type:
-              type: string
-              description: Type of controller (placement, action are 2 types supported)
-              maxLength: 48
-              example: "placement"
-            priority:
-              type: string
-              description: Priority of controller to be called
-              maxLength: 128
-              example: "4"
-          required:
-            - host
-            - port
-            - type
-            - priority
-    ControllerArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/Controller'
-    ClusterLabel:
-      type: object
-      properties:
-        label-name:
-          type: string
-          description: Logical Cloud to use for this intent
-          maxLength: 128
-          example: "cluster-label-1"
-    ClusterKv:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          properties:
-            kv:
-              items:
-                additionalProperties:
-                  type: string
-                  maxLength: 128
-                type: object
-              type: array
-          required:
-          - kv
-          type: object
-      required:
-      - metadata
-      - spec
-    Kv:
-      type: object
-      properties:
-        value:
-          type: string
-          maxLength: 128
-
-    VirtualNetwork:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          properties:
-            cniType:
-              type: string
-              maxLength: 128
-            ipv4Subnets:
-              items:
-                properties:
-                  excludeIps:
-                    type: string
-                    maxLength: 1024
-                  gateway:
-                    type: string
-                    maxLength: 128
-                  name:
-                    type: string
-                    maxLength: 128
-                  subnet:
-                    type: string
-                    maxLength: 128
-                required:
-                - excludeIps
-                - gateway
-                - name
-                - subnet
-                type: object
-              type: array
-    VirtualNetworkArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/VirtualNetwork'
-    ProviderNetwork:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          properties:
-            cniType:
-              type: string
-              maxLength: 128
-            ipv4Subnets:
-              items:
-                properties:
-                  excludeIps:
-                    type: string
-                    maxLength: 128
-                  gateway:
-                    type: string
-                    maxLength: 128
-                  name:
-                    type: string
-                    maxLength: 128
-                  subnet:
-                    type: string
-                    maxLength: 128
-                required:
-                - excludeIps
-                - gateway
-                - name
-                - subnet
-                type: object
-              type: array
-            providerNetType:
-              type: string
-              maxLength: 128
-            vlan:
-              properties:
-                logicalInterfaceName:
-                  type: string
-                  maxLength: 128
-                nodeLabelList:
-                  items:
-                    type: string
-                    maxLength: 128
-                  type: array
-                providerInterfaceName:
-                  type: string
-                  maxLength: 128
-                vlanID:
-                  type: string
-                  maxLength: 128
-                vlanNodeSelector:
-                  type: string
-                  maxLength: 128
-              required:
-              - logicalInterfaceName
-              - nodeLabelList
-              - providerInterfaceName
-              - vlanID
-              - vlanNodeSelector
-              type: object
-          required:
-          - cniType
-          - ipv4Subnets
-          - providerNetType
-          - vlan
-          type: object
-    ProviderNetworkArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/ProviderNetwork'
-    RouteBasedChain:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          properties:
-            chainType:
-              type: string
-              maxLength: 128
-            routingSpec:
-              properties:
-                leftNetwork:
-                  items:
-                    properties:
-                      gatewayIp:
-                        type: string
-                        maxLength: 128
-                      networkName:
-                        type: string
-                        maxLength: 128
-                      subnet:
-                        type: string
-                        maxLength: 128
-                    required:
-                    - gatewayIp
-                    - networkName
-                    - subnet
-                    type: object
-                  type: array
-                namespace:
-                  type: string
-                  maxLength: 128
-                networkChain:
-                  type: string
-                  maxLength: 128
-                rightNetwork:
-                  items:
-                    properties:
-                      gatewayIp:
-                        type: string
-                        maxLength: 128
-                      networkName:
-                        type: string
-                        maxLength: 128
-                      subnet:
-                        type: string
-                        maxLength: 128
-                    required:
-                    - gatewayIp
-                    - networkName
-                    - subnet
-                    type: object
-                  type: array
-              required:
-              - leftNetwork
-              - namespace
-              - networkChain
-              - rightNetwork
-              type: object
-          required:
-          - chainType
-          - routingSpec
-          type: object
-    NetworkWorloadSpec:
-      type: object
-      properties:
-        spec:
-          type: object
-          description: Newtwork Workload Intent
-          properties:
-            metadata:
-              $ref: '#/components/schemas/MetadataBase'
-            spec:
-              type: object
-              properties:
-                application-name:
-                  type: string
-                  description: Application Name
-                  maxLength: 128
-                  example: "Application1"
-                workload-resource:
-                  type: string
-                  description: Name of the workload
-                  maxLength: 254
-                  example: "firewall"
-                type:
-                  type: string
-                  description: Type of the workload
-                  maxLength: 128
-                  example: "deployment"
-    NetworkWorloadSpecArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/NetworkWorloadSpec'
-    NetworkWorloadInterface:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/MetadataBase'
-        spec:
-          type: object
-          properties:
-            interface:
-              type: string
-              description: interface Name
-              maxLength: 128
-              example: "eth0"
-            name:
-              type: string
-              description: Name of the network
-              maxLength: 128
-              example: "provider-1"
-            defaultGateway:
-              type: boolean
-              description: Is this interface default gateway
-              maxLength: 128
-              example: false
-            ipAddress:
-              type: string
-              description: Name of the network
-              maxLength: 128
-              example: "0.0.0.0"
-            macAddress:
-              type: string
-              description: Name of the network
-              maxLength: 128
-              example: "x.x.x.x"
-          required:
-            - interface
-            - name
-    NetworkWorloadInterfaceArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/NetworkWorloadInterface'
-  parameters:
-    projectName:
-      name: project-name
-      in: path
-      description: Name of the project
-      required: true
-      schema:
-        type: string
-    compositeAppName:
-      name: composite-app-name
-      in: path
-      description: Name of the Composite Application
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    compositeAppVersion:
-      name: composite-app-version
-      in: path
-      description: Version of the Composite Application
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    appName:
-      name: app-name
-      in: path
-      description: Name of the Application
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    compositeProfileName:
-      name: composite-profile-name
-      in: path
-      description: Name of the Composite Profile
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    profileName:
-      name: profile-name
-      in: path
-      description: Name of the Profile
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    genericPlacementIntentName:
-      name: generic-placement-intent-name
-      in: path
-      description: Name of Generic Placement Intent
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    intentName:
-      name: intent-name
-      in: path
-      description: Name of Generic Placement Intent for application
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    deploymentIntentGroupName:
-      name: deployment-intent-group-name
-      in: path
-      description: Name of Generic Placement Intent for application
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    clusterProviderName:
-      name: cluster-providers-name
-      in: path
-      description: Name of the cluster provider
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    clusterName:
-      name: cluster-name
-      in: path
-      description: Name of the cluster
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    clusterLabelName:
-      name: cluster-label-name
-      in: path
-      description: Name of the cluster
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    clusterKvpairName:
-      name: kv-pair-name
-      in: path
-      description: Name of the cluster
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    clusterNetworkName:
-      name: network-name
-      in: path
-      description: Name of the network
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    netControlIntent:
-      name: net-control-intent
-      in: path
-      description: Name of the network
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    netControlWorkloadIntent:
-      name: workload-intent-name
-      in: path
-      description: Name of the network
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    netControlWorkloadInterface:
-      name: interface-name
-      in: path
-      description: Name of the network
-      required: true
-      schema:
-        type: string
-        maxLength: 128
-    controllerName:
-      name: controller-name
-      in: path
-      description: Controller name
-      required: true
-      schema:
-        type: string
-        maxLength: 128

@@ -1,0 +1,68 @@
+# parameters list that are used with each operation for this path
+parameters:
+- $ref: '../components/parameters.yaml#/projectName'
+get: # documentation for GET operation for this path
+  tags:
+    - Projects
+  summary: Get project by project name
+
+  description: |
+    Get `project`
+
+  operationId: getProjectByName
+  responses: # list of responses
+    '200':
+      description: Success
+      content:
+        application/json: # operation response mime type
+          schema:
+            $ref: '../components/schemas.yaml#/Metadata'
+    '404':
+      description: Project not found
+      content: {}
+put:
+  tags:
+    - Projects
+  summary: Update project
+  description: Update `project`
+  operationId: updateProject
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json: # operation response mime type
+          schema:
+            $ref: '../components/schemas.yaml#/Metadata'
+    '400':
+      description: Invalid data
+      content: {}
+    '404':
+      description: Project not found
+      content: {}
+  # request body documentation
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas.yaml#/Metadata'
+    description: Update project object
+    required: true
+delete: # documentation for DELETE operation for this path
+  tags:
+    - Projects
+  summary: Delete project by project name
+
+  description: |
+    Delete `project`
+
+  operationId: deleteProjectByName
+  responses: # list of responses
+    '204':
+      description: Deleted
+      content: {}
+    '400':
+      description: Invalid data
+      content: {}
+    '404':
+      description: Project not found
+      content: {}

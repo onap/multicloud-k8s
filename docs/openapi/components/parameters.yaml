@@ -1,0 +1,143 @@
+projectName:
+  name: project-name
+  in: path
+  description: Name of the project
+  required: true
+  schema:
+    type: string
+compositeAppName:
+  name: composite-app-name
+  in: path
+  description: Name of the Composite Application
+  required: true
+  schema: 
+    type: string
+    maxLength: 128
+compositeAppVersion:
+  name: composite-app-version
+  in: path
+  description: Version of the Composite Application
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+appName:
+  name: app-name
+  in: path
+  description: Name of the Application
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+compositeProfileName:
+  name: composite-profile-name
+  in: path
+  description: Name of the Composite Profile
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+profileName:
+  name: profile-name
+  in: path
+  description: Name of the Profile
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+genericPlacementIntentName:
+  name: generic-placement-intent-name
+  in: path
+  description: Name of Generic Placement Intent
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+intentName:
+  name: intent-name
+  in: path
+  description: Name of Generic Placement Intent for application
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+deploymentIntentGroupName:
+  name: deployment-intent-group-name
+  in: path
+  description: Name of Generic Placement Intent for application
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+clusterProviderName:
+  name: cluster-providers-name
+  in: path
+  description: Name of the cluster provider
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+clusterName:
+  name: cluster-name
+  in: path
+  description: Name of the cluster
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+clusterLabelName:
+  name: cluster-label-name
+  in: path
+  description: Name of the cluster
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+clusterKvpairName:
+  name: kv-pair-name
+  in: path
+  description: Name of the cluster
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+clusterNetworkName:
+  name: network-name
+  in: path
+  description: Name of the network
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+netControlIntent:
+  name: net-control-intent
+  in: path
+  description: Name of the network
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+netControlWorkloadIntent:
+  name: workload-intent-name
+  in: path
+  description: Name of the network
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+netControlWorkloadInterface:
+  name: interface-name
+  in: path
+  description: Name of the network
+  required: true
+  schema:
+    type: string
+    maxLength: 128
+controllerName:
+  name: controller-name
+  in: path
+  description: Controller name
+  required: true
+  schema:
+    type: string
+    maxLength: 128

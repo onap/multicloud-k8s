@@ -1,0 +1,558 @@
+MetadataBase:
+  type: object
+  properties:
+    name:
+      description: Name of the resource
+      type: string
+      maxLength: 128
+      example: "ResName"
+    description:
+      description: Description for the resource
+      type: string
+      maxLength: 1024
+      example: "Resource description"
+    userData1:
+      description: User relevant data for the resource
+      type: string
+      maxLength: 512
+      example: "Some data"
+    userData2:
+      description: User relevant data for the resource
+      type: string
+      maxLength: 512
+      example: "Some more data"
+Metadata:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+MetadataArray:
+  type: array
+  items:
+    $ref: '#/Metadata'
+VersionSpec:
+  type: object
+  properties:
+    version:
+      description: Composite Application Version
+      type: string
+      maxLength: 128
+      example: "v1"
+CompositeAppVersion:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      $ref: '#/VersionSpec'
+CompositeAppVersionArray:
+  type: array
+  items:
+    $ref: '#/CompositeAppVersion'
+File:
+  type: string
+  format: binary
+  maxLength: 1073741824
+AppData:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    file: # Part 2 (Helm chart in tar.gz format)
+      $ref: '#/File'
+ProfileAppSpec:
+  type: object
+  properties:
+    spec:
+      type: object
+      description: AppProfileSpec contains the Spec for AppProfiles
+      properties:
+        metadata:
+          $ref: '#/MetadataBase'
+        app-name:
+          type: string
+          description: Application Name
+          maxLength: 128
+          example: "Application1"
+          required:
+          - app-name
+ProfileAppSpecArray:
+  type: array
+  items:
+    $ref: '#/ProfileAppSpec'
+ProfileAppData:
+  type: object
+  properties:
+    file: # Part 2 (Helm chart in tar.gz format)
+      $ref: '#/File'
+    metadata:
+        $ref: '#/ProfileAppSpec'
+GenericPlacementIntent:
+  type: object
+  properties:
+    spec:
+      type: object
+      description: Spec
+      properties:
+        logical-cloud:
+          type: string
+          description: Logical Cloud to use for this intent
+          maxLength: 128
+          example: "cloud1"
+          required:
+          - logical-cloud
+    metadata:
+      $ref: '#/MetadataBase'
+GenericPlacementIntentArray:
+  type: array
+  items:
+    $ref: '#/GenericPlacementIntent'
+GenericPlacementAppIntentSpec:
+  type: object
+  description: ''
+  properties:
+    app-name:
+      type: string
+      maxLength: 128
+      example: "appl"
+    allOf:
+      items:
+        description: AllOf ProviderName, ClusterName, ClusterLabelName and AnyOfArray
+        properties:
+          anyOf:
+            items:
+              description: AnyOf consists of Array of ProviderName & ClusterLabelNames
+              properties:
+                cluster-label-name:
+                  type: string
+                  maxLength: 128
+                  example: "east"
+                cluster-name:
+                  type: string
+                  maxLength: 128
+                  example: "cluster1"
+                provider-name:
+                  type: string
+                  maxLength: 128
+                  example: "provider1"
+              type: object
+            type: array
+          cluster-label-name:
+            type: string
+            maxLength: 128
+            example: "west"
+          cluster-name:
+            type: string
+            maxLength: 128
+            example: "cluster2"
+          provider-name:
+            type: string
+            maxLength: 128
+            example: "provider2"
+        type: object
+      type: array
+    anyOf:
+      items:
+        description: AnyOf consists of Array of ProviderName & ClusterLabelNames
+        properties:
+          cluster-label-name:
+            type: string
+            maxLength: 128
+            example: "east"
+          cluster-name:
+            type: string
+            maxLength: 128
+            example: "cluster1"
+          provider-name:
+            type: string
+            maxLength: 128
+            example: "provider1"
+        type: object
+      type: array
+GenericPlacementAppIntent:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      $ref: '#/GenericPlacementAppIntentSpec'
+GenericPlacementAppIntentArray:
+  type: array
+  items:
+    $ref: '#/GenericPlacementAppIntent'
+DeploymentIntentSpec:
+  type: object
+  description: DepSpecData has profile, version, OverrideValuesObj
+  properties:
+    override-values:
+      items:
+        description: OverrideValues has appName and ValuesObj
+        properties:
+          app-name:
+            type: string
+          values:
+            additionalProperties:
+              type: string
+              maxLength: 128
+            type: object
+        required:
+        - app-name
+        - values
+        type: object
+      type: array
+    profile:
+      type: string
+      maxLength: 128
+    version:
+      type: string
+      maxLength: 128
+  required:
+  - profile
+  - version
+DeploymentGroupIntent:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      $ref: '#/DeploymentIntentSpec'
+DeploymentGroupIntentArray:
+  type: array
+  items:
+    $ref: '#/DeploymentGroupIntent'
+DeploymentIntent:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      type: object
+      description: IntentSpecData has Intent
+      properties:
+        intent:
+          additionalProperties:
+            type: string
+            maxLength: 128
+          example:
+            generic-placement-intent: gpi-name
+          type: object
+      required:
+      - intent
+DeploymentIntentArray:
+  type: array
+  items:
+    $ref: '#/DeploymentIntent'
+Controller:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      type: object
+      properties:
+        host:
+          type: string
+          description: Controller reachibility information
+          maxLength: 128
+          example: "10.7.100.4"
+        port:
+          type: string
+          description: Port for controller
+          maxLength: 128
+          example: "9029"
+        type:
+          type: string
+          description: Type of controller (placement, action are 2 types supported)
+          maxLength: 48
+          example: "placement"
+        priority:
+          type: string
+          description: Priority of controller to be called
+          maxLength: 128
+          example: "4"
+      required:
+        - host
+        - port
+        - type
+        - priority
+ControllerArray:
+  type: array
+  items:
+    $ref: '#/Controller'
+ClusterLabel:
+  type: object
+  properties:
+    label-name:
+      type: string
+      description: Logical Cloud to use for this intent
+      maxLength: 128
+      example: "cluster-label-1"
+ClusterKv:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      properties:
+        kv:
+          items:
+            additionalProperties:
+              type: string
+              maxLength: 128
+            type: object
+          type: array
+      required:
+      - kv
+      type: object
+  required:
+  - metadata
+  - spec
+Kv:
+  type: object
+  properties:
+    value:
+      type: string
+      maxLength: 128
+
+VirtualNetwork:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      properties:
+        cniType:
+          type: string
+          maxLength: 128
+        ipv4Subnets:
+          items:
+            properties:
+              excludeIps:
+                type: string
+                maxLength: 1024
+              gateway:
+                type: string
+                maxLength: 128
+              name:
+                type: string
+                maxLength: 128
+              subnet:
+                type: string
+                maxLength: 128
+            required:
+            - excludeIps
+            - gateway
+            - name
+            - subnet
+            type: object
+          type: array
+VirtualNetworkArray:
+  type: array
+  items:
+    $ref: '#/VirtualNetwork'
+ProviderNetwork:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      properties:
+        cniType:
+          type: string
+          maxLength: 128
+        ipv4Subnets:
+          items:
+            properties:
+              excludeIps:
+                type: string
+                maxLength: 128
+              gateway:
+                type: string
+                maxLength: 128
+              name:
+                type: string
+                maxLength: 128
+              subnet:
+                type: string
+                maxLength: 128
+            required:
+            - excludeIps
+            - gateway
+            - name
+            - subnet
+            type: object
+          type: array
+        providerNetType:
+          type: string
+          maxLength: 128
+        vlan:
+          properties:
+            logicalInterfaceName:
+              type: string
+              maxLength: 128
+            nodeLabelList:
+              items:
+                type: string
+                maxLength: 128
+              type: array
+            providerInterfaceName:
+              type: string
+              maxLength: 128
+            vlanID:
+              type: string
+              maxLength: 128
+            vlanNodeSelector:
+              type: string
+              maxLength: 128
+          required:
+          - logicalInterfaceName
+          - nodeLabelList
+          - providerInterfaceName
+          - vlanID
+          - vlanNodeSelector
+          type: object
+      required:
+      - cniType
+      - ipv4Subnets
+      - providerNetType
+      - vlan
+      type: object
+ProviderNetworkArray:
+  type: array
+  items:
+    $ref: '#/ProviderNetwork'
+RouteBasedChain:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      properties:
+        chainType:
+          type: string
+          maxLength: 128
+        routingSpec:
+          properties:
+            leftNetwork:
+              items:
+                properties:
+                  gatewayIp:
+                    type: string
+                    maxLength: 128
+                  networkName:
+                    type: string
+                    maxLength: 128
+                  subnet:
+                    type: string
+                    maxLength: 128
+                required:
+                - gatewayIp
+                - networkName
+                - subnet
+                type: object
+              type: array
+            namespace:
+              type: string
+              maxLength: 128
+            networkChain:
+              type: string
+              maxLength: 128
+            rightNetwork:
+              items:
+                properties:
+                  gatewayIp:
+                    type: string
+                    maxLength: 128
+                  networkName:
+                    type: string
+                    maxLength: 128
+                  subnet:
+                    type: string
+                    maxLength: 128
+                required:
+                - gatewayIp
+                - networkName
+                - subnet
+                type: object
+              type: array
+          required:
+          - leftNetwork
+          - namespace
+          - networkChain
+          - rightNetwork
+          type: object
+      required:
+      - chainType
+      - routingSpec
+      type: object
+NetworkWorloadSpec:
+  type: object
+  properties:
+    spec:
+      type: object
+      description: Newtwork Workload Intent
+      properties:
+        metadata:
+          $ref: '#/MetadataBase'
+        spec:
+          type: object
+          properties:
+            application-name:
+              type: string
+              description: Application Name
+              maxLength: 128
+              example: "Application1"
+            workload-resource:
+              type: string
+              description: Name of the workload
+              maxLength: 254
+              example: "firewall"
+            type:
+              type: string
+              description: Type of the workload
+              maxLength: 128
+              example: "deployment"
+NetworkWorloadSpecArray:
+  type: array
+  items:
+    $ref: '#/NetworkWorloadSpec'
+NetworkWorloadInterface:
+  type: object
+  properties:
+    metadata:
+      $ref: '#/MetadataBase'
+    spec:
+      type: object
+      properties:
+        interface:
+          type: string
+          description: interface Name
+          maxLength: 128
+          example: "eth0"
+        name:
+          type: string
+          description: Name of the network
+          maxLength: 128
+          example: "provider-1"
+        defaultGateway:
+          type: boolean
+          description: Is this interface default gateway
+          maxLength: 128
+          example: false
+        ipAddress:
+          type: string
+          description: Name of the network
+          maxLength: 128
+          example: "0.0.0.0"
+        macAddress:
+          type: string
+          description: Name of the network
+          maxLength: 128
+          example: "x.x.x.x"
+      required:
+        - interface
+        - name
+NetworkWorloadInterfaceArray:
+  type: array
+  items:
+    $ref: '#/NetworkWorloadInterface'

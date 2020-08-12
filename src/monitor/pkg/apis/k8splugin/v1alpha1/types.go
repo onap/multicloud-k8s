@@ -33,7 +33,7 @@ type ResourceBundleStateSpec struct {
 type ResourceBundleStatus struct {
 	Ready               bool                 `json:"ready" protobuf:"varint,1,opt,name=ready"`
 	ResourceCount       int32                `json:"resourceCount" protobuf:"varint,2,opt,name=resourceCount"`
-	PodStatuses         []PodStatus          `json:"podStatuses" protobuf:"varint,3,opt,name=podStatuses"`
+	PodStatuses         []corev1.Pod         `json:"podStatuses" protobuf:"varint,3,opt,name=podStatuses"`
 	ServiceStatuses     []corev1.Service     `json:"serviceStatuses" protobuf:"varint,4,opt,name=serviceStatuses"`
 	ConfigMapStatuses   []corev1.ConfigMap   `json:"configMapStatuses" protobuf:"varint,5,opt,name=configMapStatuses"`
 	DeploymentStatuses  []appsv1.Deployment  `json:"deploymentStatuses" protobuf:"varint,6,opt,name=deploymentStatuses"`

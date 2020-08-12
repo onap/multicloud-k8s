@@ -166,6 +166,7 @@ func (r *configMapReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState, c
 
 	// Add it to CR
 	cr.Status.ConfigMapStatuses = append(cr.Status.ConfigMapStatuses, corev1.ConfigMap{
+		TypeMeta:   cm.TypeMeta,
 		ObjectMeta: cm.ObjectMeta,
 	})
 

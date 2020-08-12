@@ -168,6 +168,7 @@ func (r *ingressReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState, ing
 
 	// Add it to CR
 	cr.Status.IngressStatuses = append(cr.Status.IngressStatuses, v1beta1.Ingress{
+		TypeMeta:   ing.TypeMeta,
 		ObjectMeta: ing.ObjectMeta,
 		Status:     ing.Status,
 	})

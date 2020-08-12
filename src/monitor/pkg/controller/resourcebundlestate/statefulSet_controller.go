@@ -168,6 +168,7 @@ func (r *statefulSetReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState,
 
 	// Add it to CR
 	cr.Status.StatefulSetStatuses = append(cr.Status.StatefulSetStatuses, appsv1.StatefulSet{
+		TypeMeta:   sfs.TypeMeta,
 		ObjectMeta: sfs.ObjectMeta,
 		Status:     sfs.Status,
 	})

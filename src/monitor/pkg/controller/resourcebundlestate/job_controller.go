@@ -168,6 +168,7 @@ func (r *jobReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState, job *v1
 
 	// Add it to CR
 	cr.Status.JobStatuses = append(cr.Status.JobStatuses, v1.Job{
+		TypeMeta:   job.TypeMeta,
 		ObjectMeta: job.ObjectMeta,
 		Status:     job.Status,
 	})

@@ -136,7 +136,7 @@ func (r *podReconciler) deleteFromSingleCR(cr *v1alpha1.ResourceBundleState, nam
 		if rstatus.Name == name {
 			//Delete that status from the array
 			cr.Status.PodStatuses[i] = cr.Status.PodStatuses[length-1]
-			cr.Status.PodStatuses[length-1] = v1alpha1.PodStatus{}
+			cr.Status.PodStatuses[length-1] = corev1.Pod{}
 			cr.Status.PodStatuses = cr.Status.PodStatuses[:length-1]
 			return nil
 		}
@@ -167,9 +167,9 @@ func (r *podReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState, pod *co
 	cr.Status.ResourceCount++
 
 	// Add it to CR
-	cr.Status.PodStatuses = append(cr.Status.PodStatuses, v1alpha1.PodStatus{
+	cr.Status.PodStatuses = append(cr.Status.PodStatuses, corev1.Pod{
+		TypeMeta:   pod.TypeMeta,
 		ObjectMeta: pod.ObjectMeta,
-		Ready:      false,
 		Status:     pod.Status,
 	})
 

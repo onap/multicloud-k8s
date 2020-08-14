@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "e55f7a35_23a4612c",
+        "filename": "src/orchestrator/pkg/module/instantiation.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T20:02:45Z",
+      "side": 1,
+      "message": "this is basically keeping track of what happens to the object.  the last ActionEntry represents the current state of the object - and will have the id of the appContext once Applied or Instantiated.  If a series of instantiate/terminate actions occur, this list will contain the history.  1- so status query can be made against historical instances 2- so all appcontexts associated with the resource can be removed from etcd once the resource is deleted.",
+      "parentUuid": "b416d97f_6061a101",
+      "range": {
+        "startLine": 129,
+        "startChar": 12,
+        "endLine": 129,
+        "endChar": 23
+      },
+      "revId": "709d6d17a3b2f8bc9d46034295bd7c5a7fb76107",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6ac98780_38c18271",
         "filename": "src/rsync/pkg/context/context.go",
         "patchSetId": 8
@@ -59,6 +83,30 @@
       "writtenOn": "2020-08-14T16:47:52Z",
       "side": 1,
       "message": "Should this not be specified by an arg?",
+      "range": {
+        "startLine": 48,
+        "startChar": 35,
+        "endLine": 48,
+        "endChar": 41
+      },
+      "revId": "709d6d17a3b2f8bc9d46034295bd7c5a7fb76107",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c31fec2e_e99ac7d2",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T20:02:45Z",
+      "side": 1,
+      "message": "given a resource handle, the status handle is a \u0027constant\u0027",
+      "parentUuid": "6ac98780_38c18271",
       "range": {
         "startLine": 48,
         "startChar": 35,

@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "162f32e2_b0fcfb04",
+        "filename": "kud/tests/negative_tests/_test_functions.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-08-14T00:01:01Z",
+      "side": 1,
+      "message": "Any reason why this is different than other files licences in the patch?",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 78
+      },
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fbfda224_26a5e589",
+        "filename": "kud/tests/negative_tests/_test_functions.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-08-14T00:01:01Z",
+      "side": 1,
+      "message": "Use absolute path like other once and also change in all the files where sourcing files from relative path.",
+      "range": {
+        "startLine": 21,
+        "startChar": 7,
+        "endLine": 21,
+        "endChar": 31
+      },
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

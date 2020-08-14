@@ -18,7 +18,7 @@
     - ovn-central
 - name: "minion01"
   ip: "10.10.10.4"
-  memory: 65536
+  memory: 18432
   cpus: 16
   roles:
     - kube-node
@@ -27,7 +27,7 @@
     - cmk
 - name: "minion02"
   ip: "10.10.10.5"
-  memory: 65536
+  memory: 18432
   cpus: 16
   roles:
     - kube-node

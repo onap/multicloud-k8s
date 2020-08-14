@@ -94,6 +94,125 @@
     },
     {
       "key": {
+        "uuid": "d0fd213c_d3f534d6",
+        "filename": "kud/tests/negative_tests/test_all_intents.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T19:05:19Z",
+      "side": 1,
+      "message": "duplicate line",
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "268428d2_3e892c2f",
+        "filename": "kud/tests/negative_tests/test_controllers.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T19:05:19Z",
+      "side": 1,
+      "message": "I don\u0027t think this is required to perform the controller negative tests.",
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3f5aa97_9e5c8202",
+        "filename": "kud/tests/negative_tests/test_controllers.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T19:05:19Z",
+      "side": 1,
+      "message": "instead of \u0027costBased\u0027 controller, you can just make it a generic controller.",
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18c84ca3_05d22414",
+        "filename": "kud/tests/negative_tests/test_controllers.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T19:05:19Z",
+      "side": 1,
+      "message": "so, for example, this variable could be somethign like \u0027ControllerName\u0027 (and so on for the other parmaters)",
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6629633_05c17d51",
+        "filename": "kud/tests/negative_tests/test_controllers.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T19:05:19Z",
+      "side": 1,
+      "message": "this test is unrelated to testing the controller api",
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f59c252_b75b26a1",
+        "filename": "kud/tests/negative_tests/test_controllers.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T19:05:19Z",
+      "side": 1,
+      "message": "this is basically the same as the delete null test above",
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f1cb3c88_1372a0fd",
+        "filename": "kud/tests/negative_tests/test_controllers.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-14T19:05:19Z",
+      "side": 1,
+      "message": "this is basically the same as the get null test above",
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e05a65fa_65c10e77",
         "filename": "kud/tests/negative_tests/test_profile.sh",
         "patchSetId": 12

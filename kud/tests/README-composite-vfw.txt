@@ -19,7 +19,7 @@ In multicloud-k8s repo:
 
 Deploy monitor program in each cluster (assumes multicloud-k8s repo is present in cloud)
 	# one time setup per cluster - install the CRD
-	cd multicloud-k8s/src/monitor/deploy/crds
+	cd multicloud-k8s/src/monitor/deploy
 	kubectl apply -f crds/k8splugin_v1alpha1_resourcebundlestate_crd.yaml
 	
 	# one time setup per cluster
@@ -63,19 +63,19 @@ Change directory to multicloud-k8s/kud/tests
 
 2.  Composite app helm chart files (as prepared above)
 
-    export packetgen_helm_chart=../demo/composite-firewall/packetgen.tar.gz
-    export firewall_helm_chart=../demo/composite-firewall/firewall.tar.gz
-    export sink_helm_chart=../demo/composite-firewall/sink.tar.gz
+    export packetgen_helm_path=../demo/composite-firewall/packetgen.tar.gz
+    export firewall_helm_path=../demo/composite-firewall/firewall.tar.gz
+    export sink_helm_path=../demo/composite-firewall/sink.tar.gz
 
 3.  Composite profile application profiles (as prepared above)
 
-    export packetgen_profile_file=../demo/composite-firewall/profile.tar.gz
-    export firewall_profile_file=../demo/composite-firewall/profile.tar.gz
-    export sink_profile_file=../demo/composite-firewall/profile.tar.gz
+    export packetgen_profile_targz=../demo/composite-firewall/profile.tar.gz
+    export firewall_profile_targz=../demo/composite-firewall/profile.tar.gz
+    export sink_profile_targz=../demo/composite-firewall/profile.tar.gz
 
 4.  Modify the script to address the EMCO cluster
 
-    Modifiy the the urls at the top part of the script to point to the
+    Modifiy the urls at the top part of the script to point to the
     cluster IP address of the EMCO cluster.
 
     That is, modify the IP address 10.10.10.6 to the correct value for

@@ -18,6 +18,7 @@ package scheduler
 
 import (
 	"encoding/json"
+	"time"
 
 	clusterPkg "github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
 	oc "github.com/onap/multicloud-k8s/src/ncm/internal/ovncontroller"
@@ -57,6 +58,13 @@ func NewSchedulerClient() *SchedulerClient {
 	}
 }
 
+func deleteAppContext(ac appcontext.AppContext) {
+	err := ac.DeleteCompositeApp()
+	if err != nil {
+		log.Warn(":: Error deleting AppContext ::", log.Fields{"Error": err})
+	}
+}
+
 // Apply Network Intents associated with a cluster
 func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) error {
 
@@ -64,7 +72,11 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 	if err != nil {
 		return pkgerrors.Errorf("Error finding cluster: %v %v", clusterProvider, cluster)
 	}
-	switch s.State {
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+	}
+	switch stateVal {
 	case state.StateEnum.Approved:
 		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
 	case state.StateEnum.Terminated:
@@ -76,7 +88,7 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 	case state.StateEnum.Instantiated:
 		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
 	default:
-		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+stateVal)
 	}
 
 	// Make an app context for the network intent resources
@@ -87,19 +99,14 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 	}
 	handle, err := ac.CreateCompositeApp()
 	if err != nil {
+		deleteAppContext(ac)
 		return pkgerrors.Wrap(err, "Error creating AppContext CompositeApp")
 	}
 
 	// Add an app (fixed value) to the app context
 	apphandle, err := ac.AddApp(handle, nettypes.CONTEXT_CLUSTER_APP)
 	if err != nil {
-		cleanuperr := ac.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext CompositeApp create failure", log.Fields{
-				"cluster-provider": clusterProvider,
-				"cluster":          cluster,
-			})
-		}
+		deleteAppContext(ac)
 		return pkgerrors.Wrap(err, "Error adding App to AppContext")
 	}
 
@@ -109,28 +116,38 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 	}{
 		[]string{nettypes.CONTEXT_CLUSTER_APP},
 	}
-	jinstr, _ := json.Marshal(appinstr)
+	jinstr, err := json.Marshal(appinstr)
+	if err != nil {
+		deleteAppContext(ac)
+		return pkgerrors.Wrap(err, "Error marshalling network intent app order instruction")
+	}
 
 	appdepinstr := struct {
 		Appdep map[string]string `json:"appdependency"`
 	}{
 		map[string]string{nettypes.CONTEXT_CLUSTER_APP: "go"},
 	}
-	jdep, _ := json.Marshal(appdepinstr)
+	jdep, err := json.Marshal(appdepinstr)
+	if err != nil {
+		deleteAppContext(ac)
+		return pkgerrors.Wrap(err, "Error marshalling network intent app dependency instruction")
+	}
 
 	_, err = ac.AddInstruction(handle, "app", "order", string(jinstr))
+	if err != nil {
+		deleteAppContext(ac)
+		return pkgerrors.Wrap(err, "Error adding network intent app order instruction")
+	}
 	_, err = ac.AddInstruction(handle, "app", "dependency", string(jdep))
+	if err != nil {
+		deleteAppContext(ac)
+		return pkgerrors.Wrap(err, "Error adding network intent app dependency instruction")
+	}
 
 	// Add a cluster to the app
 	_, err = ac.AddCluster(apphandle, clusterProvider+nettypes.SEPARATOR+cluster)
 	if err != nil {
-		cleanuperr := ac.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext after add cluster failure", log.Fields{
-				"cluster-provider": clusterProvider,
-				"cluster":          cluster,
-			})
-		}
+		deleteAppContext(ac)
 		return pkgerrors.Wrap(err, "Error adding Cluster to AppContext")
 	}
 
@@ -140,14 +157,15 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 	// their own context
 	err = oc.Apply(ctxVal, clusterProvider, cluster)
 	if err != nil {
-		cleanuperr := ac.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext after controller failure", log.Fields{
-				"cluster-provider": clusterProvider,
-				"cluster":          cluster,
-			})
-		}
+		deleteAppContext(ac)
 		return pkgerrors.Wrap(err, "Error adding Cluster to AppContext")
+	}
+
+	// call resource synchronizer to instantiate the CRs in the cluster
+	err = installappclient.InvokeInstallApp(ctxVal.(string))
+	if err != nil {
+		deleteAppContext(ac)
+		return err
 	}
 
 	// update the StateInfo in the cluster db record
@@ -155,27 +173,17 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 		ClusterProviderName: clusterProvider,
 		ClusterName:         cluster,
 	}
-	stateInfo := state.StateInfo{
+	a := state.ActionEntry{
 		State:     state.StateEnum.Applied,
 		ContextId: ctxVal.(string),
+		TimeStamp: time.Now(),
 	}
+	s.Actions = append(s.Actions, a)
 
-	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagState, stateInfo)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagState, s)
 	if err != nil {
-		cleanuperr := ac.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
-				"cluster-provider": clusterProvider,
-				"cluster":          cluster,
-			})
-		}
-		return pkgerrors.Wrap(err, "Error updating the stateInfo of cluster: "+cluster)
-	}
-
-	// call resource synchronizer to instantiate the CRs in the cluster
-	err = installappclient.InvokeInstallApp(ctxVal.(string))
-	if err != nil {
-		return err
+		log.Warn(":: Error updating Cluster state in DB ::", log.Fields{"Error": err.Error(), "cluster": cluster, "cluster provider": clusterProvider, "AppContext": ctxVal.(string)})
+		return pkgerrors.Wrap(err, "Error updating the stateInfo of cluster after Apply on network intents: "+cluster)
 	}
 
 	return nil
@@ -187,7 +195,11 @@ func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster strin
 	if err != nil {
 		return pkgerrors.Wrapf(err, "Error finding StateInfo for cluster: %v, %v", clusterProvider, cluster)
 	}
-	switch s.State {
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+	}
+	switch stateVal {
 	case state.StateEnum.Approved:
 		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
 	case state.StateEnum.Terminated:
@@ -199,23 +211,14 @@ func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster strin
 	case state.StateEnum.Instantiated:
 		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
 	default:
-		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+stateVal)
 	}
 
 	// call resource synchronizer to terminate the CRs in the cluster
-	err = installappclient.InvokeUninstallApp(s.ContextId)
+	contextId := state.GetLastContextIdFromStateInfo(s)
+	err = installappclient.InvokeUninstallApp(contextId)
 	if err != nil {
 		return err
-	}
-
-	// remove the app context
-	context, err := state.GetAppContextFromStateInfo(s)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error getting appcontext from cluster StateInfo : "+clusterProvider+" "+cluster)
-	}
-	err = context.DeleteCompositeApp()
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error deleting appcontext of cluster : "+clusterProvider+" "+cluster)
 	}
 
 	// update StateInfo
@@ -223,12 +226,13 @@ func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster strin
 		ClusterProviderName: clusterProvider,
 		ClusterName:         cluster,
 	}
-	stateInfo := state.StateInfo{
+	a := state.ActionEntry{
 		State:     state.StateEnum.Terminated,
-		ContextId: "",
+		ContextId: contextId,
+		TimeStamp: time.Now(),
 	}
-
-	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagState, stateInfo)
+	s.Actions = append(s.Actions, a)
+	err = db.DBconn.Insert(v.db.StoreName, key, nil, v.db.TagState, s)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error updating the stateInfo of cluster: "+cluster)
 	}

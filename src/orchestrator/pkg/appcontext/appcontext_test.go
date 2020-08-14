@@ -18,9 +18,10 @@ package appcontext
 
 import (
 	"fmt"
-	pkgerrors "github.com/pkg/errors"
 	"strings"
 	"testing"
+
+	pkgerrors "github.com/pkg/errors"
 )
 
 // Mock run time context
@@ -143,10 +144,6 @@ func (c *MockRunTimeContext) RtcUpdateValue(handle interface{}, value interface{
 	key := fmt.Sprintf("%v", handle)
 	c.Items[key] = value
 	return c.Err
-}
-
-func (rtc *MockRunTimeContext) RtcAddStatus(handle interface{}, value interface{}) (interface{}, error) {
-	return nil, nil
 }
 
 func TestCreateCompositeApp(t *testing.T) {

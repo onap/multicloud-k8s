@@ -9,10 +9,9 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/googleapis/gnostic v0.4.0
 	github.com/jonboulle/clockwork v0.1.0
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-00010101000000-000000000000
 	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200708223327-9a9a6aedbd7a
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200721211210-783ed87fb39a
 	//github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.5.0

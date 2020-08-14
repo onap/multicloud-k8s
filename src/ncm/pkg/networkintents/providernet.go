@@ -90,7 +90,11 @@ func (v *ProviderNetClient) CreateProviderNet(p ProviderNet, clusterProvider, cl
 	if err != nil {
 		return ProviderNet{}, pkgerrors.New("Unable to find the cluster")
 	}
-	switch s.State {
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return ProviderNet{}, pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+	}
+	switch stateVal {
 	case state.StateEnum.Approved:
 		return ProviderNet{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
 	case state.StateEnum.Terminated:
@@ -102,7 +106,7 @@ func (v *ProviderNetClient) CreateProviderNet(p ProviderNet, clusterProvider, cl
 	case state.StateEnum.Instantiated:
 		return ProviderNet{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
 	default:
-		return ProviderNet{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
+		return ProviderNet{}, pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+stateVal)
 	}
 
 	//Construct key and tag to select the entry
@@ -189,7 +193,11 @@ func (v *ProviderNetClient) DeleteProviderNet(name, clusterProvider, cluster str
 	if err != nil {
 		return pkgerrors.New("Unable to find the cluster")
 	}
-	switch s.State {
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+	}
+	switch stateVal {
 	case state.StateEnum.Approved:
 		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Approved)
 	case state.StateEnum.Terminated:
@@ -201,7 +209,7 @@ func (v *ProviderNetClient) DeleteProviderNet(name, clusterProvider, cluster str
 	case state.StateEnum.Instantiated:
 		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+state.StateEnum.Instantiated)
 	default:
-		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+s.State)
+		return pkgerrors.Wrap(err, "Cluster is in an invalid state: "+cluster+" "+stateVal)
 	}
 
 	//Construct key and tag to select the entry

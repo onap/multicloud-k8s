@@ -19,6 +19,7 @@ package module
 import (
 	"encoding/json"
 	"reflect"
+	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
@@ -135,12 +136,15 @@ func (c *DeploymentIntentGroupClient) CreateDeploymentIntentGroup(d DeploymentIn
 	}
 
 	// Add the stateInfo record
-	stateInfo := state.StateInfo{
+	s := state.StateInfo{}
+	a := state.ActionEntry{
 		State:     state.StateEnum.Created,
 		ContextId: "",
+		TimeStamp: time.Now(),
 	}
+	s.Actions = append(s.Actions, a)
 
-	err = db.DBconn.Insert(c.storeName, gkey, nil, c.tagState, stateInfo)
+	err = db.DBconn.Insert(c.storeName, gkey, nil, c.tagState, s)
 	if err != nil {
 		return DeploymentIntentGroup{}, pkgerrors.Wrap(err, "Error updating the stateInfo of the DeploymentIntentGroup: "+d.MetaData.Name)
 	}
@@ -252,8 +256,31 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 		Version:      v,
 	}
 	s, err := c.GetDeploymentIntentGroupState(di, p, ca, v)
-	if err == nil && s.State == state.StateEnum.Instantiated {
+	if err != nil {
+		return pkgerrors.Errorf("Error getting stateInfo from DeploymentIntentGroup: " + di)
+	}
+
+	stateVal, err := state.GetCurrentStateFromStateInfo(s)
+	if err != nil {
+		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
+	}
+
+	if stateVal == state.StateEnum.Instantiated {
 		return pkgerrors.Errorf("DeploymentIntentGroup must be terminated before it can be deleted " + di)
+	}
+
+	// remove the app contexts associated with thie Deployment Intent Group
+	if stateVal == state.StateEnum.Terminated {
+		for _, id := range state.GetContextIdsFromStateInfo(s) {
+			context, err := state.GetAppContextFromId(id)
+			if err != nil {
+				return pkgerrors.Wrap(err, "Error getting appcontext from Deployment Intent Group StateInfo")
+			}
+			err = context.DeleteCompositeApp()
+			if err != nil {
+				return pkgerrors.Wrap(err, "Error deleting appcontext for Deployment Intent Group")
+			}
+		}
 	}
 
 	err = db.DBconn.Remove(c.storeName, k)

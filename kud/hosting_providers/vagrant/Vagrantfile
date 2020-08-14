@@ -11,7 +11,7 @@
 
 box = {
   :virtualbox => { :name => 'elastic/ubuntu-18.04-x86_64', :version => '20191013.0.0'},
-  :libvirt => { :name => 'intergratedcloudnative/ubuntu1804', :version => '1.0.0'}
+  :libvirt => { :name => 'centos/7', :version => '2004.01'}
 }
 
 require 'yaml'
@@ -90,7 +90,7 @@ Vagrant.configure("2") do |config|
         nodeconfig.vm.provision 'shell', privileged: false do |sh|
           sh.inline = <<-SHELL
             sudo sed -i 's:GRUB_CMDLINE_LINUX=.*:GRUB_CMDLINE_LINUX="isolcpus=0-7":' /etc/default/grub
-            sudo update-grub
+            sudo grub2-mkconfig --output=/boot/grub2/grub.cfg  #centos version of update-grub
           SHELL
         end
       end
@@ -140,7 +140,7 @@ Vagrant.configure("2") do |config|
         chown vagrant /home/vagrant/.ssh/id_rsa
         chmod 400 /home/vagrant/.ssh/id_rsa
         sudo apt install jq -y
-        cd /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/ && ./installer.sh | tee kud_installer.log
+#        cd /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/ && ./installer.sh | tee kud_installer.log
       SHELL
     end
   end

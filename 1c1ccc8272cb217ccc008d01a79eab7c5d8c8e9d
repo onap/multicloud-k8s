@@ -45,6 +45,75 @@
       "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "255402a6_31ba4a55",
+        "filename": "kud/tests/negative_tests/_test_functions.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-14T16:55:15Z",
+      "side": 1,
+      "message": "Merge this with create_app2, parameterize not the numbers but the actual parameters -\u003e prometheus vs. collectd: so we can called it like: $ create_app prometheus.\n\nIf not all values are predictable (example: prometheus:prometheus-operator.tar.gz vs collectd:collectd.tar.gz) create a variable that will map each app to each attribute. If a lot of things are different and it\u0027s just a bunch of work, at least rename the apps to be create_prometheus_app or something like that.",
+      "range": {
+        "startLine": 139,
+        "startChar": 9,
+        "endLine": 139,
+        "endChar": 20
+      },
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa620f66_625d0dfb",
+        "filename": "kud/tests/negative_tests/_test_functions.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-14T16:55:15Z",
+      "side": 1,
+      "message": "Ditto for most of these functions. Likely possible to reduce lines of code to half without substantial effort.",
+      "range": {
+        "startLine": 237,
+        "startChar": 9,
+        "endLine": 237,
+        "endChar": 29
+      },
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e05a65fa_65c10e77",
+        "filename": "kud/tests/negative_tests/test_profile.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-14T16:55:15Z",
+      "side": 1,
+      "message": "Get rid of whitespaces",
+      "range": {
+        "startLine": 69,
+        "startChar": 8,
+        "endLine": 69,
+        "endChar": 9
+      },
+      "revId": "1c1ccc8272cb217ccc008d01a79eab7c5d8c8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

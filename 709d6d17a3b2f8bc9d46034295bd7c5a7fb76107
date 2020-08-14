@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b9f6d475_f90efef1",
+        "filename": "src/orchestrator/pkg/appcontext/appcontext.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-14T16:47:52Z",
+      "side": 1,
+      "message": "Currently DCM is essentially only using AddResource to specify what resources to created.\nThis patch allows us to get any kv pair at different levels - but it doesn\u0027t allow to specify different types of operations correct? apply vs approve vs etc",
+      "range": {
+        "startLine": 345,
+        "startChar": 22,
+        "endLine": 345,
+        "endChar": 33
+      },
+      "revId": "709d6d17a3b2f8bc9d46034295bd7c5a7fb76107",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b416d97f_6061a101",
+        "filename": "src/orchestrator/pkg/module/instantiation.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-14T16:47:52Z",
+      "side": 1,
+      "message": "What are some cool uses of this new ActionEntry?",
+      "range": {
+        "startLine": 129,
+        "startChar": 12,
+        "endLine": 129,
+        "endChar": 23
+      },
+      "revId": "709d6d17a3b2f8bc9d46034295bd7c5a7fb76107",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6ac98780_38c18271",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-14T16:47:52Z",
+      "side": 1,
+      "message": "Should this not be specified by an arg?",
+      "range": {
+        "startLine": 48,
+        "startChar": 35,
+        "endLine": 48,
+        "endChar": 41
+      },
+      "revId": "709d6d17a3b2f8bc9d46034295bd7c5a7fb76107",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

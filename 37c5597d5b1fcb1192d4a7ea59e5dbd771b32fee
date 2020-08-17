@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f298673_986c06f8",
+        "filename": "src/k8splugin/internal/app/config_backend.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2020-08-17T16:37:09Z",
+      "side": 1,
+      "message": "When this will not happen and create will be succesful we will just after do update as well. So if create is ok, we shouldn\u0027t do update later on. I would also report error only if both create and update will fail - the message of both errors should be printed then. If create will fail and update will succeeed then none of the errors should be printed.",
+      "range": {
+        "startLine": 364,
+        "startChar": 4,
+        "endLine": 364,
+        "endChar": 19
+      },
+      "revId": "37c5597d5b1fcb1192d4a7ea59e5dbd771b32fee",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

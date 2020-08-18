@@ -15,33 +15,30 @@
 #  limitations under the License.
 #
 
-
 set -o errexit
 set -o nounset
 set -o pipefail
-
 
 source _common_test.sh
 source _functions.sh
 #source _common.sh
 
-
-base_url_orchestrator=${base_url_orchestrator:-"http://localhost:9015/v2"}
-base_url_clm=${base_url_clm:-"http://localhost:9019/v2"}
-
+master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
+    awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
+rsync_service_port=30441
+rsync_service_host="$master_ip"
+base_url_orchestrator=${base_url_orchestrator:-"http://$master_ip:30415/v2"}
+base_url_clm=${base_url_clm:-"http://$master_ip:30461/v2"}
 
 CSAR_DIR="/opt/csar"
 csar_id="cb009bfe-bbee-11e8-9766-525400435678"
-
 
 app1_helm_path="$CSAR_DIR/$csar_id/prometheus-operator.tar.gz"
 app1_profile_path="$CSAR_DIR/$csar_id/prometheus-operator_profile.tar.gz"
 app2_helm_path="$CSAR_DIR/$csar_id/collectd.tar.gz"
 app2_profile_path="$CSAR_DIR/$csar_id/collectd_profile.tar.gz"
 
-kubeConfigLocal="/home/otc/.kube/config"
-
-
+kubeconfig_path="$HOME/.kube/config"
 
 function populate_CSAR_composite_app_helm {
     _checks_args "$1"
@@ -103,8 +100,8 @@ rsynccontrollerdata="$(cat<<EOF
     "userData2": "user data 2 for $rsynccontrollername"
   },
   "spec": {
-    "host": "localhost",
-    "port": 9031
+    "host": "$rsync_service_host",
+    "port": $rsync_service_port
   }
 }
 EOF
@@ -434,7 +431,7 @@ function createClmData {
     print_msg "Creating cluster provider and cluster"
     call_api -d "${clusterproviderdata}" "${base_url_clm}/cluster-providers"
 
-    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata" -F "file=@$kubeConfigLocal" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
+    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata" -F "file=@$kubeconfig_path" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
 
     call_api -d "${labeldata}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels"
 
@@ -476,6 +473,23 @@ function setup {
     populate_CSAR_composite_app_helm "$csar_id"
 }
 
+function start {
+    setup
+    deleteData
+    print_msg "Before creating, deleting the data success"
+    createData
+    print_msg "creating the data success"
+    instantiate
+    print_msg "instantiate success"
+}
+
+function stop {
+    terminateOrchData
+    print_msg "terminated the resources"
+    deleteData
+    print_msg "deleting the data success"
+}
+
 function usage {
     echo ""
     echo "    Usage: $0  start | stop"
@@ -487,26 +501,13 @@ function usage {
     exit
 }
 
-if [ "$#" -ne 1 ] ; then
-    usage
+if [[ "$#" -gt 0 ]] ; then
+    case "$1" in
+	"start" ) start ;;
+	"stop" ) stop ;;
+	*) usage ;;
+    esac
+else
+    start
+    stop
 fi
-
-
-case "$1" in
-    "start" )
-        setup
-        deleteData
-        print_msg "Before creating, deleting the data success"
-        createData
-        print_msg "creating the data success"
-        instantiate
-        print_msg "instantiate success"
-        ;;
-    "stop" )
-        terminateOrchData
-        print_msg "terminated the resources"
-        deleteData
-        print_msg "deleting the data success"
-        ;;
-    *) usage ;;
-esac

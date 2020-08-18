@@ -123,7 +123,7 @@ function delete_resource {
     #Issues DELETE http call to provided endpoint
     #and further validates by following GET request
 
-    call_api -X DELETE "$1"
+    call_api_nox -X DELETE "$1"
     ! call_api -X GET "$1" >/dev/null
 }
 

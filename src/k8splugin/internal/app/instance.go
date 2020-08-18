@@ -46,7 +46,6 @@ type InstanceResponse struct {
 	Request        InstanceRequest           `json:"request"`
 	Namespace      string                    `json:"namespace"`
 	Resources      []helm.KubernetesResource `json:"resources"`
-	OverrideValues map[string]string         `json:"override-values"`
 }
 
 // InstanceMiniResponse contains the response from instantiation

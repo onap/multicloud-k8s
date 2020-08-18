@@ -247,6 +247,25 @@ function wait_for_deployment {
     done
 }
 
+# wait_for_deployment_status() - Wait until the deployment intent group is the specified status
+function wait_for_deployment_status {
+    #Example usage:
+    # wait_for_deployment_status {base-url-orchestrator}/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/status Instantiated
+    if [ "$#" -ne 2 ]; then
+        echo "Usage: wait_for_deployment_status URL STATUS"
+        exit 1
+    fi
+    for try in {0..59}; do
+	sleep 1
+        new_phase="$(call_api $1 | jq -r .status)"
+        echo "$(date +%H:%M:%S) - Filter=[$*] : $new_phase"
+        if [[ "$new_phase" == "$2" ]]; then
+            return 0
+        fi
+    done
+    exit 1
+}
+
 # setup() - Base testing setup shared among functional tests
 function setup {
     if ! $(kubectl version &>/dev/null); then

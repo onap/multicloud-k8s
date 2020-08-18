@@ -92,7 +92,9 @@ payload="$(cat <<EOF
     "rb-name": "${rb_name}",
     "rb-version": "${rb_version}",
     "profile-name": "${profile_name}",
-    "cloud-region": "${cloud_region_id}"
+    "cloud-region": "${cloud_region_id}",
+    "labels": {"testCaseName": "plugin_fw.sh"},
+    "override-values": {"global.onapPrivateNetworkName": "onap-private-net-test"}
 }
 EOF
 )"
@@ -100,19 +102,24 @@ response="$(call_api -d "${payload}" "${base_url}/instance")"
 echo "$response"
 vnf_id="$(jq -r '.id' <<< "${response}")"
 
-print_msg "Validating VNF instance"
-# Check if all pods are up
+print_msg "[BEGIN] Basic checks for instantiated resource"
+print_msg "Check if override value has been applied correctly"
+kubectl get network -n "${namespace}" onap-private-net-test
+print_msg "Wait for all pods to start"
 wait_for_pod -n "${namespace}" -l app=sink
 wait_for_pod -n "${namespace}" -l app=firewall
 wait_for_pod -n "${namespace}" -l app=packetgen
 # TODO: Provide some health check to verify vFW work
-
-print_msg "Waiting for VNF instances"
-sleep 480
+print_msg "Not waiting for vFW to fully install as no further checks are implemented in testcase"
+#print_msg "Waiting 8minutes for vFW installation"
+#sleep 8m
+print_msg "[END] Basic checks for instantiated resource"
 
 print_msg "Retrieving VNF details"
-call_api "${base_url}/instance/${vnf_id}"
-
+response="$(call_api "${base_url}/instance/${vnf_id}")"
+echo "$response"
+print_msg "Assert additional label has been assigned to rb instance"
+test "$(jq -r .request.labels.testCaseName <<< "${response}")" == plugin_fw.sh
 
 #Teardown
 print_msg "Deleting VNF Instance"

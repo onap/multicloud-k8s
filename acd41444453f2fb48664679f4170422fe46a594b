@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0c1ce909_0d013362",
+        "filename": "kud/tests/negative_tests/readme.txt",
+        "patchSetId": 13
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-18T15:53:36Z",
+      "side": 1,
+      "message": "you don\u0027t need this line for a text file.",
+      "revId": "acd41444453f2fb48664679f4170422fe46a594b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

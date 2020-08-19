@@ -21,8 +21,8 @@ import (
 	"io"
 	"net/http"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
+	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 
 	"github.com/gorilla/mux"
 )

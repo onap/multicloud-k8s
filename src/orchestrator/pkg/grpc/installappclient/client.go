@@ -15,39 +15,57 @@ package installappclient
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
 	pkgerrors "github.com/pkg/errors"
 )
 
 const rsyncName = "rsync"
 
+/*
+RsyncInfo consists of rsyncName, hostName and portNumber.
+*/
+type RsyncInfo struct {
+	RsyncName  string
+	hostName   string
+	portNumber int
+}
+
+var rsyncInfo RsyncInfo
+var mutex = &sync.Mutex{}
+
 // InitRsyncClient initializes connctions to the Resource Synchronizer service
 func initRsyncClient() bool {
-	client := controller.NewControllerClient()
-
-	vals, _ := client.GetControllers()
-	found := false
-	for _, v := range vals {
-		if v.Metadata.Name == rsyncName {
-			log.Info("Initializing RPC connection to resource synchronizer", log.Fields{
-				"Controller": v.Metadata.Name,
-			})
-			rpc.UpdateRpcConn(v.Metadata.Name, v.Spec.Host, v.Spec.Port)
-			found = true
-			break
-		}
+	if (RsyncInfo{}) == rsyncInfo {
+		mutex.Lock()
+		defer mutex.Unlock()
+		log.Error("RsyncInfo not set. InitRsyncClient failed", log.Fields{
+			"Rsyncname":  rsyncInfo.RsyncName,
+			"Hostname":   rsyncInfo.hostName,
+			"PortNumber": rsyncInfo.portNumber,
+		})
+		return false
 	}
-	return found
+	rpc.UpdateRpcConn(rsyncInfo.RsyncName, rsyncInfo.hostName, rsyncInfo.portNumber)
+	return true
+}
+
+// NewRsyncInfo shall return a newly created RsyncInfo object
+func NewRsyncInfo(rName, h string, pN int) RsyncInfo {
+	mutex.Lock()
+	defer mutex.Unlock()
+	rsyncInfo = RsyncInfo{RsyncName: rName, hostName: h, portNumber: pN}
+	return rsyncInfo
+
 }
 
 // InvokeInstallApp will make the grpc call to the resource synchronizer
 // or rsync controller.
-// rsync will deply the resources in the app context to the clusters as
+// rsync will deploy the resources in the app context to the clusters as
 // prepared in the app context.
 func InvokeInstallApp(appContextId string) error {
 	var err error

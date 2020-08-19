@@ -15,12 +15,12 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"math/rand"
-	"net"
 	register "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc"
 	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
 	"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installappserver"
+	"log"
+	"math/rand"
+	"net"
 	"strings"
 	"time"
 

@@ -19,8 +19,6 @@ import (
 	"strings"
 
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
-	controller "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
-	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
 )
 
 const default_host = "localhost"
@@ -57,42 +55,4 @@ func GetServerHostPort() (string, int) {
 		})
 	}
 	return host, port
-}
-
-func RegisterGrpcServer(host string, port int) error {
-	// expect name of this rsync program to be in env variable "RSYNC_NAME" - e.g. RSYNC_NAME="rsync"
-	// This will be the name of the controller that is registered in the orchestrator controller API
-	// This same name will be used as the key name for intents in the deployment intent group
-	serviceName := os.Getenv(ENV_RSYNC_NAME)
-	if serviceName == "" {
-		serviceName = default_rsync_name
-		log.Info("Using default name for rsync service name", log.Fields{
-			"Name": serviceName,
-		})
-	}
-
-	client := controller.NewControllerClient()
-
-	// Create or update the controller entry
-	controller := controller.Controller{
-		Metadata: mtypes.Metadata{
-			Name: serviceName,
-		},
-		Spec: controller.ControllerSpec{
-			Host:     host,
-			Port:     port,
-			Type:     controller.CONTROLLER_TYPE_ACTION,
-			Priority: controller.MinControllerPriority,
-		},
-	}
-	_, err := client.CreateController(controller, true)
-	if err != nil {
-		log.Error("Failed to create/update a gRPC controller", log.Fields{
-			"Error":      err,
-			"Controller": serviceName,
-		})
-		return err
-	}
-
-	return nil
 }

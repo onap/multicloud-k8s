@@ -3,16 +3,13 @@ module github.com/onap/multicloud-k8s/src/rsync
 go 1.13
 
 require (
-	//client
-	github.com/evanphx/json-patch v4.5.0+incompatible // indirect
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.1
 	github.com/googleapis/gnostic v0.4.0
 	github.com/jonboulle/clockwork v0.1.0
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-00010101000000-000000000000
-	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200708223327-9a9a6aedbd7a
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200721211210-783ed87fb39a
-	//github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4
+	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200818155723-a5ffa8aadf49
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200818155723-a5ffa8aadf49
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.5.0
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
@@ -30,7 +27,6 @@ require (
 replace (
 	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
-	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
 	k8s.io/api => k8s.io/api v0.17.3
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.17.3
 	k8s.io/apimachinery => k8s.io/apimachinery v0.17.3

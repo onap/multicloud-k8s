@@ -27,6 +27,7 @@ import (
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 	mtypes "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/types"
+	pkgerrors "github.com/pkg/errors"
 )
 
 // ControllerTypePlacement denotes "placement" Controller Type
@@ -34,6 +35,9 @@ const ControllerTypePlacement string = "placement"
 
 // ControllerTypeAction denotes "action" Controller Type
 const ControllerTypeAction string = "action"
+
+// rsyncName denotes the name of the rsync controller
+const rsyncName = "rsync"
 
 // ControllerElement consists of controller and an internal field - index
 type ControllerElement struct {
@@ -192,11 +196,38 @@ func callGrpcForControllerList(cl []controller.Controller, mc map[string]string,
 }
 
 /*
+queryDBAndSetRsyncInfo queries the MCO db to find the record the sync controller
+and then sets the RsyncInfo global variable.
+*/
+func queryDBAndSetRsyncInfo() (rsyncclient.RsyncInfo, error) {
+	client := controller.NewControllerClient()
+	vals, _ := client.GetControllers()
+	for _, v := range vals {
+		if v.Metadata.Name == rsyncName {
+			log.Info("Initializing RPC connection to resource synchronizer", log.Fields{
+				"Controller": v.Metadata.Name,
+			})
+			rsyncInfo := rsyncclient.NewRsyncInfo(v.Metadata.Name, v.Spec.Host, v.Spec.Port)
+			return rsyncInfo, nil
+		}
+	}
+	return rsyncclient.RsyncInfo{}, pkgerrors.Errorf("queryRsyncInfoInMCODB Failed - Could not get find rsync by name : %v", rsyncName)
+}
+
+/*
 callRsyncInstall method shall take in the app context id and invokes the rsync service via grpc
 */
 func callRsyncInstall(contextid interface{}) error {
+	rsyncInfo, err := queryDBAndSetRsyncInfo()
+	log.Info("Calling the Rsync ", log.Fields{
+		"RsyncName": rsyncInfo.RsyncName,
+	})
+	if err != nil {
+		return err
+	}
+
 	appContextID := fmt.Sprintf("%v", contextid)
-	err := rsyncclient.InvokeInstallApp(appContextID)
+	err = rsyncclient.InvokeInstallApp(appContextID)
 	if err != nil {
 		return err
 	}
@@ -207,8 +238,16 @@ func callRsyncInstall(contextid interface{}) error {
 callRsyncUninstall method shall take in the app context id and invokes the rsync service via grpc
 */
 func callRsyncUninstall(contextid interface{}) error {
+	rsyncInfo, err := queryDBAndSetRsyncInfo()
+	log.Info("Calling the Rsync ", log.Fields{
+		"RsyncName": rsyncInfo.RsyncName,
+	})
+	if err != nil {
+		return err
+	}
+
 	appContextID := fmt.Sprintf("%v", contextid)
-	err := rsyncclient.InvokeUninstallApp(appContextID)
+	err = rsyncclient.InvokeUninstallApp(appContextID)
 	if err != nil {
 		return err
 	}

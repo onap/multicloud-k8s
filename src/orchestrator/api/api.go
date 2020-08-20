@@ -71,6 +71,7 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	router.HandleFunc("/projects/{project-name}/composite-apps", compAppHandler.createHandler).Methods("POST")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.getHandler).Methods("GET")
 	router.HandleFunc("/projects/{project-name}/composite-apps", compAppHandler.getAllCompositeAppsHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps", compAppHandler.updateHandler).Methods("PUT")
 	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{version}", compAppHandler.deleteHandler).Methods("DELETE")
 
 	if appClient == nil {

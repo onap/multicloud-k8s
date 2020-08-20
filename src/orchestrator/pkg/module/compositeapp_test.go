@@ -31,6 +31,7 @@ func TestCreateCompositeApp(t *testing.T) {
 		label         string
 		inpCompApp    CompositeApp
 		inpProject    string
+		exists        bool
 		expectedError string
 		mockdb        *db.MockDB
 		expected      CompositeApp
@@ -50,6 +51,7 @@ func TestCreateCompositeApp(t *testing.T) {
 			},
 
 			inpProject: "testProject",
+			exists:     false,
 			expected: CompositeApp{
 				Metadata: CompositeAppMetaData{
 					Name:        "testCompositeApp",
@@ -83,7 +85,7 @@ func TestCreateCompositeApp(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewCompositeAppClient()
-			got, err := impl.CreateCompositeApp(testCase.inpCompApp, testCase.inpProject)
+			got, err := impl.CreateCompositeApp(testCase.inpCompApp, testCase.inpProject, testCase.exists)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -170,6 +172,95 @@ func TestGetCompositeApp(t *testing.T) {
 			} else {
 				if reflect.DeepEqual(testCase.expected, got) == false {
 					t.Errorf("Get returned unexpected body: got %v;"+
+						" expected %v", got, testCase.expected)
+				}
+			}
+		})
+	}
+}
+
+func TestUpdateCompositeApp(t *testing.T) {
+	testCases := []struct {
+		label         string
+		inpCompApp    CompositeApp
+		inpProject    string
+		exists        bool
+		expectedError string
+		mockdb        *db.MockDB
+		expected      CompositeApp
+	}{
+		{
+			label: "Update Composite App",
+			inpCompApp: CompositeApp{
+				Metadata: CompositeAppMetaData{
+					Name:        "testCompositeApp",
+					Description: "A sample composite app used for unit testing",
+					UserData1:   "userData1",
+					UserData2:   "userData2",
+				},
+				Spec: CompositeAppSpec{
+					Version: "v1.1",
+				},
+			},
+
+			inpProject: "testProject",
+			exists:     true,
+			expected: CompositeApp{
+				Metadata: CompositeAppMetaData{
+					Name:        "testCompositeApp",
+					Description: "A sample composite app used for unit testing",
+					UserData1:   "userData1",
+					UserData2:   "userData2",
+				},
+				Spec: CompositeAppSpec{
+					Version: "v1.1",
+				},
+			},
+			expectedError: "",
+			mockdb: &db.MockDB{
+				Items: map[string]map[string][]byte{
+					ProjectKey{ProjectName: "testProject"}.String(): {
+						"projectmetadata": []byte(
+							"{" +
+								"\"metadata\": {" +
+								"\"Name\": \"testProject\"," +
+								"\"Description\": \"Test project for unit testing\"," +
+								"\"UserData1\": \"userData1\"," +
+								"\"UserData2\": \"userData2\"}" +
+								"}"),
+					},
+					CompositeAppKey{CompositeAppName: "testCompositeApp", Version: "v1", Project: "testProject"}.String(): {
+						"compositeappmetadata": []byte(
+							"{" +
+								"\"metadata\":{" +
+								"\"Name\":\"testCompositeApp\"," +
+								"\"Description\":\"Test CompositeApp for unit testing\"," +
+								"\"UserData1\":\"userData1\"," +
+								"\"UserData2\":\"userData2\"}," +
+								"\"spec\":{" +
+								"\"Version\":\"v1\"}" +
+								"}"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			db.DBconn = testCase.mockdb
+			impl := NewCompositeAppClient()
+			got, err := impl.CreateCompositeApp(testCase.inpCompApp, testCase.inpProject, testCase.exists)
+			if err != nil {
+				if testCase.expectedError == "" {
+					t.Fatalf("Create returned an unexpected error %s", err)
+				}
+				if strings.Contains(err.Error(), testCase.expectedError) == false {
+					t.Fatalf("Create returned an unexpected error %s", err)
+				}
+			} else {
+				if reflect.DeepEqual(testCase.expected, got) == false {
+					t.Errorf("Create returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}

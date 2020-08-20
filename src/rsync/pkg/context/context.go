@@ -147,9 +147,24 @@ func instantiateResource(ac appcontext.AppContext, c *kubeclient.Client, name st
 // Wait for 2 secs
 const waitTime = 2
 
-func waitForClusterReady(c *kubeclient.Client, cluster string) error {
+func waitForClusterReady(ac appcontext.AppContext, acStatus appcontext.AppContextStatus, c *kubeclient.Client, cluster string) error {
 	for {
 		if err := c.IsReachable(); err != nil {
+			// If terminating req is recived stop retrying
+			if acStatus.Status == appcontext.AppContextStatusEnum.Terminating {
+				flag, err := getAppContextFlag(ac)
+				if err != nil {
+					logutils.Error("Failed to get the stop flag", logutils.Fields{
+					"error":    err,
+					})
+					return err
+				} else {
+					if flag == true {
+						break
+					}
+
+				}
+			}
 			// TODO: Add more realistic error checking
 			// TODO: Add Incremental wait logic here
 			time.Sleep(waitTime * time.Second)
@@ -341,6 +356,46 @@ type fn func(ac appcontext.AppContext, client *kubeclient.Client, res string, ap
 
 type statusfn func(client *kubeclient.Client, app string, cluster string, label string) error
 
+func getAppContextFlag(ac appcontext.AppContext) (bool, error) {
+        h, err := ac.GetCompositeAppHandle()
+        if err != nil {
+                return false, err
+        }
+        sh, err := ac.GetLevelHandle(h, "stopflag")
+        if sh == nil {
+                return false, err
+        } else {
+                v, err := ac.GetValue(sh)
+                if err != nil {
+                        return false, err
+                } else {
+                        return v.(bool), nil
+                }
+        }
+}
+
+func updateAppContextFlag(cid interface{}, sf bool) error {
+        ac := appcontext.AppContext{}
+        _, err := ac.LoadAppContext(cid)
+        if err != nil {
+                return err
+        }
+        hc, err := ac.GetCompositeAppHandle()
+        if err != nil {
+                return err
+        }
+        sh, err := ac.GetLevelHandle(hc, "stopflag")
+        if sh == nil {
+                _, err = ac.AddLevelValue(hc, "stopflag", sf)
+        } else {
+                err = ac.UpdateValue(sh, sf)
+        }
+        if err != nil {
+                return err
+        }
+        return nil
+}
+
 func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, sfn statusfn, breakonError bool) error {
 	con := connector.Init(cid)
 	//Cleanup
@@ -415,7 +470,7 @@ func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, 
 					// Keep retrying for reachability
 					for {
 						// Wait for cluster to be reachable
-						err = waitForClusterReady(c, cluster)
+						err = waitForClusterReady(ac, acStatus, c, cluster)
 						if err != nil {
 							// TODO: Add error handling
 							return err
@@ -484,6 +539,11 @@ func applyFnComApp(cid interface{}, acStatus appcontext.AppContextStatus, f fn, 
 
 // InstantiateComApp Instantiate Apps in Composite App
 func (instca *CompositeAppContext) InstantiateComApp(cid interface{}) error {
+        err := updateAppContextFlag(instca, false)
+        if err != nil {
+                logutils.Error("Encountered error updating AppContext flag", logutils.Fields{"error": err})
+                return err
+        }
 	go applyFnComApp(cid, appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Instantiating},
 		instantiateResource, addStatusTracker, true)
 	return nil
@@ -491,6 +551,11 @@ func (instca *CompositeAppContext) InstantiateComApp(cid interface{}) error {
 
 // TerminateComApp Terminates Apps in Composite App
 func (instca *CompositeAppContext) TerminateComApp(cid interface{}) error {
+        err := updateAppContextFlag(instca, true)
+        if err != nil {
+                logutils.Error("Encountered error updating AppContext flag", logutils.Fields{"error": err})
+                return err
+        }
 	go applyFnComApp(cid, appcontext.AppContextStatus{Status: appcontext.AppContextStatusEnum.Terminating},
 		terminateResource, deleteStatusTracker, false)
 	return nil

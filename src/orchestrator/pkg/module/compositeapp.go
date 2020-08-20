@@ -62,7 +62,7 @@ func (cK CompositeAppKey) String() string {
 
 // CompositeAppManager is an interface exposes the CompositeApp functionality
 type CompositeAppManager interface {
-	CreateCompositeApp(c CompositeApp, p string) (CompositeApp, error)
+	CreateCompositeApp(c CompositeApp, p string, e bool) (CompositeApp, error)
 	GetCompositeApp(name string, version string, p string) (CompositeApp, error)
 	GetAllCompositeApps(p string) ([]CompositeApp, error)
 	DeleteCompositeApp(name string, version string, p string) error
@@ -85,7 +85,7 @@ func NewCompositeAppClient() *CompositeAppClient {
 }
 
 // CreateCompositeApp creates a new collection based on the CompositeApp
-func (v *CompositeAppClient) CreateCompositeApp(c CompositeApp, p string) (CompositeApp, error) {
+func (v *CompositeAppClient) CreateCompositeApp(c CompositeApp, p string, exists bool) (CompositeApp, error) {
 
 	//Construct the composite key to select the entry
 	key := CompositeAppKey{
@@ -96,7 +96,7 @@ func (v *CompositeAppClient) CreateCompositeApp(c CompositeApp, p string) (Compo
 
 	//Check if this CompositeApp already exists
 	_, err := v.GetCompositeApp(c.Metadata.Name, c.Spec.Version, p)
-	if err == nil {
+	if err == nil && !exists {
 		return CompositeApp{}, pkgerrors.New("CompositeApp already exists")
 	}
 
@@ -108,6 +108,9 @@ func (v *CompositeAppClient) CreateCompositeApp(c CompositeApp, p string) (Compo
 
 	err = db.DBconn.Insert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {
+		if exists == true {
+			return CompositeApp{}, pkgerrors.Wrap(err, "Updating CompositeApp Entry")
+		}
 		return CompositeApp{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
 

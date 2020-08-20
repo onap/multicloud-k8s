@@ -57,7 +57,45 @@ func (h compositeAppHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	vars := mux.Vars(r)
 	projectName := vars["project-name"]
 
-	ret, err := h.client.CreateCompositeApp(c, projectName)
+	ret, err := h.client.CreateCompositeApp(c, projectName, false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// updateHandler handles the updation of the compositeApp entry in the database
+func (h compositeAppHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+	var c moduleLib.CompositeApp
+
+	err := json.NewDecoder(r.Body).Decode(&c)
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Name is required.
+	if c.Metadata.Name == "" {
+		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+		return
+	}
+
+	vars := mux.Vars(r)
+	projectName := vars["project-name"]
+
+	ret, err := h.client.CreateCompositeApp(c, projectName, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

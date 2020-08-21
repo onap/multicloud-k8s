@@ -210,6 +210,13 @@ func initializeResourceStatus(ac appcontext.AppContext, acStatus appcontext.AppC
 			}
 			var aov map[string][]string
 			json.Unmarshal([]byte(resorder.(string)), &aov)
+			if acStatus.Status == appcontext.AppContextStatusEnum.Terminating {
+				s := aov["resorder"]
+				l := len(s) - 1
+				for i := 0; i < len(s)/2; i++ {
+					s[i], s[l-i] = s[l-i], s[i]
+				}
+			}
 			for _, res := range aov["resorder"] {
 				rh, err := ac.GetResourceHandle(app, cluster, res)
 				if err != nil {

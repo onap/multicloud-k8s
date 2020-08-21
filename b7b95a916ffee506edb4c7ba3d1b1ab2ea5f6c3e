@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8e09ee26_9635ccbe",
+        "filename": "src/ncm/api/schedulerhandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-21T14:47:53Z",
+      "side": 1,
+      "message": "fix comment",
+      "revId": "b7b95a916ffee506edb4c7ba3d1b1ab2ea5f6c3e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

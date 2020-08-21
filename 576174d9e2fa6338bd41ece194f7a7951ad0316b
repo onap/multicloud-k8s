@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "11c8f579_b876860d",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-21T23:04:08Z",
+      "side": 1,
+      "message": "i don\u0027t think this actually does what you want - to send the terminate call in reverse order.  this is just reversing the order of initializing resource statuses in the terminate path.",
+      "revId": "576174d9e2fa6338bd41ece194f7a7951ad0316b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+      "spec": {
+        "required": [
+          "interface",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "interface": {
+            "description": "interface Name",
+            "type": "string",
+            "example": "eth0",
+            "maxLength": 128,
+            "pattern": "[-_0-9a-zA-Z]+$"
+          },
+          "macAddress": {
+            "description": "Name of the network",
+            "type": "string",
+            "example": "x.x.x.x",
+            "maxLength": 128
+          },
+          "ipAddress": {
+            "description": "Name of the network",
+            "type": "string",
+            "example": "0.0.0.0",
+            "maxLength": 128
+          },
+          "name": {
+            "description": "Name of the network",
+            "type": "string",
+            "example": "provider-1",
+            "maxLength": 128,
+            "pattern": "[-_0-9a-zA-Z]+$"
+          },
+          "defaultGateway": {
+            "description": "Is this interface default gateway",
+            "type": "boolean",
+            "example": false,
+            "maxLength": 128
+          }
+        }
+      },
+      "metadata": {
+        "required": ["name"],
+        "properties": {
+          "userData2": {
+            "description": "User relevant data for the resource",
+            "type": "string",
+            "example": "Some more data",
+            "maxLength": 512
+          },
+          "userData1": {
+            "description": "User relevant data for the resource",
+            "type": "string",
+            "example": "Some data",
+            "maxLength": 512
+          },
+          "name": {
+            "description": "Name of the resource",
+            "type": "string",
+            "example": "ResName",
+            "maxLength": 128,
+            "pattern": "[-_0-9a-zA-Z]+$"
+          },
+          "description": {
+            "description": "Description for the resource",
+            "type": "string",
+            "example": "Resource description",
+            "maxLength": 1024
+          }
+        }
+      }
+    }
+  }

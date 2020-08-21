@@ -1,0 +1,13 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+      "label-name": {
+        "description": "Logical Cloud to use for this intent",
+        "type": "string",
+        "example": "cluster-label-1",
+        "maxLength": 128,
+        "pattern": "[-_0-9a-zA-Z]+$"
+      }
+    }
+  }

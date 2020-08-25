@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9b3ac20e_a30e8d4b",
+        "filename": "src/orchestrator/pkg/grpc/installappclient/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-08-25T23:52:10Z",
+      "side": 1,
+      "message": "probably need to protect updates to this global with a mutex?",
+      "revId": "6e9d3683b2201e16078bbbf75fcf596880c4de0c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -26,6 +26,8 @@ import (
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 )
 
+var appIntentJSONFile string = "json-schemas/generic-placement-intent-app.json"
+
 /* Used to store backend implementation objects
 Also simplifies mocking for unit testing purposes
 */
@@ -48,9 +50,8 @@ func (h appIntentHandler) createAppIntentHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	jsonFile := "json-schemas/generic-placement-intent-app.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, a)
+	err, httpError := validation.ValidateJsonSchemaData(appIntentJSONFile, a)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

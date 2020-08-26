@@ -26,6 +26,8 @@ import (
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 )
 
+var caJSONFile string = "json-schemas/composite-app.json"
+
 // compositeAppHandler to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type compositeAppHandler struct {
@@ -47,9 +49,8 @@ func (h compositeAppHandler) createHandler(w http.ResponseWriter, r *http.Reques
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-	jsonFile := "json-schemas/composite-app.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, c)
+	err, httpError := validation.ValidateJsonSchemaData(caJSONFile, c)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

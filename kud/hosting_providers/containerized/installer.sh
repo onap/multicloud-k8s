@@ -131,25 +131,18 @@ function install_addons {
         for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov cmk $plugins_name}; do
             pushd $kud_tests
             bash ${addon}.sh
+            case $addon in
+                "onap4k8s" )
+                    echo "Test the onap4k8s plugin installation"
+                    for functional_test in plugin_edgex plugin_fw plugin_eaa; do
+                        bash ${functional_test}.sh --external
+                    done
+                    ;;
+            esac
             popd
         done
     fi
     echo "Add-ons deployment complete..."
-}
-
-# install_plugin() - Install ONAP Multicloud Kubernetes plugin
-function install_plugin {
-    echo "Installing multicloud/k8s onap4k8s plugin"
-    if [[ "${testing_enabled}" == "true" ]]; then
-        pushd $kud_tests
-        echo "Test the onap4k8s installation"
-        bash onap4k8s.sh
-        echo "Test the onap4k8s plugin installation"
-        for functional_test in plugin_edgex plugin_fw plugin_eaa; do
-            bash ${functional_test}.sh --external
-        done
-        popd
-    fi
 }
 
 # _print_kubernetes_info() - Prints the login Kubernetes information
@@ -207,12 +200,8 @@ function install_cluster {
     else
         install_addons
     fi
-
     echo "installed the addons"
-    if ${KUD_PLUGIN_ENABLED:-false}; then
-        install_plugin
-        echo "installed the install_plugin"
-    fi
+
     _print_kubernetes_info
 }
 

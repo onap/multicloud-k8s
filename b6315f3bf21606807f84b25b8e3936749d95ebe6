@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "87393f45_9b51a7c8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-08-26T12:46:37Z",
+      "side": 1,
+      "message": "Please squash commit message before merge",
+      "range": {
+        "startLine": 5,
+        "startChar": 37,
+        "endLine": 33,
+        "endChar": 63
+      },
+      "revId": "b6315f3bf21606807f84b25b8e3936749d95ebe6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

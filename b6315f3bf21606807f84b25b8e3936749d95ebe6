@@ -22,6 +22,29 @@
       "revId": "b6315f3bf21606807f84b25b8e3936749d95ebe6",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "745e77cf_5a451ecd",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-08-26T12:52:24Z",
+      "side": 1,
+      "message": "Please provide UTs for new `semi-public` function",
+      "range": {
+        "startLine": 241,
+        "startChar": 0,
+        "endLine": 241,
+        "endChar": 4
+      },
+      "revId": "b6315f3bf21606807f84b25b8e3936749d95ebe6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

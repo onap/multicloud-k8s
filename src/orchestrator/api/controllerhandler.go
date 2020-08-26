@@ -28,6 +28,8 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
+var controllerJSONFile string = "json-schemas/controller.json"
+
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type controllerHandler struct {
@@ -87,9 +89,8 @@ func (h controllerHandler) createHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	jsonFile := "json-schemas/controller.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, m)
+	err, httpError := validation.ValidateJsonSchemaData(controllerJSONFile, m)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

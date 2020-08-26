@@ -3210,10 +3210,10 @@ components:
               maxLength: 128
               example: "provider-1"
             defaultGateway:
-              type: boolean
+              type: "string"
               description: Is this interface default gateway
               maxLength: 128
-              example: false
+              example: "false"
             ipAddress:
               type: string
               description: Name of the network

@@ -37,8 +37,8 @@
           },
           "defaultGateway": {
             "description": "Is this interface default gateway",
-            "type": "boolean",
-            "example": false,
+            "type": "string",
+            "example": "false",
             "maxLength": 128
           }
         }

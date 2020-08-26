@@ -26,6 +26,8 @@ import (
 	moduleLib "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 )
 
+var projectJSONFile string = "json-schemas/metadata.json"
+
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type projectHandler struct {
@@ -47,9 +49,9 @@ func (h projectHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-	jsonFile := "json-schemas/metadata.json"
+
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, p)
+	err, httpError := validation.ValidateJsonSchemaData(projectJSONFile, p)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

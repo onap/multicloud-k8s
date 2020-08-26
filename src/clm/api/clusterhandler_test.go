@@ -186,6 +186,12 @@ func (m *mockClusterManager) DeleteClusterKvPairs(provider, clusterName, kvpair 
 	return m.Err
 }
 
+func init()  {
+	cpJSONFile = "../json-schemas/metadata.json"
+	ckvJSONFile = "../json-schemas/cluster-kv.json"
+	clJSONFile = "../json-schemas/cluster-label.json"
+}
+
 func TestClusterProviderCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string

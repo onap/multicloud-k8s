@@ -33,6 +33,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var appJSONFile string = "json-schemas/metadata.json"
+
 // appHandler to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type appHandler struct {
@@ -70,9 +72,8 @@ func (h appHandler) createAppHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonFile := "json-schemas/metadata.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, a)
+	err, httpError := validation.ValidateJsonSchemaData(appJSONFile, a)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

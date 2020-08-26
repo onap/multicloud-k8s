@@ -126,7 +126,7 @@ func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 		projects, err := h.client.GetAllProjects()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 
@@ -147,7 +147,7 @@ func (h projectHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.GetProject(name)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 

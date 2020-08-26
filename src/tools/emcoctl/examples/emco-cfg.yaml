@@ -1,0 +1,6 @@
+  orchestrator:
+    host: localhost
+    port: 9015
+  clm:
+    host: localhost
+    port: 9061

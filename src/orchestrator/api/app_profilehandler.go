@@ -34,6 +34,8 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
+var appProfileJSONFile string = "json-schemas/metadata.json"
+
 /* Used to store backend implementation objects
 Also simplifies mocking for unit testing purposes
 */
@@ -73,9 +75,8 @@ func (h appProfileHandler) createAppProfileHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
-	jsonFile := "json-schemas/metadata.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, ap)
+	err, httpError := validation.ValidateJsonSchemaData(appProfileJSONFile, ap)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

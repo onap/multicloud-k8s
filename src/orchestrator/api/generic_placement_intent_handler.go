@@ -27,6 +27,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var gpiJSONFile string = "json-schemas/generic-placement-intent.json"
+
 /* Used to store backend implementation objects
 Also simplifies mocking for unit testing purposes
 */
@@ -49,9 +51,8 @@ func (h genericPlacementIntentHandler) createGenericPlacementIntentHandler(w htt
 		return
 	}
 
-	jsonFile := "json-schemas/generic-placement-intent.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, g)
+	err, httpError := validation.ValidateJsonSchemaData(gpiJSONFile, g)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

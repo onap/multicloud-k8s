@@ -64,6 +64,10 @@ func (m *mockProjectManager) GetAllProjects() ([]moduleLib.Project, error) {
 	return []moduleLib.Project{}, m.Err
 }
 
+func init() {
+	projectJSONFile = "../json-schemas/metadata.json"
+}
+
 func TestProjectCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string

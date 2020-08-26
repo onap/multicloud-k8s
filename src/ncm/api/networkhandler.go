@@ -30,6 +30,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var vnJSONFile string = "json-schemas/virtual-network.json"
+
+
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type networkHandler struct {
@@ -85,6 +88,12 @@ func (h networkHandler) createNetworkHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
+
+	err, httpError := validation.ValidateJsonSchemaData(vnJSONFile, p)
+if err != nil {
+	http.Error(w, err.Error(), httpError)
+	return
+}
 
 	// Name is required.
 	if p.Metadata.Name == "" {

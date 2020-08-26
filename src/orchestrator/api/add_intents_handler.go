@@ -27,6 +27,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var addIntentJSONFile string = "json-schemas/deployment-intent.json"
+
 type intentHandler struct {
 	client moduleLib.IntentManager
 }
@@ -46,9 +48,8 @@ func (h intentHandler) addIntentHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	jsonFile := "json-schemas/deployment-intent.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, i)
+	err, httpError := validation.ValidateJsonSchemaData(addIntentJSONFile, i)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

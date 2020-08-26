@@ -273,7 +273,7 @@ func TestProjectGetHandler(t *testing.T) {
 		},
 		{
 			label:        "Get Non-Exiting Project",
-			expectedCode: http.StatusInternalServerError,
+			expectedCode: http.StatusNotFound,
 			name:         "nonexistingproject",
 			projectClient: &mockProjectManager{
 				Items: []moduleLib.Project{},

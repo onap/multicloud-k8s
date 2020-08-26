@@ -73,6 +73,10 @@ func (m *mockControllerManager) InitControllers() {
 	return
 }
 
+func init() {
+	controllerJSONFile = "../json-schemas/controller.json"
+}
+
 func TestControllerCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label            string

@@ -33,7 +33,7 @@ metadata :
    userData1: test1
    userData2: test2
 file:
-  kubeconfig
+  /home/otc/.kube/config
 
 ---
 #Add label cluster
@@ -77,7 +77,7 @@ metadata :
   userData1: test1
   userData2: test2
 file:
-  prometheus-operator.tar.gz
+  /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/prometheus-operator.tar.gz
 
 ---
 #adding collectd app to the composite app
@@ -90,7 +90,7 @@ metadata :
   userData1: test1
   userData2: test2
 file:
-  collectd.tar.gz
+  /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/collectd.tar.gz
 
 ---
 #creating collection composite profile entry
@@ -116,7 +116,9 @@ metadata :
 spec:
   app-name: prometheus-operator
 file:
-  prometheus-operator_profile.tar.gz
+  /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/prometheus-operator_profile.tar.gz
+
+
 
 ---
 #adding collectd app profiles to the composite profile
@@ -131,7 +133,8 @@ metadata :
 spec:
   app-name: collectd
 file:
-  collectd_profile.tar.gz
+  /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/collectd_profile.tar.gz
+  
 
 ---
 #create the generic placement intent
@@ -160,7 +163,7 @@ spec:
   app-name: prometheus-operator
   intent:
     allOf:
-    - provider-name: cluster-provider1
+    - provider-name: provider1
       cluster-label-name: edge-cluster
 ---
 #add the prometheus app placement intent to the generic placement intent
@@ -176,7 +179,7 @@ spec:
   app-name: collectd
   intent:
     allOf:
-    - provider-name: cluster-provider1
+    - provider-name: provider1
       cluster-label-name: edge-cluster
 
 ---

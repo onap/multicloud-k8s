@@ -31,6 +31,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var pnetJSONFile string = "json-schemas/provider-network.json"
+
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type providernetHandler struct {
@@ -138,6 +140,12 @@ func (h providernetHandler) createProviderNetHandler(w http.ResponseWriter, r *h
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
+
+	err, httpError := validation.ValidateJsonSchemaData(pnetJSONFile, p)
+if err != nil {
+	http.Error(w, err.Error(), httpError)
+	return
+}
 
 	// Name is required.
 	if p.Metadata.Name == "" {

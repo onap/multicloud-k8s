@@ -24,9 +24,15 @@ import (
 
 	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	pkgerrors "github.com/pkg/errors"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
+
 
 	"github.com/gorilla/mux"
 )
+
+var netCntIntJSONFile string = "json-schemas/metadata.json"
+
+
 
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
@@ -64,6 +70,13 @@ func (h netcontrolintentHandler) createHandler(w http.ResponseWriter, r *http.Re
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
+
+	err, httpError := validation.ValidateJsonSchemaData(netCntIntJSONFile, nci)
+if err != nil {
+	http.Error(w, err.Error(), httpError)
+	return
+}
+	
 
 	// Name is required.
 	if nci.Metadata.Name == "" {

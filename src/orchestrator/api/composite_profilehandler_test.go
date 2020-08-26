@@ -70,6 +70,10 @@ func (m *mockCompositeProfileManager) DeleteCompositeProfile(name string, projec
 	return m.Err
 }
 
+func init() {
+	caprofileJSONFile = "../json-schemas/metadata.json"
+}
+
 func Test_compositeProfileHandler_createHandler(t *testing.T) {
 	testCases := []struct {
 		label        string

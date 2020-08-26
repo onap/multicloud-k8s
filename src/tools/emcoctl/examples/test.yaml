@@ -1,0 +1,224 @@
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+   name: rsync
+   description: test
+   userData1: test1
+   userData2: test2
+spec:
+  host: localhost
+  port: 9031
+
+---
+#creating cluster provider
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers
+metadata :
+   name: provider1
+   description: test
+   userData1: test1
+   userData2: test2
+
+---
+#creating cluster
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/provider1/clusters
+metadata :
+   name: cluster1
+   description: test
+   userData1: test1
+   userData2: test2
+file:
+  kubeconfig
+
+---
+#Add label cluster
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/provider1/clusters/cluster1/labels
+label-name: edge-cluster
+
+---
+#create project
+version: emco/v2
+resourceContext:
+  anchor: projects
+metadata :
+   name: proj1
+   description: test
+   userData1: test1
+   userData2: test2
+
+---
+#creating collection composite app entry
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps
+metadata :
+  name: collection-composite-app
+  description: test
+  userData1: test1
+  userData2: test2
+spec:
+  version: v1
+
+---
+#adding prometheus app to the composite app
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/apps
+metadata :
+  name: prometheus-operator
+  description: "description for app"
+  userData1: test1
+  userData2: test2
+file:
+  prometheus-operator.tar.gz
+
+---
+#adding collectd app to the composite app
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/apps
+metadata :
+  name: collectd
+  description: "description for app"
+  userData1: test1
+  userData2: test2
+file:
+  collectd.tar.gz
+
+---
+#creating collection composite profile entry
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/composite-profiles
+metadata :
+  name: collection-composite-profile
+  description: test
+  userData1: test1
+  userData2: test2
+
+---
+#adding prometheus app profiles to the composite profile
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/composite-profiles/collection-composite-profile/profiles
+metadata :
+  name: prometheus-profile
+  description: test
+  userData1: test1
+  userData2: test2
+spec:
+  app-name: prometheus-operator
+file:
+  prometheus-operator_profile.tar.gz
+
+---
+#adding collectd app profiles to the composite profile
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/composite-profiles/collection-composite-profile/profiles
+metadata :
+  name: collectd-profile
+  description: test
+  userData1: test1
+  userData2: test2
+spec:
+  app-name: collectd
+file:
+  collectd_profile.tar.gz
+
+---
+#create the generic placement intent
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/generic-placement-intents
+metadata :
+  name: collection-placement-intent
+  description: "description for app"
+  userData1: test1
+  userData2: test2
+spec:
+  logical-cloud: NA
+
+---
+#add the prometheus app placement intent to the generic placement intent
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/generic-placement-intents/collection-placement-intent/app-intents
+metadata:
+  name: prometheus-placement-intent
+  description: description of placement_intent
+  userData1: user data 1
+  userData2: user data 2
+spec:
+  app-name: prometheus-operator
+  intent:
+    allOf:
+    - provider-name: cluster-provider1
+      cluster-label-name: edge-cluster
+---
+#add the prometheus app placement intent to the generic placement intent
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/generic-placement-intents/collection-placement-intent/app-intents
+metadata:
+  name: collectd-placement-intent
+  description: description of placement_intent
+  userData1: user data 1
+  userData2: user data 2
+spec:
+  app-name: collectd
+  intent:
+    allOf:
+    - provider-name: cluster-provider1
+      cluster-label-name: edge-cluster
+
+---
+#create deployment intent group
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/deployment-intent-groups
+metadata :
+  name: collection-deployment-intent-group
+  description: "description"
+  userData1: test1
+  userData2: test2
+spec:
+  profile: collection-composite-profile
+  version: r1
+  override-values: []
+
+---
+#create intent in deployment intent group
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/deployment-intent-groups/collection-deployment-intent-group/intents
+metadata :
+  name: collection-deployment-intent
+  description: "description"
+  userData1: test1
+  userData2: test2
+spec:
+  intent:
+    genericPlacementIntent: collection-placement-intent
+
+---
+#Approve
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/deployment-intent-groups/collection-deployment-intent-group/approve
+
+---
+#Instantiate
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/composite-apps/collection-composite-app/v1/deployment-intent-groups/collection-deployment-intent-group/instantiate
+
+
+

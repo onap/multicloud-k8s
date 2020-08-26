@@ -14,7 +14,7 @@
       include_vars:
         file: kud-vars.yml
 
-    - name: Getting onap4k8s code in /opt folder
+    - name: Getting emco code in /opt folder
       git:
         repo: 'https://github.com/onap/multicloud-k8s.git'
         dest: /opt/multicloud
@@ -27,29 +27,29 @@
       yum: name=make state=present update_cache=yes
       when: ansible_distribution == "CentOS"
 
-    - name: Change the onap4k8s directory and run the command make repo
+    - name: Change the emco directory and run the command make repo
       command: /usr/bin/make repo
       register: make_repo
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/emco
 
     - debug:
         var: make_repo.stdout_lines
 
-    - name: Change the onap4k8s directory and run the command make all
+    - name: Change the emco directory and run the command make all
       command: /usr/bin/make all
       register: make_all
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/emco
 
     - debug:
         var: make_all.stdout_lines
 
-    - name: Change the onap4k8s directory and run the command helm install
+    - name: Change the emco directory and run the command helm install
       command: /usr/local/bin/helm install dist/packages/emco-0.1.0.tgz --name emco --namespace emco
       register: helm_install
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/emco
 
     - debug:
         var: helm_install.stdout_lines

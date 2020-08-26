@@ -14,38 +14,38 @@
       include_vars:
         file: kud-vars.yml
 
-    - name: Change the onap4k8s directory and run helm delete
+    - name: Change the emco directory and run helm delete
       command: /usr/local/bin/helm delete --purge emco
       register: helm_delete
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/emco
 
     - debug:
         var: helm_delete.stdout_lines
 
-    - name: Change the onap4k8s directory and delete the emco namespace
+    - name: Change the emco directory and delete the emco namespace
       command: /usr/local/bin/kubectl delete ns emco
       register: delete_emco_ns
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/emco
 
     - debug:
         var: delete_emco_ns.stdout_lines
 
-    - name: Change the onap4k8s directory and make clean
+    - name: Change the emco directory and make clean
       command: /usr/bin/make clean
       register: make_clean
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/emco
 
     - debug:
         var: make_clean.stdout_lines
 
-    - name: Change the onap4k8s directory and make repo-stop
+    - name: Change the emco directory and make repo-stop
       command: /usr/bin/make repo-stop
       register: make_repo_stop
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/onap4k8s
+        chdir: /opt/multicloud/deployments/helm/v2/emco
 
     - debug:
         var: make_repo_stop.stdout_lines

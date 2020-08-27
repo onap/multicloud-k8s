@@ -22,6 +22,23 @@
       "revId": "ccb2124278dbfdac534e050c5b05b400ac9f70f0",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "829ae2e9_a322b8f1",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 2896,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-27T19:31:15Z",
+      "side": 1,
+      "message": "Out of date; now missing return 202 for when user certificate isn\u0027t ready yet.",
+      "revId": "ccb2124278dbfdac534e050c5b05b400ac9f70f0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

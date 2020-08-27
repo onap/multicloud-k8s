@@ -16,6 +16,24 @@
       "revId": "6e9d3683b2201e16078bbbf75fcf596880c4de0c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95ba5ac4_e6cb8f79",
+        "filename": "src/orchestrator/pkg/grpc/installappclient/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-08-27T22:16:27Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "9b3ac20e_a30e8d4b",
+      "revId": "6e9d3683b2201e16078bbbf75fcf596880c4de0c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

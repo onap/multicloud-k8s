@@ -38,7 +38,6 @@ var rootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println("Test")
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -55,7 +54,7 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	cfgFile = "emco-cfg.yaml"
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -66,7 +65,6 @@ func initConfig() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fmt.Println(home)
 		// Search config in home directory with name ".emco" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".emco")
@@ -81,5 +79,8 @@ func initConfig() {
 		if err != nil {
 			fmt.Printf("Unable to decode into struct, %v", err)
 		}
+	} else {
+		fmt.Println("Warning: No Configuration File found. Using defaults")
+		SetDefaultConfiguration()
 	}
 }

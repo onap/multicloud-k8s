@@ -24,17 +24,24 @@ import (
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Get the resource(s) based on the URL",
+	Short: "Get the resources from input file or url from command line",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("get called")
 		c := NewRestClient()
-		if len(args) >= 1 {
-			fmt.Println(args[0])
-			c.RestClientGet(args[0])
+		if len(inputFiles) > 0 {
+			resources := readResources()
+			c := NewRestClient()
+			for _, res := range resources {
+				c.RestClientGet(res.anchor, res.body)
+			}
+		} else if len(args) >= 1 {
+				c.RestClientGetAnchor(args[0])
+		} else {
+			fmt.Println("Error: No args ")
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
+	getCmd.Flags().StringSliceVarP(&inputFiles, "filename", "f", []string{}, "Filename of the input file")
 }

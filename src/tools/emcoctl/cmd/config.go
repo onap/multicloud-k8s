@@ -39,6 +39,20 @@ const urlVersion string = "v2"
 const urlPrefix string = "http://"
 var Configurations EmcoConfigurations
 
+// SetDefaultConfiguration default configuration if t
+func SetDefaultConfiguration() {
+	Configurations.Orchestrator.Host = "localhost"
+	Configurations.Orchestrator.Port = 9015
+	Configurations.Clm.Host = "localhost"
+	Configurations.Clm.Port = 9061
+	Configurations.Ncm.Host = "localhost"
+	Configurations.Ncm.Port = 9031
+	Configurations.Dcm.Host = "localhost"
+	Configurations.Dcm.Port = 0
+	Configurations.OvnAction.Host = "localhost"
+	Configurations.OvnAction.Port = 9051
+}
+
 // GetOrchestratorURL Url for Orchestrator
 func GetOrchestratorURL() string {
 	if Configurations.Orchestrator.Host == "" || Configurations.Orchestrator.Port == 0 {

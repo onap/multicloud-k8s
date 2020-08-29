@@ -24,9 +24,8 @@ import (
 // applyCmd represents the apply command
 var applyCmd = &cobra.Command{
 	Use:   "apply",
-	Short: "apply(Post) the resources from input file or url(with body) from command line",
+	Short: "apply(Post) the resources from input file or url(without body) from command line",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("apply called")
 		c := NewRestClient()
 		if len(inputFiles) > 0 {
 			resources := readResources()
@@ -46,7 +45,6 @@ var applyCmd = &cobra.Command{
 				}
 			}
 		} else if len(args) >= 1 {
-			fmt.Println(args[0])
 			c.RestClientPost(args[0], []byte{})
 		} else {
 			fmt.Println("Error: No args ")
@@ -55,8 +53,7 @@ var applyCmd = &cobra.Command{
 }
 
 func init() {
-	fmt.Println("INIT ")
 	rootCmd.AddCommand(applyCmd)
 	applyCmd.Flags().StringSliceVarP(&inputFiles, "filename", "f", []string{}, "Filename of the input file")
-	applyCmd.Flags().StringSliceVarP(&valuesFiles, "values", "v", []string{}, "Values to go with the file")
+	//applyCmd.Flags().StringSliceVarP(&valuesFiles, "values", "v", []string{}, "Values to go with the file")
 }

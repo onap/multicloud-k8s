@@ -44,6 +44,7 @@ type Configuration struct {
 	GrpcServerNameOverride string `json:"grpc-server-name-override"`
 	ServicePort            string `json:"service-port"`
 	KubernetesLabelName    string `json:"kubernetes-label-name"`
+	LogLevel               string `json:"log-level"`
 }
 
 // Config is the structure that stores the configuration
@@ -98,6 +99,8 @@ func defaultConfiguration() *Configuration {
 		GrpcServerNameOverride: "",
 		ServicePort:            "9015",
 		KubernetesLabelName:    "orchestrator.io/rb-instance-id",
+		LogLevel:               "warn",
+
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
-Copyright © 2020 Intel Corp 
+Copyright © 2020 Intel Corp
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,9 +24,8 @@ import (
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete resources in input file or commandline",
+	Short: "Delete the resources from input file or url from command line",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
 		c := NewRestClient()
 		if len(inputFiles) > 0 {
 			resources := readResources()
@@ -35,23 +34,14 @@ var deleteCmd = &cobra.Command{
 				c.RestClientDelete(res.anchor, res.body)
 			}
 		} else if len(args) >= 1 {
-			fmt.Println(args[0])
-			c.RestClientDelete(args[0], nil)
+			c.RestClientDeleteAnchor(args[0])
+		} else {
+			fmt.Println("Error: No args ")
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// deleteCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	deleteCmd.Flags().StringSliceVarP(&inputFiles, "filename", "f", []string{}, "Filename of the input file")
 }

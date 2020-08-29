@@ -179,11 +179,29 @@ func (r RestyClient) RestClientMultipartPost(anchor string, body []byte, file st
 	}
 	return pkgerrors.Errorf("Server Multipart Post Error")
 }
-// RestClientGetAll returns all resource in the input file
-func (r RestyClient) RestClientGetAll(anchor string) error {
+
+// RestClientGetAnchor returns get data from anchor
+func (r RestyClient) RestClientGetAnchor(anchor string) error {
 	url, err := GetURL(anchor)
 	if err != nil {
 		return err
+	}
+	s := strings.Split(anchor, "/")
+	if len(s) >= 3 {
+		a := s[len(s)-2]
+		// Determine if multipart
+		if a == "apps" || a == "profiles" || a == "clusters" {
+			// Supports only getting metadata
+			resp, err := r.client.R().
+				SetHeader("Accept", "application/json").
+				Get(url)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+			fmt.Println("URL:", anchor, "Response Code:", resp.StatusCode(), "Response:", resp)
+			return nil
+		}
 	}
 	resp, err := r.client.R().
 		Get(url)
@@ -194,34 +212,58 @@ func (r RestyClient) RestClientGetAll(anchor string) error {
 	fmt.Println("URL:", anchor, "Response Code:", resp.StatusCode(), "Response:", resp)
 	return nil
 }
+
 // RestClientGet gets resource
-func (r RestyClient) RestClientGet(anchor string) error {
+func (r RestyClient) RestClientGet(anchor string, body []byte) error {
+	if anchor == "" {
+		return pkgerrors.Errorf("Anchor can't be empty")
+	}
 	s := strings.Split(anchor, "/")
-	a := s[len(s)-2]
-	// Determine if multipart
-	if a == "apps" || a == "profiles" || a == "clusters" {
-		url, err := GetURL(anchor)
-		if err != nil {
-			return err
+	a := s[len(s)-1]
+	if a == "instantiate" || a == "apply" || a == "approve" || a == "terminate" {
+		// No get for these
+		return nil
+	}
+	var e emcoBody
+	err := json.Unmarshal(body, &e)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	if e.Meta.Name != "" {
+		name := e.Meta.Name
+		anchor = anchor + "/" + name
+		if a == "composite-apps" {
+			var cav emcoCompositeAppSpec
+			err := mapstructure.Decode(e.Spec, &cav)
+			if err != nil {
+				fmt.Println("mapstruct error")
+				return err
+			}
+			anchor = anchor + "/" + cav.Version
 		}
-		// Supports only getting metadata
-		resp, err := r.client.R().
-			SetHeader("Accept", "application/json").
-			Get(url)
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-		fmt.Println("URL:", anchor, "Response Code:", resp.StatusCode(), "Response:", resp)
-	} else {
-		r.RestClientGetAll(anchor)
+	} else if e.Label != "" {
+		anchor = anchor + "/" + e.Label
 	}
 
+	return r.RestClientGetAnchor(anchor)
+}
+// RestClientDeleteAnchor returns all resource in the input file
+func (r RestyClient) RestClientDeleteAnchor(anchor string) error {
+	url, err := GetURL(anchor)
+	if err != nil {
+		return err
+	}
+	resp, err := r.client.R().Delete(url)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	fmt.Println("URL:", anchor, "Response Code:", resp.StatusCode(), "Response:", resp)
 	return nil
 }
 // RestClientDelete calls rest delete command
 func (r RestyClient) RestClientDelete(anchor string, body []byte) error {
-	var url string
 
 	s := strings.Split(anchor, "/")
 	a := s[len(s)-1]
@@ -229,13 +271,11 @@ func (r RestyClient) RestClientDelete(anchor string, body []byte) error {
 		// Change instantiate to destroy
 		s[len(s)-1] = "terminate"
 		anchor = strings.Join(s[:], "/")
-		fmt.Println("URL:", anchor)
 		return r.RestClientPost(anchor, []byte{})
 	} else if a == "apply" {
 		// Change apply to terminate
 		s[len(s)-1] = "terminate"
 		anchor = strings.Join(s[:], "/")
-		fmt.Println("URL:", anchor)
 		return r.RestClientPost(anchor, []byte{})
 	} else if a == "approve" || a == "status" {
 		// Approve and status  doesn't have delete
@@ -261,19 +301,10 @@ func (r RestyClient) RestClientDelete(anchor string, body []byte) error {
 			}
 			anchor = anchor + "/" + cav.Version
 		}
+	} else if e.Label != "" {
+		anchor = anchor + "/" + e.Label
 	}
-	url, err = GetURL(anchor)
-	if err != nil {
-		return err
-	}
-	resp, err := r.client.R().
-		Delete(url)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	fmt.Println("URL:", anchor, "Response Code:", resp.StatusCode())
-	return nil
+	return r.RestClientDeleteAnchor(anchor)
 }
 // GetURL reads the configuration file to get URL
 func GetURL(anchor string) (string, error) {

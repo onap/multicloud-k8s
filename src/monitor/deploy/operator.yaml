@@ -18,6 +18,7 @@ spec:
       containers:
         - name: monitor
           # Replace this with the built image name
+          # so we have to push this one first aye
           image: emcov2/monitor:latest
           command:
           - /opt/monitor/monitor

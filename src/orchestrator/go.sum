@@ -855,6 +855,7 @@ github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee/go.mod
 github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200527175204-ef27eb4d63f1/go.mod h1:zpEOrSrzSCEO2dqjW5nullfXbjs9UQOTiJdJxUCwirI=
 github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200529003907-dbc8b2543e9c/go.mod h1:7baSFNf73xk4L/8+GZLGqE9F4TFEOYVGMAnabx4kNBY=
 github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4/go.mod h1:7baSFNf73xk4L/8+GZLGqE9F4TFEOYVGMAnabx4kNBY=
+github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200721211210-783ed87fb39a/go.mod h1:KHWzofahD3rAcWf/bp+zYhaJnslDC2ueyus7lBOfMwc=
 github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200529003854-0a7bf256bde5 h1:ADsdcBpxbFNQsRymp+zPywQWBscybnFTp+gVVPmA7ps=
 github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200529003854-0a7bf256bde5/go.mod h1:KdaZWMi5L33rQyuAtwMmtsgUv/TuG0iskqckToeb58g=
 github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d h1:0aXmwqPN8MjyqjKK5L1IhhP/hpP5nGj6xMgo6AOzCPI=

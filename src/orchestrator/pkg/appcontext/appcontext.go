@@ -419,7 +419,7 @@ func (ac *AppContext) AddInstruction(handle interface{}, level string, insttype 
 	if !(insttype == "order" || insttype == "dependency") {
 		return nil, pkgerrors.Errorf("Not a valid app context instruction type")
 	}
-	if !(level == "app" || level == "resource") {
+	if !(level == "app" || level == "resource" || level == "subresource") {
 		return nil, pkgerrors.Errorf("Not a valid app context instruction level")
 	}
 	h, err := ac.rtc.RtcAddInstruction(handle, level, insttype, value)

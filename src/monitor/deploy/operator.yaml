@@ -18,7 +18,8 @@ spec:
       containers:
         - name: monitor
           # Replace this with the built image name
-          image: emcov2/monitor:latest
+          # so we have to push this one first aye
+          image: igordcard/monitor:latest
           command:
           - /opt/monitor/monitor
           imagePullPolicy: IfNotPresent

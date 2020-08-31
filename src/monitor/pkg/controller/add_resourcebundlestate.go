@@ -15,4 +15,5 @@ func init() {
 	AddToManagerFuncs = append(AddToManagerFuncs, resourcebundlestate.AddIngressController)
 	AddToManagerFuncs = append(AddToManagerFuncs, resourcebundlestate.AddJobController)
 	AddToManagerFuncs = append(AddToManagerFuncs, resourcebundlestate.AddStatefulSetController)
+	AddToManagerFuncs = append(AddToManagerFuncs, resourcebundlestate.AddCsrController)
 }

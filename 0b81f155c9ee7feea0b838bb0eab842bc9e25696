@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1756bd09_46027f59",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 1352,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-08-31T22:30:37Z",
+      "side": 1,
+      "message": "nit: Whitespace",
+      "range": {
+        "startLine": 1352,
+        "startChar": 23,
+        "endLine": 1352,
+        "endChar": 27
+      },
+      "revId": "0b81f155c9ee7feea0b838bb0eab842bc9e25696",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa3c01fe_7c3d1898",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 2251,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-08-31T22:30:37Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 2250,
+        "startChar": 0,
+        "endLine": 2251,
+        "endChar": 8
+      },
+      "revId": "0b81f155c9ee7feea0b838bb0eab842bc9e25696",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

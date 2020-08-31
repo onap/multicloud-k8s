@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5610f706_f47841e4",
+        "filename": "src/monitor/deploy/operator.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-08-31T22:51:44Z",
+      "side": 1,
+      "message": "The image is currently in my dockerhub - what do we do about this?",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 41
+      },
+      "revId": "458ec7edc334fd4d460c018508ace44f56b7efdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

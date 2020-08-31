@@ -18,6 +18,7 @@ package scheduler
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	clusterPkg "github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
@@ -28,10 +29,14 @@ import (
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installappclient"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/state"
 
 	pkgerrors "github.com/pkg/errors"
 )
+
+// rsyncName denotes the name of the rsync controller
+const rsyncName = "rsync"
 
 // ClusterManager is an interface exposes the Cluster functionality
 type SchedulerManager interface {
@@ -63,6 +68,65 @@ func deleteAppContext(ac appcontext.AppContext) {
 	if err != nil {
 		log.Warn(":: Error deleting AppContext ::", log.Fields{"Error": err})
 	}
+}
+
+/*
+queryDBAndSetRsyncInfo queries the MCO db to find the record the sync controller
+and then sets the RsyncInfo global variable.
+*/
+func queryDBAndSetRsyncInfo() (installappclient.RsyncInfo, error) {
+	client := controller.NewControllerClient()
+	vals, _ := client.GetControllers()
+	for _, v := range vals {
+		if v.Metadata.Name == rsyncName {
+			log.Info("Initializing RPC connection to resource synchronizer", log.Fields{
+				"Controller": v.Metadata.Name,
+			})
+			rsyncInfo := installappclient.NewRsyncInfo(v.Metadata.Name, v.Spec.Host, v.Spec.Port)
+			return rsyncInfo, nil
+		}
+	}
+	return installappclient.RsyncInfo{}, pkgerrors.Errorf("queryRsyncInfoInMCODB Failed - Could not get find rsync by name : %v", rsyncName)
+}
+
+/*
+callRsyncInstall method shall take in the app context id and invokes the rsync service via grpc
+*/
+func callRsyncInstall(contextid interface{}) error {
+	rsyncInfo, err := queryDBAndSetRsyncInfo()
+	log.Info("Calling the Rsync ", log.Fields{
+		"RsyncName": rsyncInfo.RsyncName,
+	})
+	if err != nil {
+		return err
+	}
+
+	appContextID := fmt.Sprintf("%v", contextid)
+	err = installappclient.InvokeInstallApp(appContextID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
+callRsyncUninstall method shall take in the app context id and invokes the rsync service via grpc
+*/
+func callRsyncUninstall(contextid interface{}) error {
+	rsyncInfo, err := queryDBAndSetRsyncInfo()
+	log.Info("Calling the Rsync ", log.Fields{
+		"RsyncName": rsyncInfo.RsyncName,
+	})
+	if err != nil {
+		return err
+	}
+
+	appContextID := fmt.Sprintf("%v", contextid)
+	err = installappclient.InvokeUninstallApp(appContextID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Apply Network Intents associated with a cluster
@@ -162,7 +226,7 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 	}
 
 	// call resource synchronizer to instantiate the CRs in the cluster
-	err = installappclient.InvokeInstallApp(ctxVal.(string))
+	err = callRsyncInstall(ctxVal)
 	if err != nil {
 		deleteAppContext(ac)
 		return err
@@ -216,7 +280,7 @@ func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster strin
 
 	// call resource synchronizer to terminate the CRs in the cluster
 	contextId := state.GetLastContextIdFromStateInfo(s)
-	err = installappclient.InvokeUninstallApp(contextId)
+	err = callRsyncUninstall(contextId)
 	if err != nil {
 		return err
 	}

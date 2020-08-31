@@ -8,6 +8,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/batch/v1"
+	certsapi "k8s.io/api/certificates/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -116,6 +117,12 @@ func (r *reconciler) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 	err = r.updateStatefulSets(rbstate, rbstate.Spec.Selector.MatchLabels)
 	if err != nil {
 		log.Printf("Error adding statefulSetstatuses: %v\n", err)
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateCsrs(rbstate, rbstate.Spec.Selector.MatchLabels)
+	if err != nil {
+		log.Printf("Error adding csrStatuses: %v\n", err)
 		return reconcile.Result{}, err
 	}
 
@@ -340,6 +347,31 @@ func (r *reconciler) updateStatefulSets(rbstate *v1alpha1.ResourceBundleState,
 			Status:     sfs.Status,
 		}
 		rbstate.Status.StatefulSetStatuses = append(rbstate.Status.StatefulSetStatuses, resStatus)
+	}
+
+	return nil
+}
+
+func (r *reconciler) updateCsrs(rbstate *v1alpha1.ResourceBundleState,
+	selectors map[string]string) error {
+
+	// Update the CR with the csrs tracked
+	csrList := &certsapi.CertificateSigningRequestList{}
+	err := listResources(r.client, rbstate.Namespace, selectors, csrList)
+	if err != nil {
+		log.Printf("Failed to list csrs: %v", err)
+		return err
+	}
+
+	rbstate.Status.CsrStatuses = []certsapi.CertificateSigningRequest{}
+
+	for _, csr := range csrList.Items {
+		resStatus := certsapi.CertificateSigningRequest{
+			TypeMeta:   csr.TypeMeta,
+			ObjectMeta: csr.ObjectMeta,
+			Status:     csr.Status,
+		}
+		rbstate.Status.CsrStatuses = append(rbstate.Status.CsrStatuses, resStatus)
 	}
 
 	return nil

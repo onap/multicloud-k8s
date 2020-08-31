@@ -52,3 +52,12 @@ func listResources(cli client.Client, namespace string,
 
 	return nil
 }
+
+// listClusterResources lists non-namespace resources based
+// on the selectors provided.
+// The data is returned in the pointer to the runtime.Object
+// provided as argument.
+func listClusterResources(cli client.Client,
+	labelSelector map[string]string, returnData runtime.Object) error {
+	return listResources(cli, "", labelSelector, returnData)
+}

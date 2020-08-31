@@ -13,6 +13,9 @@ require (
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
 	github.com/lib/pq v1.6.0 // indirect
+	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
+	github.com/mitchellh/copystructure v1.0.0 // indirect
+	github.com/onap/multicloud-k8s/src/clm v0.0.0-00010101000000-000000000000
 	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200630152613-7c20f73e7c5d
 	github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee
 	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d

@@ -168,6 +168,7 @@ func (r *serviceReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState, svc
 
 	// Add it to CR
 	cr.Status.ServiceStatuses = append(cr.Status.ServiceStatuses, corev1.Service{
+		TypeMeta:   svc.TypeMeta,
 		ObjectMeta: svc.ObjectMeta,
 		Status:     svc.Status,
 	})

@@ -168,6 +168,7 @@ func (r *daemonSetReconciler) updateSingleCR(cr *v1alpha1.ResourceBundleState, d
 
 	// Add it to CR
 	cr.Status.DaemonSetStatuses = append(cr.Status.DaemonSetStatuses, appsv1.DaemonSet{
+		TypeMeta:   ds.TypeMeta,
 		ObjectMeta: ds.ObjectMeta,
 		Status:     ds.Status,
 	})

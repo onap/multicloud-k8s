@@ -22,15 +22,15 @@ import "time"
 // information about resources which can be instantiated via rsync.
 // The last Actions entry holds the current state of the container object.
 type StateInfo struct {
-	Actions []ActionEntry
+	Actions []ActionEntry `json:"actions"`
 }
 
 // ActionEntry is used to keep track of the time an action (e.g. Created, Instantiate, Terminate) was invoked
 // For actions where an AppContext is relevent, the ContextId field will be non-zero length
 type ActionEntry struct {
-	State     StateValue
-	ContextId string
-	TimeStamp time.Time
+	State     StateValue `json:"state"`
+	ContextId string     `json:"instance"`
+	TimeStamp time.Time  `json:"time"`
 }
 
 type StateValue = string

@@ -90,6 +90,9 @@ func NewRouter(testClient interface{}) *mux.Router {
 	}
 	router.HandleFunc("/cluster-providers/{cluster-provider}/clusters/{cluster}/apply", schedulerHandler.applySchedulerHandler).Methods("POST")
 	router.HandleFunc("/cluster-providers/{cluster-provider}/clusters/{cluster}/terminate", schedulerHandler.terminateSchedulerHandler).Methods("POST")
+	router.HandleFunc("/cluster-providers/{cluster-provider}/clusters/{cluster}/status", schedulerHandler.statusSchedulerHandler).Methods("GET")
+	router.HandleFunc("/cluster-providers/{cluster-provider}/clusters/{cluster}/status",
+		schedulerHandler.statusSchedulerHandler).Queries("instance", "{instance}", "type", "{type}", "output", "{output}", "app", "{app}", "cluster", "{cluster}", "resource", "{resource}")
 
 	return router
 }

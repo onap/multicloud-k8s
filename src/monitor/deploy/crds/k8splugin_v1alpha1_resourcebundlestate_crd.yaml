@@ -38,15 +38,6 @@ spec:
           properties:
             podStatuses:
               items:
-                properties:
-                  metadata:
-                    type: object
-                  ready:
-                    type: boolean
-                  status:
-                    type: object
-                required:
-                - ready
                 type: object
               type: array
             ready:

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a1acec11_0f074532",
+        "filename": "kud/tests/sanity-check-for-v2.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-09-01T16:55:21Z",
+      "side": 1,
+      "message": "Eric \u0026 Ritu: Is this correct Nodeport values, Please help for the review.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 58
+      },
+      "revId": "4119bd810ac518540b19ddafb3906d09f0845c07",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

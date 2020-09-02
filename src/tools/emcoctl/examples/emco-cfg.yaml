@@ -4,3 +4,9 @@
   clm:
     host: localhost
     port: 9061
+  ncm:
+    host: localhost
+    port: 9031
+  ovnaction:
+    host: localhost
+    port: 9051

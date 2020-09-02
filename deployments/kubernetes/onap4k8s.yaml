@@ -53,7 +53,7 @@ spec:
     spec:
       containers:
         - name: orchestrator
-          image: rtsood/emco:stable
+          image: emcov2/emco:stable
           imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "orchestrator"]
           workingDir: /opt/emco
@@ -125,7 +125,7 @@ spec:
     spec:
       containers:
         - name: ncm
-          image: rtsood/emco:stable
+          image: emcov2/emco:stable
           imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "ncm"]
           workingDir: /opt/emco
@@ -195,7 +195,7 @@ spec:
     spec:
       containers:
         - name: rsync
-          image: rtsood/emco:stable
+          image: emcov2/emco:stable
           imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "rsync"]
           workingDir: /opt/emco
@@ -270,7 +270,7 @@ spec:
     spec:
       containers:
         - name: ovnaction
-          image: rtsood/emco:stable
+          image: emcov2/emco:stable
           imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "ovnaction"]
           workingDir: /opt/emco
@@ -343,7 +343,7 @@ spec:
     spec:
       containers:
         - name: clm
-          image: rtsood/emco:stable
+          image: emcov2/emco:stable
           imagePullPolicy: Always
           command: ["/opt/emco/entrypoint", "clm"]
           workingDir: /opt/emco

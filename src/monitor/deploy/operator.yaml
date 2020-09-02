@@ -18,7 +18,7 @@ spec:
       containers:
         - name: monitor
           # Replace this with the built image name
-          image: ewmduck/monitor:latest
+          image: emcov2/monitor:latest
           command:
           - /opt/monitor/monitor
           imagePullPolicy: IfNotPresent

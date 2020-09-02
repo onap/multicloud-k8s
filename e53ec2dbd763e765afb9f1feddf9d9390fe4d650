@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cee4f6da_25d8423f",
+        "filename": "deployments/kubernetes/Readme.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-02T21:39:59Z",
+      "side": 1,
+      "message": "Typo",
+      "range": {
+        "startLine": 39,
+        "startChar": 4,
+        "endLine": 39,
+        "endChar": 16
+      },
+      "revId": "e53ec2dbd763e765afb9f1feddf9d9390fe4d650",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

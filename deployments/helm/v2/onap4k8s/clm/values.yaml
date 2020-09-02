@@ -23,7 +23,7 @@ global:
 #################################################################
 # application image
 repository: registry.hub.docker.com
-image: rtsood/emco:stable
+image: emcov2/emco:stable
 pullPolicy: Always
 command: "/opt/emco/entrypoint"
 args: "clm"

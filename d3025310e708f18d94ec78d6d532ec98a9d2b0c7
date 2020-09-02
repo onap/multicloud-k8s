@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f1474a29_4a351c48",
+        "filename": "src/rsync/pkg/context/context.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-02T01:18:03Z",
+      "side": 1,
+      "message": "What will happen in the case user wants to abandon all instantiations and terminations and delete the deployment?",
+      "range": {
+        "startLine": 541,
+        "startChar": 2,
+        "endLine": 543,
+        "endChar": 9
+      },
+      "revId": "d3025310e708f18d94ec78d6d532ec98a9d2b0c7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

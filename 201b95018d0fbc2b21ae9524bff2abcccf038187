@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2f340340_0f74e403",
+        "filename": "src/orchestrator/api/api.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-09-03T00:08:22Z",
+      "side": 1,
+      "message": "I was expecting the URL to be \"/projects/{project-name}/composite-apps/{composite-app-name}/{version} for PUT.",
+      "revId": "201b95018d0fbc2b21ae9524bff2abcccf038187",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "abd4369a_f5a267a3",
+        "filename": "src/orchestrator/api/composite_app_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-09-03T00:08:22Z",
+      "side": 1,
+      "message": "for a put, i would exepct the composite-app to be provided as well in the URL.",
+      "revId": "201b95018d0fbc2b21ae9524bff2abcccf038187",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

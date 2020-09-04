@@ -153,12 +153,20 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	releaseName, ok := directives["k8s-instance-release-name"]
+	if !ok {
+		//Release name is not mandatory argument as it's provided by profile anyway
+		//To provide API's backward compatibility
+		releaseName = ""
+	}
+
 	// Setup the resource parameters for making the request
 	var instReq app.InstanceRequest
 	instReq.RBName = req.VFModuleModelInvariantID
 	instReq.RBVersion = req.VFModuleModelVersionID
 	instReq.ProfileName = profileName
 	instReq.CloudRegion = cloudRegion
+	instReq.ReleaseName = releaseName
 	instReq.Labels = map[string]string{
 		"stack-name": req.TemplateData.StackName,
 	}

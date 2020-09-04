@@ -63,7 +63,7 @@ payload="$(cat <<EOF
     "rb-name": "${rb_name}",
     "rb-version": "${rb_version}",
     "profile-name": "${profile_name}",
-    "release-name": "${release_name}",
+    "release-name": "dummy",
     "namespace": "${namespace}"
 }
 EOF
@@ -92,6 +92,7 @@ payload="$(cat <<EOF
     "rb-name": "${rb_name}",
     "rb-version": "${rb_version}",
     "profile-name": "${profile_name}",
+    "release-name": "${release_name}",
     "cloud-region": "${cloud_region_id}",
     "labels": {"testCaseName": "plugin_fw.sh"},
     "override-values": {"global.onapPrivateNetworkName": "onap-private-net-test"}
@@ -120,6 +121,8 @@ response="$(call_api "${base_url}/instance/${vnf_id}")"
 echo "$response"
 print_msg "Assert additional label has been assigned to rb instance"
 test "$(jq -r .request.labels.testCaseName <<< "${response}")" == plugin_fw.sh
+print_msg "Assert ReleaseName has been correctly overriden"
+test "$(jq -r .request.release-name <<< "${response}")" == "${release_name}"
 
 #Teardown
 print_msg "Deleting VNF Instance"

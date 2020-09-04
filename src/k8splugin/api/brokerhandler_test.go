@@ -233,7 +233,7 @@ func TestBrokerCreateHandler(t *testing.T) {
 					]
 				}
 			}`)),
-		},
+		}, //FIXME Add testcase
 		{
 			label: "Succesfully create an Instance",
 			input: bytes.NewBuffer([]byte(`{

@@ -2,7 +2,7 @@
 project: 'multicloud-k8s'
 project_creation_date: '2018-04-11'
 project_category: ''
-lifecycle_state: 'Incubation'
+lifecycle_state: 'Mature'
 project_lead: &onap_multicloud_ptl
     name: 'Bin Yang'
     email: 'bin.yang@windriver.com'

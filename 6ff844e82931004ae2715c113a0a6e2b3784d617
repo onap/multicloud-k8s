@@ -22,6 +22,30 @@
       "revId": "6ff844e82931004ae2715c113a0a6e2b3784d617",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e81e511e_b7b86333",
+        "filename": "src/k8splugin/api/brokerhandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-09-08T11:22:48Z",
+      "side": 1,
+      "message": "Makes sense, I\u0027ll update review in a moment",
+      "parentUuid": "a9745791_f44fab7a",
+      "range": {
+        "startLine": 156,
+        "startChar": 1,
+        "endLine": 161,
+        "endChar": 2
+      },
+      "revId": "6ff844e82931004ae2715c113a0a6e2b3784d617",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

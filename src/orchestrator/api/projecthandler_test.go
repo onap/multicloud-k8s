@@ -64,10 +64,6 @@ func (m *mockProjectManager) GetAllProjects() ([]moduleLib.Project, error) {
 	return []moduleLib.Project{}, m.Err
 }
 
-func init() {
-	projectJSONFile = "../json-schemas/metadata.json"
-}
-
 func TestProjectCreateHandler(t *testing.T) {
 	testCases := []struct {
 		label         string
@@ -323,15 +319,28 @@ func TestProjectDeleteHandler(t *testing.T) {
 			label:         "Delete Project",
 			expectedCode:  http.StatusNoContent,
 			name:          "testProject",
-			projectClient: &mockProjectManager{},
+
+			projectClient: &mockProjectManager{
+				//Items that will be returned by the mocked Client
+				Items: []moduleLib.Project{
+					{
+						MetaData: moduleLib.ProjectMetaData{
+							Name:        "testProject",
+							Description: "Test Project used for unit testing",
+							UserData1:   "data1",
+							UserData2:   "data2",
+						},
+					},
+				},
+			},
 		},
 		{
 			label:        "Delete Non-Exiting Project",
-			expectedCode: http.StatusInternalServerError,
+			expectedCode: http.StatusNotFound,
 			name:         "testProject",
-			projectClient: &mockProjectManager{
-				Err: pkgerrors.New("Internal Error"),
-			},
+                        projectClient: &mockProjectManager{
+                             Err: pkgerrors.New("Internal Error"),
+                        },
 		},
 	}
 

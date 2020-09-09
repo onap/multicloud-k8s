@@ -323,10 +323,10 @@ func TestProjectDeleteHandler(t *testing.T) {
 		},
 		{
 			label:        "Delete Non-Exiting Project",
-			expectedCode: http.StatusInternalServerError,
+			expectedCode: http.StatusNotFound,
 			name:         "testProject",
 			projectClient: &mockProjectManager{
-				Err: pkgerrors.New("Internal Error"),
+				Err: pkgerrors.New("Not Found"),
 			},
 		},
 	}

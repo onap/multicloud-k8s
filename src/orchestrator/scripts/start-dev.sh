@@ -28,6 +28,5 @@ echo "Compiling source code"
 pushd $opath
 generate_config
 make all
-cp -r $k8s_path/src/orchestrator/json-schemas $k8s_path/src/orchestrator
 ./orchestrator
 popd

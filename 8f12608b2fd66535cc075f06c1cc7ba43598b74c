@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "944761e4_fac63cd5",
+        "filename": "src/tools/emcoctl/Readme.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-10T03:25:32Z",
+      "side": 1,
+      "message": "Remove the path - not relevant",
+      "range": {
+        "startLine": 98,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 72
+      },
+      "revId": "8f12608b2fd66535cc075f06c1cc7ba43598b74c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "df88f89c_e305bb65",
+        "filename": "src/tools/emcoctl/Readme.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-10T03:25:32Z",
+      "side": 1,
+      "message": "Apps. We are not using sub-app, can be confusing.",
+      "range": {
+        "startLine": 137,
+        "startChar": 43,
+        "endLine": 137,
+        "endChar": 51
+      },
+      "revId": "8f12608b2fd66535cc075f06c1cc7ba43598b74c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

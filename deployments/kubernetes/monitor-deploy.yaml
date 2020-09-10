@@ -1,0 +1,314 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: resourcebundlestates.k8splugin.io
+spec:
+  group: k8splugin.io
+  names:
+    kind: ResourceBundleState
+    listKind: ResourceBundleStateList
+    plural: resourcebundlestates
+    singular: resourcebundlestate
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            selector:
+              type: object
+          required:
+          - selector
+          type: object
+        status:
+          properties:
+            podStatuses:
+              items:
+                type: object
+              type: array
+            ready:
+              type: boolean
+            resourceCount:
+              format: int32
+              type: integer
+            serviceStatuses:
+              items:
+                type: object
+              type: array
+            configMapStatuses:
+              items:
+                type: object
+              type: array
+            deploymentStatuses:
+              items:
+                type: object
+              type: array
+            secretStatuses:
+              items:
+                type: object
+              type: array
+            daemonSetStatuses:
+              items:
+                type: object
+              type: array
+            ingressStatuses:
+              items:
+                type: object
+              type: array
+            jobStatuses:
+              items:
+                type: object
+              type: array
+            statefulSetStatuses:
+              items:
+                type: object
+              type: array
+          required:
+          - ready
+          - resourceCount
+          - podStatuses
+          - serviceStatuses
+          - configMapStatuses
+          - deploymentStatuses
+          - secretStatuses
+          - daemonSetStatuses
+          - ingressStatuses
+          - jobStatuses
+          - statefulSetStatuses
+          type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: monitor
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - endpoints
+  - persistentvolumeclaims
+  - events
+  - configmaps
+  - secrets
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs:
+  - '*'
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - get
+  - create
+- apiGroups:
+  - apps
+  resourceNames:
+  - monitor
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - get
+- apiGroups:
+  - k8splugin.io
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - batch
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - extensions
+  resources:
+  - '*'
+  verbs:
+  - '*'
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: monitor
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - endpoints
+  - persistentvolumeclaims
+  - events
+  - configmaps
+  - secrets
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs:
+  - '*'
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - get
+  - create
+- apiGroups:
+  - apps
+  resourceNames:
+  - monitor
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - get
+- apiGroups:
+  - k8splugin.io
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - batch
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - extensions
+  resources:
+  - '*'
+  verbs:
+  - '*'
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: monitor
+subjects:
+- kind: ServiceAccount
+  name: monitor
+roleRef:
+  kind: Role
+  name: monitor
+  apiGroup: rbac.authorization.k8s.io
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: monitor
+subjects:
+- kind: ServiceAccount
+  name: monitor
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: monitor
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: monitor
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitor
+  labels:
+    "emco/deployment-id": "monitor"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      "emco/deployment-id": "monitor"
+  template:
+    metadata:
+      labels:
+        "emco/deployment-id": "monitor"
+    spec:
+      serviceAccountName: monitor
+      containers:
+        - name: monitor
+          # Replace this with the built image name
+          image: emcov2/monitor:latest
+          command:
+          - /opt/monitor/monitor
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WATCH_NAMESPACE
+              value: ""
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "monitor"
+

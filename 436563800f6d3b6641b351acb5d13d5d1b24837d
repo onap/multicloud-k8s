@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "67e1e9e8_10944d94",
+        "filename": "kud/tests/sanity-check-for-v2.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-09-10T02:34:10Z",
+      "side": 1,
+      "message": "(sorry for an extra comment) - I think it would be a good idea to separate the terminate from delete - e.g. add another argument to the script.  \n\nthe latest code (just merged) will prevent delete (of deploymentintentgroup resource) until the terminate has completed.\n\nso the script - as is - will likely not work right.",
+      "revId": "436563800f6d3b6641b351acb5d13d5d1b24837d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

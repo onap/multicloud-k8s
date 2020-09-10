@@ -35,6 +35,7 @@ type InstanceRequest struct {
 	RBName         string            `json:"rb-name"`
 	RBVersion      string            `json:"rb-version"`
 	ProfileName    string            `json:"profile-name"`
+	ReleaseName    string            `json:"release-name"`
 	CloudRegion    string            `json:"cloud-region"`
 	Labels         map[string]string `json:"labels"`
 	OverrideValues map[string]string `json:"override-values"`
@@ -42,19 +43,21 @@ type InstanceRequest struct {
 
 // InstanceResponse contains the response from instantiation
 type InstanceResponse struct {
-	ID             string                    `json:"id"`
-	Request        InstanceRequest           `json:"request"`
-	Namespace      string                    `json:"namespace"`
-	Resources      []helm.KubernetesResource `json:"resources"`
+	ID          string                    `json:"id"`
+	Request     InstanceRequest           `json:"request"`
+	Namespace   string                    `json:"namespace"`
+	ReleaseName string                    `json:"release-name"`
+	Resources   []helm.KubernetesResource `json:"resources"`
 }
 
 // InstanceMiniResponse contains the response from instantiation
 // It does NOT include the created resources.
 // Use the regular GET to get the created resources for a particular instance
 type InstanceMiniResponse struct {
-	ID        string          `json:"id"`
-	Request   InstanceRequest `json:"request"`
-	Namespace string          `json:"namespace"`
+	ID          string          `json:"id"`
+	Request     InstanceRequest `json:"request"`
+	ReleaseName string          `json:"release-name"`
+	Namespace   string          `json:"namespace"`
 }
 
 // PodStatus defines the observed state of ResourceBundleState
@@ -144,7 +147,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 
 	//Execute the kubernetes create command
-	sortedTemplates, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues)
+	sortedTemplates, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
@@ -165,10 +168,11 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 
 	//Compose the return response
 	resp := InstanceResponse{
-		ID:        id,
-		Request:   i,
-		Namespace: profile.Namespace,
-		Resources: createdResources,
+		ID:          id,
+		Request:     i,
+		Namespace:   profile.Namespace,
+		ReleaseName: releaseName,
+		Resources:   createdResources,
 	}
 
 	key := InstanceKey{
@@ -252,9 +256,10 @@ func (v *InstanceClient) List(rbname, rbversion, profilename string) ([]Instance
 			}
 
 			miniresp := InstanceMiniResponse{
-				ID:        resp.ID,
-				Request:   resp.Request,
-				Namespace: resp.Namespace,
+				ID:          resp.ID,
+				Request:     resp.Request,
+				Namespace:   resp.Namespace,
+				ReleaseName: resp.ReleaseName,
 			}
 
 			//Filter based on the accepted keys

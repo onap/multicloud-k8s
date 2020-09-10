@@ -1,0 +1,16 @@
+{
+    "ca-file": "ca.cert",
+    "server-cert": "server.cert",
+    "server-key": "server.key",
+    "password": "",
+    "database-ip": "172.31.0.2",
+    "database-type": "mongo",
+    "plugin-dir": "plugins",
+    "etcd-ip": "127.0.0.1",
+    "etcd-cert": "",
+    "etcd-key": "",
+    "etcd-ca-file": "",
+    "service-port": "9015",
+    "log-level": "warn"
+
+}

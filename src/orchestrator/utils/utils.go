@@ -23,13 +23,14 @@ import (
 
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
 
 	pkgerrors "github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v3"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+
 )
 
 // ListYamlStruct is applied when the kind is list
@@ -69,15 +70,15 @@ type YamlStruct struct {
 
 func (y YamlStruct) isValid() bool {
 	if y.APIVersion == "" {
-		log.Printf("apiVersion is missing in manifest file")
+		log.Info("apiVersion is missing in manifest file", log.Fields{})
 		return false
 	}
 	if y.Kind == "" {
-		log.Printf("kind is missing in manifest file")
+		log.Info("kind is missing in manifest file", log.Fields{})
 		return false
 	}
 	if y.Metadata.Name == "" {
-		log.Printf("metadata.name is missing in manifest file")
+		log.Info("metadata.name is missing in manifest file", log.Fields{})
 		return false
 	}
 	return true
@@ -107,13 +108,14 @@ func ExtractYamlParameters(f string) (YamlStruct, error) {
 		li := strings.LastIndex(filename, "/")
 		fn := string(filename[li+1:])
 		yamlStruct.Metadata.Name = fn
-		log.Printf("Setting the metadata name as :: %s", fn)
+		log.Info("Setting the metadata", log.Fields{"MetaDataName":fn})
 	}
 	if yamlStruct.isValid() {
-		log.Printf("YAML parameters for file ::%s \n %v", f, yamlStruct)
+		log.Info(":: YAML parameters ::", log.Fields{"fileName": f, "yamlStruct":yamlStruct})
+
 		return yamlStruct, nil
 	}
-	log.Printf("YAML file ::%s has errors", f)
+	log.Info("YAML file has errors", log.Fields{"fileName": f})
 	return YamlStruct{}, pkgerrors.Errorf("Cant extract parameters from yaml file :: %s", filename)
 
 }
@@ -204,13 +206,3 @@ func EnsureDirectory(f string) error {
 	}
 	return os.MkdirAll(base, 0755)
 }
-
-// func main() {
-// 	filename := "./test.yaml"
-// 	yamlStruct, err := ExtractYamlParameters(filename)
-// 	if err!=nil {
-// 		log.Print(err)
-// 	}
-// 	fmt.Printf("%s+%s", yamlStruct.Metadata.Name, yamlStruct.Kind)
-// 	fmt.Printf("%v", yamlStruct)
-// }

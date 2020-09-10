@@ -35,3 +35,6 @@ Steps:
 * Run the plugin:
     * `cd k8s/deployments && ./start.sh`
 
+# Troubleshooting
+
+* Logs can be set as "warn" or "info" in the config.json file of the orchestrator directory. By default the log level is set as "warn".

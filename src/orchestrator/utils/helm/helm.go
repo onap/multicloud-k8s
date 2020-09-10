@@ -21,7 +21,7 @@ import (
 	utils "github.com/onap/multicloud-k8s/src/orchestrator/utils"
 
 	pkgerrors "github.com/pkg/errors"
-	"log"
+	
 
 	"fmt"
 	"io/ioutil"
@@ -43,6 +43,8 @@ import (
 	"k8s.io/helm/pkg/renderutil"
 	"k8s.io/helm/pkg/tiller"
 	"k8s.io/helm/pkg/timeconv"
+	logger "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+
 )
 
 //KubernetesResourceTemplate - Represents the template that is used to create a particular
@@ -174,7 +176,8 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	if err != nil {
 		return retData, pkgerrors.Wrap(err, "Got error creating temp dir")
 	}
-	log.Printf("The o/p dir:: %s ", outputDir)
+	logger.Info(":: The o/p dir:: ", logger.Fields{"OutPutDirectory ":outputDir})
+	
 
 	if namespace == "" {
 		namespace = "default"
@@ -302,20 +305,20 @@ func (h *TemplateClient) Resolve(appContent []byte, appProfileContent []byte, ov
 	if err != nil {
 		return sortedTemplates, pkgerrors.Wrap(err, "Extracting appContent")
 	}
-	log.Printf("The chartBasePath :: %s", chartBasePath)
+	logger.Info("The chartBasePath ::", logger.Fields{"chartBasePath":chartBasePath})
 
 	//prPath is the tmp path where the appProfileContent is extracted.
 	prPath, err := utils.ExtractTarBall(bytes.NewBuffer(appProfileContent))
 	if err != nil {
 		return sortedTemplates, pkgerrors.Wrap(err, "Extracting Profile Content")
 	}
-	log.Printf("The profile path:: %s", prPath)
+	logger.Info("The profile path:: ", logger.Fields{"Profile Path":prPath})
 
 	prYamlClient, err := ProcessProfileYaml(prPath, h.manifestName)
 	if err != nil {
 		return sortedTemplates, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}
-	log.Println("Got the profileYamlClient..")
+	logger.Info("Got the profileYamlClient..", logger.Fields{})
 
 	err = prYamlClient.CopyConfigurationOverrides(chartBasePath)
 	if err != nil {

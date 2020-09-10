@@ -35,7 +35,7 @@ var ExportedVariable genericPlugin
 type genericPlugin struct {
 }
 
-// Create deployment object in a specific Kubernetes cluster
+// Create generic object in a specific Kubernetes cluster
 func (g genericPlugin) Create(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
 	if namespace == "" {
 		namespace = "default"

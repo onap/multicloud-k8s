@@ -25,7 +25,7 @@ import (
 
 // DefaultValidation default action to validate. If `true` all resources by
 // default will be validated.
-const DefaultValidation = true
+const DefaultValidation = false
 
 // Client is a kubernetes client, like `kubectl`
 type Client struct {

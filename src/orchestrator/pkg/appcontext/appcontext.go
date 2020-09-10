@@ -37,30 +37,30 @@ type AppContext struct {
 // AppContextStatus represents the current status of the appcontext
 //	Instantiating - instantiate has been invoked and is still in progress
 //	Instantiated - instantiate has completed
-//	PreTerminate - terminate has been invoked when in Instantiating status - need to clean up first
 //	Terminating - terminate has been invoked and is still in progress
 //	Terminated - terminate has completed
-//	Failed - the instantiate or terminate action has failed
+//	InstantiateFailed - the instantiate action has failed
+//	TerminateFailed - the terminate action has failed
 type AppContextStatus struct {
 	Status StatusValue
 }
 type StatusValue string
 type statuses struct {
-	Instantiating StatusValue
-	Instantiated  StatusValue
-	PreTerminate  StatusValue
-	Terminating   StatusValue
-	Terminated    StatusValue
-	Failed        StatusValue
+	Instantiating     StatusValue
+	Instantiated      StatusValue
+	Terminating       StatusValue
+	Terminated        StatusValue
+	InstantiateFailed StatusValue
+	TerminateFailed   StatusValue
 }
 
 var AppContextStatusEnum = &statuses{
-	Instantiating: "Instantiating",
-	Instantiated:  "Instantiated",
-	PreTerminate:  "PreTerminate",
-	Terminating:   "Terminating",
-	Terminated:    "Terminated",
-	Failed:        "Failed",
+	Instantiating:     "Instantiating",
+	Instantiated:      "Instantiated",
+	Terminating:       "Terminating",
+	Terminated:        "Terminated",
+	InstantiateFailed: "InstantiateFailed",
+	TerminateFailed:   "TerminateFailed",
 }
 
 // CompositeAppMeta consists of projectName, CompositeAppName,

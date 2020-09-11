@@ -15,33 +15,36 @@
 #  limitations under the License.
 #
 
-
 set -o errexit
 set -o nounset
 set -o pipefail
-
 
 source _common_test.sh
 source _functions.sh
 #source _common.sh
 
+# TODO Workaround for MULTICLOUD-1202
+function delete_resource_nox {
+    call_api_nox -X DELETE "$1"
+    ! call_api -X GET "$1" >/dev/null
+}
 
-base_url_orchestrator=${base_url_orchestrator:-"http://localhost:9015/v2"}
-base_url_clm=${base_url_clm:-"http://localhost:9019/v2"}
-
+master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
+    awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
+rsync_service_port=30441
+rsync_service_host="$master_ip"
+base_url_orchestrator=${base_url_orchestrator:-"http://$master_ip:30415/v2"}
+base_url_clm=${base_url_clm:-"http://$master_ip:30461/v2"}
 
 CSAR_DIR="/opt/csar"
 csar_id="cb009bfe-bbee-11e8-9766-525400435678"
-
 
 app1_helm_path="$CSAR_DIR/$csar_id/prometheus-operator.tar.gz"
 app1_profile_path="$CSAR_DIR/$csar_id/prometheus-operator_profile.tar.gz"
 app2_helm_path="$CSAR_DIR/$csar_id/collectd.tar.gz"
 app2_profile_path="$CSAR_DIR/$csar_id/collectd_profile.tar.gz"
 
-kubeConfigLocal="/home/otc/.kube/config"
-
-
+kubeconfig_path="$HOME/.kube/config"
 
 function populate_CSAR_composite_app_helm {
     _checks_args "$1"
@@ -103,8 +106,8 @@ rsynccontrollerdata="$(cat<<EOF
     "userData2": "user data 2 for $rsynccontrollername"
   },
   "spec": {
-    "host": "localhost",
-    "port": 9031
+    "host": "$rsync_service_host",
+    "port": $rsync_service_port
   }
 }
 EOF
@@ -406,7 +409,7 @@ function deleteOrchestratorData {
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
@@ -434,7 +437,7 @@ function createClmData {
     print_msg "Creating cluster provider and cluster"
     call_api -d "${clusterproviderdata}" "${base_url_clm}/cluster-providers"
 
-    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata" -F "file=@$kubeConfigLocal" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
+    call_api -H "Content-Type: multipart/form-data" -F "metadata=$clusterdata" -F "file=@$kubeconfig_path" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters"
 
     call_api -d "${labeldata}" "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels"
 
@@ -444,7 +447,7 @@ function createClmData {
 function deleteClmData {
     print_msg "begin deleteClmData"
     delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
-    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
+    delete_resource_nox "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
     delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}"
     print_msg "deleteClmData done"
 }
@@ -469,11 +472,38 @@ function terminateOrchData {
     call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/terminate"
 }
 
+function status {
+    call_api "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/status"
+}
+
+function waitFor {
+    wait_for_deployment_status "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/status" $1
+}
+
 # Setup
 
 function setup {
     install_deps
     populate_CSAR_composite_app_helm "$csar_id"
+}
+
+function start {
+    setup
+    deleteData
+    print_msg "Before creating, deleting the data success"
+    createData
+    print_msg "creating the data success"
+    instantiate
+    print_msg "instantiate success"
+    waitFor "Instantiated"
+}
+
+function stop {
+    terminateOrchData
+    print_msg "terminated the resources"
+    waitFor "Terminated"
+    deleteData
+    print_msg "deleting the data success"
 }
 
 function usage {
@@ -487,26 +517,18 @@ function usage {
     exit
 }
 
-if [ "$#" -ne 1 ] ; then
-    usage
+if [[ "$#" -gt 0 ]] ; then
+    case "$1" in
+        "start" ) start ;;
+        "stop" ) stop ;;
+        "create" ) createData ;;
+        "instantiate" ) instantiate ;;
+        "status" ) status ;;
+        "terminate" ) terminateOrchData ;;
+        "delete" ) deleteData ;;
+        *) usage ;;
+    esac
+else
+    start
+    stop
 fi
-
-
-case "$1" in
-    "start" )
-        setup
-        deleteData
-        print_msg "Before creating, deleting the data success"
-        createData
-        print_msg "creating the data success"
-        instantiate
-        print_msg "instantiate success"
-        ;;
-    "stop" )
-        terminateOrchData
-        print_msg "terminated the resources"
-        deleteData
-        print_msg "deleting the data success"
-        ;;
-    *) usage ;;
-esac

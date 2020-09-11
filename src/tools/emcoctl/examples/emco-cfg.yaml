@@ -3,10 +3,10 @@
     port: 9015
   clm:
     host: localhost
-    port: 9061
+    port: 9019
   ncm:
     host: localhost
-    port: 9031
+    port: 9016
   ovnaction:
     host: localhost
-    port: 9051
+    port: 9018

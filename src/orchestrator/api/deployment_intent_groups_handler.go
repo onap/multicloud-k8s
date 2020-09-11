@@ -27,6 +27,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var dpiJSONFile string = "json-schemas/deployment-group-intent.json"
+
 /* Used to store backend implementation objects
 Also simplifies mocking for unit testing purposes
 */
@@ -49,9 +51,8 @@ func (h deploymentIntentGroupHandler) createDeploymentIntentGroupHandler(w http.
 		return
 	}
 
-	jsonFile := "json-schemas/deployment-group-intent.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, d)
+	err, httpError := validation.ValidateJsonSchemaData(dpiJSONFile, d)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

@@ -29,6 +29,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var netIfJSONFile string = "json-schemas/network-load-interface.json"
+
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type workloadifintentHandler struct {
@@ -101,6 +103,12 @@ func (h workloadifintentHandler) createHandler(w http.ResponseWriter, r *http.Re
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
+
+	err, httpError := validation.ValidateJsonSchemaData(netIfJSONFile, wif)
+if err != nil {
+	http.Error(w, err.Error(), httpError)
+	return
+}
 
 	// Name is required.
 	if wif.Metadata.Name == "" {

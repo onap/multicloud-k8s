@@ -28,9 +28,15 @@ import (
 	"net/textproto"
 
 	clusterPkg "github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 
 	"github.com/gorilla/mux"
 )
+
+var cpJSONFile string = "json-schemas/metadata.json"
+var ckvJSONFile string = "json-schemas/cluster-kv.json"
+var clJSONFile string = "json-schemas/cluster-label.json"
+
 
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
@@ -52,6 +58,12 @@ func (h clusterHandler) createClusterProviderHandler(w http.ResponseWriter, r *h
 		return
 	case err != nil:
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	err, httpError := validation.ValidateJsonSchemaData(cpJSONFile, p)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 
@@ -145,6 +157,12 @@ func (h clusterHandler) createClusterHandler(w http.ResponseWriter, r *http.Requ
 		return
 	case err != nil:
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	err, httpError := validation.ValidateJsonSchemaData(cpJSONFile, p)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
 		return
 	}
 
@@ -333,6 +351,12 @@ func (h clusterHandler) createClusterLabelHandler(w http.ResponseWriter, r *http
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 
+	err, httpError := validation.ValidateJsonSchemaData(clJSONFile, p)
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
+		return
+	}
+
 	// LabelName is required.
 	if p.LabelName == "" {
 		http.Error(w, "Missing label name in POST request", http.StatusBadRequest)
@@ -412,6 +436,13 @@ func (h clusterHandler) createClusterKvPairsHandler(w http.ResponseWriter, r *ht
 	var p clusterPkg.ClusterKvPairs
 
 	err := json.NewDecoder(r.Body).Decode(&p)
+
+		// Verify JSON Body
+		err, httpError := validation.ValidateJsonSchemaData(ckvJSONFile, p)
+		if err != nil {
+			http.Error(w, err.Error(), httpError)
+			return
+		}
 
 	// KvPairsName is required.
 	if p.Metadata.Name == "" {

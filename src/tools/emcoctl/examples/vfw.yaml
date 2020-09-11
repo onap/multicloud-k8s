@@ -38,7 +38,7 @@ resourceContext:
 metadata :
    name: edge01
 file:
-  kubeconfig
+  /home/otc/.kube/config
 
 ---
 #Add label cluster
@@ -89,7 +89,7 @@ spec:
 ---
 version: emco/v2
 resourceContext:
-  anchor: cluster-providers/vfw-cluster-provider/clusters/edge01/apply
+  anchor: cluster-providers/vfw-cluster-provider/clusters/edge01/apply 
 
 ---
 #create project
@@ -100,7 +100,7 @@ metadata :
   name: testvfw
 
 ---
-#creating collection composite app entry
+#creating vfw composite app entry
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps
@@ -110,37 +110,37 @@ spec:
   version: v1
 
 ---
-#adding prometheus app to the composite app
+#adding packetgen app to the composite app
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps/compositevfw/v1/apps
 metadata :
   name: packetgen
 file:
-  /home/vagrant/multicloud-k8s/kud/demo/composite-firewall/packetgen.tar.gz
+  /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/packetgen.tar.gz
 
 ---
-#adding prometheus app to the composite app
+#adding firewall app to the composite app
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps/compositevfw/v1/apps
 metadata :
   name: firewall
 file:
-  /home/vagrant/multicloud-k8s/kud/demo/composite-firewall/firewall.tar.gz
+  /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/firewall.tar.gz
 
 ---
-#adding collectd app to the composite app
+#adding sink app to the composite app
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps/compositevfw/v1/apps
 metadata :
   name: sink
 file:
-  /home/vagrant/multicloud-k8s/kud/demo/composite-firewall/sink.tar.gz
+  /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/sink.tar.gz
 
 ---
-#creating collection composite profile entry
+#creating vfw composite profile entry
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps/compositevfw/v1/composite-profiles
@@ -148,7 +148,7 @@ metadata :
   name: vfw_composite-profile
 
 ---
-#adding prometheus app profiles to the composite profile
+#adding packetgen app profiles to the composite profile
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps/compositevfw/v1/composite-profiles/vfw_composite-profile/profiles
@@ -157,7 +157,7 @@ metadata :
 spec:
   app-name: packetgen
 file:
-  /home/vagrant/multicloud-k8s/kud/demo/composite-firewall/profile.tar.gz
+  /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/profile.tar.gz
 
 ---
 #adding firewall app profiles to the composite profile
@@ -169,7 +169,7 @@ metadata :
 spec:
   app-name: firewall
 file:
-    /home/vagrant/multicloud-k8s/kud/demo/composite-firewall/profile.tar.gz
+    /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/profile.tar.gz
 
 ---
 #adding firewall app profiles to the composite profile
@@ -181,7 +181,7 @@ metadata :
 spec:
   app-name: sink
 file:
-    /home/vagrant/multicloud-k8s/kud/demo/composite-firewall/profile.tar.gz
+    /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/profile.tar.gz
 
 ---
 #create the generic placement intent
@@ -194,7 +194,7 @@ spec:
   logical-cloud: NA
 
 ---
-#add the prometheus app placement intent to the generic placement intent
+#add the packetgen app placement intent to the generic placement intent
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps/compositevfw/v1/generic-placement-intents/fw-placement-intent/app-intents
@@ -207,7 +207,7 @@ spec:
     - provider-name: vfw-cluster-provider
       cluster-label-name: LabelA
 ---
-#add the prometheus app placement intent to the generic placement intent
+#add the firewall app placement intent to the generic placement intent
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps/compositevfw/v1/generic-placement-intents/fw-placement-intent/app-intents
@@ -221,7 +221,7 @@ spec:
       cluster-label-name: LabelA
 
 ---
-#add the prometheus app placement intent to the generic placement intent
+#add the sink app placement intent to the generic placement intent
 version: emco/v2
 resourceContext:
   anchor: projects/testvfw/composite-apps/compositevfw/v1/generic-placement-intents/fw-placement-intent/app-intents

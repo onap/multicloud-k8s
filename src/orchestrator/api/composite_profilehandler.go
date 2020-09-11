@@ -27,6 +27,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var caprofileJSONFile string = "json-schemas/metadata.json"
+
 /* Used to store backend implementation objects
 Also simplifies mocking for unit testing purposes
 */
@@ -49,9 +51,8 @@ func (h compositeProfileHandler) createHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	jsonFile := "json-schemas/metadata.json"
 	// Verify JSON Body
-	err, httpError := validation.ValidateJsonSchemaData(jsonFile, cpf)
+	err, httpError := validation.ValidateJsonSchemaData(caprofileJSONFile, cpf)
 	if err != nil {
 		http.Error(w, err.Error(), httpError)
 		return

@@ -29,6 +29,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var workloadIntJSONFile string = "json-schemas/network-workload.json"
+
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
 type workloadintentHandler struct {
@@ -81,6 +83,12 @@ func (h workloadintentHandler) createHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
+
+	err, httpError := validation.ValidateJsonSchemaData(workloadIntJSONFile, wi)
+if err != nil {
+	http.Error(w, err.Error(), httpError)
+	return
+}
 
 	// Name is required.
 	if wi.Metadata.Name == "" {

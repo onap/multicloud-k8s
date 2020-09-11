@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4898b61f_c065b67f",
+        "filename": "src/orchestrator/api/projecthandler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-11T00:07:16Z",
+      "side": 1,
+      "message": "Why is this StatusNotFound? This can be any other error also not just not found",
+      "range": {
+        "startLine": 176,
+        "startChar": 34,
+        "endLine": 176,
+        "endChar": 48
+      },
+      "revId": "78f904bcd6834dccaf529237c3f613e5e7f487ef",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

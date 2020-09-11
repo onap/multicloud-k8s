@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46c08e74_958d1366",
+        "filename": "kud/tests/_functions.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-09-11T19:24:08Z",
+      "side": 1,
+      "message": "check the \u0027bashate\u0027 errors in the build logs - i think this is the line that\u0027s making it fail.",
+      "revId": "b93537977300da701373c94e5b7a8c1680a138b0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -22,6 +22,52 @@
       "revId": "4e74a5bf2b1b99ddfd504e6ccf003075923275c1",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a801a9f4_5d925e64",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-14T22:57:07Z",
+      "side": 1,
+      "message": "Should this be added by Rsync to have accurate time?",
+      "range": {
+        "startLine": 61,
+        "startChar": 1,
+        "endLine": 61,
+        "endChar": 56
+      },
+      "revId": "4e74a5bf2b1b99ddfd504e6ccf003075923275c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7da1745_21a14191",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-14T22:57:07Z",
+      "side": 1,
+      "message": "This is fixed value certificatesv1beta1.CertificateApproved and can be removed",
+      "range": {
+        "startLine": 64,
+        "startChar": 1,
+        "endLine": 64,
+        "endChar": 16
+      },
+      "revId": "4e74a5bf2b1b99ddfd504e6ccf003075923275c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

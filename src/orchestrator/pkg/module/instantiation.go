@@ -20,6 +20,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
@@ -97,10 +99,12 @@ func NewInstantiationClient() *InstantiationClient {
 func (c InstantiationClient) Approve(p string, ca string, v string, di string) error {
 	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
 	if err != nil {
+		log.Info("DeploymentIntentGroup has no state info ", log.Fields{"DeploymentIntentGroup: ":di})
 		return pkgerrors.Wrap(err, "DeploymentIntentGroup has no state info: "+di)
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
+		log.Info("Error getting current state from DeploymentIntentGroup stateInfo", log.Fields{"DeploymentIntentGroup ":di})
 		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
 	}
 	switch stateVal {
@@ -218,6 +222,30 @@ func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues
 	return sortedTemplates, err
 }
 
+func calculateDirPath(fp string) string  {
+	sa := strings.Split(fp, "/")
+	return "/" + sa[1] + "/" + sa[2] + "/"
+}
+
+func cleanTmpfiles(sortedTemplates []helm.KubernetesResourceTemplate) error {
+	dp := calculateDirPath(sortedTemplates[0].FilePath)
+	for _, st := range sortedTemplates{
+		log.Info("Clean up ::", log.Fields{"file: ": st.FilePath})
+		err := os.Remove(st.FilePath)
+		if err != nil {
+			log.Error("Error while deleting file", log.Fields{"file: ":st.FilePath})
+			return err
+		}
+	}
+	err := os.RemoveAll(dp)
+	if err != nil {
+		log.Error("Error while deleting dir", log.Fields{"Dir: ":dp})
+		return err
+	}
+	log.Info("Clean up temp-dir::", log.Fields{"Dir: ": dp})
+	return nil
+}
+
 /*
 Instantiate methods takes in projectName, compositeAppName, compositeAppVersion,
 DeploymentIntentName. This method is responsible for template resolution, intent
@@ -296,6 +324,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 
 		if err != nil {
 			deleteAppContext(context)
+			log.Error("Unable to get the sorted templates for app", log.Fields{})
 			return pkgerrors.Wrap(err, "Unable to get the sorted templates for app")
 		}
 
@@ -306,6 +335,8 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 			deleteAppContext(context)
 			return pkgerrors.Wrapf(err, "Unable to get the resources for app :: %s", eachApp.Metadata.Name)
 		}
+
+		defer cleanTmpfiles(sortedTemplates)
 
 		specData, err := NewAppIntentClient().GetAllIntentsByApp(eachApp.Metadata.Name, p, ca, v, gIntent)
 		if err != nil {
@@ -338,6 +369,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 			deleteAppContext(context)
 			return pkgerrors.Wrap(err, "Error while verifying resources in app: ")
 		}
+		
 	}
 	jappOrderInstr, err := json.Marshal(appOrderInstr)
 	if err != nil {
@@ -482,7 +514,7 @@ func (c InstantiationClient) Terminate(p string, ca string, v string, di string)
 	}
 
 	if stateVal != state.StateEnum.Instantiated {
-		return pkgerrors.Errorf("DeploymentIntentGroup is not instantiated" + di)
+		return pkgerrors.Errorf("DeploymentIntentGroup is not instantiated :" + di)
 	}
 
 	currentCtxId := state.GetLastContextIdFromStateInfo(s)

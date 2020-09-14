@@ -18,20 +18,24 @@ package helm
 
 import (
 	"bytes"
+	
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+
 	utils "github.com/onap/multicloud-k8s/src/orchestrator/utils"
 
 	pkgerrors "github.com/pkg/errors"
-	
 
 	"fmt"
 	"io/ioutil"
-	"k8s.io/helm/pkg/strvals"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"k8s.io/helm/pkg/strvals"
+
 	"github.com/ghodss/yaml"
+	logger "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/apimachinery/pkg/util/validation"
@@ -43,8 +47,6 @@ import (
 	"k8s.io/helm/pkg/renderutil"
 	"k8s.io/helm/pkg/tiller"
 	"k8s.io/helm/pkg/timeconv"
-	logger "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
-
 )
 
 //KubernetesResourceTemplate - Represents the template that is used to create a particular
@@ -295,6 +297,20 @@ type Resolver interface {
 	Resolve(appContent, appProfileContent []byte, overrideValuesOfAppStr []string, appName string) ([]KubernetesResourceTemplate, error)
 }
 
+
+func cleanupTempFiles(fp string)  error {
+	sa := strings.Split(fp, "/")
+	dp:= "/" + sa[1] + "/" + sa[2] + "/"
+	err := os.RemoveAll(dp)
+	if err != nil {
+		log.Error("Error while deleting dir", log.Fields{"Dir: ":dp})
+		return err
+	}
+	log.Info("Clean up k8s-ext-tmp-dir::", log.Fields{"Dir: ": dp})
+	return nil
+}
+
+
 // Resolve function
 func (h *TemplateClient) Resolve(appContent []byte, appProfileContent []byte, overrideValuesOfAppStr []string, appName string) ([]KubernetesResourceTemplate, error) {
 
@@ -302,33 +318,40 @@ func (h *TemplateClient) Resolve(appContent []byte, appProfileContent []byte, ov
 
 	//chartBasePath is the tmp path where the appContent(rawHelmCharts) is extracted.
 	chartBasePath, err := utils.ExtractTarBall(bytes.NewBuffer(appContent))
+	defer cleanupTempFiles(chartBasePath)
 	if err != nil {
-		return sortedTemplates, pkgerrors.Wrap(err, "Extracting appContent")
+		logger.Error("Error while extracting appContent", logger.Fields{})
+		return sortedTemplates, pkgerrors.Wrap(err, "Error while extracting appContent")
 	}
 	logger.Info("The chartBasePath ::", logger.Fields{"chartBasePath":chartBasePath})
 
 	//prPath is the tmp path where the appProfileContent is extracted.
 	prPath, err := utils.ExtractTarBall(bytes.NewBuffer(appProfileContent))
+	defer cleanupTempFiles(prPath)
 	if err != nil {
-		return sortedTemplates, pkgerrors.Wrap(err, "Extracting Profile Content")
+		logger.Error("Error while extracting Profile Content", logger.Fields{})
+		return sortedTemplates, pkgerrors.Wrap(err, "Error while extracting Profile Content")
 	}
 	logger.Info("The profile path:: ", logger.Fields{"Profile Path":prPath})
 
 	prYamlClient, err := ProcessProfileYaml(prPath, h.manifestName)
 	if err != nil {
-		return sortedTemplates, pkgerrors.Wrap(err, "Processing Profile Manifest")
+		logger.Error("Error while processing Profile Manifest", logger.Fields{})
+		return sortedTemplates, pkgerrors.Wrap(err, "Error while processing Profile Manifest")
 	}
 	logger.Info("Got the profileYamlClient..", logger.Fields{})
 
 	err = prYamlClient.CopyConfigurationOverrides(chartBasePath)
 	if err != nil {
-		return sortedTemplates, pkgerrors.Wrap(err, "Copying configresources to chart")
+		logger.Error("Error while copying configresources to chart", logger.Fields{})
+		return sortedTemplates, pkgerrors.Wrap(err, "Error while copying configresources to chart")
 	}
 
 	chartPath := filepath.Join(chartBasePath, appName)
 	sortedTemplates, err = h.GenerateKubernetesArtifacts(chartPath, []string{prYamlClient.GetValues()}, overrideValuesOfAppStr)
 	if err != nil {
-		return sortedTemplates, pkgerrors.Wrap(err, "Generate final k8s yaml")
+		logger.Error("Error while generating final k8s yaml", logger.Fields{})
+		return sortedTemplates, pkgerrors.Wrap(err, "Error while generating final k8s yaml")
 	}
 	return sortedTemplates, nil
 }

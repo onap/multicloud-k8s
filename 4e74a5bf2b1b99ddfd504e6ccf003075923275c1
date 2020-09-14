@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "296f635b_90c4d07c",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-14T23:19:37Z",
+      "side": 1,
+      "message": "I made it like this to be consistent with the approval k8s subresource itself. But we could make it more like an interface with rsync. For example: i.e. let rsync create the time but also the message and reason, based on parameters passed by DCM.\n\nDCM could provide parameters like:\n- justification\n- request time\n- others\n\nWith rsync using them (or not) while creating the actual approval subresource.\n\nI don\u0027t have a strong opinion about either way.",
+      "parentUuid": "a801a9f4_5d925e64",
+      "range": {
+        "startLine": 61,
+        "startChar": 1,
+        "endLine": 61,
+        "endChar": 56
+      },
+      "revId": "4e74a5bf2b1b99ddfd504e6ccf003075923275c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a7da1745_21a14191",
         "filename": "src/dcm/pkg/module/apply.go",
         "patchSetId": 15
@@ -59,6 +83,30 @@
       "writtenOn": "2020-09-14T22:57:07Z",
       "side": 1,
       "message": "This is fixed value certificatesv1beta1.CertificateApproved and can be removed",
+      "range": {
+        "startLine": 64,
+        "startChar": 1,
+        "endLine": 64,
+        "endChar": 16
+      },
+      "revId": "4e74a5bf2b1b99ddfd504e6ccf003075923275c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ac03a73f_5ccb438a",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-14T23:19:37Z",
+      "side": 1,
+      "message": "It\u0027s just the \"Approved\" string, see line 240. I think no assumptions should be made about the approval subresource (struct). Who knows when we might want to specify a deny.",
+      "parentUuid": "a7da1745_21a14191",
       "range": {
         "startLine": 64,
         "startChar": 1,

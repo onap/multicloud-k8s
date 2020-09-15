@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3496c61b_224a2b2c",
+        "filename": "src/orchestrator/scripts/start-dev.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-15T18:51:44Z",
+      "side": 1,
+      "message": "Remove this line, rather than commenting",
+      "revId": "1add8375e4e67f80257b19741628477fe7dd0dd0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

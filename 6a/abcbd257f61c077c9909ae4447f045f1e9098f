@@ -1,0 +1,7 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Eric Multanen <eric.w.multanen@intel.com>
+Submitted-by: Eric Multanen <eric.w.multanen@intel.com>
+Submitted-at: Tue, 15 Sep 2020 03:04:14 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/112493
+Project: multicloud/k8s
+Branch: refs/heads/master

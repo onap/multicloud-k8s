@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0904d58e_d34e85eb",
+        "filename": "src/orchestrator/api/projecthandler.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-15T16:47:49Z",
+      "side": 1,
+      "message": "Not relevant change to the patch",
+      "range": {
+        "startLine": 50,
+        "startChar": 1,
+        "endLine": 52,
+        "endChar": 65
+      },
+      "revId": "8eade4ad391ed8a83b2324b01e93a602f55ecaa4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

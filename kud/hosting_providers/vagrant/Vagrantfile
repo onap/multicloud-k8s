@@ -139,8 +139,9 @@ Vagrant.configure("2") do |config|
         cp /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/insecure_keys/key /home/vagrant/.ssh/id_rsa
         chown vagrant /home/vagrant/.ssh/id_rsa
         chmod 400 /home/vagrant/.ssh/id_rsa
-        sudo apt install jq -y
-#        cd /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/ && ./installer.sh | tee kud_installer.log
+        sudo yum install epel-release -y
+	sudo yum install jq -y
+       # cd /home/vagrant/multicloud-k8s/kud/hosting_providers/vagrant/ && ./installer.sh | tee kud_installer.log
       SHELL
     end
   end

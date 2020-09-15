@@ -16,6 +16,9 @@ INSTALLER_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 source ${INSTALLER_DIR}/../../tests/_functions.sh
 
+#grabs os type to enable switch between ubuntu and centos
+version_id=$(grep "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
+
 # _install_go() - Install GoLang package
 function _install_go {
     version=$(grep "go_version" ${kud_playbooks}/kud-vars.yml | awk -F "'" '{print $2}')
@@ -23,7 +26,11 @@ function _install_go {
 
     #gcc is required for go apps compilation
     if ! which gcc; then
-        sudo apt-get install -y gcc
+	if [ $version_id = "ubuntu" ]; then
+	    sudo apt-get install -y gcc
+	else #centos
+            sudo yum install -y gcc
+    	fi
     fi
 
     if $(go version &>/dev/null); then
@@ -43,7 +50,11 @@ function _install_pip {
     if $(pip --version &>/dev/null); then
         sudo -E pip install --no-cache-dir --upgrade pip
     else
-        sudo apt-get install -y python-dev
+	if [ $version_id = "ubuntu" ]; then
+            sudo apt-get install -y python-dev
+        else #centos
+ 	    sudo yum install -y python-devel
+	fi
         curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
     fi
 }
@@ -58,41 +69,49 @@ function _install_ansible {
     sudo mkdir -p /etc/ansible/
     sudo -E pip install --no-cache-dir ansible==$version
 }
-
-# _install_docker() - Download and install docker-engine
+# _install_docker() - Download and install docker for centos
 function _install_docker {
-    local max_concurrent_downloads=${1:-3}
 
-    if $(docker version &>/dev/null); then
-        return
-    fi
-    sudo apt-get install -y apt-transport-https ca-certificates curl
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    sudo apt-get update
-    sudo apt-get install -y docker-ce
+    if [ $version_id = "ubuntu" ]; then
+	cal max_concurrent_downloads=${1:-3}
+	if $(docker version &>/dev/null); then
+	    return
+	fi
+	sudo apt-get install -y apt-transport-https ca-certificates curl
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    	sudo apt-get update
+   	sudo apt-get install -y docker-ce
 
-    sudo mkdir -p /etc/systemd/system/docker.service.d
-    if [ ${http_proxy:-} ]; then
-        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
-        echo "Environment=\"HTTP_PROXY=$http_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/http-proxy.conf
-    fi
-    if [ ${https_proxy:-} ]; then
-        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/https-proxy.conf
-        echo "Environment=\"HTTPS_PROXY=$https_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/https-proxy.conf
-    fi
-    if [ ${no_proxy:-} ]; then
-        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/no-proxy.conf
-        echo "Environment=\"NO_PROXY=$no_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/no-proxy.conf
-    fi
-    sudo systemctl daemon-reload
-    echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --max-concurrent-downloads $max_concurrent_downloads \"" | sudo tee --append /etc/default/docker
-    if [[ -z $(groups | grep docker) ]]; then
-        sudo usermod -aG docker $USER
-    fi
+    	sudo mkdir -p /etc/systemd/system/docker.service.d
+    	if [ ${http_proxy:-} ]; then
+        	echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
+        	echo "Environment=\"HTTP_PROXY=$http_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/http-proxy.conf
+    	fi
+    	if [ ${https_proxy:-} ]; then
+        	echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/https-proxy.conf
+        	echo "Environment=\"HTTPS_PROXY=$https_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/https-proxy.conf
+    	fi
+    	if [ ${no_proxy:-} ]; then
+        	echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/no-proxy.conf
+        	echo "Environment=\"NO_PROXY=$no_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/no-proxy.conf
+    	fi
+    	sudo systemctl daemon-reload
+    	echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --max-concurrent-downloads $max_concurrent_downloads \"" | sudo tee --append /etc/default/docker
+    	if [[ -z $(groups | grep docker) ]]; then
+		sudo usermod -aG docker $USER
+    	fi
 
-    sudo systemctl restart docker
-    sleep 10
+    	sudo systemctl restart docker
+    	sleep 10
+     else #centos
+	sudo yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
+    	sudo yum install -y yum-utils
+    	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    	sudo yum install docker-ce docker-ce-cli containerd.io
+    	sudo systemctl restart docker
+    	sleep 10
+    fi
 }
 
 function _set_environment_file {
@@ -111,10 +130,17 @@ function install_k8s {
     version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
     local_release_dir=$(grep "local_release_dir" $kud_inventory_folder/group_vars/k8s-cluster.yml | awk -F "\"" '{print $2}')
     local tarball=v$version.tar.gz
-    sudo apt-get install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
-    sudo apt-get install -y gnupg2 software-properties-common
+    if [ $version_id = "ubuntu" ]; then	
+	sudo apt-get install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
+	sudo apt-get install -y gnupg2 software-properties-common          
+    else #centos
+	sudo yum install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
+	sudo yum install -y yum-utils
+	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo    
+fi
     _install_docker
     _install_ansible
+    echo "ansible installed"
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     sudo tar -C $dest_folder -xzf $tarball
     sudo mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
@@ -200,8 +226,7 @@ function _print_kubernetes_info {
     fi
     # Expose Dashboard using NodePort
     node_port=30080
-    KUBE_EDITOR="sed -i \"s|type\: ClusterIP|type\: NodePort|g\"" kubectl -n kube-system edit service kubernetes-dashboard
-    KUBE_EDITOR="sed -i \"s|nodePort\: .*|nodePort\: $node_port|g\"" kubectl -n kube-system edit service kubernetes-dashboard
+    KUBE_EDITOR="sed -i \"s|type\: ClusterIP|type\: NodePort|g\"" kubectl -n kube-system edit service kubernetes-dashboard    KUBE_EDITOR="sed -i \"s|nodePort\: .*|nodePort\: $node_port|g\"" kubectl -n kube-system edit service kubernetes-dashboard
 
     master_ip=$(kubectl cluster-info | grep "Kubernetes master" | awk -F ":" '{print $2}')
 
@@ -250,11 +275,16 @@ fi
 echo "Removing ppa for jonathonf/python-3.6"
 sudo ls /etc/apt/sources.list.d/ || true
 sudo find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
-sudo apt-get update
+if [ $version_id = "ubuntu" ]; then
+	sudo apt-get update
+else #centos
+    sudo yum update -y
+fi
+echo "k8 next"
 install_k8s
 _set_environment_file
-install_addons
+#install_addons
 if ${KUD_PLUGIN_ENABLED:-false}; then
     install_plugin
 fi
-_print_kubernetes_info
+#_print_kubernetes_info

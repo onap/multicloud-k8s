@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6df001dd_d93eaaa8",
+        "filename": "kud/hosting_providers/vagrant/Vagrantfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-16T14:02:28Z",
+      "side": 1,
+      "message": "Both Ubuntu and Centos should be an option and by default should be Ubuntu until it is decided to be otherwise",
+      "range": {
+        "startLine": 14,
+        "startChar": 26,
+        "endLine": 14,
+        "endChar": 57
+      },
+      "revId": "d09c1db86063432a2334c03f8f8f9bf984e4e217",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

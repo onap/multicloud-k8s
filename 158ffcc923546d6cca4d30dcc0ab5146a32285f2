@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "120b1294_1eae3538",
+        "filename": "kud/deployment_infra/helm/controllers/Chart.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-16T14:09:44Z",
+      "side": 1,
+      "message": "The chart name is not descriptive. Controller can mean many things. Consider a better name for the chart",
+      "range": {
+        "startLine": 18,
+        "startChar": 6,
+        "endLine": 18,
+        "endChar": 17
+      },
+      "revId": "158ffcc923546d6cca4d30dcc0ab5146a32285f2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

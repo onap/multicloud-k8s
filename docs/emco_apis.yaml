@@ -41,7 +41,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:
@@ -135,7 +135,7 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '404':
           description: Invalid data
           content: {}
         '404':

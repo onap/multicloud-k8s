@@ -41,7 +41,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:
@@ -135,7 +135,7 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '404':
           description: Invalid data
           content: {}
         '404':
@@ -159,7 +159,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CompositeAppVersion'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:
@@ -213,7 +213,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/CompositeAppVersion'
         '404':
-          description: Composite Application not found
+          description: invalid data
+          content: {}
+        '301':
+          description: Composite application not found
           content: {}
     put:
       tags:
@@ -256,10 +259,10 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '404':
           description: Invalid data
           content: {}
-        '404':
+        '301':
           description: Composite Application not found
           content: {}
 
@@ -281,7 +284,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '405':
+        '404':
           description: Invalid Input
           content: {}
       # request body documentation
@@ -410,7 +413,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '405':
+        '301':
           description: Invalid Input
           content: {}
       requestBody:
@@ -464,7 +467,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '404':
+        '301':
           description: Composite Profile not found
           content: {}
     put:
@@ -507,10 +510,10 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '301':
           description: Invalid data
           content: {}
-        '404':
+        '301':
           description: Composite Profile not found
           content: {}
 
@@ -533,7 +536,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/ProfileAppSpec'
-        '405':
+        '301':
           description: Invalid Input
           content: {}
       requestBody:
@@ -592,7 +595,7 @@ paths:
               schema:            # Request payload
                 $ref: '#/components/schemas/ProfileAppData'
 
-        '404':
+        '301':
           description: Profile not found
           content: {}
     put:
@@ -634,10 +637,10 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '301':
           description: Invalid data
           content: {}
-        '404':
+        '301':
           description: Profile not found
           content: {}
 
@@ -702,7 +705,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeploymentGroupIntent'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:
@@ -981,7 +984,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:

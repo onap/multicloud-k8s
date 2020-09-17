@@ -41,7 +41,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:
@@ -135,7 +135,7 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '404':
           description: Invalid data
           content: {}
         '404':
@@ -159,7 +159,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CompositeAppVersion'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:
@@ -213,6 +213,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/CompositeAppVersion'
         '404':
+          description: invalid data
+          content: {}
+        '301':
           description: Composite Application not found
           content: {}
     put:
@@ -256,10 +259,10 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '404':
           description: Invalid data
           content: {}
-        '404':
+        '301':
           description: Composite Application not found
           content: {}
 
@@ -410,7 +413,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '405':
+        '301':
           description: Invalid Input
           content: {}
       requestBody:
@@ -464,7 +467,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/Metadata'
-        '404':
+        '301':
           description: Composite Profile not found
           content: {}
     put:
@@ -507,10 +510,10 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '301':
           description: Invalid data
           content: {}
-        '404':
+        '301':
           description: Composite Profile not found
           content: {}
 
@@ -533,7 +536,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/ProfileAppSpec'
-        '405':
+        '301':
           description: Invalid Input
           content: {}
       requestBody:
@@ -592,7 +595,7 @@ paths:
               schema:            # Request payload
                 $ref: '#/components/schemas/ProfileAppData'
 
-        '404':
+        '301':
           description: Profile not found
           content: {}
     put:
@@ -634,10 +637,10 @@ paths:
         '204':
           description: Deleted
           content: {}
-        '400':
+        '301':
           description: Invalid data
           content: {}
-        '404':
+        '301':
           description: Profile not found
           content: {}
 
@@ -682,6 +685,284 @@ paths:
           content: {}
 
 
+############################ GENERIC PLACEMENT INTENT API'S #################################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+    post:
+      tags:
+        - Generic Placement Intent
+      summary: Add Generic Placement Intent
+      description: Add a new `generic placement intent`
+      operationId: addGenericPlacementIntent
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntent'
+        '400':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericPlacementIntent'
+        description: Generic Placement Intent definition
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get all Generic Placement Intents
+
+      description: |
+        Get all `Generic Placement Intents`
+
+      operationId: getAllGenericPlacementIntents
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntentArray'
+        '404':
+          description: No Generic Placement Intent found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get Generic Placement Intent
+
+      description: |
+        Get `generic placement intent`
+
+      operationId: getGenericPlacementIntentByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntent'
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+    put:
+      tags:
+        - Generic Placement Intent
+      summary: Update Generic Placement Intent
+      description: Update `Generic Placement Intent`
+      operationId: updateGenericPlacementIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericPlacementIntent'
+        description: Generic Placement Intent definition
+        required: true
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Delete Generic Placement Intent
+
+      description: |
+        Delete `Generic Placement Intent`
+
+      operationId: deleteGenericPlacementIntentByName
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+    post:
+      tags:
+        - Generic Placement Intent
+      summary: Add intent for an application
+      description: Add a `intent for application`
+      operationId: addIntentToGenericPlacementIntent
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/GenericPlacementAppIntent'
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get all Intents in Generic Placement
+
+      description: |
+        Get all ` Intents in Generic Placement Intent`
+
+      operationId: getAllIntentsInGenericPlacementIntents
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntentArray'
+        '404':
+          description: No Generic Placement Intent found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/{intent-name}:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - $ref: '#/components/parameters/intentName'
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get intent
+
+      description: |
+        Get `generic placement intent`
+
+      operationId: getIntentfromGenericPlacementIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+
+        '404':
+          description: Intent  not found
+          content: {}
+    put:
+      tags:
+        - Generic Placement Intent
+      summary: Update intent for an application
+      description: Update `generic placement intent for application`
+      operationId: updateIntentToGenericPlacementIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic placement intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+         application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/GenericPlacementAppIntent'
+        required: true
+
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Delete intent
+
+      description: |
+        Delete `generic placement intent`
+
+      operationId: deleteIntentFromGenericPlacementIntent
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Intent not found
+          content: {}
+
+  # Qurey for Intent - Get intent for app-name
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - in: query
+        name: app-name
+        schema:
+          type: string
+          maxLength: 128
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Query intent for an application
+
+      description: |
+        Query `generic placement intent for application`
+
+      operationId: queryIntentfromGenericPlacementIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+        '404':
+          description: Generic Placement Intent for application not found
+          content: {}
 
 ############################ Deployment Intent Group API'S #################################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups:
@@ -702,7 +983,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeploymentGroupIntent'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:
@@ -961,291 +1242,6 @@ paths:
           description: Deployment Intent not found
           content: {}
 
-############################ GENERIC PLACEMENT INTENT API'S #################################################
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents:
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
-    post:
-      tags:
-        - Generic Placement Intent
-      summary: Add Generic Placement Intent
-      description: Add a new `generic placement intent`
-      operationId: addGenericPlacementIntent
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Metadata'
-        '405':
-          description: Invalid Input
-          content: {}
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Metadata'
-        description: Generic Placement Intent definition
-        required: true
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get all Generic Placement Intents
-
-      description: |
-        Get all `Generic Placement Intents`
-
-      operationId: getAllGenericPlacementIntents
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementIntentArray'
-        '404':
-          description: No Generic Placement Intent found
-          content: {}
-
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{generic-placement-intent-name}:
-    # parameters list that are used with each operation for this path
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get Generic Placement Intent
-
-      description: |
-        Get `generic placement intent`
-
-      operationId: getGenericPlacementIntentByName
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-        '404':
-          description: Generic Placement Intent not found
-          content: {}
-    put:
-      tags:
-        - Generic Placement Intent
-      summary: Update Generic Placement Intent
-      description: Update `Generic Placement Intent`
-      operationId: updateGenericPlacementIntent
-      responses:
-        '200':
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/Metadata'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Generic Placement Intent not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Metadata'
-        description: Generic Placement Intent definition
-        required: true
-    delete: # documentation for DELETE operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Delete Generic Placement Intent
-
-      description: |
-        Delete `Generic Placement Intent`
-
-      operationId: deleteGenericPlacementIntentByName
-      responses: # list of responses
-        '204':
-          description: Deleted
-          content: {}
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Generic Placement Intent not found
-          content: {}
-
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{generic-placement-intent-name}/app-intents:
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-    post:
-      tags:
-        - Generic Placement Intent
-      summary: Add intent for an application
-      description: Add a `intent for application`
-      operationId: addIntentToGenericPlacementIntent
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-        '405':
-          description: Invalid Input
-          content: {}
-      requestBody:
-        content:
-          application/json: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/GenericPlacementAppIntent'
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get all Intents in Generic Placement
-
-      description: |
-        Get all ` Intents in Generic Placement Intent`
-
-      operationId: getAllIntentsInGenericPlacementIntents
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntentArray'
-        '404':
-          description: No Generic Placement Intent found
-          content: {}
-
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{generic-placement-intent-name}/app-intents/{intent-name}:
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-      - $ref: '#/components/parameters/intentName'
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get intent
-
-      description: |
-        Get `generic placement intent`
-
-      operationId: getIntentfromGenericPlacementIntent
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-
-        '404':
-          description: Intent  not found
-          content: {}
-    put:
-      tags:
-        - Generic Placement Intent
-      summary: Update intent for an application
-      description: Update `generic placement intent for application`
-      operationId: updateIntentToGenericPlacementIntent
-      responses:
-        '200':
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Generic placement intent not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-         application/json: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/GenericPlacementAppIntent'
-        required: true
-
-    delete: # documentation for DELETE operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Delete intent
-
-      description: |
-        Delete `generic placement intent`
-
-      operationId: deleteIntentFromGenericPlacementIntent
-      responses: # list of responses
-        '204':
-          description: Deleted
-          content: {}
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Intent not found
-          content: {}
-
-  # Qurey for Intent - Get intent for app-name
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{generic-placement-intent-name}/app-intents/:
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-      - in: query
-        name: app-name
-        schema:
-          type: string
-          maxLength: 128
-        required: true
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Query intent for an application
-
-      description: |
-        Query `generic placement intent for application`
-
-      operationId: queryIntentfromGenericPlacementIntent
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-        '404':
-          description: Generic Placement Intent for application not found
-          content: {}
-
-
 ####################Lifecycle Management#######################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/approve:
     parameters:
@@ -1386,7 +1382,7 @@ paths:
             application/json: # operation response mime type
               schema:
                 $ref: '#/components/schemas/Controller'
-        '405':
+        '400':
           description: Invalid Input
           content: {}
       requestBody:
@@ -2315,12 +2311,11 @@ paths:
 
 
 ######################## Network Controller Intent API's##########################################
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/network-controller-intent:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
       - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
     post:
       tags:
         - Network Controller Intent
@@ -2361,13 +2356,12 @@ paths:
         '404':
           description: No Network Controller Intent found
           content: {}
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/network-controller-intent/{net-control-intent}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}:
     # parameters list that are used with each operation for this path
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
       - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
       - $ref: '#/components/parameters/netControlIntent'
     get: # documentation for GET operation for this path
       tags:
@@ -2434,12 +2428,11 @@ paths:
           description: Network Controller Intent not found
           content: {}
 ################## Workload Intents##################################
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/network-controller-intent/{net-control-intent}/workload-intents:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
       - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
       - $ref: '#/components/parameters/netControlIntent'
     post:
       tags:
@@ -2453,7 +2446,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadSpec'
+                $ref: '#/components/schemas/NetworkWorloadSpec'
         '405':
           description: Invalid Input
           content: {}
@@ -2461,7 +2454,7 @@ paths:
         content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadSpec'
+                $ref: '#/components/schemas/NetworkWorloadSpec'
     get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
@@ -2477,18 +2470,17 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadSpecArray'
+                $ref: '#/components/schemas/NetworkWorloadSpecArray'
         '404':
           description: No Network Controller Workload Intent found
           content: {}
 
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}:
     # parameters list that are used with each operation for this path
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
       - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
       - $ref: '#/components/parameters/netControlIntent'
       - $ref: '#/components/parameters/netControlWorkloadIntent'
     get: # documentation for GET operation for this path
@@ -2506,7 +2498,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadSpec'
+                $ref: '#/components/schemas/NetworkWorloadSpec'
         '404':
           description: Network Controller Workload Intent not found
           content: {}
@@ -2521,7 +2513,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadSpec'
+                $ref: '#/components/schemas/NetworkWorloadSpec'
           description: Success
         '400':
           description: Invalid data
@@ -2534,7 +2526,7 @@ paths:
         content:
           application/json: # operation response mime type
             schema:
-              $ref: '#/components/schemas/NetworkWorkloadSpec'
+              $ref: '#/components/schemas/NetworkWorloadSpec'
         required: true
     delete: # documentation for DELETE operation for this path
       tags:
@@ -2557,12 +2549,11 @@ paths:
           content: {}
 
 ################## Workload Intents Interfaces ##################################
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces:
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
       - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
       - $ref: '#/components/parameters/netControlIntent'
       - $ref: '#/components/parameters/netControlWorkloadIntent'
     post:
@@ -2577,7 +2568,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadInterface'
+                $ref: '#/components/schemas/NetworkWorloadInterface'
         '405':
           description: Invalid Input
           content: {}
@@ -2585,7 +2576,7 @@ paths:
         content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadInterface'
+                $ref: '#/components/schemas/NetworkWorloadInterface'
     get: # documentation for GET operation for this path
       tags:
         - Network Controller Intent
@@ -2601,17 +2592,16 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadInterfaceArray'
+                $ref: '#/components/schemas/NetworkWorloadInterfaceArray'
         '404':
           description: No Network Controller Workload Interface found
           content: {}
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces/{interface-name}:
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/network-controller-intent/{net-control-intent}/workload-intents/{workload-intent-name}/interfaces/{interface-name}:
     # parameters list that are used with each operation for this path
     parameters:
       - $ref: '#/components/parameters/projectName'
       - $ref: '#/components/parameters/compositeAppName'
       - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/deploymentIntentGroupName'
       - $ref: '#/components/parameters/netControlIntent'
       - $ref: '#/components/parameters/netControlWorkloadIntent'
       - $ref: '#/components/parameters/netControlWorkloadInterface'
@@ -2630,7 +2620,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadInterface'
+                $ref: '#/components/schemas/NetworkWorloadInterface'
         '404':
           description: Network Controller Workload Interface not found
           content: {}
@@ -2645,7 +2635,7 @@ paths:
           content:
             application/json: # operation response mime type
               schema:
-                $ref: '#/components/schemas/NetworkWorkloadInterface'
+                $ref: '#/components/schemas/NetworkWorloadInterface'
           description: Success
         '400':
           description: Invalid data
@@ -2658,7 +2648,7 @@ paths:
         content:
           application/json: # operation response mime type
             schema:
-              $ref: '#/components/schemas/NetworkWorkloadInterface'
+              $ref: '#/components/schemas/NetworkWorloadInterface'
         required: true
 
     delete: # documentation for DELETE operation for this path
@@ -2894,15 +2884,9 @@ components:
         version:
           type: string
           maxLength: 128
-        logical-cloud:
-          type: string
-          description: Logical Cloud to use for this intent
-          maxLength: 128
-          example: "cloud1"
       required:
       - profile
       - version
-      - logical-cloud
     DeploymentGroupIntent:
       type: object
       properties:
@@ -3179,7 +3163,7 @@ components:
           - chainType
           - routingSpec
           type: object
-    NetworkWorkloadSpec:
+    NetworkWorloadSpec:
       type: object
       properties:
         spec:
@@ -3206,11 +3190,11 @@ components:
                   description: Type of the workload
                   maxLength: 128
                   example: "deployment"
-    NetworkWorkloadSpecArray:
+    NetworkWorloadSpecArray:
       type: array
       items:
-        $ref: '#/components/schemas/NetworkWorkloadSpec'
-    NetworkWorkloadInterface:
+        $ref: '#/components/schemas/NetworkWorloadSpec'
+    NetworkWorloadInterface:
       type: object
       properties:
         metadata:
@@ -3246,10 +3230,10 @@ components:
           required:
             - interface
             - name
-    NetworkWorkloadInterfaceArray:
+    NetworkWorloadInterfaceArray:
       type: array
       items:
-        $ref: '#/components/schemas/NetworkWorkloadInterface'
+        $ref: '#/components/schemas/NetworkWorloadInterface'
   parameters:
     projectName:
       name: project-name
@@ -3317,7 +3301,7 @@ components:
     deploymentIntentGroupName:
       name: deployment-intent-group-name
       in: path
-      description: Name of Deployment Intent Group
+      description: Name of Generic Placement Intent for application
       required: true
       schema:
         type: string

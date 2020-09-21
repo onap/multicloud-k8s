@@ -42,7 +42,7 @@ require (
 
 // Pinned to kubernetes-1.13.4
 replace (
-	github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.9.0
+	github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.13.0
 	k8s.io/api => k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190918161926-8f644eb6e783
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190913080033-27d36303b655

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "363de754_100e3f00",
+        "filename": "src/monitor/pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-21T22:13:05Z",
+      "side": 1,
+      "message": "Oops, this was a temporary change. Anyone knows what the effect of this might be? (expects Context)",
+      "range": {
+        "startLine": 73,
+        "startChar": 5,
+        "endLine": 73,
+        "endChar": 8
+      },
+      "revId": "9d95721589877dbeb18c6714d929cf417e0b8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

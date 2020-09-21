@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f950d7aa_5e6ed6f1",
+        "filename": "src/monitor/go.mod",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-21T23:03:12Z",
+      "side": 1,
+      "message": "1st of 2 changes that matter",
+      "revId": "e5fe2fe8ad5fbccc328159208d627cee4cfd3994",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "011f3d7b_7828a3b1",
+        "filename": "src/monitor/operator-sdk/go.sum",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-21T23:03:12Z",
+      "side": 1,
+      "message": "2nd of 2 changes that matter (also removed the line that pointed to the bitbucket dependency)",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 284,
+        "endChar": 118
+      },
+      "revId": "e5fe2fe8ad5fbccc328159208d627cee4cfd3994",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -7,7 +7,7 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/googleapis/gnostic v0.4.0
 	github.com/jonboulle/clockwork v0.1.0
-	github.com/onap/multicloud-k8s/src/clm v0.0.0-00010101000000-000000000000
+	github.com/onap/multicloud-k8s/src/clm v0.0.0-20200818155723-a5ffa8aadf49
 	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200818155723-a5ffa8aadf49
 	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200818155723-a5ffa8aadf49
 	github.com/pkg/errors v0.9.1
@@ -28,11 +28,11 @@ replace (
 	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
-	k8s.io/api => k8s.io/api v0.17.3
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.17.3
-	k8s.io/apimachinery => k8s.io/apimachinery v0.17.3
-	k8s.io/cli-runtime => k8s.io/cli-runtime v0.17.3
-	k8s.io/client-go => k8s.io/client-go v0.17.3
-	k8s.io/kubectl => k8s.io/kubectl v0.17.3
+	k8s.io/api => k8s.io/api v0.18.2
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.18.2
+	k8s.io/apimachinery => k8s.io/apimachinery v0.18.2
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.18.2
+	k8s.io/client-go => k8s.io/client-go v0.18.2
+	k8s.io/kubectl => k8s.io/kubectl v0.18.2
 	k8s.io/kubernetes => k8s.io/kubernetes v1.14.1
 )

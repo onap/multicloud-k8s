@@ -231,6 +231,7 @@ github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+
 github.com/onap/multicloud-k8s v0.0.0-20200123181220-fc960539db54 h1:0iPySKR2wPGiyvi0KmtjNmWcBoM8oUUVc3Q4QkYbkp0=
 github.com/onap/multicloud-k8s v0.0.0-20200210192739-c06be6458e99 h1:ZVCLL4/4dEbq/G9XGWhl3y8b1jgTB03ByTI2AiVMgUk=
 github.com/onap/multicloud-k8s v0.0.0-20200303230813-37aed9b7a0db h1:H+IVbOqoE4rk2qcSwOrR335VejyBhkLK75V6UL2uoJ4=
+github.com/onap/multicloud-k8s v0.0.0-20200915201756-3bc5164b3ea1 h1:aD2Mlar8OH3L+vhoHeirDDzUAVJ4QspeaCrCMTTcsec=
 github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20200303230813-37aed9b7a0db h1:RevNsc1iFXT2DGBdYViLrJJ0HXIoAxdvj6QopQOKU5I=
 github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20200303230813-37aed9b7a0db/go.mod h1:EnQd/vQGZR1/55IihaHxiux4ZUig/zfXZux7bfmU0S8=
 github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

@@ -18,6 +18,7 @@
 package v1alpha1
 
 import (
+	"context"
 	v1alpha1 "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
 	scheme "github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/scheme"
 	"time"
@@ -65,12 +66,13 @@ func newResourceBundleStates(c *K8spluginV1alpha1Client, namespace string) *reso
 // Get takes name of the resourceBundleState, and returns the corresponding resourceBundleState object, and an error if there is any.
 func (c *resourceBundleStates) Get(name string, options v1.GetOptions) (result *v1alpha1.ResourceBundleState, err error) {
 	result = &v1alpha1.ResourceBundleState{}
+	context := context.TODO()
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(context).
 		Into(result)
 	return
 }
@@ -82,12 +84,13 @@ func (c *resourceBundleStates) List(opts v1.ListOptions) (result *v1alpha1.Resou
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
 	result = &v1alpha1.ResourceBundleStateList{}
+	context := context.TODO()
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(context).
 		Into(result)
 	return
 }
@@ -99,22 +102,24 @@ func (c *resourceBundleStates) Watch(opts v1.ListOptions) (watch.Interface, erro
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
 	opts.Watch = true
+	context := context.TODO()
 	return c.client.Get().
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(context)
 }
 
 // Create takes the representation of a resourceBundleState and creates it.  Returns the server's representation of the resourceBundleState, and an error, if there is any.
 func (c *resourceBundleStates) Create(resourceBundleState *v1alpha1.ResourceBundleState) (result *v1alpha1.ResourceBundleState, err error) {
 	result = &v1alpha1.ResourceBundleState{}
+	context := context.TODO()
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		Body(resourceBundleState).
-		Do().
+		Do(context).
 		Into(result)
 	return
 }
@@ -122,12 +127,13 @@ func (c *resourceBundleStates) Create(resourceBundleState *v1alpha1.ResourceBund
 // Update takes the representation of a resourceBundleState and updates it. Returns the server's representation of the resourceBundleState, and an error, if there is any.
 func (c *resourceBundleStates) Update(resourceBundleState *v1alpha1.ResourceBundleState) (result *v1alpha1.ResourceBundleState, err error) {
 	result = &v1alpha1.ResourceBundleState{}
+	context := context.TODO()
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		Name(resourceBundleState.Name).
 		Body(resourceBundleState).
-		Do().
+		Do(context).
 		Into(result)
 	return
 }
@@ -137,25 +143,27 @@ func (c *resourceBundleStates) Update(resourceBundleState *v1alpha1.ResourceBund
 
 func (c *resourceBundleStates) UpdateStatus(resourceBundleState *v1alpha1.ResourceBundleState) (result *v1alpha1.ResourceBundleState, err error) {
 	result = &v1alpha1.ResourceBundleState{}
+	context := context.TODO()
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		Name(resourceBundleState.Name).
 		SubResource("status").
 		Body(resourceBundleState).
-		Do().
+		Do(context).
 		Into(result)
 	return
 }
 
 // Delete takes name of the resourceBundleState and deletes it. Returns an error if one occurs.
 func (c *resourceBundleStates) Delete(name string, options *v1.DeleteOptions) error {
+	context := context.TODO()
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		Name(name).
 		Body(options).
-		Do().
+		Do(context).
 		Error()
 }
 
@@ -165,26 +173,28 @@ func (c *resourceBundleStates) DeleteCollection(options *v1.DeleteOptions, listO
 	if listOptions.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
 	}
+	context := context.TODO()
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
-		Do().
+		Do(context).
 		Error()
 }
 
 // Patch applies the patch and returns the patched resourceBundleState.
 func (c *resourceBundleStates) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.ResourceBundleState, err error) {
 	result = &v1alpha1.ResourceBundleState{}
+	context := context.TODO()
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		SubResource(subresources...).
 		Name(name).
 		Body(data).
-		Do().
+		Do(context).
 		Into(result)
 	return
 }

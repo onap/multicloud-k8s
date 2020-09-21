@@ -3,7 +3,7 @@ module github.com/onap/multicloud-k8s/src/monitor
 go 1.14
 
 require (
-	github.com/go-openapi/spec v0.19.2
+	github.com/go-openapi/spec v0.19.4
 	github.com/operator-framework/operator-sdk v0.19.0
 	github.com/operator-framework/operator-sdk-samples v0.0.0-20190529081445-bd30254f3a7e
 	github.com/phpdave11/gofpdi v1.0.8 // indirect
@@ -41,12 +41,4 @@ require (
 )
 
 // Pinned to kubernetes-1.13.4
-replace (
-	github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.9.0
-	k8s.io/api => k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190918161926-8f644eb6e783
-	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190913080033-27d36303b655
-	k8s.io/client-go => k8s.io/client-go v0.0.0-20190918160344-1fbdaa4c8d90
-	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.4.0
-	sigs.k8s.io/controller-tools => sigs.k8s.io/controller-tools v0.2.4
-)
+replace k8s.io/client-go => k8s.io/client-go v0.18.2

@@ -3,17 +3,17 @@ module github.com/onap/multicloud-k8s/src/dcm
 require (
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4
-	github.com/pkg/errors v0.8.1
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200818155723-a5ffa8aadf49
+	github.com/pkg/errors v0.9.1
 	github.com/russross/blackfriday/v2 v2.0.1
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	gopkg.in/yaml.v2 v2.2.8
 )
 
 replace (
 	github.com/onap/multicloud-k8s/src/clm => ../clm
-	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
+	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
 	k8s.io/api => k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190409022649-727a075fdec8
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d

@@ -70,7 +70,7 @@ func (c *resourceBundleStates) Get(name string, options v1.GetOptions) (result *
 		Resource("resourcebundlestates").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(nil).
 		Into(result)
 	return
 }
@@ -87,7 +87,7 @@ func (c *resourceBundleStates) List(opts v1.ListOptions) (result *v1alpha1.Resou
 		Resource("resourcebundlestates").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(nil).
 		Into(result)
 	return
 }
@@ -104,7 +104,7 @@ func (c *resourceBundleStates) Watch(opts v1.ListOptions) (watch.Interface, erro
 		Resource("resourcebundlestates").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(nil)
 }
 
 // Create takes the representation of a resourceBundleState and creates it.  Returns the server's representation of the resourceBundleState, and an error, if there is any.
@@ -114,7 +114,7 @@ func (c *resourceBundleStates) Create(resourceBundleState *v1alpha1.ResourceBund
 		Namespace(c.ns).
 		Resource("resourcebundlestates").
 		Body(resourceBundleState).
-		Do().
+		Do(nil).
 		Into(result)
 	return
 }
@@ -127,7 +127,7 @@ func (c *resourceBundleStates) Update(resourceBundleState *v1alpha1.ResourceBund
 		Resource("resourcebundlestates").
 		Name(resourceBundleState.Name).
 		Body(resourceBundleState).
-		Do().
+		Do(nil).
 		Into(result)
 	return
 }
@@ -143,7 +143,7 @@ func (c *resourceBundleStates) UpdateStatus(resourceBundleState *v1alpha1.Resour
 		Name(resourceBundleState.Name).
 		SubResource("status").
 		Body(resourceBundleState).
-		Do().
+		Do(nil).
 		Into(result)
 	return
 }
@@ -155,7 +155,7 @@ func (c *resourceBundleStates) Delete(name string, options *v1.DeleteOptions) er
 		Resource("resourcebundlestates").
 		Name(name).
 		Body(options).
-		Do().
+		Do(nil).
 		Error()
 }
 
@@ -171,7 +171,7 @@ func (c *resourceBundleStates) DeleteCollection(options *v1.DeleteOptions, listO
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
-		Do().
+		Do(nil).
 		Error()
 }
 
@@ -184,7 +184,7 @@ func (c *resourceBundleStates) Patch(name string, pt types.PatchType, data []byt
 		SubResource(subresources...).
 		Name(name).
 		Body(data).
-		Do().
+		Do(nil).
 		Into(result)
 	return
 }

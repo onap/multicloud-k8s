@@ -13,7 +13,8 @@ require (
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
 	github.com/lib/pq v1.6.0 // indirect
-	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200630152613-7c20f73e7c5d
+	github.com/onap/multicloud-k8s/src/clm v0.0.0-20200630152613-7c20f73e7c5d
+	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200818155723-a5ffa8aadf49
 	github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee
 	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d
 	github.com/pkg/errors v0.9.1

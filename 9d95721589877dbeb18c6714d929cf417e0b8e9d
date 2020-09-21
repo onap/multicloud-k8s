@@ -22,6 +22,30 @@
       "revId": "9d95721589877dbeb18c6714d929cf417e0b8e9d",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3d6681b_5d761ac0",
+        "filename": "src/monitor/pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-21T22:14:58Z",
+      "side": 1,
+      "message": "pkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:73:5: not enough arguments in call to c.client.Get().Namespace(c.ns).Resource(\"resourcebundlestates\").Name(name).VersionedParams(\u0026options, \"github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/scheme\".ParameterCodec).Do\n        have ()\n        want (context.Context)\npkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:90:5: not enough arguments in call to c.client.Get().Namespace(c.ns).Resource(\"resourcebundlestates\").VersionedParams(\u0026opts, \"github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/scheme\".ParameterCodec).Timeout(timeout).Do\n        have ()\n        want (context.Context)\npkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:107:8: not enough arguments in call to c.client.Get().Namespace(c.ns).Resource(\"resourcebundlestates\").VersionedParams(\u0026opts, \"github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/scheme\".ParameterCodec).Timeout(timeout).Watch\n        have ()\n        want (context.Context)\npkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:117:5: not enough arguments in call to c.client.Post().Namespace(c.ns).Resource(\"resourcebundlestates\").Body(resourceBundleState).Do\n        have ()\n        want (context.Context)\npkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:130:5: not enough arguments in call to c.client.Put().Namespace(c.ns).Resource(\"resourcebundlestates\").Name(resourceBundleState.ObjectMeta.Name).Body(resourceBundleState).Do\n        have ()\n        want (context.Context)\npkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:146:5: not enough arguments in call to c.client.Put().Namespace(c.ns).Resource(\"resourcebundlestates\").Name(resourceBundleState.ObjectMeta.Name).SubResource(\"status\").Body(resourceBundleState).Do\n        have ()\n        want (context.Context)\npkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:158:5: not enough arguments in call to c.client.Delete().Namespace(c.ns).Resource(\"resourcebundlestates\").Name(name).Body(options).Do\n        have ()\n        want (context.Context)\npkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:174:5: not enough arguments in call to c.client.Delete().Namespace(c.ns).Resource(\"resourcebundlestates\").VersionedParams(\u0026listOptions, \"github.com/onap/multicloud-k8s/src/monitor/pkg/generated/clientset/versioned/scheme\".ParameterCodec).Timeout(timeout).Body(options).Do\n        have ()\n        want (context.Context)\npkg/generated/clientset/versioned/typed/k8splugin/v1alpha1/resourcebundlestate.go:187:5: not enough arguments in call to c.client.Patch(pt).Namespace(c.ns).Resource(\"resourcebundlestates\").SubResource(subresources...).Name(name).Body(data).Do\n        have ()\n        want (context.Context)",
+      "parentUuid": "363de754_100e3f00",
+      "range": {
+        "startLine": 73,
+        "startChar": 5,
+        "endLine": 73,
+        "endChar": 8
+      },
+      "revId": "9d95721589877dbeb18c6714d929cf417e0b8e9d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

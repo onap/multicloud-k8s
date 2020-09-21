@@ -13,6 +13,7 @@ limitations under the License.
 package client
 
 import (
+	"context"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -27,7 +28,8 @@ func (c *Client) CreateNamespace(namespace string) error {
 			},
 		},
 	}
-	_, err := c.Clientset.CoreV1().Namespaces().Create(ns)
+	context := context.TODO()
+	_, err := c.Clientset.CoreV1().Namespaces().Create(context, ns, metav1.CreateOptions{})
 	// if errors.IsAlreadyExists(err) {
 	// 	// If it failed because the NS is already there, then do not return such error
 	// 	return nil
@@ -38,12 +40,14 @@ func (c *Client) CreateNamespace(namespace string) error {
 
 // DeleteNamespace deletes the namespace with the given name
 func (c *Client) DeleteNamespace(namespace string) error {
-	return c.Clientset.CoreV1().Namespaces().Delete(namespace, &metav1.DeleteOptions{})
+	context := context.TODO()
+	return c.Clientset.CoreV1().Namespaces().Delete(context, namespace, metav1.DeleteOptions{})
 }
 
 // NodesReady returns the number of nodes ready
 func (c *Client) NodesReady() (ready int, total int, err error) {
-	nodes, err := c.Clientset.CoreV1().Nodes().List(metav1.ListOptions{})
+	context := context.TODO()
+	nodes, err := c.Clientset.CoreV1().Nodes().List(context, metav1.ListOptions{})
 	if err != nil {
 		return 0, 0, err
 	}

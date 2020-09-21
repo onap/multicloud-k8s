@@ -26,7 +26,6 @@ github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbt
 github.com/PuerkitoBio/urlesc v0.0.0-20160726150825-5bd2802263f2/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 h1:d+Bc7a5rLufV/sSk/8dngufqelfh6jnri85riMAaF/M=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
-github.com/VamshiKrishnaNemalikonda/GO v0.0.0-20191112095043-d6b01bbf585f h1:I3PTea8BCbUFS3YCRYJwHN9ppi5CuN+pmH10NtNRt+A=
 github.com/aokoli/goutils v1.1.0 h1:jy4ghdcYvs5EIoGssZNslIASX5m+KNMfyyKvRQ0TEVE=
 github.com/aokoli/goutils v1.1.0/go.mod h1:SijmP0QR8LtwsmDs8Yii5Z/S4trXFGFC2oO5g9DP+DQ=
 github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6/go.mod h1:grANhF5doyWs3UAsr3K4I6qtAmlQcZDesFNEHPZAzj8=
@@ -228,9 +227,7 @@ github.com/modern-go/reflect2 v1.0.1 h1:9f412s+6RmYXLWZSEzVVgPGK7C2PphHj5RJrvfx9
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/munnerz/goautoneg v0.0.0-20120707110453-a547fc61f48d/go.mod h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=
 github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+o7JKHSa8/e818NopupXU1YMK5fe1lsApnBw=
-github.com/onap/multicloud-k8s v0.0.0-20200123181220-fc960539db54 h1:0iPySKR2wPGiyvi0KmtjNmWcBoM8oUUVc3Q4QkYbkp0=
-github.com/onap/multicloud-k8s v0.0.0-20200210192739-c06be6458e99 h1:ZVCLL4/4dEbq/G9XGWhl3y8b1jgTB03ByTI2AiVMgUk=
-github.com/onap/multicloud-k8s v0.0.0-20200303230813-37aed9b7a0db h1:H+IVbOqoE4rk2qcSwOrR335VejyBhkLK75V6UL2uoJ4=
+github.com/onap/multicloud-k8s v0.0.0-20200915201756-3bc5164b3ea1 h1:aD2Mlar8OH3L+vhoHeirDDzUAVJ4QspeaCrCMTTcsec=
 github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20200303230813-37aed9b7a0db h1:RevNsc1iFXT2DGBdYViLrJJ0HXIoAxdvj6QopQOKU5I=
 github.com/onap/multicloud-k8s/src/k8splugin v0.0.0-20200303230813-37aed9b7a0db/go.mod h1:EnQd/vQGZR1/55IihaHxiux4ZUig/zfXZux7bfmU0S8=
 github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

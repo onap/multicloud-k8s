@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "634df525_77768f82",
+        "filename": "src/clm/go.sum",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4960
+      },
+      "writtenOn": "2020-09-22T18:39:55Z",
+      "side": 1,
+      "message": "Do u need to check-in the go.sum file, as i understand this file gets auto generated , right ?",
+      "revId": "b0aebf822188c67ff20d06f5a50e40e3f5503135",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

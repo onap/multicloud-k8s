@@ -682,284 +682,6 @@ paths:
           content: {}
 
 
-############################ GENERIC PLACEMENT INTENT API'S #################################################
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents:
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-    post:
-      tags:
-        - Generic Placement Intent
-      summary: Add Generic Placement Intent
-      description: Add a new `generic placement intent`
-      operationId: addGenericPlacementIntent
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericPlacementIntent'
-        '405':
-          description: Invalid Input
-          content: {}
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericPlacementIntent'
-        description: Generic Placement Intent definition
-        required: true
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get all Generic Placement Intents
-
-      description: |
-        Get all `Generic Placement Intents`
-
-      operationId: getAllGenericPlacementIntents
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementIntentArray'
-        '404':
-          description: No Generic Placement Intent found
-          content: {}
-
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}:
-    # parameters list that are used with each operation for this path
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get Generic Placement Intent
-
-      description: |
-        Get `generic placement intent`
-
-      operationId: getGenericPlacementIntentByName
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementIntent'
-        '404':
-          description: Generic Placement Intent not found
-          content: {}
-    put:
-      tags:
-        - Generic Placement Intent
-      summary: Update Generic Placement Intent
-      description: Update `Generic Placement Intent`
-      operationId: updateGenericPlacementIntent
-      responses:
-        '200':
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementIntent'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Generic Placement Intent not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericPlacementIntent'
-        description: Generic Placement Intent definition
-        required: true
-    delete: # documentation for DELETE operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Delete Generic Placement Intent
-
-      description: |
-        Delete `Generic Placement Intent`
-
-      operationId: deleteGenericPlacementIntentByName
-      responses: # list of responses
-        '204':
-          description: Deleted
-          content: {}
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Generic Placement Intent not found
-          content: {}
-
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents:
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-    post:
-      tags:
-        - Generic Placement Intent
-      summary: Add intent for an application
-      description: Add a `intent for application`
-      operationId: addIntentToGenericPlacementIntent
-      responses:
-        '201':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-        '405':
-          description: Invalid Input
-          content: {}
-      requestBody:
-        content:
-          application/json: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/GenericPlacementAppIntent'
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get all Intents in Generic Placement
-
-      description: |
-        Get all ` Intents in Generic Placement Intent`
-
-      operationId: getAllIntentsInGenericPlacementIntents
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntentArray'
-        '404':
-          description: No Generic Placement Intent found
-          content: {}
-
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/{intent-name}:
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-      - $ref: '#/components/parameters/intentName'
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Get intent
-
-      description: |
-        Get `generic placement intent`
-
-      operationId: getIntentfromGenericPlacementIntent
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-
-        '404':
-          description: Intent  not found
-          content: {}
-    put:
-      tags:
-        - Generic Placement Intent
-      summary: Update intent for an application
-      description: Update `generic placement intent for application`
-      operationId: updateIntentToGenericPlacementIntent
-      responses:
-        '200':
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-          description: Success
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Generic placement intent not found
-          content: {}
-      # request body documentation
-      requestBody:
-        content:
-         application/json: # Media type
-            schema:            # Request payload
-              $ref: '#/components/schemas/GenericPlacementAppIntent'
-        required: true
-
-    delete: # documentation for DELETE operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Delete intent
-
-      description: |
-        Delete `generic placement intent`
-
-      operationId: deleteIntentFromGenericPlacementIntent
-      responses: # list of responses
-        '204':
-          description: Deleted
-          content: {}
-        '400':
-          description: Invalid data
-          content: {}
-        '404':
-          description: Intent not found
-          content: {}
-
-  # Qurey for Intent - Get intent for app-name
-  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{generic-placement-intent-name}/app-intents/:
-    parameters:
-      - $ref: '#/components/parameters/projectName'
-      - $ref: '#/components/parameters/compositeAppName'
-      - $ref: '#/components/parameters/compositeAppVersion'
-      - $ref: '#/components/parameters/genericPlacementIntentName'
-      - in: query
-        name: app-name
-        schema:
-          type: string
-          maxLength: 128
-        required: true
-
-    get: # documentation for GET operation for this path
-      tags:
-        - Generic Placement Intent
-      summary: Query intent for an application
-
-      description: |
-        Query `generic placement intent for application`
-
-      operationId: queryIntentfromGenericPlacementIntent
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema:
-                $ref: '#/components/schemas/GenericPlacementAppIntent'
-        '404':
-          description: Generic Placement Intent for application not found
-          content: {}
 
 ############################ Deployment Intent Group API'S #################################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups:
@@ -1238,6 +960,291 @@ paths:
         '404':
           description: Deployment Intent not found
           content: {}
+
+############################ GENERIC PLACEMENT INTENT API'S #################################################
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+    post:
+      tags:
+        - Generic Placement Intent
+      summary: Add Generic Placement Intent
+      description: Add a new `generic placement intent`
+      operationId: addGenericPlacementIntent
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        description: Generic Placement Intent definition
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get all Generic Placement Intents
+
+      description: |
+        Get all `Generic Placement Intents`
+
+      operationId: getAllGenericPlacementIntents
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementIntentArray'
+        '404':
+          description: No Generic Placement Intent found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{generic-placement-intent-name}:
+    # parameters list that are used with each operation for this path
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get Generic Placement Intent
+
+      description: |
+        Get `generic placement intent`
+
+      operationId: getGenericPlacementIntentByName
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+    put:
+      tags:
+        - Generic Placement Intent
+      summary: Update Generic Placement Intent
+      description: Update `Generic Placement Intent`
+      operationId: updateGenericPlacementIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metadata'
+        description: Generic Placement Intent definition
+        required: true
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Delete Generic Placement Intent
+
+      description: |
+        Delete `Generic Placement Intent`
+
+      operationId: deleteGenericPlacementIntentByName
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic Placement Intent not found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{generic-placement-intent-name}/app-intents:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+    post:
+      tags:
+        - Generic Placement Intent
+      summary: Add intent for an application
+      description: Add a `intent for application`
+      operationId: addIntentToGenericPlacementIntent
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+        '405':
+          description: Invalid Input
+          content: {}
+      requestBody:
+        content:
+          application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/GenericPlacementAppIntent'
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get all Intents in Generic Placement
+
+      description: |
+        Get all ` Intents in Generic Placement Intent`
+
+      operationId: getAllIntentsInGenericPlacementIntents
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntentArray'
+        '404':
+          description: No Generic Placement Intent found
+          content: {}
+
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{generic-placement-intent-name}/app-intents/{intent-name}:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - $ref: '#/components/parameters/intentName'
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Get intent
+
+      description: |
+        Get `generic placement intent`
+
+      operationId: getIntentfromGenericPlacementIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+
+        '404':
+          description: Intent  not found
+          content: {}
+    put:
+      tags:
+        - Generic Placement Intent
+      summary: Update intent for an application
+      description: Update `generic placement intent for application`
+      operationId: updateIntentToGenericPlacementIntent
+      responses:
+        '200':
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+          description: Success
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Generic placement intent not found
+          content: {}
+      # request body documentation
+      requestBody:
+        content:
+         application/json: # Media type
+            schema:            # Request payload
+              $ref: '#/components/schemas/GenericPlacementAppIntent'
+        required: true
+
+    delete: # documentation for DELETE operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Delete intent
+
+      description: |
+        Delete `generic placement intent`
+
+      operationId: deleteIntentFromGenericPlacementIntent
+      responses: # list of responses
+        '204':
+          description: Deleted
+          content: {}
+        '400':
+          description: Invalid data
+          content: {}
+        '404':
+          description: Intent not found
+          content: {}
+
+  # Qurey for Intent - Get intent for app-name
+  /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{generic-placement-intent-name}/app-intents/:
+    parameters:
+      - $ref: '#/components/parameters/projectName'
+      - $ref: '#/components/parameters/compositeAppName'
+      - $ref: '#/components/parameters/compositeAppVersion'
+      - $ref: '#/components/parameters/deploymentIntentGroupName'
+      - $ref: '#/components/parameters/genericPlacementIntentName'
+      - in: query
+        name: app-name
+        schema:
+          type: string
+          maxLength: 128
+        required: true
+
+    get: # documentation for GET operation for this path
+      tags:
+        - Generic Placement Intent
+      summary: Query intent for an application
+
+      description: |
+        Query `generic placement intent for application`
+
+      operationId: queryIntentfromGenericPlacementIntent
+      responses: # list of responses
+        '200':
+          description: Success
+          content:
+            application/json: # operation response mime type
+              schema:
+                $ref: '#/components/schemas/GenericPlacementAppIntent'
+        '404':
+          description: Generic Placement Intent for application not found
+          content: {}
+
 
 ####################Lifecycle Management#######################################
   /projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/approve:
@@ -2881,9 +2888,15 @@ components:
         version:
           type: string
           maxLength: 128
+        logical-cloud:
+          type: string
+          description: Logical Cloud to use for this intent
+          maxLength: 128
+          example: "cloud1"
       required:
       - profile
       - version
+      - logical-cloud
     DeploymentGroupIntent:
       type: object
       properties:

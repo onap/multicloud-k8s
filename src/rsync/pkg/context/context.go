@@ -536,7 +536,13 @@ func waitForDone(ac appcontext.AppContext) {
 			logutils.Info("Wait for done watcher running..", logutils.Fields{})
 			count = 0
 		}
-		acStatus, _ := getAppContextStatus(ac)
+		acStatus, err := getAppContextStatus(ac)
+		if err != nil {
+			logutils.Error("Failed to get the app context status", logutils.Fields{
+				"error": err,
+			})
+			return
+		}
 		if acStatus.Status == appcontext.AppContextStatusEnum.Instantiated ||
 			acStatus.Status == appcontext.AppContextStatusEnum.InstantiateFailed {
 			return

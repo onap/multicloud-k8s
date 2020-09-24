@@ -26,7 +26,8 @@ function _install_go {
 
     #gcc is required for go apps compilation
     if ! which gcc; then
-	if [ $version_id = "ubuntu" ]; then
+	echo $version_id
+	if [ $version_id == "ubuntu" ]; then
 	    sudo apt-get install -y gcc
 	else #centos
             sudo yum install -y gcc
@@ -48,41 +49,56 @@ function _install_go {
 # _install_pip() - Install Python Package Manager
 function _install_pip {
     if $(pip --version &>/dev/null); then
-        sudo -E pip install --no-cache-dir --upgrade pip
+	if [ $version_id == "ubuntu" ]; then	
+		sudo -E pip install --no-cache-dir --upgrade pip
+        else #centos
+	    sudo yum install epel-release    
+	    sudo yum -y install python3-pip
+	fi
     else
-	if [ $version_id = "ubuntu" ]; then
+	if [ $version_id == "ubuntu" ]; then
             sudo apt-get install -y python-dev
         else #centos
- 	    sudo yum install -y python-devel
+ 	    sudo dnf install -y python3-devel
 	fi
-        curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python
+        curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3
     fi
 }
 
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
     if $(ansible --version &>/dev/null); then
-        sudo pip uninstall -y ansible
+	    sudo -E python3 -m pip uninstall -y ansible
     fi
     _install_pip
     local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
     sudo mkdir -p /etc/ansible/
-    sudo -E pip install --no-cache-dir ansible==$version
+    if [ $version_id == "ubuntu" ]; then
+        sudo -E python3 -m pip install --no-cache-dir ansible==$version
+    else	
+	sudo dnf install epel-release
+	sudo dnf makecache
+	sudo dnf install ansible
+    fi
 }
-# _install_docker() - Download and install docker for centos
+# _install_docker() - Download and install docker-engine
 function _install_docker {
-
-    if [ $version_id = "ubuntu" ]; then
-	cal max_concurrent_downloads=${1:-3}
-	if $(docker version &>/dev/null); then
-	    return
-	fi
+    local max_concurrent_downloads=${1:-3}
+    if $(docker version &>/dev/null); then
+	return
+    fi
+    if [ $version_id == "ubuntu" ]; then
 	sudo apt-get install -y apt-transport-https ca-certificates curl
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     	sudo apt-get update
    	sudo apt-get install -y docker-ce
-
+    else #centos
+	sudo yum install -y yum-utils
+	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        sudo dnf install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.10-3.2.el7.x86_64.rpm
+	sudo dnf install docker-ce -y 
+    fi
     	sudo mkdir -p /etc/systemd/system/docker.service.d
     	if [ ${http_proxy:-} ]; then
         	echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
@@ -101,17 +117,9 @@ function _install_docker {
     	if [[ -z $(groups | grep docker) ]]; then
 		sudo usermod -aG docker $USER
     	fi
-
+	sudo systemctl disable firewalld #required for DNS resolution inside containers to work
     	sudo systemctl restart docker
     	sleep 10
-     else #centos
-	sudo yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
-    	sudo yum install -y yum-utils
-    	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    	sudo yum install docker-ce docker-ce-cli containerd.io
-    	sudo systemctl restart docker
-    	sleep 10
-    fi
 }
 
 function _set_environment_file {
@@ -130,17 +138,19 @@ function install_k8s {
     version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
     local_release_dir=$(grep "local_release_dir" $kud_inventory_folder/group_vars/k8s-cluster.yml | awk -F "\"" '{print $2}')
     local tarball=v$version.tar.gz
-    if [ $version_id = "ubuntu" ]; then	
+    if [ $version_id == "ubuntu" ]; then	
 	sudo apt-get install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
 	sudo apt-get install -y gnupg2 software-properties-common          
     else #centos
 	sudo yum install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
 	sudo yum install -y yum-utils
-	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo    
-fi
+    fi
+    _install_pip
     _install_docker
     _install_ansible
-    echo "ansible installed"
+    if [ $version_id == "centos" ];then
+	sudo yum install wget
+    fi
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     sudo tar -C $dest_folder -xzf $tarball
     sudo mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
@@ -149,7 +159,8 @@ fi
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/
-    sudo -E pip install --no-cache-dir -r ./requirements.txt
+    sudo -E python3 -m pip install --no-cache-dir -r ./requirements.txt
+    echo "uses ansible-playbook in make"
     make mitogen
     popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
@@ -201,7 +212,7 @@ function install_plugin {
     echo "Installing multicloud/k8s plugin"
     _install_go
     _install_docker
-    sudo -E pip install --no-cache-dir docker-compose
+    sudo -E python3 -m pip install --no-cache-dir docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
     sudo cp $HOME/.kube/config /opt/kubeconfig/kud
@@ -226,7 +237,8 @@ function _print_kubernetes_info {
     fi
     # Expose Dashboard using NodePort
     node_port=30080
-    KUBE_EDITOR="sed -i \"s|type\: ClusterIP|type\: NodePort|g\"" kubectl -n kube-system edit service kubernetes-dashboard    KUBE_EDITOR="sed -i \"s|nodePort\: .*|nodePort\: $node_port|g\"" kubectl -n kube-system edit service kubernetes-dashboard
+    KUBE_EDITOR="sed -i \"s|type\: ClusterIP|type\: NodePort|g\"" kubectl -n kube-system edit service kubernetes-dashboard   
+    KUBE_EDITOR="sed -i \"s|nodePort\: .*|nodePort\: $node_port|g\"" kubectl -n kube-system edit service kubernetes-dashboard
 
     master_ip=$(kubectl cluster-info | grep "Kubernetes master" | awk -F ":" '{print $2}')
 
@@ -275,15 +287,15 @@ fi
 echo "Removing ppa for jonathonf/python-3.6"
 sudo ls /etc/apt/sources.list.d/ || true
 sudo find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
-if [ $version_id = "ubuntu" ]; then
-	sudo apt-get update
+if [ $version_id == "ubuntu" ]; then
+    sudo apt-get update
 else #centos
     sudo yum update -y
 fi
-echo "k8 next"
 install_k8s
+echo "k8s installed"
 _set_environment_file
-#install_addons
+install_addons
 if ${KUD_PLUGIN_ENABLED:-false}; then
     install_plugin
 fi

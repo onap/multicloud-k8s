@@ -11,7 +11,7 @@
 
 box = {
   :virtualbox => { :name => 'elastic/ubuntu-18.04-x86_64', :version => '20191013.0.0'},
-  :libvirt => { :name => 'centos/7', :version => '2004.01'}
+  :libvirt => { :name => 'centos/8', :version => '1905.1'}
 }
 
 require 'yaml'

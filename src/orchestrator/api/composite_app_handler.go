@@ -130,7 +130,12 @@ func (h compositeAppHandler) deleteHandler(w http.ResponseWriter, r *http.Reques
 	version := vars["version"]
 	projectName := vars["project-name"]
 
-	err := h.client.DeleteCompositeApp(name, version, projectName)
+	_, err := h.client.GetCompositeApp(name, version, projectName)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusNotFound)
+            return
+        }
+	err = h.client.DeleteCompositeApp(name, version, projectName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

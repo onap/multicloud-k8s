@@ -168,3 +168,44 @@ func (h clusterHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// getConfigHandler handles GET operations on kubeconfigs
+// Returns a kubeconfig file
+func (h clusterHandler) getConfigHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	project := vars["project-name"]
+	logicalCloud := vars["logical-cloud-name"]
+	name := vars["cluster-reference"]
+	var ret interface{}
+	var err error
+
+	ret, err = h.client.GetCluster(project, logicalCloud, name)
+	if err != nil {
+		if err.Error() == "Cluster Reference does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ret, err = h.client.GetClusterConfig(project, logicalCloud, name)
+	if err != nil {
+		if err.Error() == "The certificate for this cluster hasn't been issued yet. Please try later." {
+			http.Error(w, err.Error(), http.StatusAccepted)
+		} else if err.Error() == "Logical Cloud hasn't been applied yet" {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/yaml")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}

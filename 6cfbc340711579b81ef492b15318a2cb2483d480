@@ -70,6 +70,30 @@
       "revId": "6cfbc340711579b81ef492b15318a2cb2483d480",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d20ee07b_e9a9eb5b",
+        "filename": "src/dcm/api/quotaHandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-25T00:32:42Z",
+      "side": 1,
+      "message": "I will push a separate patch to address the logging side, since there are a lot more calls needing that than the ones I change in this patch.",
+      "parentUuid": "280612c7_ae6a9832",
+      "range": {
+        "startLine": 94,
+        "startChar": 3,
+        "endLine": 97,
+        "endChar": 4
+      },
+      "revId": "6cfbc340711579b81ef492b15318a2cb2483d480",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

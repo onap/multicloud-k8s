@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c24a413_2b66afb2",
+        "filename": "src/dcm/api/quotaHandler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-25T00:16:05Z",
+      "side": 1,
+      "message": "Is this error logged also? In other place like orchestrator these errors are not getting logged and only returned to user",
+      "range": {
+        "startLine": 94,
+        "startChar": 3,
+        "endLine": 97,
+        "endChar": 4
+      },
+      "revId": "6cfbc340711579b81ef492b15318a2cb2483d480",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

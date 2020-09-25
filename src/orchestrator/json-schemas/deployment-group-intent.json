@@ -5,7 +5,8 @@
       "spec": {
         "required": [
             "profile",
-            "version"
+            "version",
+            "logical-cloud"
           ],
           "type": "object",
           "description": "DepSpecData has profile, version, OverrideValuesObj",
@@ -40,6 +41,16 @@
             },
             "version": {
               "type": "string",
+              "maxLength": 128,
+              "pattern": "[-_0-9a-zA-Z]+$"
+            },
+            "logical-cloud": {
+              "description": "Logical Cloud to use for this intent",
+              "required": [
+                "logical-cloud"
+              ],
+              "type": "string",
+              "example": "cloud1",
               "maxLength": 128,
               "pattern": "[-_0-9a-zA-Z]+$"
             }

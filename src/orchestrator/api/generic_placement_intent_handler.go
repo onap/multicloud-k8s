@@ -62,8 +62,9 @@ func (h genericPlacementIntentHandler) createGenericPlacementIntentHandler(w htt
 	projectName := vars["project-name"]
 	compositeAppName := vars["composite-app-name"]
 	version := vars["composite-app-version"]
+	digName := vars["deployment-intent-group-name"]
 
-	gPIntent, createErr := h.client.CreateGenericPlacementIntent(g, projectName, compositeAppName, version)
+	gPIntent, createErr := h.client.CreateGenericPlacementIntent(g, projectName, compositeAppName, version, digName)
 	if createErr != nil {
 		http.Error(w, createErr.Error(), http.StatusInternalServerError)
 		return
@@ -103,7 +104,13 @@ func (h genericPlacementIntentHandler) getGenericPlacementHandler(w http.Respons
 		return
 	}
 
-	gPIntent, err := h.client.GetGenericPlacementIntent(intentName, projectName, compositeAppName, version)
+	dig := vars["deployment-intent-group-name"]
+	if dig == "" {
+		http.Error(w, "Missing deploymentIntentGroupName in GET request", http.StatusBadRequest)
+		return
+	}
+
+	gPIntent, err := h.client.GetGenericPlacementIntent(intentName, projectName, compositeAppName, version, dig)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -128,8 +135,9 @@ func (h genericPlacementIntentHandler) getAllGenericPlacementIntentsHandler(w ht
 	p := vars["project-name"]
 	ca := vars["composite-app-name"]
 	v := vars["composite-app-version"]
+	digName := vars["deployment-intent-group-name"]
 
-	gpList, err := h.client.GetAllGenericPlacementIntents(p, ca, v)
+	gpList, err := h.client.GetAllGenericPlacementIntents(p, ca, v, digName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -150,8 +158,9 @@ func (h genericPlacementIntentHandler) deleteGenericPlacementHandler(w http.Resp
 	p := vars["project-name"]
 	ca := vars["composite-app-name"]
 	v := vars["composite-app-version"]
+	digName := vars["deployment-intent-group-name"]
 
-	err := h.client.DeleteGenericPlacementIntent(i, p, ca, v)
+	err := h.client.DeleteGenericPlacementIntent(i, p, ca, v, digName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

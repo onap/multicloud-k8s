@@ -1522,6 +1522,8 @@ honnef.co/go/tools v0.0.1-2019.2.3/go.mod h1:a3bituU0lyd329TUQxRnasdCoJDkEUEAqEt
 howett.net/plist v0.0.0-20181124034731-591f970eefbb/go.mod h1:vMygbs4qMhSZSc4lCUl2OEE+rDiIIJAIdR4m7MiMcm0=
 k8s.io/api v0.16.9 h1:3vCx0WX9qcg1Hv4aQ/G1tiIKectGVuimvPVTJU4VOCA=
 k8s.io/api v0.16.9/go.mod h1:Y7dZNHs1Xy0mSwSlzL9QShi6qkljnN41yR8oWCRTDe8=
+k8s.io/api v0.18.2 h1:wG5g5ZmSVgm5B+eHMIbI9EGATS2L8Z72rda19RIEgY8=
+k8s.io/api v0.18.2/go.mod h1:SJCWI7OLzhZSvbY7U8zwNl9UA4o1fizoug34OV/2r78=
 k8s.io/apiextensions-apiserver v0.16.9 h1:CE+SWS6PM3MDJiyihW5hnDiqsJ/sjMaSMblqzH37J18=
 k8s.io/apiextensions-apiserver v0.16.9/go.mod h1:j/+KedxOeRSPMkvLNyKMbIT3+saXdTO4jTBplTmXJR4=
 k8s.io/apimachinery v0.16.10-beta.0 h1:l+qmzwWTMIBtFGlo5OpPYoZKCgGLtpAWvIa8Wcr9luU=

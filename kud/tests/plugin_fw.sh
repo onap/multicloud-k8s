@@ -116,6 +116,9 @@ print_msg "Not waiting for vFW to fully install as no further checks are impleme
 #sleep 8m
 print_msg "[END] Basic checks for instantiated resource"
 
+print_msg "Retrieving VNF status"
+call_api "${base_url}/instance/${vnf_id}/status"
+
 print_msg "Retrieving VNF details"
 response="$(call_api "${base_url}/instance/${vnf_id}")"
 echo "$response"

@@ -25,6 +25,8 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery/cached/disk"
 	"k8s.io/client-go/dynamic"
@@ -41,6 +43,38 @@ type KubernetesClient struct {
 	discoverClient *disk.CachedDiscoveryClient
 	restMapper     meta.RESTMapper
 	instanceID     string
+}
+
+// getResourcesStatus yields status of resources under given instance ID
+func (k *KubernetesClient) getResourceStatus(res helm.KubernetesResource, namespace string) (ResourceStatus, error) {
+	dynClient := k.GetDynamicClient()
+	mapper := k.GetMapper()
+	mapping, err := mapper.RESTMapping(schema.GroupKind{
+		Group: res.GVK.Group,
+		Kind:  res.GVK.Kind,
+	}, res.GVK.Version)
+	if err != nil {
+		return ResourceStatus{},
+			pkgerrors.Wrap(err, "Preparing mapper based on GVK")
+	}
+
+	gvr := mapping.Resource
+	opts := metav1.GetOptions{}
+	var unstruct *unstructured.Unstructured
+	switch mapping.Scope.Name() {
+	case meta.RESTScopeNameNamespace:
+		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(res.Name, opts)
+	case meta.RESTScopeNameRoot:
+		unstruct, err = dynClient.Resource(gvr).Get(res.Name, opts)
+	default:
+		return ResourceStatus{}, pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + res.GVK.String())
+	}
+
+	if err != nil {
+		return ResourceStatus{}, pkgerrors.Wrap(err, "Getting object status")
+	}
+
+	return ResourceStatus{unstruct.GetName(), res.GVK, *unstruct}, nil
 }
 
 // getKubeConfig uses the connectivity client to get the kubeconfig based on the name
@@ -182,40 +216,40 @@ func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
 }
 
 func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
-        namespace string) (helm.KubernetesResource, error) {
+	namespace string) (helm.KubernetesResource, error) {
 
-        if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
-                return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
-        }
+	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
+		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
+	}
 
-        log.Info("Processing Kubernetes Resource", log.Fields{
-                "filepath": resTempl.FilePath,
-        })
+	log.Info("Processing Kubernetes Resource", log.Fields{
+		"filepath": resTempl.FilePath,
+	})
 
-        pluginImpl, err := plugin.GetPluginByKind(resTempl.GVK.Kind)
-        if err != nil {
-                return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error loading plugin")
-        }
+	pluginImpl, err := plugin.GetPluginByKind(resTempl.GVK.Kind)
+	if err != nil {
+		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error loading plugin")
+	}
 
-        updatedResourceName, err := pluginImpl.Update(resTempl.FilePath, namespace, k)
-        if err != nil {
-                log.Error("Error Updating Resource", log.Fields{
-                        "error":    err,
-                        "gvk":      resTempl.GVK,
-                        "filepath": resTempl.FilePath,
-                })
-                return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
-        }
+	updatedResourceName, err := pluginImpl.Update(resTempl.FilePath, namespace, k)
+	if err != nil {
+		log.Error("Error Updating Resource", log.Fields{
+			"error":    err,
+			"gvk":      resTempl.GVK,
+			"filepath": resTempl.FilePath,
+		})
+		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
+	}
 
-        log.Info("Updated Kubernetes Resource", log.Fields{
-                "resource": updatedResourceName,
-                "gvk":      resTempl.GVK,
-        })
+	log.Info("Updated Kubernetes Resource", log.Fields{
+		"resource": updatedResourceName,
+		"gvk":      resTempl.GVK,
+	})
 
-        return helm.KubernetesResource{
-                GVK:  resTempl.GVK,
-                Name: updatedResourceName,
-        }, nil
+	return helm.KubernetesResource{
+		GVK:  resTempl.GVK,
+		Name: updatedResourceName,
+	}, nil
 }
 
 func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesResourceTemplate,
@@ -239,23 +273,23 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 }
 
 func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesResourceTemplate,
-        namespace string) ([]helm.KubernetesResource, error) {
+	namespace string) ([]helm.KubernetesResource, error) {
 
-        err := k.ensureNamespace(namespace)
-        if err != nil {
-                return nil, pkgerrors.Wrap(err, "Creating Namespace")
-        }
+	err := k.ensureNamespace(namespace)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Creating Namespace")
+	}
 
-        var updatedResources []helm.KubernetesResource
-        for _, resTempl := range sortedTemplates {
-                resUpdated, err := k.updateKind(resTempl, namespace)
-                if err != nil {
-                        return nil, pkgerrors.Wrapf(err, "Error updating kind: %+v", resTempl.GVK)
-                }
-                updatedResources = append(updatedResources, resUpdated)
-        }
+	var updatedResources []helm.KubernetesResource
+	for _, resTempl := range sortedTemplates {
+		resUpdated, err := k.updateKind(resTempl, namespace)
+		if err != nil {
+			return nil, pkgerrors.Wrapf(err, "Error updating kind: %+v", resTempl.GVK)
+		}
+		updatedResources = append(updatedResources, resUpdated)
+	}
 
-        return updatedResources, nil
+	return updatedResources, nil
 }
 
 func (k *KubernetesClient) deleteKind(resource helm.KubernetesResource, namespace string) error {

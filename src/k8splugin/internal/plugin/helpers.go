@@ -17,6 +17,7 @@
 package plugin
 
 import (
+	"encoding/json"
 	"log"
 	"strings"
 
@@ -54,12 +55,19 @@ type KubernetesConnector interface {
 	GetInstanceID() string
 }
 
+// Resource is holder structure for Get operations
+type Resource struct {
+	Name     string
+	GVK      schema.GroupVersionKind
+	Metadata json.Marshaler
+}
+
 // Reference is the interface that is implemented
 type Reference interface {
 	//Create a kubernetes resource described by the yaml in yamlFilePath
 	Create(yamlFilePath string, namespace string, client KubernetesConnector) (string, error)
 
-	//Get a kubernetes resource based on the groupVersionKind and resourceName provided in resource
+	//Get raw runtime resource based on the groupVersionKind and resourceName provided in resource
 	Get(resource helm.KubernetesResource, namespace string, client KubernetesConnector) (string, error)
 
 	//List all resources of the specified GroupVersionKind in the given namespace
@@ -69,8 +77,8 @@ type Reference interface {
 	//Delete a kubernetes resource described in the provided namespace
 	Delete(resource helm.KubernetesResource, namespace string, client KubernetesConnector) error
 
-        //Update kubernetes resource based on the groupVersionKind and resourceName provided in resource
-        Update(yamlFilePath string, namespace string, client KubernetesConnector) (string, error)
+	//Update kubernetes resource based on the groupVersionKind and resourceName provided in resource
+	Update(yamlFilePath string, namespace string, client KubernetesConnector) (string, error)
 }
 
 // GetPluginByKind returns a plugin by the kind name

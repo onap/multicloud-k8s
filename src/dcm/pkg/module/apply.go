@@ -51,8 +51,10 @@ type MetaDatas struct {
 type Specs struct {
 	Request string   `yaml:"request,omitempty"`
 	Usages  []string `yaml:"usages,omitempty"`
-	//Hard           logicalcloud.QSpec    `yaml:"hard,omitempty"`
-	Hard QSpec `yaml:"hard,omitempty"`
+	// TODO: validate quota keys
+	// //Hard           logicalcloud.QSpec    `yaml:"hard,omitempty"`
+	// Hard QSpec `yaml:"hard,omitempty"`
+	Hard map[string]string `yaml:"hard,omitempty"`
 }
 
 type RoleRules struct {

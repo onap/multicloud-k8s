@@ -22,8 +22,9 @@ import (
 
 // Quota contains the parameters needed for a Quota
 type Quota struct {
-	MetaData      QMetaDataList `json:"metadata"`
-	Specification QSpec         `json:"spec"`
+	MetaData QMetaDataList `json:"metadata"`
+	// Specification QSpec         `json:"spec"`
+	Specification map[string]string `json:"spec"`
 }
 
 // MetaData contains the parameters needed for metadata
@@ -32,6 +33,7 @@ type QMetaDataList struct {
 	Description string `json:"description"`
 }
 
+// TODO: use QSpec fields to validate quota keys
 // Spec contains the parameters needed for spec
 type QSpec struct {
 	LimitsCPU                   string `json:"limits.cpu"`

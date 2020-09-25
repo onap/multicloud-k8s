@@ -89,8 +89,12 @@ func (h userPermissionHandler) getHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 	} else {
-		ret, err = h.client.GetAllUserPerms(project, logicalCloud)
+		ret, err = h.client.GetUserPerm(project, logicalCloud, name)
 		if err != nil {
+			if err.Error() == "User Permission does not exist" {
+				http.Error(w, err.Error(), http.StatusNotFound)
+				return
+			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -131,12 +135,16 @@ func (h userPermissionHandler) updateHandler(w http.ResponseWriter, r *http.Requ
 
 	ret, err := h.client.UpdateUserPerm(project, logicalCloud, name, v)
 	if err != nil {
+		if err.Error() == "User Permission does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(),
 			http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
 		http.Error(w, err.Error(),

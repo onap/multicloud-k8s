@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6546cf79_b3a4a8eb",
+        "filename": "src/k8splugin/internal/app/instance_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-09-25T14:40:51Z",
+      "side": 0,
+      "message": "Don\u0027t bother, I\u0027ll refactor existing test in next patchset",
+      "range": {
+        "startLine": 321,
+        "startChar": 0,
+        "endLine": 321,
+        "endChar": 2
+      },
+      "revId": "b9e5d308a5e357d987758005e928f825d773ccca",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

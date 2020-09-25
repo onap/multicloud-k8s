@@ -1,0 +1,8 @@
+Code-Review+1: Igor Duarte Cardoso <igordcard@gmail.com>
+Code-Review+2: Ritu Sood <ritu.sood@intel.com>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Submitted-by: Ritu Sood <ritu.sood@intel.com>
+Submitted-at: Fri, 25 Sep 2020 02:15:45 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/111927
+Project: multicloud/k8s
+Branch: refs/heads/master

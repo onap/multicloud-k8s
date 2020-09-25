@@ -62,8 +62,9 @@ func (h appIntentHandler) createAppIntentHandler(w http.ResponseWriter, r *http.
 	compositeAppName := vars["composite-app-name"]
 	version := vars["composite-app-version"]
 	intent := vars["intent-name"]
+	digName := vars["deployment-intent-group-name"]
 
-	appIntent, createErr := h.client.CreateAppIntent(a, projectName, compositeAppName, version, intent)
+	appIntent, createErr := h.client.CreateAppIntent(a, projectName, compositeAppName, version, intent, digName)
 	if createErr != nil {
 		http.Error(w, createErr.Error(), http.StatusInternalServerError)
 		return
@@ -104,13 +105,19 @@ func (h appIntentHandler) getAppIntentHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	dig := vars["deployment-intent-group-name"]
+	if dig == "" {
+		http.Error(w, "Missing deploymentIntentGroupName in GET request", http.StatusBadRequest)
+		return
+	}
+
 	ai := vars["app-intent-name"]
 	if ai == "" {
 		http.Error(w, "Missing appIntentName in GET request", http.StatusBadRequest)
 		return
 	}
 
-	appIntent, err := h.client.GetAppIntent(ai, p, ca, v, i)
+	appIntent, err := h.client.GetAppIntent(ai, p, ca, v, i,dig)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -128,7 +135,7 @@ func (h appIntentHandler) getAppIntentHandler(w http.ResponseWriter, r *http.Req
 
 /*
 getAllIntentsByAppHandler handles the URL:
-/v2/project/{project-name}/composite-apps/{composite-app-name}/{version}/generic-placement-intent/{intent-name}/app-intents?app-name=<app-name>
+/v2/project/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intent/{intent-name}/app-intents?app-name=<app-name>
 */
 func (h appIntentHandler) getAllIntentsByAppHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -142,13 +149,15 @@ func (h appIntentHandler) getAllIntentsByAppHandler(w http.ResponseWriter, r *ht
 	ca := vars["composite-app-name"]
 	v := vars["composite-app-version"]
 	i := vars["intent-name"]
+	digName := vars["deployment-intent-group-name"]
+
 	aN := r.URL.Query().Get("app-name")
 	if aN == "" {
 		http.Error(w, "Missing appName in GET request", http.StatusBadRequest)
 		return
 	}
 
-	specData, err := h.client.GetAllIntentsByApp(aN, p, ca, v, i)
+	specData, err := h.client.GetAllIntentsByApp(aN, p, ca, v, i, digName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -166,7 +175,7 @@ func (h appIntentHandler) getAllIntentsByAppHandler(w http.ResponseWriter, r *ht
 
 /*
 getAllAppIntentsHandler handles the URL:
-/v2/project/{project-name}/composite-apps/{composite-app-name}/{version}/generic-placement-intent/{intent-name}/app-intents
+/v2/project/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intent/{intent-name}/app-intents
 */
 func (h appIntentHandler) getAllAppIntentsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -179,8 +188,9 @@ func (h appIntentHandler) getAllAppIntentsHandler(w http.ResponseWriter, r *http
 	ca := vars["composite-app-name"]
 	v := vars["composite-app-version"]
 	i := vars["intent-name"]
+	digName := vars["deployment-intent-group-name"]
 
-	applicationsAndClusterInfo, err := h.client.GetAllAppIntents(p, ca, v, i)
+	applicationsAndClusterInfo, err := h.client.GetAllAppIntents(p, ca, v, i, digName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -205,8 +215,10 @@ func (h appIntentHandler) deleteAppIntentHandler(w http.ResponseWriter, r *http.
 	v := vars["composite-app-version"]
 	i := vars["intent-name"]
 	ai := vars["app-intent-name"]
+	digName := vars["deployment-intent-group-name"]
 
-	err := h.client.DeleteAppIntent(ai, p, ca, v, i)
+
+	err := h.client.DeleteAppIntent(ai, p, ca, v, i, digName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

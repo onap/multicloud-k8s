@@ -31,6 +31,7 @@ func TestCreateGenericPlacementIntent(t *testing.T) {
 		inputProject             string
 		inputCompositeApp        string
 		inputCompositeAppVersion string
+		inputDepIntGrpName		 string
 		expectedError            string
 		mockdb                   *db.MockDB
 		expected                 GenericPlacementIntent
@@ -44,22 +45,17 @@ func TestCreateGenericPlacementIntent(t *testing.T) {
 					UserData1:   "userData1",
 					UserData2:   "userData2",
 				},
-				Spec: GenIntentSpecData{
-					LogicalCloud: "logicalCloud1",
-				},
 			},
 			inputProject:             "testProject",
 			inputCompositeApp:        "testCompositeApp",
 			inputCompositeAppVersion: "testCompositeAppVersion",
+			inputDepIntGrpName:       "testDeploymentIntentGroup",
 			expected: GenericPlacementIntent{
 				MetaData: GenIntentMetaData{
 					Name:        "testGenericPlacement",
 					Description: " A sample intent for testing",
 					UserData1:   "userData1",
 					UserData2:   "userData2",
-				},
-				Spec: GenIntentSpecData{
-					LogicalCloud: "logicalCloud1",
 				},
 			},
 			expectedError: "",
@@ -82,6 +78,40 @@ func TestCreateGenericPlacementIntent(t *testing.T) {
 								"\"spec\":{" +
 								"\"version\":\"version of the composite app\"}}"),
 					},
+					DeploymentIntentGroupKey{
+						Name:         "testDeploymentIntentGroup",
+						Project:      "testProject",
+						CompositeApp: "testCompositeApp",
+						Version:      "testCompositeAppVersion",
+					}.String(): {
+						"deploymentintentgroupmetadata": []byte(
+							"{\"metadata\":{\"name\":\"testDeploymentIntentGroup\"," +
+								"\"description\":\"DescriptionTestDeploymentIntentGroup\"," +
+								"\"userData1\": \"userData1\"," +
+								"\"userData2\": \"userData2\"}," +
+								"\"spec\":{\"profile\": \"Testprofile\"," +
+								"\"version\": \"version of deployment\"," +
+								"\"override-values\":[" +
+								"{" +
+								"\"app-name\": \"TestAppName\"," +
+								"\"values\": " +
+								"{" +
+								"\"imageRepository\":\"registry.hub.docker.com\"" +
+								"}" +
+								"}," +
+								"{" +
+								"\"app-name\": \"TestAppName\"," +
+								"\"values\": " +
+								"{" +
+								"\"imageRepository\":\"registry.hub.docker.com\"" +
+								"}" +
+								"}" +
+								"]," +
+								"\"logical-cloud\": \"cloud1\"" +
+								"}"+
+								"}"),
+					},
+
 				},
 			},
 		},
@@ -91,7 +121,7 @@ func TestCreateGenericPlacementIntent(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			intentCli := NewGenericPlacementIntentClient()
-			got, err := intentCli.CreateGenericPlacementIntent(testCase.inputIntent, testCase.inputProject, testCase.inputCompositeApp, testCase.inputCompositeAppVersion)
+			got, err := intentCli.CreateGenericPlacementIntent(testCase.inputIntent, testCase.inputProject, testCase.inputCompositeApp, testCase.inputCompositeAppVersion, testCase.inputDepIntGrpName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("CreateGenericPlacementIntent returned an unexpected error %s", err)
@@ -120,6 +150,7 @@ func TestGetGenericPlacementIntent(t *testing.T) {
 		projectName         string
 		compositeAppName    string
 		compositeAppVersion string
+		deploymentIntentGroupName string
 	}{
 		{
 			label:               "Get Intent",
@@ -127,15 +158,13 @@ func TestGetGenericPlacementIntent(t *testing.T) {
 			projectName:         "testProject",
 			compositeAppName:    "testCompositeApp",
 			compositeAppVersion: "testVersion",
+			deploymentIntentGroupName: "testDeploymentIntentGroup",
 			expected: GenericPlacementIntent{
 				MetaData: GenIntentMetaData{
 					Name:        "testIntent",
 					Description: "A sample intent for testing",
 					UserData1:   "userData1",
 					UserData2:   "userData2",
-				},
-				Spec: GenIntentSpecData{
-					LogicalCloud: "logicalCloud1",
 				},
 			},
 			expectedError: "",
@@ -146,13 +175,14 @@ func TestGetGenericPlacementIntent(t *testing.T) {
 						Project:      "testProject",
 						CompositeApp: "testCompositeApp",
 						Version:      "testVersion",
+						DigName: "testDeploymentIntentGroup",
 					}.String(): {
 						"genericplacementintentmetadata": []byte(
 							"{\"metadata\":{\"Name\":\"testIntent\"," +
 								"\"Description\":\"A sample intent for testing\"," +
 								"\"UserData1\": \"userData1\"," +
-								"\"UserData2\": \"userData2\"}," +
-								"\"spec\":{\"Logical-Cloud\": \"logicalCloud1\"}}"),
+								"\"UserData2\": \"userData2\"}" +
+								"}"),
 					},
 				},
 			},
@@ -163,7 +193,7 @@ func TestGetGenericPlacementIntent(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			intentCli := NewGenericPlacementIntentClient()
-			got, err := intentCli.GetGenericPlacementIntent(testCase.intentName, testCase.projectName, testCase.compositeAppName, testCase.compositeAppVersion)
+			got, err := intentCli.GetGenericPlacementIntent(testCase.intentName, testCase.projectName, testCase.compositeAppName, testCase.compositeAppVersion, testCase.deploymentIntentGroupName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("GetGenericPlacementIntent returned an unexpected error: %s", err)

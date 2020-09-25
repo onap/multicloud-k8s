@@ -53,11 +53,11 @@ type SpecData struct {
 // AppIntentManager is an interface which exposes the
 // AppIntentManager functionalities
 type AppIntentManager interface {
-	CreateAppIntent(a AppIntent, p string, ca string, v string, i string) (AppIntent, error)
-	GetAppIntent(ai string, p string, ca string, v string, i string) (AppIntent, error)
-	GetAllIntentsByApp(aN, p, ca, v, i string) (SpecData, error)
-	GetAllAppIntents(p, ca, v, i string) (ApplicationsAndClusterInfo, error)
-	DeleteAppIntent(ai string, p string, ca string, v string, i string) error
+	CreateAppIntent(a AppIntent, p string, ca string, v string, i string, digName string) (AppIntent, error)
+	GetAppIntent(ai string, p string, ca string, v string, i string, digName string) (AppIntent, error)
+	GetAllIntentsByApp(aN, p, ca, v, i, digName string) (SpecData, error)
+	GetAllAppIntents(p, ca, v, i, digName string) (ApplicationsAndClusterInfo, error)
+	DeleteAppIntent(ai string, p string, ca string, v string, i string, digName string) error
 }
 
 //AppIntentQueryKey required for query
@@ -72,6 +72,7 @@ type AppIntentKey struct {
 	CompositeApp string `json:"compositeapp"`
 	Version      string `json:"compositeappversion"`
 	Intent       string `json:"genericplacement"`
+	DeploymentIntentGroupName string `json:"deploymentintentgroupname"`
 }
 
 // AppIntentFindByAppKey required for query
@@ -80,6 +81,7 @@ type AppIntentFindByAppKey struct {
 	CompositeApp        string `json:"compositeapp"`
 	CompositeAppVersion string `json:"compositeappversion"`
 	Intent              string `json:"genericplacement"`
+	DeploymentIntentGroupName string `json:"deploymentintentgroupname"`
 	AppName             string `json:"app-name"`
 }
 
@@ -121,11 +123,11 @@ func NewAppIntentClient() *AppIntentClient {
 }
 
 // CreateAppIntent creates an entry for AppIntent in the db.
-// Other input parameters for it - projectName, compositeAppName, version, intentName.
-func (c *AppIntentClient) CreateAppIntent(a AppIntent, p string, ca string, v string, i string) (AppIntent, error) {
+// Other input parameters for it - projectName, compositeAppName, version, intentName and deploymentIntentGroupName.
+func (c *AppIntentClient) CreateAppIntent(a AppIntent, p string, ca string, v string, i string, digName string) (AppIntent, error) {
 
 	//Check for the AppIntent already exists here.
-	res, err := c.GetAppIntent(a.MetaData.Name, p, ca, v, i)
+	res, err := c.GetAppIntent(a.MetaData.Name, p, ca, v, i, digName)
 	if !reflect.DeepEqual(res, AppIntent{}) {
 		return AppIntent{}, pkgerrors.New("AppIntent already exists")
 	}
@@ -143,9 +145,15 @@ func (c *AppIntentClient) CreateAppIntent(a AppIntent, p string, ca string, v st
 	}
 
 	// check if Intent exists
-	_, err = NewGenericPlacementIntentClient().GetGenericPlacementIntent(i, p, ca, v)
+	_, err = NewGenericPlacementIntentClient().GetGenericPlacementIntent(i, p, ca, v, digName)
 	if err != nil {
 		return AppIntent{}, pkgerrors.New("Unable to find the intent")
+	}
+
+	// check if the deploymentIntentGrpName exists
+	_, err = NewDeploymentIntentGroupClient().GetDeploymentIntentGroup(digName,p, ca, v)
+	if err != nil {
+		return AppIntent{}, pkgerrors.New("Unable to find the deployment-intent-group-name")
 	}
 
 	akey := AppIntentKey{
@@ -154,6 +162,7 @@ func (c *AppIntentClient) CreateAppIntent(a AppIntent, p string, ca string, v st
 		CompositeApp: ca,
 		Version:      v,
 		Intent:       i,
+		DeploymentIntentGroupName: digName,
 	}
 
 	qkey := AppIntentQueryKey{
@@ -164,12 +173,12 @@ func (c *AppIntentClient) CreateAppIntent(a AppIntent, p string, ca string, v st
 	if err != nil {
 		return AppIntent{}, pkgerrors.Wrap(err, "Create DB entry error")
 	}
-
+	
 	return a, nil
 }
 
-// GetAppIntent shall take arguments - name of the app intent, name of the project, name of the composite app, version of the composite app and intent name. It shall return the AppIntent
-func (c *AppIntentClient) GetAppIntent(ai string, p string, ca string, v string, i string) (AppIntent, error) {
+// GetAppIntent shall take arguments - name of the app intent, name of the project, name of the composite app, version of the composite app,intent name and deploymentIntentGroupName. It shall return the AppIntent
+func (c *AppIntentClient) GetAppIntent(ai string, p string, ca string, v string, i string, digName string) (AppIntent, error) {
 
 	k := AppIntentKey{
 		Name:         ai,
@@ -177,6 +186,7 @@ func (c *AppIntentClient) GetAppIntent(ai string, p string, ca string, v string,
 		CompositeApp: ca,
 		Version:      v,
 		Intent:       i,
+		DeploymentIntentGroupName: digName,
 	}
 
 	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
@@ -197,16 +207,17 @@ func (c *AppIntentClient) GetAppIntent(ai string, p string, ca string, v string,
 }
 
 /*
-GetAllIntentsByApp takes in parameters AppName, CompositeAppName, CompositeNameVersion
-and GenericPlacementIntentName. Returns SpecData which contains
+GetAllIntentsByApp queries intent by AppName, it takes in parameters AppName, CompositeAppName, CompositeNameVersion,
+GenericPlacementIntentName & DeploymentIntentGroupName. Returns SpecData which contains
 all the intents for the app.
 */
-func (c *AppIntentClient) GetAllIntentsByApp(aN, p, ca, v, i string) (SpecData, error) {
+func (c *AppIntentClient) GetAllIntentsByApp(aN, p, ca, v, i, digName string) (SpecData, error) {
 	k := AppIntentFindByAppKey{
 		Project:             p,
 		CompositeApp:        ca,
 		CompositeAppVersion: v,
 		Intent:              i,
+		DeploymentIntentGroupName: digName,
 		AppName:             aN,
 	}
 	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
@@ -224,15 +235,16 @@ func (c *AppIntentClient) GetAllIntentsByApp(aN, p, ca, v, i string) (SpecData, 
 
 /*
 GetAllAppIntents takes in paramaters ProjectName, CompositeAppName, CompositeNameVersion
-and GenericPlacementIntentName. Returns the ApplicationsAndClusterInfo Object - an array of AppClusterInfo
+and GenericPlacementIntentName,DeploymentIntentGroupName. Returns the ApplicationsAndClusterInfo Object - an array of AppClusterInfo
 */
-func (c *AppIntentClient) GetAllAppIntents(p, ca, v, i string) (ApplicationsAndClusterInfo, error) {
+func (c *AppIntentClient) GetAllAppIntents(p, ca, v, i, digName string) (ApplicationsAndClusterInfo, error) {
 	k := AppIntentKey{
 		Name:         "",
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
 		Intent:       i,
+		DeploymentIntentGroupName: digName,
 	}
 	result, err := db.DBconn.Find(c.storeName, k, c.tagMetaData)
 	if err != nil {
@@ -262,13 +274,14 @@ func (c *AppIntentClient) GetAllAppIntents(p, ca, v, i string) (ApplicationsAndC
 }
 
 // DeleteAppIntent delete an AppIntent
-func (c *AppIntentClient) DeleteAppIntent(ai string, p string, ca string, v string, i string) error {
+func (c *AppIntentClient) DeleteAppIntent(ai string, p string, ca string, v string, i string, digName string) error {
 	k := AppIntentKey{
 		Name:         ai,
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
 		Intent:       i,
+		DeploymentIntentGroupName: digName,
 	}
 
 	err := db.DBconn.Remove(c.storeName, k)

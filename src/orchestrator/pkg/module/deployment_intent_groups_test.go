@@ -57,6 +57,7 @@ func TestCreateDeploymentIntentGroup(t *testing.T) {
 								"imageRepository": "registry.hub.docker.com",
 							}},
 					},
+					LogicalCloud: "cloud1",
 				},
 			},
 			inputProject:             "testProject",
@@ -82,6 +83,7 @@ func TestCreateDeploymentIntentGroup(t *testing.T) {
 								"imageRepository": "registry.hub.docker.com",
 							}},
 					},
+					LogicalCloud: "cloud1",
 				},
 			},
 			expectedError: "",
@@ -167,6 +169,7 @@ func TestGetDeploymentIntentGroup(t *testing.T) {
 								"imageRepository": "registry.hub.docker.com",
 							}},
 					},
+					LogicalCloud: "cloud1",
 				},
 			},
 			expectedError: "",
@@ -200,7 +203,10 @@ func TestGetDeploymentIntentGroup(t *testing.T) {
 								"\"imageRepository\":\"registry.hub.docker.com\"" +
 								"}" +
 								"}" +
-								"]}}"),
+								"]," +
+								"\"logical-cloud\": \"cloud1\"" +
+								"}"+
+								"}"),
 					},
 				},
 			},

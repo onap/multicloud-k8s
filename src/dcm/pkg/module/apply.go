@@ -28,10 +28,15 @@ import (
 	"strings"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installappclient"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 	pkgerrors "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
+
+// rsyncName denotes the name of the rsync controller
+const rsyncName = "rsync"
 
 type Resource struct {
 	ApiVersion    string         `yaml:"apiVersion"`
@@ -216,6 +221,45 @@ func createUserCSR(logicalcloud LogicalCloud) (string, error) {
 
 	return string(csrData), nil
 
+}
+
+/*
+queryDBAndSetRsyncInfo queries the MCO db to find the record the sync controller
+and then sets the RsyncInfo global variable.
+*/
+func queryDBAndSetRsyncInfo() (installappclient.RsyncInfo, error) {
+	client := controller.NewControllerClient()
+	vals, _ := client.GetControllers()
+	for _, v := range vals {
+		if v.Metadata.Name == rsyncName {
+			log.Info("Initializing RPC connection to resource synchronizer", log.Fields{
+				"Controller": v.Metadata.Name,
+			})
+			rsyncInfo := installappclient.NewRsyncInfo(v.Metadata.Name, v.Spec.Host, v.Spec.Port)
+			return rsyncInfo, nil
+		}
+	}
+	return installappclient.RsyncInfo{}, pkgerrors.Errorf("queryRsyncInfoInMCODB Failed - Could not get find rsync by name : %v", rsyncName)
+}
+
+/*
+callRsyncUninstall method shall take in the app context id and invoke the rsync service via grpc
+*/
+func callRsyncUninstall(contextid interface{}) error {
+	rsyncInfo, err := queryDBAndSetRsyncInfo()
+	log.Info("Calling the Rsync ", log.Fields{
+		"RsyncName": rsyncInfo.RsyncName,
+	})
+	if err != nil {
+		return err
+	}
+
+	appContextID := fmt.Sprintf("%v", contextid)
+	err = installappclient.InvokeUninstallApp(appContextID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // TODO:
@@ -421,4 +465,50 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 
 	return nil
 
+}
+
+// TODO: rename these methods
+// DestroyEtcdContext remove from rsync then delete appcontext and all resources
+func DestroyEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
+	quotaList []Quota) error {
+
+	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
+	// project := "test-project" // FIXME(igordc): temporary, need to do some rework in the LC structs
+
+	_, ctxVal, err := NewLogicalCloudClient().GetLogicalCloudContext(logicalCloudName)
+	if err != nil {
+		return pkgerrors.Wrapf(err, "Error finding AppContext for Logical Cloud: %v", logicalCloudName)
+	}
+
+	// call resource synchronizer to delete the CRs from every cluster of the logical cloud
+	err = callRsyncUninstall(ctxVal)
+	if err != nil {
+		return err
+	}
+
+	// TODO: status handling for logical cloud after terminate:
+	// rsync updates the status of the appcontext to Terminated
+	// dcm should launch thread to observe status of appcontext before concluding logical cloud is terminated
+	// dcm should somewhat mimic the status tracking of rsync
+	// logical cloud might be in a non-applied non-terminated state for a long period of time.........
+
+	// // remove the app context
+	// err = context.DeleteCompositeApp()
+	// if err != nil {
+	// 	return pkgerrors.Wrap(err, "Error deleting AppContext CompositeApp")
+	// }
+
+	// remove the app context field from the cluster db record
+	// lckey := LogicalCloudKey{
+	// 	LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
+	// 	Project:          project,
+	// }
+	// err = db.DBconn.RemoveTag("orchestrator", lckey, "lccontext")
+	// if err != nil {
+	// 	log.Warn("Error removing AppContext from Logical Cloud", log.Fields{
+	// 		"logical-cloud": logicalCloudName,
+	// 	})
+	// }
+
+	return nil
 }

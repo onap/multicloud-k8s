@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "90af204d_0b455eab",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-25T23:04:46Z",
+      "side": 1,
+      "message": "A future patch will replace this with async-friendly interaction with rsync.",
+      "range": {
+        "startLine": 483,
+        "startChar": 1,
+        "endLine": 511,
+        "endChar": 5
+      },
+      "revId": "348c484d90193d90806cd45b18350d7eb25d93d9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

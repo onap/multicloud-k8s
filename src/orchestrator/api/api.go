@@ -128,13 +128,13 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 	genericPlacementIntentHandler := genericPlacementIntentHandler{
 		client: genericPlacementIntentClient,
 	}
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents", genericPlacementIntentHandler.createGenericPlacementIntentHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents", genericPlacementIntentHandler.createGenericPlacementIntentHandler).Methods("POST")
 
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}", genericPlacementIntentHandler.getGenericPlacementHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{intent-name}", genericPlacementIntentHandler.getGenericPlacementHandler).Methods("GET")
 
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents", genericPlacementIntentHandler.getAllGenericPlacementIntentsHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents", genericPlacementIntentHandler.getAllGenericPlacementIntentsHandler).Methods("GET")
 
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}", genericPlacementIntentHandler.deleteGenericPlacementHandler).Methods("DELETE")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{intent-name}", genericPlacementIntentHandler.deleteGenericPlacementHandler).Methods("DELETE")
 
 	//setting routes for AppIntent
 	if appIntentClient == nil {
@@ -145,11 +145,11 @@ func NewRouter(projectClient moduleLib.ProjectManager,
 		client: appIntentClient,
 	}
 
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}/app-intents", appIntentHandler.createAppIntentHandler).Methods("POST")
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}/app-intents/{app-intent-name}", appIntentHandler.getAppIntentHandler).Methods("GET")
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}/app-intents", appIntentHandler.getAllAppIntentsHandler).Methods("GET")
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}/app-intents/", appIntentHandler.getAllIntentsByAppHandler).Queries("app-name", "{app-name}")
-	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/generic-placement-intents/{intent-name}/app-intents/{app-intent-name}", appIntentHandler.deleteAppIntentHandler).Methods("DELETE")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{intent-name}/app-intents", appIntentHandler.createAppIntentHandler).Methods("POST")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{intent-name}/app-intents/{app-intent-name}", appIntentHandler.getAppIntentHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{intent-name}/app-intents", appIntentHandler.getAllAppIntentsHandler).Methods("GET")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{intent-name}/app-intents/", appIntentHandler.getAllIntentsByAppHandler).Queries("app-name", "{app-name}")
+	router.HandleFunc("/projects/{project-name}/composite-apps/{composite-app-name}/{composite-app-version}/deployment-intent-groups/{deployment-intent-group-name}/generic-placement-intents/{intent-name}/app-intents/{app-intent-name}", appIntentHandler.deleteAppIntentHandler).Methods("DELETE")
 	//setting routes for deploymentIntentGroup
 	if deploymentIntentGrpClient == nil {
 		deploymentIntentGrpClient = moduleClient.DeploymentIntentGroup

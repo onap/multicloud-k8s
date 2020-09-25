@@ -26,7 +26,6 @@ import (
 // GenericPlacementIntent shall have 2 fields - metadata and spec
 type GenericPlacementIntent struct {
 	MetaData GenIntentMetaData `json:"metadata"`
-	Spec     GenIntentSpecData `json:"spec"`
 }
 
 // GenIntentMetaData has name, description, userdata1, userdata2
@@ -37,17 +36,15 @@ type GenIntentMetaData struct {
 	UserData2   string `json:"userData2"`
 }
 
-// GenIntentSpecData has logical-cloud-name
-type GenIntentSpecData struct {
-	LogicalCloud string `json:"logical-cloud"`
-}
+
+
 
 // GenericPlacementIntentManager is an interface which exposes the GenericPlacementIntentManager functionality
 type GenericPlacementIntentManager interface {
 	CreateGenericPlacementIntent(g GenericPlacementIntent, p string, ca string,
-		v string) (GenericPlacementIntent, error)
+		v string, digName string) (GenericPlacementIntent, error)
 	GetGenericPlacementIntent(intentName string, projectName string,
-		compositeAppName string, version string) (GenericPlacementIntent, error)
+		compositeAppName string, version string, digName string) (GenericPlacementIntent, error)
 	DeleteGenericPlacementIntent(intentName string, projectName string,
 		compositeAppName string, version string) error
 
@@ -60,6 +57,7 @@ type GenericPlacementIntentKey struct {
 	Project      string `json:"project"`
 	CompositeApp string `json:"compositeapp"`
 	Version      string `json:"compositeappversion"`
+	DigName      string `json:"deploymentintentgroupname"`
 }
 
 // We will use json marshalling to convert to string to
@@ -88,10 +86,10 @@ func NewGenericPlacementIntentClient() *GenericPlacementIntentClient {
 
 // CreateGenericPlacementIntent creates an entry for GenericPlacementIntent in the database. Other Input parameters for it - projectName, compositeAppName, version
 func (c *GenericPlacementIntentClient) CreateGenericPlacementIntent(g GenericPlacementIntent, p string, ca string,
-	v string) (GenericPlacementIntent, error) {
+	v string, digName string) (GenericPlacementIntent, error) {
 
 	// check if the genericPlacement already exists.
-	res, err := c.GetGenericPlacementIntent(g.MetaData.Name, p, ca, v)
+	res, err := c.GetGenericPlacementIntent(g.MetaData.Name, p, ca, v, digName)
 	if res != (GenericPlacementIntent{}) {
 		return GenericPlacementIntent{}, pkgerrors.New("Intent already exists")
 	}
@@ -108,11 +106,19 @@ func (c *GenericPlacementIntentClient) CreateGenericPlacementIntent(g GenericPla
 		return GenericPlacementIntent{}, pkgerrors.New("Unable to find the composite-app")
 	}
 
+	// check if the deploymentIntentGrpName exists
+	_, err = NewDeploymentIntentGroupClient().GetDeploymentIntentGroup(digName, p, ca, v)
+	if err != nil {
+		return GenericPlacementIntent{}, pkgerrors.New("Unable to find the deployment-intent-group-name")
+	}
+
+
 	gkey := GenericPlacementIntentKey{
 		Name:         g.MetaData.Name,
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
+		DigName: digName,
 	}
 
 	err = db.DBconn.Insert(c.storeName, gkey, nil, c.tagMetaData, g)
@@ -124,12 +130,13 @@ func (c *GenericPlacementIntentClient) CreateGenericPlacementIntent(g GenericPla
 }
 
 // GetGenericPlacementIntent shall take arguments - name of the intent, name of the project, name of the composite app and version of the composite app. It shall return the genericPlacementIntent if its present.
-func (c *GenericPlacementIntentClient) GetGenericPlacementIntent(i string, p string, ca string, v string) (GenericPlacementIntent, error) {
+func (c *GenericPlacementIntentClient) GetGenericPlacementIntent(i string, p string, ca string, v string, digName string) (GenericPlacementIntent, error) {
 	key := GenericPlacementIntentKey{
 		Name:         i,
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
+		DigName: digName,
 	}
 
 	result, err := db.DBconn.Find(c.storeName, key, c.tagMetaData)
@@ -170,6 +177,7 @@ func (c *GenericPlacementIntentClient) GetAllGenericPlacementIntents(p string, c
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
+		
 	}
 
 	var gpList []GenericPlacementIntent

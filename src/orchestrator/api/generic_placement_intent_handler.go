@@ -62,8 +62,9 @@ func (h genericPlacementIntentHandler) createGenericPlacementIntentHandler(w htt
 	projectName := vars["project-name"]
 	compositeAppName := vars["composite-app-name"]
 	version := vars["composite-app-version"]
+	digName := vars["deployment-intent-group-name"]
 
-	gPIntent, createErr := h.client.CreateGenericPlacementIntent(g, projectName, compositeAppName, version)
+	gPIntent, createErr := h.client.CreateGenericPlacementIntent(g, projectName, compositeAppName, version, digName)
 	if createErr != nil {
 		http.Error(w, createErr.Error(), http.StatusInternalServerError)
 		return
@@ -103,7 +104,13 @@ func (h genericPlacementIntentHandler) getGenericPlacementHandler(w http.Respons
 		return
 	}
 
-	gPIntent, err := h.client.GetGenericPlacementIntent(intentName, projectName, compositeAppName, version)
+	dig := vars["deployment-intent-group-name"]
+	if dig == "" {
+		http.Error(w, "Missing deploymentIntentGroupName in GET request", http.StatusBadRequest)
+		return
+	}
+
+	gPIntent, err := h.client.GetGenericPlacementIntent(intentName, projectName, compositeAppName, version, dig)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

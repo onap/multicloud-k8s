@@ -152,7 +152,7 @@ func (v *QuotaClient) GetQuota(project, logicalCloud, quotaName string) (Quota, 
 		return q, nil
 	}
 
-	return Quota{}, pkgerrors.New("Error getting Quota")
+	return Quota{}, pkgerrors.New("Cluster Quota does not exist")
 }
 
 // GetAll returns all cluster quotas in the logical cloud
@@ -211,7 +211,7 @@ func (v *QuotaClient) UpdateQuota(project, logicalCloud, quotaName string, c Quo
 	//Check if this Quota exists
 	_, err := v.GetQuota(project, logicalCloud, quotaName)
 	if err != nil {
-		return Quota{}, pkgerrors.New("Update Error - Quota doesn't exist")
+		return Quota{}, pkgerrors.New("Cluster Quota does not exist")
 	}
 	err = v.util.DBInsert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {

@@ -91,6 +91,10 @@ func (h quotaHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		ret, err = h.client.GetQuota(project, logicalCloud, name)
 		if err != nil {
+			if err.Error() == "Cluster Quota does not exist" {
+				http.Error(w, err.Error(), http.StatusNotFound)
+				return
+			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -131,12 +135,16 @@ func (h quotaHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.UpdateQuota(project, logicalCloud, name, v)
 	if err != nil {
+		if err.Error() == "Cluster Quota does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(),
 			http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
 		http.Error(w, err.Error(),

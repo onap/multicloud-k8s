@@ -133,7 +133,7 @@ func (v *ClusterClient) GetCluster(project, logicalCloud, clusterReference strin
 		return cl, nil
 	}
 
-	return Cluster{}, pkgerrors.New("Error getting Cluster")
+	return Cluster{}, pkgerrors.New("Cluster Reference does not exist")
 }
 
 // GetAll returns all cluster references in the logical cloud
@@ -148,6 +148,9 @@ func (v *ClusterClient) GetAllClusters(project, logicalCloud string) ([]Cluster,
 	values, err := v.util.DBFind(v.storeName, key, v.tagMeta)
 	if err != nil {
 		return []Cluster{}, pkgerrors.Wrap(err, "Get All Cluster references")
+	}
+	if len(values) == 0 {
+		return []Cluster{}, pkgerrors.New("No Cluster References associated")
 	}
 
 	for _, value := range values {
@@ -188,12 +191,12 @@ func (v *ClusterClient) UpdateCluster(project, logicalCloud, clusterReference st
 
 	//Check for name mismatch in cluster reference
 	if c.MetaData.ClusterReference != clusterReference {
-		return Cluster{}, pkgerrors.New("Update Error - Cluster reference mismatch")
+		return Cluster{}, pkgerrors.New("Cluster Reference mismatch")
 	}
 	//Check if this Cluster reference exists
 	_, err := v.GetCluster(project, logicalCloud, clusterReference)
 	if err != nil {
-		return Cluster{}, pkgerrors.New("Update Error - Cluster reference doesn't exist")
+		return Cluster{}, pkgerrors.New("Cluster Reference does not exist")
 	}
 	err = v.util.DBInsert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {

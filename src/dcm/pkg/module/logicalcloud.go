@@ -145,7 +145,7 @@ func (v *LogicalCloudClient) Get(project, logicalCloudName string) (LogicalCloud
 	}
 	value, err := v.util.DBFind(v.storeName, key, v.tagMeta)
 	if err != nil {
-		return LogicalCloud{}, pkgerrors.Wrap(err, "Get Logical Cloud")
+		return LogicalCloud{}, pkgerrors.Wrap(err, "Error getting Logical Cloud")
 	}
 
 	//value is a byte array
@@ -153,12 +153,12 @@ func (v *LogicalCloudClient) Get(project, logicalCloudName string) (LogicalCloud
 		lc := LogicalCloud{}
 		err = v.util.DBUnmarshal(value[0], &lc)
 		if err != nil {
-			return LogicalCloud{}, pkgerrors.Wrap(err, "Unmarshaling value")
+			return LogicalCloud{}, pkgerrors.Wrap(err, "Error unmarshaling value")
 		}
 		return lc, nil
 	}
 
-	return LogicalCloud{}, pkgerrors.New("Error getting Logical Cloud")
+	return LogicalCloud{}, pkgerrors.New("Logical Cloud does not exist")
 }
 
 // GetAll returns Logical Clouds in the project
@@ -213,12 +213,12 @@ func (v *LogicalCloudClient) Update(project, logicalCloudName string, c LogicalC
 	}
 	// Check for mismatch, logicalCloudName and payload logical cloud name
 	if c.MetaData.LogicalCloudName != logicalCloudName {
-		return LogicalCloud{}, pkgerrors.New("Update Error - Logical Cloud name mismatch")
+		return LogicalCloud{}, pkgerrors.New("Logical Cloud name mismatch")
 	}
 	//Check if this Logical Cloud exists
 	_, err := v.Get(project, logicalCloudName)
 	if err != nil {
-		return LogicalCloud{}, pkgerrors.New("Update Error - Logical Cloud doesn't exist")
+		return LogicalCloud{}, pkgerrors.New("Logical Cloud does not exist")
 	}
 	err = v.util.DBInsert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {

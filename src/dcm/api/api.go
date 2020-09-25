@@ -71,18 +71,8 @@ func NewRouter(
 	lcRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/terminate",
 		logicalCloudHandler.terminateHandler).Methods("POST")
-	// To Do
-	// get kubeconfig
-	/*lcRouter.HandleFunc(
-	       "/logical-clouds/{name}/kubeconfig?cluster-reference={cluster}",
-	       logicalCloudHandler.getConfigHandler).Methods("GET")
-	  //get status
-	  lcRouter.HandleFunc(
-	      "/logical-clouds/{name}/cluster-references/",
-	      logicalCloudHandler.associateHandler).Methods("GET")*/
 
 	// Set up Cluster API
-
 	clusterHandler := clusterHandler{client: clusterClient}
 	clusterRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
 	clusterRouter.HandleFunc(
@@ -100,6 +90,10 @@ func NewRouter(
 	clusterRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
 		clusterHandler.deleteHandler).Methods("DELETE")
+	// Get kubeconfig for cluster of logical cloud
+	clusterRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}/kubeconfig",
+		clusterHandler.getConfigHandler).Methods("GET")
 
 	// Set up User Permission API
 	if userPermissionClient == nil {
@@ -121,7 +115,6 @@ func NewRouter(
 		userPermissionHandler.deleteHandler).Methods("DELETE")
 
 	// Set up Quota API
-
 	quotaHandler := quotaHandler{client: quotaClient}
 	quotaRouter := router.PathPrefix("/v2/projects/{project-name}").Subrouter()
 	quotaRouter.HandleFunc(

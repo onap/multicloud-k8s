@@ -91,6 +91,10 @@ func (h logicalCloudHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 	} else {
 		ret, err = h.client.Get(project, name)
 		if err != nil {
+			if err.Error() == "Logical Cloud does not exist" {
+				http.Error(w, err.Error(), http.StatusNotFound)
+				return
+			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -129,6 +133,10 @@ func (h logicalCloudHandler) updateHandler(w http.ResponseWriter, r *http.Reques
 
 	ret, err := h.client.Update(project, name, v)
 	if err != nil {
+		if err.Error() == "Logical Cloud does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(),
 			http.StatusInternalServerError)
 		return
@@ -150,6 +158,10 @@ func (h logicalCloudHandler) deleteHandler(w http.ResponseWriter, r *http.Reques
 
 	err := h.client.Delete(project, name)
 	if err != nil {
+		if err.Error() == "Logical Cloud does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -165,6 +177,10 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	// Get logical cloud
 	lc, err := h.client.Get(project, name)
 	if err != nil {
+		if err.Error() == "Logical Cloud does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -173,6 +189,10 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	clusters, err := h.clusterClient.GetAllClusters(project, name)
 
 	if err != nil {
+		if err.Error() == "No Cluster References associated" {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

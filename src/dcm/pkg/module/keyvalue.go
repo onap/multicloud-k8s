@@ -133,7 +133,7 @@ func (v *KeyValueClient) GetKVPair(project, logicalCloud, kvPairName string) (Ke
 		return kv, nil
 	}
 
-	return KeyValue{}, pkgerrors.New("Error getting Key Value")
+	return KeyValue{}, pkgerrors.New("Key Value does not exist")
 }
 
 // Get All lists all key value pairs
@@ -194,7 +194,7 @@ func (v *KeyValueClient) UpdateKVPair(project, logicalCloud, kvPairName string, 
 	//Check if this Key Value exists
 	_, err := v.GetKVPair(project, logicalCloud, kvPairName)
 	if err != nil {
-		return KeyValue{}, pkgerrors.New("Update Error - Key Value Pair doesn't exist")
+		return KeyValue{}, pkgerrors.New("KV Pair does not exist")
 	}
 	err = v.util.DBInsert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {

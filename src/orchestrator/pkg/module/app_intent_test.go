@@ -33,6 +33,7 @@ func TestCreateAppIntent(t *testing.T) {
 		inputCompositeApp           string
 		inputCompositeAppVersion    string
 		inputGenericPlacementIntent string
+		inputDeploymentIntentGrpName string
 		expectedError               string
 		mockdb                      *db.MockDB
 		expected                    AppIntent
@@ -81,6 +82,7 @@ func TestCreateAppIntent(t *testing.T) {
 			inputCompositeApp:           "testCompositeApp",
 			inputCompositeAppVersion:    "testCompositeAppVersion",
 			inputGenericPlacementIntent: "testIntent",
+			inputDeploymentIntentGrpName: "testDeploymentIntentGroup",
 			expected: AppIntent{
 				MetaData: MetaData{
 					Name:        "testAppIntent",
@@ -142,6 +144,7 @@ func TestCreateAppIntent(t *testing.T) {
 						Project:      "testProject",
 						CompositeApp: "testCompositeApp",
 						Version:      "testCompositeAppVersion",
+						DigName: "testDeploymentIntentGroup",
 					}.String(): {
 						"genericplacementintentmetadata": []byte(
 							"{\"metadata\":{\"Name\":\"testIntent\"," +
@@ -149,6 +152,39 @@ func TestCreateAppIntent(t *testing.T) {
 								"\"UserData1\": \"userData1\"," +
 								"\"UserData2\": \"userData2\"}," +
 								"\"spec\":{\"Logical-Cloud\": \"logicalCloud1\"}}"),
+					},
+					DeploymentIntentGroupKey{
+						Name:         "testDeploymentIntentGroup",
+						Project:      "testProject",
+						CompositeApp: "testCompositeApp",
+						Version:      "testCompositeAppVersion",
+					}.String(): {
+						"deploymentintentgroupmetadata": []byte(
+							"{\"metadata\":{\"name\":\"testDeploymentIntentGroup\"," +
+								"\"description\":\"DescriptionTestDeploymentIntentGroup\"," +
+								"\"userData1\": \"userData1\"," +
+								"\"userData2\": \"userData2\"}," +
+								"\"spec\":{\"profile\": \"Testprofile\"," +
+								"\"version\": \"version of deployment\"," +
+								"\"override-values\":[" +
+								"{" +
+								"\"app-name\": \"TestAppName\"," +
+								"\"values\": " +
+								"{" +
+								"\"imageRepository\":\"registry.hub.docker.com\"" +
+								"}" +
+								"}," +
+								"{" +
+								"\"app-name\": \"TestAppName\"," +
+								"\"values\": " +
+								"{" +
+								"\"imageRepository\":\"registry.hub.docker.com\"" +
+								"}" +
+								"}" +
+								"]," +
+								"\"logical-cloud\": \"cloud1\"" +
+								"}"+
+								"}"),
 					},
 				},
 			},
@@ -158,7 +194,7 @@ func TestCreateAppIntent(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			appIntentCli := NewAppIntentClient()
-			got, err := appIntentCli.CreateAppIntent(testCase.inputAppIntent, testCase.inputProject, testCase.inputCompositeApp, testCase.inputCompositeAppVersion, testCase.inputGenericPlacementIntent)
+			got, err := appIntentCli.CreateAppIntent(testCase.inputAppIntent, testCase.inputProject, testCase.inputCompositeApp, testCase.inputCompositeAppVersion, testCase.inputGenericPlacementIntent, testCase.inputDeploymentIntentGrpName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("CreateAppIntent returned an unexpected error %s, ", err)
@@ -186,6 +222,7 @@ func TestGetAppIntent(t *testing.T) {
 		compositeAppName       string
 		compositeAppVersion    string
 		genericPlacementIntent string
+		deploymentIntentgrpName string
 	}{
 		{
 			label:                  "Get Intent",
@@ -194,6 +231,7 @@ func TestGetAppIntent(t *testing.T) {
 			compositeAppName:       "testCompositeApp",
 			compositeAppVersion:    "testCompositeAppVersion",
 			genericPlacementIntent: "testIntent",
+			deploymentIntentgrpName: "testDeploymentIntentGroup",
 			expected: AppIntent{
 				MetaData: MetaData{
 					Name:        "testAppIntent",
@@ -234,6 +272,7 @@ func TestGetAppIntent(t *testing.T) {
 						CompositeApp: "testCompositeApp",
 						Version:      "testCompositeAppVersion",
 						Intent:       "testIntent",
+						DeploymentIntentGroupName: "testDeploymentIntentGroup",
 					}.String(): {
 						"appintentmetadata": []byte(
 							"{\"metadata\":{\"Name\":\"testAppIntent\"," +
@@ -270,7 +309,7 @@ func TestGetAppIntent(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			appIntentCli := NewAppIntentClient()
 			got, err := appIntentCli.GetAppIntent(testCase.appIntentName, testCase.projectName, testCase.compositeAppName, testCase.compositeAppVersion,
-				testCase.genericPlacementIntent)
+				testCase.genericPlacementIntent, testCase.deploymentIntentgrpName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("GetAppIntent returned an unexpected error: %s", err)

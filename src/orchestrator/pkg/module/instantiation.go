@@ -338,7 +338,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 
 		defer cleanTmpfiles(sortedTemplates)
 
-		specData, err := NewAppIntentClient().GetAllIntentsByApp(eachApp.Metadata.Name, p, ca, v, gIntent)
+		specData, err := NewAppIntentClient().GetAllIntentsByApp(eachApp.Metadata.Name, p, ca, v, gIntent, di)
 		if err != nil {
 			deleteAppContext(context)
 			return pkgerrors.Wrap(err, "Unable to get the intents for app")

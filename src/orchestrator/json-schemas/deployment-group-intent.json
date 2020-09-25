@@ -42,6 +42,15 @@
               "type": "string",
               "maxLength": 128,
               "pattern": "[-_0-9a-zA-Z]+$"
+            },
+            "logical-cloud": {
+              "description": "Logical Cloud to use for this intent",
+              "required": [
+                "logical-cloud"
+              ],
+              "type": "string",
+              "example": "cloud1",
+              "maxLength": 128
             }
           }
       },

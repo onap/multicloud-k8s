@@ -19,6 +19,7 @@ package app
 import (
 	"encoding/json"
 	"log"
+	"strings"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
@@ -26,7 +27,6 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	pkgerrors "github.com/pkg/errors"
-	corev1 "k8s.io/api/core/v1"
 )
 
 // InstanceRequest contains the parameters needed for instantiation
@@ -60,22 +60,12 @@ type InstanceMiniResponse struct {
 	Namespace   string          `json:"namespace"`
 }
 
-// PodStatus defines the observed state of ResourceBundleState
-type PodStatus struct {
-	Name        string           `json:"name"`
-	Namespace   string           `json:"namespace"`
-	Ready       bool             `json:"ready"`
-	Status      corev1.PodStatus `json:"status,omitempty"`
-	IPAddresses []string         `json:"ipaddresses"`
-}
-
 // InstanceStatus is what is returned when status is queried for an instance
 type InstanceStatus struct {
 	Request         InstanceRequest  `json:"request"`
 	Ready           bool             `json:"ready"`
 	ResourceCount   int32            `json:"resourceCount"`
-	PodStatuses     []PodStatus      `json:"podStatuses"`
-	ServiceStatuses []corev1.Service `json:"serviceStatuses"`
+	ResourcesStatus []ResourceStatus `json:"resourcesStatus"`
 }
 
 // InstanceManager is an interface exposes the instantiation functionality
@@ -107,18 +97,16 @@ func (dk InstanceKey) String() string {
 // InstanceClient implements the InstanceManager interface
 // It will also be used to maintain some localized state
 type InstanceClient struct {
-	storeName     string
-	tagInst       string
-	tagInstStatus string
+	storeName string
+	tagInst   string
 }
 
 // NewInstanceClient returns an instance of the InstanceClient
 // which implements the InstanceManager
 func NewInstanceClient() *InstanceClient {
 	return &InstanceClient{
-		storeName:     "rbdef",
-		tagInst:       "instance",
-		tagInstStatus: "instanceStatus",
+		storeName: "rbdef",
+		tagInst:   "instance",
 	}
 }
 
@@ -217,22 +205,64 @@ func (v *InstanceClient) Status(id string) (InstanceStatus, error) {
 		ID: id,
 	}
 
-	value, err := db.DBconn.Read(v.storeName, key, v.tagInstStatus)
+	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Get Instance")
 	}
 
 	//value is a byte array
-	if value != nil {
-		resp := InstanceStatus{}
-		err = db.DBconn.Unmarshal(value, &resp)
-		if err != nil {
-			return InstanceStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
-		}
-		return resp, nil
+	if value == nil {
+		return InstanceStatus{}, pkgerrors.New("Status is not available")
 	}
 
-	return InstanceStatus{}, pkgerrors.New("Status is not available")
+	resResp := InstanceResponse{}
+	err = db.DBconn.Unmarshal(value, &resResp)
+	if err != nil {
+		return InstanceStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
+	}
+
+	k8sClient := KubernetesClient{}
+	err = k8sClient.init(resResp.Request.CloudRegion, id)
+	if err != nil {
+		return InstanceStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
+	}
+
+	cumulatedErrorMsg := make([]string, 0)
+	podsStatus, err := k8sClient.getPodsByLabel(resResp.Namespace)
+	if err != nil {
+		cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+	}
+
+	generalStatus := make([]ResourceStatus, 0, len(resResp.Resources))
+Main:
+	for _, resource := range resResp.Resources {
+		for _, pod := range podsStatus {
+			if resource.GVK == pod.GVK && resource.Name == pod.Name {
+				continue Main //Don't double check pods if someone decided to define pod explicitly in helm chart
+			}
+		}
+		status, err := k8sClient.getResourceStatus(resource, resResp.Namespace)
+		if err != nil {
+			cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+		} else {
+			generalStatus = append(generalStatus, status)
+		}
+	}
+	resp := InstanceStatus{
+		Request:         resResp.Request,
+		ResourceCount:   int32(len(generalStatus) + len(podsStatus)),
+		Ready:           false, //FIXME To determine readiness, some parsing of status fields is necessary
+		ResourcesStatus: append(generalStatus, podsStatus...),
+	}
+
+	if len(cumulatedErrorMsg) != 0 {
+		err = pkgerrors.New("Getting Resources Status:\n" +
+			strings.Join(cumulatedErrorMsg, "\n"))
+		return resp, err
+	}
+	//TODO Filter response content by requested verbosity (brief, ...)?
+
+	return resp, nil
 }
 
 // List returns the instance for corresponding ID

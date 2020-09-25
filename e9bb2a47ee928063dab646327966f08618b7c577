@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c54ac29_270672d2",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 3037,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-25T22:47:40Z",
+      "side": 1,
+      "message": "This API is not multipart API: https://github.com/onap/multicloud-k8s/blob/master/src/dcm/api/userPermissionsHandler.go#L37\n\nand has https://github.com/onap/multicloud-k8s/blob/master/src/dcm/api/userPermissionsHandler.go#L37 in the body",
+      "range": {
+        "startLine": 3033,
+        "startChar": 6,
+        "endLine": 3037,
+        "endChar": 50
+      },
+      "revId": "e9bb2a47ee928063dab646327966f08618b7c577",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

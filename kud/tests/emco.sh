@@ -247,9 +247,6 @@ generic_placement_intent_data="$(cat <<EOF
       "description":"${generic_placement_intent_name}",
       "userData1":"${generic_placement_intent_name}",
       "userData2":"${generic_placement_intent_name}"
-   },
-   "spec":{
-      "logical-cloud":"unused_logical_cloud"
    }
 }
 EOF
@@ -318,7 +315,8 @@ deployment_intent_group_data="$(cat <<EOF
    "spec":{
       "profile":"${collection_composite_profile_name}",
       "version":"${release}",
-      "override-values":[]
+      "override-values":[],
+      "logical-cloud":"unused_logical_cloud"
    }
 }
 EOF
@@ -380,22 +378,22 @@ function createOrchestratorData {
              -F "file=@${collectd_profile_file}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles"
 
-    print_msg "create the generic placement intent"
-    call_api -d "${generic_placement_intent_data}" \
-             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents"
-
-    print_msg "add the prometheus app placement intent to the generic placement intent"
-    call_api -d "${prometheus_placement_intent_data}" \
-             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
-
-    print_msg "add the collectd app placement intent to the generic placement intent"
-    call_api -d "${collectd_placement_intent_data}" \
-             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
-
-
     print_msg "create the deployment intent group"
     call_api -d "${deployment_intent_group_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups"
+
+    print_msg "create the generic placement intent"
+    call_api -d "${generic_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents"
+
+    print_msg "add the prometheus app placement intent to the generic placement intent"
+    call_api -d "${prometheus_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
+
+    print_msg "add the collectd app placement intent to the generic placement intent"
+    call_api -d "${collectd_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
+
     call_api -d "${deployment_intents_in_group_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents"
 
@@ -411,9 +409,9 @@ function deleteOrchestratorData {
 
     delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}"
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${prometheus_profile_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${collectd_profile_name}"

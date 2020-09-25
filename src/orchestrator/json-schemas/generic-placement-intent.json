@@ -2,21 +2,6 @@
     "$schema": "http://json-schema.org/schema#",
     "type": "object",
     "properties": {
-      "spec": {
-        "type": "object",
-        "description": "Spec",
-        "properties": {
-          "logical-cloud": {
-            "description": "Logical Cloud to use for this intent",
-            "required": [
-              "logical-cloud"
-            ],
-            "type": "string",
-            "example": "cloud1",
-            "maxLength": 128
-          }
-        }
-      },
       "metadata": {
         "required": ["name"],
         "properties": {

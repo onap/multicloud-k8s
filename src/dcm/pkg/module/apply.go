@@ -28,12 +28,15 @@ import (
 	"strings"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext/subresources"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installappclient"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module/controller"
 	pkgerrors "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
+	certificatesv1beta1 "k8s.io/api/certificates/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // rsyncName denotes the name of the rsync controller
@@ -232,6 +235,17 @@ func createUserCSR(logicalcloud LogicalCloud) (string, string, error) {
 	return string(csrData), string(keyData), nil
 }
 
+func createApprovalSubresource(logicalcloud LogicalCloud) (string, error) {
+	subresource := subresources.ApprovalSubresource{
+		Message:        "Approved for Logical Cloud authentication",
+		Reason:         "LogicalCloud",
+		Type:           string(certificatesv1beta1.CertificateApproved),
+		LastUpdateTime: metav1.Now().Format("2006-01-02T15:04:05Z"),
+	}
+	csrData, err := json.Marshal(subresource)
+	return string(csrData), err
+}
+
 /*
 queryDBAndSetRsyncInfo queries the MCO db to find the record the sync controller
 and then sets the RsyncInfo global variable.
@@ -331,6 +345,8 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 		return pkgerrors.Wrap(err, "Error Creating User CSR and Key for logical cloud")
 	}
 
+	approval, err := createApprovalSubresource(logicalcloud)
+
 	context := appcontext.AppContext{}
 	ctxVal, err := context.InitAppContext()
 	if err != nil {
@@ -387,7 +403,7 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 		}
 
 		// Add csr resource to each cluster
-		_, err = context.AddResource(clusterHandle, csrName, csr)
+		csrHandle, err := context.AddResource(clusterHandle, csrName, csr)
 		if err != nil {
 			cleanuperr := context.DeleteCompositeApp()
 			if cleanuperr != nil {
@@ -398,6 +414,20 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 				})
 			}
 			return pkgerrors.Wrap(err, "Error adding CSR Resource to AppContext")
+		}
+
+		// Add csr approval as a subresource of csr:
+		_, err = context.AddLevelValue(csrHandle, "subresource/approval", approval)
+		if err != nil {
+			cleanuperr := context.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Warn("Error cleaning AppContext after add CSR approval failure", log.Fields{
+					"cluster-provider": cluster.Specification.ClusterProvider,
+					"cluster":          cluster.Specification.ClusterName,
+					"logical-cloud":    logicalCloudName,
+				})
+			}
+			return pkgerrors.Wrap(err, "Error approving CSR via AppContext")
 		}
 
 		// Add private key to MongoDB
@@ -458,6 +488,13 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 			return pkgerrors.Wrap(err, "Error adding quota Resource to AppContext")
 		}
 
+		// Add Subresource Order and Subresource Dependency
+		subresOrder, err := json.Marshal(map[string][]string{"subresorder": []string{"approval"}})
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error creating subresource order JSON")
+		}
+		subresDependency, err := json.Marshal(map[string]map[string]string{"subresdependency": map[string]string{"approval": "go"}})
+
 		// Add Resource Order and Resource Dependency
 		resOrder, err := json.Marshal(map[string][]string{"resorder": []string{namespaceName, quotaName, csrName, roleName, roleBindingName}})
 		if err != nil {
@@ -492,6 +529,32 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 		}
 
 		_, err = context.AddInstruction(clusterHandle, "resource", "dependency", string(resDependency))
+		if err != nil {
+			cleanuperr := context.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Warn("Error cleaning AppContext after add instruction  failure", log.Fields{
+					"cluster-provider": cluster.Specification.ClusterProvider,
+					"cluster":          cluster.Specification.ClusterName,
+					"logical-cloud":    logicalCloudName,
+				})
+			}
+			return pkgerrors.Wrap(err, "Error adding instruction dependency to AppContext")
+		}
+
+		_, err = context.AddInstruction(csrHandle, "subresource", "order", string(subresOrder))
+		if err != nil {
+			cleanuperr := context.DeleteCompositeApp()
+			if cleanuperr != nil {
+				log.Warn("Error cleaning AppContext after add instruction  failure", log.Fields{
+					"cluster-provider": cluster.Specification.ClusterProvider,
+					"cluster":          cluster.Specification.ClusterName,
+					"logical-cloud":    logicalCloudName,
+				})
+			}
+			return pkgerrors.Wrap(err, "Error adding instruction order to AppContext")
+		}
+
+		_, err = context.AddInstruction(csrHandle, "subresource", "dependency", string(subresDependency))
 		if err != nil {
 			cleanuperr := context.DeleteCompositeApp()
 			if cleanuperr != nil {

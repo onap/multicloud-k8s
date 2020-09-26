@@ -186,6 +186,13 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	_, ctxVal, err := h.client.GetLogicalCloudContext(name)
+	if ctxVal != "" {
+		err = pkgerrors.New("Logical Cloud already applied")
+		http.Error(w, err.Error(), http.StatusConflict)
+		return
+	}
+
 	// Get Clusters
 	clusters, err := h.clusterClient.GetAllClusters(project, name)
 

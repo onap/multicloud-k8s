@@ -117,7 +117,15 @@ func TestDeleteLogicalCloud(t *testing.T) {
 
 	myMocks := new(mockValues)
 
+	data1 := [][]byte{
+		[]byte("abc"),
+	}
+	data2 := []byte("abc")
+
 	myMocks.On("DBRemove", "test_dcm", key).Return(nil)
+	myMocks.On("DBFind", "test_dcm", key, "test_meta").Return(data1, nil)
+	myMocks.On("DBUnmarshal", data2).Return(nil)
+	// TODO also test for when the logical cloud doesn't exist
 
 	lcClient := LogicalCloudClient{"test_dcm", "test_meta", "test_context", myMocks}
 	err := lcClient.Delete("test_project", "test_asdf")

@@ -199,7 +199,12 @@ func (v *LogicalCloudClient) Delete(project, logicalCloudName string) error {
 		Project:          project,
 		LogicalCloudName: logicalCloudName,
 	}
-	err := v.util.DBRemove(v.storeName, key)
+	//Check if this Logical Cloud exists
+	_, err := v.Get(project, logicalCloudName)
+	if err != nil {
+		return pkgerrors.New("Logical Cloud does not exist")
+	}
+	err = v.util.DBRemove(v.storeName, key)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Logical Cloud")
 	}

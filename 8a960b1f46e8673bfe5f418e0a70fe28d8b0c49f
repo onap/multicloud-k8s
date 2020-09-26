@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a86f75a5_6a2c6552",
+        "filename": "src/dcm/pkg/module/quota.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-26T03:01:21Z",
+      "side": 1,
+      "message": "New patchset will be submitted to remove this filechange after https://gerrit.onap.org/r/c/multicloud/k8s/+/113142 is merged and rebased.\n\nThis was the easiest way to get this patch out of the way for now.",
+      "revId": "8a960b1f46e8673bfe5f418e0a70fe28d8b0c49f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

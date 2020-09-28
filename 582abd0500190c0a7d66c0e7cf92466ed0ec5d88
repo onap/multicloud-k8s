@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa3dbbd_bbb9b3e7",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-28T18:57:46Z",
+      "side": 1,
+      "message": "This will be provided by another patch.",
+      "range": {
+        "startLine": 297,
+        "startChar": 0,
+        "endLine": 297,
+        "endChar": 96
+      },
+      "revId": "582abd0500190c0a7d66c0e7cf92466ed0ec5d88",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "165ead7f_c94738f7",
+        "filename": "src/dcm/pkg/module/cluster.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-28T23:36:46Z",
+      "side": 1,
+      "message": "Adjust implementation in future patch to extract the certificate from the cluster /status.",
+      "range": {
+        "startLine": 289,
+        "startChar": 2,
+        "endLine": 301,
+        "endChar": 3
+      },
+      "revId": "cdc4c1fc436ed94d6d3d1bef98f78b7d3a5c6bde",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

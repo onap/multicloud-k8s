@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef98d39e_39987aa8",
+        "filename": "src/orchestrator/api/composite_app_handler.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 3087
+      },
+      "writtenOn": "2020-09-28T16:33:22Z",
+      "side": 1,
+      "message": "Use tabs instead of white spaces",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 9
+      },
+      "revId": "eeb2b222911a1f3203c2fd2dd4384bc2dd1b53f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

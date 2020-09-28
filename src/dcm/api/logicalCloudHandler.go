@@ -25,6 +25,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
+	pkgerrors "github.com/pkg/errors"
 )
 
 // logicalCloudHandler is used to store backend implementations objects
@@ -205,6 +206,53 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	err = module.CreateEtcdContext(lc, clusters, quotas)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	return
+}
+
+func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	project := vars["project-name"]
+	name := vars["logical-cloud-name"]
+
+	// Get logical cloud
+	lc, err := h.client.Get(project, name)
+	if err != nil {
+		if err.Error() == "Logical Cloud does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, ctxVal, err := h.client.GetLogicalCloudContext(name)
+	if ctxVal == "" {
+		err = pkgerrors.New("Logical Cloud hasn't been applied yet")
+		http.Error(w, err.Error(), http.StatusConflict)
+		return
+	}
+
+	// Get Clusters
+	clusters, err := h.clusterClient.GetAllClusters(project, name)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//Get Quotas
+	quotas, err := h.quotaClient.GetAllQuotas(project, name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = module.DestroyEtcdContext(lc, clusters, quotas)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

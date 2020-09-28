@@ -17,6 +17,7 @@
 package module
 
 import (
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 
@@ -72,6 +73,7 @@ type LogicalCloudManager interface {
 	GetAll(project string) ([]LogicalCloud, error)
 	Delete(project, name string) error
 	Update(project, name string, c LogicalCloud) (LogicalCloud, error)
+	GetLogicalCloudContext(name string) (appcontext.AppContext, string, error)
 }
 
 // Interface facilitates unit testing by mocking functions
@@ -87,9 +89,10 @@ type Utility interface {
 // LogicalCloudClient implements the LogicalCloudManager
 // It will also be used to maintain some localized state
 type LogicalCloudClient struct {
-	storeName string
-	tagMeta   string
-	util      Utility
+	storeName  string
+	tagMeta    string
+	tagContext string
+	util       Utility
 }
 
 // Added for unit testing; implements Utility interface
@@ -225,6 +228,33 @@ func (v *LogicalCloudClient) Update(project, logicalCloudName string, c LogicalC
 		return LogicalCloud{}, pkgerrors.Wrap(err, "Updating DB Entry")
 	}
 	return c, nil
+}
+
+// GetClusterContext returns the AppContext for corresponding provider and name
+func (v *LogicalCloudClient) GetLogicalCloudContext(name string) (appcontext.AppContext, string, error) {
+	//Construct key and tag to select the entry
+	key := LogicalCloudKey{
+		LogicalCloudName: name,
+		Project:          "test-project", // FIXME(igordc): temporary, need to do some rework in the LC structs
+	}
+
+	value, err := db.DBconn.Find(v.storeName, key, v.tagContext)
+	if err != nil {
+		return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Get Logical Cloud Context")
+	}
+
+	//value is a byte array
+	if value != nil {
+		ctxVal := string(value[0])
+		var lcc appcontext.AppContext
+		_, err = lcc.LoadAppContext(ctxVal)
+		if err != nil {
+			return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Reinitializing Logical Cloud AppContext")
+		}
+		return lcc, ctxVal, nil
+	}
+
+	return appcontext.AppContext{}, "", pkgerrors.New("Error getting Logical Cloud AppContext")
 }
 
 func (d DBService) DBInsert(storeName string, key db.Key, query interface{}, meta string, c interface{}) error {

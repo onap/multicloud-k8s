@@ -44,6 +44,7 @@ func NewRouter(
 		quotaClient = module.NewQuotaClient()
 	}
 
+	// Set up Logical Cloud API
 	logicalCloudHandler := logicalCloudHandler{client: logicalCloudClient,
 		clusterClient: clusterClient,
 		quotaClient:   quotaClient,
@@ -67,6 +68,9 @@ func NewRouter(
 	lcRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/apply",
 		logicalCloudHandler.applyHandler).Methods("POST")
+	lcRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/terminate",
+		logicalCloudHandler.terminateHandler).Methods("POST")
 	// To Do
 	// get kubeconfig
 	/*lcRouter.HandleFunc(

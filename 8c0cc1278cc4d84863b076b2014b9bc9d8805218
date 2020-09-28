@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "28b02f00_8330dcf9",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-28T16:22:21Z",
+      "side": 1,
+      "message": "AppContext should be removed by default. Otherwise the stale data will collect in etcd. Better logic can be provided in next patch",
+      "range": {
+        "startLine": 496,
+        "startChar": 1,
+        "endLine": 500,
+        "endChar": 0
+      },
+      "revId": "8c0cc1278cc4d84863b076b2014b9bc9d8805218",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

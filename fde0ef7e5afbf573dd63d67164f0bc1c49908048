@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "43f78ea8_9efd8193",
+        "filename": "src/dcm/pkg/module/cluster.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-29T19:16:22Z",
+      "side": 1,
+      "message": "Is there a need for some validation of admin and user certificate values?",
+      "range": {
+        "startLine": 261,
+        "startChar": 24,
+        "endLine": 261,
+        "endChar": 40
+      },
+      "revId": "fde0ef7e5afbf573dd63d67164f0bc1c49908048",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -103,9 +103,10 @@ type DBService struct{}
 func NewLogicalCloudClient() *LogicalCloudClient {
 	service := DBService{}
 	return &LogicalCloudClient{
-		storeName: "orchestrator",
-		tagMeta:   "logicalcloud",
-		util:      service,
+		storeName:  "orchestrator",
+		tagMeta:    "logicalcloud",
+		tagContext: "lccontext",
+		util:       service,
 	}
 }
 

@@ -26,6 +26,8 @@ import (
 	"encoding/pem"
 	"fmt"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext/subresources"
@@ -83,6 +85,11 @@ type RoleRef struct {
 	Name     string `yaml:"name"`
 	ApiGroup string `yaml:"apiGroup"`
 }
+
+var (
+	mutex     sync.Mutex
+	pendingOp = false
+)
 
 func createNamespace(logicalcloud LogicalCloud) (string, error) {
 
@@ -303,6 +310,71 @@ func callRsyncUninstall(contextid interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func getAppContextStatus(ac appcontext.AppContext) (*appcontext.AppContextStatus, error) {
+
+	h, err := ac.GetCompositeAppHandle()
+	if err != nil {
+		return nil, err
+	}
+	sh, err := ac.GetLevelHandle(h, "status")
+	if err != nil {
+		return nil, err
+	}
+	s, err := ac.GetValue(sh)
+	if err != nil {
+		return nil, err
+	}
+	acStatus := appcontext.AppContextStatus{}
+	js, _ := json.Marshal(s)
+	json.Unmarshal(js, &acStatus)
+
+	return &acStatus, nil
+
+}
+
+// This function is supposed to run in a goroutine and watch the latest appcontext status for updates.
+// Once an Instantiated/Terminating context becomes Terminated, it is safe to to re-claim the Logical
+// Cloud as non-applied by removing the context ID (lccontext) field from the database.
+func waitForTerm(ac appcontext.AppContext, ctxVal string, project string, logicalcloud string) error {
+	log.Info("Starting routine to take care of Logical Cloud termination.", log.Fields{})
+	for true {
+		acStatus, _ := getAppContextStatus(ac)
+		time.Sleep(2 * time.Second)
+		if acStatus.Status == appcontext.AppContextStatusEnum.Terminated {
+			// remove the appcontext
+			err := ac.DeleteCompositeApp()
+			if err != nil {
+				return pkgerrors.Wrap(err, "Error deleting AppContext CompositeApp Logical Cloud")
+			}
+
+			// remove the app context lcontext field from the orchestrator db record
+			lckey := LogicalCloudKey{
+				LogicalCloudName: logicalcloud,
+				Project:          project,
+			}
+			err = db.DBconn.RemoveTag("orchestrator", lckey, "lccontext")
+			if err != nil {
+				log.Warn("Error removing AppContext from Logical Cloud", log.Fields{
+					"logical-cloud": logicalcloud,
+				})
+				return err
+			}
+
+			safeSetPending(false)
+			log.Info("Logical Cloud termination completed, ending routine.", log.Fields{})
+			return nil
+		}
+	}
+	return pkgerrors.New("Oops, I really wasn't supposed to error out like this!")
+}
+
+// Set pending operation in a thread-safe way
+func safeSetPending(pending bool) {
+	mutex.Lock()
+	pendingOp = pending
+	mutex.Unlock()
 }
 
 func CreateEtcdContext(project string, logicalcloud LogicalCloud, clusterList []Cluster,
@@ -601,9 +673,13 @@ func CreateEtcdContext(project string, logicalcloud LogicalCloud, clusterList []
 func DestroyEtcdContext(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	quotaList []Quota) error {
 
+	if pendingOp {
+		return pkgerrors.New("There is a previous operation already in progress. Please try again later.")
+	}
+
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
 
-	_, ctxVal, err := NewLogicalCloudClient().GetLogicalCloudContext(project, logicalCloudName)
+	context, ctxVal, err := NewLogicalCloudClient().GetLogicalCloudContext(project, logicalCloudName)
 	if err != nil {
 		return pkgerrors.Wrapf(err, "Error finding AppContext for Logical Cloud: %v", logicalCloudName)
 	}
@@ -613,30 +689,8 @@ func DestroyEtcdContext(project string, logicalcloud LogicalCloud, clusterList [
 	if err != nil {
 		return err
 	}
-
-	// TODO: status handling for logical cloud after terminate:
-	// rsync updates the status of the appcontext to Terminated
-	// dcm should launch thread to observe status of appcontext before concluding logical cloud is terminated
-	// dcm should somewhat mimic the status tracking of rsync
-	// logical cloud might be in a non-applied non-terminated state for a long period of time.........
-
-	// // remove the app context
-	// err = context.DeleteCompositeApp()
-	// if err != nil {
-	// 	return pkgerrors.Wrap(err, "Error deleting AppContext CompositeApp")
-	// }
-
-	// remove the app context field from the cluster db record
-	// lckey := LogicalCloudKey{
-	// 	LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
-	// 	Project:          project,
-	// }
-	// err = db.DBconn.RemoveTag("orchestrator", lckey, "lccontext")
-	// if err != nil {
-	// 	log.Warn("Error removing AppContext from Logical Cloud", log.Fields{
-	// 		"logical-cloud": logicalCloudName,
-	// 	})
-	// }
+	safeSetPending(true)
+	go waitForTerm(context, ctxVal, project, logicalcloud.MetaData.LogicalCloudName)
 
 	return nil
 }

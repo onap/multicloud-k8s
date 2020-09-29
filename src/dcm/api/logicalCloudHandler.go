@@ -271,9 +271,14 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 
 	err = module.DestroyEtcdContext(project, lc, clusters, quotas)
 	if err != nil {
+		if err.Error() == "There is a previous operation already in progress. Please try again later." {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	return
+	// since terminate is asynchronous, let the client know the operation has been accepted
+	http.Error(w, pkgerrors.New("Logical Cloud is now terminating").Error(), http.StatusAccepted)
 }

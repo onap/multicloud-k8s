@@ -260,7 +260,7 @@ func (v *ClusterClient) UpdateCluster(project, logicalCloud, clusterReference st
 // Get returns Cluster's kubeconfig for corresponding cluster reference
 func (v *ClusterClient) GetClusterConfig(project, logicalCloud, clusterReference string) (string, error) {
 	lcClient := NewLogicalCloudClient()
-	context, ctxVal, err := lcClient.GetLogicalCloudContext(logicalCloud)
+	context, ctxVal, err := lcClient.GetLogicalCloudContext(project, logicalCloud)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Error getting logical cloud context.")
 	}

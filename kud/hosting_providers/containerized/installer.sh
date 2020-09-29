@@ -138,6 +138,12 @@ function install_addons {
                         bash ${functional_test}.sh --external
                     done
                     ;;
+                "emco" )
+                    echo "Test the emco plugin installation"
+                    for functional_test in plugin_fw_v2; do
+                        bash ${functional_test}.sh --external
+                    done
+                    ;;
             esac
             popd
         done

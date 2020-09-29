@@ -73,7 +73,7 @@ type LogicalCloudManager interface {
 	GetAll(project string) ([]LogicalCloud, error)
 	Delete(project, name string) error
 	Update(project, name string, c LogicalCloud) (LogicalCloud, error)
-	GetLogicalCloudContext(name string) (appcontext.AppContext, string, error)
+	GetLogicalCloudContext(project string, name string) (appcontext.AppContext, string, error)
 }
 
 // Interface facilitates unit testing by mocking functions
@@ -236,11 +236,11 @@ func (v *LogicalCloudClient) Update(project, logicalCloudName string, c LogicalC
 }
 
 // GetClusterContext returns the AppContext for corresponding provider and name
-func (v *LogicalCloudClient) GetLogicalCloudContext(name string) (appcontext.AppContext, string, error) {
+func (v *LogicalCloudClient) GetLogicalCloudContext(project string, name string) (appcontext.AppContext, string, error) {
 	//Construct key and tag to select the entry
 	key := LogicalCloudKey{
 		LogicalCloudName: name,
-		Project:          "test-project", // FIXME(igordc): temporary, need to do some rework in the LC structs
+		Project:          project,
 	}
 
 	value, err := db.DBconn.Find(v.storeName, key, v.tagContext)

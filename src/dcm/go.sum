@@ -807,6 +807,7 @@ github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/olekukonko/tablewriter v0.0.1/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/olekukonko/tablewriter v0.0.2/go.mod h1:rSAaSIOAGT9odnlyGlUfAJaoc5w2fSBUmeGDbRWPxyQ=
+github.com/onap/multicloud-k8s v0.0.0-20200928235143-603a68284970 h1:yWZDIjZBhwtbV7+fa8QB/WhPlHCR4qBhY2OG7K83wGs=
 github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee/go.mod h1:q6s8c45A2NN2V4lxciJ7OmCZFaS1uQSWaGxGG3UM3kM=
 github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d h1:0aXmwqPN8MjyqjKK5L1IhhP/hpP5nGj6xMgo6AOzCPI=
 github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d/go.mod h1:pVhhvg5N0Qy8QDJkYRnWCQbxLDV5GYLmPyzlndbGx7w=

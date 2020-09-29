@@ -25,6 +25,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
+	orch "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -56,6 +57,15 @@ func (h logicalCloudHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	// Logical Cloud Name is required.
 	if v.MetaData.LogicalCloudName == "" {
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+		return
+	}
+
+	// Validate that the specified Project exists
+	// before associating a Logical Cloud with it
+	p := orch.NewProjectClient()
+	_, err = p.GetProject(project)
+	if err != nil {
+		http.Error(w, "The specified project does not exist.", http.StatusNotFound)
 		return
 	}
 
@@ -212,7 +222,7 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = module.CreateEtcdContext(lc, clusters, quotas)
+	err = module.CreateEtcdContext(project, lc, clusters, quotas)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -259,7 +269,7 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	err = module.DestroyEtcdContext(lc, clusters, quotas)
+	err = module.DestroyEtcdContext(project, lc, clusters, quotas)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

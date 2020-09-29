@@ -305,12 +305,11 @@ func callRsyncUninstall(contextid interface{}) error {
 	return nil
 }
 
-func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
+func CreateEtcdContext(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	quotaList []Quota) error {
 
 	APP := "logical-cloud"
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
-	project := "test-project" // FIXME(igordc): temporary, need to do some rework in the LC structs
 
 	//Resource Names
 	namespaceName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+namespace"}, "")
@@ -599,11 +598,10 @@ func CreateEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
 
 // TODO: rename these methods
 // DestroyEtcdContext remove from rsync then delete appcontext and all resources
-func DestroyEtcdContext(logicalcloud LogicalCloud, clusterList []Cluster,
+func DestroyEtcdContext(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	quotaList []Quota) error {
 
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
-	// project := "test-project" // FIXME(igordc): temporary, need to do some rework in the LC structs
 
 	_, ctxVal, err := NewLogicalCloudClient().GetLogicalCloudContext(logicalCloudName)
 	if err != nil {

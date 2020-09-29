@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "57a73289_fdc0dda0",
+        "filename": "src/dcm/api/clusterHandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-29T16:57:05Z",
+      "side": 1,
+      "message": "This should be wrapped up in backend",
+      "range": {
+        "startLine": 194,
+        "startChar": 33,
+        "endLine": 194,
+        "endChar": 70
+      },
+      "revId": "e75872a19db6e60613f262a2e0302db1b89870c3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e26239e5_3dff26ac",
+        "filename": "src/dcm/api/clusterHandler.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-09-29T16:57:05Z",
+      "side": 1,
+      "message": "AppContext should not matter at this level. This handler is responsible to call the backend. All processing done on backend. This is done this way so that we can change the frontend if needed in future",
+      "range": {
+        "startLine": 200,
+        "startChar": 11,
+        "endLine": 200,
+        "endChar": 35
+      },
+      "revId": "e75872a19db6e60613f262a2e0302db1b89870c3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

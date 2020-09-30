@@ -46,6 +46,30 @@
       "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f341131c_00a8abf3",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-09-30T17:29:41Z",
+      "side": 1,
+      "message": "Couple thoughts -\n1 - the v2 version of status does not differentiate\n2 - the collection of resource status is simply the list of resources that match the given label, the pods resulting from Deployments, etc. are still in this category.\n\nThat said, is there a potential use for keeping the dynamic pods separate - e.g. I want to look through that list for some purpose and don\u0027t want to always filter out the rest?\n\nSo, I\u0027m ok with all labeled resources together - but open to hear reasons to keep separate.",
+      "parentUuid": "572be23b_3f77ee6d",
+      "range": {
+        "startLine": 255,
+        "startChar": 2,
+        "endLine": 255,
+        "endChar": 56
+      },
+      "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

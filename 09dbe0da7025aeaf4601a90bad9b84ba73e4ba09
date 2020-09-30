@@ -22,6 +22,30 @@
       "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "572be23b_3f77ee6d",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2020-09-30T13:07:34Z",
+      "side": 1,
+      "message": "I\u0027m fine with either approach. @Ritu, @Eric - what do you think?",
+      "parentUuid": "3a7cefa7_0d461105",
+      "range": {
+        "startLine": 255,
+        "startChar": 2,
+        "endLine": 255,
+        "endChar": 56
+      },
+      "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

@@ -361,3 +361,75 @@ spec:
             - key: config.json
               path: config.json
 
+---
+# DCM Config Map
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dcm
+  labels:
+    app: dcm
+data:
+  config.json: |
+          {
+          "database-type": "mongo",
+          "database-ip": "mongo",
+          "etcd-ip": "etcd",
+          "service-port": "9077"
+          }
+
+---
+# DCM Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: dcm
+  labels:
+    app: dcm
+spec:
+  selector:
+    app: dcm
+  type: NodePort
+  ports:
+  - name: http
+    port: 9077
+    nodePort: 31877
+    protocol: TCP
+    targetPort: 9077
+
+---
+# DCM Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dcm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dcm
+  template:
+    metadata:
+      labels:
+        app: dcm
+    spec:
+      containers:
+        - name: dcm
+          image: emcov2/emco:stable
+          imagePullPolicy: Always
+          command: ["/opt/emco/entrypoint", "dcm"]
+          workingDir: /opt/emco
+          ports:
+          - containerPort: 9077
+          volumeMounts:
+          - name: config
+            mountPath: /opt/emco/config.json
+            subPath: config.json
+      volumes:
+        - name: config
+          configMap:
+            name: dcm
+            items:
+            - key: config.json
+              path: config.json
+

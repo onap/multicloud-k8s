@@ -34,6 +34,47 @@
       "revId": "e82fc3d828d08f768a0cdcb8e3bf752c0cbc9ed5",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e871b8e_ae8f2837",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 964,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-30T20:57:02Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ace083ce_76aef36c",
+      "revId": "e82fc3d828d08f768a0cdcb8e3bf752c0cbc9ed5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cade4071_407fa49e",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 983,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-30T20:57:02Z",
+      "side": 1,
+      "message": "Schema was changed from GenericPlacementIntent to simply Metadata. Multiple examples below for other shemas.",
+      "range": {
+        "startLine": 983,
+        "startChar": 44,
+        "endLine": 983,
+        "endChar": 52
+      },
+      "revId": "e82fc3d828d08f768a0cdcb8e3bf752c0cbc9ed5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

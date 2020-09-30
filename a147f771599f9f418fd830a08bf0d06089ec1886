@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "42530796_b4c463e4",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-09-30T18:01:49Z",
+      "side": 1,
+      "message": "Also update this description accordingly.",
+      "range": {
+        "startLine": 139,
+        "startChar": 23,
+        "endLine": 139,
+        "endChar": 35
+      },
+      "revId": "a147f771599f9f418fd830a08bf0d06089ec1886",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

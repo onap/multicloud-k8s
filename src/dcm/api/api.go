@@ -21,7 +21,6 @@ import (
 
 // NewRouter creates a router that registers the various urls that are
 // supported
-
 func NewRouter(
 	logicalCloudClient module.LogicalCloudManager,
 	clusterClient module.ClusterManager,
@@ -55,7 +54,7 @@ func NewRouter(
 		logicalCloudHandler.createHandler).Methods("POST")
 	lcRouter.HandleFunc(
 		"/logical-clouds",
-		logicalCloudHandler.getHandler).Methods("GET")
+		logicalCloudHandler.getAllHandler).Methods("GET")
 	lcRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}",
 		logicalCloudHandler.getHandler).Methods("GET")
@@ -80,7 +79,7 @@ func NewRouter(
 		clusterHandler.createHandler).Methods("POST")
 	clusterRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/cluster-references",
-		clusterHandler.getHandler).Methods("GET")
+		clusterHandler.getAllHandler).Methods("GET")
 	clusterRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
 		clusterHandler.getHandler).Methods("GET")

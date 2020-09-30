@@ -23,9 +23,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
-
 	"github.com/gorilla/mux"
+	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
 )
 
 // quotaHandler is used to store backend implementations objects
@@ -34,7 +33,6 @@ type quotaHandler struct {
 }
 
 // CreateHandler handles creation of the quota entry in the database
-
 func (h quotaHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	project := vars["project-name"]
@@ -72,8 +70,33 @@ func (h quotaHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getHandler handles GET operations over quotas
+// Returns a list of Quotas
+func (h quotaHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	project := vars["project-name"]
+	logicalCloud := vars["logical-cloud-name"]
+	name := vars["quota-name"]
+	var ret interface{}
+	var err error
+
+	ret, err = h.client.GetAllQuotas(project, logicalCloud)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // getHandler handle GET operations on a particular name
-// Returns a quota
+// Returns a Quota
 func (h quotaHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	project := vars["project-name"]
@@ -82,22 +105,14 @@ func (h quotaHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	var ret interface{}
 	var err error
 
-	if len(name) == 0 {
-		ret, err = h.client.GetAllQuotas(project, logicalCloud)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+	ret, err = h.client.GetQuota(project, logicalCloud, name)
+	if err != nil {
+		if err.Error() == "Cluster Quota does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
-	} else {
-		ret, err = h.client.GetQuota(project, logicalCloud, name)
-		if err != nil {
-			if err.Error() == "Cluster Quota does not exist" {
-				http.Error(w, err.Error(), http.StatusNotFound)
-				return
-			}
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

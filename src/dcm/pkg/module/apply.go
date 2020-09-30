@@ -266,7 +266,7 @@ func queryDBAndSetRsyncInfo() (installappclient.RsyncInfo, error) {
 }
 
 /*
-callRsyncInstall method shall take in the app context id and invokes the rsync service via grpc
+callRsyncInstall method shall take in the app context id and invoke the rsync service via grpc
 */
 func callRsyncInstall(contextid interface{}) error {
 	rsyncInfo, err := queryDBAndSetRsyncInfo()
@@ -286,7 +286,7 @@ func callRsyncInstall(contextid interface{}) error {
 }
 
 /*
-callRsyncUninstall method shall take in the app context id and invokes the rsync service via grpc
+callRsyncUninstall method shall take in the app context id and invoke the rsync service via grpc
 */
 func callRsyncUninstall(contextid interface{}) error {
 	rsyncInfo, err := queryDBAndSetRsyncInfo()
@@ -305,7 +305,9 @@ func callRsyncUninstall(contextid interface{}) error {
 	return nil
 }
 
-func CreateEtcdContext(project string, logicalcloud LogicalCloud, clusterList []Cluster,
+// Apply prepares all yaml resources to be given to the clusters via rsync,
+// then creates an appcontext with such resources and asks rsync to apply the logical cloud
+func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	quotaList []Quota) error {
 
 	APP := "logical-cloud"
@@ -596,9 +598,9 @@ func CreateEtcdContext(project string, logicalcloud LogicalCloud, clusterList []
 
 }
 
-// TODO: rename these methods
-// DestroyEtcdContext remove from rsync then delete appcontext and all resources
-func DestroyEtcdContext(project string, logicalcloud LogicalCloud, clusterList []Cluster,
+// Terminate asks rsync to terminate the logical cloud, then waits in the background until
+// rsync claims the logical cloud is terminated, and then deletes the appcontext
+func Terminate(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	quotaList []Quota) error {
 
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName

@@ -1,4 +1,4 @@
-# Copyright 2019 Intel Corporation, Inc
+# Copyright 2020 Intel Corporation, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,23 +14,5 @@
 
 dependencies:
   - name: common
-    version: ~0.x-0
-    repository: '@local'
-  - name: orchestrator
-    version: ~0.x-0
-    repository: '@local'
-  - name: ncm
-    version: ~0.x-0
-    repository: '@local'
-  - name: rsync
-    version: ~0.x-0
-    repository: '@local'
-  - name: clm
-    version: ~0.x-0
-    repository: '@local'
-  - name: ovnaction
-    version: ~0.x-0
-    repository: '@local'
-  - name: dcm
     version: ~0.x-0
     repository: '@local'

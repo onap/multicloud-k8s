@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a7cefa7_0d461105",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2020-09-30T08:47:05Z",
+      "side": 1,
+      "message": "I am not 100% sure that we should keep helm based resources\u0027 status with pods\u0027 status in the same place. Maybe we should keep dynamic resources as a separate set in InstanceStatus?",
+      "range": {
+        "startLine": 255,
+        "startChar": 2,
+        "endLine": 255,
+        "endChar": 56
+      },
+      "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

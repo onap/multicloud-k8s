@@ -2,6 +2,7 @@
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
 # Copyright (c) 2018
+# Copyright © 2020 Samsung Electronics
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Apache License, Version 2.0
 # which accompanies this distribution, and is available at
@@ -116,6 +117,9 @@ print_msg "Not waiting for vFW to fully install as no further checks are impleme
 #sleep 8m
 print_msg "[END] Basic checks for instantiated resource"
 
+print_msg "Retrieving VNF status (this will result with long output)"
+call_api "${base_url}/instance/${vnf_id}/status"
+
 print_msg "Retrieving VNF details"
 response="$(call_api "${base_url}/instance/${vnf_id}")"
 echo "$response"
@@ -136,3 +140,5 @@ delete_resource "${base_url}/rb/definition/${rb_name}/${rb_version}"
 
 print_msg "Deleting ${cloud_region_id} cloud region connection"
 delete_resource "${base_url}/connectivity-info/${cloud_region_id}"
+
+print_msg "Test finished successfully"

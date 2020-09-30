@@ -17,7 +17,15 @@
 package module
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"strings"
+
+	clm "github.com/onap/multicloud-k8s/src/clm/pkg/cluster"
+	rb "github.com/onap/multicloud-k8s/src/monitor/pkg/apis/k8splugin/v1alpha1"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	pkgerrors "github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
 // Cluster contains the parameters needed for a Cluster
@@ -37,12 +45,55 @@ type ClusterSpec struct {
 	ClusterProvider string `json:"cluster-provider"`
 	ClusterName     string `json:"cluster-name"`
 	LoadBalancerIP  string `json:"loadbalancer-ip"`
+	Certificate     string `json:"certificate"`
 }
 
 type ClusterKey struct {
 	Project          string `json:"project"`
 	LogicalCloudName string `json:"logical-cloud-name"`
 	ClusterReference string `json:"clname"`
+}
+
+type KubeConfig struct {
+	ApiVersion     string            `yaml:"apiVersion"`
+	Kind           string            `yaml:"kind"`
+	Clusters       []KubeCluster     `yaml:"clusters"`
+	Contexts       []KubeContext     `yaml:"contexts"`
+	CurrentContext string            `yaml:"current-context`
+	Preferences    map[string]string `yaml:"preferences"`
+	Users          []KubeUser        `yaml:"users"`
+}
+
+type KubeCluster struct {
+	ClusterDef  KubeClusterDef `yaml:"cluster"`
+	ClusterName string         `yaml:"name"`
+}
+
+type KubeClusterDef struct {
+	CertificateAuthorityData string `yaml:"certificate-authority-data"`
+	Server                   string `yaml:"server"`
+}
+
+type KubeContext struct {
+	ContextDef  KubeContextDef `yaml:"context"`
+	ContextName string         `yaml:"name"`
+}
+
+type KubeContextDef struct {
+	Cluster   string `yaml:"cluster"`
+	Namespace string `yaml:"namespace,omitempty"`
+	User      string `yaml:"user"`
+}
+
+type KubeUser struct {
+	UserName string      `yaml:"name"`
+	UserDef  KubeUserDef `yaml:"user"`
+}
+
+type KubeUserDef struct {
+	ClientCertificateData string `yaml:"client-certificate-data"`
+	ClientKeyData         string `yaml:"client-key-data"`
+	// client-certificate and client-key are NOT implemented
 }
 
 // ClusterManager is an interface that exposes the connection
@@ -53,6 +104,7 @@ type ClusterManager interface {
 	GetAllClusters(project, logicalCloud string) ([]Cluster, error)
 	DeleteCluster(project, logicalCloud, name string) error
 	UpdateCluster(project, logicalCloud, name string, c Cluster) (Cluster, error)
+	GetClusterConfig(project, logicalcloud, name string) (string, error)
 }
 
 // ClusterClient implements the ClusterManager
@@ -203,4 +255,166 @@ func (v *ClusterClient) UpdateCluster(project, logicalCloud, clusterReference st
 		return Cluster{}, pkgerrors.Wrap(err, "Updating DB Entry")
 	}
 	return c, nil
+}
+
+// Get returns Cluster's kubeconfig for corresponding cluster reference
+func (v *ClusterClient) GetClusterConfig(project, logicalCloud, clusterReference string) (string, error) {
+	lcClient := NewLogicalCloudClient()
+	context, ctxVal, err := lcClient.GetLogicalCloudContext(logicalCloud)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Error getting logical cloud context.")
+	}
+	if ctxVal == "" {
+		return "", pkgerrors.New("Logical Cloud hasn't been applied yet")
+	}
+
+	// private key comes from logical cloud
+	lckey := LogicalCloudKey{
+		Project:          project,
+		LogicalCloudName: logicalCloud,
+	}
+	// get logical cloud resource
+	lc, err := lcClient.Get(project, logicalCloud)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Failed getting logical cloud")
+	}
+	// get user's private key
+	privateKeyData, err := v.util.DBFind(v.storeName, lckey, "privatekey")
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Failed getting private key from logical cloud")
+	}
+
+	// get cluster from dcm (need provider/name)
+	cluster, err := v.GetCluster(project, logicalCloud, clusterReference)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Failed getting cluster")
+	}
+
+	// before attempting to generate a kubeconfig,
+	// check if certificate has been issued and copy it from etcd to mongodb
+	if cluster.Specification.Certificate == "" {
+		log.Info("Certificate not yet in MongoDB, checking etcd.", log.Fields{})
+
+		// access etcd
+		clusterName := strings.Join([]string{cluster.Specification.ClusterProvider, "+", cluster.Specification.ClusterName}, "")
+
+		// get the app context handle for the status of this cluster (which should contain the certificate inside, if already issued)
+		statusHandle, err := context.GetClusterStatusHandle("logical-cloud", clusterName)
+
+		if err != nil {
+			return "", pkgerrors.New("The cluster doesn't contain status, please check if all services are up and running.")
+		}
+		statusRaw, err := context.GetValue(statusHandle)
+		if err != nil {
+			return "", pkgerrors.Wrap(err, "An error occurred while reading the cluster status.")
+		}
+
+		var rbstatus rb.ResourceBundleStatus
+		err = json.Unmarshal([]byte(statusRaw.(string)), &rbstatus)
+		if err != nil {
+			return "", pkgerrors.Wrap(err, "An error occurred while parsing the cluster status.")
+		}
+
+		// validate that we indeed obtained a certificate before persisting it in the database:
+		approved := false
+		for _, c := range rbstatus.CsrStatuses[0].Status.Conditions {
+			if c.Type == "Denied" {
+				return "", pkgerrors.Wrap(err, "Certificate was denied!")
+			}
+			if c.Type == "Failed" {
+				return "", pkgerrors.Wrap(err, "Certificate issue failed.")
+			}
+			if c.Type == "Approved" {
+				approved = true
+			}
+		}
+		if approved {
+			//just double-check certificate field contents aren't empty:
+			cert := rbstatus.CsrStatuses[0].Status.Certificate
+			if len(cert) > 0 {
+				cluster.Specification.Certificate = base64.StdEncoding.EncodeToString([]byte(cert))
+			} else {
+				return "", pkgerrors.Wrap(err, "Certificate issued was invalid.")
+			}
+		}
+
+		// copy key to MongoDB
+		// func (v *ClusterClient)
+		// UpdateCluster(project, logicalCloud, clusterReference string, c Cluster) (Cluster, error) {
+		_, err = v.UpdateCluster(project, logicalCloud, clusterReference, cluster)
+		if err != nil {
+			return "", pkgerrors.Wrap(err, "An error occurred while storing the certificate.")
+		}
+	} else {
+		// certificate is already in MongoDB so just hand it over to create the API response
+		log.Info("Certificate already in MongoDB, pass it to API.", log.Fields{})
+	}
+
+	// contact clm about admins cluster kubeconfig (to retrieve CA cert)
+	clusterContent, err := clm.NewClusterClient().GetClusterContent(cluster.Specification.ClusterProvider, cluster.Specification.ClusterName)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Failed getting cluster content from CLM")
+	}
+	adminConfig, err := base64.StdEncoding.DecodeString(clusterContent.Kubeconfig)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Failed decoding CLM kubeconfig from base64")
+	}
+
+	// unmarshall clm kubeconfig into struct
+	adminKubeConfig := KubeConfig{}
+	err = yaml.Unmarshal(adminConfig, &adminKubeConfig)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Failed parsing CLM kubeconfig yaml")
+	}
+
+	// all data needed for final kubeconfig:
+	privateKey := string(privateKeyData[0])
+	signedCert := cluster.Specification.Certificate
+	clusterCert := adminKubeConfig.Clusters[0].ClusterDef.CertificateAuthorityData
+	clusterAddr := adminKubeConfig.Clusters[0].ClusterDef.Server
+	namespace := lc.Specification.NameSpace
+	userName := lc.Specification.User.UserName
+	contextName := userName + "@" + clusterReference
+
+	kubeconfig := KubeConfig{
+		ApiVersion: "v1",
+		Kind:       "Config",
+		Clusters: []KubeCluster{
+			KubeCluster{
+				ClusterName: clusterReference,
+				ClusterDef: KubeClusterDef{
+					CertificateAuthorityData: clusterCert,
+					Server:                   clusterAddr,
+				},
+			},
+		},
+		Contexts: []KubeContext{
+			KubeContext{
+				ContextName: contextName,
+				ContextDef: KubeContextDef{
+					Cluster:   clusterReference,
+					Namespace: namespace,
+					User:      userName,
+				},
+			},
+		},
+		CurrentContext: contextName,
+		Preferences:    map[string]string{},
+		Users: []KubeUser{
+			KubeUser{
+				UserName: userName,
+				UserDef: KubeUserDef{
+					ClientCertificateData: signedCert,
+					ClientKeyData:         privateKey,
+				},
+			},
+		},
+	}
+
+	yaml, err := yaml.Marshal(&kubeconfig)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Failed marshaling user kubeconfig into yaml")
+	}
+
+	return string(yaml), nil
 }

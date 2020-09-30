@@ -77,6 +77,10 @@ spec:
               items:
                 type: object
               type: array
+            csrStatuses:
+              items:
+                type: object
+              type: array
           required:
           - ready
           - resourceCount
@@ -89,6 +93,7 @@ spec:
           - ingressStatuses
           - jobStatuses
           - statefulSetStatuses
+          - csrStatuses
           type: object
   version: v1alpha1
   versions:
@@ -165,6 +170,12 @@ rules:
   - '*'
 - apiGroups:
   - extensions
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - certificates.k8s.io
   resources:
   - '*'
   verbs:

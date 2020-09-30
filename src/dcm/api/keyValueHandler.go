@@ -33,7 +33,6 @@ type keyValueHandler struct {
 }
 
 // CreateHandler handles creation of the key value entry in the database
-
 func (h keyValueHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	project := vars["project-name"]
@@ -71,6 +70,30 @@ func (h keyValueHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getHandler handles GET operations over key-value pairs
+// Returns a list of Key Values
+func (h keyValueHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	project := vars["project-name"]
+	logicalCloud := vars["logical-cloud-name"]
+	var ret interface{}
+	var err error
+
+	ret, err = h.client.GetAllKVPairs(project, logicalCloud)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // getHandler handle GET operations on a particular name
 // Returns a Key Value
 func (h keyValueHandler) getHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,22 +104,14 @@ func (h keyValueHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	var ret interface{}
 	var err error
 
-	if len(name) == 0 {
-		ret, err = h.client.GetAllKVPairs(project, logicalCloud)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+	ret, err = h.client.GetKVPair(project, logicalCloud, name)
+	if err != nil {
+		if err.Error() == "KV Pair does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
-	} else {
-		ret, err = h.client.GetKVPair(project, logicalCloud, name)
-		if err != nil {
-			if err.Error() == "KV Pair does not exist" {
-				http.Error(w, err.Error(), http.StatusNotFound)
-				return
-			}
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

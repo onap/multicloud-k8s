@@ -23,9 +23,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
-
 	"github.com/gorilla/mux"
+	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
 )
 
 // clusterHandler is used to store backend implementations objects
@@ -33,8 +32,7 @@ type clusterHandler struct {
 	client module.ClusterManager
 }
 
-// CreateHandler handles creation of the cluster reference entry in the database
-
+// createHandler handles creation of the cluster reference entry in the database
 func (h clusterHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	project := vars["project-name"]
@@ -72,7 +70,31 @@ func (h clusterHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// getHandler handle GET operations on a particular name
+// getAllHandler handles GET operations over cluster references
+// Returns a list of Cluster References
+func (h clusterHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	project := vars["project-name"]
+	logicalCloud := vars["logical-cloud-name"]
+	var ret interface{}
+	var err error
+
+	ret, err = h.client.GetAllClusters(project, logicalCloud)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// getHandler handles GET operations on a particular name
 // Returns a Cluster Reference
 func (h clusterHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -82,22 +104,14 @@ func (h clusterHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	var ret interface{}
 	var err error
 
-	if len(name) == 0 {
-		ret, err = h.client.GetAllClusters(project, logicalCloud)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+	ret, err = h.client.GetCluster(project, logicalCloud, name)
+	if err != nil {
+		if err.Error() == "Cluster Reference does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
-	} else {
-		ret, err = h.client.GetCluster(project, logicalCloud, name)
-		if err != nil {
-			if err.Error() == "Cluster Reference does not exist" {
-				http.Error(w, err.Error(), http.StatusNotFound)
-				return
-			}
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

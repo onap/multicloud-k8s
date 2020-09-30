@@ -21,7 +21,6 @@ import (
 
 // NewRouter creates a router that registers the various urls that are
 // supported
-
 func NewRouter(
 	logicalCloudClient module.LogicalCloudManager,
 	clusterClient module.ClusterManager,
@@ -55,7 +54,7 @@ func NewRouter(
 		logicalCloudHandler.createHandler).Methods("POST")
 	lcRouter.HandleFunc(
 		"/logical-clouds",
-		logicalCloudHandler.getHandler).Methods("GET")
+		logicalCloudHandler.getAllHandler).Methods("GET")
 	lcRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}",
 		logicalCloudHandler.getHandler).Methods("GET")
@@ -80,7 +79,7 @@ func NewRouter(
 		clusterHandler.createHandler).Methods("POST")
 	clusterRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/cluster-references",
-		clusterHandler.getHandler).Methods("GET")
+		clusterHandler.getAllHandler).Methods("GET")
 	clusterRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/cluster-references/{cluster-reference}",
 		clusterHandler.getHandler).Methods("GET")
@@ -105,6 +104,9 @@ func NewRouter(
 		"/logical-clouds/{logical-cloud-name}/user-permissions",
 		userPermissionHandler.createHandler).Methods("POST")
 	upRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/user-permissions",
+		userPermissionHandler.getAllHandler).Methods("GET")
+	upRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/user-permissions/{permission-name}",
 		userPermissionHandler.getHandler).Methods("GET")
 	upRouter.HandleFunc(
@@ -120,6 +122,9 @@ func NewRouter(
 	quotaRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/cluster-quotas",
 		quotaHandler.createHandler).Methods("POST")
+	quotaRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/cluster-quotas",
+		quotaHandler.getAllHandler).Methods("GET")
 	quotaRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/cluster-quotas/{quota-name}",
 		quotaHandler.getHandler).Methods("GET")
@@ -139,6 +144,9 @@ func NewRouter(
 	kvRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/kv-pairs",
 		keyValueHandler.createHandler).Methods("POST")
+	kvRouter.HandleFunc(
+		"/logical-clouds/{logical-cloud-name}/kv-pairs",
+		keyValueHandler.getAllHandler).Methods("GET")
 	kvRouter.HandleFunc(
 		"/logical-clouds/{logical-cloud-name}/kv-pairs/{kv-pair-name}",
 		keyValueHandler.getHandler).Methods("GET")

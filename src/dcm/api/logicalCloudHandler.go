@@ -36,8 +36,7 @@ type logicalCloudHandler struct {
 	quotaClient   module.QuotaManager
 }
 
-// CreateHandler handles creation of the logical cloud entry in the database
-
+// CreateHandler handles the creation of a logical cloud
 func (h logicalCloudHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
@@ -84,31 +83,18 @@ func (h logicalCloudHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-// getHandler handle GET operations on a particular name
-// Returns a Logical Cloud
-func (h logicalCloudHandler) getHandler(w http.ResponseWriter, r *http.Request) {
+// getAllHandler handles GET operations over logical clouds
+// Returns a list of Logical Clouds
+func (h logicalCloudHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	project := vars["project-name"]
-	name := vars["logical-cloud-name"]
 	var ret interface{}
 	var err error
 
-	if len(name) == 0 {
-		ret, err = h.client.GetAll(project)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else {
-		ret, err = h.client.Get(project, name)
-		if err != nil {
-			if err.Error() == "Logical Cloud does not exist" {
-				http.Error(w, err.Error(), http.StatusNotFound)
-				return
-			}
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	ret, err = h.client.GetAll(project)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -120,7 +106,35 @@ func (h logicalCloudHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// UpdateHandler handles Update operations on a particular logical cloud
+// getHandler handles GET operations on a particular name
+// Returns a Logical Cloud
+func (h logicalCloudHandler) getHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	project := vars["project-name"]
+	name := vars["logical-cloud-name"]
+	var ret interface{}
+	var err error
+
+	ret, err = h.client.Get(project, name)
+	if err != nil {
+		if err.Error() == "Logical Cloud does not exist" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// updateHandler handles Update operations on a particular logical cloud
 func (h logicalCloudHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	var v module.LogicalCloud
 	vars := mux.Vars(r)
@@ -162,6 +176,7 @@ func (h logicalCloudHandler) updateHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+// deleteHandler handles Delete operations on a particular logical cloud
 func (h logicalCloudHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	project := vars["project-name"]
@@ -180,6 +195,7 @@ func (h logicalCloudHandler) deleteHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// applyHandler handles applying a particular logical cloud
 func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	project := vars["project-name"]
@@ -215,14 +231,15 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	//Get Quotas
+	// Get Quotas
 	quotas, err := h.quotaClient.GetAllQuotas(project, name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = module.CreateEtcdContext(project, lc, clusters, quotas)
+	// Apply the Logical Cloud
+	err = module.Apply(project, lc, clusters, quotas)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -231,6 +248,7 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	return
 }
 
+// applyHandler handles terminating a particular logical cloud
 func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	project := vars["project-name"]
@@ -262,14 +280,15 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	//Get Quotas
+	// Get Quotas
 	quotas, err := h.quotaClient.GetAllQuotas(project, name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = module.DestroyEtcdContext(project, lc, clusters, quotas)
+	// Terminate the Logical Cloud
+	err = module.Terminate(project, lc, clusters, quotas)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

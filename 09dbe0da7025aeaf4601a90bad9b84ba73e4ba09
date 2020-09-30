@@ -94,6 +94,30 @@
       "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1d56f34f_b67dc5ee",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-09-30T23:24:22Z",
+      "side": 1,
+      "message": "we can keep as written for now.  if the need arises, an enhancement can be made.",
+      "parentUuid": "e3d647c1_838113c2",
+      "range": {
+        "startLine": 255,
+        "startChar": 2,
+        "endLine": 255,
+        "endChar": 56
+      },
+      "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

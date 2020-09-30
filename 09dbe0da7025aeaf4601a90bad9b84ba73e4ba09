@@ -70,6 +70,30 @@
       "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e3d647c1_838113c2",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2020-09-30T20:51:28Z",
+      "side": 1,
+      "message": "The only reasoning is that we have static resources comming from helm and dynamic like Pods created indireclty. From API consumer perspective processing of both may be different so maybe it is worth to give separate access to both sets. Like said, I have no clear opinion. So at the end I leave it for your decision whether to change it or not.",
+      "parentUuid": "f341131c_00a8abf3",
+      "range": {
+        "startLine": 255,
+        "startChar": 2,
+        "endLine": 255,
+        "endChar": 56
+      },
+      "revId": "09dbe0da7025aeaf4601a90bad9b84ba73e4ba09",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

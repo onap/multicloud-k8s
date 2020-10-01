@@ -23,8 +23,8 @@ import (
 	"net/http"
 	"strings"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
+	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	pkgerrors "github.com/pkg/errors"
 
 	"github.com/gorilla/mux"
@@ -141,6 +141,7 @@ func (h chainHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 
 	err := json.NewDecoder(r.Body).Decode(&ch)
@@ -166,7 +167,7 @@ func (h chainHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.CreateChain(ch, project, compositeApp, compositeAppVersion, netControlIntent, false)
+	ret, err := h.client.CreateChain(ch, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -189,6 +190,7 @@ func (h chainHandler) putHandler(w http.ResponseWriter, r *http.Request) {
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 
 	err := json.NewDecoder(r.Body).Decode(&ch)
@@ -221,7 +223,7 @@ func (h chainHandler) putHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.CreateChain(ch, project, compositeApp, compositeAppVersion, netControlIntent, true)
+	ret, err := h.client.CreateChain(ch, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -244,18 +246,19 @@ func (h chainHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 	var ret interface{}
 	var err error
 
 	if len(name) == 0 {
-		ret, err = h.client.GetChains(project, compositeApp, compositeAppVersion, netControlIntent)
+		ret, err = h.client.GetChains(project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
-		ret, err = h.client.GetChain(name, project, compositeApp, compositeAppVersion, netControlIntent)
+		ret, err = h.client.GetChain(name, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -278,9 +281,10 @@ func (h chainHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 
-	err := h.client.DeleteChain(name, project, compositeApp, compositeAppVersion, netControlIntent)
+	err := h.client.DeleteChain(name, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

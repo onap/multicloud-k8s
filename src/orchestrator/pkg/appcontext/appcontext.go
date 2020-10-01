@@ -67,10 +67,11 @@ var AppContextStatusEnum = &statuses{
 // CompositeAppVersion, ReleaseName. This shall be used for
 // instantiation of a compositeApp
 type CompositeAppMeta struct {
-	Project      string `json:"Project"`
-	CompositeApp string `json:"CompositeApp"`
-	Version      string `json:"Version"`
-	Release      string `json:"Release"`
+	Project               string `json:"Project"`
+	CompositeApp          string `json:"CompositeApp"`
+	Version               string `json:"Version"`
+	Release               string `json:"Release"`
+	DeploymentIntentGroup string `json:"DeploymentIntentGroup"`
 }
 
 // Init app context
@@ -565,6 +566,7 @@ func (ac *AppContext) GetCompositeAppMeta() (CompositeAppMeta, error) {
 	ca := fmt.Sprintf("%v", datamap["CompositeApp"])
 	v := fmt.Sprintf("%v", datamap["Version"])
 	rn := fmt.Sprintf("%v", datamap["Release"])
+	dig := fmt.Sprintf("%v", datamap["DeploymentIntentGroup"])
 
-	return CompositeAppMeta{Project: p, CompositeApp: ca, Version: v, Release: rn}, nil
+	return CompositeAppMeta{Project: p, CompositeApp: ca, Version: v, Release: rn, DeploymentIntentGroup: dig}, nil
 }

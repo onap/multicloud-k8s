@@ -41,6 +41,7 @@ type WorkloadIfIntentKey struct {
 	Project             string `json:"provider"`
 	CompositeApp        string `json:"compositeapp"`
 	CompositeAppVersion string `json:"compositeappversion"`
+	DigName             string `json:"deploymentintentgroup"`
 	NetControlIntent    string `json:"netcontrolintent"`
 	WorkloadIntent      string `json:"workloadintent"`
 	WorkloadIfIntent    string `json:"workloadifintent"`
@@ -48,10 +49,10 @@ type WorkloadIfIntentKey struct {
 
 // Manager is an interface exposing the WorkloadIfIntent functionality
 type WorkloadIfIntentManager interface {
-	CreateWorkloadIfIntent(wi WorkloadIfIntent, project, compositeapp, compositeappversion, netcontrolintent, workloadintent string, exists bool) (WorkloadIfIntent, error)
-	GetWorkloadIfIntent(name, project, compositeapp, compositeappversion, netcontrolintent, workloadintent string) (WorkloadIfIntent, error)
-	GetWorkloadIfIntents(project, compositeapp, compositeappversion, netcontrolintent, workloadintent string) ([]WorkloadIfIntent, error)
-	DeleteWorkloadIfIntent(name, project, compositeapp, compositeappversion, netcontrolintent, workloadintent string) error
+	CreateWorkloadIfIntent(wi WorkloadIfIntent, project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent string, exists bool) (WorkloadIfIntent, error)
+	GetWorkloadIfIntent(name, project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent string) (WorkloadIfIntent, error)
+	GetWorkloadIfIntents(project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent string) ([]WorkloadIfIntent, error)
+	DeleteWorkloadIfIntent(name, project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent string) error
 }
 
 // WorkloadIfIntentClient implements the Manager
@@ -72,26 +73,27 @@ func NewWorkloadIfIntentClient() *WorkloadIfIntentClient {
 }
 
 // CreateWorkloadIfIntent - create a new WorkloadIfIntent
-func (v *WorkloadIfIntentClient) CreateWorkloadIfIntent(wif WorkloadIfIntent, project, compositeapp, compositeappversion, netcontrolintent, workloadintent string, exists bool) (WorkloadIfIntent, error) {
+func (v *WorkloadIfIntentClient) CreateWorkloadIfIntent(wif WorkloadIfIntent, project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent string, exists bool) (WorkloadIfIntent, error) {
 
 	//Construct key and tag to select the entry
 	key := WorkloadIfIntentKey{
 		Project:             project,
 		CompositeApp:        compositeapp,
 		CompositeAppVersion: compositeappversion,
+		DigName:             dig,
 		NetControlIntent:    netcontrolintent,
 		WorkloadIntent:      workloadintent,
 		WorkloadIfIntent:    wif.Metadata.Name,
 	}
 
 	//Check if the Workload Intent exists
-	_, err := NewWorkloadIntentClient().GetWorkloadIntent(workloadintent, project, compositeapp, compositeappversion, netcontrolintent)
+	_, err := NewWorkloadIntentClient().GetWorkloadIntent(workloadintent, project, compositeapp, compositeappversion, dig, netcontrolintent)
 	if err != nil {
 		return WorkloadIfIntent{}, pkgerrors.Errorf("Workload Intent %v does not exist", workloadintent)
 	}
 
 	//Check if this WorkloadIfIntent already exists
-	_, err = v.GetWorkloadIfIntent(wif.Metadata.Name, project, compositeapp, compositeappversion, netcontrolintent, workloadintent)
+	_, err = v.GetWorkloadIfIntent(wif.Metadata.Name, project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent)
 	if err == nil && !exists {
 		return WorkloadIfIntent{}, pkgerrors.New("WorkloadIfIntent already exists")
 	}
@@ -105,13 +107,14 @@ func (v *WorkloadIfIntentClient) CreateWorkloadIfIntent(wif WorkloadIfIntent, pr
 }
 
 // GetWorkloadIfIntent returns the WorkloadIfIntent for corresponding name
-func (v *WorkloadIfIntentClient) GetWorkloadIfIntent(name, project, compositeapp, compositeappversion, netcontrolintent, workloadintent string) (WorkloadIfIntent, error) {
+func (v *WorkloadIfIntentClient) GetWorkloadIfIntent(name, project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent string) (WorkloadIfIntent, error) {
 
 	//Construct key and tag to select the entry
 	key := WorkloadIfIntentKey{
 		Project:             project,
 		CompositeApp:        compositeapp,
 		CompositeAppVersion: compositeappversion,
+		DigName:             dig,
 		NetControlIntent:    netcontrolintent,
 		WorkloadIntent:      workloadintent,
 		WorkloadIfIntent:    name,
@@ -136,13 +139,14 @@ func (v *WorkloadIfIntentClient) GetWorkloadIfIntent(name, project, compositeapp
 }
 
 // GetWorkloadIfIntentList returns all of the WorkloadIfIntent for corresponding name
-func (v *WorkloadIfIntentClient) GetWorkloadIfIntents(project, compositeapp, compositeappversion, netcontrolintent, workloadintent string) ([]WorkloadIfIntent, error) {
+func (v *WorkloadIfIntentClient) GetWorkloadIfIntents(project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent string) ([]WorkloadIfIntent, error) {
 
 	//Construct key and tag to select the entry
 	key := WorkloadIfIntentKey{
 		Project:             project,
 		CompositeApp:        compositeapp,
 		CompositeAppVersion: compositeappversion,
+		DigName:             dig,
 		NetControlIntent:    netcontrolintent,
 		WorkloadIntent:      workloadintent,
 		WorkloadIfIntent:    "",
@@ -167,13 +171,14 @@ func (v *WorkloadIfIntentClient) GetWorkloadIfIntents(project, compositeapp, com
 }
 
 // Delete the  WorkloadIfIntent from database
-func (v *WorkloadIfIntentClient) DeleteWorkloadIfIntent(name, project, compositeapp, compositeappversion, netcontrolintent, workloadintent string) error {
+func (v *WorkloadIfIntentClient) DeleteWorkloadIfIntent(name, project, compositeapp, compositeappversion, dig, netcontrolintent, workloadintent string) error {
 
 	//Construct key and tag to select the entry
 	key := WorkloadIfIntentKey{
 		Project:             project,
 		CompositeApp:        compositeapp,
 		CompositeAppVersion: compositeappversion,
+		DigName:             dig,
 		NetControlIntent:    netcontrolintent,
 		WorkloadIntent:      workloadintent,
 		WorkloadIfIntent:    name,

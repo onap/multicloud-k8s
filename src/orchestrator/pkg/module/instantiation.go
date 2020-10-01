@@ -99,12 +99,12 @@ func NewInstantiationClient() *InstantiationClient {
 func (c InstantiationClient) Approve(p string, ca string, v string, di string) error {
 	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
 	if err != nil {
-		log.Info("DeploymentIntentGroup has no state info ", log.Fields{"DeploymentIntentGroup: ":di})
+		log.Info("DeploymentIntentGroup has no state info ", log.Fields{"DeploymentIntentGroup: ": di})
 		return pkgerrors.Wrap(err, "DeploymentIntentGroup has no state info: "+di)
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		log.Info("Error getting current state from DeploymentIntentGroup stateInfo", log.Fields{"DeploymentIntentGroup ":di})
+		log.Info("Error getting current state from DeploymentIntentGroup stateInfo", log.Fields{"DeploymentIntentGroup ": di})
 		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
 	}
 	switch stateVal {
@@ -222,24 +222,24 @@ func GetSortedTemplateForApp(appName, p, ca, v, rName, cp string, overrideValues
 	return sortedTemplates, err
 }
 
-func calculateDirPath(fp string) string  {
+func calculateDirPath(fp string) string {
 	sa := strings.Split(fp, "/")
 	return "/" + sa[1] + "/" + sa[2] + "/"
 }
 
 func cleanTmpfiles(sortedTemplates []helm.KubernetesResourceTemplate) error {
 	dp := calculateDirPath(sortedTemplates[0].FilePath)
-	for _, st := range sortedTemplates{
+	for _, st := range sortedTemplates {
 		log.Info("Clean up ::", log.Fields{"file: ": st.FilePath})
 		err := os.Remove(st.FilePath)
 		if err != nil {
-			log.Error("Error while deleting file", log.Fields{"file: ":st.FilePath})
+			log.Error("Error while deleting file", log.Fields{"file: ": st.FilePath})
 			return err
 		}
 	}
 	err := os.RemoveAll(dp)
 	if err != nil {
-		log.Error("Error while deleting dir", log.Fields{"Dir: ":dp})
+		log.Error("Error while deleting dir", log.Fields{"Dir: ": dp})
 		return err
 	}
 	log.Info("Clean up temp-dir::", log.Fields{"Dir: ": dp})
@@ -298,7 +298,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 		return pkgerrors.Wrap(err, "Not finding the apps")
 	}
 
-	cca, err := makeAppContextForCompositeApp(p, ca, v, rName)
+	cca, err := makeAppContextForCompositeApp(p, ca, v, rName, di)
 	if err != nil {
 		return err
 	}
@@ -369,7 +369,7 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 			deleteAppContext(context)
 			return pkgerrors.Wrap(err, "Error while verifying resources in app: ")
 		}
-		
+
 	}
 	jappOrderInstr, err := json.Marshal(appOrderInstr)
 	if err != nil {

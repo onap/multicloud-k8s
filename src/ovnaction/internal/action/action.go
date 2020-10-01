@@ -47,11 +47,12 @@ func UpdateAppContext(intentName, appContextId string) error {
 	project := caMeta.Project
 	compositeapp := caMeta.CompositeApp
 	compositeappversion := caMeta.Version
+	deployIntentGroup := caMeta.DeploymentIntentGroup
 
 	// Handle all Workload Intents for the Network Control Intent
-	wis, err := module.NewWorkloadIntentClient().GetWorkloadIntents(project, compositeapp, compositeappversion, intentName)
+	wis, err := module.NewWorkloadIntentClient().GetWorkloadIntents(project, compositeapp, compositeappversion, deployIntentGroup, intentName)
 	if err != nil {
-		return pkgerrors.Wrapf(err, "Error getting Workload Intents for Network Control Intent %v for %v/%v%v not found", intentName, project, compositeapp, compositeappversion)
+		return pkgerrors.Wrapf(err, "Error getting Workload Intents for Network Control Intent %v for %v/%v%v/%v not found", intentName, project, compositeapp, deployIntentGroup, compositeappversion)
 	}
 
 	// Handle all intents (currently just Workload Interface intents) for each Workload Intent
@@ -66,20 +67,22 @@ func UpdateAppContext(intentName, appContextId string) error {
 		wifs, err := module.NewWorkloadIfIntentClient().GetWorkloadIfIntents(project,
 			compositeapp,
 			compositeappversion,
+			deployIntentGroup,
 			intentName,
 			wi.Metadata.Name)
 		if err != nil {
 			return pkgerrors.Wrapf(err,
-				"Error getting Workload Interface Intents for Workload Intent %v under Network Control Intent %v for %v/%v%v not found",
-				wi.Metadata.Name, intentName, project, compositeapp, compositeappversion)
+				"Error getting Workload Interface Intents for Workload Intent %v under Network Control Intent %v for %v/%v%v/%v not found",
+				wi.Metadata.Name, intentName, project, compositeapp, compositeappversion, deployIntentGroup)
 		}
 		if len(wifs) == 0 {
 			log.Warn("No interface intents provided for workload intent", log.Fields{
-				"project":                project,
-				"composite app":          compositeapp,
-				"composite app version":  compositeappversion,
-				"network control intent": intentName,
-				"workload intent":        wi.Metadata.Name,
+				"project":                 project,
+				"composite app":           compositeapp,
+				"composite app version":   compositeappversion,
+				"deployment intent group": deployIntentGroup,
+				"network control intent":  intentName,
+				"workload intent":         wi.Metadata.Name,
 			})
 			continue
 		}
@@ -91,14 +94,15 @@ func UpdateAppContext(intentName, appContextId string) error {
 				strings.Join([]string{wi.Spec.WorkloadResource, wi.Spec.Type}, "+"))
 			if err != nil {
 				log.Warn("App Context resource handle not found", log.Fields{
-					"project":                project,
-					"composite app":          compositeapp,
-					"composite app version":  compositeappversion,
-					"network control intent": intentName,
-					"workload name":          wi.Metadata.Name,
-					"app":                    wi.Spec.AppName,
-					"resource":               wi.Spec.WorkloadResource,
-					"resource type":          wi.Spec.Type,
+					"project":                 project,
+					"composite app":           compositeapp,
+					"composite app version":   compositeappversion,
+					"deployment intent group": deployIntentGroup,
+					"network control intent":  intentName,
+					"workload name":           wi.Metadata.Name,
+					"app":                     wi.Spec.AppName,
+					"resource":                wi.Spec.WorkloadResource,
+					"resource type":           wi.Spec.Type,
 				})
 				continue
 			}

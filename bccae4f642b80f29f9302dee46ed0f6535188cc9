@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fbb0af2_fb99029b",
+        "filename": "deployments/helm/v2/emco/dcm/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-10-01T17:55:19Z",
+      "side": 1,
+      "message": "Image needs to be pushed.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 25
+      },
+      "revId": "bccae4f642b80f29f9302dee46ed0f6535188cc9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

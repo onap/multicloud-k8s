@@ -31,8 +31,10 @@ function delete_resource_nox {
 
 master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
     awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
-rsync_service_port=30441
-rsync_service_host="$master_ip"
+#rsync_service_port=30441
+rsync_service_port=9041
+#rsync_service_host="$master_ip"
+rsync_service_host="rsync"
 base_url_orchestrator=${base_url_orchestrator:-"http://$master_ip:30415/v2"}
 base_url_clm=${base_url_clm:-"http://$master_ip:30461/v2"}
 
@@ -407,8 +409,6 @@ function deleteOrchestratorData {
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
 
-    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
-
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}"
@@ -416,6 +416,7 @@ function deleteOrchestratorData {
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${prometheus_profile_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${collectd_profile_name}"
 
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}"
 

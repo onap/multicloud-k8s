@@ -22,8 +22,8 @@ import (
 	"io"
 	"net/http"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
+	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	pkgerrors "github.com/pkg/errors"
 
 	"github.com/gorilla/mux"
@@ -90,6 +90,7 @@ func (h workloadifintentHandler) createHandler(w http.ResponseWriter, r *http.Re
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 	workloadIntent := vars["workload-intent"]
 
@@ -105,10 +106,10 @@ func (h workloadifintentHandler) createHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	err, httpError := validation.ValidateJsonSchemaData(netIfJSONFile, wif)
-if err != nil {
-	http.Error(w, err.Error(), httpError)
-	return
-}
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
+		return
+	}
 
 	// Name is required.
 	if wif.Metadata.Name == "" {
@@ -127,7 +128,7 @@ if err != nil {
 		return
 	}
 
-	ret, err := h.client.CreateWorkloadIfIntent(wif, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent, false)
+	ret, err := h.client.CreateWorkloadIfIntent(wif, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, workloadIntent, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -150,6 +151,7 @@ func (h workloadifintentHandler) putHandler(w http.ResponseWriter, r *http.Reque
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 	workloadIntent := vars["workload-intent"]
 
@@ -188,7 +190,7 @@ func (h workloadifintentHandler) putHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	ret, err := h.client.CreateWorkloadIfIntent(wif, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent, true)
+	ret, err := h.client.CreateWorkloadIfIntent(wif, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, workloadIntent, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -211,19 +213,20 @@ func (h workloadifintentHandler) getHandler(w http.ResponseWriter, r *http.Reque
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 	workloadIntent := vars["workload-intent"]
 	var ret interface{}
 	var err error
 
 	if len(name) == 0 {
-		ret, err = h.client.GetWorkloadIfIntents(project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
+		ret, err = h.client.GetWorkloadIfIntents(project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, workloadIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
-		ret, err = h.client.GetWorkloadIfIntent(name, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
+		ret, err = h.client.GetWorkloadIfIntent(name, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, workloadIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -246,10 +249,11 @@ func (h workloadifintentHandler) deleteHandler(w http.ResponseWriter, r *http.Re
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 	workloadIntent := vars["workload-intent"]
 
-	err := h.client.DeleteWorkloadIfIntent(name, project, compositeApp, compositeAppVersion, netControlIntent, workloadIntent)
+	err := h.client.DeleteWorkloadIfIntent(name, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, workloadIntent)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

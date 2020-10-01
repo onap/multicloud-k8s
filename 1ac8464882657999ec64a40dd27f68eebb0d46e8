@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a8d97db_048a159b",
+        "filename": "src/orchestrator/pkg/module/generic_placement_intent.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-10-01T05:50:54Z",
+      "side": 1,
+      "message": "As I recall, these key strings are important for how the mongo parent/child relationship works - and they need to be consistent across files.  deployment_intent_groups.go uses \"deploymentintentgroup\".",
+      "revId": "1ac8464882657999ec64a40dd27f68eebb0d46e8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

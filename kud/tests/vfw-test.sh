@@ -364,9 +364,6 @@ generic_placement_intent_data="$(cat <<EOF
       "description":"${generic_placement_intent_name}",
       "userData1":"${generic_placement_intent_name}",
       "userData2":"${generic_placement_intent_name}"
-   },
-   "spec":{
-      "logical-cloud":"unused_logical_cloud"
    }
 }
 EOF
@@ -459,6 +456,7 @@ deployment_intent_group_data="$(cat <<EOF
    "spec":{
       "profile":"${vfw_composite_profile_name}",
       "version":"${release}",
+      "logical-cloud":"unused_logical_cloud",
       "override-values":[
          {
             "app-name":"${packetgen_app_name}",
@@ -715,31 +713,31 @@ EOF
 
 function createOvnactionData {
     call_api -d "${vfw_ovnaction_intent_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent"
 
     call_api -d "${packetgen_workload_intent_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents"
     call_api -d "${firewall_workload_intent_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents"
     call_api -d "${sink_workload_intent_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents"
 
     call_api -d "${packetgen_emco_interface_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces"
     call_api -d "${packetgen_unprotected_interface_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces"
 
     call_api -d "${firewall_emco_interface_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces"
     call_api -d "${firewall_unprotected_interface_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces"
     call_api -d "${firewall_protected_interface_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces"
 
     call_api -d "${sink_emco_interface_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces"
     call_api -d "${sink_protected_interface_data}" \
-             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces"
+             "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces"
 }
 
 function createOrchData {
@@ -778,25 +776,26 @@ function createOrchData {
              -F "file=@${sink_profile_file}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/composite-profiles/${vfw_composite_profile_name}/profiles"
 
-    print_msg "create the generic placement intent"
-    call_api -d "${generic_placement_intent_data}" \
-             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents"
-
-    print_msg "add the vfw app placement intents to the generic placement intent"
-    call_api -d "${packetgen_placement_intent_data}" \
-             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
-    call_api -d "${firewall_placement_intent_data}" \
-             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
-    call_api -d "${sink_placement_intent_data}" \
-             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
-
-    createOvnactionData
-
     print_msg "create the deployment intent group"
     call_api -d "${deployment_intent_group_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups"
     call_api -d "${deployment_intents_in_group_data}" \
              "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents"
+
+    print_msg "create the generic placement intent"
+    call_api -d "${generic_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents"
+
+    print_msg "add the vfw app placement intents to the generic placement intent"
+    call_api -d "${packetgen_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
+    call_api -d "${firewall_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
+    call_api -d "${sink_placement_intent_data}" \
+             "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents"
+
+    createOvnactionData
+
 }
 
 function createNcmData {
@@ -824,21 +823,21 @@ function createData {
 }
 
 function getOvnactionData {
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}"
 
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}"
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}"
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}"
 
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces/${packetgen_emco_interface_name}"
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces/${packetgen_unprotected_interface_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces/${packetgen_emco_interface_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces/${packetgen_unprotected_interface_name}"
 
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_emco_interface_name}"
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_unprotected_interface_name}"
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_protected_interface_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_emco_interface_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_unprotected_interface_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_protected_interface_name}"
 
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces/${sink_emco_interface_name}"
-    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces/${sink_protected_interface_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces/${sink_emco_interface_name}"
+    call_api_nox "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces/${sink_protected_interface_name}"
 }
 
 function getOrchData {
@@ -860,11 +859,11 @@ function getOrchData {
     call_api_nox -H "Accept: application/json" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/composite-profiles/${vfw_composite_profile_name}/profiles/${firewall_profile_name}"
     call_api_nox -H "Accept: application/json" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/composite-profiles/${vfw_composite_profile_name}/profiles/${sink_profile_name}"
 
-    call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}"
+    call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}"
 
-    call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${packetgen_placement_intent_name}"
-    call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${firewall_placement_intent_name}"
-    call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${sink_placement_intent_name}"
+    call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${packetgen_placement_intent_name}"
+    call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${firewall_placement_intent_name}"
+    call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${sink_placement_intent_name}"
 
     call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
     call_api_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
@@ -893,30 +892,33 @@ function getData {
 }
 
 function deleteOvnactionData {
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces/${sink_protected_interface_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces/${sink_emco_interface_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_protected_interface_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_unprotected_interface_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_emco_interface_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces/${packetgen_unprotected_interface_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces/${packetgen_emco_interface_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}"
-    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/network-controller-intent/${vfw_ovnaction_intent_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces/${sink_protected_interface_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}/interfaces/${sink_emco_interface_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_protected_interface_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_unprotected_interface_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}/interfaces/${firewall_emco_interface_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces/${packetgen_unprotected_interface_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}/interfaces/${packetgen_emco_interface_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${sink_workload_intent_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${firewall_workload_intent_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}/workload-intents/${packetgen_workload_intent_name}"
+    delete_resource "${base_url_ovnaction}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/network-controller-intent/${vfw_ovnaction_intent_name}"
 }
 
 function deleteOrchData {
     delete_resource "${base_url_orchestrator}/controllers/${rsynccontrollername}"
     delete_resource "${base_url_orchestrator}/controllers/${ovnactioncontrollername}"
 
+
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${sink_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${firewall_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${packetgen_placement_intent_name}"
+    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}"
+
+    deleteOvnactionData
+
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
-
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${sink_placement_intent_name}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${firewall_placement_intent_name}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${packetgen_placement_intent_name}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/generic-placement-intents/${generic_placement_intent_name}"
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/composite-profiles/${vfw_composite_profile_name}/profiles/${sink_profile_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/composite-profiles/${vfw_composite_profile_name}/profiles/${firewall_profile_name}"
@@ -926,8 +928,6 @@ function deleteOrchData {
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/apps/${sink_app_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/apps/${firewall_app_name}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/apps/${packetgen_app_name}"
-
-    deleteOvnactionData
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}"
     delete_resource "${base_url_orchestrator}/projects/${projectname}"
@@ -981,7 +981,7 @@ function instantiateVfw {
 }
 
 function statusVfw {
-    call_api "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/status"
+    call_api "${base_url_orchestrator}/projects/${projectname}/composite-apps/${vfw_compositeapp_name}/${vfw_compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/status${query}"
 }
 
 function usage {
@@ -1053,7 +1053,7 @@ function check_for_env_settings {
     fi
 }
 
-if [ "$#" -ne 1 ] ; then
+if [ "$#" -lt 1 ] ; then
     usage
 fi
 
@@ -1067,6 +1067,11 @@ case "$1" in
     "apply" ) applyNcmData ;;
     "instantiate" ) instantiateVfw ;;
     "terminate" ) terminateVfw ;;
-    "status" ) statusVfw ;;
+    "status" )
+    query=""
+    if [ "$#" -eq 2 ] ; then
+        query="?$2"
+    fi
+    statusVfw ${query} ;;
     *) usage ;;
 esac

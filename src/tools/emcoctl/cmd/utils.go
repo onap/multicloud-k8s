@@ -332,7 +332,7 @@ func GetURL(anchor string) (string, error) {
 			baseUrl = GetDcmURL()
 			break
 		}
-		if len(s) >= 6 && s[5] == "network-controller-intent" {
+		if len(s) >= 8 && s[7] == "network-controller-intent" {
 			baseUrl = GetOvnactionURL()
 			break
 		}

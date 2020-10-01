@@ -22,8 +22,8 @@ import (
 	"io"
 	"net/http"
 
-	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
+	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	pkgerrors "github.com/pkg/errors"
 
 	"github.com/gorilla/mux"
@@ -71,6 +71,7 @@ func (h workloadintentHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 
 	err := json.NewDecoder(r.Body).Decode(&wi)
@@ -85,10 +86,10 @@ func (h workloadintentHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	err, httpError := validation.ValidateJsonSchemaData(workloadIntJSONFile, wi)
-if err != nil {
-	http.Error(w, err.Error(), httpError)
-	return
-}
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
+		return
+	}
 
 	// Name is required.
 	if wi.Metadata.Name == "" {
@@ -102,7 +103,7 @@ if err != nil {
 		return
 	}
 
-	ret, err := h.client.CreateWorkloadIntent(wi, project, compositeApp, compositeAppVersion, netControlIntent, false)
+	ret, err := h.client.CreateWorkloadIntent(wi, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -125,6 +126,7 @@ func (h workloadintentHandler) putHandler(w http.ResponseWriter, r *http.Request
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 
 	err := json.NewDecoder(r.Body).Decode(&wi)
@@ -157,7 +159,7 @@ func (h workloadintentHandler) putHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	ret, err := h.client.CreateWorkloadIntent(wi, project, compositeApp, compositeAppVersion, netControlIntent, true)
+	ret, err := h.client.CreateWorkloadIntent(wi, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -180,18 +182,19 @@ func (h workloadintentHandler) getHandler(w http.ResponseWriter, r *http.Request
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 	var ret interface{}
 	var err error
 
 	if len(name) == 0 {
-		ret, err = h.client.GetWorkloadIntents(project, compositeApp, compositeAppVersion, netControlIntent)
+		ret, err = h.client.GetWorkloadIntents(project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
-		ret, err = h.client.GetWorkloadIntent(name, project, compositeApp, compositeAppVersion, netControlIntent)
+		ret, err = h.client.GetWorkloadIntent(name, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -214,9 +217,10 @@ func (h workloadintentHandler) deleteHandler(w http.ResponseWriter, r *http.Requ
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	netControlIntent := vars["net-control-intent"]
 
-	err := h.client.DeleteWorkloadIntent(name, project, compositeApp, compositeAppVersion, netControlIntent)
+	err := h.client.DeleteWorkloadIntent(name, project, compositeApp, compositeAppVersion, deployIntentGroup, netControlIntent)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

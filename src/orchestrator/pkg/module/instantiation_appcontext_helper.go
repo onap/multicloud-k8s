@@ -46,7 +46,7 @@ type contextForCompositeApp struct {
 }
 
 // makeAppContext creates an appContext for a compositeApp and returns the output as contextForCompositeApp
-func makeAppContextForCompositeApp(p, ca, v, rName string) (contextForCompositeApp, error) {
+func makeAppContextForCompositeApp(p, ca, v, rName, dig string) (contextForCompositeApp, error) {
 	context := appcontext.AppContext{}
 	ctxval, err := context.InitAppContext()
 	if err != nil {
@@ -56,14 +56,14 @@ func makeAppContextForCompositeApp(p, ca, v, rName string) (contextForCompositeA
 	if err != nil {
 		return contextForCompositeApp{}, pkgerrors.Wrap(err, "Error creating CompositeApp handle")
 	}
-	err = context.AddCompositeAppMeta(appcontext.CompositeAppMeta{Project: p, CompositeApp: ca, Version: v, Release: rName})
+	err = context.AddCompositeAppMeta(appcontext.CompositeAppMeta{Project: p, CompositeApp: ca, Version: v, Release: rName, DeploymentIntentGroup: dig})
 	if err != nil {
 		return contextForCompositeApp{}, pkgerrors.Wrap(err, "Error Adding CompositeAppMeta")
 	}
 
 	m, err := context.GetCompositeAppMeta()
 
-	log.Info(":: The meta data stored in the runtime context :: ", log.Fields{"Project": m.Project, "CompositeApp": m.CompositeApp, "Version": m.Version, "Release": m.Release})
+	log.Info(":: The meta data stored in the runtime context :: ", log.Fields{"Project": m.Project, "CompositeApp": m.CompositeApp, "Version": m.Version, "Release": m.Release, "DeploymentIntentGroup": m.DeploymentIntentGroup})
 
 	cca := contextForCompositeApp{context: context, ctxval: ctxval, compositeAppHandle: compositeHandle}
 

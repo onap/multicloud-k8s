@@ -22,17 +22,14 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
 	moduleLib "github.com/onap/multicloud-k8s/src/ovnaction/pkg/module"
 	pkgerrors "github.com/pkg/errors"
-	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/validation"
-
 
 	"github.com/gorilla/mux"
 )
 
 var netCntIntJSONFile string = "json-schemas/metadata.json"
-
-
 
 // Used to store backend implementations objects
 // Also simplifies mocking for unit testing purposes
@@ -59,6 +56,7 @@ func (h netcontrolintentHandler) createHandler(w http.ResponseWriter, r *http.Re
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 
 	err := json.NewDecoder(r.Body).Decode(&nci)
 
@@ -72,11 +70,10 @@ func (h netcontrolintentHandler) createHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	err, httpError := validation.ValidateJsonSchemaData(netCntIntJSONFile, nci)
-if err != nil {
-	http.Error(w, err.Error(), httpError)
-	return
-}
-	
+	if err != nil {
+		http.Error(w, err.Error(), httpError)
+		return
+	}
 
 	// Name is required.
 	if nci.Metadata.Name == "" {
@@ -90,7 +87,7 @@ if err != nil {
 		return
 	}
 
-	ret, err := h.client.CreateNetControlIntent(nci, project, compositeApp, compositeAppVersion, false)
+	ret, err := h.client.CreateNetControlIntent(nci, project, compositeApp, compositeAppVersion, deployIntentGroup, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -113,6 +110,7 @@ func (h netcontrolintentHandler) putHandler(w http.ResponseWriter, r *http.Reque
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 
 	err := json.NewDecoder(r.Body).Decode(&nci)
 
@@ -144,7 +142,7 @@ func (h netcontrolintentHandler) putHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	ret, err := h.client.CreateNetControlIntent(nci, project, compositeApp, compositeAppVersion, true)
+	ret, err := h.client.CreateNetControlIntent(nci, project, compositeApp, compositeAppVersion, deployIntentGroup, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -167,17 +165,18 @@ func (h netcontrolintentHandler) getHandler(w http.ResponseWriter, r *http.Reque
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 	var ret interface{}
 	var err error
 
 	if len(name) == 0 {
-		ret, err = h.client.GetNetControlIntents(project, compositeApp, compositeAppVersion)
+		ret, err = h.client.GetNetControlIntents(project, compositeApp, compositeAppVersion, deployIntentGroup)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
-		ret, err = h.client.GetNetControlIntent(name, project, compositeApp, compositeAppVersion)
+		ret, err = h.client.GetNetControlIntent(name, project, compositeApp, compositeAppVersion, deployIntentGroup)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -200,42 +199,9 @@ func (h netcontrolintentHandler) deleteHandler(w http.ResponseWriter, r *http.Re
 	project := vars["project"]
 	compositeApp := vars["composite-app-name"]
 	compositeAppVersion := vars["version"]
+	deployIntentGroup := vars["deployment-intent-group-name"]
 
-	err := h.client.DeleteNetControlIntent(name, project, compositeApp, compositeAppVersion)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
-// Apply handles POST operations to Apply a particular NetControlIntent to the App Context
-// TODO: This is a test API - it can be removed once the orchestrator has been implemented to
-// invoke the appcontext update via grpc.
-func (h netcontrolintentHandler) applyHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	name := vars["name"]
-	project := vars["project"]
-	compositeApp := vars["composite-app-name"]
-	compositeAppVersion := vars["version"]
-
-	var aci struct {
-		AppContextId string `json:"appContextId"`
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&aci)
-
-	switch {
-	case err == io.EOF:
-		http.Error(w, "Empty body", http.StatusBadRequest)
-		return
-	case err != nil:
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
-		return
-	}
-
-	err = h.client.ApplyNetControlIntent(name, project, compositeApp, compositeAppVersion, aci.AppContextId)
+	err := h.client.DeleteNetControlIntent(name, project, compositeApp, compositeAppVersion, deployIntentGroup)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

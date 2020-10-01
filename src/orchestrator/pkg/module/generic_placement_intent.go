@@ -18,6 +18,7 @@ package module
 
 import (
 	"encoding/json"
+
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 
 	pkgerrors "github.com/pkg/errors"
@@ -35,9 +36,6 @@ type GenIntentMetaData struct {
 	UserData1   string `json:"userData1"`
 	UserData2   string `json:"userData2"`
 }
-
-
-
 
 // GenericPlacementIntentManager is an interface which exposes the GenericPlacementIntentManager functionality
 type GenericPlacementIntentManager interface {
@@ -57,7 +55,7 @@ type GenericPlacementIntentKey struct {
 	Project      string `json:"project"`
 	CompositeApp string `json:"compositeapp"`
 	Version      string `json:"compositeappversion"`
-	DigName      string `json:"deploymentintentgroupname"`
+	DigName      string `json:"deploymentintentgroup"`
 }
 
 // We will use json marshalling to convert to string to
@@ -112,13 +110,12 @@ func (c *GenericPlacementIntentClient) CreateGenericPlacementIntent(g GenericPla
 		return GenericPlacementIntent{}, pkgerrors.New("Unable to find the deployment-intent-group-name")
 	}
 
-
 	gkey := GenericPlacementIntentKey{
 		Name:         g.MetaData.Name,
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
-		DigName: digName,
+		DigName:      digName,
 	}
 
 	err = db.DBconn.Insert(c.storeName, gkey, nil, c.tagMetaData, g)
@@ -136,7 +133,7 @@ func (c *GenericPlacementIntentClient) GetGenericPlacementIntent(i string, p str
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
-		DigName: digName,
+		DigName:      digName,
 	}
 
 	result, err := db.DBconn.Find(c.storeName, key, c.tagMetaData)
@@ -177,8 +174,7 @@ func (c *GenericPlacementIntentClient) GetAllGenericPlacementIntents(p string, c
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
-		DigName: digName,
-		
+		DigName:      digName,
 	}
 
 	var gpList []GenericPlacementIntent
@@ -207,7 +203,7 @@ func (c *GenericPlacementIntentClient) DeleteGenericPlacementIntent(i string, p 
 		Project:      p,
 		CompositeApp: ca,
 		Version:      v,
-		DigName: digName,
+		DigName:      digName,
 	}
 
 	err := db.DBconn.Remove(c.storeName, key)

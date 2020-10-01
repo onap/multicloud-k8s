@@ -54,6 +54,7 @@ type ChainKey struct {
 	Project             string `json:"project"`
 	CompositeApp        string `json:"compositeapp"`
 	CompositeAppVersion string `json:"compositeappversion"`
+	DigName             string `json:"deploymentintentgroup"`
 	NetControlIntent    string `json:"netcontrolintent"`
 	NetworkChain        string `json:"networkchain"`
 }
@@ -76,10 +77,10 @@ const ChainingKind = "NetworkChaining"
 
 // ChainManager is an interface exposing the Chain functionality
 type ChainManager interface {
-	CreateChain(ch Chain, pr, ca, caver, netctrlint string, exists bool) (Chain, error)
-	GetChain(name, pr, ca, caver, netctrlint string) (Chain, error)
-	GetChains(pr, ca, caver, netctrlint string) ([]Chain, error)
-	DeleteChain(name, pr, ca, caver, netctrlint string) error
+	CreateChain(ch Chain, pr, ca, caver, dig, netctrlint string, exists bool) (Chain, error)
+	GetChain(name, pr, ca, caver, dig, netctrlint string) (Chain, error)
+	GetChains(pr, ca, caver, dig, netctrlint string) ([]Chain, error)
+	DeleteChain(name, pr, ca, caver, dig, netctrlint string) error
 }
 
 // ChainClient implements the Manager
@@ -100,24 +101,25 @@ func NewChainClient() *ChainClient {
 }
 
 // CreateChain - create a new Chain
-func (v *ChainClient) CreateChain(ch Chain, pr, ca, caver, netctrlint string, exists bool) (Chain, error) {
+func (v *ChainClient) CreateChain(ch Chain, pr, ca, caver, dig, netctrlint string, exists bool) (Chain, error) {
 	//Construct key and tag to select the entry
 	key := ChainKey{
 		Project:             pr,
 		CompositeApp:        ca,
 		CompositeAppVersion: caver,
+		DigName:             dig,
 		NetControlIntent:    netctrlint,
 		NetworkChain:        ch.Metadata.Name,
 	}
 
 	//Check if the Network Control Intent exists
-	_, err := NewNetControlIntentClient().GetNetControlIntent(netctrlint, pr, ca, caver)
+	_, err := NewNetControlIntentClient().GetNetControlIntent(netctrlint, pr, ca, caver, dig)
 	if err != nil {
 		return Chain{}, pkgerrors.Errorf("Network Control Intent %v does not exist", netctrlint)
 	}
 
 	//Check if this Chain already exists
-	_, err = v.GetChain(ch.Metadata.Name, pr, ca, caver, netctrlint)
+	_, err = v.GetChain(ch.Metadata.Name, pr, ca, caver, dig, netctrlint)
 	if err == nil && !exists {
 		return Chain{}, pkgerrors.New("Chain already exists")
 	}
@@ -131,12 +133,13 @@ func (v *ChainClient) CreateChain(ch Chain, pr, ca, caver, netctrlint string, ex
 }
 
 // GetChain returns the Chain for corresponding name
-func (v *ChainClient) GetChain(name, pr, ca, caver, netctrlint string) (Chain, error) {
+func (v *ChainClient) GetChain(name, pr, ca, caver, dig, netctrlint string) (Chain, error) {
 	//Construct key and tag to select the entry
 	key := ChainKey{
 		Project:             pr,
 		CompositeApp:        ca,
 		CompositeAppVersion: caver,
+		DigName:             dig,
 		NetControlIntent:    netctrlint,
 		NetworkChain:        name,
 	}
@@ -160,12 +163,13 @@ func (v *ChainClient) GetChain(name, pr, ca, caver, netctrlint string) (Chain, e
 }
 
 // GetChains returns all of the Chains for for the given network control intent
-func (v *ChainClient) GetChains(pr, ca, caver, netctrlint string) ([]Chain, error) {
+func (v *ChainClient) GetChains(pr, ca, caver, dig, netctrlint string) ([]Chain, error) {
 	//Construct key and tag to select the entry
 	key := ChainKey{
 		Project:             pr,
 		CompositeApp:        ca,
 		CompositeAppVersion: caver,
+		DigName:             dig,
 		NetControlIntent:    netctrlint,
 		NetworkChain:        "",
 	}
@@ -189,13 +193,14 @@ func (v *ChainClient) GetChains(pr, ca, caver, netctrlint string) ([]Chain, erro
 }
 
 // DeleteChain deletes the Chain from the database
-func (v *ChainClient) DeleteChain(name, pr, ca, caver, netctrlint string) error {
+func (v *ChainClient) DeleteChain(name, pr, ca, caver, dig, netctrlint string) error {
 
 	//Construct key and tag to select the entry
 	key := ChainKey{
 		Project:             pr,
 		CompositeApp:        ca,
 		CompositeAppVersion: caver,
+		DigName:             dig,
 		NetControlIntent:    netctrlint,
 		NetworkChain:        name,
 	}

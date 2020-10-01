@@ -39,20 +39,6 @@ type Store interface {
 	// Unmarshal implements any unmarshaling needed for the database
 	Unmarshal(inp []byte, out interface{}) error
 
-	// Creates a new master document with key and links data with tag and
-	// creates a pointer(row) to the newly added data in the master table
-	Create(table string, key Key, tag string, data interface{}) error
-
-	// Reads data for a particular key with specific tag.
-	Read(table string, key Key, tag string) ([]byte, error)
-
-	// Update data for particular key with specific tag
-	Update(table string, key Key, tag string, data interface{}) error
-
-	// Deletes a specific tag data for key.
-	// TODO: If tag is empty, it will delete all tags under key.
-	Delete(table string, key Key, tag string) error
-
 	// Inserts and Updates a tag with key and also adds query fields if provided
 	Insert(coll string, key Key, query interface{}, tag string, data interface{}) error
 

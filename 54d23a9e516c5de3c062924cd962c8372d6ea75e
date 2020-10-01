@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "51def5ca_646de815",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 2832,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-10-01T01:09:33Z",
+      "side": 1,
+      "message": "This will be removed in next patchset as implementation will change again.",
+      "range": {
+        "startLine": 2831,
+        "startChar": 0,
+        "endLine": 2832,
+        "endChar": 61
+      },
+      "revId": "54d23a9e516c5de3c062924cd962c8372d6ea75e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

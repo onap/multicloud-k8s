@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "98f3ff16_6f50484a",
+        "filename": "src/tools/emcoctl/examples/emco-cfg.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-10-01T23:28:33Z",
+      "side": 1,
+      "message": "9077",
+      "range": {
+        "startLine": 15,
+        "startChar": 10,
+        "endLine": 15,
+        "endChar": 14
+      },
+      "revId": "74933657c90c830d10b4db1dee751a5d518d040f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -46,6 +46,15 @@ spec:
         tier: node
         app: sriovdp
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/network-sriov.capable
+                operator: In
+                values:
+                - "true"
       hostNetwork: true
       hostPID: true
       nodeSelector:

@@ -9,21 +9,19 @@
 ##############################################################################
 
 - import_playbook: preconfigure-sriov.yml
-
 - hosts: localhost
-  become: yes
+  vars:
+    sriov_enabled: "{{ groups['kube-node'] | map('extract', hostvars, ['SRIOV_ENABLED']) | select() | list | length > 0 }}"
   tasks:
-    - debug:
-        var: SRIOV_NODE
     - name: Apply Multus
       shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/multus-daemonset.yml"
-      when: SRIOV_NODE
+      when: sriov_enabled
     - name: Apply SRIOV CNI
       shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/sriov-cni.yml"
-      when: SRIOV_NODE
+      when: sriov_enabled
     - name: Apply SRIOV DaemonSet
       shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/sriov-daemonset.yml"
-      when: SRIOV_NODE
+      when: sriov_enabled
     - name: Apply SRIOV Network Attachment definition
       shell: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/sriov-nad.yml"
-      when: SRIOV_NODE
+      when: sriov_enabled

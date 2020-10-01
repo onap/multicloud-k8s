@@ -1,0 +1,105 @@
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+   name: rsync
+spec:
+  host: localhost
+  port: 9018
+
+---
+#creating cluster provider
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers
+metadata :
+   name: cp-1
+
+---
+#creating cluster
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/cp-1/clusters
+metadata :
+   name: c1
+file:
+  # Replace with actual path
+  kubeconfig
+
+---
+#create project
+version: emco/v2
+resourceContext:
+  anchor: projects
+metadata :
+   name: proj1
+
+---
+#create logical cloud
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/logical-clouds
+metadata:
+  name: lc1
+spec:
+  namespace: ns1
+  user:
+    user-name: user-1
+    type: certificate
+    user-permissions:
+    - permission-name: permission-1
+      apiGroups:
+      - ""
+      resources:
+      - secrets
+      - pods
+      verbs:
+      - get
+      - watch
+      - list
+      - create
+
+---
+#create cluster reference
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/logical-clouds/lc1/cluster-references
+metadata:
+  name: lc-cl-1
+spec:
+  cluster-provider: cp-1
+  cluster-name: c1
+  loadbalancer-ip: "0.0.0.0"
+
+---
+#create cluster quotas
+version: emco/v2
+resourceContext:
+  anchor: projects/proj1/logical-clouds/lc1/cluster-quotas
+metadata:
+    name: quota-1
+spec:
+    limits.cpu: '400'
+    limits.memory: 1000Gi
+    requests.cpu: '300'
+    requests.memory: 900Gi
+    requests.storage: 500Gi
+    requests.ephemeral-storage: '500'
+    limits.ephemeral-storage: '500'
+    persistentvolumeclaims: '500'
+    pods: '500'
+    configmaps: '1000'
+    replicationcontrollers: '500'
+    resourcequotas: '500'
+    services: '500'
+    services.loadbalancers: '500'
+    services.nodeports: '500'
+    secrets: '500'
+    count/replicationcontrollers: '500'
+    count/deployments.apps: '500'
+    count/replicasets.apps: '500'
+    count/statefulsets.apps: '500'
+    count/jobs.batch: '500'
+    count/cronjobs.batch: '500'
+    count/deployments.extensions: '500'

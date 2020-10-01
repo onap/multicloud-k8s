@@ -25,8 +25,8 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
-	"gopkg.in/yaml.v3"
 	pkgerrors "github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 var inputFiles []string
@@ -53,9 +53,9 @@ type emcoRes struct {
 }
 
 type emcoBody struct {
-	Meta Metadata               `json:"metadata,omitempty"`
-	Label string                `json:"label-name,omitempty"`
-	Spec map[string]interface{} `json:"spec,omitempty"`
+	Meta  Metadata               `json:"metadata,omitempty"`
+	Label string                 `json:"label-name,omitempty"`
+	Spec  map[string]interface{} `json:"spec,omitempty"`
 }
 
 type emcoCompositeAppSpec struct {
@@ -67,6 +67,7 @@ type Resources struct {
 	body   []byte
 	file   string
 }
+
 // RestyClient to use with CLI
 type RestyClient struct {
 	client *resty.Client
@@ -141,7 +142,7 @@ func (r RestyClient) RestClientPost(anchor string, body []byte) error {
 		return err
 	}
 	fmt.Println("URL:", anchor, "Response Code:", resp.StatusCode(), "Response:", resp)
-	if (resp.StatusCode() >= 201 && resp.StatusCode() <= 299) {
+	if resp.StatusCode() >= 201 && resp.StatusCode() <= 299 {
 		return nil
 	}
 	return pkgerrors.Errorf("Server Post Error")
@@ -174,7 +175,7 @@ func (r RestyClient) RestClientMultipartPost(anchor string, body []byte, file st
 		return err
 	}
 	fmt.Println("URL:", anchor, "Response Code:", resp.StatusCode(), "Response:", resp)
-	if (resp.StatusCode() >= 201 && resp.StatusCode() <= 299) {
+	if resp.StatusCode() >= 201 && resp.StatusCode() <= 299 {
 		return nil
 	}
 	return pkgerrors.Errorf("Server Multipart Post Error")
@@ -248,6 +249,7 @@ func (r RestyClient) RestClientGet(anchor string, body []byte) error {
 
 	return r.RestClientGetAnchor(anchor)
 }
+
 // RestClientDeleteAnchor returns all resource in the input file
 func (r RestyClient) RestClientDeleteAnchor(anchor string) error {
 	url, err := GetURL(anchor)
@@ -262,6 +264,7 @@ func (r RestyClient) RestClientDeleteAnchor(anchor string) error {
 	fmt.Println("URL:", anchor, "Response Code:", resp.StatusCode(), "Response:", resp)
 	return nil
 }
+
 // RestClientDelete calls rest delete command
 func (r RestyClient) RestClientDelete(anchor string, body []byte) error {
 
@@ -306,6 +309,7 @@ func (r RestyClient) RestClientDelete(anchor string, body []byte) error {
 	}
 	return r.RestClientDeleteAnchor(anchor)
 }
+
 // GetURL reads the configuration file to get URL
 func GetURL(anchor string) (string, error) {
 	var baseUrl string
@@ -324,13 +328,19 @@ func GetURL(anchor string) (string, error) {
 	case "controllers":
 		baseUrl = GetOrchestratorURL()
 	case "projects":
+		if len(s) >= 3 && s[2] == "logical-clouds" {
+			baseUrl = GetDcmURL()
+			break
+		}
 		if len(s) >= 6 && s[5] == "network-controller-intent" {
 			baseUrl = GetOvnactionURL()
-		} else {
-			baseUrl = GetOrchestratorURL()
+			break
 		}
+		// All other paths go to Orchestrator
+		baseUrl = GetOrchestratorURL()
 	default:
 		return "", fmt.Errorf("Invalid Anchor")
 	}
+	fmt.Printf(baseUrl)
 	return (baseUrl + "/" + anchor), nil
 }

@@ -68,6 +68,28 @@ func getRes(ac appcontext.AppContext, name string, app string, cluster string) (
 	return byteRes, sh, nil
 }
 
+func getSubResApprove(ac appcontext.AppContext, name string, app string, cluster string) ([]byte, interface{}, error) {
+	var byteRes []byte
+	rh, err := ac.GetResourceHandle(app, cluster, name)
+	if err != nil {
+		return nil, nil, err
+	}
+	sh, err := ac.GetLevelHandle(rh, "subresource/approval")
+	if err != nil {
+		return nil, nil, err
+	}
+	resval, err := ac.GetValue(sh)
+	if err != nil {
+		return nil, sh, err
+	}
+	if resval != "" {
+		byteRes = []byte(fmt.Sprintf("%v", resval.(interface{})))
+	} else {
+		return nil, sh, pkgerrors.Errorf("SubResource value is nil %s", name)
+	}
+	return byteRes, sh, nil
+}
+
 func terminateResource(ac appcontext.AppContext, c *kubeclient.Client, name string, app string, cluster string, label string) error {
 	res, sh, err := getRes(ac, name, app, cluster)
 	if err != nil {
@@ -144,6 +166,22 @@ func instantiateResource(ac appcontext.AppContext, c *kubeclient.Client, name st
 		"cluster":  cluster,
 		"resource": name,
 	})
+
+	// Currently only subresource supported is approval
+	subres, _, err := getSubResApprove(ac, name, app, cluster)
+	if err == nil {
+		result := strings.Split(name, "+")
+		if result[0] == "" {
+			return pkgerrors.Errorf("Resource name is nil %s:", name)
+		}
+		logutils.Info("Approval Subresource::", logutils.Fields{
+			"cluster":  cluster,
+			"resource": result[0],
+			"approval": string(subres),
+		})
+		err = c.Approve(result[0], subres)
+		return err
+	}
 	return nil
 }
 

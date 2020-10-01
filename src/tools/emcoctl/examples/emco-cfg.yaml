@@ -10,3 +10,6 @@
   ovnaction:
     host: localhost
     port: 9018
+  dcm:
+    host: localhost
+    port: 9017

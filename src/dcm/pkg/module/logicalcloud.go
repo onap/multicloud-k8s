@@ -17,6 +17,8 @@
 package module
 
 import (
+	"encoding/json"
+
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
@@ -133,7 +135,7 @@ func (v *LogicalCloudClient) Create(project string, c LogicalCloud) (LogicalClou
 
 	err = v.util.DBInsert(v.storeName, key, nil, v.tagMeta, c)
 	if err != nil {
-		return LogicalCloud{}, pkgerrors.Wrap(err, "Creating DB Entry")
+		return LogicalCloud{}, pkgerrors.Wrap(err, "Error creating DB Entry")
 	}
 
 	return c, nil
@@ -205,12 +207,40 @@ func (v *LogicalCloudClient) Delete(project, logicalCloudName string) error {
 	if err != nil {
 		return pkgerrors.New("Logical Cloud does not exist")
 	}
-	err = v.util.DBRemove(v.storeName, key)
+
+	context, _, err := v.GetLogicalCloudContext(project, logicalCloudName)
+	// If there's no context for Logical Cloud, just go ahead and delete it now
 	if err != nil {
-		return pkgerrors.Wrap(err, "Delete Logical Cloud")
+		err = v.util.DBRemove(v.storeName, key)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error when deleting Logical Cloud")
+		}
+		return nil
 	}
 
-	return nil
+	// Make sure rsync status for this logical cloud is Terminated,
+	// otherwise we can't remove appcontext yet
+	acStatus, _ := getAppContextStatus(context)
+	switch acStatus.Status {
+	case appcontext.AppContextStatusEnum.Terminated:
+		// remove the appcontext
+		err := context.DeleteCompositeApp()
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error deleting AppContext CompositeApp Logical Cloud")
+		}
+
+		err = v.util.DBRemove(v.storeName, key)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error when deleting Logical Cloud")
+		}
+		return nil
+	case appcontext.AppContextStatusEnum.Terminating:
+		return pkgerrors.New("The Logical Cloud can't be deleted yet, it is being terminated.")
+	case appcontext.AppContextStatusEnum.Instantiated:
+		return pkgerrors.New("The Logical Cloud is applied, please terminate first.")
+	default:
+		return pkgerrors.New("The Logical Cloud can't be deleted yet at this point.")
+	}
 }
 
 // Update an entry for the Logical Cloud in the database
@@ -236,7 +266,7 @@ func (v *LogicalCloudClient) Update(project, logicalCloudName string, c LogicalC
 	return c, nil
 }
 
-// GetClusterContext returns the AppContext for corresponding provider and name
+// GetLogicalCloudContext returns the AppContext for corresponding provider and name
 func (v *LogicalCloudClient) GetLogicalCloudContext(project string, name string) (appcontext.AppContext, string, error) {
 	//Construct key and tag to select the entry
 	key := LogicalCloudKey{
@@ -244,12 +274,12 @@ func (v *LogicalCloudClient) GetLogicalCloudContext(project string, name string)
 		Project:          project,
 	}
 
-	value, err := db.DBconn.Find(v.storeName, key, v.tagContext)
+	value, err := v.util.DBFind(v.storeName, key, v.tagContext)
 	if err != nil {
 		return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Get Logical Cloud Context")
 	}
 
-	//value is a byte array
+	//value is a [][]byte
 	if value != nil {
 		ctxVal := string(value[0])
 		var lcc appcontext.AppContext
@@ -321,4 +351,26 @@ func (d DBService) CheckLogicalCloud(project, logicalCloud string) error {
 	}
 
 	return nil
+}
+
+func getAppContextStatus(ac appcontext.AppContext) (*appcontext.AppContextStatus, error) {
+
+	h, err := ac.GetCompositeAppHandle()
+	if err != nil {
+		return nil, err
+	}
+	sh, err := ac.GetLevelHandle(h, "status")
+	if err != nil {
+		return nil, err
+	}
+	s, err := ac.GetValue(sh)
+	if err != nil {
+		return nil, err
+	}
+	acStatus := appcontext.AppContextStatus{}
+	js, _ := json.Marshal(s)
+	json.Unmarshal(js, &acStatus)
+
+	return &acStatus, nil
+
 }

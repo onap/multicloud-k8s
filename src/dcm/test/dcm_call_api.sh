@@ -26,7 +26,7 @@ user="user-1"
 permission="permission-1"
 cluster_provider_name="cp-1"
 cluster_1_name="c1"
-cluster_1_name="c2"
+cluster_2_name="c2"
 lc_cluster_1_name="lc-cl-1"
 lc_cluster_2_name="lc-cl-2"
 quota_name="quota-1"
@@ -134,37 +134,11 @@ quota_data="$(cat << EOF
 EOF
 )"
 
-# Create logical cloud
-printf "\n\nCreating logical cloud data\n\n"
-curl -d "${logical_cloud_data}" -X POST ${logical_cloud_url}
-
-# Associate two clusters with the logical cloud
-printf "\n\nAdding two clusters to logical cloud\n\n"
-curl -d "${cluster_1_data}" -X POST ${cluster_url}
-curl -d "${cluster_2_data}" -X POST ${cluster_url}
-
-# Add resource quota for the logical cloud
-printf "\n\nAdding resource quota for the logical cloud\n\n"
-curl -d "${quota_data}" -X POST ${quota_url}
-
-# Get logical cloud data
-printf "\n\nGetting logical cloud\n\n"
-curl -X GET "${logical_cloud_url}/${logical_cloud_name}"
-
-printf "\n\nGetting clusters info for logical cloud\n\n"
-curl -X GET ${cluster_url}
-
-printf "\n\nGetting first cluster of logical cloud\n"
-curl -X GET ${cluster_url}/${lc_cluster_1_name}
-
-printf "\n\nGetting second cluster of logical cloud\n"
-curl -X GET ${cluster_url}/${lc_cluster_2_name}
-
-printf "\n\nGetting Quota info for the logical cloud\n\n"
-curl -X GET "${quota_url}/${quota_name}"
-
 # Cleanup (delete created resources)
 if [ "$1" == "clean" ]; then
+    printf "\n\nTerminating logical cloud...\n\n"
+    curl -X POST "${logical_cloud_url}/${logical_cloud_name}/terminate"
+
     printf "\n\nDeleting Quota info for the logical cloud\n\n"
     curl -X DELETE "${quota_url}/${quota_name}"
 
@@ -174,4 +148,32 @@ if [ "$1" == "clean" ]; then
 
     printf "\n\nDeleting logical cloud data\n\n"
     curl -X DELETE ${logical_cloud_url}/${logical_cloud_name}
+else
+    printf "\n\nCreating logical cloud data\n\n"
+    curl -d "${logical_cloud_data}" -X POST ${logical_cloud_url}
+
+    printf "\n\nAdding two clusters to logical cloud\n\n"
+    curl -d "${cluster_1_data}" -X POST ${cluster_url}
+    curl -d "${cluster_2_data}" -X POST ${cluster_url}
+
+    printf "\n\nAdding resource quota for the logical cloud\n\n"
+    curl -d "${quota_data}" -X POST ${quota_url}
+
+    printf "\n\nGetting logical cloud\n\n"
+    curl -X GET "${logical_cloud_url}/${logical_cloud_name}"
+
+    printf "\n\nGetting clusters info for logical cloud\n\n"
+    curl -X GET ${cluster_url}
+
+    printf "\n\nGetting first cluster of logical cloud\n"
+    curl -X GET ${cluster_url}/${lc_cluster_1_name}
+
+    printf "\n\nGetting second cluster of logical cloud\n"
+    curl -X GET ${cluster_url}/${lc_cluster_2_name}
+
+    printf "\n\nGetting Quota info for the logical cloud\n\n"
+    curl -X GET "${quota_url}/${quota_name}"
+
+    printf "\n\nApplying logical cloud...\n\n"
+    curl -X POST "${logical_cloud_url}/${logical_cloud_name}/apply"
 fi

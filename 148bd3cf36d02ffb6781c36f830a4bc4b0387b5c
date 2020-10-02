@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "23966604_a6692427",
+        "filename": "src/dcm/pkg/module/logicalcloud.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-10-02T16:25:26Z",
+      "side": 1,
+      "message": "This can potentially break getting and updating MongoDB record. Not suggested use of the keys.",
+      "range": {
+        "startLine": 113,
+        "startChar": 2,
+        "endLine": 113,
+        "endChar": 28
+      },
+      "revId": "148bd3cf36d02ffb6781c36f830a4bc4b0387b5c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "991db497_b22e3e62",
+        "filename": "src/dcm/pkg/module/logicalcloud.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2020-10-02T16:25:26Z",
+      "side": 1,
+      "message": "How about delete w/o apply? That should be possible.",
+      "range": {
+        "startLine": 254,
+        "startChar": 1,
+        "endLine": 254,
+        "endChar": 9
+      },
+      "revId": "148bd3cf36d02ffb6781c36f830a4bc4b0387b5c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

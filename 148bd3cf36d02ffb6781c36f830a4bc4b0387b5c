@@ -45,6 +45,30 @@
       "revId": "148bd3cf36d02ffb6781c36f830a4bc4b0387b5c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f14d0fe_a852b0a5",
+        "filename": "src/dcm/pkg/module/logicalcloud.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-10-02T21:25:34Z",
+      "side": 1,
+      "message": "It doens\u0027t reach the switch case.",
+      "parentUuid": "991db497_b22e3e62",
+      "range": {
+        "startLine": 254,
+        "startChar": 1,
+        "endLine": 254,
+        "endChar": 9
+      },
+      "revId": "148bd3cf36d02ffb6781c36f830a4bc4b0387b5c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

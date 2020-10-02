@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "7f441e20_f7d2dfde",
+        "filename": "src/tools/emcoctl/examples/emco-cfg.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-10-02T22:44:43Z",
+      "side": 1,
+      "message": "Why do we specify a different \"default\" port in almost every single file?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 19
+      },
+      "revId": "74933657c90c830d10b4db1dee751a5d518d040f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "98f3ff16_6f50484a",
         "filename": "src/tools/emcoctl/examples/emco-cfg.yaml",
         "patchSetId": 1

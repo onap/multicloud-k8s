@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Manjunath Ranganathaiah <manjunath.ranganathaiah@intel.com>
+Code-Review+2: Ritu Sood <ritu.sood@intel.com>
+Submitted-by: Ritu Sood <ritu.sood@intel.com>
+Submitted-at: Fri, 02 Oct 2020 20:10:22 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/113439
+Project: multicloud/k8s
+Branch: refs/heads/master

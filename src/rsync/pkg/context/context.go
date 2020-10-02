@@ -252,7 +252,6 @@ Loop:
 				break Loop
 			} else {
 				logutils.Info("Cluster is not reachable - keep trying::", logutils.Fields{"cluster": cluster})
-				go checkReachable()
 			}
 		case <-ch:
 			statusFailed := resourcestatus.ResourceStatus{
@@ -279,6 +278,7 @@ Loop:
 				}
 				resStateUpdated = true
 			}
+			go checkReachable()
 			break
 		}
 	}

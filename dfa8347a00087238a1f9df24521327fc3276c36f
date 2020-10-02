@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da3b3a42_5a5cb956",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 636,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-10-02T22:47:43Z",
+      "side": 1,
+      "message": "you\u0027ll want to remove this",
+      "revId": "dfa8347a00087238a1f9df24521327fc3276c36f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c6b85fa_ac092599",
+        "filename": "src/dcm/pkg/module/apply.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1603
+      },
+      "writtenOn": "2020-10-02T22:47:43Z",
+      "side": 1,
+      "message": "same as above",
+      "revId": "dfa8347a00087238a1f9df24521327fc3276c36f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

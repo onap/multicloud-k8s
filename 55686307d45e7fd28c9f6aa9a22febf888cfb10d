@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82cf24b8_d0889db0",
+        "filename": "src/dcm/api/clusterHandler.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-10-02T23:08:34Z",
+      "side": 1,
+      "message": "oops",
+      "range": {
+        "startLine": 217,
+        "startChar": 1,
+        "endLine": 219,
+        "endChar": 2
+      },
+      "revId": "55686307d45e7fd28c9f6aa9a22febf888cfb10d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

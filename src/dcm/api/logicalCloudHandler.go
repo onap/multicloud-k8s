@@ -188,6 +188,10 @@ func (h logicalCloudHandler) deleteHandler(w http.ResponseWriter, r *http.Reques
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
+		if err.Error() == "The Logical Cloud can't be deleted yet, it is being terminated." {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -209,13 +213,6 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	_, ctxVal, err := h.client.GetLogicalCloudContext(project, name)
-	if ctxVal != "" {
-		err = pkgerrors.New("Logical Cloud already applied")
-		http.Error(w, err.Error(), http.StatusConflict)
 		return
 	}
 
@@ -241,6 +238,10 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	// Apply the Logical Cloud
 	err = module.Apply(project, lc, clusters, quotas)
 	if err != nil {
+		if err.Error() == "The Logical Cloud can't be re-applied yet, it is being terminated." {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -313,6 +313,39 @@ func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	APP := "logical-cloud"
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
 
+	lcclient := NewLogicalCloudClient()
+	lckey := LogicalCloudKey{
+		LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
+		Project:          project,
+	}
+
+	// Check if there was a previous context for this logical cloud
+	ac, cid, err := lcclient.GetLogicalCloudContext(project, logicalCloudName)
+	if cid != "" {
+		// Make sure rsync status for this logical cloud is Terminated,
+		// otherwise we can't re-apply logical cloud yet
+		acStatus, _ := getAppContextStatus(ac)
+		switch acStatus.Status {
+		case appcontext.AppContextStatusEnum.Terminated:
+			// We now know Logical Cloud has terminated, so let's update the entry before we process the apply
+			err = db.DBconn.RemoveTag(lcclient.storeName, lckey, lcclient.tagContext)
+			if err != nil {
+				return pkgerrors.Wrap(err, "Error removing lccontext tag from Logical Cloud")
+			}
+			// And fully delete the old AppContext
+			err := ac.DeleteCompositeApp()
+			if err != nil {
+				return pkgerrors.Wrap(err, "Error deleting AppContext CompositeApp Logical Cloud")
+			}
+		case appcontext.AppContextStatusEnum.Terminating:
+			return pkgerrors.New("The Logical Cloud can't be re-applied yet, it is being terminated.")
+		case appcontext.AppContextStatusEnum.Instantiated:
+			return pkgerrors.New("The Logical Cloud is already applied.")
+		default:
+			return pkgerrors.New("The Logical Cloud can't be applied at this point.")
+		}
+	}
+
 	//Resource Names
 	namespaceName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+namespace"}, "")
 	roleName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+role"}, "")
@@ -348,13 +381,12 @@ func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 
 	approval, err := createApprovalSubresource(logicalcloud)
 
+	// From this point on, we are dealing with a new context (not "ac" from above)
 	context := appcontext.AppContext{}
 	ctxVal, err := context.InitAppContext()
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error creating AppContext")
 	}
-
-	fmt.Printf("%v\n", ctxVal)
 
 	handle, err := context.CreateCompositeApp()
 	if err != nil {
@@ -432,10 +464,6 @@ func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 		}
 
 		// Add private key to MongoDB
-		lckey := LogicalCloudKey{
-			LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
-			Project:          project,
-		}
 		err = db.DBconn.Insert("orchestrator", lckey, nil, "privatekey", key)
 		if err != nil {
 			cleanuperr := context.DeleteCompositeApp()
@@ -573,10 +601,6 @@ func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 		_, err = context.AddInstruction(handle, "app", "dependency", string(appDependency))
 	}
 	// save the context in the logicalcloud db record
-	lckey := LogicalCloudKey{
-		LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
-		Project:          project,
-	}
 	err = db.DBconn.Insert("orchestrator", lckey, nil, "lccontext", ctxVal)
 	if err != nil {
 		cleanuperr := context.DeleteCompositeApp()
@@ -605,40 +629,30 @@ func Terminate(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
 
-	_, ctxVal, err := NewLogicalCloudClient().GetLogicalCloudContext(project, logicalCloudName)
+	lcclient := NewLogicalCloudClient()
+
+	ac, cid, err := lcclient.GetLogicalCloudContext(project, logicalCloudName)
 	if err != nil {
-		return pkgerrors.Wrapf(err, "Error finding AppContext for Logical Cloud: %v", logicalCloudName)
+		return pkgerrors.Wrapf(err, "Logical Cloud doesn't seem applied: %v", logicalCloudName)
 	}
 
-	// call resource synchronizer to delete the CRs from every cluster of the logical cloud
-	err = callRsyncUninstall(ctxVal)
-	if err != nil {
-		return err
+	// Check if there was a previous context for this logical cloud
+	if cid != "" {
+		// Make sure rsync status for this logical cloud is Terminated,
+		// otherwise we can't re-apply logical cloud yet
+		acStatus, _ := getAppContextStatus(ac)
+		switch acStatus.Status {
+		case appcontext.AppContextStatusEnum.Terminated:
+			return pkgerrors.New("The Logical Cloud has already been terminated: " + logicalCloudName)
+		case appcontext.AppContextStatusEnum.Terminating:
+			return pkgerrors.New("The Logical Cloud is already being terminated: " + logicalCloudName)
+		case appcontext.AppContextStatusEnum.Instantiated:
+			// call resource synchronizer to delete the CRs from every cluster of the logical cloud
+			err = callRsyncUninstall(cid)
+			return err
+		default:
+			return pkgerrors.New("The Logical Cloud can't be deleted at this point: " + logicalCloudName)
+		}
 	}
-
-	// TODO: status handling for logical cloud after terminate:
-	// rsync updates the status of the appcontext to Terminated
-	// dcm should launch thread to observe status of appcontext before concluding logical cloud is terminated
-	// dcm should somewhat mimic the status tracking of rsync
-	// logical cloud might be in a non-applied non-terminated state for a long period of time.........
-
-	// // remove the app context
-	// err = context.DeleteCompositeApp()
-	// if err != nil {
-	// 	return pkgerrors.Wrap(err, "Error deleting AppContext CompositeApp")
-	// }
-
-	// remove the app context field from the cluster db record
-	// lckey := LogicalCloudKey{
-	// 	LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
-	// 	Project:          project,
-	// }
-	// err = db.DBconn.RemoveTag("orchestrator", lckey, "lccontext")
-	// if err != nil {
-	// 	log.Warn("Error removing AppContext from Logical Cloud", log.Fields{
-	// 		"logical-cloud": logicalCloudName,
-	// 	})
-	// }
-
-	return nil
+	return pkgerrors.New("Logical Cloud is not applied: " + logicalCloudName)
 }

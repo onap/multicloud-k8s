@@ -365,7 +365,7 @@ func (r *reconciler) updateCsrs(rbstate *v1alpha1.ResourceBundleState,
 
 	// Update the CR with the csrs tracked
 	csrList := &certsapi.CertificateSigningRequestList{}
-	err := listResources(r.client, rbstate.Namespace, selectors, csrList)
+	err := listResources(r.client, "", selectors, csrList)
 	if err != nil {
 		log.Printf("Failed to list csrs: %v", err)
 		return err

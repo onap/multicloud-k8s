@@ -190,10 +190,9 @@ func (h clusterHandler) getConfigHandler(w http.ResponseWriter, r *http.Request)
 	project := vars["project-name"]
 	logicalCloud := vars["logical-cloud-name"]
 	name := vars["cluster-reference"]
-	var ret interface{}
 	var err error
 
-	ret, err = h.client.GetCluster(project, logicalCloud, name)
+	_, err = h.client.GetCluster(project, logicalCloud, name)
 	if err != nil {
 		if err.Error() == "Cluster Reference does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
@@ -203,7 +202,7 @@ func (h clusterHandler) getConfigHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	ret, err = h.client.GetClusterConfig(project, logicalCloud, name)
+	cfg, err := h.client.GetClusterConfig(project, logicalCloud, name)
 	if err != nil {
 		if err.Error() == "The certificate for this cluster hasn't been issued yet. Please try later." {
 			http.Error(w, err.Error(), http.StatusAccepted)
@@ -215,9 +214,14 @@ func (h clusterHandler) getConfigHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 	w.Header().Set("Content-Type", "application/yaml")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(ret)
+	// err = json.NewEncoder(w).Encode(ret)
+	_, err = io.WriteString(w, cfg)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

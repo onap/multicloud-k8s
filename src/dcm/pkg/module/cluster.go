@@ -315,6 +315,10 @@ func (v *ClusterClient) GetClusterConfig(project, logicalCloud, clusterReference
 			return "", pkgerrors.Wrap(err, "An error occurred while parsing the cluster status.")
 		}
 
+		if len(rbstatus.CsrStatuses) == 0 {
+			return "", pkgerrors.New("The certificate for this cluster hasn't been issued yet. Please try later.")
+		}
+
 		// validate that we indeed obtained a certificate before persisting it in the database:
 		approved := false
 		for _, c := range rbstatus.CsrStatuses[0].Status.Conditions {

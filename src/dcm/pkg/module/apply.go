@@ -84,33 +84,36 @@ type RoleRef struct {
 	ApiGroup string `yaml:"apiGroup"`
 }
 
-func createNamespace(logicalcloud LogicalCloud) (string, error) {
+func createNamespace(logicalcloud LogicalCloud) (string, string, error) {
+
+	name := logicalcloud.Specification.NameSpace
 
 	namespace := Resource{
 		ApiVersion: "v1",
 		Kind:       "Namespace",
 		MetaData: MetaDatas{
-			Name: logicalcloud.Specification.NameSpace,
+			Name: name,
 		},
 	}
 
 	nsData, err := yaml.Marshal(&namespace)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return string(nsData), nil
+	return string(nsData), strings.Join([]string{name, "+Namespace"}, ""), nil
 }
 
-func createRole(logicalcloud LogicalCloud) (string, error) {
+func createRole(logicalcloud LogicalCloud) (string, string, error) {
 
 	userPermissions := logicalcloud.Specification.User.UserPermissions[0]
+	name := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "-role"}, "")
 
 	role := Resource{
 		ApiVersion: "rbac.authorization.k8s.io/v1beta1",
 		Kind:       "Role",
 		MetaData: MetaDatas{
-			Name:      strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "-role"}, ""),
+			Name:      name,
 			Namespace: logicalcloud.Specification.NameSpace,
 		},
 		Rules: []RoleRules{RoleRules{
@@ -123,19 +126,21 @@ func createRole(logicalcloud LogicalCloud) (string, error) {
 
 	roleData, err := yaml.Marshal(&role)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return string(roleData), nil
+	return string(roleData), strings.Join([]string{name, "+Role"}, ""), nil
 }
 
-func createRoleBinding(logicalcloud LogicalCloud) (string, error) {
+func createRoleBinding(logicalcloud LogicalCloud) (string, string, error) {
+
+	name := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "-roleBinding"}, "")
 
 	roleBinding := Resource{
 		ApiVersion: "rbac.authorization.k8s.io/v1beta1",
 		Kind:       "RoleBinding",
 		MetaData: MetaDatas{
-			Name:      strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "-roleBinding"}, ""),
+			Name:      name,
 			Namespace: logicalcloud.Specification.NameSpace,
 		},
 		Subjects: []RoleSubjects{RoleSubjects{
@@ -154,19 +159,22 @@ func createRoleBinding(logicalcloud LogicalCloud) (string, error) {
 
 	rBData, err := yaml.Marshal(&roleBinding)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return string(rBData), nil
+	return string(rBData), strings.Join([]string{name, "+RoleBinding"}, ""), nil
 }
 
-func createQuota(quota []Quota, namespace string) (string, error) {
+func createQuota(quota []Quota, namespace string) (string, string, error) {
+
 	lcQuota := quota[0]
+	name := lcQuota.MetaData.QuotaName
+
 	q := Resource{
 		ApiVersion: "v1",
 		Kind:       "ResourceQuota",
 		MetaData: MetaDatas{
-			Name:      lcQuota.MetaData.QuotaName,
+			Name:      name,
 			Namespace: namespace,
 		},
 		Specification: Specs{
@@ -176,26 +184,28 @@ func createQuota(quota []Quota, namespace string) (string, error) {
 
 	qData, err := yaml.Marshal(&q)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return string(qData), nil
+	return string(qData), strings.Join([]string{name, "+ResourceQuota"}, ""), nil
 }
 
-func createUserCSR(logicalcloud LogicalCloud) (string, string, error) {
+func createUserCSR(logicalcloud LogicalCloud) (string, string, string, error) {
+
 	KEYSIZE := 4096
 	userName := logicalcloud.Specification.User.UserName
+	name := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "-user-csr"}, "")
 
 	key, err := rsa.GenerateKey(rand.Reader, KEYSIZE)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
 	csrTemplate := x509.CertificateRequest{Subject: pkix.Name{CommonName: userName}}
 
 	csrCert, err := x509.CreateCertificateRequest(rand.Reader, &csrTemplate, key)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
 	//Encode csr
@@ -208,8 +218,7 @@ func createUserCSR(logicalcloud LogicalCloud) (string, string, error) {
 		ApiVersion: "certificates.k8s.io/v1beta1",
 		Kind:       "CertificateSigningRequest",
 		MetaData: MetaDatas{
-			Name: strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "-user-csr"}, ""),
-			// Namespace: logicalcloud.Specification.NameSpace,
+			Name: name,
 		},
 		Specification: Specs{
 			Request: base64.StdEncoding.EncodeToString(csr),
@@ -219,7 +228,7 @@ func createUserCSR(logicalcloud LogicalCloud) (string, string, error) {
 
 	csrData, err := yaml.Marshal(&csrObj)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
 	keyData := base64.StdEncoding.EncodeToString(pem.EncodeToMemory(
@@ -229,10 +238,10 @@ func createUserCSR(logicalcloud LogicalCloud) (string, string, error) {
 		},
 	))
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
-	return string(csrData), string(keyData), nil
+	return string(csrData), string(keyData), strings.Join([]string{name, "+CertificateSigningRequest"}, ""), nil
 }
 
 func createApprovalSubresource(logicalcloud LogicalCloud) (string, error) {
@@ -346,35 +355,28 @@ func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 		}
 	}
 
-	//Resource Names
-	namespaceName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+namespace"}, "")
-	roleName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+role"}, "")
-	roleBindingName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+roleBinding"}, "")
-	quotaName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+quota"}, "")
-	csrName := strings.Join([]string{logicalcloud.MetaData.LogicalCloudName, "+CertificateSigningRequest"}, "")
-
 	// Get resources to be added
-	namespace, err := createNamespace(logicalcloud)
+	namespace, namespaceName, err := createNamespace(logicalcloud)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error Creating Namespace YAML for logical cloud")
 	}
 
-	role, err := createRole(logicalcloud)
+	role, roleName, err := createRole(logicalcloud)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error Creating Role YAML for logical cloud")
 	}
 
-	roleBinding, err := createRoleBinding(logicalcloud)
+	roleBinding, roleBindingName, err := createRoleBinding(logicalcloud)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error Creating RoleBinding YAML for logical cloud")
 	}
 
-	quota, err := createQuota(quotaList, logicalcloud.Specification.NameSpace)
+	quota, quotaName, err := createQuota(quotaList, logicalcloud.Specification.NameSpace)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error Creating Quota YAML for logical cloud")
 	}
 
-	csr, key, err := createUserCSR(logicalcloud)
+	csr, key, csrName, err := createUserCSR(logicalcloud)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error Creating User CSR and Key for logical cloud")
 	}

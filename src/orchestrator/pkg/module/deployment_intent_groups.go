@@ -47,6 +47,7 @@ type DepSpecData struct {
 	Profile           string           `json:"profile"`
 	Version           string           `json:"version"`
 	OverrideValuesObj []OverrideValues `json:"override-values"`
+	LogicalCloud string `json:"logical-cloud"`
 }
 
 // OverrideValues has appName and ValuesObj

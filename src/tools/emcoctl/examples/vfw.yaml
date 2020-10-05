@@ -3,7 +3,7 @@ version: emco/v2
 resourceContext:
   anchor: controllers
 metadata :
-   name: rsync
+  name: rsync
 spec:
   host: "192.168.121.6"
   port: 30546
@@ -14,10 +14,10 @@ version: emco/v2
 resourceContext:
   anchor: controllers
 metadata :
-   name: ovnaction
+  name: ovnaction
 spec:
-  host: "192.168.121.6"
-  port: 32259
+  host: "ovnaction"
+  port: 9053
   type: "action"
   priority: 1
 
@@ -28,7 +28,7 @@ version: emco/v2
 resourceContext:
   anchor: cluster-providers
 metadata :
-   name: vfw-cluster-provider
+  name: vfw-cluster-provider
 
 ---
 #creating cluster
@@ -36,7 +36,7 @@ version: emco/v2
 resourceContext:
   anchor: cluster-providers/vfw-cluster-provider/clusters
 metadata :
-   name: edge01
+  name: edge01
 file:
   /home/otc/.kube/config
 
@@ -65,7 +65,7 @@ version: emco/v2
 resourceContext:
   anchor: cluster-providers/vfw-cluster-provider/clusters/edge01/networks
 metadata:
-  name: emco-unprotected-net
+  name: unprotected-private-net
 spec:
   cniType: ovn4nfv
   ipv4Subnets:
@@ -184,192 +184,6 @@ file:
     /opt/csar/cb009bfe-bbee-11e8-9766-525400435678/profile.tar.gz
 
 ---
-#create the generic placement intent
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/generic-placement-intents
-metadata :
-  name: fw-placement-intent
-spec:
-  logical-cloud: NA
-
----
-#add the packetgen app placement intent to the generic placement intent
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/generic-placement-intents/fw-placement-intent/app-intents
-metadata:
-  name: packetgen-placement-intent
-spec:
-  app-name: packetgen
-  intent:
-    allOf:
-    - provider-name: vfw-cluster-provider
-      cluster-label-name: LabelA
----
-#add the firewall app placement intent to the generic placement intent
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/generic-placement-intents/fw-placement-intent/app-intents
-metadata:
-  name: firewall-placement-intent
-spec:
-  app-name: firewall
-  intent:
-    allOf:
-    - provider-name: vfw-cluster-provider
-      cluster-label-name: LabelA
-
----
-#add the sink app placement intent to the generic placement intent
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/generic-placement-intents/fw-placement-intent/app-intents
-metadata:
-  name: sink-placement-intent
-spec:
-  app-name: sink
-  intent:
-    allOf:
-    - provider-name: vfw-cluster-provider
-      cluster-label-name: LabelA
-
----
-#creating cluster provider
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent
-metadata :
-   name: vfw_ovnaction_intent
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents
-metadata :
-   name: packetgen_workload_intent
-spec:
-  application-name: packetgen
-  workload-resource: r1-packetgen
-  type: Deployment
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents
-metadata :
-   name: firewall_workload_intent
-spec:
-  application-name: firewall
-  workload-resource: r1-firewall
-  type: Deployment
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents
-metadata :
-   name: sink_workload_intent
-spec:
-  application-name: sink
-  workload-resource: r1-sink
-  type: Deployment
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents/packetgen_workload_intent/interfaces
-metadata :
-   name: packetgen_unprotected_if
-spec:
-  interface: eth1
-  name: unprotected-private-net
-  defaultGateway: "false"
-  ipAddress: 192.168.10.2
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents/packetgen_workload_intent/interfaces
-metadata :
-   name: packetgen_emco_if
-spec:
-  interface: eth2
-  name: emco-private-net
-  defaultGateway: "false"
-  ipAddress: 10.10.20.2
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents/firewall_workload_intent/interfaces
-metadata :
-   name: firewall_emco_if
-spec:
-  interface: eth3
-  name: emco-private-net
-  defaultGateway: "false"
-  ipAddress: 10.10.20.3
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents/firewall_workload_intent/interfaces
-metadata :
-   name: firewall_unprotected_if
-spec:
-  interface: eth1
-  name: unprotected-private-net
-  defaultGateway: "false"
-  ipAddress: 192.168.10.3
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents/firewall_workload_intent/interfaces
-metadata :
-   name: firewall_protected_if
-spec:
-  interface: eth2
-  name: protected-private-net
-  defaultGateway: "false"
-  ipAddress: 192.168.20.2
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents/sink_workload_intent/interfaces
-metadata :
-   name: sink_protected_if
-spec:
-  interface: eth1
-  name: protected-private-net
-  defaultGateway: "false"
-  ipAddress: 192.168.20.3
-
----
-#
-version: emco/v2
-resourceContext:
-  anchor: projects/testvfw/composite-apps/compositevfw/v1/network-controller-intent/vfw_ovnaction_intent/workload-intents/sink_workload_intent/interfaces
-metadata :
-   name: sink_emco_if
-spec:
-  interface: eth2
-  name: emco-private-net
-  defaultGateway: "false"
-  ipAddress: 10.10.20.4
-
----
 #create deployment intent group
 version: emco/v2
 resourceContext:
@@ -379,6 +193,7 @@ metadata :
 spec:
   profile: vfw_composite-profile
   version: r1
+  logical-cloud: NA
   override-values:
   - app-name: packetgen
     values:
@@ -401,6 +216,190 @@ spec:
   intent:
     genericPlacementIntent: fw-placement-intent
     ovnaction: vfw_ovnaction_intent
+
+---
+#create the generic placement intent
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/generic-placement-intents
+metadata :
+  name: fw-placement-intent
+
+---
+#add the packetgen app placement intent to the generic placement intent
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/generic-placement-intents/fw-placement-intent/app-intents
+metadata:
+  name: packetgen-placement-intent
+spec:
+  app-name: packetgen
+  intent:
+    allOf:
+    - provider-name: vfw-cluster-provider
+      cluster-label-name: LabelA
+---
+#add the firewall app placement intent to the generic placement intent
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/generic-placement-intents/fw-placement-intent/app-intents
+metadata:
+  name: firewall-placement-intent
+spec:
+  app-name: firewall
+  intent:
+    allOf:
+    - provider-name: vfw-cluster-provider
+      cluster-label-name: LabelA
+
+---
+#add the sink app placement intent to the generic placement intent
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/generic-placement-intents/fw-placement-intent/app-intents
+metadata:
+  name: sink-placement-intent
+spec:
+  app-name: sink
+  intent:
+    allOf:
+    - provider-name: vfw-cluster-provider
+      cluster-label-name: LabelA
+
+---
+#creating network intents
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent
+metadata :
+  name: vfw_ovnaction_intent
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents
+metadata :
+  name: packetgen_workload_intent
+spec:
+  application-name: packetgen
+  workload-resource: r1-packetgen
+  type: Deployment
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents
+metadata :
+  name: firewall_workload_intent
+spec:
+  application-name: firewall
+  workload-resource: r1-firewall
+  type: Deployment
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents
+metadata :
+  name: sink_workload_intent
+spec:
+  application-name: sink
+  workload-resource: r1-sink
+  type: Deployment
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents/packetgen_workload_intent/interfaces
+metadata :
+  name: packetgen_unprotected_if
+spec:
+  interface: eth1
+  name: unprotected-private-net
+  defaultGateway: "false"
+  ipAddress: 192.168.10.2
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents/packetgen_workload_intent/interfaces
+metadata :
+  name: packetgen_emco_if
+spec:
+  interface: eth2
+  name: emco-private-net
+  defaultGateway: "false"
+  ipAddress: 10.10.20.2
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents/firewall_workload_intent/interfaces
+metadata :
+  name: firewall_emco_if
+spec:
+  interface: eth3
+  name: emco-private-net
+  defaultGateway: "false"
+  ipAddress: 10.10.20.3
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents/firewall_workload_intent/interfaces
+metadata :
+  name: firewall_unprotected_if
+spec:
+  interface: eth1
+  name: unprotected-private-net
+  defaultGateway: "false"
+  ipAddress: 192.168.10.3
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents/firewall_workload_intent/interfaces
+metadata :
+  name: firewall_protected_if
+spec:
+  interface: eth2
+  name: protected-private-net
+  defaultGateway: "false"
+  ipAddress: 192.168.20.2
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents/sink_workload_intent/interfaces
+metadata :
+  name: sink_protected_if
+spec:
+  interface: eth1
+  name: protected-private-net
+  defaultGateway: "false"
+  ipAddress: 192.168.20.3
+
+---
+#
+version: emco/v2
+resourceContext:
+  anchor: projects/testvfw/composite-apps/compositevfw/v1/deployment-intent-groups/vfw_deployment_intent_group/network-controller-intent/vfw_ovnaction_intent/workload-intents/sink_workload_intent/interfaces
+metadata :
+  name: sink_emco_if
+spec:
+  interface: eth2
+  name: emco-private-net
+  defaultGateway: "false"
+  ipAddress: 10.10.20.4
 
 ---
 version: emco/v2

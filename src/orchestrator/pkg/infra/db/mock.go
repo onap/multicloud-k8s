@@ -41,15 +41,7 @@ func (m *MockDB) HealthCheck() error {
 	return m.Err
 }
 
-func (m *MockDB) Create(table string, key Key, tag string, data interface{}) error {
-	return m.Err
-}
-
 func (m *MockDB) Insert(table string, key Key, query interface{}, tag string, data interface{}) error {
-	return m.Err
-}
-
-func (m *MockDB) Update(table string, key Key, tag string, data interface{}) error {
 	return m.Err
 }
 
@@ -60,21 +52,6 @@ func (m *MockDB) Unmarshal(inp []byte, out interface{}) error {
 		return pkgerrors.Wrap(err, "Unmarshaling json")
 	}
 	return nil
-}
-
-func (m *MockDB) Read(table string, key Key, tag string) ([]byte, error) {
-	if m.Err != nil {
-		return nil, m.Err
-	}
-
-	str := fmt.Sprintf("%v", key)
-	for k, v := range m.Items {
-		if k == str {
-			return v[tag], nil
-		}
-	}
-
-	return nil, m.Err
 }
 
 func (m *MockDB) Find(table string, key Key, tag string) ([][]byte, error) {
@@ -91,10 +68,6 @@ func (m *MockDB) Find(table string, key Key, tag string) ([][]byte, error) {
 	}
 
 	return nil, m.Err
-}
-
-func (m *MockDB) Delete(table string, key Key, tag string) error {
-	return m.Err
 }
 
 func (m *MockDB) Remove(table string, key Key) error {

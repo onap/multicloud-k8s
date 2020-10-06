@@ -34,31 +34,31 @@ Pacakges helm charts in tar.gz format. All packages are in **dist/packages** dir
 
 **4. Deploy tools (Optional)**
 
-`$ helm install dist/packages/emco-tools-0.1.0.tgz --name rel-tools --namespace emco`
+`$ helm install dist/packages/emco-tools-0.1.0.tgz --name emco-tools --namespace emco`
 
 NOTE: Deploy the Chart emco-0.1.0.tgz to deploy all packages including database, services and tools.
 
-`$ helm install dist/packages/emco-0.1.0.tgz --name rel --namespace emco`
+`$ helm install dist/packages/emco-0.1.0.tgz --name emco --namespace emco`
 
 
 **5. To check logs of the different Microservices check fluentd logs**
 
-`kubectl logs rel-fluentd-0 -n emco | grep orchestrator`
+`kubectl logs emco-tools-fluentd-0 -n emco | grep orchestrator`
 
 
 **6. Delete all packages**
 
-`$ helm delete rel-services --purge`
+`$ helm delete emco-services --purge`
 
-`$ helm delete rel-db --purge`
+`$ helm delete emco-db --purge`
 
 Optional if tools were installed
 
-`$ helm delete rel-tools --purge`
+`$ helm delete emco-tools --purge`
 
 NOTE: If the Chart emco-0.1.0.tgz was deployed
 
-`$ helm delete rel --purge`
+`$ helm delete emco --purge`
 
 
 **7. Delete local helm repo**
@@ -69,10 +69,9 @@ NOTE: If the Chart emco-0.1.0.tgz was deployed
 
 After deleting the db package and before installing the package again following error happens:
 
-`Error: release rel-db failed: object is being deleted: persistentvolumes "rel-db-emco-etcd-data-0" already exists`
+`Error: release emco-db failed: object is being deleted: persistentvolumes "emco-db-emco-etcd-data-0" already exists`
 
-Workaround :
+Workarounds:
 
-`kubectl edit persistentvolumes rel-db-emco-etcd-data-0`
-
-and remover finalizers section
+* remove the  finalizers section using `kubectl edit persistentvolumes emco-db-emco-etcd-data-0`
+* or, if appropriate, delete the entire namespace using `kubectl delete namespace emco`

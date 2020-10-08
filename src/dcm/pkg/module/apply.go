@@ -84,6 +84,19 @@ type RoleRef struct {
 	ApiGroup string `yaml:"apiGroup"`
 }
 
+func cleanupCompositeApp(context appcontext.AppContext, err error, reason string, details []string) error {
+	cleanuperr := context.DeleteCompositeApp()
+	newerr := pkgerrors.Wrap(err, reason)
+	if cleanuperr != nil {
+		log.Warn("Error cleaning AppContext, ", log.Fields{
+			"Related details": details,
+		})
+		// this would be useful: https://godoc.org/go.uber.org/multierr
+		return pkgerrors.Wrap(err, "After previous error, cleaning the AppContext also failed.")
+	}
+	return newerr
+}
+
 func createNamespace(logicalcloud LogicalCloud) (string, string, error) {
 
 	name := logicalcloud.Specification.NameSpace
@@ -397,126 +410,60 @@ func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 
 	appHandle, err := context.AddApp(handle, APP)
 	if err != nil {
-		cleanuperr := context.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext CompositeApp create failure", log.Fields{
-				"logical-cloud": logicalCloudName,
-			})
-		}
-		return pkgerrors.Wrap(err, "Error adding App to AppContext")
+		return cleanupCompositeApp(context, err, "Error adding App to AppContext", []string{logicalCloudName, ctxVal.(string)})
 	}
 
 	// Iterate through cluster list and add all the clusters
 	for _, cluster := range clusterList {
 		clusterName := strings.Join([]string{cluster.Specification.ClusterProvider, "+", cluster.Specification.ClusterName}, "")
 		clusterHandle, err := context.AddCluster(appHandle, clusterName)
+		// pre-build array to pass to cleanupCompositeApp() [for performance]
+		details := []string{logicalCloudName, clusterName, ctxVal.(string)}
 
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add cluster failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding Cluster to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding Cluster to AppContext", details)
 		}
 
 		// Add namespace resource to each cluster
 		_, err = context.AddResource(clusterHandle, namespaceName, namespace)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add namespace resource failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding Namespace Resource to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding Namespace Resource to AppContext", details)
 		}
 
 		// Add csr resource to each cluster
 		csrHandle, err := context.AddResource(clusterHandle, csrName, csr)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add CSR resource failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding CSR Resource to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding CSR Resource to AppContext", details)
 		}
 
 		// Add csr approval as a subresource of csr:
 		_, err = context.AddLevelValue(csrHandle, "subresource/approval", approval)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add CSR approval failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error approving CSR via AppContext")
+			return cleanupCompositeApp(context, err, "Error approving CSR via AppContext", details)
 		}
 
 		// Add private key to MongoDB
 		err = db.DBconn.Insert("orchestrator", lckey, nil, "privatekey", key)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
-					"logical-cloud": logicalcloud.MetaData.LogicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding private key to DB")
+			return cleanupCompositeApp(context, err, "Error adding private key to DB", details)
 		}
 
 		// Add Role resource to each cluster
 		_, err = context.AddResource(clusterHandle, roleName, role)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add role resource failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding role Resource to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding role Resource to AppContext", details)
 		}
 
 		// Add RoleBinding resource to each cluster
 		_, err = context.AddResource(clusterHandle, roleBindingName, roleBinding)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add roleBinding resource failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding roleBinding Resource to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding roleBinding Resource to AppContext", details)
 		}
 
 		// Add quota resource to each cluster
 		_, err = context.AddResource(clusterHandle, quotaName, quota)
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add quota resource failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding quota Resource to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding quota Resource to AppContext", details)
 		}
 
 		// Add Subresource Order and Subresource Dependency
@@ -541,77 +488,42 @@ func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 			return pkgerrors.Wrap(err, "Error creating resource order JSON")
 		}
 		appDependency, err := json.Marshal(map[string]map[string]string{"appdependency": map[string]string{APP: "go"}})
-
 		if err != nil {
 			return pkgerrors.Wrap(err, "Error creating resource dependency JSON")
 		}
 
+		// Add Resource-level Order and Dependency
 		_, err = context.AddInstruction(clusterHandle, "resource", "order", string(resOrder))
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add instruction  failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding instruction order to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding instruction order to AppContext", details)
 		}
-
 		_, err = context.AddInstruction(clusterHandle, "resource", "dependency", string(resDependency))
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add instruction  failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding instruction dependency to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding instruction dependency to AppContext", details)
 		}
-
 		_, err = context.AddInstruction(csrHandle, "subresource", "order", string(subresOrder))
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add instruction  failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding instruction order to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding instruction order to AppContext", details)
 		}
-
 		_, err = context.AddInstruction(csrHandle, "subresource", "dependency", string(subresDependency))
 		if err != nil {
-			cleanuperr := context.DeleteCompositeApp()
-			if cleanuperr != nil {
-				log.Warn("Error cleaning AppContext after add instruction  failure", log.Fields{
-					"cluster-provider": cluster.Specification.ClusterProvider,
-					"cluster":          cluster.Specification.ClusterName,
-					"logical-cloud":    logicalCloudName,
-				})
-			}
-			return pkgerrors.Wrap(err, "Error adding instruction dependency to AppContext")
+			return cleanupCompositeApp(context, err, "Error adding instruction dependency to AppContext", details)
 		}
 
 		// Add App-level Order and Dependency
 		_, err = context.AddInstruction(handle, "app", "order", string(appOrder))
+		if err != nil {
+			return cleanupCompositeApp(context, err, "Error adding app-level order to AppContext", details)
+		}
 		_, err = context.AddInstruction(handle, "app", "dependency", string(appDependency))
+		if err != nil {
+			return cleanupCompositeApp(context, err, "Error adding app-level dependency to AppContext", details)
+		}
 	}
 	// save the context in the logicalcloud db record
 	err = db.DBconn.Insert("orchestrator", lckey, nil, "lccontext", ctxVal)
 	if err != nil {
-		cleanuperr := context.DeleteCompositeApp()
-		if cleanuperr != nil {
-			log.Warn("Error cleaning AppContext after DB insert failure", log.Fields{
-				"logical-cloud": logicalcloud.MetaData.LogicalCloudName,
-			})
-		}
-		return pkgerrors.Wrap(err, "Error adding AppContext to DB")
+		return cleanupCompositeApp(context, err, "Error adding AppContext to DB", []string{logicalCloudName, ctxVal.(string)})
 	}
 
 	// call resource synchronizer to instantiate the CRs in the cluster

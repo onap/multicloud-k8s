@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/db"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
@@ -53,6 +54,20 @@ func (m *mockValues) CheckLogicalCloud(project, logicalCloud string) error {
 	args := m.Called(project, logicalCloud)
 
 	return args.Error(0)
+}
+
+func (m *mockValues) GetLogicalCloudContext(name string, key db.Key, meta string, project, logicalCloud string) (appcontext.AppContext, string, error) {
+	fmt.Println("Mocked Get Logical Cloud Context")
+	args := m.Called(name, key, meta, project, logicalCloud)
+
+	return appcontext.AppContext{}, "", args.Error(2)
+}
+
+func (m *mockValues) GetAppContextStatus(ac appcontext.AppContext) (*appcontext.AppContextStatus, error) {
+	fmt.Println("Mocked GetAppContextStatus")
+	args := m.Called(ac)
+
+	return &appcontext.AppContextStatus{}, args.Error(1)
 }
 
 func TestCreateLogicalCloud(t *testing.T) {
@@ -110,7 +125,7 @@ func TestGetLogicalCloud(t *testing.T) {
 	}
 }
 
-func TestDeleteLogicalCloud(t *testing.T) {
+func TestDeleteLogicalCloudWithSuccess(t *testing.T) {
 
 	key := LogicalCloudKey{
 		Project:          "test_project",
@@ -128,14 +143,14 @@ func TestDeleteLogicalCloud(t *testing.T) {
 	myMocks.On("DBFind", "test_dcm", key, "test_meta").Return(data1, nil)
 	myMocks.On("DBUnmarshal", data2).Return(nil)
 	myMocks.On("DBFind", "test_dcm", key, "test_context").Return(data1, nil)
-	// TODO also test for when the logical cloud doesn't exist
+	myMocks.On("GetLogicalCloudContext", "test_dcm", key, "test_meta", "test_project", "test_asdf").Return(appcontext.AppContext{}, "", nil)
+	myMocks.On("GetAppContextStatus", appcontext.AppContext{}).Return(&appcontext.AppContextStatus{}, nil)
 
-	// TODO: fix Etcd-related test crash
-	// lcClient := LogicalCloudClient{"test_dcm", "test_meta", "test_context", myMocks}
-	// err := lcClient.Delete("test_project", "test_asdf")
-	// if err != nil {
-	// 	t.Errorf("Some error occured!")
-	// }
+	lcClient := LogicalCloudClient{"test_dcm", "test_meta", "test_context", myMocks}
+	err := lcClient.Delete("test_project", "test_asdf")
+	if err.Error() != "The Logical Cloud can't be deleted yet at this point." {
+		t.Errorf("Some unexpected error occurred!")
+	}
 }
 
 func TestUpdateLogicalCloud(t *testing.T) {

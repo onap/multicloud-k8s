@@ -342,11 +342,11 @@ func Apply(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	}
 
 	// Check if there was a previous context for this logical cloud
-	ac, cid, err := lcclient.GetLogicalCloudContext(project, logicalCloudName)
+	ac, cid, err := lcclient.util.GetLogicalCloudContext(lcclient.storeName, lckey, lcclient.tagMeta, project, logicalCloudName)
 	if cid != "" {
 		// Make sure rsync status for this logical cloud is Terminated,
 		// otherwise we can't re-apply logical cloud yet
-		acStatus, _ := getAppContextStatus(ac)
+		acStatus, _ := lcclient.util.GetAppContextStatus(ac)
 		switch acStatus.Status {
 		case appcontext.AppContextStatusEnum.Terminated:
 			// We now know Logical Cloud has terminated, so let's update the entry before we process the apply
@@ -544,8 +544,12 @@ func Terminate(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	logicalCloudName := logicalcloud.MetaData.LogicalCloudName
 
 	lcclient := NewLogicalCloudClient()
+	lckey := LogicalCloudKey{
+		LogicalCloudName: logicalcloud.MetaData.LogicalCloudName,
+		Project:          project,
+	}
 
-	ac, cid, err := lcclient.GetLogicalCloudContext(project, logicalCloudName)
+	ac, cid, err := lcclient.util.GetLogicalCloudContext(lcclient.storeName, lckey, lcclient.tagMeta, project, logicalCloudName)
 	if err != nil {
 		return pkgerrors.Wrapf(err, "Logical Cloud doesn't seem applied: %v", logicalCloudName)
 	}
@@ -554,7 +558,7 @@ func Terminate(project string, logicalcloud LogicalCloud, clusterList []Cluster,
 	if cid != "" {
 		// Make sure rsync status for this logical cloud is Terminated,
 		// otherwise we can't re-apply logical cloud yet
-		acStatus, _ := getAppContextStatus(ac)
+		acStatus, _ := lcclient.util.GetAppContextStatus(ac)
 		switch acStatus.Status {
 		case appcontext.AppContextStatusEnum.Terminated:
 			return pkgerrors.New("The Logical Cloud has already been terminated: " + logicalCloudName)

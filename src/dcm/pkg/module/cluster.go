@@ -260,7 +260,11 @@ func (v *ClusterClient) UpdateCluster(project, logicalCloud, clusterReference st
 // Get returns Cluster's kubeconfig for corresponding cluster reference
 func (v *ClusterClient) GetClusterConfig(project, logicalCloud, clusterReference string) (string, error) {
 	lcClient := NewLogicalCloudClient()
-	context, ctxVal, err := lcClient.GetLogicalCloudContext(project, logicalCloud)
+	lckey := LogicalCloudKey{
+		Project:          project,
+		LogicalCloudName: logicalCloud,
+	}
+	context, ctxVal, err := lcClient.util.GetLogicalCloudContext(lcClient.storeName, lckey, lcClient.tagMeta, project, logicalCloud)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Error getting logical cloud context.")
 	}
@@ -268,11 +272,6 @@ func (v *ClusterClient) GetClusterConfig(project, logicalCloud, clusterReference
 		return "", pkgerrors.New("Logical Cloud hasn't been applied yet")
 	}
 
-	// private key comes from logical cloud
-	lckey := LogicalCloudKey{
-		Project:          project,
-		LogicalCloudName: logicalCloud,
-	}
 	// get logical cloud resource
 	lc, err := lcClient.Get(project, logicalCloud)
 	if err != nil {

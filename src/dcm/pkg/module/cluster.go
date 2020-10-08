@@ -59,7 +59,7 @@ type KubeConfig struct {
 	Kind           string            `yaml:"kind"`
 	Clusters       []KubeCluster     `yaml:"clusters"`
 	Contexts       []KubeContext     `yaml:"contexts"`
-	CurrentContext string            `yaml:"current-context`
+	CurrentContext string            `yaml:"current-context"`
 	Preferences    map[string]string `yaml:"preferences"`
 	Users          []KubeUser        `yaml:"users"`
 }

@@ -46,6 +46,7 @@ liveness:
 
 persistence:
   enabled: false
+  storageType: hostPath
   volumeReclaimPolicy: Retain
   accessMode:  ReadWriteMany
   storage: 1Gi

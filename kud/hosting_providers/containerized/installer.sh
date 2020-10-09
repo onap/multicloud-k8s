@@ -50,7 +50,6 @@ function install_kubespray {
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     tar -C $dest_folder -xzf $tarball
-    mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
     chown -R root:root $dest_folder/kubespray-$version
     mkdir -p ${local_release_dir}/containers
     rm $tarball
@@ -77,11 +76,11 @@ function install_kubespray {
         echo "https_proxy: \"$https_proxy\"" | tee --append \
             $kud_inventory_folder/group_vars/all.yml
     fi
+    echo "ansible_python_interpreter: /usr/bin/python3" | tee --append \
+            $kud_inventory_folder/group_vars/all.yml
 }
 
 function install_k8s {
-    version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | \
-        awk -F ': ' '{print $2}')
     local cluster_name=$1
     ansible-playbook $verbose -i \
         $kud_inventory $dest_folder/kubespray-$version/cluster.yml \
@@ -199,6 +198,9 @@ function install_pkg {
 }
 
 function install_cluster {
+    version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | \
+        awk -F ': ' '{print $2}')
+    export ANSIBLE_CONFIG=$dest_folder/kubespray-$version/ansible.cfg
     install_k8s $1
     if [ ${2:+1} ]; then
         echo "install default addons and $2"

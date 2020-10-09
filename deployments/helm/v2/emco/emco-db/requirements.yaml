@@ -15,10 +15,10 @@
 dependencies:
   - name: common
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../common'
   - name: mongo
     version: ~4.x-0
-    repository: '@local'
+    repository: 'file://../mongo'
   - name: etcd
     version: ~3.x-0
-    repository: '@local'
+    repository: 'file://../etcd'

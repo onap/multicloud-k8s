@@ -15,22 +15,22 @@
 dependencies:
   - name: common
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../common'
   - name: orchestrator
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../orchestrator'
   - name: ncm
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../ncm'
   - name: rsync
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../rsync'
   - name: clm
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../clm'
   - name: ovnaction
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../ovnaction'
   - name: dcm
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../dcm'

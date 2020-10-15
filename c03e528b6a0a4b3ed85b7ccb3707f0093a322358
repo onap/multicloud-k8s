@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22beb898_2d6cd430",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-10-15T19:22:59Z",
+      "side": 1,
+      "message": "Huh, we\u0027re doing 301s?",
+      "range": {
+        "startLine": 416,
+        "startChar": 9,
+        "endLine": 416,
+        "endChar": 12
+      },
+      "revId": "c03e528b6a0a4b3ed85b7ccb3707f0093a322358",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a34a867_48fb94b3",
+        "filename": "docs/emco_apis.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 965,
+      "author": {
+        "id": 693
+      },
+      "writtenOn": "2020-10-15T19:22:59Z",
+      "side": 1,
+      "message": "What\u0027s going on here?",
+      "range": {
+        "startLine": 688,
+        "startChar": 0,
+        "endLine": 965,
+        "endChar": 21
+      },
+      "revId": "c03e528b6a0a4b3ed85b7ccb3707f0093a322358",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

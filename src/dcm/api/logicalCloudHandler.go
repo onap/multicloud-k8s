@@ -26,7 +26,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
 	orch "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
-	pkgerrors "github.com/pkg/errors"
 )
 
 // logicalCloudHandler is used to store backend implementations objects
@@ -266,13 +265,6 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	_, ctxVal, err := h.client.GetLogicalCloudContext(project, name)
-	if ctxVal == "" {
-		err = pkgerrors.New("Logical Cloud hasn't been applied yet")
-		http.Error(w, err.Error(), http.StatusConflict)
-		return
-	}
-
 	// Get Clusters
 	clusters, err := h.clusterClient.GetAllClusters(project, name)
 
@@ -291,8 +283,11 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 	// Terminate the Logical Cloud
 	err = module.Terminate(project, lc, clusters, quotas)
 	if err != nil {
+		if err.Error() == "Logical Cloud doesn't seem applied: "+name {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	return

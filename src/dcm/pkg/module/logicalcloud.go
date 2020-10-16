@@ -75,7 +75,6 @@ type LogicalCloudManager interface {
 	GetAll(project string) ([]LogicalCloud, error)
 	Delete(project, name string) error
 	Update(project, name string, c LogicalCloud) (LogicalCloud, error)
-	GetLogicalCloudContext(project string, name string) (appcontext.AppContext, string, error)
 }
 
 // Interface facilitates unit testing by mocking functions
@@ -86,6 +85,8 @@ type Utility interface {
 	DBRemove(storeName string, key db.Key) error
 	CheckProject(project string) error
 	CheckLogicalCloud(project, logicalCloud string) error
+	GetLogicalCloudContext(storeName string, key db.Key, meta string, project string, name string) (appcontext.AppContext, string, error)
+	GetAppContextStatus(ac appcontext.AppContext) (*appcontext.AppContextStatus, error)
 }
 
 // LogicalCloudClient implements the LogicalCloudManager
@@ -208,7 +209,7 @@ func (v *LogicalCloudClient) Delete(project, logicalCloudName string) error {
 		return pkgerrors.New("Logical Cloud does not exist")
 	}
 
-	context, _, err := v.GetLogicalCloudContext(project, logicalCloudName)
+	context, _, err := v.util.GetLogicalCloudContext(v.storeName, key, v.tagMeta, project, logicalCloudName)
 	// If there's no context for Logical Cloud, just go ahead and delete it now
 	if err != nil {
 		err = v.util.DBRemove(v.storeName, key)
@@ -220,7 +221,7 @@ func (v *LogicalCloudClient) Delete(project, logicalCloudName string) error {
 
 	// Make sure rsync status for this logical cloud is Terminated,
 	// otherwise we can't remove appcontext yet
-	acStatus, _ := getAppContextStatus(context)
+	acStatus, _ := v.util.GetAppContextStatus(context)
 	switch acStatus.Status {
 	case appcontext.AppContextStatusEnum.Terminated:
 		// remove the appcontext
@@ -267,14 +268,9 @@ func (v *LogicalCloudClient) Update(project, logicalCloudName string, c LogicalC
 }
 
 // GetLogicalCloudContext returns the AppContext for corresponding provider and name
-func (v *LogicalCloudClient) GetLogicalCloudContext(project string, name string) (appcontext.AppContext, string, error) {
-	//Construct key and tag to select the entry
-	key := LogicalCloudKey{
-		LogicalCloudName: name,
-		Project:          project,
-	}
+func (d DBService) GetLogicalCloudContext(storeName string, key db.Key, meta string, project string, name string) (appcontext.AppContext, string, error) {
 
-	value, err := v.util.DBFind(v.storeName, key, v.tagContext)
+	value, err := d.DBFind(storeName, key, meta)
 	if err != nil {
 		return appcontext.AppContext{}, "", pkgerrors.Wrap(err, "Get Logical Cloud Context")
 	}
@@ -353,7 +349,7 @@ func (d DBService) CheckLogicalCloud(project, logicalCloud string) error {
 	return nil
 }
 
-func getAppContextStatus(ac appcontext.AppContext) (*appcontext.AppContextStatus, error) {
+func (d DBService) GetAppContextStatus(ac appcontext.AppContext) (*appcontext.AppContextStatus, error) {
 
 	h, err := ac.GetCompositeAppHandle()
 	if err != nil {

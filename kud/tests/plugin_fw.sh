@@ -124,9 +124,9 @@ print_msg "Retrieving VNF details"
 response="$(call_api "${base_url}/instance/${vnf_id}")"
 echo "$response"
 print_msg "Assert additional label has been assigned to rb instance"
-test "$(jq -r .request.labels.testCaseName <<< "${response}")" == plugin_fw.sh
+test "$(jq -r '.request.labels.testCaseName' <<< "${response}")" == plugin_fw.sh
 print_msg "Assert ReleaseName has been correctly overriden"
-test "$(jq -r .request.release-name <<< "${response}")" == "${release_name}"
+test "$(jq -r '.request."release-name"' <<< "${response}")" == "${release_name}"
 
 #Teardown
 print_msg "Deleting VNF Instance"

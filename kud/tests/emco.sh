@@ -424,7 +424,7 @@ function deleteOrchestratorData {
 
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}"
 
     print_msg "deleteOrchestratorData done"
 }

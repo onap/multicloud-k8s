@@ -155,6 +155,7 @@ func (r *reconciler) updateServices(rbstate *v1alpha1.ResourceBundleState,
 			TypeMeta:   svc.TypeMeta,
 			ObjectMeta: svc.ObjectMeta,
 			Status:     svc.Status,
+			Spec:       svc.Spec,
 		}
 		rbstate.Status.ServiceStatuses = append(rbstate.Status.ServiceStatuses, resStatus)
 	}
@@ -180,6 +181,7 @@ func (r *reconciler) updatePods(rbstate *v1alpha1.ResourceBundleState,
 			TypeMeta:   pod.TypeMeta,
 			ObjectMeta: pod.ObjectMeta,
 			Status:     pod.Status,
+			Spec:       pod.Spec,
 		}
 		rbstate.Status.PodStatuses = append(rbstate.Status.PodStatuses, resStatus)
 	}
@@ -229,6 +231,7 @@ func (r *reconciler) updateDeployments(rbstate *v1alpha1.ResourceBundleState,
 			TypeMeta:   dep.TypeMeta,
 			ObjectMeta: dep.ObjectMeta,
 			Status:     dep.Status,
+			Spec:       dep.Spec,
 		}
 		rbstate.Status.DeploymentStatuses = append(rbstate.Status.DeploymentStatuses, resStatus)
 	}
@@ -278,6 +281,7 @@ func (r *reconciler) updateDaemonSets(rbstate *v1alpha1.ResourceBundleState,
 			TypeMeta:   ds.TypeMeta,
 			ObjectMeta: ds.ObjectMeta,
 			Status:     ds.Status,
+			Spec:       ds.Spec,
 		}
 		rbstate.Status.DaemonSetStatuses = append(rbstate.Status.DaemonSetStatuses, resStatus)
 	}
@@ -303,6 +307,7 @@ func (r *reconciler) updateIngresses(rbstate *v1alpha1.ResourceBundleState,
 			TypeMeta:   ing.TypeMeta,
 			ObjectMeta: ing.ObjectMeta,
 			Status:     ing.Status,
+			Spec:       ing.Spec,
 		}
 		rbstate.Status.IngressStatuses = append(rbstate.Status.IngressStatuses, resStatus)
 	}
@@ -328,6 +333,7 @@ func (r *reconciler) updateJobs(rbstate *v1alpha1.ResourceBundleState,
 			TypeMeta:   job.TypeMeta,
 			ObjectMeta: job.ObjectMeta,
 			Status:     job.Status,
+			Spec:       job.Spec,
 		}
 		rbstate.Status.JobStatuses = append(rbstate.Status.JobStatuses, resStatus)
 	}
@@ -353,6 +359,7 @@ func (r *reconciler) updateStatefulSets(rbstate *v1alpha1.ResourceBundleState,
 			TypeMeta:   sfs.TypeMeta,
 			ObjectMeta: sfs.ObjectMeta,
 			Status:     sfs.Status,
+			Spec:       sfs.Spec,
 		}
 		rbstate.Status.StatefulSetStatuses = append(rbstate.Status.StatefulSetStatuses, resStatus)
 	}
@@ -378,6 +385,7 @@ func (r *reconciler) updateCsrs(rbstate *v1alpha1.ResourceBundleState,
 			TypeMeta:   csr.TypeMeta,
 			ObjectMeta: csr.ObjectMeta,
 			Status:     csr.Status,
+			Spec:       csr.Spec,
 		}
 		rbstate.Status.CsrStatuses = append(rbstate.Status.CsrStatuses, resStatus)
 	}

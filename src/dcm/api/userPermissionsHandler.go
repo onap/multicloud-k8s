@@ -25,6 +25,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 )
 
 // userPermissionHandler is used to store backend implementations objects
@@ -43,21 +44,25 @@ func (h userPermissionHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// User-Permission Name is required.
 	if v.UserPermissionName == "" {
+		log.Error("API: Missing name in POST request", log.Fields{})
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.CreateUserPerm(project, logicalCloud, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -66,6 +71,7 @@ func (h userPermissionHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -82,6 +88,7 @@ func (h userPermissionHandler) getAllHandler(w http.ResponseWriter, r *http.Requ
 
 	ret, err = h.client.GetAllUserPerms(project, logicalCloud)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -90,6 +97,7 @@ func (h userPermissionHandler) getAllHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -107,6 +115,7 @@ func (h userPermissionHandler) getHandler(w http.ResponseWriter, r *http.Request
 
 	ret, err = h.client.GetUserPerm(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "User Permission does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -119,6 +128,7 @@ func (h userPermissionHandler) getHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -135,21 +145,25 @@ func (h userPermissionHandler) updateHandler(w http.ResponseWriter, r *http.Requ
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Name is required.
 	if v.UserPermissionName == "" {
+		log.Error("API: Missing name in PUT request", log.Fields{})
 		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.UpdateUserPerm(project, logicalCloud, name, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "User Permission does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -162,6 +176,7 @@ func (h userPermissionHandler) updateHandler(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(),
 			http.StatusInternalServerError)
 		return
@@ -177,6 +192,7 @@ func (h userPermissionHandler) deleteHandler(w http.ResponseWriter, r *http.Requ
 
 	err := h.client.DeleteUserPerm(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

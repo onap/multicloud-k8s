@@ -25,6 +25,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	orch "github.com/onap/multicloud-k8s/src/orchestrator/pkg/module"
 )
 
@@ -45,9 +46,11 @@ func (h logicalCloudHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -63,12 +66,14 @@ func (h logicalCloudHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	p := orch.NewProjectClient()
 	_, err = p.GetProject(project)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "The specified project does not exist.", http.StatusNotFound)
 		return
 	}
 
 	ret, err := h.client.Create(project, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -77,6 +82,7 @@ func (h logicalCloudHandler) createHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -92,6 +98,7 @@ func (h logicalCloudHandler) getAllHandler(w http.ResponseWriter, r *http.Reques
 
 	ret, err = h.client.GetAll(project)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -100,6 +107,7 @@ func (h logicalCloudHandler) getAllHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -116,6 +124,7 @@ func (h logicalCloudHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 
 	ret, err = h.client.Get(project, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Logical Cloud does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -128,6 +137,7 @@ func (h logicalCloudHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -143,20 +153,24 @@ func (h logicalCloudHandler) updateHandler(w http.ResponseWriter, r *http.Reques
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	if v.MetaData.LogicalCloudName == "" {
+		log.Error("API: Missing name in PUT request", log.Fields{})
 		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.Update(project, name, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Logical Cloud does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -183,6 +197,7 @@ func (h logicalCloudHandler) deleteHandler(w http.ResponseWriter, r *http.Reques
 
 	err := h.client.Delete(project, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Logical Cloud does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -207,6 +222,7 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	// Get logical cloud
 	lc, err := h.client.Get(project, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Logical Cloud does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -219,6 +235,7 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	clusters, err := h.clusterClient.GetAllClusters(project, name)
 
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "No Cluster References associated" {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -230,6 +247,7 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	// Get Quotas
 	quotas, err := h.quotaClient.GetAllQuotas(project, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -237,6 +255,7 @@ func (h logicalCloudHandler) applyHandler(w http.ResponseWriter, r *http.Request
 	// Apply the Logical Cloud
 	err = module.Apply(project, lc, clusters, quotas)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "The Logical Cloud can't be re-applied yet, it is being terminated." {
 			http.Error(w, err.Error(), http.StatusConflict)
 			return
@@ -257,6 +276,7 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 	// Get logical cloud
 	lc, err := h.client.Get(project, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Logical Cloud does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -269,6 +289,7 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 	clusters, err := h.clusterClient.GetAllClusters(project, name)
 
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -276,6 +297,7 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 	// Get Quotas
 	quotas, err := h.quotaClient.GetAllQuotas(project, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -283,6 +305,7 @@ func (h logicalCloudHandler) terminateHandler(w http.ResponseWriter, r *http.Req
 	// Terminate the Logical Cloud
 	err = module.Terminate(project, lc, clusters, quotas)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Logical Cloud doesn't seem applied: "+name {
 			http.Error(w, err.Error(), http.StatusConflict)
 			return

@@ -25,6 +25,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 )
 
 // quotaHandler is used to store backend implementations objects
@@ -42,21 +43,25 @@ func (h quotaHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Quota Name is required.
 	if v.MetaData.QuotaName == "" {
+		log.Error("API: Missing name in POST request", log.Fields{})
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.CreateQuota(project, logicalCloud, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -65,6 +70,7 @@ func (h quotaHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -81,6 +87,7 @@ func (h quotaHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err = h.client.GetAllQuotas(project, logicalCloud)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -89,6 +96,7 @@ func (h quotaHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -106,6 +114,7 @@ func (h quotaHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err = h.client.GetQuota(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Cluster Quota does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -118,6 +127,7 @@ func (h quotaHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -134,21 +144,25 @@ func (h quotaHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Name is required.
 	if v.MetaData.QuotaName == "" {
+		log.Error("API: Missing name in PUT request", log.Fields{})
 		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.UpdateQuota(project, logicalCloud, name, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Cluster Quota does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -161,6 +175,7 @@ func (h quotaHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(),
 			http.StatusInternalServerError)
 		return
@@ -176,6 +191,7 @@ func (h quotaHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := h.client.DeleteQuota(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

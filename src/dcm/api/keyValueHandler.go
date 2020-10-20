@@ -25,6 +25,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 )
 
 // keyValueHandler is used to store backend implementations objects
@@ -42,21 +43,25 @@ func (h keyValueHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Key Value Name is required.
 	if v.MetaData.KeyValueName == "" {
+		log.Error("API: Missing name in POST request", log.Fields{})
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.CreateKVPair(project, logicalCloud, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -65,6 +70,7 @@ func (h keyValueHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -81,6 +87,7 @@ func (h keyValueHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err = h.client.GetAllKVPairs(project, logicalCloud)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -89,6 +96,7 @@ func (h keyValueHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -106,6 +114,7 @@ func (h keyValueHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err = h.client.GetKVPair(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "KV Pair does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -118,6 +127,7 @@ func (h keyValueHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -134,21 +144,25 @@ func (h keyValueHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Name is required.
 	if v.MetaData.KeyValueName == "" {
+		log.Error("API: Missing name in PUT request", log.Fields{})
 		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.UpdateKVPair(project, logicalCloud, name, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "KV Pair does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -176,6 +190,7 @@ func (h keyValueHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := h.client.DeleteKVPair(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

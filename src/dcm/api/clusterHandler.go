@@ -25,6 +25,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/dcm/pkg/module"
+	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 )
 
 // clusterHandler is used to store backend implementations objects
@@ -42,21 +43,25 @@ func (h clusterHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Cluster Reference Name is required.
 	if v.MetaData.ClusterReference == "" {
+		log.Error("API: Missing name in POST request", log.Fields{})
 		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.CreateCluster(project, logicalCloud, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -65,6 +70,7 @@ func (h clusterHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -81,6 +87,7 @@ func (h clusterHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err = h.client.GetAllClusters(project, logicalCloud)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -89,6 +96,7 @@ func (h clusterHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -106,6 +114,7 @@ func (h clusterHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err = h.client.GetCluster(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Cluster Reference does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -118,6 +127,7 @@ func (h clusterHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -134,21 +144,25 @@ func (h clusterHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&v)
 	switch {
 	case err == io.EOF:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, "Empty body", http.StatusBadRequest)
 		return
 	case err != nil:
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	// Name is required.
 	if v.MetaData.ClusterReference == "" {
+		log.Error("API: Missing name in PUT request", log.Fields{})
 		http.Error(w, "Missing name in PUT request", http.StatusBadRequest)
 		return
 	}
 
 	ret, err := h.client.UpdateCluster(project, logicalCloud, name, v)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Cluster Reference does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -161,6 +175,7 @@ func (h clusterHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(),
 			http.StatusInternalServerError)
 		return
@@ -176,6 +191,7 @@ func (h clusterHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := h.client.DeleteCluster(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -194,6 +210,7 @@ func (h clusterHandler) getConfigHandler(w http.ResponseWriter, r *http.Request)
 
 	_, err = h.client.GetCluster(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "Cluster Reference does not exist" {
 			http.Error(w, err.Error(), http.StatusNotFound)
 		} else {
@@ -204,6 +221,7 @@ func (h clusterHandler) getConfigHandler(w http.ResponseWriter, r *http.Request)
 
 	cfg, err := h.client.GetClusterConfig(project, logicalCloud, name)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		if err.Error() == "The certificate for this cluster hasn't been issued yet. Please try later." {
 			http.Error(w, err.Error(), http.StatusAccepted)
 		} else if err.Error() == "Logical Cloud hasn't been applied yet" {
@@ -218,6 +236,7 @@ func (h clusterHandler) getConfigHandler(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 	_, err = io.WriteString(w, cfg)
 	if err != nil {
+		log.Error("API: "+err.Error(), log.Fields{})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

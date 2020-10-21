@@ -36,6 +36,10 @@
     - debug:
         var: make_all.stdout_lines
 
+    - name: Get cluster name
+      shell: "kubectl -n kube-system get configmap/kubeadm-config -o yaml | grep clusterName: | awk '{print $2}'"
+      register: cluster_name
+
     - name: Change the emco directory and run the command helm install
       command: /usr/local/bin/helm install --namespace emco --create-namespace --set emco-tools.fluentd.clusterDomain={{ cluster_name.stdout }} emco dist/packages/emco-0.1.0.tgz
       register: helm_install

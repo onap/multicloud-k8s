@@ -18,16 +18,16 @@
 global:
   nodePortPrefixExt: 304
   readinessRepository: oomk8s
-  readinessImage: readiness-check:2.0.0
+  readinessImage: readiness-check:2.2.2
   loggingRepository: docker.elastic.co
-  loggingImage: beats/filebeat:5.5.0
+  loggingImage: beats/filebeat:7.9.3
   persistence: {}
 #################################################################
 # Application configuration defaults.
 #################################################################
 # application image
 repository: registry.hub.docker.com
-image: onap/multicloud-k8s:0.5.0
+image: onap/multicloud-k8s:0.7.0
 pullPolicy: Always
 
 # flag to enable debugging - application support required

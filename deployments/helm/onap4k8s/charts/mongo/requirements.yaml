@@ -15,4 +15,4 @@
 dependencies:
   - name: common
     version: ~5.x-0
-    repository: '@onap4k8s'
+    repository: 'file://../common'

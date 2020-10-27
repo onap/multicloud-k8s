@@ -102,6 +102,7 @@ function _set_environment_file {
     echo "export OVN_CENTRAL_ADDRESS=$(get_ovn_central_address)" | sudo tee --append /etc/environment
     echo "export KUBE_CONFIG_DIR=/opt/kubeconfig" | sudo tee --append /etc/environment
     echo "export CSAR_DIR=/opt/csar" | sudo tee --append /etc/environment
+    echo "export ANSIBLE_CONFIG=${ANSIBLE_CONFIG}" | sudo tee --append /etc/environment
 }
 
 # install_k8s() - Install Kubernetes using kubespray tool
@@ -117,7 +118,6 @@ function install_k8s {
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     sudo tar -C $dest_folder -xzf $tarball
-    sudo mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
     sudo chown -R $USER $dest_folder/kubespray-$version
     sudo mkdir -p ${local_release_dir}/containers
     rm $tarball
@@ -139,6 +139,8 @@ function install_k8s {
     if [[ -n "${https_proxy:-}" ]]; then
         echo "https_proxy: \"$https_proxy\"" | tee --append $kud_inventory_folder/group_vars/all.yml
     fi
+    export ANSIBLE_CONFIG=$dest_folder/kubespray-$version/ansible.cfg
+    ansible-playbook $verbose -i $kud_inventory $kud_playbooks/preconfigure-kubespray.yml --become --become-user=root | sudo tee $log_folder/setup-kubernetes.log
     ansible-playbook $verbose -i $kud_inventory $dest_folder/kubespray-$version/cluster.yml --become --become-user=root | sudo tee $log_folder/setup-kubernetes.log
 
     # Configure environment

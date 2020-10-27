@@ -36,7 +36,6 @@ function _install_ansible {
     pip install --no-cache-dir ansible==$version
 }
 
-# install_k8s() - Install Kubernetes using kubespray tool
 function install_kubespray {
     echo "Deploying kubernetes"
     version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | \
@@ -50,7 +49,6 @@ function install_kubespray {
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     tar -C $dest_folder -xzf $tarball
-    mv $dest_folder/kubespray-$version/ansible.cfg /etc/ansible/ansible.cfg
     chown -R root:root $dest_folder/kubespray-$version
     mkdir -p ${local_release_dir}/containers
     rm $tarball
@@ -79,10 +77,13 @@ function install_kubespray {
     fi
 }
 
+# install_k8s() - Install Kubernetes using kubespray tool
 function install_k8s {
-    version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | \
-        awk -F ': ' '{print $2}')
     local cluster_name=$1
+    ansible-playbook $verbose -i \
+        $kud_inventory $kud_playbooks/preconfigure-kubespray.yml \
+        --become --become-user=root | \
+        tee $cluster_log/setup-kubernetes.log
     ansible-playbook $verbose -i \
         $kud_inventory $dest_folder/kubespray-$version/cluster.yml \
         -e cluster_name=$cluster_name --become --become-user=root | \
@@ -199,6 +200,9 @@ function install_pkg {
 }
 
 function install_cluster {
+    version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | \
+        awk -F ': ' '{print $2}')
+    export ANSIBLE_CONFIG=$dest_folder/kubespray-$version/ansible.cfg
     install_k8s $1
     if [ ${2:+1} ]; then
         echo "install default addons and $2"

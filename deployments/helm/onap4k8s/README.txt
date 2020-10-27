@@ -16,9 +16,6 @@
 # Installation of ONAP4K8S helm chart
 #################################################################
 
-1. Create a helm repo (onap4k8s) from Makefile
-$ make repo
-
 1. Run "Makefile" in ONAP4K8S repo
 $ make all
 

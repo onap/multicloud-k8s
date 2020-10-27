@@ -54,16 +54,5 @@ clean:
 	@rm -rf $(PACKAGE_DIR)/*
 	@rm -rf $(OUTPUT_DIR)
 
-# start up a local helm repo to serve up helm chart packages
-repo:
-	@mkdir -p $(PACKAGE_DIR)
-	@helm serve --repo-path $(PACKAGE_DIR) &
-	@helm repo index $(PACKAGE_DIR)
-	@helm repo add onap4k8s http://127.0.0.1:8879
-
-# stop local helm repo
-repo-stop:
-	@pkill helm
-	@helm repo remove onap4k8s
 %:
 	@:

@@ -15,11 +15,11 @@
 dependencies:
   - name: emco-db
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../emco-db'
   - name: emco-tools
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../emco-tools'
   - name: emco-services
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../emco-services'
 

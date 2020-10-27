@@ -6,11 +6,7 @@ EMCO Helm charts include charts for EMCO microservices along with MongoDb, etcd,
 
 
 ### Steps to generate and install packages
-**1. Create a local helm repo from Makefile**
-
-`$ make repo`
-
-**2. Run make file to package all the required chart**
+**1. Run make file to package all the required chart**
 
 `$ make clean`
 
@@ -26,13 +22,13 @@ Pacakges helm charts in tar.gz format. All packages are in **dist/packages** dir
   | **emco-0.1.0.tgz**   | Includes all charts including database, all services and tools        |
 
 
-**3. Deploy EMCO Packages for Databases and Services**
+**2. Deploy EMCO Packages for Databases and Services**
 
 `$ helm install dist/packages/emco-db-0.1.0.tgz --name emco-db --namespace emco`
 
 `$ helm install dist/packages/emco-services-0.1.0.tgz --name emco-services --namespace emco`
 
-**4. Deploy tools (Optional)**
+**3. Deploy tools (Optional)**
 
 `$ helm install dist/packages/emco-tools-0.1.0.tgz --name emco-tools --namespace emco`
 
@@ -41,12 +37,12 @@ NOTE: Deploy the Chart emco-0.1.0.tgz to deploy all packages including database,
 `$ helm install dist/packages/emco-0.1.0.tgz --name emco --namespace emco`
 
 
-**5. To check logs of the different Microservices check fluentd logs**
+**4. To check logs of the different Microservices check fluentd logs**
 
 `kubectl logs emco-tools-fluentd-0 -n emco | grep orchestrator`
 
 
-**6. Delete all packages**
+**5. Delete all packages**
 
 `$ helm delete emco-services --purge`
 
@@ -61,7 +57,7 @@ NOTE: If the Chart emco-0.1.0.tgz was deployed
 `$ helm delete emco --purge`
 
 
-**7. Delete local helm repo**
+**6. Delete local helm repo**
 
 `make repo-stop`
 

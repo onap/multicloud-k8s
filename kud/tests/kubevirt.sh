@@ -39,7 +39,6 @@ if (($try > $tries)); then
 fi
 
 # Test
-master_ip=$(kubectl cluster-info | grep "Kubernetes master" | awk -F '[:/]' '{print $4}')
 deployment_pod=$(kubectl get pods | grep $kubevirt_vmi_name | awk '{print $1}')
 echo "Pod name: $deployment_pod"
 echo "ssh testuser@$(kubectl get pods $deployment_pod -o jsonpath="{.status.podIP}")"
@@ -50,7 +49,7 @@ interval=60
 for ((try=1;try<=$tries;try++)); do
     echo "try $try/$tries: Wait for $interval seconds to check for ssh access"
     sleep $interval
-    if sshpass -p testuser ssh -o ProxyCommand="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p $master_ip" -o StrictHostKeyChecking=no testuser@$(kubectl get pods $deployment_pod -o jsonpath="{.status.podIP}") -- uptime; then
+    if sshpass -p testuser ssh -o ProxyCommand="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p $(control_plane_ip)" -o StrictHostKeyChecking=no testuser@$(kubectl get pods $deployment_pod -o jsonpath="{.status.podIP}") -- uptime; then
         echo "ssh access check is success"
         break
     fi

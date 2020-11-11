@@ -17,8 +17,7 @@ function delete_resource_nox {
     ! call_api -X GET "$1" >/dev/null
 }
 
-master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
-    awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
+master_ip=$(control_plane_ip)
 rsync_service_port=30441
 rsync_service_host="$master_ip"
 base_url_orchestrator=${base_url_orchestrator:-"http://$master_ip:30415/v2"}

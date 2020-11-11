@@ -31,7 +31,7 @@ kube_users:
 
 ## It is possible to activate / deactivate selected authentication methods (basic auth, static token auth)
 #kube_oidc_auth: false
-kube_basic_auth: true
+#kube_basic_auth: true
 kube_token_auth: true
 
 # Choose network plugin (calico, contiv, weave or flannel)
@@ -47,6 +47,9 @@ enable_nodelocaldns: false
 # Enable MountPropagation gate feature
 local_volumes_enabled: true
 local_volume_provisioner_enabled: true
+
+## Change this to use another Kubernetes version, e.g. a current beta release
+kube_version: v1.20.7
 
 # Helm deployment
 helm_enabled: true
@@ -124,3 +127,6 @@ podsecuritypolicy_restricted_spec:
 kubelet_node_config_extra_args:
   cpuManagerPolicy: "static" # Options: none (disabled), static (default)
   topologyManagerPolicy: "best-effort" # Options: none (disabled), best-effort (default), restricted, single-numa-node
+
+# Deploy the Kubernetes dashboard
+dashboard_enabled: true

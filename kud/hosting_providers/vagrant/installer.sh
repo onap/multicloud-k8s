@@ -142,7 +142,7 @@ function install_addons {
     # The order of KUD_ADDONS is important: some plugins (sriov, qat)
     # require nfd to be enabled. Some addons are not currently supported with containerd
     if [ "${container_runtime}" == "docker" ]; then
-        kud_addons=${KUD_ADDONS:-virtlet ovn4nfv nfd sriov \
+        kud_addons=${KUD_ADDONS:-ovn4nfv nfd sriov \
             qat optane cmk}
     elif [ "${container_runtime}" == "containerd" ]; then
         kud_addons=${KUD_ADDONS:-ovn4nfv nfd}
@@ -216,7 +216,7 @@ function install_plugin {
     if [[ "${testing_enabled}" == "true" ]]; then
         sudo ./start.sh
         pushd $kud_tests
-        for functional_test in plugin plugin_edgex plugin_fw plugin_eaa; do
+        for functional_test in plugin plugin_edgex plugin_eaa; do
             bash ${functional_test}.sh
         done
         popd

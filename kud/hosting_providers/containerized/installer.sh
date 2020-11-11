@@ -175,16 +175,9 @@ function install_addons {
             case $addon in
                 "onap4k8s" )
                     echo "Test the onap4k8s plugin installation"
-                    for functional_test in plugin_edgex plugin_fw plugin_eaa; do
+                    for functional_test in plugin_edgex plugin_eaa; do
                         bash ${functional_test}.sh --external || failed_kud_tests="${failed_kud_tests} ${functional_test}"
                     done
-                    ;;
-                "emco" )
-                    echo "Test the emco plugin installation"
-                    # TODO plugin_fw_v2 requires virtlet and a patched multus to succeed
-                    # for functional_test in plugin_fw_v2; do
-                    #     bash ${functional_test}.sh --external || failed_kud_tests="${failed_kud_tests} ${functional_test}"
-                    # done
                     ;;
             esac
             popd

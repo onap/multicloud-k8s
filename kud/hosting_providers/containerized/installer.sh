@@ -46,8 +46,7 @@ function _install_ansible {
 
 function install_kubespray {
     echo "Deploying kubernetes"
-    version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | \
-        awk -F ': ' '{print $2}')
+    version=$kubespray_version
     local_release_dir=$(grep "local_release_dir" \
         $kud_inventory_folder/group_vars/k8s-cluster.yml | \
         awk -F "\"" '{print $2}')
@@ -139,7 +138,7 @@ function install_addons {
         $kud_infra_folder/galaxy-requirements.yml --ignore-errors
 
     ansible-playbook $verbose -i \
-        $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml \
+        $kud_inventory -e "base_dest=$HOME" -e "helm_client_version=$helm_client_version" $kud_playbooks/configure-kud.yml \
         | tee $cluster_log/setup-kud.log
 
     kud_addons="${KUD_ADDONS:-} ${plugins_name}"
@@ -175,16 +174,9 @@ function install_addons {
             case $addon in
                 "onap4k8s" )
                     echo "Test the onap4k8s plugin installation"
-                    for functional_test in plugin_edgex plugin_fw plugin_eaa; do
+                    for functional_test in plugin_edgex plugin_eaa; do
                         bash ${functional_test}.sh --external || failed_kud_tests="${failed_kud_tests} ${functional_test}"
                     done
-                    ;;
-                "emco" )
-                    echo "Test the emco plugin installation"
-                    # TODO plugin_fw_v2 requires virtlet and a patched multus to succeed
-                    # for functional_test in plugin_fw_v2; do
-                    #     bash ${functional_test}.sh --external || failed_kud_tests="${failed_kud_tests} ${functional_test}"
-                    # done
                     ;;
             esac
             popd
@@ -285,6 +277,8 @@ if [[ -n "${KUD_DEBUG:-}" ]]; then
 fi
 
 # Configuration values
+kubespray_version="2.16.0"
+helm_client_version="3.5.4"
 dest_folder=/opt
 kud_folder=${INSTALLER_DIR}
 kud_infra_folder=$kud_folder/../../deployment_infra
@@ -299,8 +293,11 @@ kata_webhook_deployed=false
 # For containerd the etcd_deployment_type: docker is the default and doesn't work.
 # You have to use either etcd_kubeadm_enabled: true or etcd_deployment_type: host
 # See https://github.com/kubernetes-sigs/kubespray/issues/5713
+#
+# The JSON notation below is used to prevent false from being interpreted as a
+# string by ansible.
 kud_kata_override_variables="container_manager=containerd \
-    -e etcd_deployment_type=host -e kubelet_cgroup_driver=cgroupfs"
+    -e etcd_deployment_type=host"
 
 mkdir -p /opt/csar
 export CSAR_DIR=/opt/csar
@@ -311,8 +308,7 @@ function install_pkg {
 }
 
 function install_cluster {
-    version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | \
-        awk -F ': ' '{print $2}')
+    version=$kubespray_version
     export ANSIBLE_CONFIG=$dest_folder/kubespray-$version/ansible.cfg
     install_k8s $1
     if [ ${2:+1} ]; then

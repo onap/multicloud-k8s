@@ -68,7 +68,7 @@ function _set_environment_file {
 function install_k8s {
     echo "Deploying kubernetes"
     local dest_folder=/opt
-    version=$(grep "kubespray_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
+    version=$kubespray_version
     local_release_dir=$(grep "local_release_dir" $kud_inventory_folder/group_vars/k8s-cluster.yml | awk -F "\"" '{print $2}')
     local tarball=v$version.tar.gz
     sudo apt-get install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
@@ -85,10 +85,19 @@ function install_k8s {
     make mitogen
     popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
+    if [[ -n "${kube_version:-}" ]]; then
+        echo "kube_version: $kube_version" | tee --append $kud_inventory_folder/group_vars/all.yml
+    fi
+    if [[ -n "${kube_basic_auth:-}" ]]; then
+        echo "kube_basic_auth: $kube_basic_auth" | tee --append $kud_inventory_folder/group_vars/all.yml
+    fi
+    if [[ -n "${dashboard_enabled:-}" ]]; then
+        echo "dashboard_enabled: $dashboard_enabled" | tee --append $kud_inventory_folder/group_vars/all.yml
+    fi
     if [[ -n "${verbose:-}" ]]; then
-        echo "kube_log_level: 5" | tee $kud_inventory_folder/group_vars/all.yml
+        echo "kube_log_level: 5" | tee --append $kud_inventory_folder/group_vars/all.yml
     else
-        echo "kube_log_level: 2" | tee $kud_inventory_folder/group_vars/all.yml
+        echo "kube_log_level: 2" | tee --append $kud_inventory_folder/group_vars/all.yml
     fi
     echo "kubeadm_enabled: true" | tee --append $kud_inventory_folder/group_vars/all.yml
     if [[ -n "${http_proxy:-}" ]]; then
@@ -109,7 +118,7 @@ function install_k8s {
             --become-user=root | sudo tee $log_folder/setup-kubernetes.log
     elif [ "$container_runtime" == "containerd" ]; then
         /bin/echo -e "\n\e[1;42mContainerd will be used as the container runtime interface\e[0m"
-        # Because the kud_kata_override_variable has its own quotations in it
+        # Because the kud_kata_override_variables has its own quotations in it
         # a eval command is needed to properly execute the ansible script
         ansible_kubespray_cmd="ansible-playbook $verbose -i $kud_inventory \
             $dest_folder/kubespray-$version/cluster.yml \
@@ -137,16 +146,17 @@ function install_addons {
     echo "Installing Kubernetes AddOns"
     _install_ansible
     sudo ansible-galaxy install $verbose -r $kud_infra_folder/galaxy-requirements.yml --ignore-errors
-    ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
+    ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" -e "helm_client_version=$helm_client_version" $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
 
     # The order of KUD_ADDONS is important: some plugins (sriov, qat)
     # require nfd to be enabled. Some addons are not currently supported with containerd
     if [ "${container_runtime}" == "docker" ]; then
-        kud_addons=${KUD_ADDONS:-virtlet ovn4nfv nfd sriov \
-            qat optane cmk}
+        default_addons="virtlet ovn4nfv nfd sriov qat optane cmk"
+        if [[ $kubespray_version == "2.16.0" ]]; then default_addons=${default_addons//virtlet/}; fi
     elif [ "${container_runtime}" == "containerd" ]; then
-        kud_addons=${KUD_ADDONS:-ovn4nfv nfd}
+        default_addons="ovn4nfv nfd"
     fi
+    kud_addons=${KUD_ADDONS:-$default_addons}
 
     for addon in ${kud_addons}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
@@ -216,7 +226,9 @@ function install_plugin {
     if [[ "${testing_enabled}" == "true" ]]; then
         sudo ./start.sh
         pushd $kud_tests
-        for functional_test in plugin plugin_edgex plugin_fw plugin_eaa; do
+        plugin_tests="plugin plugin_edgex plugin_fw plugin_eaa"
+        if [[ $kubespray_version == "2.16.0" ]]; then plugin_tests=${plugin_tests//plugin_fw/}; fi
+        for functional_test in ${plugin_tests}; do
             bash ${functional_test}.sh
         done
         popd
@@ -260,6 +272,15 @@ if [[ -n "${KUD_DEBUG:-}" ]]; then
 fi
 
 # Configuration values
+kubespray_version=${KUBESPRAY_VERSION:-2.14.1}
+if [[ $kubespray_version == "2.16.0" ]]; then
+    helm_client_version="3.5.4"
+    kube_version="v1.20.7"
+    dashboard_enabled="true"
+else
+    helm_client_version="3.2.4"
+    kube_basic_auth="true"
+fi
 log_folder=/var/log/kud
 kud_folder=${INSTALLER_DIR}
 kud_infra_folder=$kud_folder/../../deployment_infra
@@ -276,9 +297,15 @@ kata_webhook_deployed=false
 # For containerd the etcd_deployment_type: docker is the default and doesn't work.
 # You have to use either etcd_kubeadm_enabled: true or etcd_deployment_type: host
 # See https://github.com/kubernetes-sigs/kubespray/issues/5713
+#
+# The JSON notation below is used to prevent false from being interpreted as a
+# string by ansible.
 kud_kata_override_variables="container_manager=containerd \
     -e etcd_deployment_type=host -e kubelet_cgroup_driver=cgroupfs \
     -e \"{'download_localhost': false}\" -e \"{'download_run_once': false}\""
+if [[ $kubespray_version == "2.16.0" ]]; then
+    kud_kata_override_variables=${kud_kata_override_variables//-e kubelet_cgroup_driver=cgroupfs/}
+fi
 
 sudo mkdir -p $log_folder
 sudo mkdir -p /opt/csar

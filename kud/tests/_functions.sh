@@ -29,9 +29,12 @@ function print_msg {
     echo -e "${RED} $msg ---------------------------------------${NC}"
 }
 
+function control_plane_ip {
+    kubectl get endpoints kubernetes -o jsonpath='{.subsets[].addresses[].ip}'
+}
+
 function ssh_cluster {
-    master_ip=$(kubectl cluster-info | grep "Kubernetes master" | awk -F '[:/]' '{print $4}')
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${master_ip} -- "$@"
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $(control_plane_ip) -- "$@"
 }
 
 function get_ovn_central_address {

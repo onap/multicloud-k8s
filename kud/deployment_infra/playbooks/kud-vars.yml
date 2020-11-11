@@ -57,7 +57,7 @@ cmk_untaint_required: true
 #cmk_exclusive_mode: packed # choose between: packed, spread, default: packed
 
 go_version: '1.12.5'
-kubespray_version: 2.14.1
+kubespray_version: 2.14.2
 # This matches the helm_version from kubespray defaults
 helm_client_version: 3.2.4
 # kud playbooks not compatible with 2.8.0 - see MULTICLOUD-634

@@ -175,16 +175,9 @@ function install_addons {
             case $addon in
                 "onap4k8s" )
                     echo "Test the onap4k8s plugin installation"
-                    for functional_test in plugin_edgex plugin_fw plugin_eaa; do
+                    for functional_test in plugin_edgex plugin_eaa; do
                         bash ${functional_test}.sh --external || failed_kud_tests="${failed_kud_tests} ${functional_test}"
                     done
-                    ;;
-                "emco" )
-                    echo "Test the emco plugin installation"
-                    # TODO plugin_fw_v2 requires virtlet and a patched multus to succeed
-                    # for functional_test in plugin_fw_v2; do
-                    #     bash ${functional_test}.sh --external || failed_kud_tests="${failed_kud_tests} ${functional_test}"
-                    # done
                     ;;
             esac
             popd
@@ -299,8 +292,11 @@ kata_webhook_deployed=false
 # For containerd the etcd_deployment_type: docker is the default and doesn't work.
 # You have to use either etcd_kubeadm_enabled: true or etcd_deployment_type: host
 # See https://github.com/kubernetes-sigs/kubespray/issues/5713
+#
+# The JSON notation below is used to prevent false from being interpreted as a
+# string by ansible.
 kud_kata_override_variables="container_manager=containerd \
-    -e etcd_deployment_type=host -e kubelet_cgroup_driver=cgroupfs"
+    -e etcd_deployment_type=host"
 
 mkdir -p /opt/csar
 export CSAR_DIR=/opt/csar

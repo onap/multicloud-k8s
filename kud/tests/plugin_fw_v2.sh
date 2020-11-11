@@ -56,7 +56,7 @@ while [[ $# -gt 0 ]]; do
 
     case $arg in
         "--external" )
-            service_host=$(kubectl cluster-info | grep "Kubernetes master" | \
+            service_host=$(kubectl cluster-info | grep "Kubernetes control plane" | \
                 awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
             shift
             ;;

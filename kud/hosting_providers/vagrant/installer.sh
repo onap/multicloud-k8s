@@ -142,7 +142,7 @@ function install_addons {
     # The order of KUD_ADDONS is important: some plugins (sriov, qat)
     # require nfd to be enabled. Some addons are not currently supported with containerd
     if [ "${container_runtime}" == "docker" ]; then
-        kud_addons=${KUD_ADDONS:-virtlet ovn4nfv nfd sriov \
+        kud_addons=${KUD_ADDONS:-ovn4nfv nfd sriov \
             qat optane cmk}
     elif [ "${container_runtime}" == "containerd" ]; then
         kud_addons=${KUD_ADDONS:-ovn4nfv nfd}
@@ -216,7 +216,7 @@ function install_plugin {
     if [[ "${testing_enabled}" == "true" ]]; then
         sudo ./start.sh
         pushd $kud_tests
-        for functional_test in plugin plugin_edgex plugin_fw plugin_eaa; do
+        for functional_test in plugin plugin_edgex plugin_eaa; do
             bash ${functional_test}.sh
         done
         popd
@@ -276,8 +276,11 @@ kata_webhook_deployed=false
 # For containerd the etcd_deployment_type: docker is the default and doesn't work.
 # You have to use either etcd_kubeadm_enabled: true or etcd_deployment_type: host
 # See https://github.com/kubernetes-sigs/kubespray/issues/5713
+#
+# The JSON notation below is used to prevent false from being interpreted as a
+# string by ansible.
 kud_kata_override_variables="container_manager=containerd \
-    -e etcd_deployment_type=host -e kubelet_cgroup_driver=cgroupfs \
+    -e etcd_deployment_type=host \
     -e \"{'download_localhost': false}\" -e \"{'download_run_once': false}\""
 
 sudo mkdir -p $log_folder

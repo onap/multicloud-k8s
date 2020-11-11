@@ -53,9 +53,9 @@ cmk_pkgs: make,jq
 cmk_untaint_required: true
 
 go_version: '1.14.15'
-kubespray_version: 2.14.1
+kubespray_version: 2.16.0
 # This matches the helm_version from kubespray defaults
-helm_client_version: 3.2.4
+helm_client_version: 3.5.4
 # kud playbooks not compatible with 2.8.0 - see MULTICLOUD-634
 ansible_version: 2.9.7
 

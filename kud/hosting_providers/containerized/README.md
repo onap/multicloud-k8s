@@ -149,13 +149,13 @@ Multi - cluster information from the host machine;
 
 ```
 $ kubectl --kubeconfig=/opt/kud/multi-cluster/cluster-101/artifacts/admin.conf cluster-info
-Kubernetes master is running at https://192.168.121.2:6443
+Kubernetes control plane is running at https://192.168.121.2:6443
 coredns is running at https://192.168.121.2:6443/api/v1/namespaces/kube-system/services/coredns:dns/proxy
 kubernetes-dashboard is running at https://192.168.121.2:6443/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 $ kubectl --kubeconfig=/opt/kud/multi-cluster/cluster-102/artifacts/admin.conf cluster-info
-Kubernetes master is running at https://192.168.121.6:6443
+Kubernetes control plane is running at https://192.168.121.6:6443
 coredns is running at https://192.168.121.6:6443/api/v1/namespaces/kube-system/services/coredns:dns/proxy
 kubernetes-dashboard is running at https://192.168.121.6:6443/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
 

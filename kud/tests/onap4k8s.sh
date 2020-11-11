@@ -13,13 +13,11 @@ set -o pipefail
 source _functions.sh
 set +e
 
-master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
-    awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
 onap_svc_node_port=30498
 declare -i timeout=18
 declare -i interval=10
 
-base_url="http://$master_ip:$onap_svc_node_port/v1"
+base_url="http://$(control_plane_ip):$onap_svc_node_port/v1"
 
 function check_onap_svc {
     while ((timeout > 0)); do

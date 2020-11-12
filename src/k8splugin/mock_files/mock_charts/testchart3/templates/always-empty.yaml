@@ -1,0 +1,9 @@
+---
+{{ if eq 0 1 }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dummy
+data:
+  key1: value1
+{{ end }}

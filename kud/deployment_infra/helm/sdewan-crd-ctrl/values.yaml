@@ -1,0 +1,19 @@
+# Default values for controllers.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace: "sdewan-system"
+
+spec:
+  name: "sdewan-crd-controller"
+  label: "controller-manager"
+  replicas: 1
+  proxy:
+    image: "gcr.io/kubebuilder/kube-rbac-proxy:v0.4.1"
+    name: "kube-rbac-proxy"
+  sdewan:
+    image: "integratedcloudnative/sdewan-controller:dev"
+    name: "manager"
+
+
+

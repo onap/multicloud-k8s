@@ -155,6 +155,33 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 			},
 			expectedError: "",
 		},
+		{
+			label:      "Generate artifacts from multi-template and empty files v1",
+			chartPath:  "../../mock_files/mock_charts/testchart3",
+			valueFiles: []string{},
+			values: []string{
+				"goingEmpty=false",
+			},
+			expectedHashMap: map[string]string{
+				"testchart3/templates/multi.yaml-0": "e24cbbefac2c2f700880b8fd041838f2dd48bbc1e099e7c1d2485ae7feb3da0d",
+				"testchart3/templates/multi.yaml-1": "592a8e5b2c35b8469aa45703a835bc00657bfe36b51eb08427a46e7d22fb1525",
+			},
+			expectedError: "",
+		},
+		{
+			label:      "Generate artifacts from multi-template and empty files v2",
+			chartPath:  "../../mock_files/mock_charts/testchart3",
+			valueFiles: []string{},
+			values: []string{
+				"goingEmpty=true",
+			},
+			expectedHashMap: map[string]string{
+				"testchart3/templates/multi.yaml-0": "e24cbbefac2c2f700880b8fd041838f2dd48bbc1e099e7c1d2485ae7feb3da0d",
+				"testchart3/templates/multi.yaml-1": "0bea01e65148584609ede5000c024241ba1c35b440b32ec0a4f7013015715bfe",
+				"testchart3/templates/multi.yaml-2": "6a5af22538c273b9d4a3156e3b6bb538c655041eae31e93db21a9e178f73ecf0",
+			},
+			expectedError: "",
+		},
 	}
 
 	h := sha256.New()
@@ -192,7 +219,7 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 						}
 					}
 					if gotHash != expectedHash {
-						t.Fatalf("Got unexpected hash for %s", f)
+						t.Fatalf("Got unexpected hash for %s: '%s'", f, gotHash)
 					}
 				}
 			}

@@ -55,16 +55,16 @@ type Template interface {
 // TemplateClient implements the Template interface
 // It will also be used to maintain any localized state
 type TemplateClient struct {
-	whitespaceRegex *regexp.Regexp
-	kubeVersion     string
-	kubeNameSpace   string
-	releaseName     string
+	emptyRegex    *regexp.Regexp
+	kubeVersion   string
+	kubeNameSpace string
+	releaseName   string
 }
 
 // NewTemplateClient returns a new instance of TemplateClient
 func NewTemplateClient(k8sversion, namespace, releasename string) *TemplateClient {
 	return &TemplateClient{
-		whitespaceRegex: regexp.MustCompile(`^\s*$`),
+		emptyRegex: regexp.MustCompile(`^(#.*|\s*)$`),
 		// defaultKubeVersion is the default value of --kube-version flag
 		kubeVersion:   k8sversion,
 		kubeNameSpace: namespace,
@@ -215,7 +215,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 			newRenderedTemplates[key] = v1
 			count = count + 1
 		}
-	}
+	} //FIXME some issue with ordering
 
 	listManifests := manifest.SplitManifests(newRenderedTemplates)
 	var manifestsToRender []manifest.Manifest
@@ -232,7 +232,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 		}
 
 		// blank template after execution
-		if h.whitespaceRegex.MatchString(data) {
+		if h.emptyRegex.MatchString(data) {
 			continue
 		}
 
@@ -260,7 +260,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 func getGroupVersionKind(data string) (schema.GroupVersionKind, error) {
 	out, err := k8syaml.ToJSON([]byte(data))
 	if err != nil {
-		return schema.GroupVersionKind{}, pkgerrors.Wrap(err, "Converting yaml to json")
+		return schema.GroupVersionKind{}, pkgerrors.Wrap(err, "Converting yaml to json:\n"+data)
 	}
 
 	simpleMeta := json.SimpleMetaFactory{}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d75def94_b2f88075",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/values.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-11-13T14:37:07Z",
+      "side": 1,
+      "message": "Can you double check the image version? \"dev\" or maybe “0.3.0”？",
+      "range": {
+        "startLine": 31,
+        "startChar": 31,
+        "endLine": 31,
+        "endChar": 42
+      },
+      "revId": "e54430057acbee92ddb49450f88a1e9f4c40e391",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

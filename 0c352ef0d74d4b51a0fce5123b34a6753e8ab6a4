@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a907c00_4286d5a5",
+        "filename": "kud/hosting_providers/containerized/inventory/group_vars/k8s-cluster.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2020-11-17T20:04:12Z",
+      "side": 0,
+      "message": "Now it will use the default kube_version in the chosen kubespray version.  Removing it here will prevent us from using unsupported combinations on future upgrades.",
+      "parentUuid": "180410ee_27ad0f3f",
+      "revId": "0c352ef0d74d4b51a0fce5123b34a6753e8ab6a4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d502f2d6_e581dd54",
         "filename": "kud/hosting_providers/vagrant/inventory/group_vars/k8s-cluster.yml",
         "patchSetId": 1

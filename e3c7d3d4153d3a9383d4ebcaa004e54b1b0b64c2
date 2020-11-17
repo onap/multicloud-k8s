@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5a94098d_4b8d8e1a",
+        "filename": "deployments/helm/onap4k8s/charts/etcd/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2020-11-17T20:04:12Z",
+      "side": 1,
+      "message": "Without this, I get\n\n  Error: unable to build kubernetes objects from release manifest: error validating \\\"\\\": error validating data: unknown object type \\\"nil\\\" in PersistentVolume.metadata.labels.type\n\nSo I assume the checking is stricter with either the new k8s or helm versions, as this worked before without specifying this value.  Judging by the name (/dockerdata-nfs) the only other value that appears to make sense is \"nfs\".\n\nAdditional information of values can be found at https://kubernetes.io/docs/concepts/storage/persistent-volumes/#types-of-persistent-volumes.",
+      "parentUuid": "bb21a3c7_d9034e4f",
+      "range": {
+        "startLine": 58,
+        "startChar": 2,
+        "endLine": 58,
+        "endChar": 23
+      },
+      "revId": "e3c7d3d4153d3a9383d4ebcaa004e54b1b0b64c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6557926f_f14820f7",
         "filename": "deployments/helm/onap4k8s/charts/mongo/requirements.yaml",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2020-11-17T19:21:11Z",
       "side": 1,
       "message": "Like to get more understanding in the desk review on this.",
+      "range": {
+        "startLine": 18,
+        "startChar": 16,
+        "endLine": 18,
+        "endChar": 34
+      },
+      "revId": "e3c7d3d4153d3a9383d4ebcaa004e54b1b0b64c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "714f1930_d631d29a",
+        "filename": "deployments/helm/onap4k8s/charts/mongo/requirements.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2020-11-17T20:04:12Z",
+      "side": 1,
+      "message": "helm 3 removed support for \"helm serve\".  So I\u0027m using file relative URLs to work around that here.  More details are at https://helm.sh/docs/faq/.",
+      "parentUuid": "6557926f_f14820f7",
       "range": {
         "startLine": 18,
         "startChar": 16,

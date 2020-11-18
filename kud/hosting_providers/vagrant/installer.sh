@@ -52,7 +52,7 @@ function _install_pip {
 	if [ $version_id == "ubuntu" ]; then	
 		sudo -E pip install --no-cache-dir --upgrade pip
         else #centos
-	    sudo yum install epel-release    
+	    sudo yum -y install epel-release    
 	    sudo yum -y install python3-pip
 	fi
     else
@@ -96,7 +96,7 @@ function _install_docker {
     else #centos
 	sudo yum install -y yum-utils
 	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-        sudo dnf install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.10-3.2.el7.x86_64.rpm
+        sudo dnf install -y https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.10-3.2.el7.x86_64.rpm
 	sudo dnf install docker-ce -y 
     fi
     	sudo mkdir -p /etc/systemd/system/docker.service.d
@@ -150,7 +150,7 @@ function install_k8s {
     _install_docker
     _install_ansible
     if [ $version_id == "centos" ];then
-	sudo yum install wget
+	sudo yum -y install wget
     fi
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     sudo tar -C $dest_folder -xzf $tarball
@@ -299,7 +299,7 @@ fi
 install_k8s
 echo "k8s installed"
 _set_environment_file
-install_addons
+#install_addons
 if ${KUD_PLUGIN_ENABLED:-false}; then
     install_plugin
 fi

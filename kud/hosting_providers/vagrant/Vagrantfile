@@ -128,6 +128,18 @@ Vagrant.configure("2") do |config|
     end
   end
 
+#installs python and sudo perm on nodes
+  nodes.each do |node|
+    config.vm.define node['name'] do |nodeconfig|
+      nodeconfig.vm.provision 'shell', privileged: false do |sh|    
+        sh.inline = <<-SHELL
+	  sudo dnf install -y python3
+	  sudo usermod -aG wheel $USER
+        SHELL
+      end
+    end
+  end
+
   config.vm.define :installer, primary: true, autostart: false do |installer|
     installer.vm.hostname = "multicloud"
     installer.vm.network :private_network, :ip => "10.10.10.2", :type => :static

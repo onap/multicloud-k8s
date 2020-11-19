@@ -27,15 +27,6 @@
       yum: name=make state=present update_cache=yes
       when: ansible_distribution == "CentOS"
 
-    - name: Change the emco directory and run the command make repo
-      command: /usr/bin/make repo
-      register: make_repo
-      args:
-        chdir: /opt/multicloud/deployments/helm/v2/emco
-
-    - debug:
-        var: make_repo.stdout_lines
-
     - name: Change the emco directory and run the command make all
       command: /usr/bin/make all
       register: make_all
@@ -46,7 +37,7 @@
         var: make_all.stdout_lines
 
     - name: Change the emco directory and run the command helm install
-      command: /usr/local/bin/helm install dist/packages/emco-0.1.0.tgz --name emco --namespace emco
+      command: /usr/local/bin/helm install --namespace emco --create-namespace --set emco-tools.fluentd.clusterDomain={{ cluster_name.stdout }} emco dist/packages/emco-0.1.0.tgz
       register: helm_install
       args:
         chdir: /opt/multicloud/deployments/helm/v2/emco

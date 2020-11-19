@@ -15,7 +15,7 @@
 dependencies:
   - name: common
     version: ~0.x-0
-    repository: '@local'
+    repository: 'file://../common'
   - name: fluentd
     version: ~1.x-0
-    repository: '@local'
+    repository: 'file://../fluentd'

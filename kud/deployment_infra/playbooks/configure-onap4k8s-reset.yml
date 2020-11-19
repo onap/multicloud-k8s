@@ -15,7 +15,7 @@
         file: kud-vars.yml
 
     - name: Change the onap4k8s directory and run helm delete
-      command: /usr/local/bin/helm delete --purge multicloud-onap8ks
+      command: /usr/local/bin/helm uninstall --namespace onap4k8s-ns multicloud-onap8ks
       register: helm_delete
       args:
         chdir: /opt/multicloud/deployments/helm/onap4k8s
@@ -40,15 +40,6 @@
 
     - debug:
         var: make_clean.stdout_lines
-
-    - name: Change the onap4k8s directory and make repo-stop
-      command: /usr/bin/make repo-stop
-      register: make_repo_stop
-      args:
-        chdir: /opt/multicloud/deployments/helm/onap4k8s
-
-    - debug:
-        var: make_repo_stop.stdout_lines
 
     - name: clean multicloud-k8s path
       file:

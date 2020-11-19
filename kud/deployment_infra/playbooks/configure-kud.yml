@@ -23,11 +23,6 @@
       when: helm_client.rc != 0
       vars:
           kubernetes_helm_ver: "v{{ helm_client_version }}"
-  tasks:
-    - name: Initialize helm client
-      command: helm init -c
-      args:
-        creates: ~/.helm
 
 - hosts: kube-node
   become: yes

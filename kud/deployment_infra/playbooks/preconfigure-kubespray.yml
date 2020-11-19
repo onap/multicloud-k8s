@@ -1,0 +1,19 @@
+---
+# The mitogen module used in kubespray requires python2 on the nodes.
+# On some distributions (i.e. Ubuntu 18.04), the default version of
+# python is python3.
+#
+# When python2 is not present a failure message similar to "bash:
+# /usr/bin/python: No such file or directory" will be reported.
+#
+# Note the use of "strategy: linear" below to temporarily bypass
+# mitogen.
+#
+- name: Install python2
+  hosts: k8s-cluster
+  strategy: linear
+  tasks:
+    - name: Install python2
+      package:
+        name: python
+        state: present

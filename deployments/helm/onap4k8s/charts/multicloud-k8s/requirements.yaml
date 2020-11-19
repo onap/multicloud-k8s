@@ -18,10 +18,10 @@ dependencies:
     # local reference to common chart, as it is
     # a part of this chart's package and will not
     # be published independently to a repo (at this point)
-    repository: '@onap4k8s'
+    repository: 'file://../common'
   - name: mongo
     version: ~5.x-0
-    repository: '@onap4k8s'
+    repository: 'file://../mongo'
   - name: etcd
     version: ~5.x-0
-    repository: '@onap4k8s'
+    repository: 'file://../etcd'

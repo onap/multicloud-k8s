@@ -55,6 +55,7 @@ persistence:
   ##
   #storageClass: "-"
   accessMode: "ReadWriteOnce"
+  storageType: hostPath
   storage: "1Gi"
   mountPath: /dockerdata-nfs
   mountSubPath: k8s-etcd

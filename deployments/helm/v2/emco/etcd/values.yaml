@@ -48,6 +48,7 @@ persistence:
   enabled: false
   volumeReclaimPolicy: Retain
   accessMode:  ReadWriteMany
+  storageType: hostPath
   storage: 1Gi
   mountPath: /dockerdata-nfs
   mountSubPath: "etcd/data"

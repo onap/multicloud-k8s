@@ -34,3 +34,14 @@ EOF
 function start_all {
     docker-compose up -d
 }
+
+function wait_for_service {
+    for try in {0..59}; do
+        echo "$(date +%H:%M:%S) - Waiting for service up"
+        sleep 1
+        if $(curl http://localhost:9015/v1 &>/dev/null); then
+            return 0
+        fi
+    done
+    exit 1
+}

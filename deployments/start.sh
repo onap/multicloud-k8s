@@ -21,3 +21,4 @@ stop_all
 start_mongo
 generate_k8sconfig
 start_all
+wait_for_service

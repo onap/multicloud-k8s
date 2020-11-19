@@ -12,4 +12,4 @@
 - hosts: localhost
   tasks:
     - name: Apply Optane PMEM CSI Daemonset
-      command: "{{ base_dest }}/optane/deploy_optane.sh"
+      command: "{{ optane_dest }}/deploy_optane.sh"

@@ -22,6 +22,14 @@
         state: directory
         path: "{{ optane_dest }}"
       ignore_errors: yes
+    - copy:
+        src: "{{ playbook_dir }}/deploy_optane.sh"
+        dest: "{{ optane_dest }}"
+    - name: Changing perm of "sh", adding "+x"
+      shell: "chmod +x deploy_optane.sh"
+      args:
+        chdir: "{{ optane_dest }}"
+        warn: False
 
 - hosts: kube-node
   become: yes
@@ -57,14 +65,6 @@
         dest: optane
     - name: Changing perm of "sh", adding "+x"
       shell: "chmod +x install_optane.sh"
-      args:
-        chdir: "optane"
-        warn: False
-    - copy:
-        src: "{{ playbook_dir }}/deploy_optane.sh"
-        dest: optane
-    - name: Changing perm of "sh", adding "+x"
-      shell: "chmod +x deploy_optane.sh"
       args:
         chdir: "optane"
         warn: False

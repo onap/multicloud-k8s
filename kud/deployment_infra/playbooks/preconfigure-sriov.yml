@@ -8,111 +8,101 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+- hosts: localhost
+  become: yes
+  pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create SRIOV dest folder
+      file:
+        state: directory
+        path: "{{ sriov_dest }}"
+    - name: Fetching SRIOV driver
+      block:
+      - name: Download SRIOV driver tarball
+        get_url:
+          url: "{{ sriov_driver_url }}"
+          dest: "{{ sriov_dest }}/{{ sriov_package }}.tar.gz"
+
 - hosts: kube-node
   become: yes
   pre_tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+  tasks:
+    - name: Create a destination for driver folder in the target's /tmp
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - "{{ base_dest }}/sriov/{{ sriov_package }}"
+    - name: Create SRIOV dest folder
+      file:
+        state: directory
+        path: "sriov"
+    - name: Register SRIOV env variable
+      shell: "echo {{ SRIOV_ENABLED | default(False) }}"
+    - name: Copy SRIOV check script to target
+      copy:
+        src: "{{ playbook_dir }}/sriov_hardware_check.sh"
+        dest: sriov
+        mode: 0755
+    - name: Run the script and re-evaluate the variable
+      command: "sriov/sriov_hardware_check.sh"
+      register: output
+    - debug:
+        var: output.stdout_lines
+    - set_fact:
+        SRIOV_ENABLED: "{{ output.stdout }}"
+    - debug:
+        var: output
+    - name: Clean the script and folder
+      file:
+        path: sriov
+        state: absent
+    - name: Install SRIOV compilation packges
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ sriov_pkgs }}"
+      when: SRIOV_ENABLED
+    - name: Extract SRIOV source code
+      unarchive:
+         src: "{{ sriov_dest }}/{{ sriov_package }}.tar.gz"
+         dest: "{{ base_dest }}/sriov"
+      when: SRIOV_ENABLED
+    - name: Build the SRIOV target
+      make:
+        chdir: "{{ base_dest }}/sriov/{{ sriov_package }}/src"
+      when: SRIOV_ENABLED
     - name: Create SRIOV driver folder in the target destination
       file:
         state: directory
         path: "{{ item }}"
       with_items:
-        - sriov
-    - copy:
-        src: "{{ playbook_dir }}/sriov_hardware_check.sh"
-        dest: sriov
-    - name: Changing perm of "sh", adding "+x"
-      shell: "chmod +x sriov_hardware_check.sh"
-      args:
-        chdir: "sriov"
-        warn: False
-    - name: Register SRIOV
-      shell: "echo {{ SRIOV | default(False) }}"
-    - name: Run the script and Re-evaluate the variable
-      command: sriov/sriov_hardware_check.sh
-      register: output
-    - set_fact:
-        _SRIOV: "{{ output.stdout }}"
-    - name: Recreate the conf file for every host
-      file:
-        path: /tmp/sriov.conf
-        state: absent
-      delegate_to: localhost
-    - lineinfile : >
-       dest=/tmp/sriov.conf
-       create=yes
-       line='{{_SRIOV}}'
-      delegate_to: localhost
-    - name: Clean the script and folder.
-      file:
-        path: sriov
-        state: absent
-
-# Run the following task only if the SRIOV is set to True
-# i.e when SRIOV hardware is available
-- hosts: localhost
-  become: yes
-  pre_tasks:
-    - name: Read SRIOV value from the conf file.
-      command: cat /tmp/sriov.conf
-      register: installer_output
-      become: yes
-    - set_fact:
-        SRIOV_NODE: "{{ installer_output.stdout }}"
-    - name: Load kud variables
-      include_vars:
-        file: kud-vars.yml
-      when: SRIOV_NODE
-  tasks:
-    - name: Create sriov folder
-      file:
-        state: directory
-        path: "{{ sriov_dest }}"
-      ignore_errors: yes
-      when: SRIOV_NODE
-    - name: Get SRIOV compatible driver
-      get_url: "url={{ sriov_driver_url }}  dest=/tmp/{{ sriov_package }}.tar.gz"
-      when: SRIOV_NODE
-    - name: Extract sriov source code
-      unarchive:
-         src: "/tmp/{{ sriov_package }}.tar.gz"
-         dest: "{{ sriov_dest }}"
-      when: SRIOV_NODE
-    - name: Build the default target
-      make:
-        chdir: "{{ sriov_dest }}/{{ sriov_package }}/src"
-      become: yes
-      when: SRIOV_NODE
-# Copy all the driver and install script into target node
-- hosts: kube-node
-  become: yes
-  pre_tasks:
-    - name: Load kud variables
-      include_vars:
-        file: kud-vars.yml
-      when: _SRIOV
-  tasks:
-    - name: create SRIOV driver folder in the target destination
-      file:
-        state: directory
-        path: "{{ item }}"
-      with_items:
         - sriov_driver
-      when: _SRIOV
-    - copy:
-        src: "{{ sriov_dest }}/{{ sriov_package }}/src/iavf.ko"
+      when: SRIOV_ENABLED
+    - name: Copy SRIOV module to target destination
+      copy:
+        src: "{{ base_dest }}/sriov/{{ sriov_package }}/src/iavf.ko"
         dest: sriov_driver
-        remote_src: no
-      when: _SRIOV
-    - copy:
+        remote_src: yes
+      when: SRIOV_ENABLED
+    - name: Copy SRIOV install script to target
+      copy:
         src: "{{ playbook_dir }}/install_iavf_drivers.sh"
         dest: sriov_driver/install.sh
-        remote_src: no
-      when: _SRIOV
-    - name: Changing perm of "install.sh", adding "+x"
-      file: dest=sriov_driver/install.sh mode=a+x
-      when: _SRIOV
-    - name: Run a script with arguments
+        mode: 0755
+      when: SRIOV_ENABLED
+    - name: Run the install script with arguments
       shell: ./install.sh
       args:
         chdir: "sriov_driver"
-      when: _SRIOV
+      when: SRIOV_ENABLED
+    - name: Clean the SRIOV folder
+      file:
+        path: "{{ base_dest }}/sriov"
+        state: absent

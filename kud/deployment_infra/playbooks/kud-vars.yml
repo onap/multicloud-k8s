@@ -63,7 +63,8 @@ helm_client_version: 3.2.4
 # kud playbooks not compatible with 2.8.0 - see MULTICLOUD-634
 ansible_version: 2.9.7
 
-sriov_dest: "{{ base_dest }}/sriov"
+sriov_pkgs: make,gcc
+sriov_dest: "{{ base_dest }}/sriov_driver"
 sriov_driver_source_type: "tarball"
 sriov_driver_version: 3.7.34
 sriov_driver_url: "https://downloadmirror.intel.com/28943/eng/iavf-{{ sriov_driver_version }}.tar.gz"

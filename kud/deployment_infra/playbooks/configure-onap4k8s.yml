@@ -36,8 +36,16 @@
     - debug:
         var: make_all.stdout_lines
 
+    - name: Create onap4k8s-ns namespace
+      shell: "/usr/local/bin/kubectl create namespace onap4k8s-ns"
+      ignore_errors: True
+
+    - name: Create pod security policy role bindings
+      shell: "/usr/local/bin/kubectl -n onap4k8s-ns create rolebinding psp:default:privileged --clusterrole=psp:privileged --serviceaccount=onap4k8s-ns:default"
+      ignore_errors: True
+
     - name: Change the onap4k8s directory and run the command helm install
-      command: /usr/local/bin/helm install --namespace onap4k8s-ns --create-namespace --set service.type=NodePort multicloud-onap8ks dist/packages/multicloud-k8s-5.0.0.tgz
+      command: /usr/local/bin/helm install --namespace onap4k8s-ns --set service.type=NodePort multicloud-onap8ks dist/packages/multicloud-k8s-5.0.0.tgz
       register: helm_install
       args:
         chdir: /opt/multicloud/deployments/helm/onap4k8s

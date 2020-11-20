@@ -34,7 +34,30 @@ function wait_for_pod_up {
 
 function start_nginx_pod {
     kubectl delete deployment -n default nginx --ignore-not-found=true
-    kubectl create deployment nginx --image=nginx
+    cat <<EOF | kubectl create -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      securityContext:
+        runAsUser: $(id -u nobody)
+      containers:
+      - image: nginx
+        imagePullPolicy: IfNotPresent
+        name: nginx
+EOF
     sleep 2
     nginx_pod=$(kubectl get pods --all-namespaces| grep nginx | awk 'NR==1{print $2}')
     wait_for_pod_up $nginx_pod

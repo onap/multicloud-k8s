@@ -962,6 +962,8 @@ spec:
                 operator: In
                 values:
                 - virtlet
+      securityContext:
+        runAsUser: $(id -u nobody)
       containers:
       - name: $virtlet_deployment_name
         # This specifies the image to use.
@@ -1111,6 +1113,8 @@ spec:
         k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [{ "name": "ovn-port-net", "interface": "net0" , "defaultGateway": "false"},
                       { "name": "ovn-priv-net", "interface": "net1" , "defaultGateway": "false"}]}'
     spec:
+      securityContext:
+        runAsUser: $(id -u nobody)
       containers:
       - name: $ovn4nfv_deployment_name
         image: "busybox"

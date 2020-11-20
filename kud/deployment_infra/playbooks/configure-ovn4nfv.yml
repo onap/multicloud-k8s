@@ -40,6 +40,10 @@
       shell: "/usr/local/bin/kubectl create namespace operator"
       ignore_errors: True
 
+    - name: create pod security policy role bindings
+      shell: "/usr/local/bin/kubectl -n operator create rolebinding psp:default:privileged --clusterrole=psp:privileged --serviceaccount=operator:default --serviceaccount=operator:k8s-nfn-sa"
+      ignore_errors: True
+
     - name: apply nfn operator label
       command: "/usr/local/bin/kubectl label node {{ item }} nfnType=operator --overwrite"
       with_inventory_hostnames: ovn-central

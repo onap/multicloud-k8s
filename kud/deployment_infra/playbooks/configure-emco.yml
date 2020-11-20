@@ -36,12 +36,20 @@
     - debug:
         var: make_all.stdout_lines
 
+    - name: Create emco namespace
+      shell: "/usr/local/bin/kubectl create namespace emco"
+      ignore_errors: True
+
+    - name: Create pod security policy role bindings
+      shell: "/usr/local/bin/kubectl -n emco create rolebinding psp:default:privileged --clusterrole=psp:privileged --serviceaccount=emco:default --serviceaccount=emco:emco-fluentd"
+      ignore_errors: True
+
     - name: Get cluster name
       shell: "kubectl -n kube-system get configmap/kubeadm-config -o yaml | grep clusterName: | awk '{print $2}'"
       register: cluster_name
 
     - name: Change the emco directory and run the command helm install
-      command: /usr/local/bin/helm install --namespace emco --create-namespace --set emco-tools.fluentd.clusterDomain={{ cluster_name.stdout }} emco dist/packages/emco-0.1.0.tgz
+      command: /usr/local/bin/helm install --namespace emco --set emco-tools.fluentd.clusterDomain={{ cluster_name.stdout }} emco dist/packages/emco-0.1.0.tgz
       register: helm_install
       args:
         chdir: /opt/multicloud/deployments/helm/v2/emco

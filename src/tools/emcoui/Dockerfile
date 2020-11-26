@@ -1,3 +1,18 @@
+#=======================================================================
+# Copyright (c) 2017-2020 Aarna Networks, Inc.
+# All rights reserved.
+# ======================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#           http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ========================================================================
+
 # => Build container
 FROM node:alpine as builder
 WORKDIR /app
@@ -7,10 +22,13 @@ RUN npm install
 COPY src ./src
 COPY public ./public
 # => Pass the reuired version
-RUN REACT_APP_VERSION=v1.0.0 npm run build
+RUN REACT_APP_VERSION=v1.2.0 npm run build
 
 # => Run container
 FROM nginx:1.15.2-alpine
+
+# Nginx config
+COPY default.conf /etc/nginx/conf.d/
 
 # Static build
 COPY --from=builder /app/build /usr/share/nginx/html/

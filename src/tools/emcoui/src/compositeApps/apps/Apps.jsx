@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
@@ -19,7 +19,7 @@ import CardContent from "@material-ui/core/CardContent";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import DeleteIcon from "@material-ui/icons/Delete";
-import EditIcon from "@material-ui/icons/Edit";
+// import EditIcon from "@material-ui/icons/Edit";
 import { Grid, Button, Tooltip } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import apiService from "../../services/apiService";
@@ -144,7 +144,7 @@ const Apps = ({ data, onStateChange, ...props }) => {
   };
   return (
     <>
-      <Button
+      {/* <Button
         variant="outlined"
         color="primary"
         startIcon={<AddIcon />}
@@ -152,7 +152,7 @@ const Apps = ({ data, onStateChange, ...props }) => {
         size="small"
       >
         Add App
-      </Button>
+      </Button> */}
       <AppForm
         open={formOpen}
         onClose={handleFormClose}
@@ -200,6 +200,7 @@ const Apps = ({ data, onStateChange, ...props }) => {
                     </Typography>
                   </CardContent>
                   <div className={classes.controls}>
+                    {/* //edit app api is not implemented yet
                     <IconButton
                       onClick={handleEditApp.bind(this, value)}
                       color="primary"
@@ -212,7 +213,7 @@ const Apps = ({ data, onStateChange, ...props }) => {
                       onClick={() => handleDeleteApp(index)}
                     >
                       <DeleteIcon />
-                    </IconButton>
+                    </IconButton> */}
                   </div>
                 </div>
               </Card>

@@ -29,7 +29,8 @@ function Controllers() {
     apiService
       .getControllers()
       .then((res) => {
-        setControllersData(res);
+        if (res && res.length > 0) setControllersData(res);
+        else setControllersData([]);
       })
       .catch((err) => {
         console.log("error getting controllers : " + err);
@@ -53,9 +54,7 @@ function Controllers() {
         .addController(request)
         .then((res) => {
           setControllersData((controllersData) => {
-            if (controllersData && controllersData.length > 0)
-              return [...controllersData, res];
-            else return [res];
+            return [...controllersData, res];
           });
         })
         .catch((err) => {

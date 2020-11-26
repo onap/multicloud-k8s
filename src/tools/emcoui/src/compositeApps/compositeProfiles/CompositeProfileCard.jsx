@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -35,7 +35,7 @@ import TableCell from "@material-ui/core/TableCell";
 import Paper from "@material-ui/core/Paper";
 import TableBody from "@material-ui/core/TableBody";
 import apiService from "../../services/apiService";
-import EditIcon from "@material-ui/icons/Edit";
+// import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ProfileForm from "./ProfileForm";
 import DeleteDialog from "../../common/Dialogue";
@@ -196,7 +196,7 @@ export default function RecipeReviewCard(props) {
         />
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
-            <Button
+            {/* <Button
               disabled={!(props.appsData && props.appsData.length > 0)}
               variant="outlined"
               size="small"
@@ -208,11 +208,12 @@ export default function RecipeReviewCard(props) {
               }}
             >
               Add Profile
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               variant="outlined"
               size="small"
               color="secondary"
+              disabled={data && data.length > 0}
               style={{ float: "right" }}
               startIcon={<DeleteIcon />}
               onClick={() => {
@@ -220,7 +221,7 @@ export default function RecipeReviewCard(props) {
               }}
             >
               Delete Composite Profile
-            </Button>
+            </Button> */}
             {data && data.length > 0 && (
               <>
                 <DeleteDialog
@@ -238,7 +239,7 @@ export default function RecipeReviewCard(props) {
                         <StyledTableCell>Name</StyledTableCell>
                         <StyledTableCell>Description</StyledTableCell>
                         <StyledTableCell>App</StyledTableCell>
-                        <StyledTableCell>Actions</StyledTableCell>
+                        {/* <StyledTableCell>Actions</StyledTableCell> */}
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -253,7 +254,9 @@ export default function RecipeReviewCard(props) {
                           <StyledTableCell>
                             {profile.spec["app-name"]}
                           </StyledTableCell>
-                          <StyledTableCell>
+                          {/* <StyledTableCell>
+                            
+                            //edit profile api is not implemented yet
                             <IconButton
                               onClick={(e) => handleEdit(index)}
                               title="Edit"
@@ -266,7 +269,7 @@ export default function RecipeReviewCard(props) {
                             >
                               <DeleteIcon color="secondary" />
                             </IconButton>
-                          </StyledTableCell>
+                          </StyledTableCell> */}
                         </StyledTableRow>
                       ))}
                     </TableBody>
@@ -275,7 +278,7 @@ export default function RecipeReviewCard(props) {
               </>
             )}
             {!(props.appsData && props.appsData.length > 0) && (
-              <div>No apps found for adding profile</div>
+              <div>No app found for adding profile</div>
             )}
           </CardContent>
         </Collapse>

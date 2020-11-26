@@ -11,14 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useEffect, useState } from "react";
 import DIGtable from "./DIGtable";
-import { withStyles, Button, Grid } from "@material-ui/core";
+import { withStyles, Button, Grid, Typography } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import apiService from "../services/apiService";
 import Spinner from "../common/Spinner";
 import DIGform from "./DIGform";
+import { ReactComponent as EmptyIcon } from "../assets/icons/empty.svg";
 
 const styles = {
   root: {
@@ -44,84 +45,59 @@ const DeploymentIntentGroups = (props) => {
     setOpen(true);
   };
   const handleSubmit = (inputFields) => {
-    let payload = {
-      metadata: {
-        name: inputFields.name,
-        description: inputFields.description,
-      },
-      spec: {
-        profile: inputFields.compositeProfile,
-        version: inputFields.version,
-      },
-      projectName: props.projectName,
-      compositeAppName: inputFields.compositeApp,
-      compositeAppVersion: inputFields.compositeAppVersion,
-    };
-    if (inputFields.overrideValues && inputFields.overrideValues !== "") {
-      payload.spec["override-values"] = JSON.parse(inputFields.overrideValues);
+    try {
+      let payload = {
+        spec: {
+          projectName: props.projectName,
+          appsData: inputFields.intents.apps,
+        },
+      };
+      if (inputFields.overrideValues && inputFields.overrideValues !== "") {
+        payload.spec["override-values"] = JSON.parse(
+          inputFields.overrideValues
+        );
+      }
+      payload = { ...payload, ...inputFields.general };
+      apiService
+        .createDeploymentIntentGroup(payload)
+        .then((response) => {
+          response.metadata.compositeAppName = inputFields.general.compositeApp;
+          response.metadata.compositeAppVersion =
+            inputFields.general.compositeAppVersion;
+          data && data.length > 0
+            ? setData([...data, response])
+            : setData([response]);
+        })
+        .catch((error) => {
+          console.log("error creating DIG : ", error);
+        })
+        .finally(() => {
+          setIsloading(false);
+          setOpen(false);
+        });
+    } catch (error) {
+      console.error(error);
     }
-    apiService
-      .createDeploymentIntentGroup(payload)
-      .then((response) => {
-        response.compositeAppName = inputFields.compositeApp;
-        response.compositeAppVersion = inputFields.compositeAppVersion;
-        data && data.length > 0
-          ? setData([...data, response])
-          : setData([response]);
-      })
-      .catch((error) => {
-        console.log("error creating DIG : ", error);
-      })
-      .finally(() => {
-        setIsloading(false);
-        setOpen(false);
-      });
   };
 
   useEffect(() => {
+    let getDigs = () => {
+      apiService
+        .getDeploymentIntentGroups({ projectName: props.projectName })
+        .then((res) => {
+          setData(res);
+        })
+        .catch((err) => {
+          console.log("error getting deplotment intent groups : " + err);
+        })
+        .finally(() => setIsloading(false));
+    };
+
     apiService
       .getCompositeApps({ projectName: props.projectName })
       .then((response) => {
-        const getDigIntents = (input) => {
-          let request = {
-            projectName: props.projectName,
-            compositeAppName: input.compositeAppName,
-            compositeAppVersion: input.compositeAppVersion,
-            deploymentIntentGroupName: input.metadata.name,
-          };
-          apiService
-            .getDeploymentIntentGroupIntents(request)
-            .then((res) => {
-              input.intent = res.intent;
-            })
-            .catch((err) => {})
-            .finally(() => {
-              setData((data) => [...data, input]);
-            });
-        };
-        response.forEach((compositeApp) => {
-          let request = {
-            projectName: props.projectName,
-            compositeAppName: compositeApp.metadata.name,
-            compositeAppVersion: compositeApp.spec.version,
-          };
-          apiService
-            .getDeploymentIntentGroups(request)
-            .then((digResponse) => {
-              digResponse.forEach((res) => {
-                res.compositeAppName = compositeApp.metadata.name;
-                res.compositeAppVersion = compositeApp.spec.version;
-                getDigIntents(res);
-              });
-            })
-            .catch((error) => {
-              console.log("unable to get deployment intent groups", error);
-            })
-            .finally(() => {
-              setCompositeApps(response);
-              setIsloading(false);
-            });
-        });
+        setCompositeApps(response);
+        getDigs();
       })
       .catch((err) => {
         console.log("Unable to get composite apps : ", err);
@@ -131,16 +107,8 @@ const DeploymentIntentGroups = (props) => {
   return (
     <>
       {isLoading && <Spinner />}
-      {!isLoading && compositeApps && compositeApps.length > 0 && (
+      {!isLoading && compositeApps && (
         <>
-          <Button
-            variant="outlined"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={onCreateDIG}
-          >
-            Create Deployment Intent Group
-          </Button>
           <DIGform
             projectName={props.projectName}
             open={open}
@@ -148,15 +116,41 @@ const DeploymentIntentGroups = (props) => {
             onSubmit={handleSubmit}
             data={{ compositeApps: compositeApps }}
           />
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs style={{ marginTop: "20px" }}>
-              <DIGtable
-                data={data}
-                setData={setData}
-                projectName={props.projectName}
-              />
-            </Grid>
+          <Grid item xs={12}>
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={onCreateDIG}
+            >
+              Create Deployment Intent Group
+            </Button>
           </Grid>
+
+          {data && data.length > 0 && (
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs style={{ marginTop: "20px" }}>
+                <DIGtable
+                  data={data}
+                  setData={setData}
+                  projectName={props.projectName}
+                />
+              </Grid>
+            </Grid>
+          )}
+
+          {(data === null || (data && data.length < 1)) && (
+            <Grid container spacing={2} direction="column" alignItems="center">
+              <Grid style={{ marginTop: "60px" }} item xs={6}>
+                <EmptyIcon style={{ height: "100px", width: "100px" }} />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6">
+                  No deployment group found, start by adding a deployment group
+                </Typography>
+              </Grid>
+            </Grid>
+          )}
         </>
       )}
     </>

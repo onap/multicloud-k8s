@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ========================================================================
+# ========================================================================  
 
 global:
   nodePortPrefixExt: 304
@@ -19,11 +19,6 @@ global:
 #################################################################
 # Application configuration defaults.
 #################################################################
-# application image
-repository: registry.hub.docker.com
-image: emcov2/emcoui:stable
-pullPolicy: Always
-
 # default number of instances
 replicaCount: 1
 
@@ -44,14 +39,43 @@ readiness:
   initialDelaySeconds: 10
   periodSeconds: 30
 
-service:
-  type: NodePort
-  name: emcoui
-  portName: emcoui
-  internalPort: 9080
-  externalPort: 9080
-  nodePort: 80
-  label: emcoui
+middleend:
+  service:
+    type: NodePort
+    name: middleend 
+    portName: middleend 
+    internalPort: 9081
+    externalPort: 9081
+    nodePort: 81
+    label: middleend
+
+  image:
+    registry: registry.hub.docker.com
+    repository: amcop/middleend
+    tag: master
+    pullPolicy: Always
+
+emcoui:
+  service:
+    type: NodePort
+    name: emcoui
+    portName: emcoui
+    internalPort: 9080
+    externalPort: 9080
+    nodePort: 80
+    label: emcoui
+
+  image:
+    registry: registry.hub.docker.com
+    repository: amcop/emcoui
+    tag: master
+    pullPolicy: Always
+
+authproxy:
+  # These values should be updated at the time of deployment
+  issuer: http://192.168.122.224:31064/auth/realms/EMCO/
+  redirect_uri: http://192.168.122.224:30481/middleend/callback
+  client_id: emcoapp
 
 ingress:
   enabled: false

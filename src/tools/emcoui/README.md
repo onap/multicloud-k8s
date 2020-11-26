@@ -1,30 +1,11 @@
-# EMCOUI
-
-This is a web app for EMCO V2 api's. This is a reactjs based UI app created using google material ui library.
-
 ## Local setup
 
-for running the app in a local setup first install the dependencies by running
-
-```bash
-npm install
-```
-
-Then run
-
-```bash
-startup.sh
-```
+for running the app in a local setup first install the dependencies by running `npm install`.
+Then run `startup.sh`
 
 ## Production build
 
-for creating a production build, run
-
-```bash
-npm run build
-```
-
-A production ready build will be available at /build directory
+for creating a production build, run `npm run build`. A production ready build will be available at /build directory
 
 ## Available scripts
 
@@ -48,17 +29,4 @@ The build is minified and the filenames include the hashes.<br />
 ## Building docker image
 
 To build a docker image run the below command
-
-```bash
-docker build -t <image_name>:<image_version> .
-```
-
-## Installing with helm
-
-All the helm chars are in `helm` directory.
-
-Update values.yaml in `helm` directory with the required emcoui image and then run
-
-```bash
-helm install --name <app name> --namespace < namespace >
-```
+`docker build -t image_name:version .`

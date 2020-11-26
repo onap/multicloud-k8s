@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React from "react";
 import PropTypes from "prop-types";
 import { ThemeProvider, withStyles } from "@material-ui/core/styles";
@@ -25,6 +25,7 @@ import theme from "../theme/Theme";
 import apiService from "../services/apiService";
 import DeploymentIntentGroups from "../deploymentIntentGroups/DeploymentIntentGroups";
 import { Switch, Route, Link } from "react-router-dom";
+// import Dashboard from "../dashboard/DashboardView";
 
 const drawerWidth = 256;
 const styles = {
@@ -45,11 +46,10 @@ const styles = {
   },
   main: {
     flex: 1,
-    padding: theme.spacing(6, 4),
+    padding: theme.spacing(3, 4, 6, 4),
     background: "#eaeff1",
   },
   footer: {
-    // padding: theme.spacing(2),
     background: "#eaeff1",
   },
 };
@@ -63,17 +63,6 @@ class AppBase extends React.Component {
     };
   }
 
-  componentDidMount() {
-    apiService
-      .getCompositeApps({ projectName: this.state.projectName })
-      .then((response) => {
-        this.setState({ data: response });
-      })
-      .catch((err) => {
-        console.log("Unable to get composite apps");
-      })
-      .finally();
-  }
   setMobileOpen = (mobileOpen) => {
     this.setState({ mobileOpen });
   };
@@ -114,15 +103,15 @@ class AppBase extends React.Component {
                       path={`${this.props.match.url}/404`}
                       component={() => <div>Page Not found</div>}
                     />
-                    <Route
-                      exact
-                      path={`${this.props.match.url}/composite-apps`}
-                    >
+                    {/* <Route exact path={`${this.props.match.url}/dashboard`}>
+                      <Dashboard projectName={this.state.projectName} />
+                    </Route> */}
+                    <Route exact path={`${this.props.match.url}/services`}>
                       <CompositeApps projectName={this.state.projectName} />
                     </Route>
                     <Route
                       exact
-                      path={`${this.props.match.url}/composite-apps/:appname/:version`}
+                      path={`${this.props.match.url}/services/:appname/:version`}
                     >
                       <CompositeApp projectName={this.state.projectName} />
                     </Route>

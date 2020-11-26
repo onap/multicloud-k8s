@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
@@ -23,7 +23,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import HomeIcon from "@material-ui/icons/Home";
-import AppsIcon from "@material-ui/icons/Apps";
+import DeviceHubIcon from "@material-ui/icons/DeviceHub";
 import DnsRoundedIcon from "@material-ui/icons/DnsRounded";
 import { withRouter, Link } from "react-router-dom";
 
@@ -32,9 +32,9 @@ const categories = [
     id: "1",
     children: [
       {
-        id: "Composite Apps",
-        icon: <AppsIcon />,
-        url: "/composite-apps",
+        id: "Services",
+        icon: <DeviceHubIcon />,
+        url: "/services",
       },
       {
         id: "Deployment Intent Groups",
@@ -85,8 +85,8 @@ const styles = (theme) => ({
     marginTop: theme.spacing(2),
   },
   version: {
-    fontSize: "15px"
-  }
+    fontSize: "15px",
+  },
 });
 
 function Navigator(props) {
@@ -99,11 +99,20 @@ function Navigator(props) {
     setActiveTab(location.pathname);
   }
   return (
-    <Drawer PaperProps={props.PaperProps} variant={props.variant} open={props.open} onClose={props.onClose}>
+    <Drawer
+      PaperProps={props.PaperProps}
+      variant={props.variant}
+      open={props.open}
+      onClose={props.onClose}
+    >
       <List disablePadding>
-        <Link style={{ textDecoration: "none" }} to='/'>
+        <Link style={{ textDecoration: "none" }} to="/">
           <ListItem
-            className={clsx(classes.firebase, classes.item, classes.itemCategory)}
+            className={clsx(
+              classes.firebase,
+              classes.item,
+              classes.itemCategory
+            )}
           >
             <ListItemText
               classes={{
@@ -111,14 +120,29 @@ function Navigator(props) {
               }}
             >
               ONAP4K8s
-              </ListItemText>
-            <span
-              className={clsx(classes.version)}
-            >{process.env.REACT_APP_VERSION}</span>
+            </ListItemText>
+            <span className={clsx(classes.version)}>
+              {process.env.REACT_APP_VERSION}
+            </span>
           </ListItem>
         </Link>
 
-        <ListItem className={clsx(classes.item, classes.itemCategory)}>
+        {/* <Link
+          style={{ textDecoration: "none" }}
+          to={{
+            pathname: `${props.match.url}/dashboard`,
+            activeItem: "childId",
+          }}
+          key={"childId"}
+        > */}
+        <ListItem
+          button
+          className={clsx(
+            classes.item,
+            classes.itemCategory,
+            activeItem.includes("dashboard") && classes.itemActiveItem
+          )}
+        >
           <ListItemIcon className={classes.itemIcon}>
             <HomeIcon />
           </ListItemIcon>
@@ -130,10 +154,18 @@ function Navigator(props) {
             Dashboard
           </ListItemText>
         </ListItem>
+        {/* </Link> */}
         {categories.map(({ id, children }) => (
           <React.Fragment key={id}>
             {children.map(({ id: childId, icon, url }) => (
-              <Link style={{ textDecoration: "none" }} to={{ pathname: `${props.match.url}${url}`, activeItem: childId }} key={childId}>
+              <Link
+                style={{ textDecoration: "none" }}
+                to={{
+                  pathname: `${props.match.url}${url}`,
+                  activeItem: childId,
+                }}
+                key={childId}
+              >
                 <ListItem
                   button
                   className={clsx(

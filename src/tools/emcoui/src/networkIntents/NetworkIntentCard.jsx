@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -54,7 +54,7 @@ const NetworkIntentCard = (props) => {
   const [expanded, setExpanded] = useState(false);
   const [workloadData, setWorkloadData] = useState([]);
   const handleExpandClick = () => {
-    if (!expanded && workloadData.length < 1) {
+    if (!expanded && workloadData && workloadData.length < 1) {
       let request = {
         projectName: props.projectName,
         compositeAppName: props.compositeAppName,
@@ -189,6 +189,7 @@ const NetworkIntentCard = (props) => {
               variant="outlined"
               size="small"
               color="secondary"
+              disabled={workloadData && workloadData.length > 0}
               style={{ float: "right" }}
               startIcon={<DeleteIcon />}
               onClick={props.onDeleteNetworkControllerIntent.bind(
@@ -209,6 +210,9 @@ const NetworkIntentCard = (props) => {
                   props.networkControllerIntent.metadata.name
                 }
               />
+            )}
+            {!(props.appsData && props.appsData.length > 0) && (
+              <div>No app found for adding workload intent</div>
             )}
           </CardContent>
         </Collapse>

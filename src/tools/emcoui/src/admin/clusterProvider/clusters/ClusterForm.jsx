@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
@@ -113,8 +113,8 @@ const ClusterForm = (props) => {
       <DialogTitle id="simple-dialog-title">{title}</DialogTitle>
       <Formik
         initialValues={initialValues}
-        onSubmit={async (values) => {
-          onSubmit(values);
+        onSubmit={(values, actions) => {
+          onSubmit(values, actions.setSubmitting);
         }}
         validationSchema={schema}
       >

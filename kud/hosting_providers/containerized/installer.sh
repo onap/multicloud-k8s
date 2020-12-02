@@ -131,25 +131,30 @@ function install_addons {
 
     echo "Run the test cases if testing_enabled is set to true."
     if [[ "${testing_enabled}" == "true" ]]; then
+        failed_kud_tests=""
         for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov cmk $plugins_name}; do
             pushd $kud_tests
-            bash ${addon}.sh
+            bash ${addon}.sh || failed_kud_tests="${failed_kud_tests}${addon}"
             case $addon in
                 "onap4k8s" )
                     echo "Test the onap4k8s plugin installation"
                     for functional_test in plugin_edgex plugin_fw plugin_eaa; do
-                        bash ${functional_test}.sh --external
+                        bash ${functional_test}.sh --external || failed_kud_tests="${failed_kud_tests}${functional_test}"
                     done
                     ;;
                 "emco" )
                     echo "Test the emco plugin installation"
                     for functional_test in plugin_fw_v2; do
-                        bash ${functional_test}.sh --external
+                        bash ${functional_test}.sh --external || failed_kud_tests="${failed_kud_tests}${functional_test}"
                     done
                     ;;
             esac
             popd
         done
+        if [[ ! -z "$failed_kud_tests" ]]; then
+            echo "Test cases failed: ${failed_kud_tests}"
+            return 1
+        fi
     fi
     echo "Add-ons deployment complete..."
 }

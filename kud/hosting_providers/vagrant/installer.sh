@@ -165,11 +165,16 @@ function install_addons {
     done
     echo "Run the test cases if testing_enabled is set to true."
     if [[ "${testing_enabled}" == "true" ]]; then
+        failed_kud_tests=""
         for addon in ${KUD_ADDONS:-multus topology-manager virtlet ovn4nfv nfd sriov qat optane cmk}; do
             pushd $kud_tests
-            bash ${addon}.sh
+            bash ${addon}.sh || failed_kud_tests="${failed_kud_tests}${addon}"
             popd
         done
+        if [[ ! -z "$failed_kud_tests" ]]; then
+            echo "Test cases failed: ${failed_kud_tests}"
+            return 1
+        fi
     fi
     echo "Add-ons deployment complete..."
 }

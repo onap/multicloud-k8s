@@ -11,5 +11,5 @@
 - import_playbook: preconfigure-qat.yml
 - hosts: localhost
   tasks:
-    - name: Apply QAT plugin previleges Daemonset
+    - name: Apply QAT plugin privileges Daemonset
       command: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/../images/qat_plugin_privileges.yaml"

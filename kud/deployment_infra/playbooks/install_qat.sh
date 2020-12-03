@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Precondition:
-# QAT device installed, such as lspci | grep 37c8
+# QAT device installed, such as lspci -n | grep 37c8
 # Enable grub with "intel_iommu=on iommu=pt"
 
 ROOT=

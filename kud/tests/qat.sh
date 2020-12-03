@@ -10,16 +10,13 @@
 
 set -o pipefail
 
-qat_device=$( for i in 0434 0435 37c8 6f54 19e2; \
-                do lspci -d 8086:$i -m; done |\
-                grep -i "Quick*" | head -n 1 | cut -d " " -f 5 )
-#Checking if the QAT device is on the node
-if [ -z "$qat_device" ]; then
-    echo "False. This test case cannot run. Qat device unavailable."
+qat_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select(.status.capacity."qat.intel.com/cy2_dc2">="1") | .metadata.name')
+if [ -z "$qat_capable_nodes" ]; then
+    echo "This test case cannot run. QAT device unavailable."
     QAT_ENABLED=False
     exit 0
 else
-    echo "True. Can run QAT on this device."
+    echo "Can run QAT on this cluster."
     QAT_ENABLED=True
 fi
 
@@ -78,9 +75,7 @@ kubectl create -f $HOME/$pod_name.yaml --validate=false
 
 allocated_node_resource=$(kubectl describe node | grep "qat.intel.com" | tail -n1 |awk '{print $(NF)}')
 echo "The allocated resource of the node is: " $allocated_node_resource
-adf_ctl restart
-systemctl restart qat_service
-kubectl exec -it pod-case-01 -- openssl engine -c -t qat
+kubectl exec pod-case-01 -- openssl engine -c -t qat
 
 kubectl delete pod $pod_name --now
 echo "Test complete."

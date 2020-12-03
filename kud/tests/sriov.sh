@@ -10,17 +10,12 @@
 
 set -o pipefail
 
-ethernet_adpator_version=$( lspci | grep "Ethernet Controller XL710" | head -n 1 | cut -d " " -f 8 )
-if [ -z "$ethernet_adpator_version" ]; then
-    echo " Ethernet adapator version is not set. SRIOV test case cannot run on this machine"
+sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select(.status.capacity."intel.com/intel_sriov_700">="2") | .metadata.name')
+if [ -z "$sriov_capable_nodes" ]; then
+    echo "SRIOV test case cannot run on the cluster."
     exit 0
-fi
-#checking for the right hardware version of NIC on the machine
-if [ $ethernet_adpator_version == "XL710" ]; then
-    echo "NIC card specs match. SRIOV option avaiable for this version."
 else
-    echo -e "Failed. The version supplied does not match.\nTest cannot be executed."
-    exit 0
+    echo "SRIOV option avaiable in the cluster."
 fi
 
 pod_name=pod-case-01

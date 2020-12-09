@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a62b790_ea14c40a",
+        "filename": "kud/hosting_providers/vagrant/inventory/group_vars/k8s-cluster.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2020-12-09T23:22:37Z",
+      "side": 1,
+      "message": "Whitespace",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 56
+      },
+      "revId": "5f99856b3cdc3c11e82f0f67b3da973d43e47fc7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

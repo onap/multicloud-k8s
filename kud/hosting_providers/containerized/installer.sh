@@ -118,14 +118,14 @@ function install_addons {
         $kud_infra_folder/galaxy-requirements.yml --ignore-errors
 
     ansible-playbook $verbose -i \
-        $kud_inventory $kud_playbooks/configure-kud.yml | \
+        $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml | \
         tee $cluster_log/setup-kud.log
     # The order of KUD_ADDONS is important: some plugins (sriov, qat)
     # require nfd to be enabled.
     for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov qat cmk $plugins_name}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i \
-            $kud_inventory $kud_playbooks/configure-${addon}.yml | \
+            $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-${addon}.yml | \
             tee $cluster_log/setup-${addon}.log
     done
 

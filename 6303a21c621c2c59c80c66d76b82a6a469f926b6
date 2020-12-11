@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f3b0ced1_6b793acb",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/values.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6098
+      },
+      "writtenOn": "2020-12-11T15:26:35Z",
+      "side": 1,
+      "message": "openwrt:0.3.0 does not work with /usr/bin/sudo. Change to 0.3.1?",
+      "range": {
+        "startLine": 31,
+        "startChar": 9,
+        "endLine": 31,
+        "endChar": 44
+      },
+      "revId": "6303a21c621c2c59c80c66d76b82a6a469f926b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

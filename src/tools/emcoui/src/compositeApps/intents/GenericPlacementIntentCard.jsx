@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -168,6 +168,10 @@ const GenericPlacementIntentCard = (props) => {
               variant="outlined"
               size="small"
               color="secondary"
+              disabled={
+                appPlacementIntentData.applications &&
+                appPlacementIntentData.applications.length > 0
+              }
               style={{ float: "right" }}
               startIcon={<DeleteIcon />}
               onClick={() => {
@@ -190,6 +194,9 @@ const GenericPlacementIntentCard = (props) => {
                   }
                 />
               )}
+            {!(props.appsData && props.appsData.length > 0) && (
+              <div>No app found for adding app placement intent</div>
+            )}
           </CardContent>
         </Collapse>
       </Card>

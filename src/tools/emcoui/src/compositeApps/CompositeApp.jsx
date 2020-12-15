@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React from "react";
 import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
@@ -19,15 +19,15 @@ import Paper from "@material-ui/core/Paper";
 import { withStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import PropTypes from "prop-types";
-import Apps from "../compositeApps/apps/Apps";
-import CompositeProfiles from "../compositeApps/compositeProfiles/CompositeProfiles";
-import Intents from "../compositeApps/intents/GenericPlacementIntents";
 import BackIcon from "@material-ui/icons/ArrowBack";
 import { withRouter } from "react-router-dom";
 import { IconButton } from "@material-ui/core";
 import apiService from "../services/apiService";
 import Spinner from "../common/Spinner";
-import NetworkIntent from "../networkIntents/NetworkIntents";
+import Apps from "../compositeApps/apps/Apps";
+import CompositeProfiles from "../compositeApps/compositeProfiles/CompositeProfiles";
+// import Intents from "../compositeApps/intents/GenericPlacementIntents";
+// import NetworkIntent from "../networkIntents/NetworkIntents";
 
 const lightColor = "rgba(255, 255, 255, 0.7)";
 
@@ -134,8 +134,6 @@ class CompositeApp extends React.Component {
           >
             <Tab label="Apps" />
             <Tab label="Composite Profiles" />
-            <Tab label="Generic Placement Intents" />
-            <Tab label="Network Controller Intents" />
           </Tabs>
           {this.state.isLoading && <Spinner />}
 
@@ -158,22 +156,6 @@ class CompositeApp extends React.Component {
                   appsData={this.state.appsData}
                 />
               </TabPanel>
-              <TabPanel value={this.state.activeTab} index={2}>
-                <Intents
-                  projectName={this.props.projectName}
-                  compositeAppName={this.state.compositeAppName}
-                  compositeAppVersion={this.state.compositeAppVersion}
-                  appsData={this.state.appsData}
-                />
-              </TabPanel>
-              <TabPanel value={this.state.activeTab} index={3}>
-                <NetworkIntent
-                  projectName={this.props.projectName}
-                  compositeAppName={this.state.compositeAppName}
-                  compositeAppVersion={this.state.compositeAppVersion}
-                  appsData={this.state.appsData}
-                />
-              </TabPanel>
             </>
           )}
         </Paper>
@@ -181,7 +163,5 @@ class CompositeApp extends React.Component {
     );
   }
 }
-
 CompositeApp.propTypes = {};
-
 export default withStyles(styles)(withRouter(CompositeApp));

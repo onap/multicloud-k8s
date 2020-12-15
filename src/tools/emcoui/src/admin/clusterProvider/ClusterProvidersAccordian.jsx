@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Accordion from "@material-ui/core/Accordion";
@@ -22,11 +22,13 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import apiService from "../../services/apiService";
 import { Button } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
-import EditIcon from "@material-ui/icons/Edit";
+// import EditIcon from "@material-ui/icons/Edit";
 import ClusterForm from "./clusters/ClusterForm";
 import ClustersTable from "./clusters/ClusterTable";
 import DeleteDialog from "../../common/Dialogue";
-import ClusterProviderForm from "../clusterProvider/ClusterProviderForm";
+import Notification from "../../common/Notification";
+
+//import ClusterProviderForm from "../clusterProvider/ClusterProviderForm";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,8 +49,9 @@ export default function ControlledAccordions({ data, setData, ...props }) {
   const [expanded, setExpanded] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [formOpen, setFormOpen] = useState(false);
-  const [openProviderForm, setOpenProviderForm] = useState(false);
+  // const [openProviderForm, setOpenProviderForm] = useState(false);
   const [selectedRowIndex, setSelectedRowIndex] = useState(0);
+  const [notificationDetails, setNotificationDetails] = useState({});
   const handleAccordianOpen = (providerRow) => (event, isExpanded) => {
     if (!isExpanded) {
       setExpanded(isExpanded ? providerRow : false);
@@ -141,7 +144,7 @@ export default function ControlledAccordions({ data, setData, ...props }) {
     setSelectedRowIndex(index);
     setOpen(true);
   };
-  const handleSubmit = (values) => {
+  const handleSubmit = (values, setSubmitting) => {
     let metadata = {};
     if (values.userData) {
       metadata = JSON.parse(values.userData);
@@ -150,7 +153,6 @@ export default function ControlledAccordions({ data, setData, ...props }) {
     metadata.description = values.description;
     const formData = new FormData();
     formData.append("file", values.file);
-    // `{"metadata":{ "name": "${values.name}", "description": "${values.description}" }}`
     formData.append("metadata", `{"metadata":${JSON.stringify(metadata)}}`);
     formData.append("providerName", data[selectedRowIndex].metadata.name);
     apiService
@@ -161,12 +163,24 @@ export default function ControlledAccordions({ data, setData, ...props }) {
           ? (data[selectedRowIndex].clusters = [res])
           : data[selectedRowIndex].clusters.push(res);
         setData([...data]);
+        setFormOpen(false);
+        setNotificationDetails({
+          show: true,
+          message: `${values.name} cluster added`,
+          severity: "success",
+        });
       })
       .catch((err) => {
-        console.log("error adding cluster : ", err);
-      })
-      .finally(() => {
-        setFormOpen(false);
+        debugger;
+        if (err.response.status === 403) {
+          setNotificationDetails({
+            show: true,
+            message: `${err.response.data}`,
+            severity: "error",
+          });
+          setSubmitting(false);
+        }
+        console.log("error adding cluster : " + err);
       });
   };
   const handleFormClose = () => {
@@ -198,35 +212,36 @@ export default function ControlledAccordions({ data, setData, ...props }) {
     setOpen(false);
     setSelectedRowIndex(0);
   };
-  const handleEdit = (index) => {
-    setSelectedRowIndex(index);
-    setOpenProviderForm(true);
-  };
-  const handleCloseProviderForm = () => {
-    setOpenProviderForm(false);
-  };
-  const handleSubmitProviderForm = (values) => {
-    let request = {
-      payload: { metatada: values },
-      providerName: data[selectedRowIndex].metadata.name,
-    };
-    apiService
-      .updateClusterProvider(request)
-      .then((res) => {
-        setData((data) => {
-          data[selectedRowIndex].metadata = res.metadata;
-          return data;
-        });
-      })
-      .catch((err) => {
-        console.log("error updating cluster provider. " + err);
-      })
-      .finally(() => {
-        setOpenProviderForm(false);
-      });
-  };
+  // const handleEdit = (index) => {
+  //   setSelectedRowIndex(index);
+  //   setOpenProviderForm(true);
+  // };
+  // const handleCloseProviderForm = () => {
+  //   setOpenProviderForm(false);
+  // };
+  // const handleSubmitProviderForm = (values) => {
+  //   let request = {
+  //     payload: { metatada: values },
+  //     providerName: data[selectedRowIndex].metadata.name,
+  //   };
+  //   apiService
+  //     .updateClusterProvider(request)
+  //     .then((res) => {
+  //       setData((data) => {
+  //         data[selectedRowIndex].metadata = res.metadata;
+  //         return data;
+  //       });
+  //     })
+  //     .catch((err) => {
+  //       console.log("error updating cluster provider. " + err);
+  //     })
+  //     .finally(() => {
+  //       setOpenProviderForm(false);
+  //     });
+  // };
   return (
     <>
+      <Notification notificationDetails={notificationDetails} />
       {data && data.length > 0 && (
         <div className={classes.root}>
           <ClusterForm
@@ -234,12 +249,12 @@ export default function ControlledAccordions({ data, setData, ...props }) {
             onClose={handleFormClose}
             onSubmit={handleSubmit}
           />
-          <ClusterProviderForm
+          {/* <ClusterProviderForm
             open={openProviderForm}
             onClose={handleCloseProviderForm}
             onSubmit={handleSubmitProviderForm}
             item={data[selectedRowIndex]}
-          />
+          /> */}
           <DeleteDialog
             open={open}
             onClose={handleClose}
@@ -288,6 +303,8 @@ export default function ControlledAccordions({ data, setData, ...props }) {
                 >
                   Delete Provider
                 </Button>
+                {/* 
+                //edit cluster provider is not supported by the api yet
                 <Button
                   variant="outlined"
                   size="small"
@@ -299,7 +316,7 @@ export default function ControlledAccordions({ data, setData, ...props }) {
                   }}
                 >
                   Edit Provider
-                </Button>
+                </Button> */}
               </div>
               <AccordionDetails>
                 {item.clusters && (

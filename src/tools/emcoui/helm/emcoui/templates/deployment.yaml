@@ -12,27 +12,58 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ========================================================================  
-# GUI Deployment
+# middleend Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.service.name }} 
+  name: {{ .Values.middleend.service.name }} 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Values.service.label }} 
+      app: {{ .Values.middleend.service.label }} 
   template:
     metadata:
       labels:
-        app: {{ .Values.service.label }} 
+        app: {{ .Values.middleend.service.label }} 
     spec:
       containers:
-        - name: {{ .Values.service.name }} 
-          image: {{ .Values.image }} 
+        - name: {{ .Values.middleend.service.name }} 
+          image: "{{ .Values.middleend.image.repository }}:{{ .Values.middleend.image.tag }}"
           imagePullPolicy: Always
           ports:
-          - containerPort: {{ .Values.service.internalPort }} 
+          - containerPort: {{ .Values.middleend.service.internalPort }} 
+          volumeMounts:
+          - mountPath: /opt/emco/config
+            readOnly: true
+            name: config 
+      volumes:
+      - name: config 
+        configMap:
+          name: middleend-config
+
+---
+# GUI Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.emcoui.service.name }} 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.emcoui.service.label }} 
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.emcoui.service.label }} 
+    spec:
+      containers:
+        - name: {{ .Values.emcoui.service.name }} 
+          image: "{{ .Values.emcoui.image.repository }}:{{ .Values.emcoui.image.tag }}"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: {{ .Values.emcoui.service.internalPort }} 
           volumeMounts:
           - mountPath: /etc/nginx/conf.d 
             readOnly: true

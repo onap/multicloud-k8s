@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import {
   TableContainer,
@@ -24,7 +24,7 @@ import {
 } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import TableBody from "@material-ui/core/TableBody";
-import EditIcon from "@material-ui/icons/Edit";
+// import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import PropTypes from "prop-types";
 import apiService from "../../services/apiService";
@@ -106,31 +106,42 @@ const AppPlacementIntentTable = ({ data, setData, ...props }) => {
                 <StyledTableCell>{entry.name}</StyledTableCell>
                 <StyledTableCell>{entry.description}</StyledTableCell>
                 <StyledTableCell>
-                  {entry.allOf.map((intent, index) => (
-                    <Paper
-                      key={index}
-                      style={{ width: "max-content" }}
-                      variant="outlined"
-                    >
-                      <label>Cluster Provider :&nbsp;</label>
-                      <label style={{ fontWeight: "bold" }}>
-                        {intent["provider-name"]}, &nbsp;
-                      </label>
-                      <label>Labels : </label>
-                      <Chip
-                        style={{ marginRight: "10px" }}
-                        size="small"
-                        label={intent["cluster-label-name"]}
-                        color="primary"
+                  {entry.allOf &&
+                    entry.allOf.map((intent, index) => (
+                      <Paper
+                        key={index}
+                        style={{ width: "max-content" }}
                         variant="outlined"
-                      />
-                    </Paper>
-                  ))}
+                      >
+                        <label>Cluster Provider :&nbsp;</label>
+                        <label style={{ fontWeight: "bold" }}>
+                          {intent["provider-name"]}
+                        </label>
+                        <label>, &nbsp; Cluster :&nbsp;</label>
+                        <label style={{ fontWeight: "bold" }}>
+                          {intent["cluster-name"]}
+                        </label>
+                        {intent["cluster-label-name"] && (
+                          <>
+                            <label>, &nbsp; Labels : </label>
+                            <Chip
+                              style={{ marginRight: "10px" }}
+                              size="small"
+                              label={intent["cluster-label-name"]}
+                              color="primary"
+                              variant="outlined"
+                            />
+                          </>
+                        )}
+                      </Paper>
+                    ))}
                 </StyledTableCell>
                 <StyledTableCell>
+                  {/* 
+                  //edit app placement api has not been implemented yet
                   <IconButton onClick={(e) => handleEdit(index)} title="Edit">
                     <EditIcon color="primary" />
-                  </IconButton>
+                  </IconButton> */}
                   <IconButton
                     onClick={(e) => handleDelete(index)}
                     title="Delete"

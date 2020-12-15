@@ -95,7 +95,7 @@ function Content(props) {
       </AppBar>
       <div className={classes.contentWrapper}>
         <Typography color="textSecondary" align="center">
-          No composite apps for this project yet
+          No services for this project yet
         </Typography>
       </div>
     </Paper>

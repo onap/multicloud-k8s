@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React from "react";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
@@ -57,18 +57,18 @@ function Header(props) {
 
   let headerName = "";
   let getHeaderName = () => {
-    if (location.pathname === `${props.match.url}/composite-apps`) {
-      headerName = "Composite Apps";
+    if (location.pathname === `${props.match.url}/dashboard`) {
+      headerName = "Dashboard";
+    } else if (location.pathname === `${props.match.url}/services`) {
+      headerName = "Services";
     } else if (
       location.pathname === `${props.match.url}/deployment-intent-group`
     ) {
       headerName = "Deployment Intent Groups";
-    } else if (location.pathname.includes("composite-apps")) {
+    } else if (location.pathname.includes("services")) {
       headerName =
-        "Composite Apps / " +
-        location.pathname
-          .slice(location.pathname.indexOf("composite-apps"))
-          .slice(15);
+        "services / " +
+        location.pathname.slice(location.pathname.indexOf("services")).slice(9);
     } else if (location.pathname === `${props.match.url}/projects`) {
       headerName = "Projects";
     } else if (location.pathname === `${props.match.url}/clusters`) {

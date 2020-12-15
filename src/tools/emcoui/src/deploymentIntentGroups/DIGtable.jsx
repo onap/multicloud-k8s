@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -22,14 +22,14 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
-import EditIcon from "@material-ui/icons/Edit";
+// import EditIcon from "@material-ui/icons/Edit";
 import DeleteDialog from "../common/Dialogue";
-import AddIcon from "@material-ui/icons/Add";
+// import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import apiService from "../services/apiService";
-import { Button } from "@material-ui/core";
-import IntentsForm from "./IntentsForm";
+// import { Button } from "@material-ui/core";
+// import IntentsForm from "./IntentsForm";
 import Notification from "../common/Notification";
 
 const StyledTableCell = withStyles((theme) => ({
@@ -58,20 +58,15 @@ const useStyles = makeStyles({
 export default function DIGtable({ data, setData, ...props }) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  // const [openForm, setOpenForm] = useState(false);
   const [index, setIndex] = useState(0);
-  const [openIntentsForm, setOpenIntentsForm] = useState(false);
+  // const [openIntentsForm, setOpenIntentsForm] = useState(false);
   const [notificationDetails, setNotificationDetails] = useState({});
-  let handleEdit = (index) => {
-    // setIndex(index);
-    // setOpenForm(true);
-  };
   const handleClose = (el) => {
     if (el.target.innerText === "Delete") {
       let request = {
         projectName: props.projectName,
-        compositeAppName: data[index].compositeAppName,
-        compositeAppVersion: data[index].compositeAppVersion,
+        compositeAppName: data[index].metadata.compositeAppName,
+        compositeAppVersion: data[index].metadata.compositeAppVersion,
         deploymentIntentGroupName: data[index].metadata.name,
       };
       apiService
@@ -92,50 +87,46 @@ export default function DIGtable({ data, setData, ...props }) {
     setIndex(index);
     setOpen(true);
   };
-  const handleAddIntent = (index) => {
-    setIndex(index);
-    setOpenIntentsForm(true);
-  };
-  const handleCloseIntentsForm = () => {
-    setOpenIntentsForm(false);
-  };
-  const handleSubmitIntentForm = (values) => {
-    setOpenIntentsForm(false);
-    let request = {
-      projectName: props.projectName,
-      compositeAppName: values.compositeAppName,
-      compositeAppVersion: values.compositeAppVersion,
-      deploymentIntentGroupName: values.deploymentIntentGroupName,
-      payload: {
-        metadata: { name: values.name, description: values.description },
-        spec: {
-          intent: {
-            genericPlacementIntent: values.genericPlacementIntent,
-          },
-        },
-      },
-    };
-    if (values.networkControllerIntent && values.networkControllerIntent !== "")
-      request.payload.spec.intent.ovnaction = values.networkControllerIntent;
-    apiService
-      .addIntentsToDeploymentIntentGroup(request)
-      .then((res) => {
-        if (data[index].intent) {
-          data[index].intent.push(res.spec.intent);
-        } else {
-          data[index].intent = [res.spec.intent];
-        }
-        setData([...data]);
-      })
-      .catch((err) => {
-        console.log("error adding intent to deployment intent group");
-      });
-  };
+  // const handleCloseIntentsForm = () => {
+  //   setOpenIntentsForm(false);
+  // };
+  // const handleSubmitIntentForm = (values) => {
+  //   setOpenIntentsForm(false);
+  //   let request = {
+  //     projectName: props.projectName,
+  //     compositeAppName: values.compositeAppName,
+  //     compositeAppVersion: values.compositeAppVersion,
+  //     deploymentIntentGroupName: values.deploymentIntentGroupName,
+  //     payload: {
+  //       metadata: { name: values.name, description: values.description },
+  //       spec: {
+  //         intent: {
+  //           genericPlacementIntent: values.genericPlacementIntent,
+  //         },
+  //       },
+  //     },
+  //   };
+  //   if (values.networkControllerIntent && values.networkControllerIntent !== "")
+  //     request.payload.spec.intent.ovnaction = values.networkControllerIntent;
+  //   apiService
+  //     .addIntentsToDeploymentIntentGroup(request)
+  //     .then((res) => {
+  //       if (data[index].intent) {
+  //         data[index].intent.push(res.spec.intent);
+  //       } else {
+  //         data[index].intent = [res.spec.intent];
+  //       }
+  //       setData([...data]);
+  //     })
+  //     .catch((err) => {
+  //       console.log("error adding intent to deployment intent group");
+  //     });
+  // };
   const handleInstantiate = (index) => {
     let request = {
       projectName: props.projectName,
-      compositeAppName: data[index].compositeAppName,
-      compositeAppVersion: data[index].compositeAppVersion,
+      compositeAppName: data[index].metadata.compositeAppName,
+      compositeAppVersion: data[index].metadata.compositeAppVersion,
       deploymentIntentGroupName: data[index].metadata.name,
     };
     apiService
@@ -184,13 +175,6 @@ export default function DIGtable({ data, setData, ...props }) {
       <Notification notificationDetails={notificationDetails} />
       {data && data.length > 0 && (
         <>
-          <IntentsForm
-            projectName={props.projectName}
-            open={openIntentsForm}
-            onClose={handleCloseIntentsForm}
-            onSubmit={handleSubmitIntentForm}
-            data={data[index]}
-          />
           <DeleteDialog
             open={open}
             onClose={handleClose}
@@ -207,7 +191,7 @@ export default function DIGtable({ data, setData, ...props }) {
                   <StyledTableCell>Version</StyledTableCell>
                   <StyledTableCell>Profile</StyledTableCell>
                   <StyledTableCell>Composite App</StyledTableCell>
-                  <StyledTableCell>Intents</StyledTableCell>
+                  {/* <StyledTableCell>Intents</StyledTableCell> */}
                   <StyledTableCell>Description</StyledTableCell>
                   <StyledTableCell style={{ width: "15%" }}>
                     Actions
@@ -225,54 +209,39 @@ export default function DIGtable({ data, setData, ...props }) {
                       {row.spec.profile}
                     </StyledTableCell>
                     <StyledTableCell className={classes.cell}>
-                      {row.compositeAppName}
+                      {row.metadata.compositeAppName}
                     </StyledTableCell>
-                    {
+                    {/* {
                       <StyledTableCell className={classes.cell}>
-                        {row.intent
-                          ? row.intent.map((intentEntry) => {
-                              return Object.keys(intentEntry)
-                                .map(function (k) {
-                                  return intentEntry[k];
-                                })
-                                .join(" | ");
-                            })
-                          : ""}
+                        {Object.keys(row.spec.deployedIntents[0]).map(function (
+                          key,
+                          index
+                        ) {
+                          if (
+                            index === 0 ||
+                            row.spec.deployedIntents[0][key] === ""
+                          )
+                            return row.spec.deployedIntents[0][key];
+                          else return ", " + row.spec.deployedIntents[0][key];
+                        })}
                       </StyledTableCell>
-                    }
+                    } */}
                     <StyledTableCell className={classes.cell}>
                       {row.metadata.description}
                     </StyledTableCell>
                     <StyledTableCell className={classes.cell}>
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        size="small"
-                        onClick={() => {
-                          handleAddIntent(index);
-                        }}
-                        startIcon={<AddIcon />}
-                      >
-                        Intents
-                      </Button>
                       <IconButton
-                        disabled={!(row.intent && row.intent.length > 0)}
+                        color={"primary"}
+                        // disabled={
+                        //   !(
+                        //     row.spec.deployedIntents &&
+                        //     row.spec.deployedIntents.length > 0
+                        //   )
+                        // }
                         title="Instantiate"
                         onClick={(e) => handleInstantiate(index)}
                       >
-                        <GetAppIcon
-                          color={
-                            !(row.intent && row.intent.length > 0)
-                              ? ""
-                              : "primary"
-                          }
-                        />
-                      </IconButton>
-                      <IconButton
-                        onClick={(e) => handleEdit(index)}
-                        title="Edit"
-                      >
-                        <EditIcon color="primary" />
+                        <GetAppIcon />
                       </IconButton>
                       <IconButton
                         onClick={(e) => handleDelete(index)}

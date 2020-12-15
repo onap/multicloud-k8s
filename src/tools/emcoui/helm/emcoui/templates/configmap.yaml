@@ -11,7 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ========================================================================  
+# ========================================================================
+# middleend config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+        name: middleend-config
+data:
+  middleend.conf: |-
+    {
+      "ownport": "{{ .Values.middleend.service.internalPort }}",
+      "orchestrator": "orchestrator.{{ .Values.namespace }}.svc.cluster.local:9015",
+      "clm": "clm.{{ .Values.namespace }}.svc.cluster.local:9061",
+      "ovnaction": "ovnaction.{{ .Values.namespace }}.svc.cluster.local:9051",
+      "issuer": "{{ .Values.authproxy.issuer }}",
+      "redirect_uri": "{{ .Values.authproxy.redirect_uri }}",
+      "client_id": "{{ .Values.authproxy.client_id }}",
+      "mongo": "mongo.{{ .Values.namespace }}.svc.cluster.local:27017"
+    }   
+
+---
+# emcoui config
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,7 +39,7 @@ metadata:
 data:
   my-nginx-config.conf: |
     server {
-      listen       {{ .Values.service.internalPort }};
+      listen       {{ .Values.emcoui.service.internalPort }};
       server_name  localhost;
       location / {
           root   /usr/share/nginx/html;
@@ -29,6 +49,9 @@ data:
       error_page   500 502 503 504  /50x.html;
       location = /50x.html {
           root   /usr/share/nginx/html;
+      }
+      location /middleend {
+          proxy_pass   http://middleend.{{ .Values.namespace }}.svc.cluster.local:9081;
       }
       location /v2/controllers {
           proxy_pass   http://orchestrator.{{ .Values.namespace }}.svc.cluster.local:9015;

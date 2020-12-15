@@ -11,10 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import axios from "axios";
 axios.defaults.baseURL = process.env.REACT_APP_BACKEND || "";
-
 //orchestrator
 //projects
 const createProject = (request) => {
@@ -45,6 +44,14 @@ const getCompositeApps = (request) => {
       return res.data;
     });
 };
+const addService = ({ projectName, ...request }) => {
+  return axios
+    .post(`/middleend/projects/${projectName}/composite-apps`, request.payload)
+    .then((res) => {
+      return res.data;
+    });
+};
+
 const createCompositeApp = ({ projectName, ...request }) => {
   return axios
     .post(`/v2/projects/${projectName}/composite-apps`, request.payload)
@@ -65,7 +72,7 @@ const updateCompositeApp = (request) => {
 const deleteCompositeApp = (request) => {
   return axios
     .delete(
-      `/v2/projects/${request.projectName}/composite-apps/${request.compositeAppName}/${request.compositeAppVersion}`
+      `/middleend/projects/${request.projectName}/composite-apps/${request.compositeAppName}/${request.compositeAppVersion}`
     )
     .then((res) => {
       return res.data;
@@ -302,15 +309,10 @@ const deleteInterface = (request) => {
 };
 
 //deployment intent group
-const createDeploymentIntentGroup = ({
-  projectName,
-  compositeAppName,
-  compositeAppVersion,
-  ...request
-}) => {
+const createDeploymentIntentGroup = (request) => {
   return axios
     .post(
-      `/v2/projects/${projectName}/composite-apps/${compositeAppName}/${compositeAppVersion}/deployment-intent-groups`,
+      `/middleend/projects/${request.spec.projectName}/composite-apps/${request.compositeApp}/${request.compositeAppVersion}/deployment-intent-groups`,
       { ...request }
     )
     .then((res) => {
@@ -329,9 +331,7 @@ const addIntentsToDeploymentIntentGroup = (request) => {
 };
 const getDeploymentIntentGroups = (request) => {
   return axios
-    .get(
-      `/v2/projects/${request.projectName}/composite-apps/${request.compositeAppName}/${request.compositeAppVersion}/deployment-intent-groups`
-    )
+    .get(`/middleend/projects/${request.projectName}/deployment-intent-groups`)
     .then((res) => {
       return res.data;
     });
@@ -349,7 +349,7 @@ const editDeploymentIntentGroup = (request) => {
 const deleteDeploymentIntentGroup = (request) => {
   return axios
     .delete(
-      `/v2/projects/${request.projectName}/composite-apps/${request.compositeAppName}/${request.compositeAppVersion}/deployment-intent-groups/${request.deploymentIntentGroupName}`
+      `/middleend/projects/${request.projectName}/composite-apps/${request.compositeAppName}/${request.compositeAppVersion}/deployment-intent-groups/${request.deploymentIntentGroupName}`
     )
     .then((res) => {
       return res.data;
@@ -421,7 +421,7 @@ const updateClusterProvider = (request) => {
 const addCluster = (request) => {
   return axios
     .post(
-      `/v2/cluster-providers/${request.get("providerName")}/clusters`,
+      `/middleend/clusterproviders/${request.get("providerName")}/clusters`,
       request
     )
     .then((res) => {
@@ -577,6 +577,7 @@ const vimService = {
   getCompositeApps,
   getProfiles,
   createCompositeApp,
+  addService,
   updateCompositeApp,
   deleteCompositeApp,
   getApps,

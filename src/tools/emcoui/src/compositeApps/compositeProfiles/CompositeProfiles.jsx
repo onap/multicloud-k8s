@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState, useEffect } from "react";
 import Card from "./CompositeProfileCard";
 import { Button, Grid } from "@material-ui/core";
@@ -82,7 +82,6 @@ const CompositeProfiles = (props) => {
         compositeAppVersion: props.compositeAppVersion,
         compositeProfileName: data[index].metadata.name,
       };
-      console.log(request);
       apiService
         .deleteCompositeProfile(request)
         .then(() => {
@@ -115,7 +114,7 @@ const CompositeProfiles = (props) => {
         }"`}
       />
 
-      <Button
+      {/* <Button
         disabled={isLoading}
         variant="outlined"
         color="primary"
@@ -123,7 +122,7 @@ const CompositeProfiles = (props) => {
         onClick={handleAddCompositeProfile}
       >
         Add Composite Profile
-      </Button>
+      </Button> */}
       <Form onClose={handleCloseForm} open={openForm} onSubmit={handleSubmit} />
       <Grid
         container

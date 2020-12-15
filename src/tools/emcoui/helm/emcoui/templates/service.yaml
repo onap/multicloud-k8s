@@ -12,24 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ========================================================================  
-# GUI Service
+# middleend Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.service.name}} 
+  name: {{ .Values.middleend.service.name}}
   labels:
-    app: {{ .Values.service.label }} 
+    app: {{ .Values.middleend.service.label }}
 spec:
   selector:
-    app: {{ .Values.service.name }} 
-  type: {{ .Values.service.type }} 
+    app: {{ .Values.middleend.service.name }} 
+  type: {{ .Values.middleend.service.type }} 
   ports:
-  - name: {{ .Values.service.PortName }}
-    {{if eq .Values.service.type "NodePort" -}}
-    port: {{ .Values.service.internalPort }}
-    nodePort: {{ .Values.global.nodePortPrefixExt | default "302" }}{{ .Values.service.nodePort }}
+  - name: {{ .Values.middleend.service.PortName }}
+    {{if eq .Values.middleend.service.type "NodePort" -}}
+    port: {{ .Values.middleend.service.internalPort }}
+    nodePort: {{ .Values.global.nodePortPrefixExt | default "302" }}{{ .Values.middleend.service.nodePort }}
     {{- else -}}
-    port: {{ .Values.service.externalPort }}
-    targetPort: {{ .Values.service.internalPort }}
+    port: {{ .Values.middleend.externalPort }}
+    targetPort: {{ .Values.middleend.internalPort }}
+    {{- end}}
+    protocol: TCP
+
+
+---
+# emcoui service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.emcoui.service.name}} 
+  labels:
+    app: {{ .Values.emcoui.service.label }} 
+spec:
+  selector:
+    app: {{ .Values.emcoui.service.name }} 
+  type: {{ .Values.emcoui.service.type }} 
+  ports:
+  - name: {{ .Values.emcoui.service.PortName }}
+    {{if eq .Values.emcoui.service.type "NodePort" -}}
+    port: {{ .Values.emcoui.service.internalPort }}
+    nodePort: {{ .Values.global.nodePortPrefixExt | default "302" }}{{ .Values.emcoui.service.nodePort }}
+    {{- else -}}
+    port: {{ .Values.emcoui.service.externalPort }}
+    targetPort: {{ .Values.emcoui.service.internalPort }}
     {{- end}}
     protocol: TCP

@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
@@ -37,14 +37,14 @@ const categories = [
         url: "/projects",
       },
       {
-        id: "Clusters",
-        icon: <DnsRoundedIcon />,
-        url: "/clusters",
-      },
-      {
         id: "Controllers",
         icon: <SettingsIcon />,
         url: "/controllers",
+      },
+      {
+        id: "Clusters",
+        icon: <DnsRoundedIcon />,
+        url: "/clusters",
       },
     ],
   },

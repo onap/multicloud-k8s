@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// ========================================================================  
+// ========================================================================
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -53,7 +53,7 @@ function App() {
                 <Redirect
                   exact
                   from={`${match.path}`}
-                  to={`${match.path}/composite-apps`}
+                  to={`${match.path}/services`}
                 />
                 <Route
                   path={`${match.path}`}

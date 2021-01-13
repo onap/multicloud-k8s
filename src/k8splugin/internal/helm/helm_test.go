@@ -182,6 +182,16 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 			},
 			expectedError: "",
 		},
+		{
+			label:         "Test simple v3 helm charts support",
+			chartPath:     "../../mock_files/mock_charts/mockv3",
+			valueFiles:    []string{},
+			values:        []string{},
+			expectedError: "",
+			expectedHashMap: map[string]string{
+				"mockv3/templates/deployment.yaml": "259a027a4957e7428eb1d2e774fa1afaa62449521853f8b2916887040bae2ca4",
+			},
+		},
 	}
 
 	h := sha256.New()

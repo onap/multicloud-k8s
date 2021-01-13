@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
+ * Copyright 2020,2021 Samsung Electronics, Modifications
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,6 +182,16 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 				"testchart3/templates/multi.yaml-5": "6a5af22538c273b9d4a3156e3b6bb538c655041eae31e93db21a9e178f73ecf0",
 			},
 			expectedError: "",
+		},
+		{
+			label:         "Test simple v3 helm charts support",
+			chartPath:     "../../mock_files/mock_charts/mockv3",
+			valueFiles:    []string{},
+			values:        []string{},
+			expectedError: "",
+			expectedHashMap: map[string]string{
+				"mockv3/templates/deployment.yaml": "259a027a4957e7428eb1d2e774fa1afaa62449521853f8b2916887040bae2ca4",
+			},
 		},
 	}
 

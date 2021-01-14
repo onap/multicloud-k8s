@@ -115,3 +115,14 @@ emcoctl_localhost: true
 emco_roles:
 - emco
 - monitor
+
+kata_version: 2.1.0-rc0
+kata_rbac_url: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/kata-rbac/base/kata-rbac.yaml"
+kata_deploy_url: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/kata-deploy/base/kata-deploy.yaml"
+kata_runtimeclass_url: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/runtimeclasses/kata-runtimeClasses.yaml"
+kata_webhook_dest: "{{ base_dest }}/kata_webhook"
+kata_webhook_version: 2.1.0-rc0
+kata_webhook_script_url: "https://raw.githubusercontent.com/kata-containers/tests/{{ kata_webhook_version }}/kata-webhook/create-certs.sh"
+kata_webhook_registration_url: "https://raw.githubusercontent.com/kata-containers/tests/{{ kata_webhook_version }}/kata-webhook/deploy/webhook-registration.yaml.tpl"
+kata_webhook_deployment_url: "https://raw.githubusercontent.com/kata-containers/tests/{{ kata_webhook_version }}/kata-webhook/deploy/webhook.yaml"
+kata_webhook_runtimeclass: "kata-clh"

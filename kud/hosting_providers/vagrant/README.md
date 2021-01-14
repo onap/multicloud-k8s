@@ -39,6 +39,20 @@ the following instructions:
 In-depth documentation and use cases of various Vagrant commands [Vagrant commands][3]
 is available on the Vagrant site.
 
+### CRI Runtimes
+
+Currently both docker and containerd are supported CRI runtimes. If nothing is
+specified then docker will be used by default. This can be changed by setting
+the `CONTAINER_RUNTIME` environment variable. To be able to run secure
+containers using Kata Containers it is required to change the CRI runtime to
+containerd.
+
+```
+$ export CONTAINER_RUNTIME=containerd
+```
+
+
+
 ## License
 
 Apache-2.0

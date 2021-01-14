@@ -14,7 +14,6 @@ set -o pipefail
 set -ex
 
 INSTALLER_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
-KUD_ADDONS=""
 
 function install_prerequisites {
 #install package for docker images
@@ -78,17 +77,35 @@ function install_kubespray {
     fi
 }
 
-# install_k8s() - Install Kubernetes using kubespray tool
+# install_k8s() - Install Kubernetes using kubespray tool including Kata
 function install_k8s {
     local cluster_name=$1
     ansible-playbook $verbose -i \
         $kud_inventory $kud_playbooks/preconfigure-kubespray.yml \
         --become --become-user=root | \
         tee $cluster_log/setup-kubernetes.log
-    ansible-playbook $verbose -i \
-        $kud_inventory $dest_folder/kubespray-$version/cluster.yml \
-        -e cluster_name=$cluster_name --become --become-user=root | \
-        tee $cluster_log/setup-kubernetes.log
+    if [ "$container_runtime" == "docker" ]; then
+        echo "Docker will be used as the container runtime interface"
+        ansible-playbook $verbose -i \
+            $kud_inventory $dest_folder/kubespray-$version/cluster.yml \
+            -e cluster_name=$cluster_name --become --become-user=root | \
+            tee $cluster_log/setup-kubernetes.log
+    elif [ "$container_runtime" == "containerd" ]; then
+        echo "Containerd will be used as the container runtime interface"
+        ansible-playbook $verbose -i \
+            $kud_inventory $dest_folder/kubespray-$version/cluster.yml \
+            -e $kud_kata_override_variables -e cluster_name=$cluster_name \
+            --become --become-user=root | \
+            tee $cluster_log/setup-kubernetes.log
+        #Install Kata Containers in containerd scenario
+        ansible-playbook $verbose -i \
+            $kud_inventory -e "base_dest=$HOME" \
+            $kud_playbooks/configure-kata.yml | \
+            tee $cluster_log/setup-kata.log
+    else
+        echo "Only Docker or Containerd are supported container runtimes"
+        exit 1
+    fi
 
     # Configure environment
     # Requires kubeconfig_localhost and kubectl_localhost to be true
@@ -116,21 +133,37 @@ function install_addons {
         $kud_infra_folder/galaxy-requirements.yml --ignore-errors
 
     ansible-playbook $verbose -i \
-        $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml | \
-        tee $cluster_log/setup-kud.log
-    # The order of KUD_ADDONS is important: some plugins (sriov, qat)
-    # require nfd to be enabled.
-    for addon in $KUD_ADDONS $plugins_name; do
+        $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml \
+        | tee $cluster_log/setup-kud.log
+
+    kud_addons="${KUD_ADDONS:-} ${plugins_name}"
+
+    for addon in ${kud_addons}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i \
-            $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-${addon}.yml | \
+            $kud_inventory -e "base_dest=$HOME" \
+            $kud_playbooks/configure-${addon}.yml | \
             tee $cluster_log/setup-${addon}.log
     done
 
     echo "Run the test cases if testing_enabled is set to true."
     if [[ "${testing_enabled}" == "true" ]]; then
         failed_kud_tests=""
-        for addon in $KUD_ADDONS $plugins_name; do
+        # Run Kata test first if Kata was installed
+        if [ "$container_runtime" == "containerd" ]; then
+            #Install Kata webhook for test pods
+            ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" \
+                -e "kata_webhook_runtimeclass=$kata_webhook_runtimeclass" \
+                $kud_playbooks/configure-kata-webhook.yml \
+                --become --become-user=root | \
+                sudo tee $cluster_log/setup-kata-webhook.log
+            kata_webhook_deployed=true
+            pushd $kud_tests
+            bash kata.sh || failed_kud_tests="${failed_kud_tests} kata"
+            popd
+        fi
+        #Run other plugin tests
+        for addon in ${kud_addons}; do
             pushd $kud_tests
             bash ${addon}.sh || failed_kud_tests="${failed_kud_tests} ${addon}"
             case $addon in
@@ -150,11 +183,30 @@ function install_addons {
             esac
             popd
         done
+        # Remove Kata webhook if user didn't want it permanently installed
+        if ! [ "$enable_kata_webhook" == "true" ] && [ "$kata_webhook_deployed" == "true" ]; then
+            ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" \
+                -e "kata_webhook_runtimeclass=$kata_webhook_runtimeclass" \
+                $kud_playbooks/configure-kata-webhook-reset.yml \
+                --become --become-user=root | \
+                sudo tee $cluster_log/kata-webhook-reset.log
+            kata_webhook_deployed=false
+        fi
         if [[ ! -z "$failed_kud_tests" ]]; then
             echo "Test cases failed:${failed_kud_tests}"
             return 1
         fi
     fi
+
+    # Check if Kata webhook should be installed and isn't already installed
+    if [ "$enable_kata_webhook" == "true" ] && ! [ "$kata_webhook_deployed" == "true" ]; then
+        ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" \
+            -e "kata_webhook_runtimeclass=$kata_webhook_runtimeclass" \
+            $kud_playbooks/configure-kata-webhook.yml \
+            --become --become-user=root | \
+            sudo tee $cluster_log/setup-kata-webhook.log
+    fi
+
     echo "Add-ons deployment complete..."
 }
 
@@ -230,6 +282,15 @@ kud_playbooks=$kud_infra_folder/playbooks
 kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
+container_runtime=${CONTAINER_RUNTIME:-docker}
+enable_kata_webhook=${ENABLE_KATA_WEBHOOK:-false}
+kata_webhook_runtimeclass=${KATA_WEBHOOK_RUNTIMECLASS:-kata-qemu}
+kata_webhook_deployed=false
+# For containerd the etcd_deployment_type: docker is the default and doesn't work.
+# You have to use either etcd_kubeadm_enabled: true or etcd_deployment_type: host
+# See https://github.com/kubernetes-sigs/kubespray/issues/5713
+kud_kata_override_variables="container_manager=containerd \
+    -e etcd_deployment_type=host -e kubelet_cgroup_driver=cgroupfs"
 
 mkdir -p /opt/csar
 export CSAR_DIR=/opt/csar
@@ -335,6 +396,7 @@ if [ "$1" == "--cluster" ]; then
     install_cluster $cluster_name
     exit 0
 fi
+
 
 echo "Error: Refer the installer usage"
 usage

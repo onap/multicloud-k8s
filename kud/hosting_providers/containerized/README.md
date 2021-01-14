@@ -21,9 +21,9 @@ KUD installation installer is divided into two regions with args - `--install-pk
 
 * Container image is build using the `installer --install-pkg` arg and Kubernetes job is used to install the cluster using `installer --cluster <cluster-name>`. Installer will invoke the kubespray cluster.yml, kud-addsons and plugins ansible cluster.
 
-Installer script finds the `hosts.init` for each cluster in `/opt/multi-cluster/<cluster-name>`
+Installer script finds the `hosts.ini` for each cluster in `/opt/multi-cluster/<cluster-name>`
 
-Kubernetes jobs(a cluster per job) are used to install multiple clusters and logs of each cluster deployments are stored in the `/opt/kud/multi-cluster/<cluster-name>/logs` and artifacts are stored as follows `/opt/kud/multi-cluster/<cluster-name>/artifacts`
+Kubernetes jobs (a cluster per job) are used to install multiple clusters and logs of each cluster deployments are stored in the `/opt/kud/multi-cluster/<cluster-name>/logs` and artifacts are stored as follows `/opt/kud/multi-cluster/<cluster-name>/artifacts`
 
 ## Creating TestBed for Testing and Development
 
@@ -38,26 +38,31 @@ $ pushd multicloud-k8s/kud/hosting_providers/containerized/testing
 $ vagrant up
 $ popd
 ```
-Do following steps to keep note of
+Do the following steps to keep note of
 1. Get the IP address for the Vagrant machine - <VAGRANT_IP_ADDRESS>
 2. Copy the host /root/.ssh/id_rsa.pub into the vagrant /root/.ssh/authorized_keys
 3. From host make sure to ssh into vagrant without password ssh root@<VAGRANT_IP_ADDRESS>
 
 ## Quickstart Installation Guide
 
-Build the kud docker images as follows, add KUD_ENABLE_TESTS & KUD_PLUGIN_ENABLED for the testing only:
+Build the kud docker images as follows. Add `KUD_ENABLE_TESTS` & `KUD_PLUGIN_ENABLED`
+for the testing only. Currently only docker and containerd are supported CRI
+runtimes and can be configured using the `CONTAINER_RUNTIME` environment variable.
+To be able to run secure containers using Kata Containers, it is required to
+change the CRI runtime to containerd.
 
 ```
 $ git clone https://github.com/onap/multicloud-k8s.git && cd multicloud-k8s
-$  docker build  --rm \
+$ docker build  --rm \
 	--build-arg http_proxy=${http_proxy} \
 	--build-arg HTTP_PROXY=${HTTP_PROXY} \
 	--build-arg https_proxy=${https_proxy} \
 	--build-arg HTTPS_PROXY=${HTTPS_PROXY} \
 	--build-arg no_proxy=${no_proxy} \
 	--build-arg NO_PROXY=${NO_PROXY} \
-        --build-arg KUD_ENABLE_TESTS=true \
-        --build-arg KUD_PLUGIN_ENABLED=true \
+	--build-arg KUD_ENABLE_TESTS=true \
+	--build-arg KUD_PLUGIN_ENABLED=true \
+	--build-arg CONTAINER_RUNTIME=docker \
 	-t github.com/onap/multicloud-k8s:latest . -f kud/build/Dockerfile
 ```
 Let's create a cluster-101 and cluster-102 hosts.ini as follows
@@ -66,7 +71,7 @@ Let's create a cluster-101 and cluster-102 hosts.ini as follows
 $ mkdir -p /opt/kud/multi-cluster/{cluster-101,cluster-102}
 ```
 
-Create hosts.ini as follows in the direcotry cluster-101(c01 IP address 10.10.10.3) and cluster-102(c02 IP address 10.10.10.5). If user used Vagrant setup as mentioned in the above steps, replace the IP address with vagrant IP address
+Create the hosts.ini as follows in the directory cluster-101(c01 IP address 10.10.10.3) and cluster-102(c02 IP address 10.10.10.5). If the user used a Vagrant setup as mentioned in the above steps, replace the IP address with the vagrant IP address.
 
 ```
 $ cat /opt/kud/multi-cluster/cluster-101/hosts.ini
@@ -97,7 +102,7 @@ kube-master
 ```
 Do the same for the cluster-102 with c01 and IP address 10.10.10.5.
 
-Create the ssh secret for Baremetal or VM based on your deployment. and Launch the kubernetes job as follows
+Create the ssh secret for Baremetal or VM based on your deployment. Launch the kubernetes job as follows.
 ```
 $ kubectl create secret generic ssh-key-secret --from-file=id_rsa=/root/.ssh/id_rsa --from-file=id_rsa.pub=/root/.ssh/id_rsa.pub
 $ CLUSTER_NAME=cluster-101

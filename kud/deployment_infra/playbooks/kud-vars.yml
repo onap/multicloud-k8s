@@ -88,3 +88,7 @@ cpu_manager:
   checkpoint_file: "/var/lib/kubelet/cpu_manager_state"
 topology_manager:
   policy: "best-effort" # Options: none (disabled), best-effort (default), restricted, single-numa-node
+
+kata_rbac_url: "https://raw.githubusercontent.com/kata-containers/packaging/master/kata-deploy/kata-rbac/base/kata-rbac.yaml"
+kata_deploy_url: "https://raw.githubusercontent.com/kata-containers/packaging/master/kata-deploy/kata-deploy/base/kata-deploy.yaml"
+kata_runtimeclass_url: "https://raw.githubusercontent.com/kata-containers/packaging/master/kata-deploy/k8s-1.18/kata-runtimeClasses.yaml"

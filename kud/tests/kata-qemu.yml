@@ -1,0 +1,11 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: kata-qemu
+spec:
+  runtimeClassName: kata-qemu
+  containers:
+    - name: busybox
+      image: busybox
+      imagePullPolicy: Always
+      command: [ "sleep", "100000" ]

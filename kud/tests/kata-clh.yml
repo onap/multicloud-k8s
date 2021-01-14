@@ -1,0 +1,11 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: kata-clh
+spec:
+  runtimeClassName: kata-clh
+  containers:
+    - name: busybox
+      image: busybox
+      imagePullPolicy: Always
+      command: [ "sleep", "100000" ]

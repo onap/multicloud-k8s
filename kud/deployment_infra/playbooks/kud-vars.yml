@@ -88,3 +88,11 @@ cpu_manager:
   checkpoint_file: "/var/lib/kubelet/cpu_manager_state"
 topology_manager:
   policy: "best-effort" # Options: none (disabled), best-effort (default), restricted, single-numa-node
+
+kata_version: 2.0.1
+kata_rbac_url: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/kata-rbac/base/kata-rbac.yaml"
+kata_deploy_url: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/kata-deploy/base/kata-deploy.yaml"
+kata_runtimeclass_url_qemu: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/k8s-1.14/kata-qemu-runtimeClass.yaml" 
+kata_runtimeclass_url_fc: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/k8s-1.14/kata-fc-runtimeClass.yaml"
+kata_runtimeclass_url_clh: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/k8s-1.14/kata-clh-runtimeClass.yaml"
+kata_runtimeclass_url_qemu_virtiofs: "https://raw.githubusercontent.com/kata-containers/kata-containers/{{ kata_version }}/tools/packaging/kata-deploy/k8s-1.14/kata-qemu-virtiofs-runtimeClass.yaml"

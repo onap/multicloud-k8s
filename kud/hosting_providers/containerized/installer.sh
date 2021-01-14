@@ -77,17 +77,34 @@ function install_kubespray {
     fi
 }
 
-# install_k8s() - Install Kubernetes using kubespray tool
+# install_k8s() - Install Kubernetes using kubespray tool including Kata
 function install_k8s {
     local cluster_name=$1
     ansible-playbook $verbose -i \
         $kud_inventory $kud_playbooks/preconfigure-kubespray.yml \
         --become --become-user=root | \
         tee $cluster_log/setup-kubernetes.log
-    ansible-playbook $verbose -i \
-        $kud_inventory $dest_folder/kubespray-$version/cluster.yml \
-        -e cluster_name=$cluster_name --become --become-user=root | \
-        tee $cluster_log/setup-kubernetes.log
+    if [ "$container_runtime" == "docker" ]; then
+        echo "Docker will be used as the container runtime interface"
+        ansible-playbook $verbose -i \
+            $kud_inventory $dest_folder/kubespray-$version/cluster.yml \
+            -e cluster_name=$cluster_name --become --become-user=root | \
+            tee $cluster_log/setup-kubernetes.log
+    elif [ "$container_runtime" == "containerd" ]; then
+        echo "Containerd will be used as the container runtime interface"
+        ansible-playbook $verbose -i \
+            $kud_inventory $dest_folder/kubespray-$version/cluster.yml \
+            -e $kud_kata_override_variables -e cluster_name=$cluster_name \
+            --become --become-user=root | \
+            tee $cluster_log/setup-kubernetes.log
+        ansible-playbook $verbose -i \
+            $kud_inventory $kud_playbooks/configure-kata.yml \
+            --become --become-user=root | \
+            tee $cluster_log/setup-kata.log
+    else
+        echo "Only Docker or Containerd are supported container runtimes"
+        exit 1
+    fi
 
     # Configure environment
     mkdir -p $HOME/.kube
@@ -118,21 +135,30 @@ function install_addons {
         $kud_infra_folder/galaxy-requirements.yml --ignore-errors
 
     ansible-playbook $verbose -i \
-        $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml | \
-        tee $cluster_log/setup-kud.log
+        $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml \
+        | tee $cluster_log/setup-kud.log
+
     # The order of KUD_ADDONS is important: some plugins (sriov, qat)
-    # require nfd to be enabled.
-    for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov qat cmk $plugins_name}; do
+    # require nfd to be enabled. Some addons aren't working with containerd.
+    if [ "$container_runtime" == "docker" ]; then
+        kud_addons=${KUD_ADDONS:-virtlet ovn4nfv nfd sriov qat cmk \
+            $plugins_name}
+    elif [ "$container_runtime" == "containerd" ]; then
+        kud_addons=${KUD_ADDONS:-ovn4nfv nfd $plugins_name}
+    fi
+
+    for addon in ${kud_addons}; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i \
-            $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-${addon}.yml | \
+            $kud_inventory -e "base_dest=$HOME" \
+            $kud_playbooks/configure-${addon}.yml | \
             tee $cluster_log/setup-${addon}.log
     done
 
     echo "Run the test cases if testing_enabled is set to true."
     if [[ "${testing_enabled}" == "true" ]]; then
         failed_kud_tests=""
-        for addon in ${KUD_ADDONS:-virtlet ovn4nfv nfd sriov qat cmk $plugins_name}; do
+        for addon in ${kud_addons}; do
             pushd $kud_tests
             bash ${addon}.sh || failed_kud_tests="${failed_kud_tests} ${addon}"
             case $addon in
@@ -195,6 +221,12 @@ kud_playbooks=$kud_infra_folder/playbooks
 kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
+container_runtime=${CONTAINER_RUNTIME:-docker}
+# For containerd the etcd_deployment_type: docker is the default and doesn't work.
+# You have to use either etcd_kubeadm_enabled: true or etcd_deployment_type: host
+# See https://github.com/kubernetes-sigs/kubespray/issues/5713
+kud_kata_override_variables="container_manager=containerd \
+    -e etcd_deployment_type=host -e kubelet_cgroup_driver=cgroupfs"
 
 mkdir -p /opt/csar
 export CSAR_DIR=/opt/csar
@@ -298,6 +330,7 @@ if [ "$1" == "--cluster" ]; then
     install_cluster $cluster_name
     exit 0
 fi
+
 
 echo "Error: Refer the installer usage"
 usage

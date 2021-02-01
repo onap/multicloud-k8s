@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285bad66_aa839531",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2021-02-01T07:10:18Z",
+      "side": 1,
+      "message": "Do you know if we could switch to 3.x? Python2 is already deprecated for year and may soon stop to be distributed",
+      "range": {
+        "startLine": 47,
+        "startChar": 43,
+        "endLine": 47,
+        "endChar": 46
+      },
+      "revId": "7c6084bc79697852367a039b3e40d369fbe4b94c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

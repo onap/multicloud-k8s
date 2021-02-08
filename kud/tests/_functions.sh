@@ -172,25 +172,31 @@ function _checks_args {
     mkdir -p ${CSAR_DIR}/${1}
 }
 
+function _destroy {
+    local type=$1
+    local name=$2
+
+    echo "$(date +%H:%M:%S) - $name : Destroying $type"
+    kubectl delete $type $name --ignore-not-found=true --now
+    while kubectl get $type $name &>/dev/null; do
+        echo "$(date +%H:%M:%S) - $name : Destroying $type"
+    done
+}
+
 # destroy_deployment() - This function ensures that a specific deployment is
 # destroyed in Kubernetes
 function destroy_deployment {
     local deployment_name=$1
 
-    echo "$(date +%H:%M:%S) - $deployment_name : Destroying deployment"
-    kubectl delete deployment $deployment_name --ignore-not-found=true --now
-    while kubectl get deployment $deployment_name &>/dev/null; do
-        echo "$(date +%H:%M:%S) - $deployment_name : Destroying deployment"
-    done
+    _destroy "deployment" $deployment_name
 }
 
-# recreate_deployment() - This function destroys an existing deployment and
-# creates an new one based on its yaml file
-function recreate_deployment {
-    local deployment_name=$1
+function _recreate {
+    local type=$1
+    local name=$2
 
-    destroy_deployment $deployment_name
-    kubectl create -f $deployment_name.yaml
+    _destroy $type $name
+    kubectl create -f $name.yaml
 }
 
 # wait_deployment() - Wait process to Running status on the Deployment's pods
@@ -271,26 +277,40 @@ function wait_for_deployment_status {
     exit 1
 }
 
-# setup() - Base testing setup shared among functional tests
-function setup {
+function setup_type {
+    local type=$1
+    shift;
+
     if ! $(kubectl version &>/dev/null); then
         echo "This funtional test requires kubectl client"
         exit 1
     fi
-    for deployment_name in $@; do
-        recreate_deployment $deployment_name
+    for name in $@; do
+        _recreate $type $name
     done
     sleep 5
-    for deployment_name in $@; do
-        wait_deployment $deployment_name
+    for name in $@; do
+        wait_deployment $name
     done
+}
+
+function teardown_type {
+    local type=$1
+    shift;
+
+    for name in $@; do
+        _destroy $type $name
+    done
+}
+
+# setup() - Base testing setup shared among functional tests
+function setup {
+    setup_type "deployment" $@
 }
 
 # teardown() - Base testing teardown function
 function teardown {
-    for deployment_name in $@; do
-        destroy_deployment $deployment_name
-    done
+    teardown_type "deployment" $@
 }
 
 # check_ip_range() - Verifying IP address in address range

@@ -230,7 +230,7 @@ function install_host_artifacts {
     done
 
     mkdir -p ${host_addons_dir}/tests
-    for test in _common _common_test _functions multus ovn4nfv nfd sriov-network qat cmk; do
+    for test in _common _common_test _functions kubevirt multus ovn4nfv nfd sriov-network qat cmk; do
         cp ${kud_tests}/${test}.sh ${host_addons_dir}/tests
     done
 

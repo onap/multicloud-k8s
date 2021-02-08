@@ -16,9 +16,11 @@ packetgen_deployment_name=packetgen
 sink_deployment_name=sink
 firewall_deployment_name=firewall
 image_name=virtlet.cloud/ubuntu/16.04
+kubevirt_image=integratedcloudnative/fedora:33
 multus_deployment_name=multus-deployment
 virtlet_image=virtlet.cloud/fedora
 virtlet_deployment_name=virtlet-deployment
+kubevirt_vmi_name=kubevirt-vmi
 plugin_deployment_name=plugin-deployment
 plugin_service_name=plugin-service
 ovn4nfv_deployment_name=ovn4nfv-deployment
@@ -976,6 +978,72 @@ spec:
           limits:
             # This memory limit is applied to the libvirt domain definition
             memory: 160Mi
+DEPLOYMENT
+    popd
+}
+
+# populate_CSAR_kubevirt() - This function creates the content of CSAR file
+# required for testing Kubevirt feature
+function populate_CSAR_kubevirt {
+    local csar_id=$1
+
+    _checks_args $csar_id
+    pushd ${CSAR_DIR}/${csar_id}
+
+    cat << META > metadata.yaml
+resources:
+  virtualmachineinstance:
+    - $kubevirt_vmi_name.yaml
+META
+
+    cat << DEPLOYMENT > $kubevirt_vmi_name.yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+metadata:
+  name: $kubevirt_vmi_name
+spec:
+  domain:
+    cpu:
+      model: host-passthrough
+    devices:
+      disks:
+      - disk:
+          bus: virtio
+        name: rootfs
+      - disk:
+          bus: virtio
+        name: cloudinit
+      interfaces:
+      - name: default
+        masquerade: {}
+    resources:
+      requests:
+        memory: 256M
+  networks:
+  - name: default
+    pod: {}
+  volumes:
+    - name: rootfs
+      containerDisk:
+        image: $kubevirt_image
+        imagePullPolicy: IfNotPresent
+    - name: cloudinit
+      cloudInitNoCloud:
+        userData: |
+          #cloud-config
+          ssh_pwauth: True
+          users:
+          - name: testuser
+            gecos: User
+            primary-group: testuser
+            groups: users
+            lock_passwd: false
+            shell: /bin/bash
+            # the password is "testuser"
+            passwd: "\$6\$rounds=4096\$wPs4Hz4tfs\$a8ssMnlvH.3GX88yxXKF2cKMlVULsnydoOKgkuStTErTq2dzKZiIx9R/pPWWh5JLxzoZEx7lsSX5T2jW5WISi1"
+            sudo: ALL=(ALL) NOPASSWD:ALL
+          runcmd:
+            - echo hello world
 DEPLOYMENT
     popd
 }

@@ -1,0 +1,63 @@
+# sharedNumCores is the number of CPU cores to be assigned to the "shared" pool on each of the nodes
+sharedNumCores: 1
+# exclusiveNumCores is the number of CPU cores to be assigned to the "exclusive" pool on each of the nodes
+exclusiveNumCores: 2
+# untaintRequired removes the cmk=true:NoSchedule taint from each of the nodes
+untaintRequired: true
+# configDir is the CMK config dir in the host file system
+configDir: "/etc/cmk"
+# installDir is the CMK installation dir in the host file system
+installDir: "/opt/bin"
+# reconcileSleepTime is the sleep interval in seconds between consecutive CMK reconcile runs
+reconcileSleepTime: 60
+# nodeReportSleepTime is the sleep interval in seconds between consecutive CMK node report runs
+nodeReportSleepTime: 60
+
+image:
+  repository: integratedcloudnative/cmk
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+imagePullSecrets: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+nameOverride: ""
+fullnameOverride: ""
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+
+resources: {}
+
+annotations: {}
+
+affinity: {}
+
+tolerations: {}
+
+webhook:
+  # webhook.enabled runs the CMK mutating admission webhook server
+  enabled: true
+
+  service:
+    port: 443
+
+  replicaCount: 1
+
+  annotations: {}
+
+## RBAC parameteres
+## https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  create: true

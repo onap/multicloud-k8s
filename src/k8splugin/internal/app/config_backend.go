@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
+ * Copyright © 2021 Samsung Electronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,17 +45,13 @@ type configVersionDBContent struct {
 
 //ConfigStore to Store the Config
 type ConfigStore struct {
-	rbName      string
-	rbVersion   string
-	profileName string
-	configName  string
+	instanceID string
+	configName string
 }
 
 //ConfigVersionStore to Store the Versions of the Config
 type ConfigVersionStore struct {
-	rbName      string
-	rbVersion   string
-	profileName string
+	instanceID string
 }
 
 type configResourceList struct {
@@ -101,8 +98,12 @@ func constructKey(strs ...string) string {
 // Create an entry for the config in the database
 func (c ConfigStore) createConfig(p Config) error {
 
-	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagConfig, p.ConfigName)
-	_, err := db.Etcd.Get(cfgKey)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagConfig, p.ConfigName)
+	_, err = db.Etcd.Get(cfgKey)
 	if err == nil {
 		return pkgerrors.Wrap(err, "Config DB Entry Already exists")
 	}
@@ -121,7 +122,11 @@ func (c ConfigStore) createConfig(p Config) error {
 // Returns the previous value of the Config
 func (c ConfigStore) updateConfig(p Config) (Config, error) {
 
-	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagConfig, p.ConfigName)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return Config{}, pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagConfig, p.ConfigName)
 	value, err := db.Etcd.Get(cfgKey)
 	configPrev := Config{}
 	if err == nil {
@@ -144,7 +149,11 @@ func (c ConfigStore) updateConfig(p Config) (Config, error) {
 
 // Read the config entry in the database
 func (c ConfigStore) getConfig() (Config, error) {
-	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagConfig, c.configName)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return Config{}, pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagConfig, c.configName)
 	value, err := db.Etcd.Get(cfgKey)
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Get Config DB Entry")
@@ -164,7 +173,11 @@ func (c ConfigStore) getConfig() (Config, error) {
 // Delete the config entry in the database
 func (c ConfigStore) deleteConfig() (Config, error) {
 
-	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagConfig, c.configName)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return Config{}, pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagConfig, c.configName)
 	value, err := db.Etcd.Get(cfgKey)
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Config DB Entry Not found")
@@ -190,7 +203,11 @@ func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, ac
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Get Next Version")
 	}
-	versionKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagVersion, strconv.Itoa(int(version)))
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return 0, pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, strconv.Itoa(int(version)))
 
 	var cs configVersionDBContent
 	cs.Action = action
@@ -216,7 +233,11 @@ func (c ConfigVersionStore) deleteConfigVersion() error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Next Version")
 	}
-	versionKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagVersion, strconv.Itoa(int(counter)))
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, strconv.Itoa(int(counter)))
 
 	err = db.Etcd.Delete(versionKey)
 	if err != nil {
@@ -233,7 +254,11 @@ func (c ConfigVersionStore) deleteConfigVersion() error {
 // Also returns the action for the config version
 func (c ConfigVersionStore) getConfigVersion(version uint) (Config, Config, string, error) {
 
-	versionKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagVersion, strconv.Itoa(int(version)))
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return Config{}, Config{}, "", pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, strconv.Itoa(int(version)))
 	configBytes, err := db.Etcd.Get(versionKey)
 	if err != nil {
 		return Config{}, Config{}, "", pkgerrors.Wrap(err, "Get Config Version ")
@@ -253,7 +278,11 @@ func (c ConfigVersionStore) getConfigVersion(version uint) (Config, Config, stri
 // Get the counter for the version
 func (c ConfigVersionStore) getCurrentVersion() (uint, error) {
 
-	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagCounter)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return 0, pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagCounter)
 
 	value, err := db.Etcd.Get(cfgKey)
 	if err != nil {
@@ -275,8 +304,12 @@ func (c ConfigVersionStore) getCurrentVersion() (uint, error) {
 // Update the counter for the version
 func (c ConfigVersionStore) updateVersion(counter uint) error {
 
-	cfgKey := constructKey(c.rbName, c.rbVersion, c.profileName, tagCounter)
-	err := db.Etcd.Put(cfgKey, strconv.Itoa(int(counter)))
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagCounter)
+	err = db.Etcd.Put(cfgKey, strconv.Itoa(int(counter)))
 	if err != nil {
 		return pkgerrors.Wrap(err, "Counter DB Entry")
 	}
@@ -318,8 +351,12 @@ func (c ConfigVersionStore) decrementVersion() error {
 }
 
 // Apply Config
-func applyConfig(rbName, rbVersion, profileName string, p Config, pChannel chan configResourceList, action string) error {
+func applyConfig(instanceID string, p Config, pChannel chan configResourceList, action string) error {
 
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Retrieving model info")
+	}
 	// Get Template and Resolve the template with values
 	crl, err := resolve(rbName, rbVersion, profileName, p)
 	if err != nil {
@@ -362,12 +399,12 @@ func scheduleResources(c chan configResourceList) {
 				}
 				//assuming - the resource is not exist already
 				data.createdResources, err = k8sClient.createResources(data.resourceTemplates, inst.Namespace)
-                                errCreate := err
+				errCreate := err
 				if err != nil {
 					// assuming - the err represent the resource is already exist, so going for update
 					data.createdResources, err = k8sClient.updateResources(data.resourceTemplates, inst.Namespace)
 					if err != nil {
-                                                log.Printf("Error Creating resources: %s", errCreate.Error())
+						log.Printf("Error Creating resources: %s", errCreate.Error())
 						log.Printf("Error Updating resources: %s", err.Error())
 						continue
 					}
@@ -405,7 +442,7 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 
 	profile, err := rb.NewProfileClient().Get(rbName, rbVersion, profileName)
 	if err != nil {
-		return configResourceList{}, pkgerrors.Wrap(err, "Reading  Profile Data")
+		return configResourceList{}, pkgerrors.Wrap(err, "Reading Profile Data")
 	}
 
 	t, err := rb.NewConfigTemplateClient().Get(rbName, rbVersion, p.TemplateName)

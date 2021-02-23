@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
+ * Copyright © 2021 Samsung Electronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@
 package app
 
 import (
+	"fmt"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"reflect"
 	"strings"
@@ -24,12 +26,31 @@ import (
 	//	pkgerrors "github.com/pkg/errors"
 )
 
+func provideMockModelData(instanceID, rbName, rbVersion, profileName string) *db.MockDB {
+	return &db.MockDB{
+		Items: map[string]map[string][]byte{
+			InstanceKey{ID: instanceID}.String(): {
+				"instance": []byte(fmt.Sprintf(
+					`{
+          "id": "%s",
+          "request": {
+            "rb-name": "%s",
+            "rb-version": "%s",
+            "profile-name": "%s"
+          }
+        }`, instanceID, rbName, rbVersion, profileName)),
+			},
+		},
+	}
+}
+
 func TestCreateConfig(t *testing.T) {
 	testCases := []struct {
 		label         string
 		rbName        string
 		rbVersion     string
 		profileName   string
+		instanceID    string
 		inp           Config
 		expectedError string
 		mockdb        *db.MockEtcdClient
@@ -40,6 +61,7 @@ func TestCreateConfig(t *testing.T) {
 			rbName:      "testdef1",
 			rbVersion:   "v1",
 			profileName: "testprofile1",
+			instanceID:  "testinstance1",
 			inp: Config{
 				ConfigName:   "testconfig1",
 				TemplateName: "testtemplate1",
@@ -47,6 +69,7 @@ func TestCreateConfig(t *testing.T) {
 					"values": "{\"namespace\": \"kafka\", \"topic\": {\"name\":\"orders\", \"cluster\":\"my-cluster\", \"partitions\": 10,\"replicas\":   2, }}"},
 			},
 			expected: ConfigResult{
+				InstanceName:      "testinstance1",
 				DefinitionName:    "testdef1",
 				DefinitionVersion: "v1",
 				ProfileName:       "testprofile1",
@@ -65,11 +88,13 @@ func TestCreateConfig(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.Etcd = testCase.mockdb
+			db.DBconn = provideMockModelData(testCase.instanceID, testCase.rbName,
+				testCase.rbVersion, testCase.profileName)
 			resolve = func(rbName, rbVersion, profileName string, p Config) (configResourceList, error) {
 				return configResourceList{}, nil
 			}
 			impl := NewConfigClient()
-			got, err := impl.Create(testCase.rbName, testCase.rbVersion, testCase.profileName, testCase.inp)
+			got, err := impl.Create(testCase.instanceID, testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -93,6 +118,7 @@ func TestRollbackConfig(t *testing.T) {
 		rbName         string
 		rbVersion      string
 		profileName    string
+		instanceID     string
 		inp            Config
 		inpUpdate1     Config
 		inpUpdate2     Config
@@ -109,6 +135,7 @@ func TestRollbackConfig(t *testing.T) {
 			rbName:      "testdef1",
 			rbVersion:   "v1",
 			profileName: "testprofile1",
+			instanceID:  "testinstance1",
 			inp: Config{
 				ConfigName:   "testconfig1",
 				TemplateName: "testtemplate1",
@@ -131,6 +158,7 @@ func TestRollbackConfig(t *testing.T) {
 				DefinitionName:    "testdef1",
 				DefinitionVersion: "v1",
 				ProfileName:       "testprofile1",
+				InstanceName:      "testinstance1",
 				ConfigName:        "testconfig1",
 				TemplateName:      "testtemplate1",
 				ConfigVersion:     1,
@@ -139,6 +167,7 @@ func TestRollbackConfig(t *testing.T) {
 				DefinitionName:    "testdef1",
 				DefinitionVersion: "v1",
 				ProfileName:       "testprofile1",
+				InstanceName:      "testinstance1",
 				ConfigName:        "testconfig1",
 				TemplateName:      "testtemplate1",
 				ConfigVersion:     2,
@@ -147,6 +176,7 @@ func TestRollbackConfig(t *testing.T) {
 				DefinitionName:    "testdef1",
 				DefinitionVersion: "v1",
 				ProfileName:       "testprofile1",
+				InstanceName:      "testinstance1",
 				ConfigName:        "testconfig1",
 				TemplateName:      "testtemplate1",
 				ConfigVersion:     3,
@@ -155,6 +185,7 @@ func TestRollbackConfig(t *testing.T) {
 				DefinitionName:    "testdef1",
 				DefinitionVersion: "v1",
 				ProfileName:       "testprofile1",
+				InstanceName:      "testinstance1",
 				ConfigName:        "testconfig1",
 				TemplateName:      "testtemplate1",
 				ConfigVersion:     4,
@@ -170,11 +201,13 @@ func TestRollbackConfig(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.Etcd = testCase.mockdb
+			db.DBconn = provideMockModelData(testCase.instanceID, testCase.rbName,
+				testCase.rbVersion, testCase.profileName)
 			resolve = func(rbName, rbVersion, profileName string, p Config) (configResourceList, error) {
 				return configResourceList{}, nil
 			}
 			impl := NewConfigClient()
-			got, err := impl.Create(testCase.rbName, testCase.rbVersion, testCase.profileName, testCase.inp)
+			got, err := impl.Create(testCase.instanceID, testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -188,7 +221,7 @@ func TestRollbackConfig(t *testing.T) {
 						" expected %v", got, testCase.expected1)
 				}
 			}
-			got, err = impl.Update(testCase.rbName, testCase.rbVersion, testCase.profileName, testCase.inp.ConfigName, testCase.inpUpdate1)
+			got, err = impl.Update(testCase.instanceID, testCase.inp.ConfigName, testCase.inpUpdate1)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -202,7 +235,7 @@ func TestRollbackConfig(t *testing.T) {
 						" expected %v", got, testCase.expected2)
 				}
 			}
-			got, err = impl.Update(testCase.rbName, testCase.rbVersion, testCase.profileName, testCase.inp.ConfigName, testCase.inpUpdate2)
+			got, err = impl.Update(testCase.instanceID, testCase.inp.ConfigName, testCase.inpUpdate2)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -216,7 +249,7 @@ func TestRollbackConfig(t *testing.T) {
 						" expected %v", got, testCase.expected3)
 				}
 			}
-			got, err = impl.Delete(testCase.rbName, testCase.rbVersion, testCase.profileName, testCase.inp.ConfigName)
+			got, err = impl.Delete(testCase.instanceID, testCase.inp.ConfigName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -231,7 +264,7 @@ func TestRollbackConfig(t *testing.T) {
 				}
 			}
 			testCase.rollbackConfig.AnyOf.ConfigVersion = "2"
-			err = impl.Rollback(testCase.rbName, testCase.rbVersion, testCase.profileName, testCase.rollbackConfig)
+			err = impl.Rollback(testCase.instanceID, testCase.rollbackConfig)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -240,7 +273,7 @@ func TestRollbackConfig(t *testing.T) {
 					t.Fatalf("Create returned an unexpected error %s", err)
 				}
 			}
-			rollbackConfig, err := impl.Get(testCase.rbName, testCase.rbVersion, testCase.profileName, testCase.inp.ConfigName)
+			rollbackConfig, err := impl.Get(testCase.instanceID, testCase.inp.ConfigName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)

@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
+ * Copyright © 2021 Samsung Electronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +36,7 @@ type Config struct {
 
 //ConfigResult output for Create, Update and delete
 type ConfigResult struct {
+	InstanceName      string `json:"instance-id"`
 	DefinitionName    string `json:"rb-name"`
 	DefinitionVersion string `json:"rb-version"`
 	ProfileName       string `json:"profile-name"`
@@ -58,13 +60,13 @@ type ConfigTagit struct {
 
 // ConfigManager is an interface exposes the config functionality
 type ConfigManager interface {
-	Create(rbName, rbVersion, profileName string, p Config) (ConfigResult, error)
-	Get(rbName, rbVersion, profileName, configName string) (Config, error)
+	Create(instanceID string, p Config) (ConfigResult, error)
+	Get(instanceID, configName string) (Config, error)
 	Help() map[string]string
-	Update(rbName, rbVersion, profileName, configName string, p Config) (ConfigResult, error)
-	Delete(rbName, rbVersion, profileName, configName string) (ConfigResult, error)
-	Rollback(rbName, rbVersion, profileName string, p ConfigRollback) error
-	Tagit(rbName, rbVersion, profileName string, p ConfigTagit) error
+	Update(instanceID, configName string, p Config) (ConfigResult, error)
+	Delete(instanceID, configName string) (ConfigResult, error)
+	Rollback(instanceID string, p ConfigRollback) error
+	Tagit(instanceID string, p ConfigTagit) error
 }
 
 // ConfigClient implements the ConfigManager
@@ -90,19 +92,22 @@ func (v *ConfigClient) Help() map[string]string {
 }
 
 // Create an entry for the config in the database
-func (v *ConfigClient) Create(rbName, rbVersion, profileName string, p Config) (ConfigResult, error) {
+func (v *ConfigClient) Create(instanceID string, p Config) (ConfigResult, error) {
 
 	// Check required fields
 	if p.ConfigName == "" || p.TemplateName == "" || len(p.Values) == 0 {
 		return ConfigResult{}, pkgerrors.New("Incomplete Configuration Provided")
 	}
-	cs := ConfigStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
-		configName:  p.ConfigName,
+	// Resolving rbName, Version, etc. not to break response
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	if err != nil {
+		return ConfigResult{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
-	_, err := cs.getConfig()
+	cs := ConfigStore{
+		instanceID: instanceID,
+		configName: p.ConfigName,
+	}
+	_, err = cs.getConfig()
 	if err == nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Error - Config exists")
 	} else {
@@ -110,13 +115,13 @@ func (v *ConfigClient) Create(rbName, rbVersion, profileName string, p Config) (
 			return ConfigResult{}, pkgerrors.Wrap(err, "Create Error")
 		}
 	}
-	lock, profileChannel := getProfileData(rbName + rbVersion + profileName)
+	lock, profileChannel := getProfileData(instanceID)
 	// Acquire per profile Mutex
 	lock.Lock()
 	defer lock.Unlock()
-	err = applyConfig(rbName, rbVersion, profileName, p, profileChannel, "POST")
+	err = applyConfig(instanceID, p, profileChannel, "POST")
 	if err != nil {
-		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
+		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config failed")
 	}
 	// Create Config DB Entry
 	err = cs.createConfig(p)
@@ -125,16 +130,16 @@ func (v *ConfigClient) Create(rbName, rbVersion, profileName string, p Config) (
 	}
 	// Create Version Entry in DB for Config
 	cvs := ConfigVersionStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
+		instanceID: instanceID,
 	}
 	version, err := cvs.createConfigVersion(p, Config{}, "POST")
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Config Version DB Entry")
 	}
+
 	// Create Result structure
 	cfgRes := ConfigResult{
+		InstanceName:      instanceID,
 		DefinitionName:    rbName,
 		DefinitionVersion: rbVersion,
 		ProfileName:       profileName,
@@ -146,28 +151,31 @@ func (v *ConfigClient) Create(rbName, rbVersion, profileName string, p Config) (
 }
 
 // Update an entry for the config in the database
-func (v *ConfigClient) Update(rbName, rbVersion, profileName, configName string, p Config) (ConfigResult, error) {
+func (v *ConfigClient) Update(instanceID, configName string, p Config) (ConfigResult, error) {
 
 	// Check required fields
 	if len(p.Values) == 0 {
 		return ConfigResult{}, pkgerrors.New("Incomplete Configuration Provided")
 	}
+	// Resolving rbName, Version, etc. not to break response
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	if err != nil {
+		return ConfigResult{}, pkgerrors.Wrap(err, "Retrieving model info")
+	}
 	// Check if Config exists
 	cs := ConfigStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
-		configName:  configName,
+		instanceID: instanceID,
+		configName: configName,
 	}
-	_, err := cs.getConfig()
+	_, err = cs.getConfig()
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Error - Config doesn't exist")
 	}
-	lock, profileChannel := getProfileData(rbName + rbVersion + profileName)
+	lock, profileChannel := getProfileData(instanceID)
 	// Acquire per profile Mutex
 	lock.Lock()
 	defer lock.Unlock()
-	err = applyConfig(rbName, rbVersion, profileName, p, profileChannel, "PUT")
+	err = applyConfig(instanceID, p, profileChannel, "PUT")
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 	}
@@ -178,16 +186,16 @@ func (v *ConfigClient) Update(rbName, rbVersion, profileName, configName string,
 	}
 	// Create Version Entry in DB for Config
 	cvs := ConfigVersionStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
+		instanceID: instanceID,
 	}
 	version, err := cvs.createConfigVersion(p, configPrev, "PUT")
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Config Version DB Entry")
 	}
+
 	// Create Result structure
 	cfgRes := ConfigResult{
+		InstanceName:      instanceID,
 		DefinitionName:    rbName,
 		DefinitionVersion: rbVersion,
 		ProfileName:       profileName,
@@ -199,18 +207,16 @@ func (v *ConfigClient) Update(rbName, rbVersion, profileName, configName string,
 }
 
 // Get config entry in the database
-func (v *ConfigClient) Get(rbName, rbVersion, profileName, configName string) (Config, error) {
+func (v *ConfigClient) Get(instanceID, configName string) (Config, error) {
 
 	// Acquire per profile Mutex
-	lock, _ := getProfileData(rbName + rbVersion + profileName)
+	lock, _ := getProfileData(instanceID)
 	lock.Lock()
 	defer lock.Unlock()
 	// Read Config DB
 	cs := ConfigStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
-		configName:  configName,
+		instanceID: instanceID,
+		configName: configName,
 	}
 	cfg, err := cs.getConfig()
 	if err != nil {
@@ -220,24 +226,27 @@ func (v *ConfigClient) Get(rbName, rbVersion, profileName, configName string) (C
 }
 
 // Delete the Config from database
-func (v *ConfigClient) Delete(rbName, rbVersion, profileName, configName string) (ConfigResult, error) {
+func (v *ConfigClient) Delete(instanceID, configName string) (ConfigResult, error) {
 
+	// Resolving rbName, Version, etc. not to break response
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	if err != nil {
+		return ConfigResult{}, pkgerrors.Wrap(err, "Retrieving model info")
+	}
 	// Check if Config exists
 	cs := ConfigStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
-		configName:  configName,
+		instanceID: instanceID,
+		configName: configName,
 	}
 	p, err := cs.getConfig()
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Error - Config doesn't exist")
 	}
-	lock, profileChannel := getProfileData(rbName + rbVersion + profileName)
+	lock, profileChannel := getProfileData(instanceID)
 	// Acquire per profile Mutex
 	lock.Lock()
 	defer lock.Unlock()
-	err = applyConfig(rbName, rbVersion, profileName, p, profileChannel, "DELETE")
+	err = applyConfig(instanceID, p, profileChannel, "DELETE")
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 	}
@@ -248,16 +257,16 @@ func (v *ConfigClient) Delete(rbName, rbVersion, profileName, configName string)
 	}
 	// Create Version Entry in DB for Config
 	cvs := ConfigVersionStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
+		instanceID: instanceID,
 	}
 	version, err := cvs.createConfigVersion(Config{}, configPrev, "DELETE")
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Delete Config Version DB Entry")
 	}
+
 	// Create Result structure
 	cfgRes := ConfigResult{
+		InstanceName:      instanceID,
 		DefinitionName:    rbName,
 		DefinitionVersion: rbVersion,
 		ProfileName:       profileName,
@@ -269,13 +278,13 @@ func (v *ConfigClient) Delete(rbName, rbVersion, profileName, configName string)
 }
 
 // Rollback starts from current version and rollbacks to the version desired
-func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback ConfigRollback) error {
+func (v *ConfigClient) Rollback(instanceID string, rback ConfigRollback) error {
 
 	var reqVersion string
 	var err error
 
 	if rback.AnyOf.ConfigTag != "" {
-		reqVersion, err = v.GetTagVersion(rbName, rbVersion, profileName, rback.AnyOf.ConfigTag)
+		reqVersion, err = v.GetTagVersion(instanceID, rback.AnyOf.ConfigTag)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Rollback Invalid tag")
 		}
@@ -291,15 +300,13 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 	}
 	rollbackIndex := uint(index)
 
-	lock, profileChannel := getProfileData(rbName + rbVersion + profileName)
+	lock, profileChannel := getProfileData(instanceID)
 	// Acquire per profile Mutex
 	lock.Lock()
 	defer lock.Unlock()
 
 	cvs := ConfigVersionStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
+		instanceID: instanceID,
 	}
 	currentVersion, err := cvs.getCurrentVersion()
 	if err != nil {
@@ -317,14 +324,12 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 			return pkgerrors.Wrap(err, "Rollback Get Config Version")
 		}
 		cs := ConfigStore{
-			rbName:      rbName,
-			rbVersion:   rbVersion,
-			profileName: profileName,
-			configName:  configNew.ConfigName,
+			instanceID: instanceID,
+			configName: configNew.ConfigName,
 		}
 		if action == "PUT" {
 			// PUT is proceeded by PUT or POST
-			err = applyConfig(rbName, rbVersion, profileName, configPrev, profileChannel, "PUT")
+			err = applyConfig(instanceID, configPrev, profileChannel, "PUT")
 			if err != nil {
 				return pkgerrors.Wrap(err, "Apply Config  failed")
 			}
@@ -334,7 +339,7 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 			}
 		} else if action == "POST" {
 			// POST is always preceeded by Config not existing
-			err = applyConfig(rbName, rbVersion, profileName, configNew, profileChannel, "DELETE")
+			err = applyConfig(instanceID, configNew, profileChannel, "DELETE")
 			if err != nil {
 				return pkgerrors.Wrap(err, "Delete Config  failed")
 			}
@@ -344,7 +349,7 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 			}
 		} else if action == "DELETE" {
 			// DELETE is proceeded by PUT or POST
-			err = applyConfig(rbName, rbVersion, profileName, configPrev, profileChannel, "PUT")
+			err = applyConfig(instanceID, configPrev, profileChannel, "PUT")
 			if err != nil {
 				return pkgerrors.Wrap(err, "Delete Config  failed")
 			}
@@ -365,23 +370,25 @@ func (v *ConfigClient) Rollback(rbName, rbVersion, profileName string, rback Con
 }
 
 // Tagit tags the current version with the tag provided
-func (v *ConfigClient) Tagit(rbName, rbVersion, profileName string, tag ConfigTagit) error {
+func (v *ConfigClient) Tagit(instanceID string, tag ConfigTagit) error {
 
-	lock, _ := getProfileData(rbName + rbVersion + profileName)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	lock, _ := getProfileData(instanceID)
 	// Acquire per profile Mutex
 	lock.Lock()
 	defer lock.Unlock()
 
 	cvs := ConfigVersionStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
+		instanceID: instanceID,
 	}
 	currentVersion, err := cvs.getCurrentVersion()
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Current Config Version ")
 	}
-	tagKey := constructKey(rbName, rbVersion, profileName, v.tagTag, tag.TagName)
+	tagKey := constructKey(rbName, rbVersion, profileName, instanceID, v.tagTag, tag.TagName)
 
 	err = db.Etcd.Put(tagKey, strconv.Itoa(int(currentVersion)))
 	if err != nil {
@@ -391,9 +398,13 @@ func (v *ConfigClient) Tagit(rbName, rbVersion, profileName string, tag ConfigTa
 }
 
 // GetTagVersion returns the version associated with the tag
-func (v *ConfigClient) GetTagVersion(rbName, rbVersion, profileName, tagName string) (string, error) {
+func (v *ConfigClient) GetTagVersion(instanceID, tagName string) (string, error) {
 
-	tagKey := constructKey(rbName, rbVersion, profileName, v.tagTag, tagName)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	tagKey := constructKey(rbName, rbVersion, profileName, instanceID, v.tagTag, tagName)
 
 	value, err := db.Etcd.Get(tagKey)
 	if err != nil {
@@ -403,17 +414,15 @@ func (v *ConfigClient) GetTagVersion(rbName, rbVersion, profileName, tagName str
 }
 
 // ApplyAllConfig starts from first configuration version and applies all versions in sequence
-func (v *ConfigClient) ApplyAllConfig(rbName, rbVersion, profileName string) error {
+func (v *ConfigClient) ApplyAllConfig(instanceID string) error {
 
-	lock, profileChannel := getProfileData(rbName + rbVersion + profileName)
+	lock, profileChannel := getProfileData(instanceID)
 	// Acquire per profile Mutex
 	lock.Lock()
 	defer lock.Unlock()
 
 	cvs := ConfigVersionStore{
-		rbName:      rbName,
-		rbVersion:   rbVersion,
-		profileName: profileName,
+		instanceID: instanceID,
 	}
 	currentVersion, err := cvs.getCurrentVersion()
 	if err != nil {
@@ -429,7 +438,7 @@ func (v *ConfigClient) ApplyAllConfig(rbName, rbVersion, profileName string) err
 		if err != nil {
 			return pkgerrors.Wrap(err, "Get Config Version")
 		}
-		err = applyConfig(rbName, rbVersion, profileName, configNew, profileChannel, action)
+		err = applyConfig(instanceID, configNew, profileChannel, action)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Apply Config  failed")
 		}

@@ -22,6 +22,30 @@
       "revId": "e54430057acbee92ddb49450f88a1e9f4c40e391",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3724dd79_44296749",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/values.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6457
+      },
+      "writtenOn": "2021-02-23T06:52:34Z",
+      "side": 1,
+      "message": "We currently use 0.3.0. But I may upload new docker image, so wo label 0.4.0 or replace 0.4.0",
+      "parentUuid": "d75def94_b2f88075",
+      "range": {
+        "startLine": 31,
+        "startChar": 31,
+        "endLine": 31,
+        "endChar": 42
+      },
+      "revId": "e54430057acbee92ddb49450f88a1e9f4c40e391",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

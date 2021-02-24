@@ -14,8 +14,8 @@ limitations under the License.
 package healthcheck
 
 import (
-	"k8s.io/helm/pkg/kube"
-	"k8s.io/helm/pkg/tiller/environment"
+//	"k8s.io/helm/pkg/kube"
+//	"k8s.io/helm/pkg/tiller/environment"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
@@ -27,7 +27,7 @@ import (
 //custom labels can be injected into created resources
 // using internal k8sClient
 type KubeClientImpl struct {
-	environment.KubeClient
+	//environment.KubeClient
 	labels map[string]string
 	k      app.KubernetesClient
 }
@@ -42,7 +42,7 @@ func NewKubeClient(instanceId, cloudRegion string) (*KubeClientImpl, error) {
 		labels: map[string]string{
 			config.GetConfiguration().KubernetesLabelName: instanceId,
 		},
-		KubeClient: kube.New(&k8sClient),
+        //KubeClient: kube.New(&k8sClient),
 		k:          k8sClient,
 	}, nil
 }

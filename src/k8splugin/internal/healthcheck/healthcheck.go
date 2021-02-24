@@ -16,12 +16,12 @@ package healthcheck
 import (
 	"encoding/json"
 
-	protorelease "k8s.io/helm/pkg/proto/hapi/release"
-	"k8s.io/helm/pkg/releasetesting"
+//	protorelease "k8s.io/helm/pkg/proto/hapi/release"
+//	"k8s.io/helm/pkg/releasetesting"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
-	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
+	//log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
 
 	pkgerrors "github.com/pkg/errors"
@@ -71,7 +71,7 @@ type InstanceHCClient struct {
 
 // InstanceHCStatus holds healthcheck status
 type InstanceHCStatus struct {
-	releasetesting.TestSuite
+	//releasetesting.TestSuite
 	Id     string
 	Status HealthcheckState
 }
@@ -96,39 +96,39 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceHCStatus, error) 
 
 	//Prepare Environment, Request and Release structs
 	//TODO In future could derive params from request
-	client, err := NewKubeClient(instanceId, instance.Request.CloudRegion)
-	if err != nil {
-		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Preparing KubeClient")
-	}
-	env := &releasetesting.Environment{
-		Namespace:  instance.Namespace,
-		KubeClient: client,
-		Parallel:   false,
-	}
-	release := protorelease.Release{
-		Name:  instance.ReleaseName,
-		Hooks: instance.Hooks,
-	}
+	//client, err := NewKubeClient(instanceId, instance.Request.CloudRegion)
+	// if err != nil {
+	// 	return InstanceHCStatus{}, pkgerrors.Wrap(err, "Preparing KubeClient")
+	// }
+	// // env := &releasetesting.Environment{
+	// 	Namespace:  instance.Namespace,
+	// 	KubeClient: client,
+	// 	Parallel:   false,
+	// }
+	// release := protorelease.Release{
+	// 	Name:  instance.ReleaseName,
+	// 	Hooks: instance.Hooks,
+	// }
 
 	//Run HC
-	testSuite, err := releasetesting.NewTestSuite(&release)
-	if err != nil {
-		log.Error("Error creating TestSuite", log.Fields{
-			"Release": release,
-		})
-		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Creating TestSuite")
-	}
-	if err = testSuite.Run(env); err != nil {
-		log.Error("Error running TestSuite", log.Fields{
-			"TestSuite":   testSuite,
-			"Environment": env,
-		})
-		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Running TestSuite")
-	}
+	// testSuite, err := releasetesting.NewTestSuite(&release)
+	// if err != nil {
+	// 	log.Error("Error creating TestSuite", log.Fields{
+	// 		"Release": release,
+	// 	})
+	// 	return InstanceHCStatus{}, pkgerrors.Wrap(err, "Creating TestSuite")
+	// }
+	// if err = testSuite.Run(env); err != nil {
+	// 	log.Error("Error running TestSuite", log.Fields{
+	// 		"TestSuite":   testSuite,
+	// 		"Environment": env,
+	// 	})
+	// 	return InstanceHCStatus{}, pkgerrors.Wrap(err, "Running TestSuite")
+	// }
 
 	//Save state
 	ihcs := InstanceHCStatus{
-		TestSuite: *testSuite,
+		//TestSuite: *testSuite,
 		Id:        id,
 		Status:    HcS_STARTED,
 	}

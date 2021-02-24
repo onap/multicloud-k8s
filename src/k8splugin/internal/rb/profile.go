@@ -24,8 +24,7 @@ import (
 	"log"
 	"path/filepath"
 
-	protorelease "k8s.io/helm/pkg/proto/hapi/release"
-
+	"helm.sh/helm/v3/pkg/release"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 
@@ -273,10 +272,10 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 //Resolve returns the path where the helm chart merged with
 //configuration overrides resides and final ReleaseName picked for instantiation
 func (v *ProfileClient) Resolve(rbName string, rbVersion string,
-	profileName string, values []string, overrideReleaseName string) ([]helm.KubernetesResourceTemplate, []*protorelease.Hook, string, error) {
+	profileName string, values []string, overrideReleaseName string) ([]helm.KubernetesResourceTemplate, []*release.Hook, string, error) {
 
 	var sortedTemplates []helm.KubernetesResourceTemplate
-	var hookList []*protorelease.Hook
+	var hookList []*release.Hook
 	var finalReleaseName string
 
 	//Download and process the profile first

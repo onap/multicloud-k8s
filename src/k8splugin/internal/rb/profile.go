@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
+ * Copyright © 2021 Samsung Electronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +23,8 @@ import (
 	"encoding/json"
 	"log"
 	"path/filepath"
+
+	protorelease "k8s.io/helm/pkg/proto/hapi/release"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
@@ -270,49 +273,50 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 //Resolve returns the path where the helm chart merged with
 //configuration overrides resides and final ReleaseName picked for instantiation
 func (v *ProfileClient) Resolve(rbName string, rbVersion string,
-	profileName string, values []string, overrideReleaseName string) ([]helm.KubernetesResourceTemplate, string, error) {
+	profileName string, values []string, overrideReleaseName string) ([]helm.KubernetesResourceTemplate, []*protorelease.Hook, string, error) {
 
 	var sortedTemplates []helm.KubernetesResourceTemplate
+	var hookList []*protorelease.Hook
 	var finalReleaseName string
 
 	//Download and process the profile first
 	//If everything seems okay, then download the definition
 	prData, err := v.Download(rbName, rbVersion, profileName)
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Downloading Profile")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Downloading Profile")
 	}
 
 	prPath, err := ExtractTarBall(bytes.NewBuffer(prData))
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Extracting Profile Content")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Extracting Profile Content")
 	}
 
 	prYamlClient, err := ProcessProfileYaml(prPath, v.manifestName)
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Processing Profile Manifest")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}
 
 	definitionClient := NewDefinitionClient()
 
 	definition, err := definitionClient.Get(rbName, rbVersion)
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Getting Definition Metadata")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Getting Definition Metadata")
 	}
 
 	defData, err := definitionClient.Download(rbName, rbVersion)
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Downloading Definition")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Downloading Definition")
 	}
 
 	chartBasePath, err := ExtractTarBall(bytes.NewBuffer(defData))
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Extracting Definition Charts")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Extracting Definition Charts")
 	}
 
 	//Get the definition ID and download its contents
 	profile, err := v.Get(rbName, rbVersion, profileName)
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Getting Profile")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Getting Profile")
 	}
 
 	//Copy the profile configresources to the chart locations
@@ -322,7 +326,7 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 	//   chartpath: chart/config/resources/config.yaml
 	err = prYamlClient.CopyConfigurationOverrides(chartBasePath)
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Copying configresources to chart")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Copying configresources to chart")
 	}
 
 	if overrideReleaseName == "" {
@@ -336,14 +340,14 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 		finalReleaseName)
 
 	chartPath := filepath.Join(chartBasePath, definition.ChartName)
-	sortedTemplates, err = helmClient.GenerateKubernetesArtifacts(chartPath,
+	sortedTemplates, hookList, err = helmClient.GenerateKubernetesArtifacts(chartPath,
 		[]string{prYamlClient.GetValues()},
 		values)
 	if err != nil {
-		return sortedTemplates, finalReleaseName, pkgerrors.Wrap(err, "Generate final k8s yaml")
+		return sortedTemplates, hookList, finalReleaseName, pkgerrors.Wrap(err, "Generate final k8s yaml")
 	}
 
-	return sortedTemplates, finalReleaseName, nil
+	return sortedTemplates, hookList, finalReleaseName, nil
 }
 
 // Returns an empty profile with the following contents

@@ -200,7 +200,7 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			tc := NewTemplateClient("1.12.3", "testnamespace", "testreleasename")
-			out, err := tc.GenerateKubernetesArtifacts(testCase.chartPath, testCase.valueFiles,
+			out, _, err := tc.GenerateKubernetesArtifacts(testCase.chartPath, testCase.valueFiles,
 				testCase.values)
 			if err != nil {
 				if testCase.expectedError == "" {

@@ -16,6 +16,7 @@ limitations under the License.
 package app
 
 import (
+	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -32,9 +33,11 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/disk"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -42,6 +45,8 @@ import (
 // KubernetesClient encapsulates the different clients' interfaces
 // we need when interacting with a Kubernetes cluster
 type KubernetesClient struct {
+	rawConfig      clientcmd.ClientConfig
+	restConfig     *rest.Config
 	clientSet      kubernetes.Interface
 	dynamicClient  dynamic.Interface
 	discoverClient *disk.CachedDiscoveryClient
@@ -168,8 +173,8 @@ func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
 	return kubeConfigPath, nil
 }
 
-// init loads the Kubernetes configuation values stored into the local configuration file
-func (k *KubernetesClient) init(cloudregion string, iid string) error {
+// Init loads the Kubernetes configuation values stored into the local configuration file
+func (k *KubernetesClient) Init(cloudregion string, iid string) error {
 	if cloudregion == "" {
 		return pkgerrors.New("Cloudregion is empty")
 	}
@@ -209,6 +214,21 @@ func (k *KubernetesClient) init(cloudregion string, iid string) error {
 	}
 
 	k.restMapper = restmapper.NewDeferredDiscoveryRESTMapper(k.discoverClient)
+	k.restConfig = config
+
+	//Spawn ClientConfig
+	kubeFile, err := os.Open(configPath)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Opening kubeConfig")
+	}
+	kubeData, err := ioutil.ReadAll(kubeFile)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Reading kubeConfig")
+	}
+	k.rawConfig, err = clientcmd.NewClientConfigFromBytes(kubeData)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Creating rawConfig")
+	}
 
 	return nil
 }
@@ -422,4 +442,19 @@ func (k *KubernetesClient) GetStandardClient() kubernetes.Interface {
 //resources created by the plugin
 func (k *KubernetesClient) GetInstanceID() string {
 	return k.instanceID
+}
+
+//Following set of methods are implemented so that KubernetesClient
+//implements genericclioptions.RESTClientGetter interface
+func (k *KubernetesClient) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
+	return k.discoverClient, nil
+}
+func (k *KubernetesClient) ToRESTMapper() (meta.RESTMapper, error) {
+	return k.GetMapper(), nil
+}
+func (k *KubernetesClient) ToRawKubeConfigLoader() clientcmd.ClientConfig {
+	return k.rawConfig
+}
+func (k *KubernetesClient) ToRESTConfig() (*rest.Config, error) {
+	return k.restConfig, nil
 }

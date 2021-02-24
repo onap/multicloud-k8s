@@ -391,7 +391,7 @@ func scheduleResources(c chan configResourceList) {
 			log.Printf("[scheduleResources]: POST %v %v", data.profile, data.resourceTemplates)
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
-				err = k8sClient.init(inst.Request.CloudRegion, inst.ID)
+				err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
 				if err != nil {
 					log.Printf("Getting CloudRegion Information: %s", err.Error())
 					//Move onto the next cloud region
@@ -418,7 +418,7 @@ func scheduleResources(c chan configResourceList) {
 			log.Printf("[scheduleResources]: DELETE %v %v", data.profile, data.resourceTemplates)
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
-				err = k8sClient.init(inst.Request.CloudRegion, inst.ID)
+				err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
 				if err != nil {
 					log.Printf("Getting CloudRegion Information: %s", err.Error())
 					//Move onto the next cloud region
@@ -488,7 +488,7 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 		profile.ReleaseName)
 
 	chartPath := filepath.Join(chartBasePath, t.ChartName)
-	resTemplates, err = helmClient.GenerateKubernetesArtifacts(chartPath,
+	resTemplates, _, err = helmClient.GenerateKubernetesArtifacts(chartPath,
 		[]string{outputfile.Name()},
 		nil)
 	if err != nil {

@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
+ * Copyright © 2021 Samsung Electronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +25,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
@@ -35,8 +37,10 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 	k8syaml "k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/helm/pkg/chartutil"
+	"k8s.io/helm/pkg/hooks"
 	"k8s.io/helm/pkg/manifest"
 	"k8s.io/helm/pkg/proto/hapi/chart"
+	protorelease "k8s.io/helm/pkg/proto/hapi/release"
 	"k8s.io/helm/pkg/releaseutil"
 	"k8s.io/helm/pkg/renderutil"
 	"k8s.io/helm/pkg/tiller"
@@ -46,6 +50,7 @@ import (
 // Template is the interface for all helm templating commands
 // Any backend implementation will implement this interface and will
 // access the functionality via this.
+// FIXME Template is not referenced anywhere
 type Template interface {
 	GenerateKubernetesArtifacts(
 		chartPath string,
@@ -72,6 +77,12 @@ func NewTemplateClient(k8sversion, namespace, releasename string) *TemplateClien
 		kubeNameSpace: namespace,
 		releaseName:   releasename,
 	}
+}
+
+// Define hooks that are honored by k8splugin
+var honoredEvents = map[string]protorelease.Hook_Event{
+	hooks.ReleaseTestSuccess: protorelease.Hook_RELEASE_TEST_SUCCESS,
+	hooks.ReleaseTestFailure: protorelease.Hook_RELEASE_TEST_FAILURE,
 }
 
 // Combines valueFiles and values into a single values stream.
@@ -138,12 +149,60 @@ func (h *TemplateClient) mergeValues(dest map[string]interface{}, src map[string
 	return dest
 }
 
+// Checks whether resource is a hook and if it is, returns hook struct
+//Logic is based on private method
+//file *manifestFile) sort(result *result) error
+//of helm/pkg/tiller package
+func isHook(path, resource string) (*protorelease.Hook, error) {
+
+	var entry releaseutil.SimpleHead
+	err := yaml.Unmarshal([]byte(resource), &entry)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Loading resource to YAML")
+	}
+	//If resource has no metadata it can't be a hook
+	if entry.Metadata == nil ||
+		entry.Metadata.Annotations == nil ||
+		len(entry.Metadata.Annotations) == 0 {
+		return nil, nil
+	}
+	//Determine hook weight
+	hookWeight, err := strconv.Atoi(entry.Metadata.Annotations[hooks.HookWeightAnno])
+	if err != nil {
+		hookWeight = 0
+	}
+	//Prepare hook obj
+	resultHook := &protorelease.Hook{
+		Name:           entry.Metadata.Name,
+		Kind:           entry.Kind,
+		Path:           path,
+		Manifest:       resource,
+		Events:         []protorelease.Hook_Event{},
+		Weight:         int32(hookWeight),
+		DeletePolicies: []protorelease.Hook_DeletePolicy{},
+	}
+	//Determine hook's events
+	hookTypes, ok := entry.Metadata.Annotations[hooks.HookAnno]
+	if !ok {
+		return resultHook, nil
+	}
+	for _, hookType := range strings.Split(hookTypes, ",") {
+		hookType = strings.ToLower(strings.TrimSpace(hookType))
+		e, ok := honoredEvents[hookType]
+		if ok {
+			resultHook.Events = append(resultHook.Events, e)
+		}
+	}
+	return resultHook, nil
+}
+
 // GenerateKubernetesArtifacts a mapping of type to fully evaluated helm template
 func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFiles []string,
-	values []string) ([]KubernetesResourceTemplate, error) {
+	values []string) ([]KubernetesResourceTemplate, []*protorelease.Hook, error) {
 
 	var outputDir, chartPath, namespace, releaseName string
 	var retData []KubernetesResourceTemplate
+	var hookList []*protorelease.Hook
 
 	releaseName = h.releaseName
 	namespace = h.kubeNameSpace
@@ -151,16 +210,16 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	// verify chart path exists
 	if _, err := os.Stat(inputPath); err == nil {
 		if chartPath, err = filepath.Abs(inputPath); err != nil {
-			return retData, err
+			return retData, hookList, err
 		}
 	} else {
-		return retData, err
+		return retData, hookList, err
 	}
 
 	//Create a temp directory in the system temp folder
 	outputDir, err := ioutil.TempDir("", "helm-tmpl-")
 	if err != nil {
-		return retData, pkgerrors.Wrap(err, "Got error creating temp dir")
+		return retData, hookList, pkgerrors.Wrap(err, "Got error creating temp dir")
 	}
 
 	if namespace == "" {
@@ -170,18 +229,18 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	// get combined values and create config
 	rawVals, err := h.processValues(valueFiles, values)
 	if err != nil {
-		return retData, err
+		return retData, hookList, err
 	}
 	config := &chart.Config{Raw: string(rawVals), Values: map[string]*chart.Value{}}
 
 	if msgs := validation.IsDNS1123Label(releaseName); releaseName != "" && len(msgs) > 0 {
-		return retData, fmt.Errorf("release name %s is not a valid DNS label: %s", releaseName, strings.Join(msgs, ";"))
+		return retData, hookList, fmt.Errorf("release name %s is not a valid DNS label: %s", releaseName, strings.Join(msgs, ";"))
 	}
 
 	// Check chart requirements to make sure all dependencies are present in /charts
 	c, err := chartutil.Load(chartPath)
 	if err != nil {
-		return retData, pkgerrors.Errorf("Got error: %s", err.Error())
+		return retData, hookList, pkgerrors.Errorf("Got error: %s", err.Error())
 	}
 
 	renderOpts := renderutil.Options{
@@ -197,7 +256,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 
 	renderedTemplates, err := renderutil.Render(c, config, renderOpts)
 	if err != nil {
-		return retData, err
+		return retData, hookList, err
 	}
 
 	newRenderedTemplates := make(map[string]string)
@@ -246,16 +305,24 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 			continue
 		}
 
+		hook, _ := isHook(b, data)
+		// if hook is not nil, then append it to hooks list and continue
+		// if it's not, disregard error
+		if hook != nil {
+			hookList = append(hookList, hook)
+			continue
+		}
+
 		mfilePath := filepath.Join(outputDir, m.Name)
 		utils.EnsureDirectory(mfilePath)
 		err = ioutil.WriteFile(mfilePath, []byte(data), 0666)
 		if err != nil {
-			return retData, err
+			return retData, hookList, err
 		}
 
 		gvk, err := getGroupVersionKind(data)
 		if err != nil {
-			return retData, err
+			return retData, hookList, err
 		}
 
 		kres := KubernetesResourceTemplate{
@@ -264,7 +331,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 		}
 		retData = append(retData, kres)
 	}
-	return retData, nil
+	return retData, hookList, nil
 }
 
 func getGroupVersionKind(data string) (schema.GroupVersionKind, error) {

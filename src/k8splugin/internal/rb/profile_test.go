@@ -773,7 +773,7 @@ func TestResolveProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			data, releaseName, err := impl.Resolve(testCase.rbname,
+			data, _, releaseName, err := impl.Resolve(testCase.rbname,
 				testCase.rbversion, testCase.prname, []string{}, testCase.releaseName)
 			defer cleanup(data)
 			if err != nil {

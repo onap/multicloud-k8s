@@ -179,7 +179,7 @@ func TestInstanceCreate(t *testing.T) {
 		log.Println(ir)
 
 		if len(ir.Resources) == 0 {
-			t.Fatalf("TestInstanceCreate returned empty data (%s)", ir)
+			t.Fatalf("TestInstanceCreate returned empty data (%+v)", ir)
 		}
 	})
 

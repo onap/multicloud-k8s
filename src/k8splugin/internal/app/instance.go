@@ -22,6 +22,8 @@ import (
 	"log"
 	"strings"
 
+	protorelease "k8s.io/helm/pkg/proto/hapi/release"
+
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
@@ -49,6 +51,7 @@ type InstanceResponse struct {
 	Namespace   string                    `json:"namespace"`
 	ReleaseName string                    `json:"release-name"`
 	Resources   []helm.KubernetesResource `json:"resources"`
+	Hooks       []*protorelease.Hook      `json:"hooks"`
 }
 
 // InstanceMiniResponse contains the response from instantiation
@@ -146,7 +149,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 
 	//Execute the kubernetes create command
-	sortedTemplates, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
+	sortedTemplates, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
@@ -155,7 +158,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	id := namegenerator.Generate()
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.init(i.CloudRegion, id)
+	err = k8sClient.Init(i.CloudRegion, id)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
@@ -172,6 +175,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		Namespace:   profile.Namespace,
 		ReleaseName: releaseName,
 		Resources:   createdResources,
+		Hooks:       hookList,
 	}
 
 	key := InstanceKey{
@@ -233,7 +237,7 @@ func (v *InstanceClient) Status(id string) (InstanceStatus, error) {
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.init(resResp.Request.CloudRegion, id)
+	err = k8sClient.Init(resResp.Request.CloudRegion, id)
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
@@ -369,7 +373,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.init(inst.Request.CloudRegion, inst.ID)
+	err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}

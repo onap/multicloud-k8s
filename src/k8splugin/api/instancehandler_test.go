@@ -194,7 +194,7 @@ func TestInstanceCreateHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 
 			request := httptest.NewRequest("POST", "/v1/instance", testCase.input)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				body, _ := ioutil.ReadAll(resp.Body)
@@ -295,7 +295,7 @@ func TestInstanceGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v1/instance/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v",
@@ -430,7 +430,7 @@ func TestInstanceListHandler(t *testing.T) {
 				}
 				request.URL.RawQuery = q.Encode()
 			}
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v",
@@ -489,7 +489,7 @@ func TestDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v1/instance/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)

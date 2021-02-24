@@ -72,7 +72,7 @@ func TestInit(t *testing.T) {
 
 		kubeClient := KubernetesClient{}
 		// Refer to the connection via its name
-		err = kubeClient.init("mock_connection", "abcdefg")
+		err = kubeClient.Init("mock_connection", "abcdefg")
 		if err != nil {
 			t.Fatalf("TestGetKubeClient returned an error (%s)", err)
 		}

@@ -1,5 +1,6 @@
 /*
 Copyright 2018 Intel Corporation.
+Copyright © 2021 Samsung Electronics
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -47,6 +48,11 @@ func NewRouter(defClient rb.DefinitionManager,
 
 	instRouter.HandleFunc("/instance/{instID}", instHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/status", instHandler.statusHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/query", instHandler.queryHandler).
+		Queries("ApiVersion", "{ApiVersion}",
+			"Kind", "{Kind}",
+			"Name", "{Name}",
+			"Labels", "{Labels}").Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}", instHandler.deleteHandler).Methods("DELETE")
 	// (TODO): Fix update method
 	// instRouter.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

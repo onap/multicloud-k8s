@@ -14,6 +14,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"log"
 
 	pkgerrors "github.com/pkg/errors"
@@ -42,7 +43,7 @@ func (p namespacePlugin) Create(yamlFilePath string, namespace string, client pl
 			Name: namespace,
 		},
 	}
-	_, err := client.GetStandardClient().CoreV1().Namespaces().Create(namespaceObj)
+	_, err := client.GetStandardClient().CoreV1().Namespaces().Create(context.TODO(), namespaceObj, metaV1.CreateOptions{})
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Namespace error")
 	}
@@ -54,7 +55,7 @@ func (p namespacePlugin) Create(yamlFilePath string, namespace string, client pl
 // Get an existing namespace hosted in a specific Kubernetes cluster
 func (p namespacePlugin) Get(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) (string, error) {
 	opts := metaV1.GetOptions{}
-	ns, err := client.GetStandardClient().CoreV1().Namespaces().Get(resource.Name, opts)
+	ns, err := client.GetStandardClient().CoreV1().Namespaces().Get(context.TODO(), resource.Name, opts)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Get Namespace error")
 	}
@@ -65,12 +66,12 @@ func (p namespacePlugin) Get(resource helm.KubernetesResource, namespace string,
 // Delete an existing namespace hosted in a specific Kubernetes cluster
 func (p namespacePlugin) Delete(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) error {
 	deletePolicy := metaV1.DeletePropagationForeground
-	opts := &metaV1.DeleteOptions{
+	opts := metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}
 
 	log.Println("Deleting namespace: " + resource.Name)
-	if err := client.GetStandardClient().CoreV1().Namespaces().Delete(resource.Name, opts); err != nil {
+	if err := client.GetStandardClient().CoreV1().Namespaces().Delete(context.TODO(), resource.Name, opts); err != nil {
 		return pkgerrors.Wrap(err, "Delete namespace error")
 	}
 
@@ -84,7 +85,7 @@ func (p namespacePlugin) List(gvk schema.GroupVersionKind, namespace string, cli
 		Limit: utils.ResourcesListLimit,
 	}
 
-	list, err := client.GetStandardClient().CoreV1().Namespaces().List(opts)
+	list, err := client.GetStandardClient().CoreV1().Namespaces().List(context.TODO(), opts)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Namespace list error")
 	}

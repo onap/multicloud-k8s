@@ -16,6 +16,7 @@ limitations under the License.
 package app
 
 import (
+	"context"
 	"os"
 	"strings"
 	"time"
@@ -62,7 +63,7 @@ func (k *KubernetesClient) getPodsByLabel(namespace string) ([]ResourceStatus, e
 	listOpts := metav1.ListOptions{
 		LabelSelector: config.GetConfiguration().KubernetesLabelName + "=" + k.instanceID,
 	}
-	podList, err := client.List(listOpts)
+	podList, err := client.List(context.TODO(), listOpts)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Retrieving PodList from cluster")
 	}
@@ -106,9 +107,9 @@ func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, names
 	var unstrList *unstructured.UnstructuredList
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		unstrList, err = dynClient.Resource(gvr).Namespace(namespace).List(opts)
+		unstrList, err = dynClient.Resource(gvr).Namespace(namespace).List(context.TODO(), opts)
 	case meta.RESTScopeNameRoot:
-		unstrList, err = dynClient.Resource(gvr).List(opts)
+		unstrList, err = dynClient.Resource(gvr).List(context.TODO(), opts)
 	default:
 		return nil, pkgerrors.New("Got an unknown RESTScopeName for mapping: " + gvk.String())
 	}
@@ -141,9 +142,9 @@ func (k *KubernetesClient) getResourceStatus(res helm.KubernetesResource, namesp
 	var unstruct *unstructured.Unstructured
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(res.Name, opts)
+		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(context.TODO(), res.Name, opts)
 	case meta.RESTScopeNameRoot:
-		unstruct, err = dynClient.Resource(gvr).Get(res.Name, opts)
+		unstruct, err = dynClient.Resource(gvr).Get(context.TODO(), res.Name, opts)
 	default:
 		return ResourceStatus{}, pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + res.GVK.String())
 	}

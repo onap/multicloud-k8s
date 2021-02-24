@@ -14,6 +14,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"log"
 
 	pkgerrors "github.com/pkg/errors"
@@ -61,7 +62,7 @@ func (p servicePlugin) Create(yamlFilePath string, namespace string, client plug
 	labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
 	service.SetLabels(labels)
 
-	result, err := client.GetStandardClient().CoreV1().Services(namespace).Create(service)
+	result, err := client.GetStandardClient().CoreV1().Services(namespace).Create(context.TODO(), service, metaV1.CreateOptions{})
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Service error")
 	}
@@ -80,7 +81,7 @@ func (p servicePlugin) List(gvk schema.GroupVersionKind, namespace string, clien
 		Limit: utils.ResourcesListLimit,
 	}
 
-	list, err := client.GetStandardClient().CoreV1().Services(namespace).List(opts)
+	list, err := client.GetStandardClient().CoreV1().Services(namespace).List(context.TODO(), opts)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Service list error")
 	}
@@ -111,12 +112,12 @@ func (p servicePlugin) Delete(resource helm.KubernetesResource, namespace string
 	}
 
 	deletePolicy := metaV1.DeletePropagationForeground
-	opts := &metaV1.DeleteOptions{
+	opts := metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}
 
 	log.Println("Deleting service: " + resource.Name)
-	if err := client.GetStandardClient().CoreV1().Services(namespace).Delete(resource.Name, opts); err != nil {
+	if err := client.GetStandardClient().CoreV1().Services(namespace).Delete(context.TODO(), resource.Name, opts); err != nil {
 		return pkgerrors.Wrap(err, "Delete service error")
 	}
 
@@ -130,7 +131,7 @@ func (p servicePlugin) Get(resource helm.KubernetesResource, namespace string, c
 	}
 
 	opts := metaV1.GetOptions{}
-	service, err := client.GetStandardClient().CoreV1().Services(namespace).Get(resource.Name, opts)
+	service, err := client.GetStandardClient().CoreV1().Services(namespace).Get(context.TODO(), resource.Name, opts)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Get Service error")
 	}

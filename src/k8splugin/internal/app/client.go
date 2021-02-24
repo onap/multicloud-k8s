@@ -90,6 +90,39 @@ func (k *KubernetesClient) getPodsByLabel(namespace string) ([]ResourceStatus, e
 	return resp, nil
 }
 
+func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, namespace string) ([]ResourceStatus, error) {
+	dynClient := k.GetDynamicClient()
+	mapper := k.GetMapper()
+	gvk := schema.FromAPIVersionAndKind(apiVersion, kind)
+	mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Preparing mapper based on GVK")
+	}
+
+	gvr := mapping.Resource
+	opts := metav1.ListOptions{
+		LabelSelector: labelSelector,
+	}
+	var unstrList *unstructured.UnstructuredList
+	switch mapping.Scope.Name() {
+	case meta.RESTScopeNameNamespace:
+		unstrList, err = dynClient.Resource(gvr).Namespace(namespace).List(opts)
+	case meta.RESTScopeNameRoot:
+		unstrList, err = dynClient.Resource(gvr).List(opts)
+	default:
+		return nil, pkgerrors.New("Got an unknown RESTScopeName for mapping: " + gvk.String())
+	}
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Querying for resources")
+	}
+
+	resp := make([]ResourceStatus, len(unstrList.Items))
+	for _, unstr := range unstrList.Items {
+		resp = append(resp, ResourceStatus{unstr.GetName(), gvk, unstr})
+	}
+	return resp, nil
+}
+
 // getResourcesStatus yields status of given generic resource
 func (k *KubernetesClient) getResourceStatus(res helm.KubernetesResource, namespace string) (ResourceStatus, error) {
 	dynClient := k.GetDynamicClient()

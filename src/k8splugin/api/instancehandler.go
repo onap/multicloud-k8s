@@ -171,6 +171,51 @@ func (i instanceHandler) statusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// queryHandler retrieves information about specified resources for instance
+func (i instanceHandler) queryHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["instID"]
+	apiVersion := r.FormValue("ApiVersion")
+	kind := r.FormValue("Kind")
+	name := r.FormValue("Name")
+	labels := r.FormValue("Labels")
+	if apiVersion == "" {
+		http.Error(w, "Missing apiVersion mandatory parameter", http.StatusBadRequest)
+		return
+	}
+	if kind == "" {
+		http.Error(w, "Missing kind mandatory parameter", http.StatusBadRequest)
+		return
+	}
+	if name == "" && labels == "" {
+		http.Error(w, "Name or Labels parameter must be provided", http.StatusBadRequest)
+		return
+	}
+	resp, err := i.client.Query(id, apiVersion, kind, name, labels)
+	if err != nil {
+		log.Error("Error getting Query results", log.Fields{
+			"error":      err,
+			"id":         id,
+			"apiVersion": apiVersion,
+			"kind":       kind,
+			"name":       name,
+			"labels":     labels,
+		})
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		log.Error("Error Marshaling Response", log.Fields{
+			"error":    err,
+			"response": resp,
+		})
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // listHandler retrieves information about an instance via the ID
 func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 

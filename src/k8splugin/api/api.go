@@ -1,5 +1,6 @@
 /*
 Copyright 2018 Intel Corporation.
+Copyright © 2021 Samsung Electronics
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -107,12 +108,12 @@ func NewRouter(defClient rb.DefinitionManager,
 		configClient = app.NewConfigClient()
 	}
 	configHandler := rbConfigHandler{client: configClient}
-	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config", configHandler.createHandler).Methods("POST")
-	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/{cfgname}", configHandler.getHandler).Methods("GET")
-	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/{cfgname}", configHandler.updateHandler).Methods("PUT")
-	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/{cfgname}", configHandler.deleteHandler).Methods("DELETE")
-	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/rollback", configHandler.rollbackHandler).Methods("POST")
-	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/config/tagit", configHandler.tagitHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/config", configHandler.createHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.getHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.updateHandler).Methods("PUT")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.deleteHandler).Methods("DELETE")
+	instRouter.HandleFunc("/instance/{instID}/config/rollback", configHandler.rollbackHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/config/tagit", configHandler.tagitHandler).Methods("POST")
 
 	// Add healthcheck path
 	instRouter.HandleFunc("/healthcheck", healthCheckHandler).Methods("GET")

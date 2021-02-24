@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
+ * Copyright © 2021 Samsung Electronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +38,7 @@ type rbConfigHandler struct {
 func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	var p app.Config
 	vars := mux.Vars(r)
-	rbName := vars["rbname"]
-	rbVersion := vars["rbversion"]
-	prName := vars["prname"]
+	instanceID := vars["instID"]
 
 	if r.Body == nil {
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -58,7 +57,7 @@ func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.Create(rbName, rbVersion, prName, p)
+	ret, err := h.client.Create(instanceID, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -77,12 +76,10 @@ func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 // Returns a app.Definition
 func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	rbName := vars["rbname"]
-	rbVersion := vars["rbversion"]
-	prName := vars["prname"]
+	instanceID := vars["instID"]
 	cfgName := vars["cfgname"]
 
-	ret, err := h.client.Get(rbName, rbVersion, prName, cfgName)
+	ret, err := h.client.Get(instanceID, cfgName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -100,12 +97,10 @@ func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 // deleteHandler handles DELETE operations on a config
 func (h rbConfigHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	rbName := vars["rbname"]
-	rbVersion := vars["rbversion"]
-	prName := vars["prname"]
+	instanceID := vars["instID"]
 	cfgName := vars["cfgname"]
 
-	ret, err := h.client.Delete(rbName, rbVersion, prName, cfgName)
+	ret, err := h.client.Delete(instanceID, cfgName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -124,9 +119,7 @@ func (h rbConfigHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 // UpdateHandler handles Update operations on a particular configuration
 func (h rbConfigHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	rbName := vars["rbname"]
-	rbVersion := vars["rbversion"]
-	prName := vars["prname"]
+	instanceID := vars["instID"]
 	cfgName := vars["cfgname"]
 
 	var p app.Config
@@ -142,7 +135,7 @@ func (h rbConfigHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.Update(rbName, rbVersion, prName, cfgName, p)
+	ret, err := h.client.Update(instanceID, cfgName, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -160,9 +153,7 @@ func (h rbConfigHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 // rollbackHandler handles Rollback operations to a specific version
 func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	rbName := vars["rbname"]
-	rbVersion := vars["rbversion"]
-	prName := vars["prname"]
+	instanceID := vars["instID"]
 
 	if r.Body == nil {
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -175,7 +166,7 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-	err = h.client.Rollback(rbName, rbVersion, prName, p)
+	err = h.client.Rollback(instanceID, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -186,9 +177,7 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 // tagitHandler handles TAGIT operation
 func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	rbName := vars["rbname"]
-	rbVersion := vars["rbversion"]
-	prName := vars["prname"]
+	instanceID := vars["instID"]
 
 	if r.Body == nil {
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -202,7 +191,7 @@ func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.client.Tagit(rbName, rbVersion, prName, p)
+	err = h.client.Tagit(instanceID, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

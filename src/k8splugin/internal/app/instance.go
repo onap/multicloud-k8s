@@ -1,6 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
- * Copyright © 2020 Samsung Electronics
+ * Copyright © 2021 Samsung Electronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,6 +109,16 @@ func NewInstanceClient() *InstanceClient {
 		storeName: "rbdef",
 		tagInst:   "instance",
 	}
+}
+
+// Simplified function to retrieve model data from instance ID
+func resolveModelFromInstance(instanceID string) (rbName, rbVersion, profileName, releaseName string, err error) {
+	v := NewInstanceClient()
+	resp, err := v.Get(instanceID)
+	if err != nil {
+		return "", "", "", "", pkgerrors.Wrap(err, "Getting instance")
+	}
+	return resp.Request.RBName, resp.Request.RBVersion, resp.Request.ProfileName, resp.ReleaseName, nil
 }
 
 // Create an instance of rb on the cluster  in the database

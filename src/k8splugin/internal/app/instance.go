@@ -19,16 +19,13 @@ package app
 
 import (
 	"encoding/json"
-	"log"
-	"strings"
-
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	protorelease "k8s.io/helm/pkg/proto/hapi/release"
-
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"log"
+	"strings"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -52,7 +49,7 @@ type InstanceResponse struct {
 	Namespace   string                    `json:"namespace"`
 	ReleaseName string                    `json:"release-name"`
 	Resources   []helm.KubernetesResource `json:"resources"`
-	Hooks       []*protorelease.Hook      `json:"-"`
+	Hooks       []*helm.Hook              `json:"-"`
 }
 
 // InstanceMiniResponse contains the response from instantiation
@@ -264,7 +261,7 @@ func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (Insta
 			Name: name,
 			GVK:  schema.FromAPIVersionAndKind(apiVersion, kind),
 		}
-		res, err := k8sClient.getResourceStatus(resIdentifier, resResp.Namespace)
+		res, err := k8sClient.GetResourceStatus(resIdentifier, resResp.Namespace)
 		if err != nil {
 			return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resource")
 		}
@@ -323,7 +320,7 @@ Main:
 				continue Main //Don't double check pods if someone decided to define pod explicitly in helm chart
 			}
 		}
-		status, err := k8sClient.getResourceStatus(resource, resResp.Namespace)
+		status, err := k8sClient.GetResourceStatus(resource, resResp.Namespace)
 		if err != nil {
 			cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
 		} else {

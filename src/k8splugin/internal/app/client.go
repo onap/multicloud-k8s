@@ -16,6 +16,7 @@ limitations under the License.
 package app
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -33,7 +34,6 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/disk"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -67,7 +67,7 @@ func (k *KubernetesClient) getPodsByLabel(namespace string) ([]ResourceStatus, e
 	listOpts := metav1.ListOptions{
 		LabelSelector: config.GetConfiguration().KubernetesLabelName + "=" + k.instanceID,
 	}
-	podList, err := client.List(listOpts)
+	podList, err := client.List(context.TODO(), listOpts)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Retrieving PodList from cluster")
 	}
@@ -111,9 +111,9 @@ func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, names
 	var unstrList *unstructured.UnstructuredList
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		unstrList, err = dynClient.Resource(gvr).Namespace(namespace).List(opts)
+		unstrList, err = dynClient.Resource(gvr).Namespace(namespace).List(context.TODO(), opts)
 	case meta.RESTScopeNameRoot:
-		unstrList, err = dynClient.Resource(gvr).List(opts)
+		unstrList, err = dynClient.Resource(gvr).List(context.TODO(), opts)
 	default:
 		return nil, pkgerrors.New("Got an unknown RESTScopeName for mapping: " + gvk.String())
 	}
@@ -128,8 +128,8 @@ func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, names
 	return resp, nil
 }
 
-// getResourcesStatus yields status of given generic resource
-func (k *KubernetesClient) getResourceStatus(res helm.KubernetesResource, namespace string) (ResourceStatus, error) {
+// GetResourcesStatus yields status of given generic resource
+func (k *KubernetesClient) GetResourceStatus(res helm.KubernetesResource, namespace string) (ResourceStatus, error) {
 	dynClient := k.GetDynamicClient()
 	mapper := k.GetMapper()
 	mapping, err := mapper.RESTMapping(schema.GroupKind{
@@ -146,9 +146,9 @@ func (k *KubernetesClient) getResourceStatus(res helm.KubernetesResource, namesp
 	var unstruct *unstructured.Unstructured
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(res.Name, opts)
+		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(context.TODO(), res.Name, opts)
 	case meta.RESTScopeNameRoot:
-		unstruct, err = dynClient.Resource(gvr).Get(res.Name, opts)
+		unstruct, err = dynClient.Resource(gvr).Get(context.TODO(), res.Name, opts)
 	default:
 		return ResourceStatus{}, pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + res.GVK.String())
 	}
@@ -276,7 +276,7 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 	return nil
 }
 
-func (k *KubernetesClient) createKind(resTempl helm.KubernetesResourceTemplate,
+func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate,
 	namespace string) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
@@ -360,7 +360,7 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 
 	var createdResources []helm.KubernetesResource
 	for _, resTempl := range sortedTemplates {
-		resCreated, err := k.createKind(resTempl, namespace)
+		resCreated, err := k.CreateKind(resTempl, namespace)
 		if err != nil {
 			return nil, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
 		}
@@ -390,7 +390,7 @@ func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesReso
 	return updatedResources, nil
 }
 
-func (k *KubernetesClient) deleteKind(resource helm.KubernetesResource, namespace string) error {
+func (k *KubernetesClient) DeleteKind(resource helm.KubernetesResource, namespace string) error {
 	log.Warn("Deleting Resource", log.Fields{
 		"gvk":      resource.GVK,
 		"resource": resource.Name,
@@ -412,7 +412,7 @@ func (k *KubernetesClient) deleteKind(resource helm.KubernetesResource, namespac
 func (k *KubernetesClient) deleteResources(resources []helm.KubernetesResource, namespace string) error {
 	//TODO: Investigate if deletion should be in a particular order
 	for _, res := range resources {
-		err := k.deleteKind(res, namespace)
+		err := k.DeleteKind(res, namespace)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Deleting resources")
 		}
@@ -442,19 +442,4 @@ func (k *KubernetesClient) GetStandardClient() kubernetes.Interface {
 //resources created by the plugin
 func (k *KubernetesClient) GetInstanceID() string {
 	return k.instanceID
-}
-
-//Following set of methods are implemented so that KubernetesClient
-//implements genericclioptions.RESTClientGetter interface
-func (k *KubernetesClient) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
-	return k.discoverClient, nil
-}
-func (k *KubernetesClient) ToRESTMapper() (meta.RESTMapper, error) {
-	return k.GetMapper(), nil
-}
-func (k *KubernetesClient) ToRawKubeConfigLoader() clientcmd.ClientConfig {
-	return k.rawConfig
-}
-func (k *KubernetesClient) ToRESTConfig() (*rest.Config, error) {
-	return k.restConfig, nil
 }

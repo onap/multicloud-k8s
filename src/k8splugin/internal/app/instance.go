@@ -19,16 +19,13 @@ package app
 
 import (
 	"encoding/json"
-	"log"
-	"strings"
-
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	protorelease "k8s.io/helm/pkg/proto/hapi/release"
-
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"log"
+	"strings"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -52,7 +49,7 @@ type InstanceResponse struct {
 	Namespace   string                    `json:"namespace"`
 	ReleaseName string                    `json:"release-name"`
 	Resources   []helm.KubernetesResource `json:"resources"`
-	Hooks       []*protorelease.Hook      `json:"-"`
+	Hooks       []*helm.Hook              `json:"-"`
 }
 
 // InstanceMiniResponse contains the response from instantiation

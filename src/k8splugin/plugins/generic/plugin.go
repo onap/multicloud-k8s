@@ -14,6 +14,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -77,9 +78,9 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		createdObj, err = dynClient.Resource(gvr).Namespace(namespace).Create(unstruct, metav1.CreateOptions{})
+		createdObj, err = dynClient.Resource(gvr).Namespace(namespace).Create(context.TODO(), unstruct, metav1.CreateOptions{})
 	case meta.RESTScopeNameRoot:
-		createdObj, err = dynClient.Resource(gvr).Create(unstruct, metav1.CreateOptions{})
+		createdObj, err = dynClient.Resource(gvr).Create(context.TODO(), unstruct, metav1.CreateOptions{})
 	default:
 		return "", pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + gvk.String())
 	}
@@ -133,9 +134,9 @@ func (g genericPlugin) Update(yamlFilePath string, namespace string, client plug
 
         switch mapping.Scope.Name() {
         case meta.RESTScopeNameNamespace:
-                updatedObj, err = dynClient.Resource(gvr).Namespace(namespace).Update(unstruct, metav1.UpdateOptions{})
+                updatedObj, err = dynClient.Resource(gvr).Namespace(namespace).Update(context.TODO(), unstruct, metav1.UpdateOptions{})
         case meta.RESTScopeNameRoot:
-                updatedObj, err = dynClient.Resource(gvr).Update(unstruct, metav1.UpdateOptions{})
+                updatedObj, err = dynClient.Resource(gvr).Update(context.TODO(), unstruct, metav1.UpdateOptions{})
         default:
                 return "", pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + gvk.String())
         }
@@ -170,9 +171,9 @@ func (g genericPlugin) Get(resource helm.KubernetesResource,
 	var unstruct *unstructured.Unstructured
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(resource.Name, opts)
+		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(context.TODO(), resource.Name, opts)
 	case meta.RESTScopeNameRoot:
-		unstruct, err = dynClient.Resource(gvr).Get(resource.Name, opts)
+		unstruct, err = dynClient.Resource(gvr).Get(context.TODO(), resource.Name, opts)
 	default:
 		return "", pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + resource.GVK.String())
 	}
@@ -212,15 +213,15 @@ func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string
 
 	gvr := mapping.Resource
 	deletePolicy := metav1.DeletePropagationForeground
-	opts := &metav1.DeleteOptions{
+	opts := metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}
 
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		err = dynClient.Resource(gvr).Namespace(namespace).Delete(resource.Name, opts)
+		err = dynClient.Resource(gvr).Namespace(namespace).Delete(context.TODO(), resource.Name, opts)
 	case meta.RESTScopeNameRoot:
-		err = dynClient.Resource(gvr).Delete(resource.Name, opts)
+		err = dynClient.Resource(gvr).Delete(context.TODO(), resource.Name, opts)
 	default:
 		return pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + resource.GVK.String())
 	}

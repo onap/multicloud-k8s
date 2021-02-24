@@ -17,6 +17,7 @@ package api
 import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/healthcheck"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	"github.com/gorilla/mux"
@@ -28,7 +29,8 @@ func NewRouter(defClient rb.DefinitionManager,
 	instClient app.InstanceManager,
 	configClient app.ConfigManager,
 	connectionClient connection.ConnectionManager,
-	templateClient rb.ConfigTemplateManager) *mux.Router {
+	templateClient rb.ConfigTemplateManager,
+	healthcheckClient healthcheck.InstanceHCManager) *mux.Router {
 
 	router := mux.NewRouter()
 
@@ -114,6 +116,16 @@ func NewRouter(defClient rb.DefinitionManager,
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.deleteHandler).Methods("DELETE")
 	instRouter.HandleFunc("/instance/{instID}/config/rollback", configHandler.rollbackHandler).Methods("POST")
 	instRouter.HandleFunc("/instance/{instID}/config/tagit", configHandler.tagitHandler).Methods("POST")
+
+	// Instance Healthcheck API
+	if healthcheckClient == nil {
+		healthcheckClient = healthcheck.NewHCClient()
+	}
+	healthcheckHandler := instanceHCHandler{client: healthcheckClient}
+	instRouter.HandleFunc("/instance/{instID}/healthcheck", healthcheckHandler.listHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/healthcheck", healthcheckHandler.createHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/healthcheck/{hcID}", healthcheckHandler.getHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/healthcheck/{hcID}", healthcheckHandler.deleteHandler).Methods("DELETE")
 
 	// Add healthcheck path
 	instRouter.HandleFunc("/healthcheck", healthCheckHandler).Methods("GET")

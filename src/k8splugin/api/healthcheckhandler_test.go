@@ -35,7 +35,7 @@ func TestHealthCheckHandler(t *testing.T) {
 			Err: nil,
 		}
 		request := httptest.NewRequest("GET", "/v1/healthcheck", nil)
-		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil))
+		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil, nil))
 
 		//Check returned code
 		if resp.StatusCode != http.StatusOK {
@@ -48,7 +48,7 @@ func TestHealthCheckHandler(t *testing.T) {
 			Err: pkgerrors.New("Runtime Error in DB"),
 		}
 		request := httptest.NewRequest("GET", "/v1/healthcheck", nil)
-		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil))
+		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil, nil))
 
 		//Check returned code
 		if resp.StatusCode != http.StatusInternalServerError {

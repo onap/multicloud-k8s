@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Lukasz Rajewski <lukasz.rajewski@orange.com>
+Code-Review+2: Ritu Sood <ritu.sood@intel.com>
+Submitted-by: Bin Yang <bin.yang@windriver.com>
+Submitted-at: Wed, 24 Feb 2021 13:04:48 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/118312
+Project: multicloud/k8s
+Branch: refs/heads/master

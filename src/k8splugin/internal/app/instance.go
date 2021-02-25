@@ -74,6 +74,7 @@ type InstanceManager interface {
 	Create(i InstanceRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
 	Status(id string) (InstanceStatus, error)
+	Query(id, apiVersion, kind, name, labels string) (InstanceStatus, error)
 	List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error)
 	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error)
 	Delete(id string) error
@@ -206,6 +207,68 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 	}
 
 	return InstanceResponse{}, pkgerrors.New("Error getting Instance")
+}
+
+// Query returns state of instance's filtered resources
+func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (InstanceStatus, error) {
+
+	//Read the status from the DB
+	key := InstanceKey{
+		ID: id,
+	}
+	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
+	if err != nil {
+		return InstanceStatus{}, pkgerrors.Wrap(err, "Get Instance")
+	}
+	if value == nil { //value is a byte array
+		return InstanceStatus{}, pkgerrors.New("Status is not available")
+	}
+	resResp := InstanceResponse{}
+	err = db.DBconn.Unmarshal(value, &resResp)
+	if err != nil {
+		return InstanceStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
+	}
+
+	k8sClient := KubernetesClient{}
+	err = k8sClient.init(resResp.Request.CloudRegion, id)
+	if err != nil {
+		return InstanceStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
+	}
+
+	var resourcesStatus []ResourceStatus
+	if labels != "" {
+		resList, err := k8sClient.queryResources(apiVersion, kind, labels, resResp.Namespace)
+		if err != nil {
+			return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resources")
+		}
+		// If user specifies both label and name, we want to pick up only single resource from these matching label
+		if name != "" {
+			//Assigning 0-length, because we may actually not find matching name
+			resourcesStatus = make([]ResourceStatus, 0)
+			for _, res := range resList {
+				if res.Name == name {
+					resourcesStatus = append(resourcesStatus, res)
+					break
+				}
+			}
+		} else {
+			resourcesStatus = resList
+		}
+	} else if name != "" {
+		resIdentifier := helm.KubernetesResource{}
+		res, err := k8sClient.getResourceStatus(resIdentifier, resResp.Namespace)
+		if err != nil {
+			return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resource")
+		}
+		resourcesStatus = []ResourceStatus{res}
+	}
+
+	resp := InstanceStatus{
+		Request:         resResp.Request,
+		ResourceCount:   int32(len(resourcesStatus)),
+		ResourcesStatus: resourcesStatus,
+	}
+	return resp, nil
 }
 
 // Status returns the status for the instance

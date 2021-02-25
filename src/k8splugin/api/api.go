@@ -48,6 +48,11 @@ func NewRouter(defClient rb.DefinitionManager,
 
 	instRouter.HandleFunc("/instance/{instID}", instHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/status", instHandler.statusHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/query", instHandler.queryHandler).
+		Queries("ApiVersion", "{ApiVersion}",
+			"Kind", "{Kind}",
+			"Name", "{Name}",
+			"Labels", "{Labels}").Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}", instHandler.deleteHandler).Methods("DELETE")
 	// (TODO): Fix update method
 	// instRouter.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")

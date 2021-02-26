@@ -2,12 +2,15 @@
 # SPDX-license-identifier: Apache-2.0
 ##############################################################################
 # Copyright (c) 2018
-# Copyright © 2020 Samsung Electronics
+# Copyright © 2021 Samsung Electronics
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Apache License, Version 2.0
 # which accompanies this distribution, and is available at
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
+
+# Script respects environment variable SKIP_CNF_TEARDOWN
+# If set to "yes", it will preserve CNF for manual handling
 
 set -o errexit
 set -o nounset
@@ -129,16 +132,26 @@ print_msg "Assert ReleaseName has been correctly overriden"
 test "$(jq -r '.request."release-name"' <<< "${response}")" == "${release_name}"
 
 #Teardown
-print_msg "Deleting VNF Instance"
-delete_resource "${base_url}/instance/${vnf_id}"
+if [ "${SKIP_CNF_TEARDOWN:-}" == "yes" ]; then
+    print_msg "Leaving CNF running for further debugging"
+    echo "Remember to later issue following DELETE calls to clean environment"
+    cat <<EOF
+    curl -X DELETE "${base_url}/instance/${vnf_id}"
+    curl -X DELETE "${base_url}/rb/definition/${rb_name}/${rb_version}/profile/${profile_name}"
+    curl -X DELETE "${base_url}/rb/definition/${rb_name}/${rb_version}"
+    curl -X DELETE "${base_url}/connectivity-info/${cloud_region_id}"
+EOF
+else
+    print_msg "Deleting VNF Instance"
+    delete_resource "${base_url}/instance/${vnf_id}"
 
-print_msg "Deleting Profile"
-delete_resource "${base_url}/rb/definition/${rb_name}/${rb_version}/profile/${profile_name}"
+    print_msg "Deleting Profile"
+    delete_resource "${base_url}/rb/definition/${rb_name}/${rb_version}/profile/${profile_name}"
 
-print_msg "Deleting Resource Bundle"
-delete_resource "${base_url}/rb/definition/${rb_name}/${rb_version}"
+    print_msg "Deleting Resource Bundle"
+    delete_resource "${base_url}/rb/definition/${rb_name}/${rb_version}"
 
-print_msg "Deleting ${cloud_region_id} cloud region connection"
-delete_resource "${base_url}/connectivity-info/${cloud_region_id}"
-
+    print_msg "Deleting ${cloud_region_id} cloud region connection"
+    delete_resource "${base_url}/connectivity-info/${cloud_region_id}"
+fi
 print_msg "Test finished successfully"

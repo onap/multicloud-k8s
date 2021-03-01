@@ -1,0 +1,107 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ include "ovn4nfv.fullname" . }}-ovn-control-plane
+  labels:
+    {{- include "ovn4nfv.labels" . | nindent 4 }}
+    role: ovn-control-plane
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 0%
+      maxUnavailable: 100%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "ovn4nfv.selectorLabels" . | nindent 6 }}
+      role: ovn-control-plane
+  template:
+    metadata:
+      labels:
+        {{- include "ovn4nfv.selectorLabels" . | nindent 8 }}
+        role: ovn-control-plane
+    spec:
+      {{- with .Values.ovn.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostNetwork: true
+      {{- with .Values.ovnControlPlane.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ovnControlPlane.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.ovnControlPlane.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      priorityClassName: system-cluster-critical
+      containers:
+        - name: ovn-control-plane
+          image: "{{ .Values.ovn.image.repository }}:{{ .Values.ovn.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ovn.image.pullPolicy }}
+          command: ["ovn4nfv-k8s", "start_ovn_control_plane"]
+          resources:
+            {{- toYaml .Values.ovnControlPlane.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.ovnControlPlane.securityContext | nindent 12 }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - mountPath: /var/run/openvswitch
+              name: host-run-ovs
+            - mountPath: /var/run/ovn
+              name: host-run-ovn
+            - mountPath: /sys
+              name: host-sys
+              readOnly: true
+            - mountPath: /etc/openvswitch
+              name: host-config-openvswitch
+            - mountPath: /var/log/openvswitch
+              name: host-log-ovs
+            - mountPath: /var/log/ovn
+              name: host-log-ovn
+          readinessProbe:
+            exec:
+              command: ["ovn4nfv-k8s", "check_ovn_control_plane"]
+            periodSeconds: 3
+          livenessProbe:
+            exec:
+              command: ["ovn4nfv-k8s", "check_ovn_control_plane"]
+            initialDelaySeconds: 30
+            periodSeconds: 7
+            failureThreshold: 5
+      volumes:
+        - name: host-run-ovs
+          hostPath:
+            path: /run/openvswitch
+        - name: host-run-ovn
+          hostPath:
+            path: /run/ovn
+        - name: host-sys
+          hostPath:
+            path: /sys
+        - name: host-config-openvswitch
+          hostPath:
+            path: /etc/origin/openvswitch
+        - name: host-log-ovs
+          hostPath:
+            path: /var/log/openvswitch
+        - name: host-log-ovn
+          hostPath:
+            path: /var/log/ovn

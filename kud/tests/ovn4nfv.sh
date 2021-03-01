@@ -34,8 +34,8 @@ echo "===== $deployment_pod details ====="
 kubectl exec -it $deployment_pod -- ip a
 
 ovn_nic=$(kubectl exec -it $deployment_pod -- ip a )
-if [[ $ovn_nic != *"net1"* ]]; then
-    echo "The $deployment_pod pod doesn't contain the net1 nic"
+if [[ $ovn_nic != *"net3"* ]]; then
+    echo "The $deployment_pod pod doesn't contain the net3 nic"
     exit 1
 else
     echo "Test Completed!"

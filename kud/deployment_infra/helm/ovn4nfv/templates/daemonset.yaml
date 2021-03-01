@@ -1,0 +1,164 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "ovn4nfv.fullname" . }}-cni
+  labels:
+    {{- include "ovn4nfv.labels" . | nindent 4 }}
+    role: cni
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "ovn4nfv.selectorLabels" . | nindent 6 }}
+      role: cni
+  template:
+    metadata:
+      labels:
+        {{- include "ovn4nfv.selectorLabels" . | nindent 8 }}
+        role: cni
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostNetwork: true
+      {{- with .Values.cni.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.cni.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      serviceAccountName: {{ include "ovn4nfv.serviceAccountName" . }}
+      containers:
+      - name: ovn4nfv
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/usr/local/bin/entrypoint", "cni"]
+        resources:
+          {{- toYaml .Values.cni.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.cni.securityContext | nindent 10 }}
+        volumeMounts:
+        - name: cni
+          mountPath: /host/etc/cni/net.d
+        - name: cnibin
+          mountPath: /host/opt/cni/bin
+        - name: cniconf
+          mountPath: /host/etc/openvswitch
+        - name: ovn4nfv-cfg
+          mountPath: /tmp/ovn4nfv-conf
+        - name: ovn4nfv-cni-net-conf
+          mountPath: /tmp/ovn4nfv-cni
+      volumes:
+        - name: cni
+          hostPath:
+            path: /etc/cni/net.d
+        - name: cnibin
+          hostPath:
+            path: /opt/cni/bin
+        - name: cniconf
+          hostPath:
+            path: /etc/openvswitch
+        - name: ovn4nfv-cfg
+          configMap:
+            name: {{ .Values.cni.config.name }}
+            items:
+            - key: ovn4nfv_k8s.conf
+              path: ovn4nfv_k8s.conf
+        - name: ovn4nfv-cni-net-conf
+          configMap:
+            name: {{ .Values.cni.config.name }}
+            items:
+            - key: 00-network.conf
+              path: 00-network.conf
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "ovn4nfv.fullname" . }}-nfn-agent
+  labels:
+    {{- include "ovn4nfv.labels" . | nindent 4 }}
+    role: nfn-agent
+spec:
+  selector:
+    matchLabels:
+      {{- include "ovn4nfv.selectorLabels" . | nindent 6 }}
+      role: nfn-agent
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "ovn4nfv.selectorLabels" . | nindent 8 }}
+        role: nfn-agent
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostNetwork: true
+      hostPID: true
+      {{- with .Values.nfnAgent.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nfnAgent.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      serviceAccountName: {{ include "ovn4nfv.serviceAccountName" . }}
+      containers:
+      - name: nfn-agent
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/usr/local/bin/entrypoint", "agent"]
+        resources:
+          {{- toYaml .Values.nfnAgent.resources | nindent 10 }}
+        env:
+          - name: NFN_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        securityContext:
+          {{- toYaml .Values.nfnAgent.securityContext | nindent 10 }}
+        volumeMounts:
+        - mountPath: /var/run/dbus/
+          name: host-var-run-dbus
+          readOnly: true
+        - mountPath: /run/openvswitch
+          name: host-run-ovs
+        - mountPath: /var/run/openvswitch
+          name: host-var-run-ovs
+        - mountPath: /var/run
+          name: host-var-run
+        - mountPath: /host/proc
+          name: host-proc
+        - mountPath: /host/sys
+          name: host-sys
+        - mountPath: /var/run/ovn4nfv-k8s-plugin
+          name: host-var-cniserver-socket-dir
+      volumes:
+      - name: host-run-ovs
+        hostPath:
+          path: /run/openvswitch
+      - name: host-var-run-ovs
+        hostPath:
+          path: /var/run/openvswitch
+      - name: host-var-run-dbus
+        hostPath:
+          path: /var/run/dbus
+      - name: host-var-cniserver-socket-dir
+        hostPath:
+          path: /var/run/ovn4nfv-k8s-plugin
+      - name: host-var-run
+        hostPath:
+          path: /var/run
+      - name: host-proc
+        hostPath:
+          path: /proc
+      - name: host-sys
+        hostPath:
+          path: /sys

@@ -1,0 +1,177 @@
+image:
+  repository: docker.io/integratedcloudnative/ovn4nfv-k8s-plugin
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+imagePullSecrets: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+nameOverride: ""
+fullnameOverride: ""
+
+cni:
+  securityContext:
+    privileged: true
+
+  nodeSelector:
+    beta.kubernetes.io/arch: amd64
+
+  tolerations:
+  - operator: Exists
+    effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 50Mi
+
+  config:
+    name: ovn4nfv-cni-config
+    ovn4nfv_k8s: |
+      [logging]
+      loglevel=5
+      logfile=/var/log/openvswitch/ovn4k8s.log
+
+      [cni]
+      conf-dir=/etc/cni/net.d
+      plugin=ovn4nfvk8s-cni
+
+      [kubernetes]
+      kubeconfig=/etc/cni/net.d/ovn4nfv-k8s.d/ovn4nfv-k8s.kubeconfig
+    network: |
+      {
+        "name": "ovn4nfv-k8s-plugin",
+        "type": "ovn4nfvk8s-cni",
+        "cniVersion": "0.3.1"
+      }
+
+nfnAgent:
+  securityContext:
+    runAsUser: 0
+    capabilities:
+      add: ["NET_ADMIN", "SYS_ADMIN", "SYS_PTRACE"]
+    privileged: true
+
+  nodeSelector:
+    beta.kubernetes.io/arch: amd64
+
+  tolerations:
+  - operator: Exists
+    effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 50Mi
+
+nfnOperator:
+  nodeSelector: {}
+
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: role
+            operator: In
+            values:
+            - ovn-control-plane
+        topologyKey: "kubernetes.io/hostname"
+
+  tolerations:
+  - operator: Exists
+    effect: NoSchedule
+
+  config:
+    name: ovn-controller-network
+    data: |
+      OVN_SUBNET: 10.154.142.0/18
+      OVN_GATEWAYIP: 10.154.142.1/18
+
+  service:
+    type: NodePort
+    port: 50000
+
+ovn:
+  image:
+    repository: docker.io/integratedcloudnative/ovn-images
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  imagePullSecrets: []
+
+ovnControlPlane:
+  securityContext:
+    capabilities:
+      add: ["SYS_NICE"]
+
+  nodeSelector:
+    beta.kubernetes.io/os: "linux"
+    node-role.kubernetes.io/master: ""
+
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              role: ovn-control-plane
+          topologyKey: kubernetes.io/hostname
+
+  tolerations:
+  - operator: Exists
+    effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 300Mi
+
+  nbService:
+    type: ClusterIP
+    port: 6641
+
+  sbService:
+    type: ClusterIP
+    port: 6642
+
+ovnController:
+  securityContext:
+    runAsUser: 0
+    privileged: true
+
+  nodeSelector:
+    beta.kubernetes.io/os: "linux"
+
+  affinity: {}
+
+  tolerations:
+  - operator: Exists
+    effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 300Mi
+    limits:
+      cpu: 1000m
+      memory: 800Mi
+
+## RBAC parameteres
+## https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  create: true

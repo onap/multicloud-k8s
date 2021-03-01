@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.nfnOperator.config.name }}
+data:
+  {{ .Values.nfnOperator.config.data | nindent 2 }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Values.cni.config.name }}
+  labels:
+    {{- include "ovn4nfv.labels" . | nindent 4 }}
+data:
+  ovn4nfv_k8s.conf: | {{ .Values.cni.config.ovn4nfv_k8s | nindent 4 }}
+  00-network.conf: | {{ .Values.cni.config.network | nindent 4 }}

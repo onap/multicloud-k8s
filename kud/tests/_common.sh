@@ -1108,8 +1108,8 @@ spec:
         app: ovn4nfv
       annotations:
         k8s.v1.cni.cncf.io/networks: '[{ "name": "$ovn_multus_network_name"}]'
-        k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [{ "name": "ovn-port-net", "interface": "net0" , "defaultGateway": "false"},
-                      { "name": "ovn-priv-net", "interface": "net1" , "defaultGateway": "false"}]}'
+        k8s.plugin.opnfv.org/nfn-network: '{ "type": "ovn4nfv", "interface": [{ "name": "ovn-port-net", "interface": "net2" , "defaultGateway": "false"},
+                      { "name": "ovn-priv-net", "interface": "net3" , "defaultGateway": "false"}]}'
     spec:
       containers:
       - name: $ovn4nfv_deployment_name

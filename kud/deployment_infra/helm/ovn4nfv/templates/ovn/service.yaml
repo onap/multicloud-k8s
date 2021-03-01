@@ -1,0 +1,37 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ovn-nb-tcp
+  labels:
+    {{- include "ovn4nfv.labels" . | nindent 4 }}
+    role: ovn-control-plane
+spec:
+  ports:
+    - name: ovn-nb-tcp
+      protocol: TCP
+      port: {{ .Values.ovnControlPlane.nbService.port }}
+      targetPort: 6641
+  type: {{ .Values.ovnControlPlane.nbService.type }}
+  selector:
+    {{- include "ovn4nfv.selectorLabels" . | nindent 4 }}
+    role: ovn-control-plane
+  sessionAffinity: None
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ovn-sb-tcp
+  labels:
+    {{- include "ovn4nfv.labels" . | nindent 4 }}
+    role: ovn-control-plane
+spec:
+  ports:
+    - name: ovn-sb-tcp
+      protocol: TCP
+      port: {{ .Values.ovnControlPlane.sbService.port }}
+      targetPort: 6642
+  type: {{ .Values.ovnControlPlane.sbService.type }}
+  selector:
+    {{- include "ovn4nfv.selectorLabels" . | nindent 4 }}
+    role: ovn-control-plane
+  sessionAffinity: None

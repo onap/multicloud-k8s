@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "multus.fullname" . }}-ds
+  labels:
+    {{- include "multus.labels" . | nindent 4 }}
+    tier: node
+spec:
+  selector:
+    matchLabels:
+      {{- include "multus.selectorLabels" . | nindent 6 }}
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "multus.selectorLabels" . | nindent 8 }}
+        tier: node
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostNetwork: true
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      serviceAccountName: {{ include "multus.serviceAccountName" . }}
+      containers:
+      - name: kube-multus
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: KUBERNETES_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        command:
+        {{- if .Values.config.enabled }}
+        - /bin/bash
+        - -cex
+        - |
+          #!/bin/bash
+          sed "s|__KUBERNETES_NODE_NAME__|${KUBERNETES_NODE_NAME}|g" /tmp/multus-conf/{{ .Values.config.path }}.template > /tmp/{{ .Values.config.path }}
+          /entrypoint.sh --multus-conf-file=/tmp/{{ .Values.config.path }}
+        {{- else }}
+        - /entrypoint.sh
+        - "--multus-conf-file=auto"
+        - "--cni-version=0.3.1"
+        {{- end }}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/bash", "-c", "rm /host/etc/cni/net.d/*-multus.conf"]
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        volumeMounts:
+        - name: cni
+          mountPath: /host/etc/cni/net.d
+        - name: cnibin
+          mountPath: /host/opt/cni/bin
+        - name: multus-cfg
+          mountPath: /tmp/multus-conf
+      volumes:
+        - name: cni
+          hostPath:
+            path: /etc/cni/net.d
+        - name: cnibin
+          hostPath:
+            path: /opt/cni/bin
+        - name: multus-cfg
+          configMap:
+            name: {{ .Values.config.name }}
+            items:
+            - key: cni-conf.json
+              path: {{ .Values.config.path }}.template

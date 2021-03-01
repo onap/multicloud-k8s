@@ -1,0 +1,102 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: {{ include "ovn4nfv.fullname" . }}-ovn-controller
+  labels:
+    {{- include "ovn4nfv.labels" . | nindent 4 }}
+    role: ovn-controller
+spec:
+  selector:
+    matchLabels:
+      {{- include "ovn4nfv.selectorLabels" . | nindent 6 }}
+      role: ovn-controller
+  updateStrategy:
+    type: OnDelete
+  template:
+    metadata:
+      labels:
+        {{- include "ovn4nfv.selectorLabels" . | nindent 8 }}
+        role: ovn-controller
+    spec:
+      {{- with .Values.ovn.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostNetwork: true
+      hostPID: true
+      {{- with .Values.ovnController.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ovnController.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.ovnController.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      priorityClassName: system-cluster-critical
+      containers:
+        - name: ovn-controller
+          image: "{{ .Values.ovn.image.repository }}:{{ .Values.ovn.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ovn.image.pullPolicy }}
+          command: ["ovn4nfv-k8s", "start_ovn_controller"]
+          resources:
+            {{- toYaml .Values.ovnController.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.ovnController.securityContext | nindent 12 }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: host-modules
+              readOnly: true
+            - mountPath: /var/run/openvswitch
+              name: host-run-ovs
+            - mountPath: /var/run/ovn
+              name: host-run-ovn
+            - mountPath: /sys
+              name: host-sys
+              readOnly: true
+            - mountPath: /etc/openvswitch
+              name: host-config-openvswitch
+            - mountPath: /var/log/openvswitch
+              name: host-log-ovs
+            - mountPath: /var/log/ovn
+              name: host-log-ovn
+          readinessProbe:
+            exec:
+              command: ["ovn4nfv-k8s", "check_ovn_controller"]
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["ovn4nfv-k8s", "check_ovn_controller"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 5
+      volumes:
+        - name: host-modules
+          hostPath:
+            path: /lib/modules
+        - name: host-run-ovs
+          hostPath:
+            path: /run/openvswitch
+        - name: host-run-ovn
+          hostPath:
+            path: /run/ovn
+        - name: host-sys
+          hostPath:
+            path: /sys
+        - name: host-config-openvswitch
+          hostPath:
+            path: /etc/origin/openvswitch
+        - name: host-log-ovs
+          hostPath:
+            path: /var/log/openvswitch
+        - name: host-log-ovn
+          hostPath:
+            path: /var/log/ovn

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ovn4nfv.fullname" . }}-nfn-operator
+  labels:
+    {{- include "ovn4nfv.labels" . | nindent 4 }}
+    role: nfn-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "ovn4nfv.selectorLabels" . | nindent 6 }}
+      role: nfn-operator
+  template:
+    metadata:
+      labels:
+        {{- include "ovn4nfv.selectorLabels" . | nindent 8 }}
+        role: nfn-operator
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostNetwork: true
+      {{- with .Values.nfnOperator.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nfnOperator.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nfnOperator.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      serviceAccountName: {{ include "ovn4nfv.serviceAccountName" . }}
+      containers:
+        - name: nfn-operator
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/bin/entrypoint", "operator"]
+          envFrom:
+          - configMapRef:
+              name: {{ .Values.nfnOperator.config.name }}
+          ports:
+          - containerPort: 50000
+            protocol: TCP
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "nfn-operator"

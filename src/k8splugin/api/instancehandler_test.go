@@ -20,9 +20,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	neturl "net/url"
 	"reflect"
 	"sort"
 	"testing"
+
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
@@ -59,6 +62,14 @@ func (m *mockInstanceClient) Get(id string) (app.InstanceResponse, error) {
 	}
 
 	return m.items[0], nil
+}
+
+func (m *mockInstanceClient) Query(id, apiVersion, kind, name, labels string) (app.InstanceStatus, error) {
+	if m.err != nil {
+		return app.InstanceStatus{}, m.err
+	}
+
+	return m.statusItem, nil
 }
 
 func (m *mockInstanceClient) Status(id string) (app.InstanceStatus, error) {
@@ -493,6 +504,265 @@ func TestDeleteHandler(t *testing.T) {
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)
+			}
+		})
+	}
+}
+
+func TestInstanceQueryHandler(t *testing.T) {
+	testCases := []struct {
+		label            string
+		input            map[string]string
+		id               string
+		expectedCode     int
+		expectedResponse *app.InstanceStatus
+		instClient       *mockInstanceClient
+	}{
+		{
+			label:        "Missing apiVersion mandatory parameter",
+			id:           "HaKpys8e",
+			input:        map[string]string{},
+			expectedCode: http.StatusBadRequest,
+			instClient: &mockInstanceClient{
+				err: pkgerrors.New("Missing apiVersion mandatory parameter"),
+			},
+		},
+		{
+			label: "Missing kind mandatory parameter",
+			id:    "HaKpys8e",
+			input: map[string]string{
+				"ApiVersion": "v1",
+			},
+			expectedCode: http.StatusBadRequest,
+			instClient: &mockInstanceClient{
+				err: pkgerrors.New("Missing kind mandatory parameter"),
+			},
+		},
+		{
+			label: "Missing name or label mandatory parameters",
+			id:    "HaKpys8e",
+			input: map[string]string{
+				"ApiVersion": "v1",
+				"Kind":       "Pod",
+			},
+			expectedCode: http.StatusBadRequest,
+			instClient: &mockInstanceClient{
+				err: pkgerrors.New("Name or Labels parameter must be provided"),
+			},
+		},
+		{
+			label: "Query instance by name",
+			id:    "HaKpys8e",
+			input: map[string]string{
+				"ApiVersion": "v1",
+				"Kind":       "Pod",
+				"Name":       "Test",
+			},
+			expectedCode: http.StatusOK,
+			expectedResponse: &app.InstanceStatus{
+				Request: app.InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+				},
+				Ready:         false,
+				ResourceCount: int32(1),
+				ResourcesStatus: []app.ResourceStatus{
+					{
+						Name: "Test",
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Pod",
+						},
+						Status: unstructured.Unstructured{
+							Object: map[string]interface{}{
+								"kind":       "Pod",
+								"apiVersion": "v1",
+								"metadata": map[string]interface{}{
+									"name": string("Test"),
+								},
+							},
+						},
+					},
+				},
+			},
+			instClient: &mockInstanceClient{
+				statusItem: app.InstanceStatus{
+					Request: app.InstanceRequest{
+						RBName:      "test-rbdef",
+						RBVersion:   "v1",
+						ProfileName: "profile1",
+						CloudRegion: "region1",
+					},
+					Ready:         false,
+					ResourceCount: int32(1),
+					ResourcesStatus: []app.ResourceStatus{
+						{
+							Name: "Test",
+							GVK: schema.GroupVersionKind{
+								Group:   "",
+								Version: "v1",
+								Kind:    "Pod",
+							},
+							Status: unstructured.Unstructured{
+								Object: map[string]interface{}{
+									"kind":       "Pod",
+									"apiVersion": "v1",
+									"metadata": map[string]interface{}{
+										"name": string("Test"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			label: "Query instance by label",
+			id:    "HaKpys8e",
+			input: map[string]string{
+				"ApiVersion": "v1",
+				"Kind":       "Pod",
+				"Labels":     "app=test",
+			},
+			expectedCode: http.StatusOK,
+			expectedResponse: &app.InstanceStatus{
+				Request: app.InstanceRequest{
+					RBName:      "test-rbdef",
+					RBVersion:   "v1",
+					ProfileName: "profile1",
+					CloudRegion: "region1",
+				},
+				Ready:         false,
+				ResourceCount: int32(1),
+				ResourcesStatus: []app.ResourceStatus{
+					{
+						Name: "Test-1",
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Pod",
+						},
+						Status: unstructured.Unstructured{
+							Object: map[string]interface{}{
+								"kind":       "Pod",
+								"apiVersion": "v1",
+								"metadata": map[string]interface{}{
+									"name": string("Test-1"),
+									"labels": map[string]interface{}{
+										"app": string("test"),
+									},
+								},
+							},
+						},
+					},
+					{
+						Name: "Test-2",
+						GVK: schema.GroupVersionKind{
+							Group:   "",
+							Version: "v1",
+							Kind:    "Pod",
+						},
+						Status: unstructured.Unstructured{
+							Object: map[string]interface{}{
+								"kind":       "Pod",
+								"apiVersion": "v1",
+								"metadata": map[string]interface{}{
+									"name": string("Test-2"),
+									"labels": map[string]interface{}{
+										"app": string("test"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			instClient: &mockInstanceClient{
+				statusItem: app.InstanceStatus{
+					Request: app.InstanceRequest{
+						RBName:      "test-rbdef",
+						RBVersion:   "v1",
+						ProfileName: "profile1",
+						CloudRegion: "region1",
+					},
+					Ready:         false,
+					ResourceCount: int32(1),
+					ResourcesStatus: []app.ResourceStatus{
+						{
+							Name: "Test-1",
+							GVK: schema.GroupVersionKind{
+								Group:   "",
+								Version: "v1",
+								Kind:    "Pod",
+							},
+							Status: unstructured.Unstructured{
+								Object: map[string]interface{}{
+									"kind":       "Pod",
+									"apiVersion": "v1",
+									"metadata": map[string]interface{}{
+										"name": string("Test-1"),
+										"labels": map[string]interface{}{
+											"app": string("test"),
+										},
+									},
+								},
+							},
+						},
+						{
+							Name: "Test-2",
+							GVK: schema.GroupVersionKind{
+								Group:   "",
+								Version: "v1",
+								Kind:    "Pod",
+							},
+							Status: unstructured.Unstructured{
+								Object: map[string]interface{}{
+									"kind":       "Pod",
+									"apiVersion": "v1",
+									"metadata": map[string]interface{}{
+										"name": string("Test-2"),
+										"labels": map[string]interface{}{
+											"app": string("test"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.label, func(t *testing.T) {
+			params := neturl.Values{}
+			for k, v := range testCase.input {
+				params.Add(k, v)
+			}
+			url := "/v1/instance/" + testCase.id + "/query?" + params.Encode()
+			request := httptest.NewRequest("GET", url, nil)
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil))
+
+			if testCase.expectedCode != resp.StatusCode {
+				body, _ := ioutil.ReadAll(resp.Body)
+				t.Fatalf("Request method returned: %v and it was expected: %v\nReturned body: %s",
+					resp.StatusCode, testCase.expectedCode, body)
+			}
+			if resp.StatusCode == http.StatusOK {
+				var response app.InstanceStatus
+				err := json.NewDecoder(resp.Body).Decode(&response)
+				if err != nil {
+					t.Fatalf("Parsing the returned response got an error (%s)", err)
+				}
+				if !reflect.DeepEqual(testCase.expectedResponse, &response) {
+					t.Fatalf("TestQueryHandler returned:\n result=%v\n expected=%v",
+						&response, testCase.expectedResponse)
+				}
 			}
 		})
 	}

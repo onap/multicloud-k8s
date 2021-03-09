@@ -22,6 +22,7 @@ import (
 	"log"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	protorelease "k8s.io/helm/pkg/proto/hapi/release"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
@@ -259,7 +260,10 @@ func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (Insta
 			resourcesStatus = resList
 		}
 	} else if name != "" {
-		resIdentifier := helm.KubernetesResource{}
+		resIdentifier := helm.KubernetesResource{
+			Name: name,
+			GVK:  schema.FromAPIVersionAndKind(apiVersion, kind),
+		}
 		res, err := k8sClient.getResourceStatus(resIdentifier, resResp.Namespace)
 		if err != nil {
 			return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resource")

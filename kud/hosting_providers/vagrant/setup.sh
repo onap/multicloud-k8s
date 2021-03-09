@@ -176,7 +176,7 @@ sudo modprobe vhost_net
 
 ${INSTALLER_CMD} "${packages[@]}"
 if ! which pip; then
-    curl -sL https://bootstrap.pypa.io/2.7/get-pip.py | sudo python
+    curl -sL https://bootstrap.pypa.io/pip/2.7/get-pip.py | sudo python
 else
     sudo -H -E pip install --no-cache-dir --upgrade pip
 fi

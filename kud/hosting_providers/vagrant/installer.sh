@@ -44,7 +44,7 @@ function _install_pip {
         sudo -E pip install --no-cache-dir --upgrade pip
     else
         sudo apt-get install -y python-dev
-        curl -sL https://bootstrap.pypa.io/2.7/get-pip.py | sudo python
+        curl -sL https://bootstrap.pypa.io/pip/2.7/get-pip.py | sudo python
     fi
 }
 

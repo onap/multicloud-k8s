@@ -130,6 +130,20 @@ print_msg "Assert additional label has been assigned to rb instance"
 test "$(jq -r '.request.labels.testCaseName' <<< "${response}")" == plugin_fw.sh
 print_msg "Assert ReleaseName has been correctly overriden"
 test "$(jq -r '.request."release-name"' <<< "${response}")" == "${release_name}"
+print_msg "Retrieving CRD (network) by name via Query API with basic validation"
+response="$(call_api "${base_url}/instance/${vnf_id}/query" -G \
+    -d "ApiVersion=k8s.plugin.opnfv.org/v1alpha1" \
+    -d "Kind=Network" \
+    -d "Name=onap-private-net-test")"
+test "$(jq -r '.resourceCount' <<< "${response}")" == 1
+test "$(jq -r '.resourcesStatus[0].status.spec.cniType' <<< "${response}")" == ovn4nfv
+print_msg "Retrieving indirect resources (replicaset) by label via Query API with basic validation"
+response="$(call_api "${base_url}/instance/${vnf_id}/query" -G \
+    -d "ApiVersion=apps/v1" \
+    -d "Kind=ReplicaSet" \
+    -d "Labels=app=firewall,release=${release_name}")"
+#TODO: Finish test
+#test "$(jq -r TBD <<< "${response}")" == TBD
 
 #Teardown
 if [ "${SKIP_CNF_TEARDOWN:-}" == "yes" ]; then

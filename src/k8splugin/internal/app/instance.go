@@ -52,7 +52,7 @@ type InstanceResponse struct {
 	Namespace   string                    `json:"namespace"`
 	ReleaseName string                    `json:"release-name"`
 	Resources   []helm.KubernetesResource `json:"resources"`
-	Hooks       []*protorelease.Hook      `json:"hooks"`
+	Hooks       []*protorelease.Hook      `json:"-"`
 }
 
 // InstanceMiniResponse contains the response from instantiation

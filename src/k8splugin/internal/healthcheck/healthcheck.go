@@ -15,6 +15,8 @@ package healthcheck
 
 import (
 	"encoding/json"
+	"strings"
+	"time"
 
 	protorelease "k8s.io/helm/pkg/proto/hapi/release"
 	"k8s.io/helm/pkg/releasetesting"
@@ -27,22 +29,18 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-// HealthcheckState holds possible states of Healthcheck instance
-type HealthcheckState string
-
-const (
-	HcS_UNKNOWN HealthcheckState = "UNKNOWN"
-	HcS_STARTED HealthcheckState = "STARTED"
-	HcS_RUNNING HealthcheckState = "RUNNING"
-	HcS_SUCCESS HealthcheckState = "SUCCESS"
-	HcS_FAILURE HealthcheckState = "FAILURE"
+var (
+	HcS_UNKNOWN string = protorelease.TestRun_Status_name[int32(protorelease.TestRun_UNKNOWN)]
+	HcS_RUNNING string = protorelease.TestRun_Status_name[int32(protorelease.TestRun_RUNNING)]
+	HcS_SUCCESS string = protorelease.TestRun_Status_name[int32(protorelease.TestRun_SUCCESS)]
+	HcS_FAILURE string = protorelease.TestRun_Status_name[int32(protorelease.TestRun_FAILURE)]
 )
 
 // InstanceHCManager interface exposes instance Healthcheck fuctionalities
 type InstanceHCManager interface {
-	Create(instanceId string) (InstanceHCStatus, error)
+	Create(instanceId string) (InstanceMiniHCStatus, error)
 	Get(instanceId, healthcheckId string) (InstanceHCStatus, error)
-	List(instanceId string) ([]InstanceHCStatus, error)
+	List(instanceId string) (InstanceHCOverview, error)
 	Delete(instanceId, healthcheckId string) error
 }
 
@@ -71,9 +69,24 @@ type InstanceHCClient struct {
 
 // InstanceHCStatus holds healthcheck status
 type InstanceHCStatus struct {
-	releasetesting.TestSuite
-	Id     string
-	Status HealthcheckState
+	InstanceId               string `json:"instance-id"`
+	HealthcheckId            string `json:"healthcheck-id"`
+	Status                   string `json:"status"`
+	Info                     string `json:"info"`
+	releasetesting.TestSuite `json:"test-suite"`
+}
+
+// InstanceMiniHCStatus holds only healthcheck summary
+type InstanceMiniHCStatus struct {
+	HealthcheckId string `json:"healthcheck-id"`
+	Status        string `json:"status"`
+}
+
+// InstanceHCOverview holds Healthcheck-related data
+type InstanceHCOverview struct {
+	InstanceId string                 `json:"instance-id"`
+	HCSummary  []InstanceMiniHCStatus `json:"healthcheck-summary"`
+	Hooks      []*protorelease.Hook   `json:"hooks"`
 }
 
 func NewHCClient() *InstanceHCClient {
@@ -83,7 +96,12 @@ func NewHCClient() *InstanceHCClient {
 	}
 }
 
-func (ihc InstanceHCClient) Create(instanceId string) (InstanceHCStatus, error) {
+func instanceMiniHCStatusFromStatus(ihcs InstanceHCStatus) InstanceMiniHCStatus {
+	return InstanceMiniHCStatus{ihcs.HealthcheckId, ihcs.Status}
+}
+
+func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, error) {
+	//FIXME switch to InstanceMiniHCStatus
 	//Generate ID
 	id := namegenerator.Generate()
 
@@ -91,67 +109,192 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceHCStatus, error) 
 	v := app.NewInstanceClient()
 	instance, err := v.Get(instanceId)
 	if err != nil {
-		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Getting instance")
+		return InstanceMiniHCStatus{}, pkgerrors.Wrap(err, "Getting instance")
 	}
 
 	//Prepare Environment, Request and Release structs
 	//TODO In future could derive params from request
 	client, err := NewKubeClient(instanceId, instance.Request.CloudRegion)
 	if err != nil {
-		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Preparing KubeClient")
+		return InstanceMiniHCStatus{}, pkgerrors.Wrap(err, "Preparing KubeClient")
+	}
+	key := HealthcheckKey{
+		InstanceId:    instanceId,
+		HealthcheckId: id,
 	}
 	env := &releasetesting.Environment{
 		Namespace:  instance.Namespace,
 		KubeClient: client,
 		Parallel:   false,
+		Stream:     NewStream(key, ihc.storeName, ihc.tagInst),
 	}
 	release := protorelease.Release{
 		Name:  instance.ReleaseName,
 		Hooks: instance.Hooks,
 	}
 
-	//Run HC
+	//Define HC
 	testSuite, err := releasetesting.NewTestSuite(&release)
 	if err != nil {
 		log.Error("Error creating TestSuite", log.Fields{
 			"Release": release,
 		})
-		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Creating TestSuite")
-	}
-	if err = testSuite.Run(env); err != nil {
-		log.Error("Error running TestSuite", log.Fields{
-			"TestSuite":   testSuite,
-			"Environment": env,
-		})
-		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Running TestSuite")
+		return InstanceMiniHCStatus{}, pkgerrors.Wrap(err, "Creating TestSuite")
 	}
 
 	//Save state
 	ihcs := InstanceHCStatus{
-		TestSuite: *testSuite,
-		Id:        id,
-		Status:    HcS_STARTED,
-	}
-	key := HealthcheckKey{
-		InstanceId:    instance.ID,
+		TestSuite:     *testSuite,
 		HealthcheckId: id,
+		InstanceId:    instanceId,
+		Status:        HcS_RUNNING,
 	}
 	err = db.DBconn.Create(ihc.storeName, key, ihc.tagInst, ihcs)
 	if err != nil {
-		return ihcs, pkgerrors.Wrap(err, "Creating Instance DB Entry")
+		return instanceMiniHCStatusFromStatus(ihcs),
+			pkgerrors.Wrap(err, "Creating Instance DB Entry")
 	}
 
-	return ihcs, nil
+	// Run HC async
+	// If testSuite doesn't fail immediately, we let it continue in background
+	errC := make(chan error, 1)
+	timeout := make(chan bool, 1)
+	// Stream handles updates of testSuite run so we don't need to care
+	var RunAsync func() = func() {
+		err := ihcs.TestSuite.Run(env)
+		if err != nil {
+			log.Error("Error running TestSuite", log.Fields{
+				"TestSuite":   ihcs.TestSuite,
+				"Environment": env,
+				"Error":       err.Error(),
+			})
+			ihcs.Status = HcS_FAILURE
+			ihcs.Info = err.Error()
+		} else {
+			//TODO handle same way as in GET /hc/$hcid
+		}
+		// Send to channel before db update as it can be slow
+		errC <- err
+		// Download latest Status/Info
+		resp, err := ihc.Get(ihcs.InstanceId, ihcs.HealthcheckId)
+		if err != nil {
+			log.Error("Error querying Healthcheck status", log.Fields{"error": err})
+			return
+		}
+		ihcs.Status = resp.Status
+		ihcs.Info = resp.Info
+		// Update DB
+		err = db.DBconn.Update(ihc.storeName, key, ihc.tagInst, ihcs)
+		if err != nil {
+			log.Error("Error saving Testsuite failure in DB", log.Fields{
+				"InstanceHCStatus": ihcs,
+				"Error":            err,
+			})
+		}
+	}
+	go func() {
+		time.Sleep(2 * time.Second)
+		timeout <- true
+	}()
+	go RunAsync()
+	select {
+	case err := <-errC:
+		if err == nil {
+			return instanceMiniHCStatusFromStatus(ihcs), nil
+		} else {
+			return instanceMiniHCStatusFromStatus(ihcs), err
+		}
+	case <-timeout:
+		return instanceMiniHCStatusFromStatus(ihcs), nil
+	}
 }
 
 func (ihc InstanceHCClient) Get(instanceId, healthcheckId string) (InstanceHCStatus, error) {
-	return InstanceHCStatus{}, nil
+	key := HealthcheckKey{
+		InstanceId:    instanceId,
+		HealthcheckId: healthcheckId,
+	}
+	DBResp, err := db.DBconn.Read(ihc.storeName, key, ihc.tagInst)
+	if err != nil || DBResp == nil {
+		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Error retrieving Healthcheck data")
+	}
+
+	resp := InstanceHCStatus{}
+	err = db.DBconn.Unmarshal(DBResp, &resp)
+	if err != nil {
+		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
+	}
+	//TODO: Implement parsing TestSuite's TestRuns to update Status
+	return resp, nil
+
 }
 
 func (ihc InstanceHCClient) Delete(instanceId, healthcheckId string) error {
+	v := app.NewInstanceClient()
+	instance, err := v.Get(instanceId)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Getting instance")
+	}
+	client, err := NewKubeClient(instanceId, instance.Request.CloudRegion)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Preparing KubeClient")
+	}
+	env := &releasetesting.Environment{
+		Namespace:  instance.Namespace,
+		KubeClient: client,
+	}
+	ihcs, err := ihc.Get(instanceId, healthcheckId)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error querying Healthcheck status")
+	}
+	env.DeleteTestPods(ihcs.TestSuite.TestManifests)
+	key := HealthcheckKey{instanceId, healthcheckId}
+	err = db.DBconn.Delete(ihc.storeName, key, ihc.tagInst)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Removing Healthcheck in DB")
+	}
 	return nil
 }
 
-func (ihc InstanceHCClient) List(instanceId string) ([]InstanceHCStatus, error) {
-	return make([]InstanceHCStatus, 0), nil
+func (ihc InstanceHCClient) List(instanceId string) (InstanceHCOverview, error) {
+	ihco := InstanceHCOverview{
+		InstanceId: instanceId,
+	}
+
+	// Retrieve info about available hooks
+	v := app.NewInstanceClient()
+	instance, err := v.Get(instanceId)
+	if err != nil {
+		return ihco, pkgerrors.Wrap(err, "Getting Instance data")
+	}
+	ihco.Hooks = instance.Hooks
+
+	// Retrieve info about running/completed healthchecks
+	dbResp, err := db.DBconn.ReadAll(ihc.storeName, ihc.tagInst)
+	if err != nil {
+		if !strings.Contains(err.Error(), "Did not find any objects with tag") {
+			return ihco, pkgerrors.Wrap(err, "Getting Healthcheck data")
+		}
+	}
+	miniStatus := make([]InstanceMiniHCStatus, 0)
+	for key, value := range dbResp {
+		//value is a byte array
+		if value != nil {
+			resp := InstanceHCStatus{}
+			err = db.DBconn.Unmarshal(value, &resp)
+			if err != nil {
+				log.Error("Error unmarshaling Instance HC data", log.Fields{
+					"error": err.Error(),
+					"key":   key})
+			}
+			//Filter-out healthchecks from other instances
+			if instanceId != resp.InstanceId {
+				continue
+			}
+			miniStatus = append(miniStatus, instanceMiniHCStatusFromStatus(resp))
+		}
+	}
+	ihco.HCSummary = miniStatus
+
+	return ihco, nil
 }

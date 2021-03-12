@@ -15,6 +15,8 @@ package healthcheck
 
 import (
 	"encoding/json"
+	"strings"
+	"time"
 
 	protorelease "k8s.io/helm/pkg/proto/hapi/release"
 	"k8s.io/helm/pkg/releasetesting"
@@ -33,7 +35,6 @@ type HealthcheckState string
 const (
 	HcS_UNKNOWN HealthcheckState = "UNKNOWN"
 	HcS_STARTED HealthcheckState = "STARTED"
-	HcS_RUNNING HealthcheckState = "RUNNING"
 	HcS_SUCCESS HealthcheckState = "SUCCESS"
 	HcS_FAILURE HealthcheckState = "FAILURE"
 )
@@ -42,7 +43,7 @@ const (
 type InstanceHCManager interface {
 	Create(instanceId string) (InstanceHCStatus, error)
 	Get(instanceId, healthcheckId string) (InstanceHCStatus, error)
-	List(instanceId string) ([]InstanceHCStatus, error)
+	List(instanceId string) (InstanceHCOverview, error)
 	Delete(instanceId, healthcheckId string) error
 }
 
@@ -71,9 +72,24 @@ type InstanceHCClient struct {
 
 // InstanceHCStatus holds healthcheck status
 type InstanceHCStatus struct {
-	releasetesting.TestSuite
-	Id     string
-	Status HealthcheckState
+	InstanceId               string           `json:"instance-id"`
+	HealthcheckId            string           `json:"healthcheck-id"`
+	Status                   HealthcheckState `json:"status"`
+	Info                     string           `json:"info"`
+	releasetesting.TestSuite `json:"test-suite"`
+}
+
+// InstanceMiniHCStatus holds only healthcheck summary
+type InstanceMiniHCStatus struct {
+	HealthcheckId string           `json:"healthcheck-id"`
+	Status        HealthcheckState `json:"status"`
+}
+
+// InstanceHCOverview holds Healthcheck-related data
+type InstanceHCOverview struct {
+	InstanceId string                 `json:"instance-id"`
+	HCSummary  []InstanceMiniHCStatus `json:"healthcheck-summary"`
+	Hooks      []*protorelease.Hook   `json:"hooks"`
 }
 
 func NewHCClient() *InstanceHCClient {
@@ -104,13 +120,14 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceHCStatus, error) 
 		Namespace:  instance.Namespace,
 		KubeClient: client,
 		Parallel:   false,
+		Stream:     NewStream(),
 	}
 	release := protorelease.Release{
 		Name:  instance.ReleaseName,
 		Hooks: instance.Hooks,
 	}
 
-	//Run HC
+	//Define HC
 	testSuite, err := releasetesting.NewTestSuite(&release)
 	if err != nil {
 		log.Error("Error creating TestSuite", log.Fields{
@@ -118,22 +135,16 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceHCStatus, error) 
 		})
 		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Creating TestSuite")
 	}
-	if err = testSuite.Run(env); err != nil {
-		log.Error("Error running TestSuite", log.Fields{
-			"TestSuite":   testSuite,
-			"Environment": env,
-		})
-		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Running TestSuite")
-	}
 
 	//Save state
 	ihcs := InstanceHCStatus{
-		TestSuite: *testSuite,
-		Id:        id,
-		Status:    HcS_STARTED,
+		TestSuite:     *testSuite,
+		HealthcheckId: id,
+		InstanceId:    instanceId,
+		Status:        HcS_STARTED,
 	}
 	key := HealthcheckKey{
-		InstanceId:    instance.ID,
+		InstanceId:    instanceId,
 		HealthcheckId: id,
 	}
 	err = db.DBconn.Create(ihc.storeName, key, ihc.tagInst, ihcs)
@@ -141,7 +152,61 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceHCStatus, error) 
 		return ihcs, pkgerrors.Wrap(err, "Creating Instance DB Entry")
 	}
 
-	return ihcs, nil
+	// Run HC async
+	// If testSuite doesn't fail immediately, we let it continue in background
+	errC := make(chan error, 1)
+	timeout := make(chan bool, 1)
+	// Stream handles updates of testSuite run so we don't need to care
+	go func() {
+		err := testSuite.Run(env)
+		if err != nil {
+			log.Error("Error running TestSuite", log.Fields{
+				"TestSuite":   testSuite,
+				"Environment": env,
+				"Error":       err.Error(),
+			})
+			ihcs.Status = HcS_FAILURE
+			ihcs.Info = err.Error()
+		} else {
+			//TODO handle same way as in GET /hc/$hcid
+			ihcs.Status = HcS_UNKNOWN
+			ihcs.Info = "TestSuite ended but results were not parsed"
+		}
+		// Send to channel before db update as it can be slow
+		errC <- err
+		err = db.DBconn.Update(ihc.storeName, key, ihc.tagInst, ihcs)
+		if err != nil {
+			log.Error("Error saving Testsuite failure in DB", log.Fields{
+				"InstanceHCStatus": ihcs,
+				"Error":            err,
+			})
+		}
+	}()
+	go func() {
+		time.Sleep(2 * time.Second)
+		timeout <- true
+	}()
+	select {
+	case err := <-errC:
+		if err == nil {
+			return ihcs, nil
+		} else {
+			return ihcs, err
+		}
+	case <-timeout:
+		return ihcs, nil
+	}
+	//FIXME Remove
+	/*
+		if err = testSuite.Run(env); err != nil {
+			log.Error("Error running TestSuite", log.Fields{
+				"TestSuite":   testSuite,
+				"Environment": env,
+			})
+			return InstanceHCStatus{}, pkgerrors.Wrap(err, "Running TestSuite")
+		}
+		return ihcs, nil
+	*/
 }
 
 func (ihc InstanceHCClient) Get(instanceId, healthcheckId string) (InstanceHCStatus, error) {
@@ -152,6 +217,48 @@ func (ihc InstanceHCClient) Delete(instanceId, healthcheckId string) error {
 	return nil
 }
 
-func (ihc InstanceHCClient) List(instanceId string) ([]InstanceHCStatus, error) {
-	return make([]InstanceHCStatus, 0), nil
+func (ihc InstanceHCClient) List(instanceId string) (InstanceHCOverview, error) {
+	ihco := InstanceHCOverview{
+		InstanceId: instanceId,
+	}
+
+	// Retrieve info about available hooks
+	v := app.NewInstanceClient()
+	instance, err := v.Get(instanceId)
+	if err != nil {
+		return ihco, pkgerrors.Wrap(err, "Getting Instance data")
+	}
+	ihco.Hooks = instance.Hooks
+
+	// Retrieve info about running/completed healthchecks
+	dbResp, err := db.DBconn.ReadAll(ihc.storeName, ihc.tagInst)
+	if err != nil {
+		if !strings.Contains(err.Error(), "Did not find any objects with tag") {
+			return ihco, pkgerrors.Wrap(err, "Getting Healthcheck data")
+		}
+	}
+	miniStatus := make([]InstanceMiniHCStatus, 0)
+	for key, value := range dbResp {
+		//value is a byte array
+		if value != nil {
+			resp := InstanceHCStatus{}
+			err = db.DBconn.Unmarshal(value, &resp)
+			if err != nil {
+				log.Error("Error unmarshaling Instance HC data", log.Fields{
+					"error": err.Error(),
+					"key":   key})
+			}
+			//Filter-out healthchecks from other instances
+			if instanceId != resp.InstanceId {
+				continue
+			}
+			miniStatus = append(miniStatus, InstanceMiniHCStatus{
+				HealthcheckId: resp.HealthcheckId,
+				Status:        resp.Status,
+			})
+		}
+	}
+	ihco.HCSummary = miniStatus
+
+	return ihco, nil
 }

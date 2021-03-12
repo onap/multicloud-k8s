@@ -46,7 +46,7 @@ func (ih instanceHCHandler) createHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {
 		log.Error("Error Marshaling Reponse", log.Fields{
@@ -65,4 +65,28 @@ func (ih instanceHCHandler) deleteHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (ih instanceHCHandler) listHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["instID"]
+
+	resp, err := ih.client.List(id)
+	if err != nil {
+		log.Error("Error getting instance healthcheck overview", log.Fields{
+			"error":       err,
+			"instance-id": id,
+		})
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		log.Error("Error Marshaling Response", log.Fields{
+			"error":    err,
+			"response": resp,
+		})
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

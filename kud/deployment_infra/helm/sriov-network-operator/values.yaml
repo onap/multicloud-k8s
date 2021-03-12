@@ -1,0 +1,100 @@
+# enableInjector controls whether the network resource injector
+# webhook shall be deployed
+enableInjector: false
+
+# enableOperatorWebhook controls whether the operator admission
+# controller webhook shall be deployed
+enableOperatorWebhook: false
+
+# logLevel controls the log verbose level of the operator. Set to '0'
+# to show only the basic logs. And set to '2' to show all the
+# available logs.
+logLevel: 2
+
+# resourcePrefix is the device plugin resource prefix.
+resourcePrefix: "intel.com"
+
+image:
+  repository: quay.io/openshift/origin-sriov-network-operator
+  # This should be set to 'IfNotPresent' for released version
+  pullPolicy: IfNotPresent
+  # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+  # tag
+imagePullSecrets: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+nameOverride: ""
+fullnameOverride: ""
+
+nodeSelector:
+  node-role.kubernetes.io/master: ""
+
+affinity: {}
+
+tolerations:
+- effect: NoSchedule
+  key: node-role.kubernetes.io/master
+  operator: Exists
+
+cni:
+  image:
+    repository: quay.io/openshift/origin-sriov-cni
+    # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+
+infinibandCni:
+  image:
+    repository: quay.io/openshift/origin-sriov-infiniband-cni
+    # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+
+devicePlugin:
+  image:
+    repository: quay.io/openshift/origin-sriov-network-device-plugin
+    # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+
+resourcesInjector:
+  image:
+    repository: quay.io/openshift/origin-sriov-dp-admission-controller
+    # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+
+configDaemon:
+  image:
+    repository: integratedcloudnative/sriov-network-config-daemon
+    # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+
+  nodeSelector:
+    beta.kubernetes.io/os: "linux"
+
+webhook:
+  image:
+    repository: quay.io/openshift/origin-sriov-network-webhook
+    # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+
+iavfDriver:
+  image:
+    repository: integratedcloudnative/iavf-driver-installer
+    pullPolicy: IfNotPresent
+    tag: latest
+  imagePullSecrets: []
+
+  nodeSelector:
+    feature.node.kubernetes.io/custom-iavf: "true"
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext:
+    privileged: true
+
+  resources: {}
+
+  affinity: {}
+
+  tolerations: {}

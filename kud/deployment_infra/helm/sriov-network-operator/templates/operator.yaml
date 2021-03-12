@@ -1,0 +1,89 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovOperatorConfig
+metadata:
+  name: default
+  labels:
+    {{- include "sriov-network-operator.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.configDaemon.nodeSelector }}
+  configDaemonNodeSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  enableInjector: {{ .Values.enableInjector }}
+  enableOperatorWebhook: {{ .Values.enableOperatorWebhook }}
+  logLevel: {{ .Values.logLevel }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  {{ include "sriov-network-operator.fullname" . }}
+  labels:
+    {{- include "sriov-network-operator.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "sriov-network-operator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sriov-network-operator.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "sriov-network-operator.serviceAccountName" . }}
+      containers:
+        - name: sriov-network-operator
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+          - sriov-network-operator
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: SRIOV_CNI_IMAGE
+              value: "{{ .Values.cni.image.repository }}:{{ .Values.cni.image.tag | default .Chart.AppVersion }}"
+            - name: SRIOV_INFINIBAND_CNI_IMAGE
+              value: "{{ .Values.infinibandCni.image.repository }}:{{ .Values.infinibandCni.image.tag | default .Chart.AppVersion }}"
+            - name: SRIOV_DEVICE_PLUGIN_IMAGE
+              value: "{{ .Values.devicePlugin.image.repository }}:{{ .Values.devicePlugin.image.tag | default .Chart.AppVersion }}"
+            - name: NETWORK_RESOURCES_INJECTOR_IMAGE
+              value: "{{ .Values.resourcesInjector.image.repository }}:{{ .Values.resourcesInjector.image.tag | default .Chart.AppVersion }}"
+            - name: OPERATOR_NAME
+              value: "sriov-network-operator"
+            - name: SRIOV_NETWORK_CONFIG_DAEMON_IMAGE
+              value: "{{ .Values.configDaemon.image.repository }}:{{ .Values.configDaemon.image.tag | default .Chart.AppVersion }}"
+            - name: SRIOV_NETWORK_WEBHOOK_IMAGE
+              value: "{{ .Values.webhook.image.repository }}:{{ .Values.webhook.image.tag | default .Chart.AppVersion }}"
+            - name: RESOURCE_PREFIX
+              value: "{{ .Values.resourcePrefix }}"
+            - name: ENABLE_ADMISSION_CONTROLLER
+              value: "false"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: RELEASE_VERSION
+              value: "4.3.0"
+            - name: SRIOV_CNI_BIN_PATH
+              value: "/opt/cni/bin"
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,44 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "sriov-network-operator.fullname" . }}
+  labels:
+    {{- include "sriov-network-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "sriov-network-operator.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "sriov-network-operator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: sriov-network-config-daemon
+  labels:
+    {{- include "sriov-network-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: sriov-network-config-daemon
+subjects:
+- kind: ServiceAccount
+  name: sriov-network-config-daemon
+  namespace: {{ .Release.Namespace }}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: operator-webhook-sa
+  labels:
+    {{- include "sriov-network-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: operator-webhook-sa
+subjects:
+- kind: ServiceAccount
+  name: operator-webhook-sa
+  namespace: {{ .Release.Namespace }}

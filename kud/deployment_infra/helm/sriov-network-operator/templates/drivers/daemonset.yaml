@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name:  {{ include "sriov-network-operator.fullname" . }}-iavf-driver-installer
+  labels:
+    {{- include "sriov-network-operator.labels" . | nindent 4 }}
+    role: iavf-driver-installer
+spec:
+  selector:
+    matchLabels:
+      {{- include "sriov-network-operator.selectorLabels" . | nindent 6 }}
+      role: iavf-driver-installer
+  template:
+    metadata:
+      labels:
+        {{- include "sriov-network-operator.selectorLabels" . | nindent 8 }}
+        role: iavf-driver-installer
+    spec:
+      hostPID: true
+      {{- with .Values.iavfDriver.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.iavfDriver.podSecurityContext | nindent 8 }}
+      initContainers:
+        - image: "{{ .Values.iavfDriver.image.repository }}:{{ .Values.iavfDriver.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.iavfDriver.image.pullPolicy }}
+          name: iavf-driver-installer
+          securityContext:
+            {{- toYaml .Values.iavfDriver.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.iavfDriver.resources | nindent 12 }}
+          volumeMounts:
+            - name: iavf-install-dir
+              mountPath: "/usr/local/iavf"
+            - name: root-dir
+              mountPath: "/root"
+            - name: lib-modules-dir
+              mountPath: "/root/lib/modules"
+            - name: run-systemd-dir
+              mountPath: "/root/run/systemd/system"
+      containers:
+      - image: "gcr.io/google-containers/pause:3.2"
+        name: pause
+      volumes:
+        - name: iavf-install-dir
+          hostPath:
+            path: "/opt/iavf"
+        - name: root-dir
+          hostPath:
+            path: "/"
+        - name: lib-modules-dir
+          hostPath:
+            path: "/lib/modules"
+        - name: run-systemd-dir
+          hostPath:
+            path: "/run/systemd/system"
+      {{- with .Values.iavfDriver.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.iavfDriver.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.iavfDriver.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

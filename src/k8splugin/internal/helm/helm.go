@@ -305,19 +305,19 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 			continue
 		}
 
-		hook, _ := isHook(b, data)
-		// if hook is not nil, then append it to hooks list and continue
-		// if it's not, disregard error
-		if hook != nil {
-			hookList = append(hookList, hook)
-			continue
-		}
-
 		mfilePath := filepath.Join(outputDir, m.Name)
 		utils.EnsureDirectory(mfilePath)
 		err = ioutil.WriteFile(mfilePath, []byte(data), 0666)
 		if err != nil {
 			return retData, hookList, err
+		}
+
+		hook, _ := isHook(mfilePath, data)
+		// if hook is not nil, then append it to hooks list and continue
+		// if it's not, disregard error
+		if hook != nil {
+			hookList = append(hookList, hook)
+			continue
 		}
 
 		gvk, err := getGroupVersionKind(data)

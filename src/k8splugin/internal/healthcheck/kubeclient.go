@@ -25,12 +25,14 @@ import (
 
 //implements environment.KubeClient but overrides it so that
 //custom labels can be injected into created resources
-// using internal k8sClient
+//using internal k8sClient
 type KubeClientImpl struct {
 	environment.KubeClient
 	labels map[string]string
 	k      app.KubernetesClient
 }
+
+var _ environment.KubeClient = KubeClientImpl{}
 
 func NewKubeClient(instanceId, cloudRegion string) (*KubeClientImpl, error) {
 	k8sClient := app.KubernetesClient{}

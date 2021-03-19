@@ -36,7 +36,7 @@ apiVersion: v1
 metadata:
   name: $pod_name
   annotations:
-    k8s.v1.cni.cncf.io/networks: sriov-eno2
+    k8s.v1.cni.cncf.io/networks: sriov-intel
 spec:
   containers:
   - name: $pod_name
@@ -47,11 +47,11 @@ spec:
       limits:
         cpu: "1"
         memory: "500Mi"
-        intel.com/intel_sriov_700: '1'
+        openshift.io/intel_sriov_nic: '1'
       requests:
         cpu: "1"
         memory: "500Mi"
-        intel.com/intel_sriov_700: '1'
+        openshift.io/intel_sriov_nic: '1'
 POD
     popd
 }

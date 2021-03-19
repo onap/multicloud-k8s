@@ -1,0 +1,40 @@
+{{- range $network := .Values.networks }}
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetwork
+metadata:
+  name: {{ $network.networkName }}
+  labels:
+    {{- include "sriov-network.labels" $ | nindent 4 }}
+spec:
+  {{- with $network.capabilities }}
+  capabilities: | {{ . | nindent 4 }}
+  {{- end }}
+  ipam: | {{ $network.ipam | nindent 4 }}
+  {{- if $network.linkState }}
+  linkState: {{ $network.linkState }}
+  {{- end }}
+  {{- if $network.maxTxRate }}
+  maxTxRate: {{ $network.maxTxRate }}
+  {{- end }}
+  {{- with $network.metaPlugins }}
+  metaPlugins: | {{ . | nindent 4 }}
+  {{- end }}
+  {{- if $network.minTxRate }}
+  minTxRate: {{ $network.minTxRate }}
+  {{- end }}
+  networkNamespace: {{ $network.networkNamespace }}
+  resourceName: {{ $network.resourceName }}
+  {{- if $network.spoofChk }}
+  spoofChk: {{ $network.spoofChk }}
+  {{- end }}
+  {{- if $network.trust }}
+  trust: {{ $network.trust }}
+  {{- end }}
+  {{- if $network.vlan }}
+  vlan: {{ $network.vlan }}
+  {{- end }}
+  {{- if $network.vlanQoS }}
+  vlanQoS: {{ $network.vlanQoS }}
+  {{- end }}
+{{- end }}

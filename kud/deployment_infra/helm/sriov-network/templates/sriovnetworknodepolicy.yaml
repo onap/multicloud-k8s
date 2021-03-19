@@ -1,0 +1,52 @@
+{{- range $policy := .Values.policies }}
+---
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: {{ $policy.policyName }}
+  labels:
+    {{- include "sriov-network.labels" $ | nindent 4 }}
+spec:
+  {{- if $policy.deviceType }}
+  deviceType: {{ $policy.deviceType }}
+  {{- end }}
+  {{- if $policy.eSwitchMode }}
+  eSwitchMode: {{ $policy.eSwitchMode }}
+  {{- end }}
+  nicSelector:
+    {{- if $policy.nicSelector.deviceID }}
+    deviceID: {{ $policy.nicSelector.deviceID | quote }}
+    {{- end }}
+    {{- if $policy.nicSelector.netFilter }}
+    netFilter: {{ $policy.nicSelector.netFilter | quote }}
+    {{- end }}
+    {{- with $policy.nicSelector.pfNames }}
+    pfNames:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $policy.nicSelector.rootDevices }}
+    rootDevices:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if $policy.nicSelector.vendor }}
+    vendor: {{ $policy.nicSelector.vendor | quote }}
+    {{- end }}
+  {{- if $policy.isRdma }}
+  isRdma: {{ $policy.isRdma }}
+  {{- end }}
+  {{- if $policy.linkType }}
+  linkType: {{ $policy.linkType }}
+  {{- end }}
+  {{- if $policy.mtu }}
+  mtu: {{ $policy.mtu }}
+  {{- end }}
+  {{- with $policy.nodeSelector }}
+  nodeSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  numVfs: {{ $policy.numVfs }}
+  {{- if $policy.priority }}
+  priority: {{ $policy.priority }}
+  {{- end }}
+  resourceName: {{ $policy.resourceName }}
+{{- end }}

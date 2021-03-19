@@ -10,7 +10,7 @@
 
 set -o pipefail
 
-sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select(.status.capacity."intel.com/intel_sriov_700">="2") | .metadata.name')
+sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."intel.com/intel_sriov_nic"|tonumber)>=2) | .metadata.name')
 if [ -z "$sriov_capable_nodes" ]; then
     echo "SRIOV test case cannot run on the cluster."
     exit 0
@@ -28,7 +28,7 @@ kind: Pod
 metadata:
   name: pod-case-01
   annotations:
-    k8s.v1.cni.cncf.io/networks: sriov-eno2
+    k8s.v1.cni.cncf.io/networks: sriov-intel
 spec:
   containers:
   - name: test-pod
@@ -37,9 +37,9 @@ spec:
     - /sbin/init
     resources:
       requests:
-        intel.com/intel_sriov_700: '1'
+        intel.com/intel_sriov_nic: '1'
       limits:
-        intel.com/intel_sriov_700: '1'
+        intel.com/intel_sriov_nic: '1'
 POD
 }
 
@@ -51,7 +51,7 @@ kind: Pod
 metadata:
   name: pod-case-01
   annotations:
-    k8s.v1.cni.cncf.io/networks: sriov-eno2, sriov-eno2
+    k8s.v1.cni.cncf.io/networks: sriov-intel, sriov-intel
 spec:
   containers:
   - name: test-pod
@@ -60,9 +60,9 @@ spec:
     - /sbin/init
     resources:
       requests:
-        intel.com/intel_sriov_700: '2'
+        intel.com/intel_sriov_nic: '2'
       limits:
-        intel.com/intel_sriov_700: '2'
+        intel.com/intel_sriov_nic: '2'
 POD
 }
 create_pod_yaml_with_single_VF
@@ -71,7 +71,7 @@ create_pod_yaml_with_multiple_VF
 for podType in ${POD_TYPE:-single multiple}; do
 
     kubectl delete pod $pod_name --ignore-not-found=true --now --wait
-    allocated_node_resource=$(kubectl describe node | grep "intel.com/intel_sriov_700" | tail -n1 |awk '{print $(NF)}')
+    allocated_node_resource=$(kubectl describe node | grep "intel.com/intel_sriov_nic" | tail -n1 |awk '{print $(NF)}')
 
     echo "The allocated resource of the node is: " $allocated_node_resource
 
@@ -93,7 +93,7 @@ for podType in ${POD_TYPE:-single multiple}; do
                 fi
             done
         done
-    allocated_node_resource=$(kubectl describe node | grep "intel.com/intel_sriov_700" | tail -n1 |awk '{print $(NF)}')
+    allocated_node_resource=$(kubectl describe node | grep "intel.com/intel_sriov_nic" | tail -n1 |awk '{print $(NF)}')
 
     echo " The current resource allocation after the pod creation is: " $allocated_node_resource
     kubectl delete pod $pod_name --now

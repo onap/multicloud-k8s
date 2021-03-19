@@ -282,7 +282,7 @@ kind: NetworkAttachmentDefinition
 metadata:
   name: sriov-conf
   annotations:
-    k8s.v1.cni.cncf.io/resourceName: intel.com/intel_sriov_700
+    k8s.v1.cni.cncf.io/resourceName: intel.com/intel_sriov_nic
 spec:
   config: '{
     "type": "sriov",
@@ -316,9 +316,9 @@ spec:
     - /sbin/init
     resources:
       requests:
-        intel.com/intel_sriov_700: '1'
+        intel.com/intel_sriov_nic: '1'
       limits:
-        intel.com/intel_sriov_700: '1'
+        intel.com/intel_sriov_nic: '1'
 POD
 ```
 #### multiple VF allocated
@@ -338,9 +338,9 @@ spec:
     - /sbin/init
     resources:
       requests:
-        intel.com/intel_sriov_700: '2'
+        intel.com/intel_sriov_nic: '2'
       limits:
-        intel.com/intel_sriov_700: '2'
+        intel.com/intel_sriov_nic: '2'
 POD
 ```
 

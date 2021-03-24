@@ -1,0 +1,49 @@
+config:
+  name: intel-qat-plugin-config
+
+  # logLevel sets the plugin's log level.
+  logLevel: 4
+
+imagePullSecrets: []
+
+image:
+  repository: integratedcloudnative/intel-qat-plugin
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+nodeSelector:
+  feature.node.kubernetes.io/iommu-enabled: "true"
+  feature.node.kubernetes.io/custom-qat: "true"
+
+securityContext:
+  readOnlyRootFilesystem: true
+  privileged: true
+
+resources: {}
+
+affinity: {}
+
+tolerations: {}
+
+qatDriver:
+  image:
+    repository: integratedcloudnative/qat-driver-installer
+    pullPolicy: IfNotPresent
+    tag: latest
+  imagePullSecrets: []
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext:
+    privileged: true
+
+  nodeSelector:
+    feature.node.kubernetes.io/iommu-enabled: "true"
+    feature.node.kubernetes.io/custom-qat: "true"
+
+  resources: {}
+
+  affinity: {}
+
+  tolerations: {}

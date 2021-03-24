@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.config.name }}
+  labels:
+    {{- include "qat-device-plugin.labels" . | nindent 4 }}
+data:
+  VERBOSITY: {{ .Values.config.logLevel | quote }}

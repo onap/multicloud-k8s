@@ -1,0 +1,21 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && \
+    apt-get install -y \
+        bc \
+        build-essential \
+        curl \
+        kmod \
+        libelf-dev \
+        libssl-dev \
+        libudev-dev \
+        pciutils \
+        pkg-config \
+        && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY _common.sh /
+COPY _qat-driver-installer.sh /
+COPY entrypoint-qat-driver-installer.sh /entrypoint.sh
+
+CMD /entrypoint.sh

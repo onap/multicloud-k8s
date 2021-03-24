@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name:  {{ include "qat-device-plugin.fullname" . }}-qat-driver-installer
+  labels:
+    {{- include "qat-device-plugin.labels" . | nindent 4 }}
+    role: qat-driver-installer
+spec:
+  selector:
+    matchLabels:
+      {{- include "qat-device-plugin.selectorLabels" . | nindent 6 }}
+      role: qat-driver-installer
+  template:
+    metadata:
+      labels:
+        {{- include "qat-device-plugin.selectorLabels" . | nindent 8 }}
+        role: qat-driver-installer
+    spec:
+      hostPID: true
+      {{- with .Values.qatDriver.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.qatDriver.podSecurityContext | nindent 8 }}
+      initContainers:
+        - image: "{{ .Values.qatDriver.image.repository }}:{{ .Values.qatDriver.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.qatDriver.image.pullPolicy }}
+          name: qat-driver-installer
+          securityContext:
+            {{- toYaml .Values.qatDriver.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.qatDriver.resources | nindent 12 }}
+          volumeMounts:
+            - name: qat-install-dir
+              mountPath: "/usr/local/qat"
+            - name: root-dir
+              mountPath: "/root"
+            - name: lib-modules-dir
+              mountPath: "/root/lib/modules"
+            - name: run-systemd-dir
+              mountPath: "/root/run/systemd/system"
+      containers:
+      - image: "gcr.io/google-containers/pause:3.2"
+        name: pause
+      volumes:
+        - name: qat-install-dir
+          hostPath:
+            path: "/opt/qat"
+        - name: root-dir
+          hostPath:
+            path: "/"
+        - name: lib-modules-dir
+          hostPath:
+            path: "/lib/modules"
+        - name: run-systemd-dir
+          hostPath:
+            path: "/run/systemd/system"
+      {{- with .Values.qatDriver.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.qatDriver.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.qatDriver.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

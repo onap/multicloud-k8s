@@ -1,6 +1,6 @@
 REGISTRY?=integratedcloudnative
 TAG?=latest
-IMAGES=iavf-driver-installer
+IMAGES=iavf-driver-installer qat-driver-installer
 
 .PHONY: all $(IMAGES)
 

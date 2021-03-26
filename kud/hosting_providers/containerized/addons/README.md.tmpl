@@ -1,0 +1,37 @@
+# Installing KUD addons with emcoctl
+
+1. Customize values.yaml as needed
+
+2. Create prerequisites to deploy addons
+
+Apply prerequisites.yaml.  This step is optional.  If there are
+existing resources in the cluster, it is sufficient to customize
+values.yaml with the values of those resources.  The supplied
+prequisites.yaml creates controllers, one project, one cluster, and
+one logical cloud.
+
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f prerequisites.yaml -v values.yaml\`
+
+3. Deploy addons
+
+Apply addons.yaml. This deploys the addons listed in the \`Addons\`
+value in values.yaml.
+
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f composite-app.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f composite-app.yaml -v values-resources.yaml\`
+
+# Uninstalling KUD addons with emcoctl
+
+1. Delete addons
+
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f composite-app.yaml -v values-resources.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f composite-app.yaml -v values.yaml\`
+
+2. Cleanup prerequisites
+
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f prerequisites.yaml -v values.yaml\`
+
+#### NOTE: Known issue: deletion of the resources fails sometimes as
+some resources can't be deleted before others are deleted. This can
+happen due to timing issue. In that case try deleting again and the
+deletion should succeed.

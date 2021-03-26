@@ -1,0 +1,24 @@
+HostIP: $HOST_IP
+KubeConfig: $KUBE_PATH
+PackagesPath: $PWD/../output/packages
+ProjectName: proj1
+RsyncPort: 30441
+GacPort: 30493
+OvnPort: 30473
+DtcPort: 30483
+ClusterProvider: provider1
+Cluster1: cluster1
+ClusterLabel: edge-cluster
+LogicalCloud: default
+CompositeApp: addons
+CompositeProfile: addons-profile
+DeploymentIntentGroup: addons-deployment-intent-group
+DeploymentIntent: addons-deployment-intent
+GenericPlacementIntent: addons-placement-intent
+Apps:
+- multus-cni
+- ovn4nfv
+- node-feature-discovery
+- sriov-network-operator
+- qat-device-plugin
+- cpu-manager

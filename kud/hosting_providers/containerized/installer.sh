@@ -159,6 +159,88 @@ function install_addons {
     echo "Add-ons deployment complete..."
 }
 
+function master_ip {
+    kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}' | awk -F '[:/]' '{print $4}'
+}
+
+# Copy installation artifacts to be usable in host running Ansible
+function install_host_artifacts {
+    local -r cluster_name=$1
+    local -r host_addons_dir="/opt/kud/addons"
+    local -r host_artifacts_dir="/opt/kud/multi-cluster/${cluster_name}/artifacts"
+
+    cp -rf ${kud_inventory_folder}/artifacts ${host_artifacts_dir}
+
+    mkdir -p ${host_artifacts_dir}/addons
+    cp ${kud_emco}/examples/prerequisites.yaml ${host_artifacts_dir}/addons
+    cp ${kud_emco}/addons.yaml ${host_artifacts_dir}/addons
+    cat <<EOF >${host_artifacts_dir}/addons/values.yaml
+HostIP: $(master_ip)
+KubeConfig: ${host_artifacts_dir}/admin.conf
+PackagesPath: ${host_addons_dir}
+ProjectName: proj1
+RsyncPort: 30441
+GacPort: 30493
+OvnPort: 30473
+DtcPort: 30483
+ClusterProvider: provider1
+Cluster1: cluster1
+ClusterLabel: edge-cluster
+LogicalCloud: default
+CompositeApp: addons
+CompositeProfile: addons-profile
+DeploymentIntentGroup: addons-deployment-intent-group
+DeploymentIntent: addons-deployment-intent
+GenericPlacementIntent: addons-placement-intent
+Addons:
+- multus-cni
+- ovn4nfv
+- node-feature-discovery
+- sriov-network-operator
+- sriov-network
+- qat-device-plugin
+- cpu-manager
+EOF
+
+    cat <<EOF >${host_artifacts_dir}/addons/README.md
+# Installing KUD addons with emcoctl
+
+1. Customize values.yaml as needed
+
+2. Create prerequisites to deploy addons
+
+Apply prerequisites.yaml.  This step is optional.  If there are
+existing resources in the cluster, it is sufficient to customize
+values.yaml with the values of those resources.  The supplied
+prequisites.yaml creates controllers, one project, one cluster, and
+one logical cloud.
+
+    \`$ /opt/kud/multi-cluster/${cluster_name}/artifacts/emcoctl.sh apply -f prerequisites.yaml -v values.yaml\`
+
+3. Deploy addons
+
+Apply addons.yaml. This deploys the addons listed in the \`Addons\`
+value in values.yaml.
+
+    \`$ /opt/kud/multi-cluster/${cluster_name}/artifacts/emcoctl.sh apply -f addons.yaml -v values.yaml\`
+
+# Uninstalling KUD addons with emcoctl
+
+1. Delete addons
+
+    \`$ /opt/kud/multi-cluster/${cluster_name}/artifacts/emcoctl.sh delete -f addons.yaml -v values.yaml\`
+
+2. Cleanup prerequisites
+
+    \`$ /opt/kud/multi-cluster/${cluster_name}/artifacts/emcoctl.sh delete -f prerequisites.yaml -v values.yaml\`
+
+#### NOTE: Known issue: deletion of the resources fails sometimes as
+some resources can't be deleted before others are deleted. This can
+happen due to timing issue. In that case try deleting again and the
+deletion should succeed.
+EOF
+}
+
 # _print_kubernetes_info() - Prints the login Kubernetes information
 function _print_kubernetes_info {
     if ! $(kubectl version &>/dev/null); then
@@ -172,11 +254,8 @@ function _print_kubernetes_info {
     KUBE_EDITOR="sed -i \"s|nodePort\: .*|nodePort\: $node_port|g\"" \
         kubectl -n kube-system edit service kubernetes-dashboard
 
-    master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
-        awk -F ":" '{print $2}')
-
     printf "Kubernetes Info\n===============\n" > $k8s_info_file
-    echo "Dashboard URL: https:$master_ip:$node_port" >> $k8s_info_file
+    echo "Dashboard URL: https://$(master_ip):$node_port" >> $k8s_info_file
     echo "Admin user: kube" >> $k8s_info_file
     echo "Admin password: secret" >> $k8s_info_file
 }
@@ -192,6 +271,7 @@ dest_folder=/opt
 kud_folder=${INSTALLER_DIR}
 kud_infra_folder=$kud_folder/../../deployment_infra
 kud_playbooks=$kud_infra_folder/playbooks
+kud_emco=$kud_infra_folder/emco
 kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
@@ -218,6 +298,8 @@ function install_cluster {
         install_addons
     fi
     echo "installed the addons"
+
+    install_host_artifacts $1
 
     _print_kubernetes_info
 }

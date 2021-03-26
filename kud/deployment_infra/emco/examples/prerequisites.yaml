@@ -1,0 +1,113 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2020 Intel Corporation
+
+---
+#create project
+version: emco/v2
+resourceContext:
+  anchor: projects
+metadata :
+   name: {{ .ProjectName }}
+---
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+   name: rsync
+spec:
+  host:  {{ .HostIP }}
+  port: {{ .RsyncPort }}
+
+---
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+   name: gac
+spec:
+  host:  {{ .HostIP }}
+  port: {{ .GacPort }}
+  type: "action"
+  priority: 1
+
+---
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+  name: ovnaction
+spec:
+  host: {{ .HostIP }}
+  port: {{ .OvnPort }}
+  type: "action"
+  priority: 1
+
+---
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+  name: dtc
+spec:
+  host: {{ .HostIP }}
+  port: {{ .DtcPort }}
+  type: "action"
+  priority: 1
+
+---
+#creating cluster provider
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers
+metadata :
+   name: {{ .ClusterProvider }}
+
+---
+#creating cluster
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/{{ .ClusterProvider }}/clusters
+metadata :
+   name: {{ .Cluster1 }}
+file:
+  {{ .KubeConfig }}
+
+---
+#Add label cluster
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/{{ .ClusterProvider }}/clusters/{{ .Cluster1 }}/labels
+label-name: {{ .ClusterLabel }}
+
+---
+#create default logical cloud with admin permissions
+version: emco/v2
+resourceContext:
+  anchor: projects/{{ .ProjectName }}/logical-clouds
+metadata:
+  name: {{ .LogicalCloud }}
+spec:
+  level: "0"
+
+---
+#add cluster reference to logical cloud
+version: emco/v2
+resourceContext:
+  anchor: projects/{{ .ProjectName }}/logical-clouds/{{ .LogicalCloud }}/cluster-references
+metadata:
+  name: lc-cl-1
+spec:
+  cluster-provider: {{ .ClusterProvider }}
+  cluster-name: {{ .Cluster1 }}
+  loadbalancer-ip: "0.0.0.0"
+
+---
+#instantiate logical cloud
+version: emco/v2
+resourceContext:
+  anchor: projects/{{ .ProjectName }}/logical-clouds/{{ .LogicalCloud }}/instantiate
+

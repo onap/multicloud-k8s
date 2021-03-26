@@ -1,0 +1,19 @@
+HostIP: $HOST_IP
+KubeConfig: $KUBE_PATH
+PackagesPath: $PWD/../output/packages
+ProjectName: proj1
+RsyncPort: 30441
+GacPort: 30493
+OvnPort: 30473
+DtcPort: 30483
+ClusterProvider: provider1
+Cluster1: cluster1
+ClusterLabel: edge-cluster
+LogicalCloud: default
+CompositeApp: addon-resources
+CompositeProfile: addon-resources-profile
+DeploymentIntentGroup: addon-resources-deployment-intent-group
+DeploymentIntent: addon-resources-deployment-intent
+GenericPlacementIntent: addon-resources-placement-intent
+Apps:
+- sriov-network

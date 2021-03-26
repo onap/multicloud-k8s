@@ -25,6 +25,11 @@ function print_msg {
     echo -e "${RED} $msg ---------------------------------------${NC}"
 }
 
+function ssh_cluster {
+    master_ip=$(kubectl cluster-info | grep "Kubernetes master" | awk -F '[:/]' '{print $4}')
+    ssh -o StrictHostKeyChecking=no ${master_ip} -- "$@"
+}
+
 function get_ovn_central_address {
     #Reuse OVN_CENTRAL_ADDRESS if available (bypassable by --force flag)
     if [[ "${1:-}" != "--force" ]] && [[ -n "${OVN_CENTRAL_ADDRESS:-}" ]]; then

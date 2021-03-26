@@ -13,6 +13,7 @@ set -o nounset
 set -o pipefail
 
 INSTALLER_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
+KUD_ADDONS="topology-manager optane"
 
 source ${INSTALLER_DIR}/../../tests/_functions.sh
 
@@ -159,14 +160,14 @@ function install_addons {
     ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-kud.yml | sudo tee $log_folder/setup-kud.log
     # The order of KUD_ADDONS is important: some plugins (sriov, qat)
     # require nfd to be enabled.
-    for addon in ${KUD_ADDONS:-topology-manager virtlet ovn4nfv nfd sriov qat optane cmk}; do
+    for addon in $KUD_ADDONS; do
         echo "Deploying $addon using configure-$addon.yml playbook.."
         ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" $kud_playbooks/configure-${addon}.yml | sudo tee $log_folder/setup-${addon}.log
     done
     echo "Run the test cases if testing_enabled is set to true."
     if [[ "${testing_enabled}" == "true" ]]; then
         failed_kud_tests=""
-        for addon in ${KUD_ADDONS:-multus topology-manager virtlet ovn4nfv nfd sriov qat optane cmk}; do
+        for addon in $KUD_ADDONS; do
             pushd $kud_tests
             bash ${addon}.sh || failed_kud_tests="${failed_kud_tests} ${addon}"
             popd
@@ -212,10 +213,10 @@ function _print_kubernetes_info {
     KUBE_EDITOR="sed -i \"s|type\: ClusterIP|type\: NodePort|g\"" kubectl -n kube-system edit service kubernetes-dashboard
     KUBE_EDITOR="sed -i \"s|nodePort\: .*|nodePort\: $node_port|g\"" kubectl -n kube-system edit service kubernetes-dashboard
 
-    master_ip=$(kubectl cluster-info | grep "Kubernetes master" | awk -F ":" '{print $2}')
+    master_ip=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}' | awk -F '[:/]' '{print $4}')
 
     printf "Kubernetes Info\n===============\n" > $k8s_info_file
-    echo "Dashboard URL: https:$master_ip:$node_port" >> $k8s_info_file
+    echo "Dashboard URL: https://$master_ip:$node_port" >> $k8s_info_file
     echo "Admin user: kube" >> $k8s_info_file
     echo "Admin password: secret" >> $k8s_info_file
 }

@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "a631015e_9a9c7393",
+        "filename": "kud/deployment_infra/playbooks/kud-vars.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-03-29T22:12:13Z",
+      "side": 1,
+      "message": "Should we pin a version here instead of using master?",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 137
+      },
+      "revId": "3c1e156e67b659d8b9dd20fd31ce047994ec7547",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "257de4a6_44732bb8",
         "filename": "kud/hosting_providers/containerized/installer.sh",
         "patchSetId": 2
@@ -18,6 +41,29 @@
         "startChar": 8,
         "endLine": 106,
         "endChar": 16
+      },
+      "revId": "3c1e156e67b659d8b9dd20fd31ce047994ec7547",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8ab9a5a5_f6514592",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-03-29T22:12:13Z",
+      "side": 1,
+      "message": "Add back in $plugins_name",
+      "range": {
+        "startLine": 144,
+        "startChar": 8,
+        "endLine": 145,
+        "endChar": 27
       },
       "revId": "3c1e156e67b659d8b9dd20fd31ce047994ec7547",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "257de4a6_44732bb8",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-03-29T17:53:45Z",
+      "side": 1,
+      "message": "return or exit should be used here ? I think this should tested before jumping into the install_k8s ?",
+      "range": {
+        "startLine": 106,
+        "startChar": 8,
+        "endLine": 106,
+        "endChar": 16
+      },
+      "revId": "3c1e156e67b659d8b9dd20fd31ce047994ec7547",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

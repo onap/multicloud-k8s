@@ -36,6 +36,8 @@ function _install_go {
 
     export PATH=$PATH:/usr/local/go/bin
     sudo sed -i "s|^PATH=.*|PATH=\"$PATH\"|" /etc/environment
+    #allow golang to work with sudo
+    sudo sed -i 's|secure_path="\([^"]\+\)"|secure_path="\1:/usr/local/go/bin"|' /etc/sudoers
 }
 
 # _install_pip() - Install Python Package Manager
@@ -182,7 +184,6 @@ function install_addons {
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
 function install_plugin {
     echo "Installing multicloud/k8s plugin"
-    _install_go
     _install_docker
     sudo -E pip install --no-cache-dir docker-compose
 
@@ -260,6 +261,7 @@ echo "Removing ppa for jonathonf/python-3.6"
 sudo ls /etc/apt/sources.list.d/ || true
 sudo find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
 sudo apt-get update
+_install_go
 install_k8s
 _set_environment_file
 install_addons

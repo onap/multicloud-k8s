@@ -88,3 +88,37 @@ cpu_manager:
   checkpoint_file: "/var/lib/kubelet/cpu_manager_state"
 topology_manager:
   policy: "best-effort" # Options: none (disabled), best-effort (default), restricted, single-numa-node
+
+emco_git_url: "https://github.com/open-ness/EMCO.git"
+emco_version: "openness-21.03"
+emco_dir: "/opt/emco"
+emco_values:
+  global:
+    repository: integratedcloudnative/
+    pullPolicy: IfNotPresent
+  emco-db:
+    mongo:
+      persistence:
+        enabled: false
+    etcd:
+      persistence:
+        enabled: false
+  emco-services:
+    orchestrator:
+      imageTag: "{{ emco_version }}"
+    ncm:
+      imageTag: "{{ emco_version }}"
+    rsync:
+      imageTag: "{{ emco_version }}"
+    clm:
+      imageTag: "{{ emco_version }}"
+    ovnaction:
+      imageTag: "{{ emco_version }}"
+    dcm:
+      imageTag: "{{ emco_version }}"
+    dtc:
+      imageTag: "{{ emco_version }}"
+    gac:
+      imageTag: "{{ emco_version }}"
+emcoconfig_localhost: true
+emcoctl_localhost: true

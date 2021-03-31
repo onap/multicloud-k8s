@@ -90,16 +90,13 @@ function install_k8s {
         tee $cluster_log/setup-kubernetes.log
 
     # Configure environment
+    # Requires kubeconfig_localhost and kubectl_localhost to be true
+    # in inventory/group_vars/k8s-cluster.yml
     mkdir -p $HOME/.kube
     cp $kud_inventory_folder/artifacts/admin.conf $HOME/.kube/config
-    # Copy Kubespray kubectl to be usable in host running Ansible.
-    # Requires kubectl_localhost: true in inventory/group_vars/k8s-cluster.yml
     if !(which kubectl); then
         cp $kud_inventory_folder/artifacts/kubectl /usr/local/bin/
     fi
-
-    cp -rf $kud_inventory_folder/artifacts \
-        /opt/kud/multi-cluster/$cluster_name/
 }
 
 # install_addons() - Install Kubenertes AddOns
@@ -218,6 +215,10 @@ function install_cluster {
         install_addons
     fi
     echo "installed the addons"
+
+    # Copy installation artifacts to be usable in host running Ansible
+    cp -rf $kud_inventory_folder/artifacts \
+        /opt/kud/multi-cluster/$cluster_name/
 
     _print_kubernetes_info
 }

@@ -8,7 +8,8 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- hosts: kube-master
+- hosts: localhost
+  become: yes
   tasks:
     - name: Load kud variables
       include_vars:
@@ -16,43 +17,159 @@
 
     - name: Getting emco code in /opt folder
       git:
-        repo: 'https://github.com/onap/multicloud-k8s.git'
-        dest: /opt/multicloud
+        repo: "{{ emco_git_url }}"
+        version: "{{ emco_version }}"
+        dest: "{{ emco_dir }}"
+        depth: 1
+        force: yes
 
-    - name: install make package for ubuntu systems
+    - name: Install make package for Ubuntu systems
       apt: name=make state=present update_cache=yes
       when: ansible_distribution == "Ubuntu"
 
-    - name: install make package for centos systems
+    - name: Install make package for CentOS systems
       yum: name=make state=present update_cache=yes
       when: ansible_distribution == "CentOS"
-
-    - name: Change the emco directory and run the command make all
-      command: /usr/bin/make all
-      register: make_all
-      args:
-        chdir: /opt/multicloud/deployments/helm/v2/emco
-
-    - debug:
-        var: make_all.stdout_lines
 
     - name: Create emco namespace
       shell: "/usr/local/bin/kubectl create namespace emco"
       ignore_errors: True
 
     - name: Create pod security policy role bindings
-      shell: "/usr/local/bin/kubectl -n emco create rolebinding psp:default:privileged --clusterrole=psp:privileged --serviceaccount=emco:default --serviceaccount=emco:emco-fluentd"
+      shell: "/usr/local/bin/kubectl -n emco create rolebinding psp:default:privileged --clusterrole=psp:privileged --serviceaccount=emco:default --serviceaccount=emco:emco-fluentd --serviceaccount=emco:monitor"
       ignore_errors: True
 
-    - name: Get cluster name
-      shell: "kubectl -n kube-system get configmap/kubeadm-config -o yaml | grep clusterName: | awk '{print $2}'"
-      register: cluster_name
+    - name: Set artifacts_dir fact
+      set_fact:
+        artifacts_dir: "{{ hostvars[groups['kube-master'][0]]['inventory_dir'] }}/artifacts"
 
-    - name: Change the emco directory and run the command helm install
-      command: /usr/local/bin/helm install --namespace emco --set emco-tools.fluentd.clusterDomain={{ cluster_name.stdout }} emco dist/packages/emco-0.1.0.tgz
-      register: helm_install
+    - name: Make emco helm charts
+      command: /usr/bin/make all
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/emco
+        chdir: "{{ emco_dir }}/deployments/helm/emcoOpenNESS"
+      when: "'orchestrator' in emco_roles"
 
-    - debug:
-        var: helm_install.stdout_lines
+    - name: Get cluster name
+      shell: "/usr/local/bin/kubectl -n kube-system get configmap/kubeadm-config -o yaml | grep clusterName: | awk '{print $2}'"
+      register: cluster_name
+      when: "'orchestrator' in emco_roles"
+
+    - name: Create helm override values
+      copy:
+        dest: "{{ emco_dir }}/deployments/helm/emcoOpenNESS/helm_value_overrides.yaml"
+        content: |
+          {{ emco_values | to_nice_yaml(indent=2) }}
+      when: "'orchestrator' in emco_roles"
+
+    - name: Install emco helm charts
+      command: /usr/local/bin/helm install --wait --namespace emco -f helm_value_overrides.yaml --set emco-db.etcd.clusterDomain={{ cluster_name.stdout }} --set emco-tools.fluentd.clusterDomain={{ cluster_name.stdout }} emco dist/packages/emco-0.1.0.tgz
+      args:
+        chdir: "{{ emco_dir }}/deployments/helm/emcoOpenNESS"
+      when: "'orchestrator' in emco_roles"
+
+    - name: Apply patch to emcoctl
+      patch:
+        src: emcoctl-openness-21.03.patch
+        basedir: "{{ emco_dir }}"
+        strip: 1
+      when: emco_version == "openness-21.03"
+
+    - name: Make emcoctl
+      command: /usr/bin/make
+      args:
+        chdir: "{{ emco_dir }}/src/tools/emcoctl"
+      when: "'orchestrator' in emco_roles"
+
+    - name: Get emco host address
+      shell: "/usr/local/bin/kubectl -n kube-system get configmap/kubeadm-config -o yaml | awk '/advertiseAddress:/ {print $2;exit}'"
+      register: emco_host
+      when: "'orchestrator' in emco_roles"
+
+    - name: Write emcoctl config on ansible host
+      template:
+        src: emcoconfig.yaml.j2
+        dest: "{{ artifacts_dir }}/emcoconfig.yaml"
+        mode: 0640
+      become: no
+      run_once: yes
+      vars:
+        host: "{{ emco_host.stdout }}"
+      when:
+      - emcoconfig_localhost
+      - "'orchestrator' in emco_roles"
+
+    - name: Copy emcoctl binary to ansible host
+      copy:
+        src: "{{ emco_dir }}/bin/emcoctl/emcoctl"
+        dest: "{{ artifacts_dir }}/emcoctl"
+        mode: 0755
+      become: no
+      run_once: yes
+      when:
+      - emcoctl_localhost
+      - "'orchestrator' in emco_roles"
+
+    - name: Create helper script emcoctl.sh on ansible host
+      copy:
+        content: |
+          #!/bin/bash
+          ${BASH_SOURCE%/*}/emcoctl --config ${BASH_SOURCE%/*}/emcoconfig.yaml "$@"
+        dest: "{{ artifacts_dir }}/emcoctl.sh"
+        mode: 0755
+      become: no
+      run_once: yes
+      when:
+      - emcoctl_localhost
+      - emcoconfig_localhost
+      - "'orchestrator' in emco_roles"
+
+    - name: Apply patch to monitor chart
+      patch:
+        src: emco-monitor-openness-21.03.patch
+        basedir: "{{ emco_dir }}"
+        strip: 1
+      when:
+      - emco_version == "openness-21.03"
+      - "'edge' in emco_roles"
+
+    - name: Package monitor chart
+      command: /usr/local/bin/helm package monitor
+      args:
+        chdir: "{{ emco_dir }}/deployments/helm"
+      when: "'edge' in emco_roles"
+
+    - name: Install monitor helm chart
+      command: /usr/local/bin/helm install --wait --namespace emco --set registryPrefix={{ emco_repository }} --set tag={{ emco_version }} monitor monitor-0.1.0.tgz
+      args:
+        chdir: "{{ emco_dir }}/deployments/helm"
+      when: "'edge' in emco_roles"
+
+- hosts: kube-master
+  become: yes
+  tasks:
+    - name: Load kud variables
+      include_vars:
+        file: kud-vars.yml
+
+    - name: Get emco host address
+      shell: "/usr/local/bin/kubectl -n kube-system get configmap/kubeadm-config -o yaml | grep advertiseAddress: | awk '{print $2}'"
+      register: emco_host
+      when: "'orchestrator' in emco_roles"
+
+    - name: Install emcoctl config
+      template:
+        src: emcoconfig.yaml.j2
+        dest: "~/.emco.yaml"
+        mode: 0640
+      become: no
+      run_once: yes
+      vars:
+        host: "{{ emco_host.stdout }}"
+      when: "'orchestrator' in emco_roles"
+
+    - name: Install emcoctl
+      copy:
+        src: "{{ emco_dir }}/bin/emcoctl/emcoctl"
+        dest: "/usr/local/bin/emcoctl"
+        mode: 0755
+      when: "'orchestrator' in emco_roles"

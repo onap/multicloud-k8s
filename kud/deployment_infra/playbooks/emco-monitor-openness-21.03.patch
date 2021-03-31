@@ -1,0 +1,13 @@
+diff --git a/deployments/helm/monitor/templates/clusterrolebinding.yaml b/deployments/helm/monitor/templates/clusterrolebinding.yaml
+index 70305e50..6616787b 100644
+--- a/deployments/helm/monitor/templates/clusterrolebinding.yaml
++++ b/deployments/helm/monitor/templates/clusterrolebinding.yaml
+@@ -7,7 +7,7 @@ metadata:
+ subjects:
+ - kind: ServiceAccount
+   name: monitor
+-  namespace: default
++  namespace: {{ .Release.Namespace }}
+ roleRef:
+   kind: ClusterRole
+   name: monitor

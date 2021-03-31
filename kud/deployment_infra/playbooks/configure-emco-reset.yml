@@ -8,40 +8,36 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- hosts: kube-master
+- hosts: localhost
+  become: yes
   tasks:
     - name: Load kud variables
       include_vars:
         file: kud-vars.yml
 
-    - name: Change the emco directory and run helm delete
+    - name: Check if emco is installed
+      command: /usr/local/bin/helm -n emco list
+      register: helm_list
+
+    - name: Uninstall emco helm charts
       command: /usr/local/bin/helm uninstall --namespace emco emco
-      register: helm_delete
-      args:
-        chdir: /opt/multicloud/deployments/helm/v2/emco
+      when: '"emco" in helm_list.stdout'
 
-    - debug:
-        var: helm_delete.stdout_lines
+    - name: Change to the emco directory and delete the emco namespace
+      command: /usr/local/bin/kubectl delete ns emco --ignore-not-found=true
 
-    - name: Change the emco directory and delete the emco namespace
-      command: /usr/local/bin/kubectl delete ns emco
-      register: delete_emco_ns
-      args:
-        chdir: /opt/multicloud/deployments/helm/v2/emco
+    - name: Check if emco directory exists
+      stat:
+        path: "{{ emco_dir }}"
+      register: emco_dir_stat
 
-    - debug:
-        var: delete_emco_ns.stdout_lines
-
-    - name: Change the emco directory and make clean
+    - name: Change to the emco directory and make clean
       command: /usr/bin/make clean
-      register: make_clean
       args:
-        chdir: /opt/multicloud/deployments/helm/v2/emco
+        chdir: "{{ emco_dir }}/deployments/helm/emcoOpenNESS"
+      when: emco_dir_stat.stat.exists
 
-    - debug:
-        var: make_clean.stdout_lines
-
-    - name: clean multicloud-k8s path
+    - name: Clean emco directory
       file:
         state: absent
-        path: /opt/multicloud
+        path: "{{ emco_dir }}"

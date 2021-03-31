@@ -1,0 +1,13 @@
+diff --git a/src/tools/emcoctl/cmd/utils.go b/src/tools/emcoctl/cmd/utils.go
+index 9f0821e..3d16b92 100644
+--- a/src/tools/emcoctl/cmd/utils.go
++++ b/src/tools/emcoctl/cmd/utils.go
+@@ -106,7 +106,7 @@ func readResources() []Resources {
+ 			return []Resources{}
+ 		}
+ 		valDec := yaml.NewDecoder(v)
+-		var mapDoc map[string]string
++		var mapDoc interface{}
+ 		if valDec.Decode(&mapDoc) != nil {
+ 			fmt.Println("Values file format incorrect:", "error", err, "filename", valuesFiles[0])
+ 			return []Resources{}

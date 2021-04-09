@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ecb12d49_025f4eb8",
+        "filename": "kud/deployment_infra/playbooks/kud-vars.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-09T20:40:32Z",
+      "side": 1,
+      "message": "Please remove this",
+      "range": {
+        "startLine": 95,
+        "startChar": 179,
+        "endLine": 95,
+        "endChar": 180
+      },
+      "revId": "0581098f01acca6562194c60f566323c1269a034",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0ed94670_422abc0b",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-09T20:40:32Z",
+      "side": 1,
+      "message": "Once the kata container is installed all the workloads will be kata container right? If so how the privileaged and hostnetwork containers are handled ?",
+      "range": {
+        "startLine": 144,
+        "startChar": 33,
+        "endLine": 144,
+        "endChar": 38
+      },
+      "revId": "0581098f01acca6562194c60f566323c1269a034",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

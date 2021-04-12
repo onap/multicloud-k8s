@@ -226,9 +226,17 @@ func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) err
 	}
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
-	if err != nil {
-		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
+	_, err = db.DBconn.Read(v.storeName, key, v.tagContent)
+	if err == nil{
+		err = db.DBconn.Update(v.storeName, key, v.tagContent, encodedStr)
+		if err != nil {
+			return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
+		}
+	}else{
+		err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
+		if err != nil {
+			return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
+		}
 	}
 
 	return nil

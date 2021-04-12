@@ -268,8 +268,7 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 			return pkgerrors.New("Unable to detect chart name")
 		}
 
-		//TODO: Use db update api once db supports it.
-		err = db.DBconn.Create(v.storeName, key, v.tagMeta, def)
+		err = db.DBconn.Update(v.storeName, key, v.tagMeta, def)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Storing updated chart metadata")
 		}
@@ -277,9 +276,17 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
-	if err != nil {
-		return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
+	_, err = db.DBconn.Read(v.storeName, key, v.tagContent)
+	if err == nil{
+		err = db.DBconn.Update(v.storeName, key, v.tagContent, encodedStr)
+		if err != nil {
+			return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
+		}
+	}else{
+		err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
+		if err != nil {
+			return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
+		}
 	}
 
 	return nil

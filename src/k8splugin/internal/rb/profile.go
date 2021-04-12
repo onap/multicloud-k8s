@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"log"
 	"path/filepath"
+	"strings"
 
 	protorelease "k8s.io/helm/pkg/proto/hapi/release"
 
@@ -265,8 +266,11 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 	}
 
 	if value != nil {
+		newVal := string(value)
+		newVal = strings.Replace(newVal, "\"", "", -1)
+
 		//Decode the string from base64
-		out, err := base64.StdEncoding.DecodeString(string(value))
+		out, err := base64.StdEncoding.DecodeString(newVal)
 		if err != nil {
 			return nil, pkgerrors.Wrap(err, "Decode base64 string")
 		}

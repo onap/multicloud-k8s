@@ -259,17 +259,17 @@ func TestConsulReadAll(t *testing.T) {
 			mock: &mockConsulKVStore{
 				Items: api.KVPairs{
 					&api.KVPair{
-						Key:   "test",
+						Key:   "rbinst/test/data",
 						Value: []byte("test-value"),
 					},
 					&api.KVPair{
-						Key:   "test2",
+						Key:   "rbinst/test2/data",
 						Value: []byte("test-value2"),
 					},
 				},
 			},
-			expectedResult: map[string][]byte{"test": []byte("test-value"),
-				"test2": []byte("test-value2")},
+			expectedResult: map[string][]byte{"rbinst/test/data": []byte("test-value"),
+				"rbinst/test2/data": []byte("test-value2")},
 		},
 		{
 			label: "Sucessful retrieve an empty list from Consul Database",

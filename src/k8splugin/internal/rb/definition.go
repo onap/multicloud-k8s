@@ -24,6 +24,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
@@ -312,8 +313,11 @@ func (v *DefinitionClient) Download(name string, version string) ([]byte, error)
 	}
 
 	if value != nil {
+		newVal := string(value)
+		newVal = strings.Replace(newVal, "\"", "", -1)
+
 		//Decode the string from base64
-		out, err := base64.StdEncoding.DecodeString(string(value))
+		out, err := base64.StdEncoding.DecodeString(newVal)
 		if err != nil {
 			return nil, pkgerrors.Wrap(err, "Decode base64 string")
 		}

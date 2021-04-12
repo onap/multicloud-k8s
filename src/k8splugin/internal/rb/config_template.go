@@ -23,6 +23,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"encoding/base64"
 
@@ -251,8 +252,11 @@ func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) 
 	}
 
 	if value != nil {
+		newVal := string(value)
+		newVal = strings.Replace(newVal, "\"", "", -1)
+
 		//Decode the string from base64
-		out, err := base64.StdEncoding.DecodeString(string(value))
+		out, err := base64.StdEncoding.DecodeString(newVal)
 		if err != nil {
 			return nil, pkgerrors.Wrap(err, "Decode base64 string")
 		}

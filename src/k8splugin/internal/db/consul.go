@@ -15,6 +15,7 @@ package db
 
 import (
 	k8sconfig "github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
+	"strings"
 
 	"github.com/hashicorp/consul/api"
 	pkgerrors "github.com/pkg/errors"
@@ -63,6 +64,11 @@ func (c *ConsulStore) HealthCheck() error {
 
 // Unmarshal implements any unmarshaling that is needed when using consul
 func (c *ConsulStore) Unmarshal(inp []byte, out interface{}) error {
+	str := string(inp)
+	err := DeSerialize(str, out)
+	if err != nil {
+		return pkgerrors.Wrap(err, "DeSerializing input data")
+	}
 	return nil
 }
 
@@ -81,7 +87,7 @@ func (c *ConsulStore) Create(root string, key Key, tag string, data interface{})
 	}
 
 	p := &api.KVPair{
-		Key:   k,
+		Key:   root + "/" + k + "/" + tag,
 		Value: []byte(value),
 	}
 	_, err = c.client.Put(p, nil)
@@ -121,6 +127,8 @@ func (c *ConsulStore) Delete(root string, key Key, tag string) error {
 	if k == "" {
 		return pkgerrors.New("Key.String() returned an empty string")
 	}
+
+	k = root + "/" + k + "/" + tag
 	_, err := c.client.Delete(k, nil)
 	return err
 }
@@ -132,10 +140,13 @@ func (c *ConsulStore) ReadAll(root string, tag string) (map[string][]byte, error
 		return nil, err
 	}
 
-	//TODO: Filter results by tag and return it
 	result := make(map[string][]byte)
 	for _, keypair := range pairs {
-		result[keypair.Key] = keypair.Value
+		keys := strings.Split(keypair.Key, "/")
+		tagName := keys[len(keys)-1]
+		if tagName == tag {
+			result[keypair.Key] = keypair.Value
+		}
 	}
 
 	return result, nil

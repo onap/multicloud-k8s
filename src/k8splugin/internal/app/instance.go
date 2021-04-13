@@ -170,6 +170,9 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
 	}
 
+	//Update instance status
+	namegenerator.Update(id, true)
+
 	//Compose the return response
 	resp := InstanceResponse{
 		ID:          id,
@@ -457,6 +460,9 @@ func (v *InstanceClient) Delete(id string) error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Instance")
 	}
+
+	//Update instance status
+	namegenerator.Update(inst.ID, false)
 
 	return nil
 }

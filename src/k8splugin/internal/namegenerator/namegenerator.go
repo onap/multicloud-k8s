@@ -133,7 +133,7 @@ func (c *cache) generateName() string {
 			continue
 		}
 
-		c.cache[name] = true
+		c.cache[name] = false
 
 		// Update the cache and db
 		c.writeCacheToDB()
@@ -145,4 +145,22 @@ func (c *cache) generateName() string {
 func Generate() string {
 
 	return nameCache.generateName()
+}
+
+func Update(key string,status bool){
+	nameCache.updateStatus(key, status)
+}
+
+// Update the status of the instance in the cache and db
+func (c *cache) updateStatus(key string,status bool) {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
+	c.init()
+
+	if _, ok := c.cache[key]; ok{
+		c.cache[key] = status
+	}
+
+	c.writeCacheToDB()
 }

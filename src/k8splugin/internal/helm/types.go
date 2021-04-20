@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
+ * Copyright © 2021 Samsung Electronics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,9 @@
 package helm
 
 import (
+	"encoding/json"
+
+	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
@@ -38,4 +42,22 @@ type KubernetesResource struct {
 	GVK schema.GroupVersionKind
 	// Name of resource in Kubernetes
 	Name string
+}
+
+// Hook is internal container for Helm Hook Definition
+type Hook struct {
+	Hook release.Hook
+	KRT  KubernetesResourceTemplate
+}
+
+// Custom Marshal implementation to satisfy external interface
+func (h Hook) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name     string              `json:"name"`
+		Kind     string              `json:"kind"`
+		Path     string              `json:"kind"`
+		Manifest string              `json:"kind"`
+		Events   []release.HookEvent `json:"events"`
+	}{h.Hook.Name, h.Hook.Kind, h.Hook.Path,
+		h.Hook.Manifest, h.Hook.Events})
 }

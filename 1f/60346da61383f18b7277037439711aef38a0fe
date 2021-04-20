@@ -1,0 +1,7 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Lukasz Rajewski <lukasz.rajewski@orange.com>
+Submitted-by: Lukasz Rajewski <lukasz.rajewski@orange.com>
+Submitted-at: Tue, 20 Apr 2021 16:59:11 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/118337
+Project: multicloud/k8s
+Branch: refs/heads/master

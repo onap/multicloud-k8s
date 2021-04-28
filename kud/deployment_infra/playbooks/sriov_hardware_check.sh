@@ -12,14 +12,8 @@ set -o pipefail
 
 source /etc/environment
 
-ethernet_adpator_version=$( lspci | grep "Ethernet Controller XL710" | head -n 1 | cut -d " " -f 8 )
-if [ -z "$ethernet_adpator_version" ]; then
-    echo "False"
-    exit 0
-fi
-SRIOV_ENABLED=${ethernet_adpator_version:-"false"}
-#checking for the right hardware version of NIC on the machine
-if [ "$ethernet_adpator_version" == "XL710" ]; then
+adaptors="X710 XL710 X722"
+if [[ $(lspci | grep -c "Ethernet .* \(${adaptors// /\\|}\)") != "0" ]]; then
     echo "True"
 else
     echo "False"

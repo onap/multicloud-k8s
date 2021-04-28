@@ -51,6 +51,7 @@ local_volume_provisioner_enabled: true
 
 # Helm deployment
 helm_enabled: true
+helm_stable_repo_url: "https://charts.helm.sh/stable"
 
 # Kube-proxy proxyMode configuration.
 # NOTE: Ipvs is based on netfilter hook function, but uses hash table as the underlying data structure and

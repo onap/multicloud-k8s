@@ -1,4 +1,7 @@
 #!/bin/bash
+
+source _common.sh
+
 ENV=$(kubectl get nodes --all-namespaces | wc -l)
 if [[ $ENV -gt 2 ]]; then
     COMPUTE_NODE=$(kubectl get nodes --all-namespaces | grep -v master | awk 'NR==2{print $1}')
@@ -59,8 +62,8 @@ for ((i=0;i<$num;i++)); do
     echo "##################################"
     if [ "${case[$POOL]}" == "exclusive" ]; then
         echo "TC: to allocate ${case[$CORE]} CPU(s) from pool of ${case[$POOL]} on node of ${case[$NODE]}"
-        TOTAL=$(kubectl get cmk-nodereport ${case[$NODE]} -o json | jq .spec.report.description.pools.${case[$POOL]} | jq .cpuLists | awk -F  '{' '{print $(NF)}' | awk -F  '}' '{print $(NF)}' | awk -F  ',' '{print $(NF)}' | grep "\"tasks\": \[" | wc -l)
-            echo "ready to generate yaml"
+        TOTAL=$(kubectl get cmk-nodereport ${case[$NODE]} -o json | jq --arg pool "${case[$POOL]}" '.spec.report.description.pools[$pool].cpuLists|length')
+        echo "ready to generate yaml"
 cat << EOF > $DIR/$pod_name.yaml
     apiVersion: v1
     kind: Pod
@@ -113,18 +116,16 @@ EOF
         done
         echo "waiting for CPU allocation finished ..."
         rest=$TOTAL
-        until [[ $TOTAL -gt $rest ]]; do
-            rest=$(kubectl get cmk-nodereport ${case[$NODE]} -o json | jq .spec.report.description.pools.exclusive | jq .cpuLists | awk -F  '{' '{print $(NF)}' | awk -F  '}' '{print $(NF)}' | awk -F  ',' '{print $(NF)}' | grep "\"tasks\": \[\]" | wc -l)
+        timeout=0
+        until [[ $TOTAL -gt $rest || $timeout == 180 ]]; do
+            sleep 1
+            rest=$(kubectl get cmk-nodereport ${case[$NODE]} -o json | jq '.spec.report.description.pools.exclusive.cpuLists[].tasks|select(type=="array" and length==0)' | wc -l)
+            timeout=$((timeout+1))
         done
         let allocated=`expr $TOTAL - $rest`
         echo "The allocated CPU amount is:" $allocated
         echo "deploy a nginx pod"
         start_nginx_pod
-        if [[ $allocated == ${case[$CORE]} ]]; then
-            echo "CPU was allocated as expected, TC passed !!"
-        else
-            echo "failed to allocate CPU, TC failed !!"
-        fi
         rm -f $DIR/$pod_name.yaml
         echo "ready to delete pod"
         kubectl delete pod $pod_name --ignore-not-found=true --now --wait
@@ -132,6 +133,12 @@ EOF
         echo "##################################"
         echo
         echo
+        if [[ $allocated == ${case[$CORE]} ]]; then
+            echo "CPU was allocated as expected, TC passed !!"
+        else
+            echo "failed to allocate CPU, TC failed !!"
+            exit 1
+        fi
     else
         echo "TC: to allocate CPU(s) from pool of ${case[$POOL]} on node of ${case[$NODE]}"
         echo "ready to generate yaml"
@@ -207,19 +214,14 @@ EOF
         echo "waiting for CPU allocation finished ..."
         rest=0
         timeout=0
-        until [ $rest == 2 -o $timeout == 180 ]; do
-            rest=$(kubectl get cmk-nodereport ${case[$NODE]} -o json | jq .spec.report.description.pools.shared | jq .cpuLists | awk -F  '{' '{print $(NF)}' | awk -F  '}' '{print $(NF)}' | grep -v "cpus" | grep "  "| grep -v "tasks"| grep -v "\]" | wc -l)
-            sleep -- 1
-            let timeout++
+        until [[ $rest == 2 || $timeout == 180 ]]; do
+            sleep 1
+            rest=$(kubectl get cmk-nodereport ${case[$NODE]} -o json | jq '.spec.report.description.pools.shared.cpuLists[].tasks' | jq length)
+            timeout=$((timeout+1))
         done
         echo "The CPU allocated in shared pool for 2 tasks"
         echo "deploy a nginx pod"
         start_nginx_pod
-        if [[ $rest == 2 ]]; then
-            echo "CPU was allocated as expected, TC passed !!"
-        else
-            echo "failed to allocate CPU, TC failed !!"
-        fi
         rm -f $DIR/$pod_name.yaml
         echo "ready to delete pod"
         kubectl delete pod $pod_name --ignore-not-found=true --now --wait
@@ -227,5 +229,11 @@ EOF
         echo "##################################"
         echo
         echo
+        if [[ $rest == 2 ]]; then
+            echo "CPU was allocated as expected, TC passed !!"
+        else
+            echo "failed to allocate CPU, TC failed !!"
+            exit 1
+        fi
     fi
 done

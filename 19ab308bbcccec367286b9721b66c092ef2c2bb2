@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "03830294_41b4af77",
+        "filename": "kud/deployment_infra/helm/Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:17:38Z",
+      "side": 1,
+      "message": "Why it is not Intel ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 32
+      },
+      "revId": "19ab308bbcccec367286b9721b66c092ef2c2bb2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "4e3a56ce_7d01aa28",
+        "filename": "kud/deployment_infra/playbooks/configure-emco-reset.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:46:05Z",
+      "side": 1,
+      "message": "Please see comment in configure-emco.yml.",
+      "parentUuid": "fdc70418_57e81493",
+      "range": {
+        "startLine": 11,
+        "startChar": 9,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f9c8340e_44cc18ce",
         "filename": "kud/deployment_infra/playbooks/configure-emco.yml",
         "patchSetId": 7
@@ -36,6 +60,30 @@
       "writtenOn": "2021-04-28T21:47:15Z",
       "side": 1,
       "message": "This should be on kube master right ?",
+      "range": {
+        "startLine": 11,
+        "startChar": 9,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "05011f27_d272fdae",
+        "filename": "kud/deployment_infra/playbooks/configure-emco.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:46:05Z",
+      "side": 1,
+      "message": "This will work correctly when the localhost kube config is pointing to the cluster being provisioned, which will be the case in the containerized installer.  \n\nI can rework it if necessary to use kube-master here, but there is some building and copying that will need to be rearranged so that emcoctl gets installed properly on the jump server.",
+      "parentUuid": "f9c8340e_44cc18ce",
       "range": {
         "startLine": 11,
         "startChar": 9,
@@ -82,6 +130,30 @@
       "writtenOn": "2021-04-28T21:47:15Z",
       "side": 1,
       "message": "Ritu, Eric and Todd this patch should be separate from one or please change the file directly.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 24
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "41dc1878_8e8078af",
+        "filename": "kud/deployment_infra/playbooks/emcoctl-openness-21.03.patch",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:46:05Z",
+      "side": 1,
+      "message": "Ritu and I discussed this a bit earlier.  This would require the patch to be included in the https://github.com/open-ness/EMCO repository.",
+      "parentUuid": "77236bc6_8cae0d4d",
       "range": {
         "startLine": 1,
         "startChar": 0,

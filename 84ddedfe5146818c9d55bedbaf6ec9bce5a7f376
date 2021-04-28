@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fdc70418_57e81493",
+        "filename": "kud/deployment_infra/playbooks/configure-emco-reset.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:47:15Z",
+      "side": 1,
+      "message": "Is this should be on kube-master right ?",
+      "range": {
+        "startLine": 11,
+        "startChar": 9,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9c8340e_44cc18ce",
+        "filename": "kud/deployment_infra/playbooks/configure-emco.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:47:15Z",
+      "side": 1,
+      "message": "This should be on kube master right ?",
+      "range": {
+        "startLine": 11,
+        "startChar": 9,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "28d2a9ec_c8c273bc",
+        "filename": "kud/deployment_infra/playbooks/emco-monitor-openness-21.03.patch",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:47:15Z",
+      "side": 1,
+      "message": "Ritu, Eric and Todd this patch should be separate from one or please change the file directly.",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 16
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "77236bc6_8cae0d4d",
+        "filename": "kud/deployment_infra/playbooks/emcoctl-openness-21.03.patch",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:47:15Z",
+      "side": 1,
+      "message": "Ritu, Eric and Todd this patch should be separate from one or please change the file directly.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 24
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

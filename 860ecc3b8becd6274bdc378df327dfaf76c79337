@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "02c9a3d0_3b8a0011",
+        "filename": "kud/deployment_infra/helm/ovn4nfv/templates/ovn/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:25:26Z",
+      "side": 1,
+      "message": "I will remove extra whitespace in next patchset.",
+      "parentUuid": "7a40ebce_59017e8b",
+      "range": {
+        "startLine": 84,
+        "startChar": 17,
+        "endLine": 84,
+        "endChar": 18
+      },
+      "revId": "860ecc3b8becd6274bdc378df327dfaf76c79337",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "415a8444_943bf3b6",
         "filename": "kud/deployment_infra/helm/ovn4nfv/templates/ovn/deployment.yaml",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "479c3a05_b63e679e",
+        "filename": "kud/deployment_infra/helm/ovn4nfv/templates/ovn/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:25:26Z",
+      "side": 1,
+      "message": "Yes, this chart is based on the ovn-daemonset.yaml file in the ovn4nfv-k8s-plugin repository.",
+      "parentUuid": "415a8444_943bf3b6",
+      "range": {
+        "startLine": 86,
+        "startChar": 11,
+        "endLine": 88,
+        "endChar": 31
+      },
+      "revId": "860ecc3b8becd6274bdc378df327dfaf76c79337",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7a1b00e8_d4268a9a",
         "filename": "kud/deployment_infra/helm/ovn4nfv/values.yaml",
         "patchSetId": 2
@@ -59,6 +107,30 @@
       "writtenOn": "2021-04-28T21:33:43Z",
       "side": 1,
       "message": "Helm chart run with Calio or stand alone ?\nI think this value should come from the user.",
+      "range": {
+        "startLine": 102,
+        "startChar": 6,
+        "endLine": 103,
+        "endChar": 36
+      },
+      "revId": "860ecc3b8becd6274bdc378df327dfaf76c79337",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "88143b31_8cc724fa",
+        "filename": "kud/deployment_infra/helm/ovn4nfv/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:25:26Z",
+      "side": 1,
+      "message": "We should discuss more, I based the charts on the multus instructions at https://github.com/opnfv/ovn4nfv-k8s-plugin/blob/master/doc/how-to-use.md.",
+      "parentUuid": "7a1b00e8_d4268a9a",
       "range": {
         "startLine": 102,
         "startChar": 6,

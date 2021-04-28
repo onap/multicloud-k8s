@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7414d6c7_4d11c60a",
+        "filename": "kud/deployment_infra/helm/sriov-network-operator/templates/operator.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T22:06:27Z",
+      "side": 1,
+      "message": "how we can give the device plugin name here ?",
+      "range": {
+        "startLine": 52,
+        "startChar": 20,
+        "endLine": 53,
+        "endChar": 131
+      },
+      "revId": "b8c06e216eced0d706113f718769b69ba8e62a72",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a821e134_ab074593",
+        "filename": "kud/deployment_infra/helm/sriov-network-operator/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T22:06:27Z",
+      "side": 1,
+      "message": "Can we copy and do a version control in Integratedcloudnative dockerhub",
+      "range": {
+        "startLine": 15,
+        "startChar": 14,
+        "endLine": 15,
+        "endChar": 61
+      },
+      "revId": "b8c06e216eced0d706113f718769b69ba8e62a72",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1091e24d_684ae17b",
+        "filename": "kud/deployment_infra/helm/sriov-network-operator/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T22:06:27Z",
+      "side": 1,
+      "message": "Can we copy and do a version control in Integratedcloudnative dockerhub",
+      "range": {
+        "startLine": 46,
+        "startChar": 15,
+        "endLine": 46,
+        "endChar": 50
+      },
+      "revId": "b8c06e216eced0d706113f718769b69ba8e62a72",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9dba88a2_2789ac55",
+        "filename": "kud/deployment_infra/helm/sriov-network-operator/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T22:06:27Z",
+      "side": 1,
+      "message": "Can we copy and do a version control in Integratedcloudnative dockerhub",
+      "range": {
+        "startLine": 51,
+        "startChar": 16,
+        "endLine": 51,
+        "endChar": 61
+      },
+      "revId": "b8c06e216eced0d706113f718769b69ba8e62a72",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "579af446_65615ac8",
+        "filename": "kud/deployment_infra/helm/sriov-network-operator/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T22:06:27Z",
+      "side": 1,
+      "message": "Can we copy and do a version control in Integratedcloudnative dockerhub",
+      "range": {
+        "startLine": 56,
+        "startChar": 16,
+        "endLine": 56,
+        "endChar": 68
+      },
+      "revId": "b8c06e216eced0d706113f718769b69ba8e62a72",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0f3c1f50_49eb8218",
+        "filename": "kud/deployment_infra/helm/sriov-network-operator/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T22:06:27Z",
+      "side": 1,
+      "message": "Can we copy and do a version control in Integratedcloudnative dockerhub",
+      "range": {
+        "startLine": 61,
+        "startChar": 16,
+        "endLine": 61,
+        "endChar": 70
+      },
+      "revId": "b8c06e216eced0d706113f718769b69ba8e62a72",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "623759a3_4e0684ff",
+        "filename": "kud/deployment_infra/helm/sriov-network-operator/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T22:06:27Z",
+      "side": 1,
+      "message": "Can we copy and do a version control in Integratedcloudnative dockerhub",
+      "range": {
+        "startLine": 66,
+        "startChar": 16,
+        "endLine": 66,
+        "endChar": 65
+      },
+      "revId": "b8c06e216eced0d706113f718769b69ba8e62a72",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b32e3aff_a8509e96",
+        "filename": "kud/deployment_infra/helm/sriov-network-operator/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T22:06:27Z",
+      "side": 1,
+      "message": "Can we copy and do a version control in Integratedcloudnative dockerhub",
+      "range": {
+        "startLine": 74,
+        "startChar": 16,
+        "endLine": 74,
+        "endChar": 62
+      },
+      "revId": "b8c06e216eced0d706113f718769b69ba8e62a72",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

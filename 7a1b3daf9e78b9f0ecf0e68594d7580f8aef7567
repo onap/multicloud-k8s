@@ -1,0 +1,192 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5b871ed4_f355bd85",
+        "filename": "kud/deployment_infra/emco/Makefile",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Why not Intel ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 32
+      },
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "532125ed_f91fdda9",
+        "filename": "kud/deployment_infra/emco/Makefile",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "current support only flannel ?",
+      "range": {
+        "startLine": 19,
+        "startChar": 10,
+        "endLine": 19,
+        "endChar": 20
+      },
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0ce8e2d9_ff575ff7",
+        "filename": "kud/deployment_infra/profiles/cpu-manager/override_values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Empty file",
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a18dffbe_9647f1cb",
+        "filename": "kud/deployment_infra/profiles/multus-cni/override_values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Empty file",
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79cde690_eb8e30a2",
+        "filename": "kud/deployment_infra/profiles/node-feature-discovery/override_values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Empty file",
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3919326_b7c8829c",
+        "filename": "kud/deployment_infra/profiles/ovn4nfv/override_values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Empty file",
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "959b7e3d_ed89c2ba",
+        "filename": "kud/deployment_infra/profiles/qat-device-plugin/override_values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Empty file ?",
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ffdd0ccf_2f5cc06c",
+        "filename": "kud/deployment_infra/profiles/sriov-network-operator/override_values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Empty file?",
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a72598e8_fd88f130",
+        "filename": "kud/deployment_infra/profiles/sriov-network/override_values.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Empty file?",
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d51b254_0c3835b0",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:55:10Z",
+      "side": 1,
+      "message": "Can\u0027t all these move to a script ?",
+      "range": {
+        "startLine": 180,
+        "startChar": 3,
+        "endLine": 267,
+        "endChar": 1
+      },
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

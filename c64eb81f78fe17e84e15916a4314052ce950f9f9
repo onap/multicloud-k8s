@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "a2cc9aac_c44fb827",
+        "filename": "kud/deployment_infra/helm/sriov-network/templates/sriovnetwork.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T22:37:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35e8c6ad_7e36c7ef",
+      "range": {
+        "startLine": 27,
+        "startChar": 20,
+        "endLine": 27,
+        "endChar": 40
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a30a5fa5_b1741681",
         "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
         "patchSetId": 1
@@ -93,6 +117,30 @@
       "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce75d59a_34f828b4",
+        "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T22:37:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02bff57d_51f9dc6b",
+      "range": {
+        "startLine": 36,
+        "startChar": 3,
+        "endLine": 37,
+        "endChar": 33
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     },
     {
       "key": {
@@ -143,6 +191,30 @@
     },
     {
       "key": {
+        "uuid": "64e9cfc0_1ef154f5",
+        "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T22:37:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84b3adba_19a613ff",
+      "range": {
+        "startLine": 47,
+        "startChar": 17,
+        "endLine": 47,
+        "endChar": 32
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cd356a0c_8fb09273",
         "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
         "patchSetId": 1
@@ -187,6 +259,30 @@
       "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "99195f8b_8094715d",
+        "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T22:37:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6b657b4_81d5e898",
+      "range": {
+        "startLine": 57,
+        "startChar": 17,
+        "endLine": 57,
+        "endChar": 32
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     },
     {
       "key": {
@@ -237,6 +333,30 @@
     },
     {
       "key": {
+        "uuid": "716a0314_425632f1",
+        "filename": "kud/tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T22:37:48Z",
+      "side": 1,
+      "message": "Resolved in patchset 2.",
+      "parentUuid": "b429cb7a_721d0664",
+      "range": {
+        "startLine": 285,
+        "startChar": 37,
+        "endLine": 285,
+        "endChar": 49
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "350305ae_8c5ee5d0",
         "filename": "kud/tests/sriov.sh",
         "patchSetId": 1
@@ -284,6 +404,30 @@
     },
     {
       "key": {
+        "uuid": "9dd2cef5_32a1446b",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T22:37:48Z",
+      "side": 1,
+      "message": "Resolved in patchset 2.",
+      "parentUuid": "37f35459_658b18e0",
+      "range": {
+        "startLine": 13,
+        "startChar": 94,
+        "endLine": 13,
+        "endChar": 156
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "48a27355_3576d896",
         "filename": "kud/tests/topology-manager.sh",
         "patchSetId": 1
@@ -328,6 +472,30 @@
       "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b43b625_2bad6365",
+        "filename": "kud/tests/topology-manager.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T22:37:48Z",
+      "side": 1,
+      "message": "Resolved in patchset 2.",
+      "parentUuid": "489ec0ca_c58769e0",
+      "range": {
+        "startLine": 50,
+        "startChar": 8,
+        "endLine": 50,
+        "endChar": 41
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

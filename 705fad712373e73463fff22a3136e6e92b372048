@@ -16,6 +16,24 @@
       "revId": "705fad712373e73463fff22a3136e6e92b372048",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2a623765_7d6113ac",
+        "filename": "kud/hosting_providers/vagrant/setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T21:58:48Z",
+      "side": 0,
+      "message": "Do we support Ubuntu 16.04 or earlier?",
+      "parentUuid": "00442161_22a6fe93",
+      "revId": "705fad712373e73463fff22a3136e6e92b372048",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

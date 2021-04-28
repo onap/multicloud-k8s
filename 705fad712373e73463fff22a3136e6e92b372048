@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "00442161_22a6fe93",
+        "filename": "kud/hosting_providers/vagrant/setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 285
+      },
+      "writtenOn": "2021-04-28T21:55:41Z",
+      "side": 0,
+      "message": "Will it continue to work will older versions of Ubuntu?",
+      "revId": "705fad712373e73463fff22a3136e6e92b372048",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

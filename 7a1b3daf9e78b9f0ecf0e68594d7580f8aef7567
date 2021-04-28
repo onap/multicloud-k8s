@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "8d6ffde6_004a9043",
+        "filename": "kud/deployment_infra/emco/Makefile",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:54:08Z",
+      "side": 1,
+      "message": "This file is modified from the existing deployments/helm/v2/emco/Makefile which has the above copyright notice.  Should I replace it?",
+      "parentUuid": "5b871ed4_f355bd85",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 32
+      },
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "532125ed_f91fdda9",
         "filename": "kud/deployment_infra/emco/Makefile",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2021-04-28T21:55:10Z",
       "side": 1,
       "message": "current support only flannel ?",
+      "range": {
+        "startLine": 19,
+        "startChar": 10,
+        "endLine": 19,
+        "endChar": 20
+      },
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c5a23372_5daf3dc8",
+        "filename": "kud/deployment_infra/emco/Makefile",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:54:08Z",
+      "side": 1,
+      "message": "I have not tested with calico.",
+      "parentUuid": "532125ed_f91fdda9",
       "range": {
         "startLine": 19,
         "startChar": 10,
@@ -178,6 +226,30 @@
       "writtenOn": "2021-04-28T21:55:10Z",
       "side": 1,
       "message": "Can\u0027t all these move to a script ?",
+      "range": {
+        "startLine": 180,
+        "startChar": 3,
+        "endLine": 267,
+        "endChar": 1
+      },
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "768b52e1_21b7d919",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:54:08Z",
+      "side": 1,
+      "message": "We should discuss more, the intention here is for the end user to run the containerized installer (e.g. via an ICN Provisioning resource) and then go into /opt/kud/multi-cluster/.../artifacts and customize as needed before applying the YAML files with emcoctl.\n\nThe e2e test in the ICN repository automates the above steps in the pending EMCO deploy commit.",
+      "parentUuid": "6d51b254_0c3835b0",
       "range": {
         "startLine": 180,
         "startChar": 3,

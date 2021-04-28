@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "35e8c6ad_7e36c7ef",
+        "filename": "kud/deployment_infra/helm/sriov-network/templates/sriovnetwork.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T21:56:21Z",
+      "side": 1,
+      "message": "Essentially, yes.  The default resourceName in values.yaml is \"intel_sriov_nic\"",
+      "parentUuid": "9752c4ad_fa7be850",
+      "range": {
+        "startLine": 27,
+        "startChar": 20,
+        "endLine": 27,
+        "endChar": 40
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a30a5fa5_b1741681",
         "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2021-04-28T21:13:20Z",
       "side": 1,
       "message": "here we have intel, why the name are openshit in other files",
+      "range": {
+        "startLine": 36,
+        "startChar": 3,
+        "endLine": 37,
+        "endChar": 33
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "02bff57d_51f9dc6b",
+        "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T21:56:21Z",
+      "side": 1,
+      "message": "openshift in other files is the resource prefix so the full name ends up being e.g. openshift.io/intel_sriov_nic.",
+      "parentUuid": "a30a5fa5_b1741681",
       "range": {
         "startLine": 36,
         "startChar": 3,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "84b3adba_19a613ff",
+        "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T21:56:21Z",
+      "side": 1,
+      "message": "openshift in other files is the resource prefix so the full name ends up being e.g. openshift.io/intel_sriov_nic.",
+      "parentUuid": "fd4c0648_9137072d",
+      "range": {
+        "startLine": 47,
+        "startChar": 17,
+        "endLine": 47,
+        "endChar": 32
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "cd356a0c_8fb09273",
         "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2021-04-28T21:13:20Z",
       "side": 1,
       "message": "here we have intel, why the name are openshit in other files",
+      "range": {
+        "startLine": 57,
+        "startChar": 17,
+        "endLine": 57,
+        "endChar": 32
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6b657b4_81d5e898",
+        "filename": "kud/deployment_infra/helm/sriov-network/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T21:56:21Z",
+      "side": 1,
+      "message": "openshift in other files is the resource prefix so the full name ends up being e.g. openshift.io/intel_sriov_nic.",
+      "parentUuid": "cd356a0c_8fb09273",
       "range": {
         "startLine": 57,
         "startChar": 17,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "b429cb7a_721d0664",
+        "filename": "kud/tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T21:56:21Z",
+      "side": 1,
+      "message": "When I initially did this it appeared baked into the resources created by the operator.  However, now I see that there is a RESOURCE_PREFIX environment variable provided in the operator YAML.  I will give that a test run with \"intel.com\".",
+      "parentUuid": "aa5e9c26_52a0b5f2",
+      "range": {
+        "startLine": 285,
+        "startChar": 37,
+        "endLine": 285,
+        "endChar": 49
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "350305ae_8c5ee5d0",
         "filename": "kud/tests/sriov.sh",
         "patchSetId": 1
@@ -140,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "37f35459_658b18e0",
+        "filename": "kud/tests/sriov.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T21:56:21Z",
+      "side": 1,
+      "message": "It may be possible to do this.  I will test and report back.",
+      "parentUuid": "350305ae_8c5ee5d0",
+      "range": {
+        "startLine": 13,
+        "startChar": 94,
+        "endLine": 13,
+        "endChar": 156
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "48a27355_3576d896",
         "filename": "kud/tests/topology-manager.sh",
         "patchSetId": 1
@@ -151,6 +295,30 @@
       "writtenOn": "2021-04-28T21:13:20Z",
       "side": 1,
       "message": "Can we can it to intel.com?? it is specific to openshift. Can we define the device plugin name when we start it.",
+      "range": {
+        "startLine": 50,
+        "startChar": 8,
+        "endLine": 50,
+        "endChar": 41
+      },
+      "revId": "c64eb81f78fe17e84e15916a4314052ce950f9f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "489ec0ca_c58769e0",
+        "filename": "kud/tests/topology-manager.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T21:56:21Z",
+      "side": 1,
+      "message": "It may be possible to do this, I will test and report back.",
+      "parentUuid": "48a27355_3576d896",
       "range": {
         "startLine": 50,
         "startChar": 8,

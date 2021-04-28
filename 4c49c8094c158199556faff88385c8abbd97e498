@@ -22,6 +22,30 @@
       "revId": "4c49c8094c158199556faff88385c8abbd97e498",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ccfa251a_2265864d",
+        "filename": "kud/deployment_infra/helm/node-feature-discovery/values.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:28:51Z",
+      "side": 1,
+      "message": "Correct, sources in the custom section get prefixed, so the end result is \"custom-qat\".",
+      "parentUuid": "47d96d70_112caf4a",
+      "range": {
+        "startLine": 83,
+        "startChar": 10,
+        "endLine": 88,
+        "endChar": 56
+      },
+      "revId": "4c49c8094c158199556faff88385c8abbd97e498",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

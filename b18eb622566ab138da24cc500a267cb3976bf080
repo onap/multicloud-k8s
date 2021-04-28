@@ -22,6 +22,30 @@
       "revId": "b18eb622566ab138da24cc500a267cb3976bf080",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dd4b1d62_d3c0025d",
+        "filename": "kud/deployment_infra/helm/qat-device-plugin/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-28T23:20:03Z",
+      "side": 1,
+      "message": "Yes, the values.yaml in the NFD addon adds a custom block to identify QAT hardware.",
+      "parentUuid": "0a38bcc9_b675a456",
+      "range": {
+        "startLine": 16,
+        "startChar": 2,
+        "endLine": 16,
+        "endChar": 47
+      },
+      "revId": "b18eb622566ab138da24cc500a267cb3976bf080",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

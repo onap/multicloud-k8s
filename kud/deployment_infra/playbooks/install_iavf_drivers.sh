@@ -3,7 +3,7 @@
 # Based on:
 # https://gerrit.akraino.org/r/#/c/icn/+/1359/1/deploy/kud-plugin-addons/device-plugins/sriov/driver/install_iavf_drivers.sh
 
-nic_models=(XL710 X722)
+nic_models=(X710 XL710 X722)
 nic_drivers=(i40e)
 device_checkers=(is_not_used is_driver_match is_model_match)
 

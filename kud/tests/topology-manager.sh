@@ -15,7 +15,8 @@ set -o pipefail
 source _common.sh
 source _functions.sh
 
-if [ -z "$( lspci | grep "Ethernet Controller XL710" | head -n 1 | cut -d " " -f 8 )" ]; then
+adaptors="X710 XL710 X722"
+if [[ $(lspci | grep -c "Ethernet .* \(${adaptors// /\\|}\)") == "0" ]]; then
     echo "Ethernet adaptor version is not set. Topology manager test case cannot run on this machine"
     exit 0
 else

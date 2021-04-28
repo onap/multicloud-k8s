@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a38bcc9_b675a456",
+        "filename": "kud/deployment_infra/helm/qat-device-plugin/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-04-28T21:21:24Z",
+      "side": 1,
+      "message": "NFD is configured for it ?",
+      "range": {
+        "startLine": 16,
+        "startChar": 2,
+        "endLine": 16,
+        "endChar": 47
+      },
+      "revId": "b18eb622566ab138da24cc500a267cb3976bf080",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

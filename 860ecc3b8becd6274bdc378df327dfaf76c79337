@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "c317c483_97a91276",
+        "filename": "kud/deployment_infra/helm/ovn4nfv/templates/ovn/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-29T15:50:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02c9a3d0_3b8a0011",
+      "range": {
+        "startLine": 84,
+        "startChar": 17,
+        "endLine": 84,
+        "endChar": 18
+      },
+      "revId": "860ecc3b8becd6274bdc378df327dfaf76c79337",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "415a8444_943bf3b6",
         "filename": "kud/deployment_infra/helm/ovn4nfv/templates/ovn/deployment.yaml",
         "patchSetId": 2

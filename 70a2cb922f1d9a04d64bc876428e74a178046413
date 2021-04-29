@@ -46,6 +46,30 @@
       "revId": "70a2cb922f1d9a04d64bc876428e74a178046413",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6c7eb99d_ff2be12e",
+        "filename": "kud/deployment_infra/helm/cpu-manager/templates/clusterrole.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-29T15:48:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b80fdd4_80268983",
+      "range": {
+        "startLine": 13,
+        "startChar": 15,
+        "endLine": 13,
+        "endChar": 70
+      },
+      "revId": "70a2cb922f1d9a04d64bc876428e74a178046413",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

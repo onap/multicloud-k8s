@@ -187,6 +187,52 @@
       "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bdf5adc0_ba75bdde",
+        "filename": "kud/deployment_infra/playbooks/kud-vars.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-30T21:55:37Z",
+      "side": 1,
+      "message": "rename to emco",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 14
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a55b9c5_554fb1bb",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-30T21:55:37Z",
+      "side": 1,
+      "message": "double check why this got added",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 93
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

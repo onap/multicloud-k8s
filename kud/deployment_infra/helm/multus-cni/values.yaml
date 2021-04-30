@@ -1,0 +1,126 @@
+image:
+  repository: nfvpe/multus
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+nameOverride: ""
+fullnameOverride: ""
+
+securityContext:
+  privileged: true
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "50Mi"
+  limits:
+    cpu: "100m"
+    memory: "50Mi"
+
+nodeSelector:
+  kubernetes.io/arch: amd64
+
+tolerations:
+- operator: Exists
+  effect: NoSchedule
+
+# NOTE: If you'd prefer to manually apply a configuration file, you
+# may create one here.  Additionally -- you should ensure that the
+# name "{{ .Values.config.path }}" is the alphabetically first name in
+# the /etc/cni/net.d/ directory on each node, otherwise, it will not
+# be used by the Kubelet.
+#
+# __KUBERNETES_NODE_NAME__ below is replaced by spec.nodeName at
+# startup.
+config:
+  enabled: true
+  name: multus-cni-config
+  path: 00-multus.conf
+  # data:
+  #   {
+  #     "name": "multus-cni-network",
+  #     "type": "multus",
+  #     "capabilities": {
+  #       "portMappings": true
+  #     },
+  #     "delegates": [
+  #       {
+  #         "cniVersion": "0.3.1",
+  #         "name": "default-cni-network",
+  #         "plugins": [
+  #           {
+  #             "name": "k8s-pod-network",
+  #             "cniVersion": "0.3.1",
+  #             "type": "calico",
+  #             "log_level": "info",
+  #             "datastore_type": "kubernetes",
+  #             "nodename": "__KUBERNETES_NODE_NAME__",
+  #             "mtu": 1440,
+  #             "ipam": {
+  #               "type": "calico-ipam"
+  #             },
+  #             "policy": {
+  #               "type": "k8s"
+  #             },
+  #             "kubernetes": {
+  #               "kubeconfig": "/etc/cni/net.d/calico-kubeconfig"
+  #             }
+  #           },
+  #           {
+  #             "type": "portmap",
+  #             "snat": true,
+  #             "capabilities": {"portMappings": true}
+  #           }
+  #         ]
+  #       }
+  #     ],
+  #     "kubeconfig": "/etc/cni/net.d/multus.d/multus.kubeconfig"
+  #   }
+  data:
+    {
+      "cniVersion": "0.3.1",
+      "name": "multus-cni-network",
+      "type": "multus",
+      "capabilities": {
+        "portMappings": true
+      },
+      "kubeconfig": "/etc/cni/net.d/multus.d/multus.kubeconfig",
+      "delegates": [
+        {
+          "name": "cbr0",
+          "cniVersion": "0.3.1",
+          "plugins": [
+            {
+              "type": "flannel",
+              "delegate": {
+                "isDefaultGateway": true,
+                "hairpinMode": true
+              }
+            },
+            {
+              "type": "portmap",
+              "capabilities": {
+                "portMappings": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+
+## RBAC parameteres
+## https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  create: true
+  serviceAccountName:

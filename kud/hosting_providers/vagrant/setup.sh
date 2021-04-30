@@ -94,7 +94,6 @@ case ${ID,,} in
     ;;
 
     ubuntu|debian)
-    libvirt_group="libvirtd"
     INSTALLER_CMD="sudo -H -E apt-get -y -q=3 install"
     packages+=(python-dev)
 

@@ -46,6 +46,30 @@
       "revId": "19ab308bbcccec367286b9721b66c092ef2c2bb2",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44f08ca6_50f77cdc",
+        "filename": "kud/deployment_infra/helm/Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-30T21:18:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88d2520d_bb48181e",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 32
+      },
+      "revId": "19ab308bbcccec367286b9721b66c092ef2c2bb2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

@@ -120,6 +120,30 @@
     },
     {
       "key": {
+        "uuid": "8bebac49_8a3ecc80",
+        "filename": "kud/deployment_infra/helm/ovn4nfv/templates/ovn/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-30T21:36:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "479c3a05_b63e679e",
+      "range": {
+        "startLine": 86,
+        "startChar": 11,
+        "endLine": 88,
+        "endChar": 31
+      },
+      "revId": "860ecc3b8becd6274bdc378df327dfaf76c79337",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a1b00e8_d4268a9a",
         "filename": "kud/deployment_infra/helm/ovn4nfv/values.yaml",
         "patchSetId": 2
@@ -164,6 +188,30 @@
       "revId": "860ecc3b8becd6274bdc378df327dfaf76c79337",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1d318190_d8b063ec",
+        "filename": "kud/deployment_infra/helm/ovn4nfv/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-04-30T21:36:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88143b31_8cc724fa",
+      "range": {
+        "startLine": 102,
+        "startChar": 6,
+        "endLine": 103,
+        "endChar": 36
+      },
+      "revId": "860ecc3b8becd6274bdc378df327dfaf76c79337",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

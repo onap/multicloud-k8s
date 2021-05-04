@@ -257,6 +257,30 @@
       "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "80d5076d_353036bc",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-05-04T21:24:51Z",
+      "side": 1,
+      "message": "This was added so that the \"Make emcoctl\" step of configure-emco.yml succeeds when running the playbook on a cluster created with the vagrant installer.",
+      "parentUuid": "3a55b9c5_554fb1bb",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 93
+      },
+      "revId": "84ddedfe5146818c9d55bedbaf6ec9bce5a7f376",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "cpu-manager.fullname" . }}-reconcile-nodereport-ds
+  labels:
+    {{- include "cpu-manager.labels" . | nindent 4 }}
+    app: cmk-reconcile-nodereport-ds
+spec:
+  selector:
+    matchLabels:
+      {{- include "cpu-manager.selectorLabels" . | nindent 6 }}
+      app: cmk-reconcile-nodereport-ds
+  template:
+    metadata:
+      labels:
+        {{- include "cpu-manager.selectorLabels" . | nindent 8 }}
+        app: cmk-reconcile-nodereport-ds
+      annotations:
+        {{- toYaml .Values.annotations | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ include "cpu-manager.serviceAccountName" . }}
+      initContainers:
+      - args:
+        - "/cmk/cmk.py init --conf-dir=/etc/cmk --num-exclusive-cores=$NUM_EXCLUSIVE_CORES --num-shared-cores=$NUM_SHARED_CORES"
+        command:
+        - "/bin/bash"
+        - "-c"
+        env:
+        - name: CMK_PROC_FS
+          value: '/proc'
+        - name: NUM_EXCLUSIVE_CORES
+          value: {{ .Values.exclusiveNumCores | quote }}
+        - name: NUM_SHARED_CORES
+          value: {{ .Values.sharedNumCores | quote }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: cmk-init-pod
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: "/etc/cmk"
+          name: cmk-conf-dir
+      - args:
+        - "/cmk/cmk.py discover --conf-dir=/etc/cmk {{ if .Values.untaintRequired }}--no-taint{{ end }}"
+        command:
+        - "/bin/bash"
+        - "-c"
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: cmk-discover-pod
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: "/etc/cmk"
+          name: cmk-conf-dir
+      - args:
+        - "/cmk/cmk.py install --install-dir=/opt/bin"
+        command:
+        - "/bin/bash"
+        - "-c"
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: cmk-install-pod
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: "/opt/bin"
+          name: cmk-install-dir
+      containers:
+      - args:
+        - "/cmk/cmk.py isolate --pool=infra /cmk/cmk.py -- reconcile --interval=$CMK_RECONCILE_SLEEP_TIME --publish"
+        command:
+        - "/bin/bash"
+        - "-c"
+        env:
+        - name: CMK_RECONCILE_SLEEP_TIME
+          value: {{ .Values.reconcileSleepTime | quote }}
+        - name: CMK_PROC_FS
+          value: "/host/proc"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: cmk-reconcile
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: "/host/proc"
+          name: host-proc
+          readOnly: true
+        - mountPath: "/etc/cmk"
+          name: cmk-conf-dir
+      - args:
+        - "/cmk/cmk.py isolate --pool=infra /cmk/cmk.py -- node-report --interval=$CMK_NODE_REPORT_SLEEP_TIME --publish"
+        command:
+        - "/bin/bash"
+        - "-c"
+        env:
+        - name: CMK_NODE_REPORT_SLEEP_TIME
+          value: {{ .Values.nodeReportSleepTime | quote }}
+        - name: CMK_PROC_FS
+          value: "/host/proc"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: cmk-nodereport
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: "/host/proc"
+          name: host-proc
+          readOnly: true
+        - mountPath: "/etc/cmk"
+          name: cmk-conf-dir
+      volumes:
+      - hostPath:
+          path: "/proc"
+        name: host-proc
+      - hostPath:
+          path: {{ .Values.configDir | quote }}
+        name: cmk-conf-dir
+      - hostPath:
+          path: {{ .Values.installDir | quote }}
+        name: cmk-install-dir
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,59 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ include "cpu-manager.fullname" . }}-custom-resource-definition-controller
+  labels:
+    {{- include "cpu-manager.labels" . | nindent 4 }}
+rules:
+- apiGroups: ["intel.com"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions", "customresourcedefinitions.extensions"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ include "cpu-manager.fullname" . }}-daemonset-controller
+  labels:
+    {{- include "cpu-manager.labels" . | nindent 4 }}
+rules:
+- apiGroups: ["extensions", "apps"]
+  resources: ["daemonsets", "daemonsets.extensions", "daemonsets.apps"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ include "cpu-manager.fullname" . }}-version-controller
+  labels:
+    {{- include "cpu-manager.labels" . | nindent 4 }}
+rules:
+  - nonResourceURLs: ["*"]
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ include "cpu-manager.fullname" . }}-webhook-installer
+  labels:
+    {{- include "cpu-manager.labels" . | nindent 4 }}
+rules:
+- apiGroups: ["", "apps", "extensions", "admissionregistration.k8s.io"]
+  resources: ["secrets", "configmaps", "deployments", "services", "mutatingwebhookconfigurations"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ include "cpu-manager.fullname" . }}-node-lister
+  labels:
+    {{- include "cpu-manager.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["*"]
+{{- end }}

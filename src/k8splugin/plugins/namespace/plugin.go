@@ -65,7 +65,7 @@ func (p namespacePlugin) Get(resource helm.KubernetesResource, namespace string,
 
 // Delete an existing namespace hosted in a specific Kubernetes cluster
 func (p namespacePlugin) Delete(resource helm.KubernetesResource, namespace string, client plugin.KubernetesConnector) error {
-	deletePolicy := metaV1.DeletePropagationForeground
+	deletePolicy := metaV1.DeletePropagationBackground
 	opts := metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}

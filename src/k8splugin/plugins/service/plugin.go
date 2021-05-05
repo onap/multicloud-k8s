@@ -111,7 +111,7 @@ func (p servicePlugin) Delete(resource helm.KubernetesResource, namespace string
 		namespace = "default"
 	}
 
-	deletePolicy := metaV1.DeletePropagationForeground
+	deletePolicy := metaV1.DeletePropagationBackground
 	opts := metaV1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}

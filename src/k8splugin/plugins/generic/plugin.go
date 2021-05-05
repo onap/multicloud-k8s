@@ -212,7 +212,7 @@ func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string
 	}
 
 	gvr := mapping.Resource
-	deletePolicy := metav1.DeletePropagationForeground
+	deletePolicy := metav1.DeletePropagationBackground
 	opts := metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}

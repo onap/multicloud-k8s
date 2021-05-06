@@ -283,6 +283,30 @@
       "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b546effd_8f49c23f",
+        "filename": "kud/hosting_providers/containerized/installer.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-05-06T22:17:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19dfd03e_a8ef6a76",
+      "range": {
+        "startLine": 180,
+        "startChar": 3,
+        "endLine": 267,
+        "endChar": 1
+      },
+      "revId": "7a1b3daf9e78b9f0ecf0e68594d7580f8aef7567",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

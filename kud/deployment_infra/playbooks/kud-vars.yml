@@ -52,7 +52,7 @@ registry_local_address: "localhost:5000"
 cmk_pkgs: make,jq
 cmk_untaint_required: true
 
-go_version: '1.12.5'
+go_version: '1.14.15'
 kubespray_version: 2.14.1
 # This matches the helm_version from kubespray defaults
 helm_client_version: 3.2.4

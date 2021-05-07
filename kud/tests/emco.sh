@@ -1,19 +1,7 @@
 #!/bin/bash
 
-#  Copyright 2020 Intel Corporation, Inc
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-#
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2020 Intel Corporation
 
 set -o errexit
 set -o nounset
@@ -35,6 +23,7 @@ rsync_service_port=30441
 rsync_service_host="$master_ip"
 base_url_orchestrator=${base_url_orchestrator:-"http://$master_ip:30415/v2"}
 base_url_clm=${base_url_clm:-"http://$master_ip:30461/v2"}
+base_url_dcm=${base_url_dcm:-"http://$master_ip:30477/v2"}
 
 CSAR_DIR="/opt/csar"
 csar_id="cb009bfe-bbee-11e8-9766-525400435678"
@@ -94,6 +83,41 @@ labeldata="$(cat<<EOF
 EOF
 )"
 
+admin_logical_cloud_name="lcadmin"
+admin_logical_cloud_data="$(cat << EOF
+{
+ "metadata" : {
+    "name": "${admin_logical_cloud_name}",
+    "description": "logical cloud description",
+    "userData1":"<user data>",
+    "userData2":"<user data>"
+   },
+ "spec" : {
+    "level": "0"
+  }
+ }
+}
+EOF
+)"
+
+lc_cluster_1_name="lc1-c1"
+cluster_1_data="$(cat << EOF
+{
+ "metadata" : {
+    "name": "${lc_cluster_1_name}",
+    "description": "logical cloud cluster 1 description",
+    "userData1":"<user data>",
+    "userData2":"<user data>"
+   },
+
+ "spec" : {
+    "cluster-provider": "${clusterprovidername}",
+    "cluster-name": "${clustername}",
+    "loadbalancer-ip" : "0.0.0.0"
+  }
+}
+EOF
+)"
 
 # add the rsync controller entry
 rsynccontrollername="rsync"
@@ -316,7 +340,7 @@ deployment_intent_group_data="$(cat <<EOF
       "profile":"${collection_composite_profile_name}",
       "version":"${release}",
       "override-values":[],
-      "logical-cloud":"unused_logical_cloud"
+      "logical-cloud":"${admin_logical_cloud_name}"
    }
 }
 EOF
@@ -351,6 +375,8 @@ function createOrchestratorData {
     call_api -d "${rsynccontrollerdata}" "${base_url_orchestrator}/controllers"
     print_msg "creating project entry"
     call_api -d "${projectdata}" "${base_url_orchestrator}/projects"
+
+    createLogicalCloudData
 
     print_msg "creating collection composite app entry"
     call_api -d "${compositeapp_data}" "${base_url_orchestrator}/projects/${projectname}/composite-apps"
@@ -403,27 +429,30 @@ function deleteOrchestratorData {
 
     print_msg "Begin deleteOrchestratorData"
 
-    delete_resource "${base_url_orchestrator}/controllers/${rsynccontrollername}"
+    delete_resource_nox "${base_url_orchestrator}/controllers/${rsynccontrollername}"
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${prometheus_placement_intent_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}/app-intents/${collectd_placement_intent_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/generic-placement-intents/${generic_placement_intent_name}"
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${prometheus_profile_name}"
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${collectd_profile_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${prometheus_profile_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}/profiles/${collectd_profile_name}"
 
     delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}"
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/composite-profiles/${collection_composite_profile_name}"
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${prometheus_app_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${prometheus_app_name}"
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${collectd_app_name}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/apps/${collectd_app_name}"
 
 
-    delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}"
+    delete_resource_nox "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}"
+
+    deleteLogicalCloud
+
     delete_resource_nox "${base_url_orchestrator}/projects/${projectname}"
 
     print_msg "deleteOrchestratorData done"
@@ -443,10 +472,26 @@ function createClmData {
 
 function deleteClmData {
     print_msg "begin deleteClmData"
-    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
+    delete_resource_nox "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}/labels/${labelname}"
     delete_resource_nox "${base_url_clm}/cluster-providers/${clusterprovidername}/clusters/${clustername}"
-    delete_resource "${base_url_clm}/cluster-providers/${clusterprovidername}"
+    delete_resource_nox "${base_url_clm}/cluster-providers/${clusterprovidername}"
     print_msg "deleteClmData done"
+}
+
+function createLogicalCloudData {
+    print_msg "creating logical cloud"
+    call_api -d "${admin_logical_cloud_data}" "${base_url_dcm}/projects/${projectname}/logical-clouds"
+    call_api -d "${cluster_1_data}" "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}/cluster-references"
+}
+
+function getLogicalCloudData {
+    call_api_nox "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}"
+    call_api_nox "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}/cluster-references/${lc_cluster_1_name}"
+}
+
+function deleteLogicalCloud {
+    delete_resource_nox "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}/cluster-references/${lc_cluster_1_name}"
+    delete_resource_nox "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}"
 }
 
 function createData {
@@ -460,13 +505,25 @@ function deleteData {
 }
 
 function instantiate {
+    call_api -d "{ }" "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}/instantiate"
     call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/approve"
-    call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/instantiate"
+    # instantiate may fail due to the logical cloud not yet instantiated, so retry
+    try=0
+    until call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/instantiate"; do
+        if [[ $try -lt 10 ]]; then
+            sleep 1s
+        else
+            return 1
+        fi
+        try=$((try + 1))
+    done
+    return 0
 }
 
-
 function terminateOrchData {
+    call_api -d "{ }" "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}/terminate"
     call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/terminate"
+    call_api -d "{ }" "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}/terminate"
 }
 
 function status {
@@ -479,13 +536,13 @@ function waitFor {
 
 # Setup
 
-function setup {
+function setupEmcoTest {
     install_deps
     populate_CSAR_composite_app_helm "$csar_id"
 }
 
 function start {
-    setup
+    setupEmcoTest
     deleteData
     print_msg "Before creating, deleting the data success"
     createData
@@ -516,6 +573,7 @@ function usage {
 
 if [[ "$#" -gt 0 ]] ; then
     case "$1" in
+        "setup" ) setupEmcoTest ;;
         "start" ) start ;;
         "stop" ) stop ;;
         "create" ) createData ;;

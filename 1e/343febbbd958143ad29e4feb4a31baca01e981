@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Todd Malsbary <todd.malsbary@intel.com>
+Code-Review+2: Ritu Sood <ritu.sood@intel.com>
+Submitted-by: Ritu Sood <ritu.sood@intel.com>
+Submitted-at: Fri, 07 May 2021 00:51:47 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/120242
+Project: multicloud/k8s
+Branch: refs/heads/master

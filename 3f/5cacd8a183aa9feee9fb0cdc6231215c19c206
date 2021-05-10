@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Konrad Banka <k.banka@samsung.com>
+Code-Review+2: Ritu Sood <ritu.sood@intel.com>
+Submitted-by: Ritu Sood <ritu.sood@intel.com>
+Submitted-at: Mon, 10 May 2021 21:22:46 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/121197
+Project: multicloud/k8s
+Branch: refs/heads/master

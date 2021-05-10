@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "057808b1_8eb42579",
+        "filename": "kud/hosting_providers/vagrant/installer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-05-10T20:42:28Z",
+      "side": 1,
+      "message": "We don\u0027t want topology manager for the kata.",
+      "range": {
+        "startLine": 192,
+        "startChar": 33,
+        "endLine": 192,
+        "endChar": 49
+      },
+      "revId": "883d139285b63626467ea2aef21f0b970a40d216",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

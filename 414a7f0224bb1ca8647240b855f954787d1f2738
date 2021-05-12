@@ -46,6 +46,30 @@
       "revId": "414a7f0224bb1ca8647240b855f954787d1f2738",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "31e78f69_6b8b1ba6",
+        "filename": "releases/0.8.2-container.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-05-12T19:14:28Z",
+      "side": 1,
+      "message": "with log directory, I am not sure..",
+      "parentUuid": "fafd139c_bdc533f3",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 45
+      },
+      "revId": "414a7f0224bb1ca8647240b855f954787d1f2738",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

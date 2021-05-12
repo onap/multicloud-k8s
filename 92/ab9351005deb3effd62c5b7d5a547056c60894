@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Lukasz Rajewski <lukasz.rajewski@orange.com>
+Code-Review+2: Ritu Sood <ritu.sood@intel.com>
+Submitted-by: Ritu Sood <ritu.sood@intel.com>
+Submitted-at: Wed, 12 May 2021 19:45:27 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/121294
+Project: multicloud/k8s
+Branch: refs/heads/honolulu

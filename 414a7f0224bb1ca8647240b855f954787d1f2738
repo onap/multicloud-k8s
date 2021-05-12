@@ -22,6 +22,30 @@
       "revId": "414a7f0224bb1ca8647240b855f954787d1f2738",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fafd139c_bdc533f3",
+        "filename": "releases/0.8.2-container.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5550
+      },
+      "writtenOn": "2021-05-12T19:07:54Z",
+      "side": 1,
+      "message": "Correct, my bad with refspec, however for log_dir I was always pointing to job that built latest docker image (the one we use for tagging), not build that merged code referenced. Are you sure this needs to be changed as well?",
+      "parentUuid": "84a33538_4aac0533",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 45
+      },
+      "revId": "414a7f0224bb1ca8647240b855f954787d1f2738",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

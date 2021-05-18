@@ -138,6 +138,7 @@ spec:
           name: host-var-run-ovs
         - mountPath: /var/run
           name: host-var-run
+          mountPropagation: Bidirectional
         - mountPath: /host/proc
           name: host-proc
         - mountPath: /host/sys

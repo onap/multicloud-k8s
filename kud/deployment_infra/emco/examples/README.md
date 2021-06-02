@@ -27,33 +27,36 @@ needs to be installed and configured for the edge cluster.
 2. Customize values.yaml.
 
     `$ envsubst < values.yaml.example > values.yaml`
-    `$ envsubst < values-resources.yaml.example > values-resources.yaml`
 
 ## Create prerequisites to deploy addons
 
-Apply prerequisites.yaml. This creates controllers, one project, one
-cluster, and default logical cloud. This step is required to be done
-only once.
+Apply the prerequisites. This creates the controllers, one or more
+clusters, one project, and one default logical cloud. This step is
+required to be done only once.
 
-    `$ emcoctl apply -f prerequisites.yaml -v values.yaml`
+    `$ emcoctl apply -f 00-controllers.yaml -v values.yaml`
+    `$ emcoctl apply -f 01-cluster.yaml -v values.yaml`
+    `$ emcoctl apply -f 02-project.yaml -v values.yaml`
 
 ## Deploying addons
 
-Apply composite-app.yaml. This deploys the addons listed in the `Apps`
-value.
+This deploys the applications listed in the `Addons` and
+`AddonResources` values.
 
-    `$ emcoctl apply -f ../output/composite-app.yaml -v values.yaml`
-    `$ emcoctl apply -f ../output/composite-app.yaml -v values-resources.yaml`
+    `$ emcoctl apply -f 03-addons-app.yaml -v values.yaml`
+    `$ emcoctl apply -f 04-addon-resources-app.yaml -v values.yaml`
 
 ## Cleanup
 
 1. Delete addons.
 
-    `$ emcoctl delete -f ../output/composite-app.yaml -v values-resources.yaml`
-    `$ emcoctl delete -f ../output/composite-app.yaml -v values.yaml`
+    `$ emcoctl delete -f 04-addon-resources-app.yaml -v values.yaml`
+    `$ emcoctl delete -f 03-addons-app.yaml -v values.yaml`
 
 2. Cleanup prerequisites.
 
-    `$ emcoctl delete -f prerequisites.yaml -v values.yaml`
+    `$ emcoctl delete -f 02-project.yaml -v values.yaml`
+    `$ emcoctl delete -f 01-cluster.yaml -v values.yaml`
+    `$ emcoctl delete -f 00-controllers.yaml -v values.yaml`
 
 #### NOTE: Known issue: Deletion of the resources fails sometimes as some resources can't be deleted before others are deleted. This can happen due to timing issue. In that case try deleting again and the deletion should succeed.

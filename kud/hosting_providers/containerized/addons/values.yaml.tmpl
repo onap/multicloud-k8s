@@ -1,24 +1,36 @@
 HostIP: ${HOST_IP}
-KubeConfig: ${KUBE_PATH}
-PackagesPath: ${PACKAGES_PATH}
-ProjectName: proj1
 RsyncPort: 30441
 GacPort: 30493
 OvnPort: 30473
 DtcPort: 30483
-ClusterProvider: provider1
-Cluster1: cluster1
-ClusterLabel: edge-cluster
+
+ClusterProvider: kud
+ClustersLabel: kud-cluster
+Clusters:
+- KubeConfig: ${KUBE_PATH}
+  Name: cluster
+
+ProjectName: kud
 LogicalCloud: default
-Apps:
+
+PackagesPath: ${PACKAGES_PATH}
+AddonsApp: addons
+AddonsProfile: addons-profile
+AddonsDeploymentIntentGroup: addons-deployment-intent-group
+AddonsDeploymentIntent: addons-deployment-intent
+AddonsPlacementIntent: addons-placement-intent
+Addons:
 - multus-cni
 - ovn4nfv
 - node-feature-discovery
 - sriov-network-operator
 - qat-device-plugin
 - cpu-manager
-CompositeApp: addons
-CompositeProfile: addons-profile
-DeploymentIntentGroup: addons-deployment-intent-group
-DeploymentIntent: addons-deployment-intent
-GenericPlacementIntent: addons-placement-intent
+
+AddonResourcesApp: addon-resources
+AddonResourcesProfile: addon-resources-profile
+AddonResourcesDeploymentIntentGroup: addon-resources-deployment-intent-group
+AddonResourcesDeploymentIntent: addon-resources-deployment-intent
+AddonResourcesPlacementIntent: addon-resources-placement-intent
+AddonResources:
+- sriov-network

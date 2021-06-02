@@ -1,43 +1,47 @@
 # Installing KUD addons with emcoctl
 
-1. Customize values.yaml and values-resources.yaml as needed
+1. Customize values.yaml as needed
 
 To create a customized profile for a specific addon, edit the profile
 as needed, and then (for example, cpu-manager):
 
 ```
     tar -czf /opt/kud/multi-cluster/addons/cpu-manager.tar.gz -C /opt/kud/multi-cluster/addons/cpu-manager/helm .
-    tar -czf /opt/kud/multi-cluster/addons/collectd_profile.tar.gz -C /opt/kud/multi-cluster/addons/cpu-manager/profile .
+    tar -czf /opt/kud/multi-cluster/addons/cpu-manager_profile.tar.gz -C /opt/kud/multi-cluster/addons/cpu-manager/profile .
 ```
 
 2. Create prerequisites to deploy addons
 
-Apply prerequisites.yaml.  This step is optional.  If there are
-existing resources in the cluster, it is sufficient to customize
-values.yaml with the values of those resources.  The supplied
-prequisites.yaml creates controllers, one project, one cluster, and
-one logical cloud.
+Apply prerequisites.  This step is optional.  If there are existing
+resources in the cluster, it is sufficient to customize values.yaml
+with the values of those resources.  The supplied YAML files creates
+the controllers, one or more clusters, one project, and one logical
+cloud.
 
-    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f prerequisites.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 00-controllers.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 01-cluster.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 02-project.yaml -v values.yaml\`
 
 3. Deploy addons
 
-Apply addons.yaml. This deploys the addons listed in the \`Addons\`
-value in values.yaml.
+This deploys the addons listed in the \`Addons\` and
+\`AddonResources\` values in values.yaml.
 
-    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f composite-app.yaml -v values.yaml\`
-    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f composite-app.yaml -v values-resources.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 03-addons-app.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 04-addon-resources-app.yaml -v values.yaml\`
 
 # Uninstalling KUD addons with emcoctl
 
 1. Delete addons
 
-    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f composite-app.yaml -v values-resources.yaml\`
-    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f composite-app.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 04-addon-resources-app.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 03-addons-app.yaml -v values.yaml\`
 
 2. Cleanup prerequisites
 
-    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f prerequisites.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 02-project.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 01-cluster.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 00-controllers.yaml -v values.yaml\`
 
 #### NOTE: Known issue: deletion of the resources fails sometimes as
 some resources can't be deleted before others are deleted. This can

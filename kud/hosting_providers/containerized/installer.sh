@@ -238,8 +238,9 @@ function install_host_artifacts {
     cp -rf ${kud_inventory_folder}/artifacts/* ${host_artifacts_dir}
 
     mkdir -p ${host_artifacts_dir}/addons
-    cp ${kud_infra_folder}/emco/examples/prerequisites.yaml ${host_artifacts_dir}/addons
-    cp ${kud_infra_folder}/emco/composite-app.yaml ${host_artifacts_dir}/addons
+    for yaml in ${kud_infra_folder}/emco/examples/*.yaml; do
+        cp ${yaml} ${host_artifacts_dir}/addons
+    done
     for template in addons/*.tmpl; do
         CLUSTER_NAME="${cluster_name}" \
         HOST_IP="$(master_ip)" \

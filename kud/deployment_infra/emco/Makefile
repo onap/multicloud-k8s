@@ -16,7 +16,18 @@ ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 OUTPUT_DIR := $(ROOT_DIR)/output
 PACKAGE_DIR := $(OUTPUT_DIR)/packages
 
-ADDONS := multus-cni ovn4nfv node-feature-discovery sriov-network-operator sriov-network qat-device-plugin cpu-manager
+ADDONS := \
+	cdi \
+	cdi-operator \
+	cpu-manager \
+	kubevirt \
+	kubevirt-operator \
+	multus-cni \
+	node-feature-discovery \
+	ovn4nfv \
+	sriov-network \
+	sriov-network-operator \
+	qat-device-plugin
 
 .PHONY: $(ADDONS)
 

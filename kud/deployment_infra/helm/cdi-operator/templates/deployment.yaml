@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  {{ include "cdi-operator.fullname" . }}
+  labels:
+    {{- include "cdi-operator.labels" . | nindent 4 }}
+    operator.cdi.kubevirt.io: ""
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "cdi-operator.selectorLabels" . | nindent 6 }}
+      operator.cdi.kubevirt.io: ""
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        {{- include "cdi-operator.selectorLabels" . | nindent 8 }}
+        operator.cdi.kubevirt.io: ""
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cdi-operator.serviceAccountName" . }}
+      containers:
+      - name: cdi-operator
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: DEPLOY_CLUSTER_RESOURCES
+          value: "true"
+        - name: OPERATOR_VERSION
+          value: {{ .Values.image.tag | default .Chart.AppVersion }}
+        - name: CONTROLLER_IMAGE
+          value: {{ .Values.controllerImage.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        - name: IMPORTER_IMAGE
+          value: {{ .Values.importerImage.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        - name: CLONER_IMAGE
+          value: {{ .Values.clonerImage.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        - name: APISERVER_IMAGE
+          value: {{ .Values.apiserverImage.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        - name: UPLOAD_SERVER_IMAGE
+          value: {{ .Values.uploadServerImage.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        - name: UPLOAD_PROXY_IMAGE
+          value: {{ .Values.uploadProxyImage.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        - name: VERBOSITY
+          value: "1"
+        - name: PULL_POLICY
+          value: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 60000
+          name: metrics
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}

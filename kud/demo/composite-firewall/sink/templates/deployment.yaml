@@ -18,6 +18,7 @@ spec:
         app: {{ include "sink.name" . }}
         release: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ include "sink.serviceAccountName" . }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.sinkrepo }}:{{ .Values.image.sinktag }}"

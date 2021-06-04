@@ -1,0 +1,57 @@
+image:
+  repository: quay.io/kubevirt/cdi-operator
+  # This should be set to 'IfNotPresent' for released version
+  pullPolicy: IfNotPresent
+  # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+  # tag
+imagePullSecrets: []
+
+controllerImage:
+  repository : quay.io/kubevirt/cdi-controller
+  # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+
+importerImage:
+  repository: quay.io/kubevirt/cdi-importer
+  # tag, if defined will use the given image tag, else Chart.AppVersion will be used
+
+clonerImage:
+  repository: quay.io/kubevirt/cdi-cloner
+  # tag, if defined will use the given image tag, else Chart.AppVersion will be used  
+
+apiserverImage:
+  repository: quay.io/kubevirt/cdi-apiserver
+  # tag, if defined will use the given image tag, else Chart.AppVersion will be used  
+
+uploadServerImage:
+  repository: quay.io/kubevirt/cdi-uploadserver
+  # tag, if defined will use the given image tag, else Chart.AppVersion will be used  
+
+uploadProxyImage:
+  repository: quay.io/kubevirt/cdi-uploadproxy
+  # tag, if defined will use the given image tag, else Chart.AppVersion will be used  
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: cdi-operator
+
+nameOverride: ""
+fullnameOverride: ""
+
+resources: {}
+
+securityContext:
+  runAsNonRoot: true
+
+nodeSelector:
+  kubernetes.io/os: linux
+
+affinity: {}
+
+tolerations:
+- key: CriticalAddonsOnly
+  operator: Exists

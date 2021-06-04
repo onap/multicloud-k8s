@@ -1,0 +1,55 @@
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name:  {{ include "kubevirt.fullname" . }}
+  labels:
+    {{- include "kubevirt.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.certificateRotateStrategy }}
+  certificateRotateStrategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.configuration }}
+  configuration:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.customizeComponents }}
+  customizeComponents:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.imagePullPolicy }}
+  imagePullPolicy: {{ . }}
+  {{- end }}
+  {{- with .Values.imageRegistry }}
+  imageRegistry: {{ . }}
+  {{- end }}
+  {{- with .Values.imageTag }}
+  imageTag: {{ . }}
+  {{- end }}
+  {{- with .Values.infra }}
+  infra:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.monitorAccount }}
+  monitorAccount: {{ . }}
+  {{- end }}
+  {{- with .Values.monitorNamespace }}
+  monitorNamespace: {{ . }}
+  {{- end }}
+  {{- with .Values.productName }}
+  productName: {{ . }}
+  {{- end }}
+  {{- with .Values.productVersion }}
+  productVersion: {{ . }}
+  {{- end }}
+  {{- with .Values.uninstallStrategy }}
+  uninstallStrategy: {{ . }}
+  {{- end }}
+  {{- with .Values.workloadUpdateStrategy }}
+  workloadUpdateStrategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.workloads }}
+  workloads:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

@@ -1,0 +1,34 @@
+nameOverride: ""
+fullnameOverride: ""
+
+# certConfig is the certificate configuration.
+#certConfig: {}
+
+# cloneStrategyOverride: should we use a host-assisted copy even if
+# snapshots are available?
+#cloneStrategyOverride: ""
+
+# config is the CDIConfig at CDI level.
+#config: {}
+
+# imagePullPolicy describes a policy for if/when to pull a container
+# image.
+imagePullPolicy: IfNotPresent
+
+# infra contains the rules on which nodes CDI infrastructure pods will
+# be scheduled.
+infra:
+  nodeSelector:
+    kubernetes.io/os: linux
+  tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists
+
+# uninstallStrategy defines the state to leave CDI on uninstall.
+#uninstallStrategy: ""
+
+# workload restricts on which nodes CDI workload pods will be
+# scheduled.
+workload:
+  nodeSelector:
+    kubernetes.io/os: linux

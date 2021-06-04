@@ -1,0 +1,29 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: CDI
+metadata:
+  name:  {{ include "cdi.fullname" . }}
+  labels:
+    {{- include "cdi.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.certConfig }}
+  certConfig:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.cloneStrategyOverride }}
+  cloneStrategyOverride: {{ . }}
+  {{- end }}
+  {{- with .Values.config }}
+  config:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.imagePullPolicy }}
+  imagePullPolicy: {{ . }}
+  {{- end }}
+  {{- with .Values.infra }}
+  infra:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.workload }}
+  workload:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

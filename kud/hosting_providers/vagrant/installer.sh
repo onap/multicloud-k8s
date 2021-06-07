@@ -61,42 +61,6 @@ function _install_ansible {
     sudo -E pip install --no-cache-dir ansible==$version
 }
 
-# _install_docker() - Download and install docker-engine
-function _install_docker {
-    local max_concurrent_downloads=${1:-3}
-
-    if $(docker version &>/dev/null); then
-        return
-    fi
-    sudo apt-get install -y apt-transport-https ca-certificates curl
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    sudo apt-get update
-    sudo apt-get install -y docker-ce
-
-    sudo mkdir -p /etc/systemd/system/docker.service.d
-    if [ ${http_proxy:-} ]; then
-        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
-        echo "Environment=\"HTTP_PROXY=$http_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/http-proxy.conf
-    fi
-    if [ ${https_proxy:-} ]; then
-        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/https-proxy.conf
-        echo "Environment=\"HTTPS_PROXY=$https_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/https-proxy.conf
-    fi
-    if [ ${no_proxy:-} ]; then
-        echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/no-proxy.conf
-        echo "Environment=\"NO_PROXY=$no_proxy\"" | sudo tee --append /etc/systemd/system/docker.service.d/no-proxy.conf
-    fi
-    sudo systemctl daemon-reload
-    echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --max-concurrent-downloads $max_concurrent_downloads \"" | sudo tee --append /etc/default/docker
-    if [[ -z $(groups | grep docker) ]]; then
-        sudo usermod -aG docker $USER
-    fi
-
-    sudo systemctl restart docker
-    sleep 10
-}
-
 function _set_environment_file {
     # By default ovn central interface is the first active network interface on localhost. If other wanted, need to export this variable in aio.sh or Vagrant file.
     OVN_CENTRAL_INTERFACE="${OVN_CENTRAL_INTERFACE:-$(ip addr show | awk '/inet.*brd/{print $NF; exit}')}"
@@ -116,7 +80,6 @@ function install_k8s {
     local tarball=v$version.tar.gz
     sudo apt-get install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
     sudo apt-get install -y gnupg2 software-properties-common
-    _install_docker
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     sudo tar -C $dest_folder -xzf $tarball
@@ -248,7 +211,6 @@ function install_addons {
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
 function install_plugin {
     echo "Installing multicloud/k8s plugin"
-    _install_docker
     sudo -E pip install --no-cache-dir docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6027d2a0_bfaa725d",
+        "filename": "kud/hosting_providers/containerized/addons/README.md.tmpl",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-06-09T15:38:54Z",
+      "side": 1,
+      "message": "There is a typo here, will fix in next patch set",
+      "revId": "2c7a00360090a49ae06b42dd6c69c6b2cb4f2410",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

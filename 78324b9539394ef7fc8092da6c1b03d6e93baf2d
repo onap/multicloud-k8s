@@ -1,0 +1,199 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d740627f_2b16eed3",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/Chart.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "change to 2021",
+      "range": {
+        "startLine": 2,
+        "startChar": 14,
+        "endLine": 2,
+        "endChar": 19
+      },
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c18e5205_a2f6312d",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/templates/_helpers.tpl",
+        "patchSetId": 17
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "add license",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 1,
+        "endChar": 37
+      },
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a16e8989_abdcdcc8",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/templates/cm.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "change to 2021",
+      "range": {
+        "startLine": 1,
+        "startChar": 14,
+        "endLine": 1,
+        "endChar": 19
+      },
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "448a067a_a2d7fbe4",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/templates/cm.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "delete the blank line",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 0
+      },
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "852a9389_da2e3776",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/templates/deployment.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "change to 2021",
+      "range": {
+        "startLine": 1,
+        "startChar": 14,
+        "endLine": 1,
+        "endChar": 19
+      },
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "554a69d1_048e73be",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/templates/deployment.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "delete it",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 23
+      },
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "11332987_626ef159",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/templates/deployment.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "delete this line",
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "31dce89a_fc24469d",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/values.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "add licence",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 25
+      },
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e439234b_89b72315",
+        "filename": "kud/deployment_infra/helm/sdewan_cnf/values.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 2363
+      },
+      "writtenOn": "2021-06-16T03:17:13Z",
+      "side": 1,
+      "message": "delete the blank line",
+      "revId": "78324b9539394ef7fc8092da6c1b03d6e93baf2d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

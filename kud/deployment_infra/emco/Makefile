@@ -25,6 +25,7 @@ ADDONS := \
 	multus-cni \
 	node-feature-discovery \
 	ovn4nfv \
+	ovn4nfv-network \
 	sriov-network \
 	sriov-network-operator \
 	qat-device-plugin

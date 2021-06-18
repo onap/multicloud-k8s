@@ -33,4 +33,5 @@ AddonResourcesDeploymentIntentGroup: addon-resources-deployment-intent-group
 AddonResourcesDeploymentIntent: addon-resources-deployment-intent
 AddonResourcesPlacementIntent: addon-resources-placement-intent
 AddonResources:
+- ovn4nfv-network
 - sriov-network

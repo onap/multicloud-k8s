@@ -27,7 +27,7 @@ function print_msg {
 
 function ssh_cluster {
     master_ip=$(kubectl cluster-info | grep "Kubernetes master" | awk -F '[:/]' '{print $4}')
-    ssh -o StrictHostKeyChecking=no ${master_ip} -- "$@"
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${master_ip} -- "$@"
 }
 
 function get_ovn_central_address {

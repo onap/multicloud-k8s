@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2020 Intel Corporation
+
+---
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+   name: rsync
+spec:
+  host:  {{ .HostIP }}
+  port: {{ .RsyncPort }}
+
+---
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+   name: gac
+spec:
+  host:  {{ .HostIP }}
+  port: {{ .GacPort }}
+  type: "action"
+  priority: 1
+
+---
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+  name: ovnaction
+spec:
+  host: {{ .HostIP }}
+  port: {{ .OvnPort }}
+  type: "action"
+  priority: 1
+
+---
+#creating controller entries
+version: emco/v2
+resourceContext:
+  anchor: controllers
+metadata :
+  name: dtc
+spec:
+  host: {{ .HostIP }}
+  port: {{ .DtcPort }}
+  type: "action"
+  priority: 1

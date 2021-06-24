@@ -1,0 +1,411 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2020 Intel Corporation
+
+---
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers
+metadata:
+  name: {{.ClusterProvider}}
+
+{{- range $index, $cluster := .Clusters }}
+---
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/{{$.ClusterProvider}}/clusters
+metadata:
+  name: {{$cluster.Name}}
+file:
+  {{$cluster.KubeConfig}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/{{$.ClusterProvider}}/clusters/{{$cluster.Name}}/labels
+label-name: {{$.ClusterLabel}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/{{$.ClusterProvider}}/clusters/{{$cluster.Name}}/provider-networks
+metadata:
+  name: {{$.EmcoProviderNetwork}}
+spec:
+  cniType: ovn4nfv
+  ipv4Subnets:
+    - subnet: 10.10.20.0/24
+      name: subnet1
+      gateway: 10.10.20.1/24
+  providerNetType: VLAN
+  vlan:
+    vlanId: "102"
+    providerInterfaceName: eth1
+    logicalInterfaceName: eth1.102
+    vlanNodeSelector: specific
+    nodeLabelList:
+      - kubernetes.io/hostname=localhost
+
+---
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/{{$.ClusterProvider}}/clusters/{{$cluster.Name}}/provider-networks
+metadata:
+  name: {{$.UnprotectedProviderNetwork}}
+spec:
+  cniType: ovn4nfv
+  ipv4Subnets:
+    - subnet: 192.168.10.0/24
+      name: subnet1
+      gateway: 192.168.10.1/24
+  providerNetType: VLAN
+  vlan:
+    vlanId: "100"
+    providerInterfaceName: eth1
+    logicalInterfaceName: eth1.100
+    vlanNodeSelector: specific
+    nodeLabelList:
+      - kubernetes.io/hostname=localhost
+
+---
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/{{$.ClusterProvider}}/clusters/{{$cluster.Name}}/networks
+metadata:
+  name: {{$.ProtectedNetwork}}
+spec:
+  cniType: ovn4nfv
+  ipv4Subnets:
+    - subnet: 192.168.20.0/24
+      name: subnet1
+      gateway: 192.168.20.100/32
+{{- end }}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects
+metadata:
+  name: {{.Project}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/logical-clouds
+metadata:
+  name: {{.LogicalCloud}}
+spec:
+  level: "0"
+
+{{- range $index, $cluster := .Clusters }}
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{$.Project}}/logical-clouds/{{$.LogicalCloud}}/cluster-references
+metadata:
+  name: {{$cluster.Name}}
+spec:
+  cluster-provider: {{$.ClusterProvider}}
+  cluster-name: {{$cluster.Name}}
+  loadbalancer-ip: "0.0.0.0"
+{{- end }}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps
+metadata:
+  name: {{.CompositeApp}}
+spec:
+  version: {{.Version}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/apps
+metadata:
+  name: packetgen
+file:
+  {{.PackagesPath}}/packetgen.tar.gz
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/apps
+metadata:
+  name: firewall
+file:
+  {{.PackagesPath}}/firewall.tar.gz
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/apps
+metadata:
+  name: sink
+file:
+  {{.PackagesPath}}/sink.tar.gz
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/composite-profiles
+metadata:
+  name: {{.CompositeProfile}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/composite-profiles/{{.CompositeProfile}}/profiles
+metadata :
+  name: packetgen-profile
+spec:
+  app-name: packetgen
+file:
+  {{.PackagesPath}}/profile.tar.gz
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/composite-profiles/{{.CompositeProfile}}/profiles
+metadata :
+  name: firewall-profile
+spec:
+  app-name: firewall
+file:
+  {{.PackagesPath}}/profile.tar.gz
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/composite-profiles/{{.CompositeProfile}}/profiles
+metadata :
+  name: sink-profile
+spec:
+  app-name: sink
+file:
+  {{.PackagesPath}}/profile.tar.gz
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups
+metadata:
+  name: {{.DeploymentIntentGroup}}
+spec:
+  profile: {{.CompositeProfile}}
+  version: {{.Release}}
+  logical-cloud: {{.LogicalCloud}}
+  override-values:
+    - app-name: packetgen
+      values:
+        ".Values.service.ports.nodePort": '30888'
+    - app-name: firewall
+      values:
+        ".Values.global.dcaeCollectorIp": 1.2.3.4
+        ".Values.global.dcaeCollectorPort": '8888'
+    - app-name: sink
+      values:
+        ".Values.service.ports.nodePort": '30677'
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/intents
+metadata:
+  name: {{.DeploymentIntentsInGroup}}
+spec:
+  intent:
+    genericPlacementIntent: {{.GenericPlacementIntent}}
+    ovnaction: {{.OvnActionIntent}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent
+metadata:
+  name: {{.OvnActionIntent}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents
+metadata:
+  name: packetgen_workload_intent
+spec:
+  application-name: packetgen
+  workload-resource: {{.Release}}-packetgen
+  type: Deployment
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents
+metadata:
+  name: firewall_workload_intent
+spec:
+  application-name: firewall
+  workload-resource: {{.Release}}-firewall
+  type: Deployment
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents
+metadata:
+  name: sink_workload_intent
+spec:
+  application-name: sink
+  workload-resource: {{.Release}}-sink
+  type: Deployment
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents/packetgen_workload_intent/interfaces
+metadata:
+  name: packetgen_unprotected_if
+spec:
+  interface: eth1
+  name: {{.UnprotectedProviderNetwork}}
+  defaultGateway: "false"
+  ipAddress: 192.168.10.2
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents/packetgen_workload_intent/interfaces
+metadata:
+  name: packetgen_emco_if
+spec:
+  interface: eth2
+  name: {{.EmcoProviderNetwork}}
+  defaultGateway: "false"
+  ipAddress: 10.10.20.2
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents/firewall_workload_intent/interfaces
+metadata:
+  name: firewall_unprotected_if
+spec:
+  interface: eth1
+  name: {{.UnprotectedProviderNetwork}}
+  defaultGateway: "false"
+  ipAddress: 192.168.10.3
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents/firewall_workload_intent/interfaces
+metadata:
+  name: firewall_protected_if
+spec:
+  interface: eth2
+  name: {{.ProtectedNetwork}}
+  defaultGateway: "false"
+  ipAddress: 192.168.20.2
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents/firewall_workload_intent/interfaces
+metadata:
+  name: firewall_emco_if
+spec:
+  interface: eth3
+  name: {{.EmcoProviderNetwork}}
+  defaultGateway: "false"
+  ipAddress: 10.10.20.3
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents/sink_workload_intent/interfaces
+metadata:
+  name: sink_protected_if
+spec:
+  interface: eth1
+  name: {{.ProtectedNetwork}}
+  defaultGateway: "false"
+  ipAddress: 192.168.20.3
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/network-controller-intent/{{.OvnActionIntent}}/workload-intents/sink_workload_intent/interfaces
+metadata:
+  name: sink_emco_if
+spec:
+  interface: eth2
+  name: {{.EmcoProviderNetwork}}
+  defaultGateway: "false"
+  ipAddress: 10.10.20.4
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/generic-placement-intents
+metadata:
+  name: {{.GenericPlacementIntent}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/generic-placement-intents/{{.GenericPlacementIntent}}/app-intents
+metadata:
+  name: packetgen-placement-intent
+spec:
+  app-name: packetgen
+  intent:
+    allOf:
+      - provider-name: {{.ClusterProvider}}
+        cluster-label-name: {{.ClusterLabel}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/generic-placement-intents/{{.GenericPlacementIntent}}/app-intents
+metadata:
+  name: firewall-placement-intent
+spec:
+  app-name: firewall
+  intent:
+    allOf:
+      - provider-name: {{.ClusterProvider}}
+        cluster-label-name: {{.ClusterLabel}}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/generic-placement-intents/{{.GenericPlacementIntent}}/app-intents
+metadata:
+  name: sink-placement-intent
+spec:
+  app-name: sink
+  intent:
+    allOf:
+      - provider-name: {{.ClusterProvider}}
+        cluster-label-name: {{.ClusterLabel}}
+
+{{- range $index, $cluster := .Clusters }}
+---
+version: emco/v2
+resourceContext:
+  anchor: cluster-providers/{{$.ClusterProvider}}/clusters/{{$cluster.Name}}/apply
+{{- end }}
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/logical-clouds/{{.LogicalCloud}}/instantiate
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/approve
+
+---
+version: emco/v2
+resourceContext:
+  anchor: projects/{{.Project}}/composite-apps/{{.CompositeApp}}/{{.Version}}/deployment-intent-groups/{{.DeploymentIntentGroup}}/instantiate

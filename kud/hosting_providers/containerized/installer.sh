@@ -221,7 +221,7 @@ function install_host_artifacts {
     local -r host_addons_dir="${host_dir}/addons"
     local -r host_artifacts_dir="${host_dir}/${cluster_name}/artifacts"
 
-    for addon in cpu-manager multus-cni node-feature-discovery ovn4nfv qat-device-plugin sriov-network sriov-network-operator; do
+    for addon in cdi cdi-operator cpu-manager kubevirt kubevirt-operator multus-cni node-feature-discovery ovn4nfv qat-device-plugin sriov-network sriov-network-operator; do
         mkdir -p ${host_addons_dir}/${addon}/{helm,profile}
         cp -r ${kud_infra_folder}/helm/${addon} ${host_addons_dir}/${addon}/helm
         cp -r ${kud_infra_folder}/profiles/${addon}/* ${host_addons_dir}/${addon}/profile

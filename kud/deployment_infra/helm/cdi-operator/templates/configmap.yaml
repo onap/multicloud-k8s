@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cdi-operator-leader-election-helper
+  labels:
+    {{- include "cdi-operator.labels" . | nindent 4 }}
+    operator.cdi.kubevirt.io: ""

@@ -149,7 +149,7 @@ function install_addons {
     # The order of KUD_ADDONS is important: some plugins (sriov, qat)
     # require nfd to be enabled. Some addons are not currently supported with containerd
     if [ "${container_runtime}" == "docker" ]; then
-        kud_addons=${KUD_ADDONS:-topology-manager virtlet ovn4nfv nfd sriov \
+        kud_addons=${KUD_ADDONS:-virtlet ovn4nfv nfd sriov \
             qat optane cmk}
     elif [ "${container_runtime}" == "containerd" ]; then
         kud_addons=${KUD_ADDONS:-ovn4nfv nfd}
@@ -179,7 +179,9 @@ function install_addons {
             popd
         fi
         # Run other plugin tests
-        for addon in ${kud_addons}; do
+        # The topology-manager is added to the tests here as it is
+        # enabled via kubelet config, not an addon
+        for addon in topology-manager ${kud_addons}; do
             pushd $kud_tests
             bash ${addon}.sh || failed_kud_tests="${failed_kud_tests} ${addon}"
             popd

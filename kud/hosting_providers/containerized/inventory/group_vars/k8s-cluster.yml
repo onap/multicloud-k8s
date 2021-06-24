@@ -122,3 +122,8 @@ podsecuritypolicy_restricted_spec:
   # This will fail if allowed-unsafe-sysctls is not set accordingly in kubelet flags
   allowedUnsafeSysctls:
     - '*'
+
+# Customize kubelet config of CPU and topology manager
+kubelet_node_config_extra_args:
+  cpuManagerPolicy: "static" # Options: none (disabled), static (default)
+  topologyManagerPolicy: "best-effort" # Options: none (disabled), best-effort (default), restricted, single-numa-node

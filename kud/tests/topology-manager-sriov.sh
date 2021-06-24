@@ -15,7 +15,7 @@ set -o pipefail
 source _common.sh
 source _functions.sh
 
-sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."intel.com/intel_sriov_700"!=null) and ((.status.capacity."intel.com/intel_sriov_700"|tonumber)>=2)) | .metadata.name')
+sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."intel.com/intel_sriov_nic"!=null) and ((.status.capacity."intel.com/intel_sriov_nic"|tonumber)>=2)) | .metadata.name')
 if [ -z "$sriov_capable_nodes" ]; then
     echo "Ethernet adaptor version is not set. Topology manager test case cannot run on this machine"
     exit 0
@@ -37,7 +37,7 @@ apiVersion: v1
 metadata:
   name: $pod_name
   annotations:
-    k8s.v1.cni.cncf.io/networks: sriov-eno2
+    k8s.v1.cni.cncf.io/networks: sriov-intel
 spec:
   containers:
   - name: $pod_name
@@ -48,11 +48,11 @@ spec:
       limits:
         cpu: "1"
         memory: "500Mi"
-        intel.com/intel_sriov_700: '1'
+        intel.com/intel_sriov_nic: '1'
       requests:
         cpu: "1"
         memory: "500Mi"
-        intel.com/intel_sriov_700: '1'
+        intel.com/intel_sriov_nic: '1'
 POD
     popd
 }
@@ -95,7 +95,7 @@ for (( node=0; node<$numa_node_number; node++ )); do
     done
 done
 
-vf_pci=$(kubectl exec -it $pod_name -- env | grep PCIDEVICE_INTEL_COM_INTEL_SRIOV_700 | awk -F '=' '{print $2}' | sed 's/\r//g')
+vf_pci=$(kubectl exec -it $pod_name -- env | grep PCIDEVICE_INTEL_COM_INTEL_SRIOV_NIC | awk -F '=' '{print $2}' | sed 's/\r//g')
 vf_numa_node=$(ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $node_ip -- cat /sys/bus/pci/devices/$vf_pci/numa_node)
 
 echo "The allocated cpu core is:" $cpu_core

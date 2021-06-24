@@ -10,7 +10,7 @@
 
 set -o pipefail
 
-qat_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."qat.intel.com/cy2_dc2"|tonumber)>=1) | .metadata.name')
+qat_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."qat.intel.com/cy2_dc2"!=null) and ((.status.capacity."qat.intel.com/cy2_dc2"|tonumber)>=1)) | .metadata.name')
 if [ -z "$qat_capable_nodes" ]; then
     echo "This test case cannot run. QAT device unavailable."
     QAT_ENABLED=False

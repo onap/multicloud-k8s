@@ -15,8 +15,8 @@ set -o pipefail
 source _common.sh
 source _functions.sh
 
-adaptors="X710 XL710 X722"
-if [[ $(lspci | grep -c "Ethernet .* \(${adaptors// /\\|}\)") == "0" ]]; then
+sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."intel.com/intel_sriov_700"!=null) and ((.status.capacity."intel.com/intel_sriov_700"|tonumber)>=2)) | .metadata.name')
+if [ -z "$sriov_capable_nodes" ]; then
     echo "Ethernet adaptor version is not set. Topology manager test case cannot run on this machine"
     exit 0
 else

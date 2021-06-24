@@ -10,7 +10,7 @@
 
 set -o pipefail
 
-sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."intel.com/intel_sriov_nic"|tonumber)>=2) | .metadata.name')
+sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."intel.com/intel_sriov_nic"!=null) and ((.status.capacity."intel.com/intel_sriov_nic"|tonumber)>=2)) | .metadata.name')
 if [ -z "$sriov_capable_nodes" ]; then
     echo "SRIOV test case cannot run on the cluster."
     exit 0

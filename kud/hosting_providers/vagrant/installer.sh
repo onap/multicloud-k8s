@@ -40,25 +40,16 @@ function _install_go {
     sudo sed -i 's|secure_path="\([^"]\+\)"|secure_path="\1:/usr/local/go/bin"|' /etc/sudoers
 }
 
-# _install_pip() - Install Python Package Manager
-function _install_pip {
-    if $(pip --version &>/dev/null); then
-        sudo -E pip install --no-cache-dir --upgrade pip
-    else
-        sudo apt-get install -y python-dev
-        curl -sL https://bootstrap.pypa.io/pip/2.7/get-pip.py | sudo python
-    fi
-}
-
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
+    sudo apt-get install -y python3-pip
+    sudo -E pip3 install --no-cache-dir --upgrade pip
     if $(ansible --version &>/dev/null); then
-        sudo pip uninstall -y ansible
+        sudo pip3 uninstall -y ansible
     fi
-    _install_pip
     local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
     sudo mkdir -p /etc/ansible/
-    sudo -E pip install --no-cache-dir ansible==$version
+    sudo -E pip3 install --no-cache-dir ansible==$version
 }
 
 function _set_environment_file {
@@ -88,7 +79,7 @@ function install_k8s {
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/
-    sudo -E pip install --no-cache-dir -r ./requirements.txt
+    sudo -E pip3 install --no-cache-dir -r ./requirements.txt
     make mitogen
     popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
@@ -213,7 +204,7 @@ function install_addons {
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
 function install_plugin {
     echo "Installing multicloud/k8s plugin"
-    sudo -E pip install --no-cache-dir docker-compose
+    sudo -E pip3 install --no-cache-dir docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
     sudo cp $HOME/.kube/config /opt/kubeconfig/kud

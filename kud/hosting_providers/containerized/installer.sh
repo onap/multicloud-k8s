@@ -16,16 +16,23 @@ set -ex
 INSTALLER_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 function install_prerequisites {
-#install package for docker images
-    echo "Removing ppa for jonathonf/python-3.6"
-    ls /etc/apt/sources.list.d/ || true
-    find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
     apt-get update
-    apt-get install -y curl vim wget git \
-        software-properties-common python-pip sudo gettext-base
+    apt-get install -y software-properties-common
     add-apt-repository -y ppa:longsleep/golang-backports
     apt-get update
-    apt-get install -y golang-go rsync
+    apt-get install -y \
+            curl \
+            gettext-base \
+            git \
+            golang-go \
+            make \
+            python3-pip \
+            rsync \
+            sshpass \
+            sudo \
+            unzip \
+            vim \
+            wget
 }
 
 # _install_ansible() - Install and Configure Ansible program
@@ -33,7 +40,7 @@ function _install_ansible {
     local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml |
         awk -F ': ' '{print $2}')
     mkdir -p /etc/ansible/
-    pip install --no-cache-dir ansible==$version
+    pip3 install --no-cache-dir ansible==$version
 }
 
 function install_kubespray {
@@ -44,8 +51,6 @@ function install_kubespray {
         $kud_inventory_folder/group_vars/k8s-cluster.yml | \
         awk -F "\"" '{print $2}')
     local tarball=v$version.tar.gz
-    # install make to run mitogen target & unzip is mitogen playbook dependency
-    apt-get install -y sshpass make unzip
     _install_ansible
     wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     tar -C $dest_folder -xzf $tarball
@@ -54,7 +59,7 @@ function install_kubespray {
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/
-    pip install --no-cache-dir -r ./requirements.txt
+    pip3 install --no-cache-dir -r ./requirements.txt
     make mitogen
     popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
@@ -297,8 +302,6 @@ mkdir -p /opt/csar
 export CSAR_DIR=/opt/csar
 
 function install_pkg {
-# Install dependencies
-    apt-get update
     install_prerequisites
     install_kubespray
 }

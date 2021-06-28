@@ -187,7 +187,7 @@ function install_addons {
             popd
         done
         # Remove Kata webhook if user didn't want it permanently installed
-        if ! [ "${enable_kata_webhook}" == "true" ]; then
+        if ! [ "${enable_kata_webhook}" == "true" ] && [ "${kata_webhook_deployed}" == "true" ]; then
             ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" \
                 -e "kata_webhook_runtimeclass=$kata_webhook_runtimeclass" \
                 $kud_playbooks/configure-kata-webhook-reset.yml \

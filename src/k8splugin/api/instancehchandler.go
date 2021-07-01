@@ -15,6 +15,7 @@ package api
 
 import (
 	"encoding/json"
+	logger "log"
 	"net/http"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/healthcheck"
@@ -29,6 +30,27 @@ type instanceHCHandler struct {
 	// Interface that implements Healthcheck operations
 	client healthcheck.InstanceHCManager
 }
+
+//Scan db and look for uncompleted tasks to continue
+func (i instanceHandler) RecoverCreateOrDelete() {
+	logger.Printf("--------Recovering failed instances--------")
+	resp, err := i.client.List("", "", "")
+	if err != nil {
+		if err.Error() != "Listing Instances: Did not find any objects with tag: instance" {
+			logger.Printf("Error listing instances, will not recover failed instances, error: " + err.Error())
+		} else {
+			logger.Printf("--------DONE Recovering failed instances--------")
+		}
+		return
+	}
+	for _,instance := range resp {
+		if err = i.client.RecoverCreateOrDelete(instance.ID); err!=nil {
+			logger.Printf(err.Error())
+			continue
+		}
+	}
+}
+
 
 func (ih instanceHCHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

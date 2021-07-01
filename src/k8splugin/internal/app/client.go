@@ -19,6 +19,15 @@ package app
 import (
 	"context"
 	"io/ioutil"
+	appsv1 "k8s.io/api/apps/v1"
+	//appsv1beta1 "k8s.io/api/apps/v1beta1"
+	//appsv1beta2 "k8s.io/api/apps/v1beta2"
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
+	//extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
+	//apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	//apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"strings"
 	"time"
@@ -28,10 +37,10 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
+	logger "log"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -60,6 +69,140 @@ type ResourceStatus struct {
 	Name   string                    `json:"name"`
 	GVK    schema.GroupVersionKind   `json:"GVK"`
 	Status unstructured.Unstructured `json:"status"`
+}
+
+func (k *KubernetesClient) getObjType(kind string) (runtime.Object, error) {
+	switch kind {
+	case "Job":
+		return &batchv1.Job{}, nil
+	case "Pod":
+		return &corev1.Pod{}, nil
+	case "Deployment":
+		return &appsv1.Deployment{}, nil
+	case "DaemonSet":
+		return &appsv1.DaemonSet{}, nil
+	case "StatefulSet":
+		return &appsv1.StatefulSet{}, nil
+	default:
+		return nil, pkgerrors.New("kind " + kind + " unknown")
+	}
+}
+
+func (k *KubernetesClient) getRestApi(apiVersion string) (rest.Interface, error) {
+	//based on kubectl api-versions
+	switch apiVersion {
+	case "admissionregistration.k8s.io/v1":
+		return k.clientSet.AdmissionregistrationV1().RESTClient(), nil
+	case "admissionregistration.k8s.io/v1beta1":
+		return k.clientSet.AdmissionregistrationV1beta1().RESTClient(), nil
+	case "apps/v1":
+		return k.clientSet.AppsV1().RESTClient(), nil
+	case "apps/v1beta1":
+		return k.clientSet.AppsV1beta1().RESTClient(), nil
+	case "apps/v1beta2":
+		return k.clientSet.AppsV1beta2().RESTClient(), nil
+	case "authentication.k8s.io/v1":
+		return k.clientSet.AuthenticationV1().RESTClient(), nil
+	case "authentication.k8s.io/v1beta1":
+		return k.clientSet.AuthenticationV1beta1().RESTClient(), nil
+	case "authorization.k8s.io/v1":
+		return k.clientSet.AuthorizationV1().RESTClient(), nil
+	case "authorization.k8s.io/v1beta1":
+		return k.clientSet.AuthorizationV1beta1().RESTClient(), nil
+	case "autoscaling/v1":
+		return k.clientSet.AutoscalingV1().RESTClient(), nil
+	case "autoscaling/v2beta1":
+		return k.clientSet.AutoscalingV2beta1().RESTClient(), nil
+	case "autoscaling/v2beta2":
+		return k.clientSet.AutoscalingV2beta2().RESTClient(), nil
+	case "batch/v1":
+		return k.clientSet.BatchV1().RESTClient(), nil
+	case "batch/v1beta1":
+		return k.clientSet.BatchV1beta1().RESTClient(), nil
+	case "certificates.k8s.io/v1":
+		return k.clientSet.CertificatesV1().RESTClient(), nil
+	case "certificates.k8s.io/v1beta1":
+		return k.clientSet.CertificatesV1beta1().RESTClient(), nil
+	case "coordination.k8s.io/v1":
+		return k.clientSet.CoordinationV1().RESTClient(), nil
+	case "coordination.k8s.io/v1beta1":
+		return k.clientSet.CoordinationV1beta1().RESTClient(), nil
+	case "v1":
+		return k.clientSet.CoreV1().RESTClient(), nil
+	case "discovery.k8s.io/v1beta1":
+		return k.clientSet.DiscoveryV1beta1().RESTClient(), nil
+	case "events.k8s.io/v1":
+		return k.clientSet.EventsV1().RESTClient(), nil
+	case "events.k8s.io/v1beta1":
+		return k.clientSet.EventsV1beta1().RESTClient(), nil
+	case "extensions/v1beta1":
+		return k.clientSet.ExtensionsV1beta1().RESTClient(), nil
+	case "flowcontrol.apiserver.k8s.io/v1alpha1":
+		return k.clientSet.FlowcontrolV1alpha1().RESTClient(), nil
+	case "networking.k8s.io/v1":
+		return k.clientSet.NetworkingV1().RESTClient(), nil
+	case "networking.k8s.io/v1beta1":
+		return k.clientSet.NetworkingV1beta1().RESTClient(), nil
+	case "node.k8s.io/v1alpha1":
+		return k.clientSet.NodeV1alpha1().RESTClient(), nil
+	case "node.k8s.io/v1beta1":
+		return k.clientSet.NodeV1beta1().RESTClient(), nil
+	case "policy/v1beta1":
+		return k.clientSet.PolicyV1beta1().RESTClient(), nil
+	case "rbac.authorization.k8s.io/v1":
+		return k.clientSet.RbacV1().RESTClient(), nil
+	case "rbac.authorization.k8s.io/v1alpha1":
+		return k.clientSet.RbacV1alpha1().RESTClient(), nil
+	case "rbac.authorization.k8s.io/v1beta1":
+		return k.clientSet.RbacV1beta1().RESTClient(), nil
+	case "scheduling.k8s.io/v1":
+		return k.clientSet.SchedulingV1().RESTClient(), nil
+	case "scheduling.k8s.io/v1alpha1":
+		return k.clientSet.SchedulingV1alpha1().RESTClient(), nil
+	case "scheduling.k8s.io/v1beta1":
+		return k.clientSet.SchedulingV1beta1().RESTClient(), nil
+	case "storage.k8s.io/v1":
+		return k.clientSet.StorageV1().RESTClient(), nil
+	case "storage.k8s.io/v1alpha1":
+		return k.clientSet.StorageV1alpha1().RESTClient(), nil
+	case "storage.k8s.io/v1beta1":
+		return k.clientSet.StorageV1beta1().RESTClient(), nil
+	default:
+		return nil, pkgerrors.New("Api version " + apiVersion + " unknown")
+	}
+}
+
+func (k *KubernetesClient) WatchUntilReady(timeout time.Duration, ns string, res helm.KubernetesResource) error {
+	switch res.GVK.Kind {
+	case "Job", "Pod", "Deployment", "DaemonSet", "StatefulSet":
+	default:
+		return nil
+	}
+	//for now, only generic plugin has dedicated WatchUntilReady implemented. Later, we can implement this function
+	//for each plugin separately.
+	pluginImpl, err := plugin.GetPluginByKind("generic")
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error loading plugin")
+	}
+
+	mapper := k.GetMapper()
+	apiVersion, kind := res.GVK.ToAPIVersionAndKind()
+	if apiVersion == "" {
+		//apiVersion is empty -> we can suppose that the rss is ready
+		logger.Printf("apiVersion is empty, consider that the rss is ready")
+		return nil
+	}
+	logger.Printf("apiVersion: %s, Kind: %s", apiVersion, kind)
+	restClient, err := k.getRestApi(apiVersion)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Get rest client")
+	}
+
+	objType, err := k.getObjType(kind)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Get obj type")
+	}
+	return pluginImpl.WatchUntilReady(timeout, ns, res, mapper, restClient, objType, k.clientSet)
 }
 
 // getPodsByLabel yields status of all pods under given instance ID
@@ -279,8 +422,7 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 	return nil
 }
 
-func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate,
-	namespace string) (helm.KubernetesResource, error) {
+func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate, namespace string) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
 		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
@@ -320,7 +462,7 @@ func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
 	namespace string) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
-		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
+		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + " does not exists")
 	}
 
 	log.Info("Processing Kubernetes Resource", log.Fields{
@@ -371,6 +513,23 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 	}
 
 	return createdResources, nil
+}
+
+func (k *KubernetesClient) CreateHookResources(h *helm.Hook, namespace string) (*helm.KubernetesResource, error) {
+	err := k.ensureNamespace(namespace)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Creating Namespace")
+	}
+
+	resTempl := helm.KubernetesResourceTemplate{
+		GVK:      h.KRT.GVK,
+		FilePath: h.KRT.FilePath,
+	}
+	resCreated, err := k.CreateKind(resTempl, namespace)
+	if err != nil {
+		return nil, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
+	}
+	return &resCreated, nil
 }
 
 func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesResourceTemplate,

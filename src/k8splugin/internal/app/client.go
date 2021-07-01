@@ -2,6 +2,7 @@
 Copyright 2018 Intel Corporation.
 Copyright © 2021 Samsung Electronics
 Copyright © 2021 Orange
+Copyright © 2021 Nokia Bell Labs.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +20,15 @@ package app
 import (
 	"context"
 	"io/ioutil"
+	appsv1 "k8s.io/api/apps/v1"
+	//appsv1beta1 "k8s.io/api/apps/v1beta1"
+	//appsv1beta2 "k8s.io/api/apps/v1beta2"
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
+	//extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
+	//apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	//apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"strings"
 	"time"
@@ -28,10 +38,10 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
+	logger "log"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -60,6 +70,23 @@ type ResourceStatus struct {
 	Name   string                    `json:"name"`
 	GVK    schema.GroupVersionKind   `json:"GVK"`
 	Status unstructured.Unstructured `json:"status"`
+}
+
+func (k *KubernetesClient) getObjTypeForHook(kind string) (runtime.Object, error) {
+	switch kind {
+	case "Job":
+		return &batchv1.Job{}, nil
+	case "Pod":
+		return &corev1.Pod{}, nil
+	case "Deployment":
+		return &appsv1.Deployment{}, nil
+	case "DaemonSet":
+		return &appsv1.DaemonSet{}, nil
+	case "StatefulSet":
+		return &appsv1.StatefulSet{}, nil
+	default:
+		return nil, pkgerrors.New("kind " + kind + " unknown")
+	}
 }
 
 func (k *KubernetesClient) getRestApi(apiVersion string) (rest.Interface, error) {
@@ -144,6 +171,37 @@ func (k *KubernetesClient) getRestApi(apiVersion string) (rest.Interface, error)
 	default:
 		return nil, pkgerrors.New("Api version " + apiVersion + " unknown")
 	}
+}
+
+func (k *KubernetesClient) WatchUntilReady(timeout time.Duration, ns string, res helm.KubernetesResource) error {
+
+	//for now, only generic plugin has dedicated WatchUntilReady implemented. Later, we can implement this function
+	//for each plugin separately.
+	pluginImpl, err := plugin.GetPluginByKind("generic")
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error loading plugin")
+	}
+
+	mapper := k.GetMapper()
+	apiVersion, kind := res.GVK.ToAPIVersionAndKind()
+	if apiVersion == "" {
+		//apiVersion is empty -> we can suppose that the rss is ready
+		logger.Printf("apiVersion is empty, consider that the rss is ready")
+		return nil
+	}
+	objType, err := k.getObjTypeForHook(kind)
+	if err != nil {
+		//have error from getObjTypeForHook -> this kind is not considered in hook -> consider ready
+		return nil
+	}
+
+	logger.Printf("apiVersion: %s, Kind: %s", apiVersion, kind)
+	restClient, err := k.getRestApi(apiVersion)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Get rest client")
+	}
+
+	return pluginImpl.WatchUntilReady(timeout, ns, res, mapper, restClient, objType, k.clientSet)
 }
 
 // getPodsByLabel yields status of all pods under given instance ID
@@ -363,8 +421,7 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 	return nil
 }
 
-func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate,
-	namespace string) (helm.KubernetesResource, error) {
+func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate, namespace string) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
 		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
@@ -404,7 +461,7 @@ func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
 	namespace string) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
-		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
+		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + " does not exists")
 	}
 
 	log.Info("Processing Kubernetes Resource", log.Fields{
@@ -455,6 +512,23 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 	}
 
 	return createdResources, nil
+}
+
+func (k *KubernetesClient) CreateHookResources(h *helm.Hook, namespace string) (*helm.KubernetesResource, error) {
+	err := k.ensureNamespace(namespace)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Creating Namespace")
+	}
+
+	resTempl := helm.KubernetesResourceTemplate{
+		GVK:      h.KRT.GVK,
+		FilePath: h.KRT.FilePath,
+	}
+	resCreated, err := k.CreateKind(resTempl, namespace)
+	if err != nil {
+		return nil, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
+	}
+	return &resCreated, nil
 }
 
 func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesResourceTemplate,

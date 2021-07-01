@@ -2,6 +2,7 @@
 Copyright 2018 Intel Corporation.
 Copyright © 2021 Samsung Electronics
 Copyright © 2021 Orange
+Copyright © 2021 Nokia Bell Labs.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

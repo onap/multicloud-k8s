@@ -1,5 +1,6 @@
 /*
 Copyright 2018 Intel Corporation.
+Copyright © 2021 Nokia Bell Labs.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -791,6 +792,101 @@ func TestInstanceDelete(t *testing.T) {
 		err := ic.Delete(id)
 		if err == nil {
 			t.Fatal("Expected error, got pass", err)
+		}
+	})
+}
+
+func TestInstanceWithHookCreate(t *testing.T) {
+	err := LoadMockPlugins(utils.LoadedPlugins)
+	if err != nil {
+		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
+	}
+
+	// Load the mock kube config file into memory
+	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+	if err != nil {
+		t.Fatal("Unable to read mock_kube_config")
+	}
+
+	t.Run("Successfully create Instance With Hook", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Items: map[string]map[string][]byte{
+				rb.ProfileKey{RBName: "test-rbdef-hook", RBVersion: "v1",
+					ProfileName: "profile1"}.String(): {
+					"profilemetadata": []byte(
+						"{\"profile-name\":\"profile1\"," +
+							"\"release-name\":\"testprofilereleasename\"," +
+							"\"namespace\":\"testnamespace\"," +
+							"\"rb-name\":\"test-rbdef\"," +
+							"\"rb-version\":\"v1\"," +
+							"\"kubernetesversion\":\"1.12.3\"}"),
+					// base64 encoding of vagrant/tests/vnfs/testrb/helm/profile
+					"profilecontent": []byte("H4sICCVd3FwAA3Byb2ZpbGUxLnRhcgDt1NEKgjAUxvFd7ylG98aWO" +
+						"sGXiYELxLRwJvj2rbyoIPDGiuD/uzmwM9iB7Vvruvrgw7CdXHsUn6Ejm2W3aopcP9eZL" +
+						"YRJM1voPN+ZndAm16kVSn9onheXMLheKeGqfdM0rq07/3bfUv9PJUkiR9+H+tSVajRym" +
+						"M6+lEqN7njxoVSbU+z2deX388r9nWzkr8fGSt5d79pnLOZfm0f+dRrzb7P4DZD/LyDJA" +
+						"AAAAAAAAAAAAAAA/+0Ksq1N5QAoAAA="),
+				},
+				rb.DefinitionKey{RBName: "test-rbdef-hook", RBVersion: "v1"}.String(): {
+					"defmetadata": []byte(
+						"{\"rb-name\":\"test-rbdef-hook\"," +
+							"\"rb-version\":\"v1\"," +
+							"\"chart-name\":\"test\"," +
+							"\"description\":\"testresourcebundle\"}"),
+					// base64 encoding of test helm package with hooks inside
+					"defcontent": []byte("H4sICE+Q8WAAA3Rlc3QudGFyAO1aW2+jOBTOM7/CYl6HlEsIq7xV24" +
+						"fVqluNdlYjrVajkQMnhS1gFjvZjbr972MDJYTQwGhMMmn9qVUaYx/o8TnfuRgGlF1NxoX" +
+						"J4Xmu+LQ812x+PmNiOXzEMe3ZfD4xLdO23QlyR36uAmvKcI7QhIXs6Ly+6xcKJvZ/g+M1" +
+						"0OkWJ/EY9xAbPJ/PXtx/m9tGtf+WOePjlu143gSZYzxMG298/9+hG1jhdcxQaQRoRXKU5" +
+						"WBEKVdMHEM+1d6hP8KIIv6D0Z/Xv90afE6CGYMAraIYxIQb8GOcAxeSR3gZczmMoCWgDF" +
+						"PKp0Up/8pCQAySLMbc6KYaDpIoXWgIhYQ8fAkgBgZfMhJH/naBdDFo0LXvAwQQvOey+E3" +
+						"BKIb9HDCLSKqfW3mvAIX//xzinI3m/r3+b7nzZ/83Z57gf9tyHeX/pwDOok+QU+5NC7Sx" +
+						"NJxl9VfdmppTU9cCoH4eZawYvEa/QJwgX1hMwRXCgKL0HiWcQyI/JutAS3ECi+KCtnkWV" +
+						"sjSzv3fKrRR+H/NyuNkgoPyv5npzRzxOxP+b9uOyv9Ogdb+BxgSklKQGg36+N+zZ7v9tw" +
+						"X/u3xM8f8p0OR/Tv70igeBhygNFuimMIWPwLQEGA4wwyJZK7n98RFNf+cZG6YwveMj6On" +
+						"JqE2nmkUz7POp+uPj3tRi+OlJ57NivISYCqlI3LtPLM3AF5Mpn+EzkpcLeSLqh7cNSYNk" +
+						"oToTraQ0/kWBeE/gQJH80apHFPBJynCUcuU+jxiV9uortfgowfdCV8s13S7Jf3p9gbKAJ" +
+						"8mI5WuoxxjbtkZ8kiRY7NlfOg31z9+y/y3/zwhlRpmLG3+TpRwW6PF/25l7Vf5nWZaIE9" +
+						"ac/6H8/xRo+v9SuNKOAH4ly4Gu37IaSy4DdEjHaUpYUQNWi/WQZ6VTGl6JAlFfoMaaw+v" +
+						"GvxDdh4xP042f9I7r1c3KYlQvn+pT2SMpqtbpYcmK/kf/rAkTD1wT1RL7D2S1uo2SiC2Q" +
+						"I490OjSyzz2Up+fwISc+UHq324kGaeQg7J59qOrtO9jUdHRIXDvqojFAZhwS2BEK26cns" +
+						"V5/z2sLU/+sGYahjWGA9qgGaMs0QPMV2J89tv31Wd+LttdlebawvHPT7g+DdvzPQXr474" +
+						"//7i7+25Yt8n/PVPH/JJBDv3tWIzv8HwjvJ996yWsM/gf6eOOxf08fskP/gXBZxneZgf9" +
+						"AHSruXzZa8Z9Cvol8kHsW1Nf/K+r/sv83dx3R/5u5rjr/PQla5z8l+X4srWAgAVc2I7nt" +
+						"B1lMtgmku75fRnJWLTOKLwtkces56AgOkXlutf8waPf/axVJpIDe/r9jtc5/XNszlf+fA" +
+						"kf6/ztvGXgAsFswNhV8xxFA8yFlnQE0ZV7YIUBH/V+9+XOy/v/M9qxd/PfMsv/vKv8/BY" +
+						"7F/2vfJ+vB7k9xUaJwC6oMaKh/dy0cVGXtph+p8d0R6iyptWvD3UbonLSky9PrxfZOWhp" +
+						"RzZOGQkbonrSkSzPAi+2ftBRyYQ2UtuV9Z87YVMhY+eOL95Bmi9YQW9Q7X2GWkNLuP6V8" +
+						"Sx2Q1B5La48yXFdq25XcHqS3qoKXg673f2QXAL3nf17j/M8U539zx1T5/0kg7/WLEfPYD" +
+						"vHDXsB4xZlsh07eeCrb0sgYLwF9czI71AgvM5vtUMmFpbPnpl8FBQUFBQUFBQUFBQUFBQ" +
+						"UFBQUFhdHwFf2f+3IAUAAA"),
+				},
+				connection.ConnectionKey{CloudRegion: "mock_connection"}.String(): {
+					"metadata": []byte(
+						"{\"cloud-region\":\"mock_connection\"," +
+							"\"cloud-owner\":\"mock_owner\"," +
+							"\"kubeconfig\": \"" + base64.StdEncoding.EncodeToString(fd) + "\"}"),
+				},
+			},
+		}
+
+		ic := NewInstanceClient()
+		input := InstanceRequest{
+			RBName:      "test-rbdef-hook",
+			RBVersion:   "v1",
+			ProfileName: "profile1",
+			CloudRegion: "mock_connection",
+		}
+
+		ir, err := ic.Create(input)
+		if err != nil {
+			t.Fatalf("TestInstanceWithHookCreate returned an error (%s)", err)
+		}
+
+		log.Println(ir)
+
+		if len(ir.Resources) == 0 {
+			t.Fatalf("TestInstanceWithHookCreate returned empty data (%+v)", ir)
 		}
 	})
 }

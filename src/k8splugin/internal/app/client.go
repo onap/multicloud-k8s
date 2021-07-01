@@ -370,6 +370,23 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 	return createdResources, nil
 }
 
+func (k *KubernetesClient) CreateHookResources(h *helm.Hook, namespace string) (*helm.KubernetesResource, error) {
+	err := k.ensureNamespace(namespace)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Creating Namespace")
+	}
+
+	resTempl := helm.KubernetesResourceTemplate{
+		GVK: h.KRT.GVK,
+		FilePath: h.KRT.FilePath,
+	}
+	resCreated, err := k.CreateKind(resTempl, namespace)
+	if err != nil {
+		return nil, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
+	}
+	return &resCreated, nil
+}
+
 func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesResourceTemplate,
 	namespace string) ([]helm.KubernetesResource, error) {
 

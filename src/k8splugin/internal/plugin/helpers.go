@@ -17,12 +17,14 @@
 package plugin
 
 import (
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
+	"k8s.io/client-go/rest"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 
 	pkgerrors "github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
@@ -71,6 +73,16 @@ type Reference interface {
 
 	//Update kubernetes resource based on the groupVersionKind and resourceName provided in resource
 	Update(yamlFilePath string, namespace string, client KubernetesConnector) (string, error)
+
+
+	//WatchUntilReady a kubernetes resource until it's ready
+	WatchUntilReady(timeout time.Duration,
+		ns string,
+		res helm.KubernetesResource,
+		mapper meta.RESTMapper,
+		restClient rest.Interface,
+		objType runtime.Object,
+		clientSet kubernetes.Interface) error
 }
 
 // GetPluginByKind returns a plugin by the kind name

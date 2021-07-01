@@ -15,17 +15,22 @@ package main
 
 import (
 	"context"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"log"
+	"time"
 
 	pkgerrors "github.com/pkg/errors"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 )
 
 // Compile time check to see if servicePlugin implements the correct interface
@@ -35,6 +40,17 @@ var _ plugin.Reference = servicePlugin{}
 var ExportedVariable servicePlugin
 
 type servicePlugin struct {
+}
+
+func (g servicePlugin) WatchUntilReady(
+	timeout time.Duration,
+	ns string,
+	res helm.KubernetesResource,
+	mapper meta.RESTMapper,
+	restClient rest.Interface,
+	objType runtime.Object,
+	clientSet kubernetes.Interface) error {
+	return pkgerrors.Errorf("This function is not implemented in this plugin")
 }
 
 // Create a service object in a specific Kubernetes cluster

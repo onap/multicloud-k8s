@@ -50,6 +50,7 @@ func NewRouter(defClient rb.DefinitionManager,
 		Queries("rb-name", "{rb-name}",
 			"rb-version", "{rb-version}",
 			"profile-name", "{profile-name}").Methods("GET")
+	//Want to get full Data -> add query param: /install/{instID}?full=true
 	instRouter.HandleFunc("/instance/{instID}", instHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/status", instHandler.statusHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/query", instHandler.queryHandler).Methods("GET")

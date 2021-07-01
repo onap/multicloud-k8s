@@ -122,27 +122,56 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["instID"]
-
-	resp, err := i.client.Get(id)
-	if err != nil {
-		log.Error("Error getting Instance", log.Fields{
-			"error": err,
-			"id":    id,
-		})
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	var getFull bool
+	if r.URL.Query().Get("full") == "true" {
+		getFull = true
+	} else {
+		getFull = false
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(resp)
-	if err != nil {
-		log.Error("Error Marshaling Response", log.Fields{
-			"error":    err,
-			"response": resp,
-		})
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if getFull {
+		resp, err := i.client.GetFull(id)
+		//GetFull and Get return different data struct so can not use the same resp var
+		if err != nil {
+			log.Error("Error getting Full Instance", log.Fields{
+				"error": err,
+				"id":    id,
+			})
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(w).Encode(resp)
+		if err != nil {
+			log.Error("Error Marshaling Response", log.Fields{
+				"error":    err,
+				"response": resp,
+			})
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		resp, err := i.client.Get(id)
+		if err != nil {
+			log.Error("Error getting Instance", log.Fields{
+				"error": err,
+				"id":    id,
+			})
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(w).Encode(resp)
+		if err != nil {
+			log.Error("Error Marshaling Response", log.Fields{
+				"error":    err,
+				"response": resp,
+			})
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }
 

@@ -16,8 +16,12 @@ package main
 import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
-
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"time"
 )
 
 // ExportedVariable is what we will look for when calling the plugin
@@ -26,8 +30,19 @@ var ExportedVariable mockPlugin
 type mockPlugin struct {
 }
 
+func (g mockPlugin) WatchUntilReady(
+	timeout time.Duration,
+	ns string,
+	res helm.KubernetesResource,
+	mapper meta.RESTMapper,
+	restClient rest.Interface,
+	objType runtime.Object,
+	clientSet kubernetes.Interface) error {
+	return nil
+}
+
 // Create object in a specific Kubernetes resource
-func (p mockPlugin) Create(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
+func (p mockPlugin) Create(yamlFilePath string, namespace string, client plugin.KubernetesConnector, isDryrun bool) (string, error) {
 	return "resource-name", nil
 }
 

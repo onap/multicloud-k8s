@@ -15,7 +15,12 @@ package main
 
 import (
 	"context"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"log"
+	"time"
 
 	pkgerrors "github.com/pkg/errors"
 	coreV1 "k8s.io/api/core/v1"
@@ -34,6 +39,17 @@ var _ plugin.Reference = namespacePlugin{}
 var ExportedVariable namespacePlugin
 
 type namespacePlugin struct {
+}
+
+func (g namespacePlugin) WatchUntilReady(
+	timeout time.Duration,
+	ns string,
+	res helm.KubernetesResource,
+	mapper meta.RESTMapper,
+	restClient rest.Interface,
+	objType runtime.Object,
+	clientSet kubernetes.Interface) error {
+	return nil
 }
 
 // Create a namespace object in a specific Kubernetes cluster

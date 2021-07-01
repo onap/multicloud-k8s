@@ -122,8 +122,15 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["instID"]
+	var resp interface{}
+	var err error
 
-	resp, err := i.client.Get(id)
+	if r.URL.Query().Get("full") == "true" {
+		resp, err = i.client.GetFull(id)
+	} else {
+		resp, err = i.client.Get(id)
+	}
+
 	if err != nil {
 		log.Error("Error getting Instance", log.Fields{
 			"error": err,
@@ -132,7 +139,6 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(resp)

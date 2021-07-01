@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job
+  labels:
+    app: job
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-8"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: job
+    spec:
+      shareProcessNamespace: true
+      restartPolicy: Never
+      containers:
+        - name: sleep-container
+          image: "busybox"
+          command: ["sleep", "10"]

@@ -45,7 +45,9 @@ require (
 	gopkg.in/yaml.v2 v2.3.0
 	helm.sh/helm/v3 v3.5.0
 	k8s.io/api v0.20.1
+	k8s.io/apiextensions-apiserver v0.20.1
 	k8s.io/apimachinery v0.20.1
+	k8s.io/cli-runtime v0.20.1
 	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 	rsc.io/letsencrypt v0.0.3 // indirect
 )

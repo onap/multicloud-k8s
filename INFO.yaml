@@ -56,11 +56,11 @@ committers:
       company: 'Intel'
       id: 'ritusood'
       timezone: 'America/Los_Angeles'
-    - name: 'Liexiang Yue'
-      email: 'yueliexiang@chinamobile.com'
-      company: 'China Mobile'
-      id: 'YueLiexiang'
-      timezone: 'Asia/Shanghai'
+    - name: 'Konrad Banka'
+      email: 'k.banka@samsung.com'
+      company: 'Samsung'
+      id: 'kbanka'
+      timezone: 'Europe/Paris'
 tsc:
     approval: 'https://lists.onap.org/pipermail/onap-tsc'
     changes:
@@ -104,3 +104,11 @@ tsc:
               - 'Ethan Lynn'
               - 'Sudhakar Reddy'
           link: 'https://lists.onap.org/g/onap-tsc/message/6676'
+        - type: 'Remove'
+          name:
+              - 'Liexiang Yue'
+          link: 'https://lists.onap.org/g/onap-tsc/message/7962'
+        - type: 'Addition'
+          name:
+              - 'Konrad Banka'
+          link: 'https://lists.onap.org/g/onap-tsc/message/7962'

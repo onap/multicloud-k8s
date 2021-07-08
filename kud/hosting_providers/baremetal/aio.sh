@@ -12,6 +12,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+apt list --installed # TODO
+sudo apt-get update # TODO
+
 aio_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 cd ${aio_dir}/../vagrant
 

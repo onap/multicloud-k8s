@@ -41,7 +41,9 @@ Prepare the environment and clone the repo
 
 `$ sudo apt-get upgrade -y`
 
-`$ sudo apt-get install -y python-pip`
+`$ sudo apt-get install -y python3-pip`
+
+`$ sudo update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1`
 
 `$ git clone https://git.onap.org/multicloud/k8s/`
 

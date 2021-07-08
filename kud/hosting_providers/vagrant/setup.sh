@@ -61,7 +61,7 @@ packages=()
 case ${ID,,} in
     *suse)
     INSTALLER_CMD="sudo -H -E zypper -q install -y --no-recommends"
-    packages+=(python-devel)
+    packages+=(python-devel python-pip)
 
     # Vagrant installation
     if [[ "${enable_vagrant_install+x}" ]]; then
@@ -95,7 +95,7 @@ case ${ID,,} in
 
     ubuntu|debian)
     INSTALLER_CMD="sudo -H -E apt-get -y -q=3 install"
-    packages+=(python-dev)
+    packages+=(python3-dev python3-pip)
 
     # Vagrant installation
     if [[ "${enable_vagrant_install+x}" ]]; then
@@ -125,7 +125,7 @@ case ${ID,,} in
     PKG_MANAGER=$(which dnf || which yum)
     sudo "$PKG_MANAGER" updateinfo
     INSTALLER_CMD="sudo -H -E ${PKG_MANAGER} -q -y install"
-    packages+=(python-devel)
+    packages+=(python-devel python-pip)
 
     # Vagrant installation
     if [[ "${enable_vagrant_install+x}" ]]; then
@@ -174,11 +174,12 @@ fi
 sudo modprobe vhost_net
 
 ${INSTALLER_CMD} "${packages[@]}"
-if ! which pip; then
-    curl -sL https://bootstrap.pypa.io/pip/2.7/get-pip.py | sudo python
-else
-    sudo -H -E pip install --no-cache-dir --upgrade pip
-fi
+case ${ID,,} in
+    ubuntu|debian)
+    sudo update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+    ;;
+esac
+sudo -H -E pip install --no-cache-dir --upgrade pip
 sudo -H -E pip install --no-cache-dir tox
 if [[ ${http_proxy+x} ]]; then
     vagrant plugin install vagrant-proxyconf

@@ -27,7 +27,7 @@ set -o errexit
 
 function setup_dependencies {
     apt-get update
-    apt-get install -y curl gnupg2 pciutils make gcc libnuma-dev python git linux-headers-`uname -r` module-init-tools libssl-dev
+    apt-get install -y curl gnupg2 pciutils make gcc libnuma-dev git linux-headers-`uname -r` module-init-tools libssl-dev
     echo "deb [trusted=yes] https://packagecloud.io/fdio/release/ubuntu bionic main" >> /etc/apt/sources.list.d/99fd.io.list
     curl -L https://packagecloud.io/fdio/master/gpgkey | apt-key add -
 }

@@ -36,7 +36,7 @@ function setup_dependencies {
     git clone http://dpdk.org/git/apps/pktgen-dpdk
     KERNEL_VERSION=$(uname -r)
     echo $KERNEL_VERSION
-    sudo apt-get install -y linux-headers-$KERNEL_VERSION libpcap-dev gcc make libnuma-dev liblua5.3-dev python
+    sudo apt-get install -y linux-headers-$KERNEL_VERSION libpcap-dev gcc make libnuma-dev liblua5.3-dev
 }
 
 function build_dpdk {

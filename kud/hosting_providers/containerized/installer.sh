@@ -33,6 +33,7 @@ function install_prerequisites {
             unzip \
             vim \
             wget
+    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
 }
 
 # _install_ansible() - Install and Configure Ansible program
@@ -40,7 +41,7 @@ function _install_ansible {
     local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml |
         awk -F ': ' '{print $2}')
     mkdir -p /etc/ansible/
-    pip3 install --no-cache-dir ansible==$version
+    pip install --no-cache-dir ansible==$version
 }
 
 function install_kubespray {
@@ -59,7 +60,7 @@ function install_kubespray {
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/
-    pip3 install --no-cache-dir -r ./requirements.txt
+    pip install --no-cache-dir -r ./requirements.txt
     make mitogen
     popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null

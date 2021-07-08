@@ -80,6 +80,7 @@ case ${ID,,} in
     *suse)
     ;;
     ubuntu|debian)
+        apt-get update
         apt-get install -y cpu-checker
         kvm-ok
     ;;

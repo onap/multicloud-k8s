@@ -42,14 +42,16 @@ function _install_go {
 
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
-    sudo apt-get install -y python3-pip
-    sudo -E pip3 install --no-cache-dir --upgrade pip
+    sudo apt-get install -y python3 python3-pip
+    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1 --force
+    sudo update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1 --force
+    sudo -E pip install --no-cache-dir --upgrade pip
     if $(ansible --version &>/dev/null); then
-        sudo pip3 uninstall -y ansible
+        sudo pip uninstall -y ansible
     fi
     local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
     sudo mkdir -p /etc/ansible/
-    sudo -E pip3 install --no-cache-dir ansible==$version
+    sudo -E pip install --no-cache-dir ansible==$version
 }
 
 function _set_environment_file {
@@ -79,7 +81,7 @@ function install_k8s {
     rm $tarball
 
     pushd $dest_folder/kubespray-$version/
-    sudo -E pip3 install --no-cache-dir -r ./requirements.txt
+    sudo -E pip install --no-cache-dir -r ./requirements.txt
     make mitogen
     popd
     rm -f $kud_inventory_folder/group_vars/all.yml 2> /dev/null
@@ -204,7 +206,7 @@ function install_addons {
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
 function install_plugin {
     echo "Installing multicloud/k8s plugin"
-    sudo -E pip3 install --no-cache-dir docker-compose
+    sudo -E pip install --no-cache-dir docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
     sudo cp $HOME/.kube/config /opt/kubeconfig/kud

@@ -15,12 +15,12 @@ limitations under the License.
 package api
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/healthcheck"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
-
-	"github.com/gorilla/mux"
+	"log"
 )
 
 // NewRouter creates a router that registers the various urls that are supported
@@ -134,6 +134,22 @@ func NewRouter(defClient rb.DefinitionManager,
 
 	// Add healthcheck path
 	instRouter.HandleFunc("/healthcheck", healthCheckHandler).Methods("GET")
+
+	//Scan db and look for uncompleted tasks to continue
+	go func() {
+		log.Printf("--------Recovering failed instances--------")
+		resp, err := instHandler.client.List("", "", "")
+		if err != nil {
+			log.Printf("Error listing instances, will not recover failed instances, error: " + err.Error())
+			return
+		}
+		for _,instance := range resp {
+			if err = instHandler.client.Recover(instance.ID); err!=nil {
+				log.Printf(err.Error())
+				continue
+			}
+		}
+	}()
 
 	return router
 }

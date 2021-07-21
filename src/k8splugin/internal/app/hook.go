@@ -14,6 +14,8 @@ limitations under the License.
 package app
 
 import (
+	"fmt"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"helm.sh/helm/v3/pkg/release"
 	"log"
@@ -26,8 +28,10 @@ const defaultHookDeleteTimeoutInSeconds = int64(60)
 
 // HookClient implements the Helm Hook interface
 type HookClient struct {
-	kubeNameSpace string
-	id     string
+	kubeNameSpace 	string
+	id     			string
+	dbStoreName		string
+	dbTagInst		string
 }
 
 type MultiCloudHook struct{
@@ -36,22 +40,24 @@ type MultiCloudHook struct{
 	Version string
 }
 
-type result struct {
-	hooks   []*MultiCloudHook
-	generic []helm.KubernetesResourceTemplate
-}
-
 // NewHookClient returns a new instance of HookClient
-func NewHookClient(namespace, id string) *HookClient {
+func NewHookClient(namespace, id, dbStoreName, dbTagInst string) *HookClient {
 	return &HookClient{
 		kubeNameSpace: namespace,
 		id: id,
+		dbStoreName: dbStoreName,
+		dbTagInst: dbTagInst,
 	}
 }
 
 // Mimic function ExecHook in helm/pkg/tiller/release_server.go
-func (hc *HookClient) ExecHook(k8sClient KubernetesClient, hs []*helm.Hook, name string, hook release.HookEvent, timeout int64) ([]helm.KubernetesResource, []*helm.Hook, error){
-	createdHooks := []helm.KubernetesResource{}
+func (hc *HookClient) ExecHook(
+	k8sClient KubernetesClient,
+	hs []*helm.Hook,
+	hook release.HookEvent,
+	timeout int64,
+	startIndex int,
+	dbData *DbData) (error){
 	executingHooks := []*helm.Hook{}
 	for _, h := range hs {
 		for _, e := range h.Hook.Events {
@@ -60,74 +66,78 @@ func (hc *HookClient) ExecHook(k8sClient KubernetesClient, hs []*helm.Hook, name
 			}
 		}
 	}
-	log.Printf("Executing %d %s hook(s) for release %s", len(executingHooks), hook, name)
+	key := InstanceKey{
+		ID: hc.id,
+	}
+	log.Printf("Executing %d %s hook(s) for instance %s", len(executingHooks), hook, hc.id)
 	executingHooks = sortByHookWeight(executingHooks)
 
-	for _, h := range executingHooks {
-		if err := hc.deleteHookByPolicy(h, release.HookBeforeHookCreation, name, hook, k8sClient); err != nil {
-			return createdHooks, executingHooks, err
+	for index, h := range executingHooks {
+		if index < startIndex {
+			continue
 		}
-		log.Printf("  Release: %s, Creating %s hook %s", name, hook, h.Hook.Name)
-		createdHook, err := k8sClient.CreateHookResources(h, hc.kubeNameSpace);
+		if err := hc.deleteHookByPolicy(h, release.HookBeforeHookCreation, hook, k8sClient); err != nil {
+			return err
+		}
+		//update DB here before the creation of the hook, if the plugin quits
+		//-> when it comes back, it will continue from next hook and consider that this one is done
+		dbData.HookProgress = fmt.Sprintf("%d/%d", index + 1, len(executingHooks))
+		err := db.DBconn.Update(hc.dbStoreName, key, hc.dbTagInst, dbData)
+		if err != nil {
+			return err
+		}
+		log.Printf("  Instance: %s, Creating %s hook %s, index %d", hc.id, hook, h.Hook.Name, index)
+		createdHook, err := k8sClient.CreateHookResources(h, hc.kubeNameSpace)
 		if  err != nil {
-			log.Printf("  Release: %s, Warning: %s hook %s, filePath %s failed: %s", name, hook, h.Hook.Name, h.KRT.FilePath, err)
-			hc.deleteHookByPolicy(h, release.HookFailed, name, hook, k8sClient);
-			return createdHooks, executingHooks, err
+			log.Printf("  Instance: %s, Warning: %s hook %s, filePath %s failed: %s", hc.id, hook, h.Hook.Name, h.KRT.FilePath, err)
+			hc.deleteHookByPolicy(h, release.HookFailed, hook, k8sClient)
+			return err
 		}
-
 		if hook != "crd-install" {
-			// Watch hook resources until they have completed
+			// Watch hook resources until they are completed
 			err = k8sClient.watchUntilReady(time.Duration(timeout)*time.Second, hc.kubeNameSpace, *createdHook)
 			if err != nil {
-				return createdHooks, executingHooks, err
+				return err
 			}
-			createdHooks = append(createdHooks, helm.KubernetesResource{
-				GVK: h.KRT.GVK,
-				Name: h.Hook.Name,
-			})
 		} else {
 			//Do not handle CRD Hooks
-			createdHooks = append(createdHooks, helm.KubernetesResource{
-				GVK: h.KRT.GVK,
-				Name: h.Hook.Name,
-			})
 		}
 	}
 
-	log.Printf("%d %s hook(s) complete for release %s", len(executingHooks), hook, name)
+	log.Printf("%d %s hook(s) complete for release %s", len(executingHooks), hook, hc.id)
 	go func() {
 		for _, h := range executingHooks {
-			if err := hc.deleteHookByPolicy(h, release.HookSucceeded, name, hook, k8sClient); err != nil {
-				log.Printf("  Release: %s, Warning: Error deleting %s hook %s based on delete policy, continue", name, hook, h.Hook.Name)
+			if err := hc.deleteHookByPolicy(h, release.HookSucceeded, hook, k8sClient); err != nil {
+				log.Printf("  Instance: %s, Warning: Error deleting %s hook %s based on delete policy, continue", hc.id, hook, h.Hook.Name)
 			}
 		}
 	}()
 
-	return createdHooks, executingHooks, nil
+	return nil
 }
 
-func (hc *HookClient) deleteHookByPolicy(h *helm.Hook, policy release.HookDeletePolicy, name string, hook release.HookEvent, k8sClient KubernetesClient) error {
+func (hc *HookClient) deleteHookByPolicy(h *helm.Hook, policy release.HookDeletePolicy, hook release.HookEvent, k8sClient KubernetesClient) error {
 	rss := helm.KubernetesResource{
 		GVK:  h.KRT.GVK,
 		Name: h.Hook.Name,
 	}
 	if hookHasDeletePolicy(h, policy) {
-		log.Printf("  Release: %s, Deleting %s hook %s due to %q policy", name, hook, h.Hook.Name, policy)
+		log.Printf("  Instance: %s, Deleting %s hook %s due to %q policy", hc.id, hook, h.Hook.Name, policy)
 		if errHookDelete := k8sClient.deleteResources(append([]helm.KubernetesResource{}, rss), hc.kubeNameSpace); errHookDelete != nil {
 			if strings.Contains(errHookDelete.Error(), "not found") {
 				return nil
 			} else {
-				log.Printf("  Release: %s, Warning: %s hook %s, filePath %s could not be deleted: %s", name, hook, h.Hook.Name, h.KRT.FilePath ,errHookDelete)
+				log.Printf("  Instance: %s, Warning: %s hook %s, filePath %s could not be deleted: %s", hc.id, hook, h.Hook.Name, h.KRT.FilePath ,errHookDelete)
 				return errHookDelete
 			}
 		} else {
 			//Verify that the rss is deleted
 			isDeleted := false
 			for !isDeleted {
-				log.Printf("  Release: %s, Waiting on deleting %s hook %s for release %s due to %q policy", name, hook, h.Hook.Name, name, policy)
+				log.Printf("  Instance: %s, Waiting on deleting %s hook %s for release %s due to %q policy", hc.id, hook, h.Hook.Name, hc.id, policy)
 				if _, err := k8sClient.GetResourceStatus(rss, hc.kubeNameSpace); err != nil {
 					if strings.Contains(err.Error(), "not found") {
-						log.Printf("  Release: %s, Deleted %s hook %s for release %s due to %q policy", name, hook, h.Hook.Name, name, policy)
+						log.Printf("  Instance: %s, Deleted %s hook %s for release %s due to %q policy", hc.id, hook, h.Hook.Name, hc.id, policy)
 						return nil
 					} else {
 						isDeleted = true

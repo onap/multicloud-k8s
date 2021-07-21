@@ -630,7 +630,7 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate, namespace string) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
-		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
+		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + " does not exists")
 	}
 
 	log.Info("Processing Kubernetes Resource", log.Fields{
@@ -667,7 +667,7 @@ func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
 	namespace string) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
-		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
+		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + " does not exists")
 	}
 
 	log.Info("Processing Kubernetes Resource", log.Fields{

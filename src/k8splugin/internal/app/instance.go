@@ -21,7 +21,6 @@ package app
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
@@ -37,6 +36,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	resource "k8s.io/cli-runtime/pkg/resource"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -72,7 +72,7 @@ type DbData struct {
 	ReleaseName string                    `json:"release-name"`
 	Resources   []helm.KubernetesResource `json:"resources"`
 	Hooks       []*helm.Hook              `json:"hooks"`
-	HookProgress string					  `json:hook-progress`
+	HookProgress string					  `json:"hook-progress"`
 }
 
 // InstanceMiniResponse contains the response from instantiation
@@ -97,11 +97,13 @@ type InstanceStatus struct {
 type InstanceManager interface {
 	Create(i InstanceRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
+	GetFull(id string) (DbData, error)
 	Status(id string) (InstanceStatus, error)
 	Query(id, apiVersion, kind, name, labels string) (InstanceStatus, error)
 	List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error)
 	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error)
 	Delete(id string) error
+	Recover(id string) error
 }
 
 // InstanceKey is used as the primary key in the db
@@ -217,14 +219,14 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Instance DB Entry")
 	}
 
-	hookClient := NewHookClient(profile.Namespace, id)
-	createdHooks, hooksToRun, err := hookClient.ExecHook(k8sClient, hookList, id, release.HookPreInstall, 60)
-	dbData.HookProgress = fmt.Sprintf("%d/%d", len(createdHooks), len(hooksToRun))
+	hookClient := NewHookClient(profile.Namespace, id, v.storeName, v.tagInst)
+	err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall, 60, 0, &dbData)
+	log.Printf("dbData.HookProgress %s", dbData.HookProgress)
 	if err != nil {
 		log.Printf("Error running preinstall hooks for release %s, Error: %s. Stop here", releaseName, err)
 		dbData.Status = "PRE-INSTALL-FAILED"
-		err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
-		if err != nil {
+		err2 := db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+		if err2 != nil {
 			log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
 		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error running preinstall hooks")
@@ -235,6 +237,8 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	if err != nil {
 		log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
 	}
+
+	//Main rss creation is supposed to be very quick -> no need to support recover for main rss
 	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace);
 	if err != nil {
 		dbData.Status = "FAILED"
@@ -244,7 +248,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
 	if err != nil {
-		log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
 
 	//Compose the return response
@@ -262,7 +266,6 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 	go func() {
 		//No need to check for main rss status, based on the official implementation of helm
-		//check if all rss are ready
 		//for _, rss := range createdResources {
 		//	isReady := false
 		//	count := 0
@@ -271,23 +274,23 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		//		status, err := k8sClient.GetResourceStatus(rss, profile.Namespace);
 		//		if err != nil {
 		//			dbData.Status = "FAILED"
-		//			log.Printf("  Release: %s, Get rss status %s has error, will not run the post-install hooks", releaseName, rss.Name)
+		//			log.Printf("  Instance: %s, Get rss status %s has error, will not run the post-install hooks", id, rss.Name)
 		//			break
 		//		}
 		//		isReady, err = IsRssReady(rss.Name, status, true)
 		//		if err != nil {
 		//			dbData.Status = "FAILED"
-		//			log.Printf("  Release: %s, Rss %s has error, will not run the post-install hooks", releaseName, rss.Name)
+		//			log.Printf("  Instance: %s, Rss %s has error, will not run the post-install hooks", id, rss.Name)
 		//			break
 		//		}
 		//		if isReady {
-		//			log.Printf("  Release: %s, creation complete for %s", releaseName, status.Name)
+		//			log.Printf("  Instance: %s, creation complete for %s", id, status.Name)
 		//			break
 		//		} else {
-		//			log.Printf("  Release: %s, rss %s, kind %s is NOT READY, wait. couting left: %d", releaseName, rss.Name, rss.GVK.Kind, countMax - count)
+		//			log.Printf("  Instance: %s, rss %s, kind %s is NOT READY, wait. couting left: %d", id, rss.Name, rss.GVK.Kind, countMax - count)
 		//			time.Sleep(5 * time.Second)
 		//			if count++; count >= countMax {
-		//				log.Printf("  Release: %s, warning: Rss %s cannot ready, consider deployment failed", releaseName, status.Name)
+		//				log.Printf("  Instance: %s, warning: Rss %s cannot ready, consider deployment failed", id, status.Name)
 		//				dbData.Status = "FAILED"
 		//				break
 		//			}
@@ -301,16 +304,16 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		}
 		db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
 		if dbData.Status != "FAILED" {
-			createdHooks, hooksToRun, err = hookClient.ExecHook(k8sClient, hookList, id, release.HookPostInstall, 600)
-			dbData.HookProgress = fmt.Sprintf("%d/%d", len(createdHooks), len(hooksToRun))
+			err = hookClient.ExecHook(k8sClient, hookList, release.HookPostInstall, 600, 0, &dbData)
+			log.Printf("dbData.HookProgress %s", dbData.HookProgress)
 			if err != nil {
 				dbData.Status = "POST-INSTALL-FAILED"
-				log.Printf("  Release: %s, Error running postinstall hooks error: %s", releaseName, err)
+				log.Printf("  Instance: %s, Error running postinstall hooks error: %s", id, err)
 			} else {
 				dbData.Status = "DONE"
 			}
 		} else {
-			log.Printf("  Release: %s, Main rss are failed, skip post-install", releaseName)
+			log.Printf("  Instance: %s, Main rss are failed, skip post-install", id)
 		}
 		err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
 		if err != nil {
@@ -673,7 +676,6 @@ func (v *InstanceClient) Find(rbName string, version string, profile string, lab
 		if add {
 			ret = append(ret, resp)
 		}
-
 	}
 
 	return ret, nil
@@ -688,6 +690,18 @@ func (v *InstanceClient) Delete(id string) error {
 	key := InstanceKey{
 		ID: id,
 	}
+	if inst.Status == "DELETED" {
+		//The instance is deleted when the plugin comes back -> just remove from Db
+		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
+		if err != nil {
+			log.Printf("Delete Instance DB Entry for release %s has error.", inst.ReleaseName)
+		}
+		return nil
+	} else if inst.Status != "DONE"{
+		//Recover is ongoing, do nothing here
+		return nil
+	}
+
 	k8sClient := KubernetesClient{}
 	err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
 	if err != nil {
@@ -700,19 +714,23 @@ func (v *InstanceClient) Delete(id string) error {
 		log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 	}
 
-	hookClient := NewHookClient(inst.Namespace, id)
-	createdHooks, hooksToRun, err := hookClient.ExecHook(k8sClient, inst.Hooks, id, release.HookPreDelete, 60)
-	inst.HookProgress = fmt.Sprintf("%d/%d", len(createdHooks), len(hooksToRun))
+	hookClient := NewHookClient(inst.Namespace, id, v.storeName, v.tagInst)
+	err = hookClient.ExecHook(k8sClient, inst.Hooks, release.HookPreDelete, 60, 0, &inst)
 	if err != nil {
-		log.Printf("  Release: %s, Error running predelete hooks error: %s", inst.ReleaseName, err)
+		log.Printf("  Instance: %s, Error running pre-delete hooks error: %s", id, err)
 		inst.Status = "PRE-DELETE-FAILED"
-		err = db.DBconn.Update(v.storeName, key, v.tagInst, inst)
-		if err != nil {
+		err2 := db.DBconn.Update(v.storeName, key, v.tagInst, inst)
+		if err2 != nil {
 			log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 		}
-		return pkgerrors.Wrap(err, "Error running predelete hooks")
+		return pkgerrors.Wrap(err, "Error running pre-delete hooks")
 	}
 
+	inst.Status = "DELETING"
+	err = db.DBconn.Update(v.storeName, key, v.tagInst, inst)
+	if err != nil {
+		log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
+	}
 	err = k8sClient.deleteResources(inst.Resources, inst.Namespace)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Deleting Instance Resources")
@@ -724,33 +742,172 @@ func (v *InstanceClient) Delete(id string) error {
 		//	isDeleted := false
 		//	for !isDeleted {
 		//		if _, err := k8sClient.GetResourceStatus(rss, inst.Namespace); err != nil {
-		//			log.Printf("  Release: %s, rss %s is DELETED, continue", inst.ReleaseName, rss.Name)
+		//			log.Printf("  Instance: %s, rss %s is DELETED, continue", id, rss.Name)
 		//			isDeleted = true
 		//		} else {
-		//			log.Printf("  Release: %s, rss %s is NOT DELETED, wait", inst.ReleaseName, rss.Name)
+		//			log.Printf("  Instance: %s, rss %s is NOT DELETED, wait", id, rss.Name)
 		//			time.Sleep(5 * time.Second)
 		//		}
 		//	}
 		//}
 		//
-		//log.Printf("  Release: %s, All rss are deleted, continue", inst.ReleaseName)
-		createdHooks, hooksToRun, err := hookClient.ExecHook(k8sClient, inst.Hooks, id, release.HookPostDelete, 600)
-		inst.HookProgress = fmt.Sprintf("%d/%d", len(createdHooks), len(hooksToRun))
-		if err != nil {
-			//If this case happen, user should clean the cluster
-			log.Printf("  Release: %s, Error running postdelete hooks error: %s", inst.ReleaseName, err)
-			inst.Status = "POST-DELETE-FAILED"
-			err = db.DBconn.Update(v.storeName, key, v.tagInst, inst)
-			if err != nil {
-				log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
-			}
-		}
-
-		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
-		if err != nil {
-			log.Printf("Delete Instance DB Entry for release %s has error.", inst.ReleaseName)
+		//log.Printf("  Instance: %s, All rss are deleted, continue", id)
+		inst.HookProgress = ""
+		if err := v.runPostDelete(k8sClient, hookClient, &inst, 0, true); err != nil {
+			log.Printf(err.Error())
 		}
 	}()
 
+	return nil
+}
+
+//Continue the instantiation
+func (v *InstanceClient) Recover(id string) error {
+	instance, err := v.GetFull(id)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error getting instance " + id + ", skip this instance.  Error detail")
+	}
+	log.Printf("Instance " + id + ", status: " + instance.Status + ", HookProgress: " + instance.HookProgress)
+	//have to resolve again template for this instance because all templates are in /tmp -> will be deleted when container restarts
+	overrideValues := []string{}
+	if instance.Request.OverrideValues != nil {
+		for k, v := range instance.Request.OverrideValues {
+			overrideValues = append(overrideValues, k+"="+v)
+		}
+	}
+	key := InstanceKey{
+		ID: id,
+	}
+	log.Printf("  Resolving template for release %s", instance.Request.ReleaseName)
+	_, hookList, _, err := rb.NewProfileClient().Resolve(instance.Request.RBName, instance.Request.RBVersion, instance.Request.ProfileName, overrideValues, instance.Request.ReleaseName)
+	instance.Hooks = hookList
+	err = db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Update Instance DB Entry")
+	}
+
+	if strings.Contains(instance.Status, "FAILED"){
+		log.Printf("  This instance has failed during instantiation, not going to recover")
+		return nil
+	} else if !strings.Contains(instance.Status, "INSTALL") && !strings.Contains(instance.Status, "DELETE") {
+		log.Printf("  This instance is not in hook state, not going to recover")
+		return nil
+	}
+
+	splitHookProgress := strings.Split(instance.HookProgress,"/")
+	completedHooks,err := strconv.Atoi(splitHookProgress[0])
+	if err != nil {
+		return pkgerrors.Wrap(err, "Error getting completed PRE-INSTALL hooks for instance  " + instance.ID + ", skip. Error detail")
+	}
+
+	//we can add an option to delete instances that will not be recovered from database to clean the db
+	if (instance.Status != "POST-INSTALL") && (instance.Status != "PRE-DELETE") && (instance.Status != "POST-DELETE") {
+		if instance.Status == "PRE-INSTALL" {
+			//Plugin quits during pre-install hooks -> Will do nothing because from SO point of view, there's no instance ID and will be reported as fail and be rolled back
+			log.Printf("  The plugin quits during pre-install hook of this instance, not going to recover")
+		}
+		return nil
+	}
+	k8sClient := KubernetesClient{}
+	err = k8sClient.Init(instance.Request.CloudRegion, id)
+	if err != nil {
+		log.Printf("  Error getting CloudRegion %s", instance.Request.CloudRegion)
+		return nil
+	}
+	hookClient := NewHookClient(instance.Namespace, id, v.storeName, v.tagInst)
+	switch instance.Status {
+	case "POST-INSTALL":
+		//Plugin quits during post-install hooks -> continue
+		go func() {
+			log.Printf("  The plugin quits during post-install hook of this instance, continue post-install hook")
+			err = hookClient.ExecHook(k8sClient, instance.Hooks, release.HookPostInstall, 600, completedHooks, &instance)
+			log.Printf("dbData.HookProgress %s", instance.HookProgress)
+			if err != nil {
+				instance.Status = "POST-INSTALL-FAILED"
+				log.Printf("  Instance: %s, Error running postinstall hooks error: %s", id, err)
+			} else {
+				instance.Status = "DONE"
+			}
+			err = db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+			if err != nil {
+				log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
+			}
+		}()
+	case "PRE-DELETE":
+		//Plugin quits during pre-delete hooks -> This already effects the instance -> should continue the deletion
+		go func() {
+			log.Printf("  The plugin quits during pre-delete hook of this instance, continue pre-delete hook")
+			err = hookClient.ExecHook(k8sClient, instance.Hooks, release.HookPreDelete, 60, completedHooks, &instance)
+			if err != nil {
+				log.Printf("  Instance: %s, Error running pre-delete hooks error: %s", id, err)
+				instance.Status = "PRE-DELETE-FAILED"
+				err = db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+				if err != nil {
+					log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
+				}
+				return
+			}
+
+			err = k8sClient.deleteResources(instance.Resources, instance.Namespace)
+			if err != nil {
+				log.Printf("  Error running deleting instance resources, error: %s", err)
+				return
+			}
+			//will not delete the instance in Db to avoid error when SO call delete again and there is not instance in DB
+			//the instance in DB will be deleted when SO call delete again.
+			instance.HookProgress = ""
+			if err := v.runPostDelete(k8sClient, hookClient, &instance, 0, false); err != nil {
+				log.Printf(err.Error())
+			}
+		}()
+	case "POST-DELETE":
+		//Plugin quits during post-delete hooks -> continue
+		go func() {
+			log.Printf("  The plugin quits during post-delete hook of this instance, continue post-delete hook")
+
+			if err := v.runPostDelete(k8sClient, hookClient, &instance, completedHooks, true); err != nil {
+				log.Printf(err.Error())
+			}
+		}()
+	default:
+		log.Printf("  This instance is not in hook state, not going to recover")
+	}
+
+	return nil
+}
+
+func (v *InstanceClient) runPostDelete(k8sClient KubernetesClient,hookClient *HookClient, instance *DbData, startIndex int, clearDb bool) error {
+	key := InstanceKey{
+		ID: instance.ID,
+	}
+	instance.Status = "POST-DELETE"
+	err := db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+	if err != nil {
+		log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
+	}
+	err = hookClient.ExecHook(k8sClient, instance.Hooks, release.HookPostDelete, 600, startIndex, instance)
+	if err != nil {
+		//If this case happen, user should clean the cluster
+		log.Printf("  Instance: %s, Error running post-delete hooks error: %s", instance.ID, err)
+		instance.Status = "POST-DELETE-FAILED"
+		err2 := db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+		if err2 != nil {
+			log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
+			return pkgerrors.Wrap(err2, "Error running post-delete hooks")
+		}
+		return pkgerrors.Wrap(err, "Error running post-delete hooks")
+	}
+	if clearDb {
+		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
+		if err != nil {
+			log.Printf("Delete Instance DB Entry for release %s has error.", instance.ReleaseName)
+		}
+	} else {
+		instance.Status = "DELETED"
+		err2 := db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+		if err2 != nil {
+			log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
+		}
+	}
 	return nil
 }

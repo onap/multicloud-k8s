@@ -14,10 +14,10 @@ set -o pipefail
 
 source _common_test.sh
 source _functions.sh
-source _functions.sh
 
 # TODO KUBECONFIG may be a list of paths
-kubeconfig_path="${KUBECONFIG:-$HOME/.kube/config}"
+KUBECONFIG_PATH="${KUBECONFIG:-$HOME/.kube/config}"
+DEMO_FOLDER="${DEMO_FOLDER:-$test_folder/../demo}"
 
 clusters="${KUD_PLUGIN_FW_CLUSTERS:-$(cat <<EOF
 [
@@ -28,7 +28,7 @@ clusters="${KUD_PLUGIN_FW_CLUSTERS:-$(cat <<EOF
       "userData1": "edge01 user data 1",
       "userData2": "edge01 user data 2"
     },
-    "file": "$kubeconfig_path"
+    "file": "$KUBECONFIG_PATH"
   }
 ]
 EOF
@@ -73,17 +73,15 @@ service_host=${service_host:-"localhost"}
 CSAR_DIR="/opt/csar"
 csar_id="4bf66240-a0be-4ce2-aebd-a01df7725f16"
 
-demo_folder=$test_folder/../demo
-
 function populate_CSAR_compositevfw_helm {
     _checks_args "$1"
     pushd "${CSAR_DIR}/$1"
     print_msg "Create Helm Chart Archives for compositevfw"
     rm -f *.tar.gz
-    tar -czf packetgen.tar.gz -C $demo_folder/composite-firewall packetgen
-    tar -czf firewall.tar.gz -C $demo_folder/composite-firewall firewall
-    tar -czf sink.tar.gz -C $demo_folder/composite-firewall sink
-    tar -czf profile.tar.gz -C $demo_folder/composite-firewall manifest.yaml override_values.yaml
+    tar -czf packetgen.tar.gz -C $DEMO_FOLDER/composite-firewall packetgen
+    tar -czf firewall.tar.gz -C $DEMO_FOLDER/composite-firewall firewall
+    tar -czf sink.tar.gz -C $DEMO_FOLDER/composite-firewall sink
+    tar -czf profile.tar.gz -C $DEMO_FOLDER/composite-firewall manifest.yaml override_values.yaml
     popd
 }
 
@@ -228,7 +226,7 @@ else
     for name in $(cluster_names); do
         print_msg "Wait for all pods to start on cluster $name"
         file=$(cluster_file "$name")
-        KUBECONFIG=$file kubectl wait pod -l release=fw0 --for=condition=Ready
+        KUBECONFIG=$file kubectl wait pod -l release=fw0 --for=condition=Ready --timeout=5m
     done
     # TODO: Provide some health check to verify vFW work
     print_msg "Not waiting for vFW to fully install as no further checks are implemented in testcase"

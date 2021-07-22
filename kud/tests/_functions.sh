@@ -14,8 +14,11 @@ set -o pipefail
 
 FUNCTIONS_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
+# Do not overwrite any user modifications to PATH when sourcing
+# /etc/environment
+USER_PATH=$PATH
 source /etc/environment
-source $FUNCTIONS_DIR/_common_test.sh
+PATH=$USER_PATH:$PATH
 
 function print_msg {
     local msg=$1

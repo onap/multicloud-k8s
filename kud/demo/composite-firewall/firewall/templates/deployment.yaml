@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
 metadata:
   name: {{ include "firewall.fullname" . }}
   labels:
@@ -7,57 +7,96 @@ metadata:
     app: {{ include "firewall.name" . }}
     chart: {{ .Chart.Name }}
 spec:
-  replicas: {{ .Values.replicaCount }}
-  selector:
-    matchLabels:
-      app: {{ include "firewall.name" . }}
-      release: {{ .Release.Name }}
+  running: true
   template:
     metadata:
       labels:
         app: {{ include "firewall.name" . }}
         release: {{ .Release.Name }}
-      annotations:
-        VirtletLibvirtCPUSetting: |
-          mode: host-model
-        VirtletCloudInitUserData: |
-          ssh_pwauth: True
-          users:
-          - name: admin
-            gecos: User
-            primary-group: admin
-            groups: users
-            sudo: ALL=(ALL) NOPASSWD:ALL
-            lock_passwd: false
-            passwd: "$6$rounds=4096$QA5OCKHTE41$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
-          runcmd:
-            - export demo_artifacts_version={{ .Values.global.demoArtifactsVersion }}
-            - export vfw_private_ip_0={{ .Values.global.vfwPrivateIp0 }}
-            - export vsn_private_ip_0={{ .Values.global.vsnPrivateIp0 }}
-            - export protected_net_cidr={{ .Values.global.protectedNetCidr }}
-            - export dcae_collector_ip={{ .Values.global.dcaeCollectorIp }}
-            - export dcae_collector_port={{ .Values.global.dcaeCollectorPort }}
-            - export protected_net_gw={{ .Values.global.protectedNetGw }}
-            - export protected_private_net_cidr={{ .Values.global.protectedPrivateNetCidr }}
-            - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/firewall | sudo -E bash
-        VirtletRootVolumeSize: 5Gi
-        kubernetes.io/target-runtime: virtlet.cloud
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: extraRuntime
-                operator: In
-                values:
-                - virtlet
-      containers:
-      - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        tty: true
-        stdin: true
+      domain:
+        cpu:
+          model: host-model
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+          - name: default
+            bridge: {}
+          - name: unprotected
+            macAddress: 52:57:2b:7b:e4:27
+            bridge: {}
+          - name: protected
+            macAddress: fa:d1:3a:a1:5c:67
+            bridge: {}
+          - name: emco
+            macAddress: 86:31:ea:6a:ce:75
+            bridge: {}
         resources:
-          limits:
+          requests:
             memory: {{ .Values.resources.memory }}
+      networks:
+      - name: default
+        pod: {}
+      - name: unprotected
+        multus:
+          networkName: {{ .Values.global.unprotectedNetworkName }}
+      - name: protected
+        multus:
+          networkName: {{ .Values.global.protectedNetworkName }}
+      - name: emco
+        multus:
+          networkName: {{ .Values.global.emcoPrivateNetworkName }}
+      volumes:
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            networkData: |
+              version: 2
+              ethernets:
+                enp1s0:
+                  dhcp4: true
+                eth1:
+                  match:
+                    macaddress: "52:57:2b:7b:e4:27"
+                  set-name: eth1
+                  dhcp4: true
+                eth2:
+                  match:
+                    macaddress: "fa:d1:3a:a1:5c:67"
+                  set-name: eth2
+                  dhcp4: true
+                eth3:
+                  match:
+                    macaddress: "86:31:ea:6a:ce:75"
+                  set-name: eth3
+                  dhcp4: true
+            userData: |
+              #cloud-config
+              ssh_pwauth: True
+              users:
+              - name: admin
+                gecos: User
+                primary-group: admin
+                groups: users
+                sudo: ALL=(ALL) NOPASSWD:ALL
+                lock_passwd: false
+                passwd: "$6$rounds=4096$QA5OCKHTE41$jRACivoPMJcOjLRgxl3t.AMfU7LhCFwOWv2z66CQX.TSxBy50JoYtycJXSPr2JceG.8Tq/82QN9QYt3euYEZW/"
+              runcmd:
+                - export demo_artifacts_version={{ .Values.global.demoArtifactsVersion }}
+                - export vfw_private_ip_0={{ .Values.global.vfwPrivateIp0 }}
+                - export vsn_private_ip_0={{ .Values.global.vsnPrivateIp0 }}
+                - export protected_net_cidr={{ .Values.global.protectedNetCidr }}
+                - export dcae_collector_ip={{ .Values.global.dcaeCollectorIp }}
+                - export dcae_collector_port={{ .Values.global.dcaeCollectorPort }}
+                - export protected_net_gw={{ .Values.global.protectedNetGw }}
+                - export protected_private_net_cidr={{ .Values.global.protectedPrivateNetCidr }}
+                - wget -O - https://git.onap.org/multicloud/k8s/plain/kud/tests/vFW/firewall | sudo -E bash
+        - name: containerdisk
+          containerDisk:
+            image: integratedcloudnative/ubuntu:16.04
+            imagePullPolicy: IfNotPresent

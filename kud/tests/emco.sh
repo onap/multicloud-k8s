@@ -521,7 +521,6 @@ function instantiate {
 }
 
 function terminateOrchData {
-    call_api -d "{ }" "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}/terminate"
     call_api -d "{ }" "${base_url_orchestrator}/projects/${projectname}/composite-apps/${collection_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/terminate"
     call_api -d "{ }" "${base_url_dcm}/projects/${projectname}/logical-clouds/${admin_logical_cloud_name}/terminate"
 }

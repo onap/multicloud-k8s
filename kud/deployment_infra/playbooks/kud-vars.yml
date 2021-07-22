@@ -80,7 +80,7 @@ optane_ipmctl_package: ipmctl_02.00.00.3474+really01.00.00.3469.orig
 
 emco_git_url: "https://github.com/open-ness/EMCO.git"
 emco_repository: "integratedcloudnative/"
-emco_version: "openness-21.03"
+emco_version: "openness-21.03.06"
 emco_dir: "/opt/emco"
 emco_values:
   global:
@@ -101,7 +101,15 @@ emco_values:
       imageTag: "{{ emco_version }}"
     dtc:
       imageTag: "{{ emco_version }}"
+    nps:
+      imageTag: "{{ emco_version }}"
+    sds:
+      imageTag: "{{ emco_version }}"
     gac:
+      imageTag: "{{ emco_version }}"
+    sfc:
+      imageTag: "{{ emco_version }}"
+    sfcclient:
       imageTag: "{{ emco_version }}"
 emcoconfig_localhost: true
 emcoctl_localhost: true

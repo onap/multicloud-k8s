@@ -62,7 +62,7 @@
       when: "'emco' in emco_roles"
 
     - name: Install emco helm charts
-      command: /usr/local/bin/helm install --wait --namespace emco -f helm_value_overrides.yaml --set emco-db.etcd.clusterDomain={{ cluster_name.stdout }} --set emco-tools.fluentd.clusterDomain={{ cluster_name.stdout }} emco dist/packages/emco-0.1.0.tgz
+      command: /usr/local/bin/helm install --wait --timeout 10m --namespace emco -f helm_value_overrides.yaml --set emco-db.etcd.clusterDomain={{ cluster_name.stdout }} --set emco-tools.fluentd.clusterDomain={{ cluster_name.stdout }} emco dist/packages/emco-0.1.0.tgz
       args:
         chdir: "{{ emco_dir }}/deployments/helm/emcoOpenNESS"
       when: "'emco' in emco_roles"

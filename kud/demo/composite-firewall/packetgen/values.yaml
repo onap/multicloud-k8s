@@ -2,13 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
-
-image:
-  repository: virtlet.cloud/ubuntu/16.04
-  tag: latest
-  pullPolicy: IfNotPresent
-
 nameOverride: ""
 fullnameOverride: ""
 
@@ -43,8 +36,8 @@ global:
   vfwPrivateIp2: 10.10.20.3
 
   #Packetgen container
-  vpgPrivateIp0: 192.168.10.200
-  vpgPrivateIp1: 10.10.20.200
+  vpgPrivateIp0: 192.168.10.2
+  vpgPrivateIp1: 10.10.20.2
 
   #Sink container
   vsnPrivateIp0: 192.168.20.3

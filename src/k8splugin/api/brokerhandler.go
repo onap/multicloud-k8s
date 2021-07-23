@@ -163,7 +163,7 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	// Setup the resource parameters for making the request
 	var instReq app.InstanceRequest
 	instReq.RBName = req.VFModuleModelInvariantID
-	instReq.RBVersion = req.VFModuleModelVersionID
+	instReq.RBVersion = req.VFModuleModelCustomizationID
 	instReq.ProfileName = profileName
 	instReq.CloudRegion = cloudRegion
 	instReq.ReleaseName = releaseName

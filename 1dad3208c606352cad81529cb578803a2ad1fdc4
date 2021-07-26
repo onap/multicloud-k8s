@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1d54fb7e_121e07fc",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-07-26T19:39:35Z",
+      "side": 1,
+      "message": "Rename to InstanceDbData",
+      "range": {
+        "startLine": 67,
+        "startChar": 5,
+        "endLine": 67,
+        "endChar": 11
+      },
+      "revId": "1dad3208c606352cad81529cb578803a2ad1fdc4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b13645b0_3f2f27e8",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-07-26T19:39:35Z",
+      "side": 1,
+      "message": "we should expose timeouts in the request. Why this value is so small here? 60 seconds only?",
+      "range": {
+        "startLine": 221,
+        "startChar": 103,
+        "endLine": 221,
+        "endChar": 105
+      },
+      "revId": "1dad3208c606352cad81529cb578803a2ad1fdc4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "75dce51a_ae290ee2",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-07-26T19:39:35Z",
+      "side": 1,
+      "message": "we should skip this code if there are no pre-hooks",
+      "range": {
+        "startLine": 220,
+        "startChar": 0,
+        "endLine": 231,
+        "endChar": 2
+      },
+      "revId": "1dad3208c606352cad81529cb578803a2ad1fdc4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dd0e0b0d_20bcc67f",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-07-26T19:39:35Z",
+      "side": 1,
+      "message": "we should return here request response with status failed, right?",
+      "range": {
+        "startLine": 239,
+        "startChar": 0,
+        "endLine": 240,
+        "endChar": 26
+      },
+      "revId": "1dad3208c606352cad81529cb578803a2ad1fdc4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "57f739d1_8f44c60e",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-07-26T19:39:35Z",
+      "side": 1,
+      "message": "we are here only when it is not failed?",
+      "range": {
+        "startLine": 298,
+        "startChar": 2,
+        "endLine": 298,
+        "endChar": 32
+      },
+      "revId": "1dad3208c606352cad81529cb578803a2ad1fdc4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2816ac0e_ecf73824",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-07-26T19:39:35Z",
+      "side": 1,
+      "message": "we should expose timeouts in the request",
+      "range": {
+        "startLine": 304,
+        "startChar": 105,
+        "endLine": 304,
+        "endChar": 109
+      },
+      "revId": "1dad3208c606352cad81529cb578803a2ad1fdc4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

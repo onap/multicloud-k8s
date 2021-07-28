@@ -4,6 +4,10 @@ policies:
 - # policyName is the name of the policy
   policyName: "policy-xl710"
 
+  # deviceType is the driver type for configured VFs. Allowed values are
+  # "netdevice" and "vfio-pci".
+  deviceType: "vfio-pci"
+
   # nicSelector selects the NICs to be configured.  At least one of
   # vendor, deviceId, pfNames, or rootDevices must be deined.
   nicSelector:
@@ -37,6 +41,7 @@ policies:
   resourceName: "intel_sriov_nic"
 
 - policyName: "policy-82599es"
+  deviceType: "vfio-pci"
   nicSelector:
     deviceID: "10fb"
     vendor: "8086"
@@ -47,6 +52,7 @@ policies:
   resourceName: "intel_sriov_nic"
 
 - policyName: "policy-i350"
+  deviceType: "vfio-pci"
   nicSelector:
     deviceID: "1521"
     vendor: "8086"
@@ -81,7 +87,7 @@ networks:
 
   # deviceType is the driver type for configured VFs. Allowed values are
   # "netdevice" and "vfio-pci".
-  #deviceType: "netdevice"
+  #deviceType: "vfio-pci"
 
   # eSwitchMode NIC Device Mode. Allowed values are "legacy" and
   # "switchdev".

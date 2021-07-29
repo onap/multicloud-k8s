@@ -27,6 +27,12 @@ cloud.
 This deploys the addons listed in the \`Addons\` and
 \`AddonResources\` values in values.yaml.
 
+NOTE: On a single node cluster, the SRIOV addon resource will trigger
+a drain of the worker node.  KubeVirt will prevent the drain from
+completing due to its PodDisruptionBudget.  The workaround is to scale
+down the KubeVirt operator before applying 04-addon-resources-app.yaml
+then scaling it back up after the node is ready again.
+
     \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 03-addons-app.yaml -v values.yaml\`
     \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 04-addon-resources-app.yaml -v values.yaml\`
 

@@ -353,12 +353,12 @@ func (c ConfigVersionStore) decrementVersion() error {
 // Apply Config
 func applyConfig(instanceID string, p Config, pChannel chan configResourceList, action string) error {
 
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	rbName, rbVersion, profileName, releaseName, err := resolveModelFromInstance(instanceID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
 	// Get Template and Resolve the template with values
-	crl, err := resolve(rbName, rbVersion, profileName, p)
+	crl, err := resolve(rbName, rbVersion, profileName, p, releaseName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Resolve Config")
 	}
@@ -436,7 +436,7 @@ func scheduleResources(c chan configResourceList) {
 
 //Resolve returns the path where the helm chart merged with
 //configuration overrides resides.
-var resolve = func(rbName, rbVersion, profileName string, p Config) (configResourceList, error) {
+var resolve = func(rbName, rbVersion, profileName string, p Config, releaseName string) (configResourceList, error) {
 
 	var resTemplates []helm.KubernetesResourceTemplate
 
@@ -483,9 +483,17 @@ var resolve = func(rbName, rbVersion, profileName string, p Config) (configResou
 		return configResourceList{}, pkgerrors.Wrap(err, "Extracting Template")
 	}
 
+	var finalReleaseName string
+
+	if releaseName == "" {
+		finalReleaseName = profile.ReleaseName
+	} else {
+		finalReleaseName = releaseName
+	}
+
 	helmClient := helm.NewTemplateClient(profile.KubernetesVersion,
 		profile.Namespace,
-		profile.ReleaseName)
+		finalReleaseName)
 
 	chartPath := filepath.Join(chartBasePath, t.ChartName)
 	resTemplates, _, err = helmClient.GenerateKubernetesArtifacts(chartPath,

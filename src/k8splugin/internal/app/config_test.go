@@ -19,10 +19,11 @@ package app
 
 import (
 	"fmt"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	//	pkgerrors "github.com/pkg/errors"
 )
 
@@ -90,7 +91,7 @@ func TestCreateConfig(t *testing.T) {
 			db.Etcd = testCase.mockdb
 			db.DBconn = provideMockModelData(testCase.instanceID, testCase.rbName,
 				testCase.rbVersion, testCase.profileName)
-			resolve = func(rbName, rbVersion, profileName string, p Config) (configResourceList, error) {
+			resolve = func(rbName, rbVersion, profileName string, p Config, releaseName string) (configResourceList, error) {
 				return configResourceList{}, nil
 			}
 			impl := NewConfigClient()
@@ -203,7 +204,7 @@ func TestRollbackConfig(t *testing.T) {
 			db.Etcd = testCase.mockdb
 			db.DBconn = provideMockModelData(testCase.instanceID, testCase.rbName,
 				testCase.rbVersion, testCase.profileName)
-			resolve = func(rbName, rbVersion, profileName string, p Config) (configResourceList, error) {
+			resolve = func(rbName, rbVersion, profileName string, p Config, releaseName string) (configResourceList, error) {
 				return configResourceList{}, nil
 			}
 			impl := NewConfigClient()

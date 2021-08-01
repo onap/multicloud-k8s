@@ -121,9 +121,11 @@ func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, names
 		return nil, pkgerrors.Wrap(err, "Querying for resources")
 	}
 
-	resp := make([]ResourceStatus, len(unstrList.Items))
+	resp := make([]ResourceStatus, 0)
 	for _, unstr := range unstrList.Items {
-		resp = append(resp, ResourceStatus{unstr.GetName(), gvk, unstr})
+		if unstr.GetName() != "" {
+			resp = append(resp, ResourceStatus{unstr.GetName(), gvk, unstr})
+		}
 	}
 	return resp, nil
 }

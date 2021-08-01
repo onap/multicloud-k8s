@@ -27,6 +27,7 @@ import (
 func NewRouter(defClient rb.DefinitionManager,
 	profileClient rb.ProfileManager,
 	instClient app.InstanceManager,
+	queryClient app.QueryManager,
 	configClient app.ConfigManager,
 	connectionClient connection.ConnectionManager,
 	templateClient rb.ConfigTemplateManager,
@@ -56,8 +57,21 @@ func NewRouter(defClient rb.DefinitionManager,
 			"Name", "{Name}",
 			"Labels", "{Labels}").Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}", instHandler.deleteHandler).Methods("DELETE")
-	// (TODO): Fix update method
-	// instRouter.HandleFunc("/{vnfInstanceId}", UpdateHandler).Methods("PUT")
+
+	// Query handler routes
+	if queryClient == nil {
+		queryClient = app.NewQueryClient()
+	}
+	queryHandler := queryHandler{client: queryClient}
+	queryRouter := router.PathPrefix("/v1").Subrouter()
+	queryRouter.HandleFunc("/query", queryHandler.queryHandler).Methods("GET")
+	queryRouter.HandleFunc("/query", queryHandler.queryHandler).
+		Queries("Namespace", "{Namespace}",
+			"CloudRegion", "{CloudRegion}",
+			"ApiVersion", "{ApiVersion}",
+			"Kind", "{Kind}",
+			"Name", "{Name}",
+			"Labels", "{Labels}").Methods("GET")
 
 	//Setup the broker handler here
 	//Use the base router without any path prefixes

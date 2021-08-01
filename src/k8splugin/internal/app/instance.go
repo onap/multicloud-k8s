@@ -19,13 +19,13 @@ package app
 
 import (
 	"encoding/json"
+	"log"
+	"strings"
+
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"log"
-	"strings"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -214,6 +214,7 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 // Query returns state of instance's filtered resources
 func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (InstanceStatus, error) {
 
+	queryClient := NewQueryClient()
 	//Read the status from the DB
 	key := InstanceKey{
 		ID: id,
@@ -231,47 +232,15 @@ func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (Insta
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
 	}
 
-	k8sClient := KubernetesClient{}
-	err = k8sClient.Init(resResp.Request.CloudRegion, id)
+	resources, err := queryClient.Query(resResp.Namespace, resResp.Request.CloudRegion, apiVersion, kind, name, labels, id)
 	if err != nil {
-		return InstanceStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
-	}
-
-	var resourcesStatus []ResourceStatus
-	if labels != "" {
-		resList, err := k8sClient.queryResources(apiVersion, kind, labels, resResp.Namespace)
-		if err != nil {
-			return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resources")
-		}
-		// If user specifies both label and name, we want to pick up only single resource from these matching label
-		if name != "" {
-			//Assigning 0-length, because we may actually not find matching name
-			resourcesStatus = make([]ResourceStatus, 0)
-			for _, res := range resList {
-				if res.Name == name {
-					resourcesStatus = append(resourcesStatus, res)
-					break
-				}
-			}
-		} else {
-			resourcesStatus = resList
-		}
-	} else if name != "" {
-		resIdentifier := helm.KubernetesResource{
-			Name: name,
-			GVK:  schema.FromAPIVersionAndKind(apiVersion, kind),
-		}
-		res, err := k8sClient.GetResourceStatus(resIdentifier, resResp.Namespace)
-		if err != nil {
-			return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resource")
-		}
-		resourcesStatus = []ResourceStatus{res}
+		return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resources")
 	}
 
 	resp := InstanceStatus{
 		Request:         resResp.Request,
-		ResourceCount:   int32(len(resourcesStatus)),
-		ResourcesStatus: resourcesStatus,
+		ResourceCount:   resources.ResourceCount,
+		ResourcesStatus: resources.ResourcesStatus,
 	}
 	return resp, nil
 }

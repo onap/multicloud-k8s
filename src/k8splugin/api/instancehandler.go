@@ -1,6 +1,8 @@
 /*
 Copyright 2018 Intel Corporation.
 Copyright © 2021 Samsung Electronics
+Copyright © 2021 Orange
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -181,15 +183,11 @@ func (i instanceHandler) queryHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 	labels := r.FormValue("Labels")
 	if apiVersion == "" {
-		http.Error(w, "Missing apiVersion mandatory parameter", http.StatusBadRequest)
+		http.Error(w, "Missing ApiVersion mandatory parameter", http.StatusBadRequest)
 		return
 	}
 	if kind == "" {
-		http.Error(w, "Missing kind mandatory parameter", http.StatusBadRequest)
-		return
-	}
-	if name == "" && labels == "" {
-		http.Error(w, "Name or Labels parameter must be provided", http.StatusBadRequest)
+		http.Error(w, "Missing Kind mandatory parameter", http.StatusBadRequest)
 		return
 	}
 	resp, err := i.client.Query(id, apiVersion, kind, name, labels)

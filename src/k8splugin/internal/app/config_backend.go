@@ -170,6 +170,33 @@ func (c ConfigStore) getConfig() (Config, error) {
 	return Config{}, pkgerrors.Wrap(err, "Get Config DB Entry")
 }
 
+// Read the config entry in the database
+func (c ConfigStore) getConfigList() ([]Config, error) {
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return []Config{}, pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagConfig)
+	values, err := db.Etcd.GetAll(cfgKey)
+	if err != nil {
+		return []Config{}, pkgerrors.Wrap(err, "Get Config DB List")
+	}
+	//value is a byte array
+	if values != nil {
+		result := make([]Config, 0)
+		for _, value := range values {
+			cfg := Config{}
+			err = db.DeSerialize(string(value), &cfg)
+			if err != nil {
+				return []Config{}, pkgerrors.Wrap(err, "Unmarshaling Config Value")
+			}
+			result = append(result, cfg)
+		}
+		return result, nil
+	}
+	return []Config{}, pkgerrors.Wrap(err, "Get Config DB List")
+}
+
 // Delete the config entry in the database
 func (c ConfigStore) deleteConfig() (Config, error) {
 

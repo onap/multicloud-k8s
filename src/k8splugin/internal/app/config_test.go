@@ -104,7 +104,7 @@ func TestCreateConfig(t *testing.T) {
 				}
 			} else {
 				if reflect.DeepEqual(testCase.expected, got) == false {
-					t.Errorf("Create Resource Bundle returned unexpected body: got %v;"+
+					t.Errorf("Create returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected)
 				}
 			}
@@ -217,8 +217,36 @@ func TestRollbackConfig(t *testing.T) {
 				}
 			} else {
 				if reflect.DeepEqual(testCase.expected1, got) == false {
-					t.Errorf("Create Resource Bundle returned unexpected body: got %v;"+
+					t.Errorf("Create returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected1)
+				}
+			}
+			get, err := impl.Get(testCase.instanceID, testCase.inp.ConfigName)
+			if err != nil {
+				if testCase.expectedError == "" {
+					t.Fatalf("Get returned an unexpected error %s", err)
+				}
+				if strings.Contains(err.Error(), testCase.expectedError) == false {
+					t.Fatalf("Get returned an unexpected error %s", err)
+				}
+			} else {
+				if reflect.DeepEqual(testCase.inp, get) == false {
+					t.Errorf("Get returned unexpected body: got %v;"+
+						" expected %v", get, testCase.inp)
+				}
+			}
+			getList, err := impl.List(testCase.instanceID)
+			if err != nil {
+				if testCase.expectedError == "" {
+					t.Fatalf("List returned an unexpected error %s", err)
+				}
+				if strings.Contains(err.Error(), testCase.expectedError) == false {
+					t.Fatalf("List returned an unexpected error %s", err)
+				}
+			} else {
+				if reflect.DeepEqual([]Config{testCase.inp}, getList) == false {
+					t.Errorf("List returned unexpected body: got %v;"+
+						" expected %v", getList, []Config{testCase.inp})
 				}
 			}
 			got, err = impl.Update(testCase.instanceID, testCase.inp.ConfigName, testCase.inpUpdate1)
@@ -231,7 +259,7 @@ func TestRollbackConfig(t *testing.T) {
 				}
 			} else {
 				if reflect.DeepEqual(testCase.expected2, got) == false {
-					t.Errorf("Create Resource Bundle returned unexpected body: got %v;"+
+					t.Errorf("Create returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected2)
 				}
 			}
@@ -245,7 +273,7 @@ func TestRollbackConfig(t *testing.T) {
 				}
 			} else {
 				if reflect.DeepEqual(testCase.expected3, got) == false {
-					t.Errorf("Create Resource Bundle returned unexpected body: got %v;"+
+					t.Errorf("Create returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected3)
 				}
 			}
@@ -259,7 +287,7 @@ func TestRollbackConfig(t *testing.T) {
 				}
 			} else {
 				if reflect.DeepEqual(testCase.expected4, got) == false {
-					t.Errorf("Create Resource Bundle returned unexpected body: got %v;"+
+					t.Errorf("Create returned unexpected body: got %v;"+
 						" expected %v", got, testCase.expected4)
 				}
 			}

@@ -1,6 +1,7 @@
 /*
 Copyright 2018 Intel Corporation.
 Copyright © 2021 Samsung Electronics
+Copyright © 2021 Orange
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -121,9 +122,11 @@ func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, names
 		return nil, pkgerrors.Wrap(err, "Querying for resources")
 	}
 
-	resp := make([]ResourceStatus, len(unstrList.Items))
+	resp := make([]ResourceStatus, 0)
 	for _, unstr := range unstrList.Items {
-		resp = append(resp, ResourceStatus{unstr.GetName(), gvk, unstr})
+		if unstr.GetName() != "" {
+			resp = append(resp, ResourceStatus{unstr.GetName(), gvk, unstr})
+		}
 	}
 	return resp, nil
 }

@@ -116,6 +116,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	}
 	configHandler := rbConfigHandler{client: configClient}
 	instRouter.HandleFunc("/instance/{instID}/config", configHandler.createHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/config", configHandler.listHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.updateHandler).Methods("PUT")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.deleteHandler).Methods("DELETE")

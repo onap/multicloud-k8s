@@ -1,0 +1,251 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ee507466_daa10f9e",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "what for all these types if we care only about 5 types from getObjType?",
+      "range": {
+        "startLine": 91,
+        "startChar": 27,
+        "endLine": 91,
+        "endChar": 38
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b8c0a13_2e46b415",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "duplication of code, we can use getObjType to check here",
+      "range": {
+        "startLine": 176,
+        "startChar": 8,
+        "endLine": 176,
+        "endChar": 21
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a31ecc29_e72e23cd",
+        "filename": "src/k8splugin/internal/app/converter.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "it looks like copy paste from some lib Don\u0027t we need copyright info here?",
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4267196f_19d49bac",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "please remove from this commit",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 6
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c2bdd654_57f7839e",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "k8s-rb-instance-pre-install-timeout and others ranamed respectively",
+      "range": {
+        "startLine": 189,
+        "startChar": 30,
+        "endLine": 189,
+        "endChar": 69
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d370cae_d723ab20",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "we decided to do it only after main resource creation.",
+      "range": {
+        "startLine": 281,
+        "startChar": 1,
+        "endLine": 285,
+        "endChar": 0
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ffc11772_0610f29e",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "we decided to do it only after main resource creation.",
+      "range": {
+        "startLine": 301,
+        "startChar": 0,
+        "endLine": 305,
+        "endChar": 2
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0e2d6e20_9e2086b6",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "to remove",
+      "range": {
+        "startLine": 404,
+        "startChar": 0,
+        "endLine": 411,
+        "endChar": 5
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "11f09d13_3ef6ec89",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "to remove",
+      "range": {
+        "startLine": 454,
+        "startChar": 0,
+        "endLine": 454,
+        "endChar": 71
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "53ff27c4_c8c6d6cd",
+        "filename": "src/k8splugin/plugins/namespace/plugin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "i understand we do not watch for namespace but if we place the function here, we can give it some sense. We can check the existience of service and true when present, false when it is not.",
+      "range": {
+        "startLine": 52,
+        "startChar": 1,
+        "endLine": 52,
+        "endChar": 11
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "12bb5467_306adcba",
+        "filename": "src/k8splugin/plugins/service/plugin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T16:39:46Z",
+      "side": 1,
+      "message": "i understand we do not watch for namespace but if we place the function here, we can give it some sense. We can check the existience of service and true when present, false when it is not.",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 19
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

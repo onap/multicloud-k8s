@@ -15,6 +15,7 @@ package main
 
 import (
 	"context"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"log"
 
 	pkgerrors "github.com/pkg/errors"
@@ -22,7 +23,6 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"

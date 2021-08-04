@@ -19,13 +19,12 @@ package helm
 
 import (
 	"fmt"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 
 	pkgerrors "github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"

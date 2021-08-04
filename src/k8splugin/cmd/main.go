@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"log"
 	"math/rand"
 	"net/http"
@@ -24,7 +25,6 @@ import (
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/api"
-	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/auth"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 

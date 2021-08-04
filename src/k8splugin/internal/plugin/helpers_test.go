@@ -17,11 +17,11 @@
 package plugin
 
 import (
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 )
 

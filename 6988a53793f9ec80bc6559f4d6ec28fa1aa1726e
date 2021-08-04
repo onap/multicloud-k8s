@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "4e9e9cf9_733d3d51",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T18:34:34Z",
+      "side": 1,
+      "message": "let\u0027s make the name more precise. What kind of object type it is. Don\u0027t we have to enhance this set, to follow the status patch that has longer list here?",
+      "range": {
+        "startLine": 74,
+        "startChar": 27,
+        "endLine": 74,
+        "endChar": 38
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ee507466_daa10f9e",
         "filename": "src/k8splugin/internal/app/client.go",
         "patchSetId": 7
@@ -49,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "3acf2171_3372c659",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T18:34:34Z",
+      "side": 1,
+      "message": "let\u0027s keep it as it is. At least for me",
+      "parentUuid": "2fe00586_87b5299d",
+      "range": {
+        "startLine": 91,
+        "startChar": 27,
+        "endLine": 91,
+        "endChar": 38
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2b8c0a13_2e46b415",
         "filename": "src/k8splugin/internal/app/client.go",
         "patchSetId": 7
@@ -84,6 +131,30 @@
       "side": 1,
       "message": "If we decided to keep only 5 types in getObjType function, yes, this is duplication.",
       "parentUuid": "2b8c0a13_2e46b415",
+      "range": {
+        "startLine": 176,
+        "startChar": 8,
+        "endLine": 176,
+        "endChar": 21
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb930730_51d3dd1d",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T18:34:34Z",
+      "side": 1,
+      "message": "We verify the same types like getObjType returns other than null, so we can use its result.",
+      "parentUuid": "522b7fcf_80ab377c",
       "range": {
         "startLine": 176,
         "startChar": 8,
@@ -178,6 +249,30 @@
     },
     {
       "key": {
+        "uuid": "d1ca70d1_5a21f9b2",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T18:34:34Z",
+      "side": 1,
+      "message": "We can keep todo here with short explanation, no need to leave commmented out function body as it is being addressed in a separate commit.",
+      "parentUuid": "db5f300a_bd33ce82",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 6
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c2bdd654_57f7839e",
         "filename": "src/k8splugin/internal/app/instance.go",
         "patchSetId": 7
@@ -260,6 +355,30 @@
       "side": 1,
       "message": "During discussion, I explained that we might need to save instance info to DB in case we want to have a concrete hook progress (including pre-install hook).",
       "parentUuid": "4d370cae_d723ab20",
+      "range": {
+        "startLine": 281,
+        "startChar": 1,
+        "endLine": 285,
+        "endChar": 0
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eec65186_08c9d2b1",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T18:34:34Z",
+      "side": 1,
+      "message": "ok, but if we return error in the response we need to remove instance from the DB. We don\u0027t want to mess up DB with failed instances. Especially, List hanlder should return only those that are created and for those we can perform delete operation.",
+      "parentUuid": "734de778_2039ecc4",
       "range": {
         "startLine": 281,
         "startChar": 1,
@@ -448,6 +567,30 @@
       "side": 1,
       "message": "I put the function here just to make the struct follow the interface (the same for servicePlugin) and we do not need to check the existence of service because this function is called only to check hook resource status, and as you know, we do not check service/namespace status in hook so I think that this is not necessary to verify the existence of service (or namespace).",
       "parentUuid": "53ff27c4_c8c6d6cd",
+      "range": {
+        "startLine": 52,
+        "startChar": 1,
+        "endLine": 52,
+        "endChar": 11
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14232247_1c0da319",
+        "filename": "src/k8splugin/plugins/namespace/plugin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2701
+      },
+      "writtenOn": "2021-08-04T18:34:34Z",
+      "side": 1,
+      "message": "yes and no. We don\u0027t use it for hooks but we expose this function maybe for other purposes later on. We should at least mark it TODO and raise error, as this is just not implemented.",
+      "parentUuid": "354e7fa0_8e0d7e57",
       "range": {
         "startLine": 52,
         "startChar": 1,

@@ -15,13 +15,13 @@ package main
 
 import (
 	"context"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"

@@ -62,6 +62,90 @@ type ResourceStatus struct {
 	Status unstructured.Unstructured `json:"status"`
 }
 
+func (k *KubernetesClient) getRestApi(apiVersion string) (rest.Interface, error) {
+	//based on kubectl api-versions
+	switch apiVersion {
+	case "admissionregistration.k8s.io/v1":
+		return k.clientSet.AdmissionregistrationV1().RESTClient(), nil
+	case "admissionregistration.k8s.io/v1beta1":
+		return k.clientSet.AdmissionregistrationV1beta1().RESTClient(), nil
+	case "apps/v1":
+		return k.clientSet.AppsV1().RESTClient(), nil
+	case "apps/v1beta1":
+		return k.clientSet.AppsV1beta1().RESTClient(), nil
+	case "apps/v1beta2":
+		return k.clientSet.AppsV1beta2().RESTClient(), nil
+	case "authentication.k8s.io/v1":
+		return k.clientSet.AuthenticationV1().RESTClient(), nil
+	case "authentication.k8s.io/v1beta1":
+		return k.clientSet.AuthenticationV1beta1().RESTClient(), nil
+	case "authorization.k8s.io/v1":
+		return k.clientSet.AuthorizationV1().RESTClient(), nil
+	case "authorization.k8s.io/v1beta1":
+		return k.clientSet.AuthorizationV1beta1().RESTClient(), nil
+	case "autoscaling/v1":
+		return k.clientSet.AutoscalingV1().RESTClient(), nil
+	case "autoscaling/v2beta1":
+		return k.clientSet.AutoscalingV2beta1().RESTClient(), nil
+	case "autoscaling/v2beta2":
+		return k.clientSet.AutoscalingV2beta2().RESTClient(), nil
+	case "batch/v1":
+		return k.clientSet.BatchV1().RESTClient(), nil
+	case "batch/v1beta1":
+		return k.clientSet.BatchV1beta1().RESTClient(), nil
+	case "certificates.k8s.io/v1":
+		return k.clientSet.CertificatesV1().RESTClient(), nil
+	case "certificates.k8s.io/v1beta1":
+		return k.clientSet.CertificatesV1beta1().RESTClient(), nil
+	case "coordination.k8s.io/v1":
+		return k.clientSet.CoordinationV1().RESTClient(), nil
+	case "coordination.k8s.io/v1beta1":
+		return k.clientSet.CoordinationV1beta1().RESTClient(), nil
+	case "v1":
+		return k.clientSet.CoreV1().RESTClient(), nil
+	case "discovery.k8s.io/v1beta1":
+		return k.clientSet.DiscoveryV1beta1().RESTClient(), nil
+	case "events.k8s.io/v1":
+		return k.clientSet.EventsV1().RESTClient(), nil
+	case "events.k8s.io/v1beta1":
+		return k.clientSet.EventsV1beta1().RESTClient(), nil
+	case "extensions/v1beta1":
+		return k.clientSet.ExtensionsV1beta1().RESTClient(), nil
+	case "flowcontrol.apiserver.k8s.io/v1alpha1":
+		return k.clientSet.FlowcontrolV1alpha1().RESTClient(), nil
+	case "networking.k8s.io/v1":
+		return k.clientSet.NetworkingV1().RESTClient(), nil
+	case "networking.k8s.io/v1beta1":
+		return k.clientSet.NetworkingV1beta1().RESTClient(), nil
+	case "node.k8s.io/v1alpha1":
+		return k.clientSet.NodeV1alpha1().RESTClient(), nil
+	case "node.k8s.io/v1beta1":
+		return k.clientSet.NodeV1beta1().RESTClient(), nil
+	case "policy/v1beta1":
+		return k.clientSet.PolicyV1beta1().RESTClient(), nil
+	case "rbac.authorization.k8s.io/v1":
+		return k.clientSet.RbacV1().RESTClient(), nil
+	case "rbac.authorization.k8s.io/v1alpha1":
+		return k.clientSet.RbacV1alpha1().RESTClient(), nil
+	case "rbac.authorization.k8s.io/v1beta1":
+		return k.clientSet.RbacV1beta1().RESTClient(), nil
+	case "scheduling.k8s.io/v1":
+		return k.clientSet.SchedulingV1().RESTClient(), nil
+	case "scheduling.k8s.io/v1alpha1":
+		return k.clientSet.SchedulingV1alpha1().RESTClient(), nil
+	case "scheduling.k8s.io/v1beta1":
+		return k.clientSet.SchedulingV1beta1().RESTClient(), nil
+	case "storage.k8s.io/v1":
+		return k.clientSet.StorageV1().RESTClient(), nil
+	case "storage.k8s.io/v1alpha1":
+		return k.clientSet.StorageV1alpha1().RESTClient(), nil
+	case "storage.k8s.io/v1beta1":
+		return k.clientSet.StorageV1beta1().RESTClient(), nil
+	default:
+		return nil, pkgerrors.New("Api version " + apiVersion + " unknown")
+	}
+}
+
 // getPodsByLabel yields status of all pods under given instance ID
 func (k *KubernetesClient) getPodsByLabel(namespace string) ([]ResourceStatus, error) {
 	client := k.GetStandardClient().CoreV1().Pods(namespace)

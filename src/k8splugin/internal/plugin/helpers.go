@@ -17,10 +17,10 @@
 package plugin
 
 import (
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"log"
 	"strings"
 
-	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 

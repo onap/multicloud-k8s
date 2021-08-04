@@ -42,7 +42,7 @@ func TestDecodeYAML(t *testing.T) {
 		},
 		{
 			label: "Successfully read YAML file",
-			input: "../mock_files/mock_yamls/deployment.yaml",
+			input: "../../mock_files/mock_yamls/deployment.yaml",
 			expectedResult: &appsV1.Deployment{
 				ObjectMeta: metaV1.ObjectMeta{
 					Name: "mock-deployment",

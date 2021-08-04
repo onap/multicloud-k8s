@@ -19,14 +19,25 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
+
+	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
+	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/cli-runtime/pkg/resource"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/statuscheck"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -281,26 +292,89 @@ func (v *InstanceClient) Status(id string) (InstanceStatus, error) {
 	if err != nil {
 		cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
 	}
-
+	readyChecker := statuscheck.NewReadyChecker(k8sClient.clientSet, statuscheck.PausedAsReady(true), statuscheck.CheckJobs(true))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(60)*time.Second)
+	defer cancel()
+	isReady := true
 	generalStatus := make([]ResourceStatus, 0, len(resResp.Resources))
 Main:
-	for _, resource := range resResp.Resources {
+	for _, oneResource := range resResp.Resources {
 		for _, pod := range podsStatus {
-			if resource.GVK == pod.GVK && resource.Name == pod.Name {
+			if oneResource.GVK == pod.GVK && oneResource.Name == pod.Name {
 				continue Main //Don't double check pods if someone decided to define pod explicitly in helm chart
 			}
 		}
-		status, err := k8sClient.GetResourceStatus(resource, resResp.Namespace)
+		apiVersion, kind := oneResource.GVK.ToAPIVersionAndKind()
+		log.Printf("apiVersion: %s, Kind: %s", apiVersion, kind)
+		restClient, err := k8sClient.getRestApi(apiVersion)
+		if err != nil {
+			cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+			break
+		}
+		mapper := k8sClient.GetMapper()
+		mapping, err := mapper.RESTMapping(schema.GroupKind{
+			Group: oneResource.GVK.Group,
+			Kind:  oneResource.GVK.Kind,
+		}, oneResource.GVK.Version)
+		resourceInfo := resource.Info{
+			Client:          restClient,
+			Mapping:         mapping,
+			Namespace:       resResp.Namespace,
+			Name:            oneResource.Name,
+			Source:          "",
+			Object:          nil,
+			ResourceVersion: "",
+		}
+		status, err := k8sClient.GetResourceStatus(oneResource, resResp.Namespace)
 		if err != nil {
 			cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
 		} else {
 			generalStatus = append(generalStatus, status)
 		}
+
+		var parsedRes runtime.Object
+		//TODO: Should we care about different api version for a same kind?
+		switch kind {
+		case "Pod":
+			parsedRes = new(corev1.Pod)
+		case "Job":
+			parsedRes = new(batchv1.Job)
+		case "Deployment":
+			parsedRes = new(appsv1.Deployment)
+		case "PersistentVolumeClaim":
+			parsedRes = new(corev1.PersistentVolume)
+		case "Service":
+			parsedRes = new(corev1.Service)
+		case "DaemonSet":
+			parsedRes = new(appsv1.DaemonSet)
+		case "CustomResourceDefinition":
+			parsedRes = new(apiextv1.CustomResourceDefinition)
+		case "StatefulSet":
+			parsedRes = new(appsv1.StatefulSet)
+		case "ReplicationController":
+			parsedRes = new(corev1.ReplicationController)
+		case "ReplicaSet":
+			parsedRes = new(appsv1.ReplicaSet)
+		default:
+			//For not listed resource, consider ready
+			continue
+		}
+		err = runtime.DefaultUnstructuredConverter.FromUnstructured(status.Status.Object, parsedRes)
+		if err != nil {
+			cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+			break
+		}
+		resourceInfo.Object = parsedRes
+		ready, err := readyChecker.IsReady(ctx, &resourceInfo)
+		if !ready || err != nil {
+			isReady = false
+			break
+		}
 	}
 	resp := InstanceStatus{
 		Request:         resResp.Request,
 		ResourceCount:   int32(len(generalStatus) + len(podsStatus)),
-		Ready:           false, //FIXME To determine readiness, some parsing of status fields is necessary
+		Ready:           isReady, //FIXME To determine readiness, some parsing of status fields is necessary
 		ResourcesStatus: append(generalStatus, podsStatus...),
 	}
 

@@ -19,13 +19,12 @@ package rb
 import (
 	"archive/tar"
 	"compress/gzip"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	pkgerrors "github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	utils "github.com/onap/multicloud-k8s/src/k8splugin/internal"
 )
 
 func isTarGz(r io.Reader) error {

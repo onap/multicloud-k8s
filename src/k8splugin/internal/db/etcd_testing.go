@@ -14,6 +14,8 @@ limitations under the License.
 package db
 
 import (
+	"strings"
+
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -37,6 +39,16 @@ func (c *MockEtcdClient) Get(key string) ([]byte, error) {
 		}
 	}
 	return nil, pkgerrors.Errorf("Key doesn't exist")
+}
+
+func (c *MockEtcdClient) GetAll(key string) ([][]byte, error) {
+	result := make([][]byte, 0)
+	for kvKey, kvValue := range c.Items {
+		if strings.HasPrefix(kvKey, key) {
+			result = append(result, []byte(kvValue))
+		}
+	}
+	return result, nil
 }
 
 func (c *MockEtcdClient) Delete(key string) error {

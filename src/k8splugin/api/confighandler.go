@@ -94,6 +94,27 @@ func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// listHandler handles GET operations for all configs of instance
+// Returns a app.Definition
+func (h rbConfigHandler) listHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	instanceID := vars["instID"]
+
+	ret, err := h.client.List(instanceID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // deleteHandler handles DELETE operations on a config
 func (h rbConfigHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

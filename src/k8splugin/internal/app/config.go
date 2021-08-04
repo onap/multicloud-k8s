@@ -42,7 +42,7 @@ type ConfigResult struct {
 	ProfileName       string `json:"profile-name"`
 	ConfigName        string `json:"config-name"`
 	TemplateName      string `json:"template-name"`
-	ConfigVersion     uint   `json:"config-verion"`
+	ConfigVersion     uint   `json:"config-version"`
 }
 
 //ConfigRollback input
@@ -62,6 +62,7 @@ type ConfigTagit struct {
 type ConfigManager interface {
 	Create(instanceID string, p Config) (ConfigResult, error)
 	Get(instanceID, configName string) (Config, error)
+	List(instanceID string) ([]Config, error)
 	Help() map[string]string
 	Update(instanceID, configName string, p Config) (ConfigResult, error)
 	Delete(instanceID, configName string) (ConfigResult, error)
@@ -221,6 +222,24 @@ func (v *ConfigClient) Get(instanceID, configName string) (Config, error) {
 	cfg, err := cs.getConfig()
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Get Config DB Entry")
+	}
+	return cfg, nil
+}
+
+// List config entry in the database
+func (v *ConfigClient) List(instanceID string) ([]Config, error) {
+
+	// Acquire per profile Mutex
+	lock, _ := getProfileData(instanceID)
+	lock.Lock()
+	defer lock.Unlock()
+	// Read Config DB
+	cs := ConfigStore{
+		instanceID: instanceID,
+	}
+	cfg, err := cs.getConfigList()
+	if err != nil {
+		return []Config{}, pkgerrors.Wrap(err, "Get Config DB Entry")
 	}
 	return cfg, nil
 }

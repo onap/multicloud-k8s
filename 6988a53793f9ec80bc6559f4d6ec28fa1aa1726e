@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "2fe00586_87b5299d",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "As i said during our discussion, I want to make a completed list of all types available, maybe we will need them later. But of course, If you find that this is too much, I can remove the redundant ones.",
+      "parentUuid": "ee507466_daa10f9e",
+      "range": {
+        "startLine": 91,
+        "startChar": 27,
+        "endLine": 91,
+        "endChar": 38
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2b8c0a13_2e46b415",
         "filename": "src/k8splugin/internal/app/client.go",
         "patchSetId": 7
@@ -36,6 +60,30 @@
       "writtenOn": "2021-08-04T16:39:46Z",
       "side": 1,
       "message": "duplication of code, we can use getObjType to check here",
+      "range": {
+        "startLine": 176,
+        "startChar": 8,
+        "endLine": 176,
+        "endChar": 21
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "522b7fcf_80ab377c",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "If we decided to keep only 5 types in getObjType function, yes, this is duplication.",
+      "parentUuid": "2b8c0a13_2e46b415",
       "range": {
         "startLine": 176,
         "startChar": 8,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "36095884_73dd50c5",
+        "filename": "src/k8splugin/internal/app/converter.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a31ecc29_e72e23cd",
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4267196f_19d49bac",
         "filename": "src/k8splugin/internal/app/instance.go",
         "patchSetId": 7
@@ -76,6 +142,30 @@
       "writtenOn": "2021-08-04T16:39:46Z",
       "side": 1,
       "message": "please remove from this commit",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 6
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db5f300a_bd33ce82",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "I think that we can put TODO stuffs in the commit cause I see that people are doing the same?",
+      "parentUuid": "4267196f_19d49bac",
       "range": {
         "startLine": 136,
         "startChar": 0,
@@ -111,6 +201,30 @@
     },
     {
       "key": {
+        "uuid": "34c9cb01_335e7eac",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c2bdd654_57f7839e",
+      "range": {
+        "startLine": 189,
+        "startChar": 30,
+        "endLine": 189,
+        "endChar": 69
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4d370cae_d723ab20",
         "filename": "src/k8splugin/internal/app/instance.go",
         "patchSetId": 7
@@ -122,6 +236,30 @@
       "writtenOn": "2021-08-04T16:39:46Z",
       "side": 1,
       "message": "we decided to do it only after main resource creation.",
+      "range": {
+        "startLine": 281,
+        "startChar": 1,
+        "endLine": 285,
+        "endChar": 0
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "734de778_2039ecc4",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "During discussion, I explained that we might need to save instance info to DB in case we want to have a concrete hook progress (including pre-install hook).",
+      "parentUuid": "4d370cae_d723ab20",
       "range": {
         "startLine": 281,
         "startChar": 1,
@@ -157,6 +295,30 @@
     },
     {
       "key": {
+        "uuid": "2de5fa79_2dc33fa0",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ffc11772_0610f29e",
+      "range": {
+        "startLine": 301,
+        "startChar": 0,
+        "endLine": 305,
+        "endChar": 2
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0e2d6e20_9e2086b6",
         "filename": "src/k8splugin/internal/app/instance.go",
         "patchSetId": 7
@@ -177,6 +339,30 @@
       "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d3ebe12_6a7c4b18",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0e2d6e20_9e2086b6",
+      "range": {
+        "startLine": 404,
+        "startChar": 0,
+        "endLine": 411,
+        "endChar": 5
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     },
     {
       "key": {
@@ -203,6 +389,30 @@
     },
     {
       "key": {
+        "uuid": "38559438_63fe5636",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "11f09d13_3ef6ec89",
+      "range": {
+        "startLine": 454,
+        "startChar": 0,
+        "endLine": 454,
+        "endChar": 71
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "53ff27c4_c8c6d6cd",
         "filename": "src/k8splugin/plugins/namespace/plugin.go",
         "patchSetId": 7
@@ -214,6 +424,30 @@
       "writtenOn": "2021-08-04T16:39:46Z",
       "side": 1,
       "message": "i understand we do not watch for namespace but if we place the function here, we can give it some sense. We can check the existience of service and true when present, false when it is not.",
+      "range": {
+        "startLine": 52,
+        "startChar": 1,
+        "endLine": 52,
+        "endChar": 11
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "354e7fa0_8e0d7e57",
+        "filename": "src/k8splugin/plugins/namespace/plugin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "I put the function here just to make the struct follow the interface (the same for servicePlugin) and we do not need to check the existence of service because this function is called only to check hook resource status, and as you know, we do not check service/namespace status in hook so I think that this is not necessary to verify the existence of service (or namespace).",
+      "parentUuid": "53ff27c4_c8c6d6cd",
       "range": {
         "startLine": 52,
         "startChar": 1,
@@ -246,6 +480,30 @@
       "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "62aab8a3_9cd338f1",
+        "filename": "src/k8splugin/plugins/service/plugin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-04T18:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "12bb5467_306adcba",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 19
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

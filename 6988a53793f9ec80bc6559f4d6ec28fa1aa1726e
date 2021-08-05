@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0e45c397_5410d9be",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-05T15:35:19Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4e9e9cf9_733d3d51",
+      "range": {
+        "startLine": 74,
+        "startChar": 27,
+        "endLine": 74,
+        "endChar": 38
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ee507466_daa10f9e",
         "filename": "src/k8splugin/internal/app/client.go",
         "patchSetId": 7
@@ -96,6 +120,30 @@
     },
     {
       "key": {
+        "uuid": "97cf501a_14e4b7ed",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-05T15:35:19Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3acf2171_3372c659",
+      "range": {
+        "startLine": 91,
+        "startChar": 27,
+        "endLine": 91,
+        "endChar": 38
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b8c0a13_2e46b415",
         "filename": "src/k8splugin/internal/app/client.go",
         "patchSetId": 7
@@ -155,6 +203,30 @@
       "side": 1,
       "message": "We verify the same types like getObjType returns other than null, so we can use its result.",
       "parentUuid": "522b7fcf_80ab377c",
+      "range": {
+        "startLine": 176,
+        "startChar": 8,
+        "endLine": 176,
+        "endChar": 21
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b07f638_90986a99",
+        "filename": "src/k8splugin/internal/app/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-05T15:35:19Z",
+      "side": 1,
+      "message": "Oh, my bad, I was thinking about getRestApi function. Gonna fix this",
+      "parentUuid": "bb930730_51d3dd1d",
       "range": {
         "startLine": 176,
         "startChar": 8,
@@ -273,6 +345,30 @@
     },
     {
       "key": {
+        "uuid": "b017dd78_4628b66d",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-05T15:35:19Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d1ca70d1_5a21f9b2",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 6
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c2bdd654_57f7839e",
         "filename": "src/k8splugin/internal/app/instance.go",
         "patchSetId": 7
@@ -379,6 +475,30 @@
       "side": 1,
       "message": "ok, but if we return error in the response we need to remove instance from the DB. We don\u0027t want to mess up DB with failed instances. Especially, List hanlder should return only those that are created and for those we can perform delete operation.",
       "parentUuid": "734de778_2039ecc4",
+      "range": {
+        "startLine": 281,
+        "startChar": 1,
+        "endLine": 285,
+        "endChar": 0
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "391d55d9_a81c540c",
+        "filename": "src/k8splugin/internal/app/instance.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-05T15:35:19Z",
+      "side": 1,
+      "message": "Ok, I will update this",
+      "parentUuid": "eec65186_08c9d2b1",
       "range": {
         "startLine": 281,
         "startChar": 1,
@@ -591,6 +711,30 @@
       "side": 1,
       "message": "yes and no. We don\u0027t use it for hooks but we expose this function maybe for other purposes later on. We should at least mark it TODO and raise error, as this is just not implemented.",
       "parentUuid": "354e7fa0_8e0d7e57",
+      "range": {
+        "startLine": 52,
+        "startChar": 1,
+        "endLine": 52,
+        "endChar": 11
+      },
+      "revId": "6988a53793f9ec80bc6559f4d6ec28fa1aa1726e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1eea2fa0_cbafa92b",
+        "filename": "src/k8splugin/plugins/namespace/plugin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7819
+      },
+      "writtenOn": "2021-08-05T15:35:19Z",
+      "side": 1,
+      "message": "Ok, I\u0027ll put TODO here",
+      "parentUuid": "14232247_1c0da319",
       "range": {
         "startLine": 52,
         "startChar": 1,

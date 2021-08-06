@@ -306,19 +306,16 @@ Main:
 		status, err := k8sClient.GetResourceStatus(oneResource, resResp.Namespace)
 		if err != nil {
 			cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+			isReady = false
 		} else {
 			generalStatus = append(generalStatus, status)
-		}
+			ready, err := v.checkRssStatus(oneResource, k8sClient, resResp.Namespace, status)
 
-		ready, err := v.checkRssStatus(oneResource, k8sClient, resResp.Namespace, status)
-
-		if !ready || err != nil {
-			isReady = false
-			if err != nil {
-				cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
-			} else {
-				apiVersion, kind := oneResource.GVK.ToAPIVersionAndKind()
-				cumulatedErrorMsg = append(cumulatedErrorMsg, kind+"/"+apiVersion+" ("+oneResource.Name+") is not ready")
+			if !ready || err != nil {
+				isReady = false
+				if err != nil {
+					cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+				}
 			}
 		}
 	}

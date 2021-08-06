@@ -22,6 +22,10 @@ import (
 	"context"
 	"encoding/json"
 
+	"log"
+	"strings"
+	"time"
+
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -29,9 +33,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/cli-runtime/pkg/resource"
-	"log"
-	"strings"
-	"time"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
@@ -313,14 +314,18 @@ Main:
 
 		if !ready || err != nil {
 			isReady = false
-			cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
-			break
+			if err != nil {
+				cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+			} else {
+				apiVersion, kind := oneResource.GVK.ToAPIVersionAndKind()
+				cumulatedErrorMsg = append(cumulatedErrorMsg, kind+"/"+apiVersion+" ("+oneResource.Name+") is not ready")
+			}
 		}
 	}
 	resp := InstanceStatus{
 		Request:         resResp.Request,
 		ResourceCount:   int32(len(generalStatus) + len(podsStatus)),
-		Ready:           isReady, //FIXME To determine readiness, some parsing of status fields is necessary
+		Ready:           isReady,
 		ResourcesStatus: append(generalStatus, podsStatus...),
 	}
 
@@ -334,7 +339,7 @@ Main:
 	return resp, nil
 }
 
-func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient KubernetesClient, namespace string, status ResourceStatus) (bool, error){
+func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient KubernetesClient, namespace string, status ResourceStatus) (bool, error) {
 	readyChecker := statuscheck.NewReadyChecker(k8sClient.clientSet, statuscheck.PausedAsReady(true), statuscheck.CheckJobs(true))
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(60)*time.Second)
 	defer cancel()

@@ -440,16 +440,17 @@ func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
 func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesResourceTemplate,
 	namespace string) ([]helm.KubernetesResource, error) {
 
+	var createdResources []helm.KubernetesResource
+
 	err := k.ensureNamespace(namespace)
 	if err != nil {
-		return nil, pkgerrors.Wrap(err, "Creating Namespace")
+		return createdResources, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
-	var createdResources []helm.KubernetesResource
 	for _, resTempl := range sortedTemplates {
 		resCreated, err := k.CreateKind(resTempl, namespace)
 		if err != nil {
-			return nil, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
+			return createdResources, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
 		}
 		createdResources = append(createdResources, resCreated)
 	}

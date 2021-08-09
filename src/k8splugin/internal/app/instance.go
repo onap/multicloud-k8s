@@ -164,6 +164,10 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 
 	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace)
 	if err != nil {
+		if len(createdResources) > 0 {
+			log.Printf("[Instance] Reverting created resources on Error: %s", err.Error())
+			k8sClient.deleteResources(createdResources, profile.Namespace)
+		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
 	}
 

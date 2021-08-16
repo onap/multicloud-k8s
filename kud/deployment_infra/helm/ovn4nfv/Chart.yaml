@@ -13,7 +13,7 @@
 # limitations under the License.
 
 apiVersion: v2
-appVersion: v2.2.0
+appVersion: v3.0.0
 description: |
   OVN4NFV K8s Plugin - Network controller
 home: https://github.com/opnfv/ovn4nfv-k8s-plugin

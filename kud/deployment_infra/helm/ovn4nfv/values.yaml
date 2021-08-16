@@ -111,7 +111,7 @@ ovn:
     repository: docker.io/integratedcloudnative/ovn-images
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: v2.2.0
   imagePullSecrets: []
 
 ovnControlPlane:

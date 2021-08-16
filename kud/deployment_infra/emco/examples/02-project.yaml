@@ -7,17 +7,63 @@ version: emco/v2
 resourceContext:
   anchor: projects
 metadata :
-   name: {{ .ProjectName }}
+  name: {{ .ProjectName }}
 
 ---
-#create default logical cloud with admin permissions
+#create privileged logical cloud
 version: emco/v2
 resourceContext:
   anchor: projects/{{ .ProjectName }}/logical-clouds
 metadata:
   name: {{ .LogicalCloud }}
 spec:
-  level: "0"
+  namespace: {{ .LogicalCloud }}
+  user:
+    user-name: {{ .LogicalCloud }}-admin
+    type: certificate
+
+---
+#create cluster quotas
+version: emco/v2
+resourceContext:
+  anchor: projects/{{ .ProjectName }}/logical-clouds/{{ .LogicalCloud }}/cluster-quotas
+metadata:
+  name: quota
+spec:
+  #an empty spec means that the addons will not be required to specify
+  #cpu, memory, etc. limits
+
+---
+#add namespaced permissions
+version: emco/v2
+resourceContext:
+  anchor: projects/{{ .ProjectName }}/logical-clouds/{{ .LogicalCloud }}/user-permissions
+metadata:
+  name: namespaced
+spec:
+  namespace: {{ .LogicalCloud }}
+  apiGroups:
+  - "*"
+  resources:
+  - "*"
+  verbs:
+  - "*"
+
+---
+#add non-namespaced permissions
+version: emco/v2
+resourceContext:
+  anchor: projects/{{ .ProjectName }}/logical-clouds/{{ .LogicalCloud }}/user-permissions
+metadata:
+  name: non-namespaced
+spec:
+  namespace: ""
+  apiGroups:
+  - "*"
+  resources:
+  - "*"
+  verbs:
+  - "*"
 
 {{- range $index, $cluster := .Clusters }}
 ---

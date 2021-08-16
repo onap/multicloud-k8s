@@ -11,7 +11,7 @@ Clusters:
   Name: cluster
 
 ProjectName: kud
-LogicalCloud: default
+LogicalCloud: kud
 
 PackagesPath: $PWD/../output/packages
 AddonsApp: addons

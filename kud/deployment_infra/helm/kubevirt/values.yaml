@@ -6,7 +6,8 @@ certificateRotateStrategy: {}
 # configuration holds kubevirt configurations.  Same as the virt-configMap.
 configuration:
   developerConfiguration:
-    featureGates: []
+    featureGates:
+    - CPUManager
 
 customizeComponents: {}
 

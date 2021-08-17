@@ -545,24 +545,6 @@ func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient K
 
 	apiVersion, kind := rss.GVK.ToAPIVersionAndKind()
 	log.Printf("apiVersion: %s, Kind: %s", apiVersion, kind)
-	restClient, err := k8sClient.getRestApi(apiVersion)
-	if err != nil {
-		return false, err
-	}
-	mapper := k8sClient.GetMapper()
-	mapping, err := mapper.RESTMapping(schema.GroupKind{
-		Group: rss.GVK.Group,
-		Kind:  rss.GVK.Kind,
-	}, rss.GVK.Version)
-	resourceInfo := resource.Info{
-		Client:          restClient,
-		Mapping:         mapping,
-		Namespace:       namespace,
-		Name:            rss.Name,
-		Source:          "",
-		Object:          nil,
-		ResourceVersion: "",
-	}
 
 	var parsedRes runtime.Object
 	//TODO: Should we care about different api version for a same kind?
@@ -591,6 +573,26 @@ func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient K
 		//For not listed resource, consider ready
 		return true, nil
 	}
+
+	restClient, err := k8sClient.getRestApi(apiVersion)
+	if err != nil {
+		return false, err
+	}
+	mapper := k8sClient.GetMapper()
+	mapping, err := mapper.RESTMapping(schema.GroupKind{
+		Group: rss.GVK.Group,
+		Kind:  rss.GVK.Kind,
+	}, rss.GVK.Version)
+	resourceInfo := resource.Info{
+		Client:          restClient,
+		Mapping:         mapping,
+		Namespace:       namespace,
+		Name:            rss.Name,
+		Source:          "",
+		Object:          nil,
+		ResourceVersion: "",
+	}
+
 	err = runtime.DefaultUnstructuredConverter.FromUnstructured(status.Status.Object, parsedRes)
 	if err != nil {
 		return false, err

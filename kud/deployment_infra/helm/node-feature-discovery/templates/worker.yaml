@@ -37,7 +37,7 @@ spec:
             fieldRef:
               fieldPath: spec.nodeName
         resources:
-        {{- toYaml .Values.worker.resources | nindent 12 }}
+          {{- toYaml .Values.worker.resources | nindent 10 }}
         command:
         - "nfd-worker"
         args:

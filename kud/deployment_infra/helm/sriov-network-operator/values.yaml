@@ -37,6 +37,8 @@ fullnameOverride: ""
 nodeSelector:
   node-role.kubernetes.io/master: ""
 
+resources: {}
+
 affinity: {}
 
 tolerations:

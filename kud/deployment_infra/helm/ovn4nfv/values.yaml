@@ -106,6 +106,8 @@ nfnOperator:
     type: NodePort
     port: 50000
 
+  resources: {}
+
 ovn:
   image:
     repository: docker.io/integratedcloudnative/ovn-images

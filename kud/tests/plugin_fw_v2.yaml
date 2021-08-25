@@ -234,7 +234,7 @@ metadata:
 spec:
   application-name: packetgen
   workload-resource: {{.Release}}-packetgen
-  type: Deployment
+  type: VirtualMachine
 
 ---
 version: emco/v2
@@ -245,7 +245,7 @@ metadata:
 spec:
   application-name: firewall
   workload-resource: {{.Release}}-firewall
-  type: Deployment
+  type: VirtualMachine
 
 ---
 version: emco/v2
@@ -265,10 +265,11 @@ resourceContext:
 metadata:
   name: packetgen_unprotected_if
 spec:
-  interface: eth1
+  interface: net1
   name: {{.UnprotectedProviderNetwork}}
   defaultGateway: "false"
   ipAddress: 192.168.10.2
+  macAddress: ee:f0:75:e0:b6:26
 
 ---
 version: emco/v2
@@ -277,10 +278,11 @@ resourceContext:
 metadata:
   name: packetgen_emco_if
 spec:
-  interface: eth2
+  interface: net2
   name: {{.EmcoProviderNetwork}}
   defaultGateway: "false"
   ipAddress: 10.10.20.2
+  macAddress: 0a:c0:37:55:f5:ab
 
 ---
 version: emco/v2
@@ -289,10 +291,11 @@ resourceContext:
 metadata:
   name: firewall_unprotected_if
 spec:
-  interface: eth1
+  interface: net1
   name: {{.UnprotectedProviderNetwork}}
   defaultGateway: "false"
   ipAddress: 192.168.10.3
+  macAddress: 52:57:2b:7b:e4:27
 
 ---
 version: emco/v2
@@ -301,10 +304,11 @@ resourceContext:
 metadata:
   name: firewall_protected_if
 spec:
-  interface: eth2
+  interface: net2
   name: {{.ProtectedNetwork}}
   defaultGateway: "false"
   ipAddress: 192.168.20.2
+  macAddress: fa:d1:3a:a1:5c:67
 
 ---
 version: emco/v2
@@ -313,10 +317,11 @@ resourceContext:
 metadata:
   name: firewall_emco_if
 spec:
-  interface: eth3
+  interface: net3
   name: {{.EmcoProviderNetwork}}
   defaultGateway: "false"
   ipAddress: 10.10.20.3
+  macAddress: 86:31:ea:6a:ce:75
 
 ---
 version: emco/v2

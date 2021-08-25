@@ -239,6 +239,9 @@ function install_host_artifacts {
     for test in _common _common_test _functions topology-manager-sriov kubevirt multus ovn4nfv nfd sriov-network qat cmk; do
         cp ${kud_tests}/${test}.sh ${host_addons_dir}/tests
     done
+    cp ${kud_tests}/plugin_fw_v2.sh ${host_addons_dir}/tests
+    cp ${kud_tests}/plugin_fw_v2.yaml ${host_addons_dir}/tests
+    cp -r ${kud_tests}/../demo/composite-firewall ${host_addons_dir}/tests
 
     mkdir -p ${host_artifacts_dir}
     cp -rf ${kud_inventory_folder}/artifacts/* ${host_artifacts_dir}

@@ -23,8 +23,8 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"strings"
 	"strconv"
+	"strings"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -69,18 +69,18 @@ type InstanceResponse struct {
 
 // InstanceDbData contains the data to put to Db
 type InstanceDbData struct {
-	ID          string                    `json:"id"`
-	Request     InstanceRequest           `json:"request"`
-	Namespace   string                    `json:"namespace"`
-	Status      string                    `json:"status"`
-	ReleaseName string                    `json:"release-name"`
-	Resources   []helm.KubernetesResource `json:"resources"`
-	Hooks       []*helm.Hook              `json:"hooks"`
-	HookProgress string					  `json:"hook-progress"`
-	PreInstallTimeout       int64      	  `json:"PreInstallTimeout"`
-	PostInstallTimeout      int64         `json:"PostInstallTimeout"`
-	PreDeleteTimeout        int64         `json:"PreDeleteTimeout"`
-	PostDeleteTimeout       int64         `json:"PostDeleteTimeout"`
+	ID                 string                    `json:"id"`
+	Request            InstanceRequest           `json:"request"`
+	Namespace          string                    `json:"namespace"`
+	Status             string                    `json:"status"`
+	ReleaseName        string                    `json:"release-name"`
+	Resources          []helm.KubernetesResource `json:"resources"`
+	Hooks              []*helm.Hook              `json:"hooks"`
+	HookProgress       string                    `json:"hook-progress"`
+	PreInstallTimeout  int64                     `json:"PreInstallTimeout"`
+	PostInstallTimeout int64                     `json:"PostInstallTimeout"`
+	PreDeleteTimeout   int64                     `json:"PreDeleteTimeout"`
+	PostDeleteTimeout  int64                     `json:"PostDeleteTimeout"`
 }
 
 // InstanceMiniResponse contains the response from instantiation
@@ -133,8 +133,8 @@ func (dk InstanceKey) String() string {
 // InstanceClient implements the InstanceManager interface
 // It will also be used to maintain some localized state
 type InstanceClient struct {
-	storeName 	string
-	tagInst   	string
+	storeName string
+	tagInst   string
 }
 
 // NewInstanceClient returns an instance of the InstanceClient
@@ -182,7 +182,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		if !ok {
 			preInstallTimeOutStr = "60"
 		}
-		preInstallTimeOut,err = strconv.ParseInt(preInstallTimeOutStr, 10, 64)
+		preInstallTimeOut, err = strconv.ParseInt(preInstallTimeOutStr, 10, 64)
 		if err != nil {
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-pre-install-timeout")
 		}
@@ -191,7 +191,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		if !ok {
 			postInstallTimeOutStr = "600"
 		}
-		postInstallTimeOut,err = strconv.ParseInt(postInstallTimeOutStr, 10, 64)
+		postInstallTimeOut, err = strconv.ParseInt(postInstallTimeOutStr, 10, 64)
 		if err != nil {
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-post-install-timeout")
 		}
@@ -200,7 +200,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		if !ok {
 			preDeleteTimeOutStr = "60"
 		}
-		preDeleteTimeout,err = strconv.ParseInt(preDeleteTimeOutStr, 10, 64)
+		preDeleteTimeout, err = strconv.ParseInt(preDeleteTimeOutStr, 10, 64)
 		if err != nil {
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-pre-delete-timeout")
 		}
@@ -209,7 +209,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		if !ok {
 			postDeleteTimeOutStr = "600"
 		}
-		postDeleteTimeout,err = strconv.ParseInt(postDeleteTimeOutStr, 10, 64)
+		postDeleteTimeout, err = strconv.ParseInt(postDeleteTimeOutStr, 10, 64)
 		if err != nil {
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-post-delete-timeout")
 		}
@@ -240,13 +240,13 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 
 	log.Printf("Main rss info")
-	for _,t := range sortedTemplates {
+	for _, t := range sortedTemplates {
 		log.Printf("  Path: %s", t.FilePath)
 		log.Printf("    Kind: %s", t.GVK.Kind)
 	}
 
 	log.Printf("Hook info")
-	for _,h := range hookList {
+	for _, h := range hookList {
 		log.Printf("  Name: %s", h.Hook.Name)
 		log.Printf("    Events: %s", h.Hook.Events)
 		log.Printf("    Weight: %d", h.Hook.Weight)
@@ -260,7 +260,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		Status:             "PRE-INSTALL",
 		Resources:          []helm.KubernetesResource{},
 		Hooks:              hookList,
-		HookProgress:		"",
+		HookProgress:       "",
 		PreInstallTimeout:  preInstallTimeOut,
 		PostInstallTimeout: postInstallTimeOut,
 		PreDeleteTimeout:   preDeleteTimeout,
@@ -296,15 +296,15 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	dbData.Status = "CREATING"
 	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
 	if err != nil {
-		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
-		if err != nil {
+		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
+		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
 		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
 
 	//Main rss creation is supposed to be very quick -> no need to support recover for main rss
-	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace);
+	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace)
 	if err != nil {
 		if len(createdResources) > 0 {
 			log.Printf("[Instance] Reverting created resources on Error: %s", err.Error())
@@ -312,8 +312,8 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		}
 		log.Printf("  Instance: %s, Main rss are failed, skip post-install and remove instance in DB", id)
 		//main rss creation failed -> remove instance in DB
-		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
-		if err != nil {
+		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
+		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
 		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
@@ -707,7 +707,7 @@ func (v *InstanceClient) Delete(id string) error {
 			log.Printf("Delete Instance DB Entry for release %s has error.", inst.ReleaseName)
 		}
 		return nil
-	} else if inst.Status != "DONE"{
+	} else if inst.Status != "DONE" {
 		//Recover is ongoing, do nothing here
 		return nil
 	}
@@ -737,7 +737,6 @@ func (v *InstanceClient) Delete(id string) error {
 			return pkgerrors.Wrap(err, "Error running pre-delete hooks")
 		}
 	}
-
 
 	inst.Status = "DELETING"
 	err = db.DBconn.Update(v.storeName, key, v.tagInst, inst)
@@ -769,14 +768,14 @@ func (v *InstanceClient) Delete(id string) error {
 func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 	instance, err := v.GetFull(id)
 	if err != nil {
-		return pkgerrors.Wrap(err, "Error getting instance " + id + ", skip this instance.  Error detail")
+		return pkgerrors.Wrap(err, "Error getting instance "+id+", skip this instance.  Error detail")
 	}
 	log.Printf("Instance " + id + ", status: " + instance.Status + ", HookProgress: " + instance.HookProgress)
 	//have to resolve again template for this instance because all templates are in /tmp -> will be deleted when container restarts
 	overrideValues := []string{}
 	if instance.Request.OverrideValues != nil {
 		for k, v := range instance.Request.OverrideValues {
-			overrideValues = append(overrideValues, k + "=" + v)
+			overrideValues = append(overrideValues, k+"="+v)
 		}
 	}
 	key := InstanceKey{
@@ -790,7 +789,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 		return pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
 
-	if strings.Contains(instance.Status, "FAILED"){
+	if strings.Contains(instance.Status, "FAILED") {
 		log.Printf("  This instance has failed during instantiation, not going to recover")
 		return nil
 	} else if !strings.Contains(instance.Status, "-INSTALL") && !strings.Contains(instance.Status, "-DELETE") {
@@ -798,10 +797,10 @@ func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 		return nil
 	}
 
-	splitHookProgress := strings.Split(instance.HookProgress,"/")
-	completedHooks,err := strconv.Atoi(splitHookProgress[0])
+	splitHookProgress := strings.Split(instance.HookProgress, "/")
+	completedHooks, err := strconv.Atoi(splitHookProgress[0])
 	if err != nil {
-		return pkgerrors.Wrap(err, "Error getting completed PRE-INSTALL hooks for instance  " + instance.ID + ", skip. Error detail")
+		return pkgerrors.Wrap(err, "Error getting completed PRE-INSTALL hooks for instance  "+instance.ID+", skip. Error detail")
 	}
 
 	//we can add an option to delete instances that will not be recovered from database to clean the db

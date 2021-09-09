@@ -15,6 +15,8 @@ needs to be installed and configured for the edge cluster.
 5. SR-IOV Network
 6. QuickAssist Technology (QAT) Device Plugin
 7. CPU Manager for Kubernetes
+8. KubeVirt and CDI Operators
+9. KubeVirt and CDI Instances
 
 ## Setup environment to deploy addons
 
@@ -38,22 +40,40 @@ required to be done only once.
     `$ emcoctl apply -f 01-cluster.yaml -v values.yaml`
     `$ emcoctl apply -f 02-project.yaml -v values.yaml`
 
-## Deploying addons
+## Create addons project
 
-This deploys the applications listed in the `Addons` and
-`AddonResources` values.
+This creates the project with the addons listed `CompositeApps` value.
 
     `$ emcoctl apply -f 03-addons-app.yaml -v values.yaml`
-    `$ emcoctl apply -f 04-addon-resources-app.yaml -v values.yaml`
+
+## Instantiate the addons
+
+This instantiates each composite app listed in the `CompositeApps`
+value.
+
+NOTE: The ordering is important when both the sriov-network and
+kubevirt addons are enabled.  The sriov-network addon will trigger a
+drain of the nodes and kubevirt will prevent the drain from
+completing, so kubevirt must be instantiated after sriov-network has
+completed the drain.
+
+	`$ emcoctl apply projects/kud/composite-apps/addons/v1/deployment-intent-groups/deployment/instantiate`
+	`$ emcoctl apply projects/kud/composite-apps/networks/v1/deployment-intent-groups/deployment/instantiate`
+	`$ emcoctl apply projects/kud/composite-apps/kubevirt/v1/deployment-intent-groups/deployment/instantiate`
 
 ## Cleanup
 
-1. Delete addons.
+1. Terminate addons.
 
-    `$ emcoctl delete -f 04-addon-resources-app.yaml -v values.yaml`
+	`$ emcoctl apply projects/kud/composite-apps/kubevirt/v1/deployment-intent-groups/deployment/terminate`
+	`$ emcoctl apply projects/kud/composite-apps/networks/v1/deployment-intent-groups/deployment/terminate`
+	`$ emcoctl apply projects/kud/composite-apps/addons/v1/deployment-intent-groups/deployment/terminate`
+
+2. Delete addons.
+
     `$ emcoctl delete -f 03-addons-app.yaml -v values.yaml`
 
-2. Cleanup prerequisites.
+3. Cleanup prerequisites.
 
     `$ emcoctl delete -f 02-project.yaml -v values.yaml`
     `$ emcoctl delete -f 01-cluster.yaml -v values.yaml`

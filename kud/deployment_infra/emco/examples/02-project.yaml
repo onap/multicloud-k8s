@@ -65,17 +65,17 @@ spec:
   verbs:
   - "*"
 
-{{- range $index, $cluster := .Clusters }}
+{{- range $clusterName, $cluster := .Clusters }}
 ---
 #add cluster reference to logical cloud
 version: emco/v2
 resourceContext:
   anchor: projects/{{ $.ProjectName }}/logical-clouds/{{ $.LogicalCloud }}/cluster-references
 metadata:
-  name: {{ $cluster.Name }}
+  name: {{ $clusterName }}
 spec:
   cluster-provider: {{ $.ClusterProvider }}
-  cluster-name: {{ $cluster.Name }}
+  cluster-name: {{ $clusterName }}
   loadbalancer-ip: "0.0.0.0"
 {{- end }}
 

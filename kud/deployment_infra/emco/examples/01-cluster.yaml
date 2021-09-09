@@ -9,14 +9,14 @@ resourceContext:
 metadata :
    name: {{ .ClusterProvider }}
 
-{{- range $index, $cluster := .Clusters }}
+{{- range $clusterName, $cluster := .Clusters }}
 ---
 #creating cluster
 version: emco/v2
 resourceContext:
   anchor: cluster-providers/{{ $.ClusterProvider }}/clusters
 metadata :
-   name: {{ $cluster.Name }}
+   name: {{ $clusterName }}
 file:
   {{ $cluster.KubeConfig }}
 
@@ -24,6 +24,6 @@ file:
 #Add label cluster
 version: emco/v2
 resourceContext:
-  anchor: cluster-providers/{{ $.ClusterProvider }}/clusters/{{ $cluster.Name }}/labels
+  anchor: cluster-providers/{{ $.ClusterProvider }}/clusters/{{ $clusterName }}/labels
 label-name: {{ $.ClustersLabel }}
 {{- end }}

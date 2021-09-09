@@ -22,28 +22,40 @@ cloud.
     \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 01-cluster.yaml -v values.yaml\`
     \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 02-project.yaml -v values.yaml\`
 
-3. Deploy addons
+3. Create addons project
 
-This deploys the addons listed in the \`Addons\` and
-\`AddonResources\` values in values.yaml.
-
-NOTE: On a single node cluster, the SRIOV addon resource will trigger
-a drain of the worker node.  KubeVirt will prevent the drain from
-completing due to its PodDisruptionBudget.  The workaround is to scale
-down the KubeVirt operator before applying 04-addon-resources-app.yaml
-then scaling it back up after the node is ready again.
+This creates the project with the addons listed `CompositeApps` value.
 
     \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 03-addons-app.yaml -v values.yaml\`
-    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply -f 04-addon-resources-app.yaml -v values.yaml\`
+
+4. Instantiate the addons
+
+This instantiates each composite app listed in the `CompositeApps`
+value.
+
+NOTE: The ordering is important when both the sriov-network and
+kubevirt addons are enabled.  The sriov-network addon will trigger a
+drain of the nodes and kubevirt will prevent the drain from
+completing, so kubevirt must be instantiated after sriov-network has
+completed the drain.
+
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply projects/kud/composite-apps/addons/v1/deployment-intent-groups/deployment/instantiate\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply projects/kud/composite-apps/networks/v1/deployment-intent-groups/deployment/instantiate\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply projects/kud/composite-apps/kubevirt/v1/deployment-intent-groups/deployment/instantiate\`
 
 # Uninstalling KUD addons with emcoctl
 
-1. Delete addons
+1. Terminate the addons
 
-    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 04-addon-resources-app.yaml -v values.yaml\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply projects/kud/composite-apps/kubevirt/v1/deployment-intent-groups/deployment/terminate\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply projects/kud/composite-apps/networks/v1/deployment-intent-groups/deployment/terminate\`
+    \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh apply projects/kud/composite-apps/addons/v1/deployment-intent-groups/deployment/terminate\`
+
+2. Delete addons
+
     \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 03-addons-app.yaml -v values.yaml\`
 
-2. Cleanup prerequisites
+3. Cleanup prerequisites
 
     \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 02-project.yaml -v values.yaml\`
     \`$ /opt/kud/multi-cluster/${CLUSTER_NAME}/artifacts/emcoctl.sh delete -f 01-cluster.yaml -v values.yaml\`

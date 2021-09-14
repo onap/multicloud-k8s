@@ -1,0 +1,7 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Huang Haibin <haibin.huang@intel.com>
+Submitted-by: Huang Haibin <haibin.huang@intel.com>
+Submitted-at: Tue, 14 Sep 2021 01:40:58 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/124049
+Project: multicloud/k8s
+Branch: refs/heads/master

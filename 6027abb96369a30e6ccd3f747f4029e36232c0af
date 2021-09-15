@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "47cbed03_0e183a43",
+        "filename": "kud/tests/plugin_fw_v2.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5576
+      },
+      "writtenOn": "2021-09-15T17:01:19Z",
+      "side": 1,
+      "message": "Can we check the status of the Pods instead of sleep ?",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 13
+      },
+      "revId": "6027abb96369a30e6ccd3f747f4029e36232c0af",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

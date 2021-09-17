@@ -22,6 +22,30 @@
       "revId": "6027abb96369a30e6ccd3f747f4029e36232c0af",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4312b1f2_1e2ba392",
+        "filename": "kud/tests/plugin_fw_v2.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 6874
+      },
+      "writtenOn": "2021-09-17T21:37:14Z",
+      "side": 1,
+      "message": "That\u0027s what the kubectl wait below was intending to do.  But I experienced one test run where the wait command apparently ran too soon and there were no pods up with the label release\u003dfw0.",
+      "parentUuid": "47cbed03_0e183a43",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 13
+      },
+      "revId": "6027abb96369a30e6ccd3f747f4029e36232c0af",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }

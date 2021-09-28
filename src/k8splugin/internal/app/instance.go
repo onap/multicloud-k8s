@@ -717,6 +717,13 @@ func (v *InstanceClient) Delete(id string) error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
+
+	configClient := NewConfigClient()
+	configs, err := configClient.List(id)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Getting Configs Information")
+	}
+
 	inst.Status = "PRE-DELETE"
 	inst.HookProgress = ""
 	err = db.DBconn.Update(v.storeName, key, v.tagInst, inst)
@@ -743,6 +750,18 @@ func (v *InstanceClient) Delete(id string) error {
 	if err != nil {
 		log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 	}
+
+	if len(configs) > 0 {
+		log.Printf("Deleting config resources first")
+		for _, config := range configs {
+			log.Printf("Deleting Config %s Resources", config.ConfigName)
+			_, err = configClient.Delete(id, config.ConfigName)
+			if err != nil {
+				return pkgerrors.Wrap(err, "Deleting Config Resources")
+			}
+		}
+	}
+
 	err = k8sClient.deleteResources(inst.Resources, inst.Namespace)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Deleting Instance Resources")

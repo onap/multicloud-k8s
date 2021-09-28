@@ -176,6 +176,7 @@ func (h rbConfigHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
+	cfgName := vars["cfgname"]
 
 	if r.Body == nil {
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -188,7 +189,7 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-	err = h.client.Rollback(instanceID, p)
+	err = h.client.Rollback(instanceID, cfgName, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -200,6 +201,7 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
+	cfgName := vars["cfgname"]
 
 	if r.Body == nil {
 		http.Error(w, "Empty body", http.StatusBadRequest)
@@ -213,7 +215,7 @@ func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.client.Tagit(instanceID, p)
+	err = h.client.Tagit(instanceID, cfgName, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

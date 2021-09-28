@@ -20,8 +20,9 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 	"net/http"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	"github.com/gorilla/mux"
 )
@@ -108,6 +109,27 @@ func (h rbTemplateHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	templateName := vars["tname"]
 
 	ret, err := h.client.Get(rbName, rbVersion, templateName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// getHandler handles GET operations on a particular template
+func (h rbTemplateHandler) listHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	rbName := vars["rbname"]
+	rbVersion := vars["rbversion"]
+
+	ret, err := h.client.List(rbName, rbVersion)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

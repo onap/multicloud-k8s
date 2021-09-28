@@ -123,6 +123,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	}
 	templateHandler := rbTemplateHandler{client: templateClient}
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template", templateHandler.createHandler).Methods("POST")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template", templateHandler.listHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}/content", templateHandler.uploadHandler).Methods("POST")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}", templateHandler.getHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}", templateHandler.deleteHandler).Methods("DELETE")
@@ -137,8 +138,8 @@ func NewRouter(defClient rb.DefinitionManager,
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.updateHandler).Methods("PUT")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.deleteHandler).Methods("DELETE")
-	instRouter.HandleFunc("/instance/{instID}/config/rollback", configHandler.rollbackHandler).Methods("POST")
-	instRouter.HandleFunc("/instance/{instID}/config/tagit", configHandler.tagitHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/rollback", configHandler.rollbackHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/tagit", configHandler.tagitHandler).Methods("POST")
 
 	// Instance Healthcheck API
 	if healthcheckClient == nil {

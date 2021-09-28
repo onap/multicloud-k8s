@@ -52,6 +52,7 @@ type ConfigStore struct {
 //ConfigVersionStore to Store the Versions of the Config
 type ConfigVersionStore struct {
 	instanceID string
+	configName string
 }
 
 type configResourceList struct {
@@ -225,7 +226,14 @@ func (c ConfigStore) deleteConfig() (Config, error) {
 // Create a version for the configuration. If previous config provided that is also stored
 func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, action string) (uint, error) {
 
-	version, err := c.incrementVersion()
+	configName := ""
+	if configNew.ConfigName != "" {
+		configName = configNew.ConfigName
+	} else {
+		configName = configPrev.ConfigName
+	}
+
+	version, err := c.incrementVersion(configName)
 
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Get Next Version")
@@ -234,7 +242,8 @@ func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, ac
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Retrieving model info")
 	}
-	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, strconv.Itoa(int(version)))
+
+	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, configName, strconv.Itoa(int(version)))
 
 	var cs configVersionDBContent
 	cs.Action = action
@@ -253,9 +262,9 @@ func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, ac
 }
 
 // Delete current version of the configuration. Configuration always deleted from top
-func (c ConfigVersionStore) deleteConfigVersion() error {
+func (c ConfigVersionStore) deleteConfigVersion(configName string) error {
 
-	counter, err := c.getCurrentVersion()
+	counter, err := c.getCurrentVersion(configName)
 
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Next Version")
@@ -264,13 +273,13 @@ func (c ConfigVersionStore) deleteConfigVersion() error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
-	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, strconv.Itoa(int(counter)))
+	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, configName, strconv.Itoa(int(counter)))
 
 	err = db.Etcd.Delete(versionKey)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Config DB Entry")
 	}
-	err = c.decrementVersion()
+	err = c.decrementVersion(configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Decrement Version")
 	}
@@ -279,13 +288,13 @@ func (c ConfigVersionStore) deleteConfigVersion() error {
 
 // Read the specified version of the configuration and return its prev and current value.
 // Also returns the action for the config version
-func (c ConfigVersionStore) getConfigVersion(version uint) (Config, Config, string, error) {
+func (c ConfigVersionStore) getConfigVersion(configName string, version uint) (Config, Config, string, error) {
 
 	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
 	if err != nil {
 		return Config{}, Config{}, "", pkgerrors.Wrap(err, "Retrieving model info")
 	}
-	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, strconv.Itoa(int(version)))
+	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, configName, strconv.Itoa(int(version)))
 	configBytes, err := db.Etcd.Get(versionKey)
 	if err != nil {
 		return Config{}, Config{}, "", pkgerrors.Wrap(err, "Get Config Version ")
@@ -303,13 +312,13 @@ func (c ConfigVersionStore) getConfigVersion(version uint) (Config, Config, stri
 }
 
 // Get the counter for the version
-func (c ConfigVersionStore) getCurrentVersion() (uint, error) {
+func (c ConfigVersionStore) getCurrentVersion(configName string) (uint, error) {
 
 	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Retrieving model info")
 	}
-	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagCounter)
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, configName, tagCounter)
 
 	value, err := db.Etcd.Get(cfgKey)
 	if err != nil {
@@ -329,13 +338,13 @@ func (c ConfigVersionStore) getCurrentVersion() (uint, error) {
 }
 
 // Update the counter for the version
-func (c ConfigVersionStore) updateVersion(counter uint) error {
+func (c ConfigVersionStore) updateVersion(configName string, counter uint) error {
 
 	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
-	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagCounter)
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, configName, tagCounter)
 	err = db.Etcd.Put(cfgKey, strconv.Itoa(int(counter)))
 	if err != nil {
 		return pkgerrors.Wrap(err, "Counter DB Entry")
@@ -344,15 +353,15 @@ func (c ConfigVersionStore) updateVersion(counter uint) error {
 }
 
 // Increment the version counter
-func (c ConfigVersionStore) incrementVersion() (uint, error) {
+func (c ConfigVersionStore) incrementVersion(configName string) (uint, error) {
 
-	counter, err := c.getCurrentVersion()
+	counter, err := c.getCurrentVersion(configName)
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Get Next Counter Value")
 	}
 	//This is done while Profile lock is taken
 	counter++
-	err = c.updateVersion(counter)
+	err = c.updateVersion(configName, counter)
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Store Next Counter Value")
 	}
@@ -361,15 +370,15 @@ func (c ConfigVersionStore) incrementVersion() (uint, error) {
 }
 
 // Decrement the version counter
-func (c ConfigVersionStore) decrementVersion() error {
+func (c ConfigVersionStore) decrementVersion(configName string) error {
 
-	counter, err := c.getCurrentVersion()
+	counter, err := c.getCurrentVersion(configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Next Counter Value")
 	}
 	//This is done while Profile lock is taken
 	counter--
-	err = c.updateVersion(counter)
+	err = c.updateVersion(configName, counter)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Store Next Counter Value")
 	}
@@ -437,10 +446,22 @@ func scheduleResources(c chan configResourceList) {
 					}
 				}
 			}
-			//TODO: Needs to add code to call Kubectl create
 		case data.action == "PUT":
 			log.Printf("[scheduleResources]: PUT %v %v", data.profile, data.resourceTemplates)
-			//TODO: Needs to add code to call Kubectl apply
+			for _, inst := range resp {
+				k8sClient := KubernetesClient{}
+				err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
+				if err != nil {
+					log.Printf("Getting CloudRegion Information: %s", err.Error())
+					//Move onto the next cloud region
+					continue
+				}
+				data.createdResources, err = k8sClient.updateResources(data.resourceTemplates, inst.Namespace)
+				if err != nil {
+					log.Printf("Error Updating resources: %s", err.Error())
+					continue
+				}
+			}
 		case data.action == "DELETE":
 			log.Printf("[scheduleResources]: DELETE %v %v", data.profile, data.resourceTemplates)
 			for _, inst := range resp {

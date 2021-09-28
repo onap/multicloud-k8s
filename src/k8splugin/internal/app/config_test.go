@@ -293,7 +293,7 @@ func TestRollbackConfig(t *testing.T) {
 				}
 			}
 			testCase.rollbackConfig.AnyOf.ConfigVersion = "2"
-			err = impl.Rollback(testCase.instanceID, testCase.rollbackConfig)
+			err = impl.Rollback(testCase.instanceID, testCase.inp.ConfigName, testCase.rollbackConfig)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)

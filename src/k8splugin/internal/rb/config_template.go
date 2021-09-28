@@ -20,14 +20,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"os"
 	"path/filepath"
 
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+
 	"encoding/base64"
 
-	pkgerrors "github.com/pkg/errors"
 	"log"
+
+	pkgerrors "github.com/pkg/errors"
 )
 
 // ConfigTemplate contains the parameters needed for ConfigTemplates
@@ -41,6 +43,7 @@ type ConfigTemplate struct {
 type ConfigTemplateManager interface {
 	Create(rbName, rbVersion string, p ConfigTemplate) error
 	Get(rbName, rbVersion, templateName string) (ConfigTemplate, error)
+	List(rbName, rbVersion string) ([]ConfigTemplate, error)
 	Delete(rbName, rbVersion, templateName string) error
 	Upload(rbName, rbVersion, templateName string, inp []byte) error
 }
@@ -76,8 +79,8 @@ type ConfigTemplateClient struct {
 func NewConfigTemplateClient() *ConfigTemplateClient {
 	return &ConfigTemplateClient{
 		storeName:  "rbdef",
-		tagMeta:    "metadata",
-		tagContent: "content",
+		tagMeta:    "confdefmetadata",
+		tagContent: "confdefcontent",
 	}
 }
 
@@ -139,6 +142,44 @@ func (v *ConfigTemplateClient) Get(rbName, rbVersion, templateName string) (Conf
 	}
 
 	return ConfigTemplate{}, pkgerrors.New("Error getting ConfigTemplate")
+}
+
+// List returns the Resource Bundle ConfigTemplate for corresponding ID
+func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplate, error) {
+
+	//Get all config templates
+	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
+	if err != nil || len(dbres) == 0 {
+		return []ConfigTemplate{}, pkgerrors.Wrap(err, "No Config Templates Found")
+	}
+
+	var results []ConfigTemplate
+	for key, value := range dbres {
+		//value is a byte array
+		if value != nil {
+			tmp := ConfigTemplate{}
+			err = db.DBconn.Unmarshal(value, &tmp)
+			if err != nil {
+				log.Printf("[ConfigTemplate] Error: %s Unmarshaling value for: %s", err.Error(), key)
+				continue
+			}
+			keyTmp := ConfigTemplateKey{
+				RBName:       rbName,
+				RBVersion:    rbVersion,
+				TemplateName: tmp.TemplateName,
+			}
+			_, err := db.DBconn.Read(v.storeName, keyTmp, v.tagMeta)
+			if err == nil && keyTmp.RBName == rbName && keyTmp.RBVersion == rbVersion {
+				results = append(results, tmp)
+			}
+		}
+	}
+
+	if len(results) == 0 {
+		return results, pkgerrors.New("No Config Templates Found for Definition and Version")
+	}
+
+	return results, nil
 }
 
 // Delete the Resource Bundle  ConfigTemplate from database

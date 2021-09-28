@@ -66,8 +66,8 @@ type ConfigManager interface {
 	Help() map[string]string
 	Update(instanceID, configName string, p Config) (ConfigResult, error)
 	Delete(instanceID, configName string) (ConfigResult, error)
-	Rollback(instanceID string, p ConfigRollback) error
-	Tagit(instanceID string, p ConfigTagit) error
+	Rollback(instanceID string, configName string, p ConfigRollback) error
+	Tagit(instanceID string, configName string, p ConfigTagit) error
 }
 
 // ConfigClient implements the ConfigManager
@@ -132,6 +132,7 @@ func (v *ConfigClient) Create(instanceID string, p Config) (ConfigResult, error)
 	// Create Version Entry in DB for Config
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
+		configName: p.ConfigName,
 	}
 	version, err := cvs.createConfigVersion(p, Config{}, "POST")
 	if err != nil {
@@ -188,6 +189,7 @@ func (v *ConfigClient) Update(instanceID, configName string, p Config) (ConfigRe
 	// Create Version Entry in DB for Config
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
+		configName: configName,
 	}
 	version, err := cvs.createConfigVersion(p, configPrev, "PUT")
 	if err != nil {
@@ -277,6 +279,7 @@ func (v *ConfigClient) Delete(instanceID, configName string) (ConfigResult, erro
 	// Create Version Entry in DB for Config
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
+		configName: configName,
 	}
 	version, err := cvs.createConfigVersion(Config{}, configPrev, "DELETE")
 	if err != nil {
@@ -297,13 +300,13 @@ func (v *ConfigClient) Delete(instanceID, configName string) (ConfigResult, erro
 }
 
 // Rollback starts from current version and rollbacks to the version desired
-func (v *ConfigClient) Rollback(instanceID string, rback ConfigRollback) error {
+func (v *ConfigClient) Rollback(instanceID string, configName string, rback ConfigRollback) error {
 
 	var reqVersion string
 	var err error
 
 	if rback.AnyOf.ConfigTag != "" {
-		reqVersion, err = v.GetTagVersion(instanceID, rback.AnyOf.ConfigTag)
+		reqVersion, err = v.GetTagVersion(instanceID, configName, rback.AnyOf.ConfigTag)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Rollback Invalid tag")
 		}
@@ -326,8 +329,9 @@ func (v *ConfigClient) Rollback(instanceID string, rback ConfigRollback) error {
 
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
+		configName: configName,
 	}
-	currentVersion, err := cvs.getCurrentVersion()
+	currentVersion, err := cvs.getCurrentVersion(configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Rollback Get Current Config Version ")
 	}
@@ -338,7 +342,7 @@ func (v *ConfigClient) Rollback(instanceID string, rback ConfigRollback) error {
 
 	//Rollback all the intermettinent configurations
 	for i := currentVersion; i > rollbackIndex; i-- {
-		configNew, configPrev, action, err := cvs.getConfigVersion(i)
+		configNew, configPrev, action, err := cvs.getConfigVersion(configName, i)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Rollback Get Config Version")
 		}
@@ -380,7 +384,7 @@ func (v *ConfigClient) Rollback(instanceID string, rback ConfigRollback) error {
 	}
 	for i := currentVersion; i > rollbackIndex; i-- {
 		// Delete rolled back items
-		err = cvs.deleteConfigVersion()
+		err = cvs.deleteConfigVersion(configName)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Delete Config Version ")
 		}
@@ -389,7 +393,7 @@ func (v *ConfigClient) Rollback(instanceID string, rback ConfigRollback) error {
 }
 
 // Tagit tags the current version with the tag provided
-func (v *ConfigClient) Tagit(instanceID string, tag ConfigTagit) error {
+func (v *ConfigClient) Tagit(instanceID string, configName string, tag ConfigTagit) error {
 
 	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
 	if err != nil {
@@ -402,12 +406,13 @@ func (v *ConfigClient) Tagit(instanceID string, tag ConfigTagit) error {
 
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
+		configName: configName,
 	}
-	currentVersion, err := cvs.getCurrentVersion()
+	currentVersion, err := cvs.getCurrentVersion(configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Current Config Version ")
 	}
-	tagKey := constructKey(rbName, rbVersion, profileName, instanceID, v.tagTag, tag.TagName)
+	tagKey := constructKey(rbName, rbVersion, profileName, instanceID, v.tagTag, configName, tag.TagName)
 
 	err = db.Etcd.Put(tagKey, strconv.Itoa(int(currentVersion)))
 	if err != nil {
@@ -417,13 +422,13 @@ func (v *ConfigClient) Tagit(instanceID string, tag ConfigTagit) error {
 }
 
 // GetTagVersion returns the version associated with the tag
-func (v *ConfigClient) GetTagVersion(instanceID, tagName string) (string, error) {
+func (v *ConfigClient) GetTagVersion(instanceID, configName string, tagName string) (string, error) {
 
 	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Retrieving model info")
 	}
-	tagKey := constructKey(rbName, rbVersion, profileName, instanceID, v.tagTag, tagName)
+	tagKey := constructKey(rbName, rbVersion, profileName, instanceID, v.tagTag, configName, tagName)
 
 	value, err := db.Etcd.Get(tagKey)
 	if err != nil {
@@ -433,7 +438,7 @@ func (v *ConfigClient) GetTagVersion(instanceID, tagName string) (string, error)
 }
 
 // ApplyAllConfig starts from first configuration version and applies all versions in sequence
-func (v *ConfigClient) ApplyAllConfig(instanceID string) error {
+func (v *ConfigClient) ApplyAllConfig(instanceID string, configName string) error {
 
 	lock, profileChannel := getProfileData(instanceID)
 	// Acquire per profile Mutex
@@ -442,8 +447,9 @@ func (v *ConfigClient) ApplyAllConfig(instanceID string) error {
 
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
+		configName: configName,
 	}
-	currentVersion, err := cvs.getCurrentVersion()
+	currentVersion, err := cvs.getCurrentVersion(configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Current Config Version ")
 	}
@@ -453,7 +459,7 @@ func (v *ConfigClient) ApplyAllConfig(instanceID string) error {
 	//Apply all configurations
 	var i uint
 	for i = 1; i <= currentVersion; i++ {
-		configNew, _, action, err := cvs.getConfigVersion(i)
+		configNew, _, action, err := cvs.getConfigVersion(configName, i)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Get Config Version")
 		}

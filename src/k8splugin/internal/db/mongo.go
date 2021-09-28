@@ -17,8 +17,9 @@
 package db
 
 import (
-	"golang.org/x/net/context"
 	"log"
+
+	"golang.org/x/net/context"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 
@@ -374,7 +375,7 @@ func (m *MongoStore) ReadAll(coll, tag string) (map[string][]byte, error) {
 		//Get objectID of tag document
 		tid, ok := d.Lookup(tag).ObjectIDOK()
 		if !ok {
-			log.Printf("Did not find tag: %s", tag)
+			//"Did not find tag: %s", tag)
 			continue
 		}
 

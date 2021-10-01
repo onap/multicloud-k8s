@@ -137,7 +137,8 @@ func NewRouter(defClient rb.DefinitionManager,
 	instRouter.HandleFunc("/instance/{instID}/config", configHandler.listHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.getHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.updateHandler).Methods("PUT")
-	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.deleteHandler).Methods("DELETE")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.deleteAllHandler).Methods("DELETE")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/delete", configHandler.deleteHandler).Methods("POST")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/rollback", configHandler.rollbackHandler).Methods("POST")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/tagit", configHandler.tagitHandler).Methods("POST")
 

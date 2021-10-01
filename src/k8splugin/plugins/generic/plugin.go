@@ -22,6 +22,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/client-go/kubernetes"
+
 	//appsv1beta1 "k8s.io/api/apps/v1beta1"
 	//appsv1beta2 "k8s.io/api/apps/v1beta2"
 	batchv1 "k8s.io/api/batch/v1"
@@ -340,58 +341,58 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 
 // Update deployment object in a specific Kubernetes cluster
 func (g genericPlugin) Update(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
-        if namespace == "" {
-                namespace = "default"
-        }
+	if namespace == "" {
+		namespace = "default"
+	}
 
-        //Decode the yaml file to create a runtime.Object
-        unstruct := &unstructured.Unstructured{}
-        //Ignore the returned obj as we expect the data in unstruct
-        _, err := utils.DecodeYAML(yamlFilePath, unstruct)
-        if err != nil {
-                return "", pkgerrors.Wrap(err, "Decode deployment object error")
-        }
+	//Decode the yaml file to create a runtime.Object
+	unstruct := &unstructured.Unstructured{}
+	//Ignore the returned obj as we expect the data in unstruct
+	_, err := utils.DecodeYAML(yamlFilePath, unstruct)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Decode deployment object error")
+	}
 
-        dynClient := client.GetDynamicClient()
-        mapper := client.GetMapper()
+	dynClient := client.GetDynamicClient()
+	mapper := client.GetMapper()
 
-        gvk := unstruct.GroupVersionKind()
-        mapping, err := mapper.RESTMapping(schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}, gvk.Version)
-        if err != nil {
-                return "", pkgerrors.Wrap(err, "Mapping kind to resource error")
-        }
+	gvk := unstruct.GroupVersionKind()
+	mapping, err := mapper.RESTMapping(schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}, gvk.Version)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Mapping kind to resource error")
+	}
 
-        //Add the tracking label to all resources created here
-        labels := unstruct.GetLabels()
-        //Check if labels exist for this object
-        if labels == nil {
-                labels = map[string]string{}
-        }
-        labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
-        unstruct.SetLabels(labels)
+	//Add the tracking label to all resources created here
+	labels := unstruct.GetLabels()
+	//Check if labels exist for this object
+	if labels == nil {
+		labels = map[string]string{}
+	}
+	labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
+	unstruct.SetLabels(labels)
 
-        // This checks if the resource we are creating has a podSpec in it
-        // Eg: Deployment, StatefulSet, Job etc..
-        // If a PodSpec is found, the label will be added to it too.
-        plugin.TagPodsIfPresent(unstruct, client.GetInstanceID())
+	// This checks if the resource we are creating has a podSpec in it
+	// Eg: Deployment, StatefulSet, Job etc..
+	// If a PodSpec is found, the label will be added to it too.
+	plugin.TagPodsIfPresent(unstruct, client.GetInstanceID())
 
-        gvr := mapping.Resource
-        var updatedObj *unstructured.Unstructured
+	gvr := mapping.Resource
+	var updatedObj *unstructured.Unstructured
 
-        switch mapping.Scope.Name() {
-        case meta.RESTScopeNameNamespace:
-                updatedObj, err = dynClient.Resource(gvr).Namespace(namespace).Update(context.TODO(), unstruct, metav1.UpdateOptions{})
-        case meta.RESTScopeNameRoot:
-                updatedObj, err = dynClient.Resource(gvr).Update(context.TODO(), unstruct, metav1.UpdateOptions{})
-        default:
-                return "", pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + gvk.String())
-        }
+	switch mapping.Scope.Name() {
+	case meta.RESTScopeNameNamespace:
+		updatedObj, err = dynClient.Resource(gvr).Namespace(namespace).Update(context.TODO(), unstruct, metav1.UpdateOptions{})
+	case meta.RESTScopeNameRoot:
+		updatedObj, err = dynClient.Resource(gvr).Update(context.TODO(), unstruct, metav1.UpdateOptions{})
+	default:
+		return "", pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + gvk.String())
+	}
 
-        if err != nil {
-                return "", pkgerrors.Wrap(err, "Update object error")
-        }
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Update object error")
+	}
 
-        return updatedObj.GetName(), nil
+	return updatedObj.GetName(), nil
 }
 
 // Get an existing resource hosted in a specific Kubernetes cluster
@@ -425,7 +426,7 @@ func (g genericPlugin) Get(resource helm.KubernetesResource,
 	}
 
 	if err != nil {
-		return "", pkgerrors.Wrap(err, "Delete object error")
+		return "", pkgerrors.Wrap(err, "Get object error")
 	}
 
 	return unstruct.GetName(), nil

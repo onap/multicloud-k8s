@@ -39,6 +39,7 @@ type EtcdStore interface {
 	GetAll(key string) ([][]byte, error)
 	Put(key, value string) error
 	Delete(key string) error
+	DeletePrefix(keyPrefix string) error
 }
 
 // EtcdClient for Etcd
@@ -148,6 +149,19 @@ func (e EtcdClient) Delete(key string) error {
 	_, err := e.cli.Delete(context.Background(), key)
 	if err != nil {
 		return pkgerrors.Errorf("Delete failed etcd entry:%s", err.Error())
+	}
+	return nil
+}
+
+// Delete values by prefix from Etcd DB
+func (e EtcdClient) DeletePrefix(keyPrefix string) error {
+
+	if e.cli == nil {
+		return pkgerrors.Errorf("Etcd Client not initialized")
+	}
+	_, err := e.cli.Delete(context.Background(), keyPrefix, clientv3.WithPrefix())
+	if err != nil {
+		return pkgerrors.Errorf("Delete prefix failed etcd entry:%s", err.Error())
 	}
 	return nil
 }

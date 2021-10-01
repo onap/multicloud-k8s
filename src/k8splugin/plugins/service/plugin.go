@@ -21,10 +21,10 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 	coreV1 "k8s.io/api/core/v1"
-	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/api/meta"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
@@ -156,8 +156,43 @@ func (p servicePlugin) Get(resource helm.KubernetesResource, namespace string, c
 	return service.Name, nil
 }
 
+// Update a service object in a specific Kubernetes cluster
 func (p servicePlugin) Update(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
+	if namespace == "" {
+		namespace = "default"
+	}
 
-        return "", nil
+	obj, err := utils.DecodeYAML(yamlFilePath, nil)
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Decode service object error")
+	}
 
+	service, ok := obj.(*coreV1.Service)
+	if !ok {
+		return "", pkgerrors.New("Decoded object contains another resource different than Service")
+	}
+	service.Namespace = namespace
+
+	existingService, err := client.GetStandardClient().CoreV1().Services(namespace).Get(context.TODO(), service.Name, metaV1.GetOptions{})
+	if err == nil {
+		service.ResourceVersion = existingService.ResourceVersion
+		service.Spec.ClusterIP = existingService.Spec.ClusterIP
+	} else {
+		return p.Create(yamlFilePath, namespace, client)
+	}
+	labels := service.GetLabels()
+	//Check if labels exist for this object
+	if labels == nil {
+		labels = map[string]string{}
+	}
+	labels[config.GetConfiguration().KubernetesLabelName] = client.GetInstanceID()
+	service.SetLabels(labels)
+
+	_, err = client.GetStandardClient().CoreV1().Services(namespace).Update(context.TODO(), service, metaV1.UpdateOptions{})
+
+	if err != nil {
+		return "", pkgerrors.Wrap(err, "Update object error")
+	}
+
+	return service.Name, nil
 }

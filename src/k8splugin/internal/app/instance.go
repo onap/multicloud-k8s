@@ -709,19 +709,14 @@ func (v *InstanceClient) Delete(id string) error {
 		return nil
 	} else if inst.Status != "DONE" {
 		//Recover is ongoing, do nothing here
-		return nil
+		//return nil
+		//TODO: implement recovery
 	}
 
 	k8sClient := KubernetesClient{}
 	err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")
-	}
-
-	configClient := NewConfigClient()
-	configs, err := configClient.List(id)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Getting Configs Information")
 	}
 
 	inst.Status = "PRE-DELETE"
@@ -751,15 +746,10 @@ func (v *InstanceClient) Delete(id string) error {
 		log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 	}
 
-	if len(configs) > 0 {
-		log.Printf("Deleting config resources first")
-		for _, config := range configs {
-			log.Printf("Deleting Config %s Resources", config.ConfigName)
-			_, err = configClient.Delete(id, config.ConfigName)
-			if err != nil {
-				return pkgerrors.Wrap(err, "Deleting Config Resources")
-			}
-		}
+	configClient := NewConfigClient()
+	err = configClient.Cleanup(id)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Cleanup Config Resources")
 	}
 
 	err = k8sClient.deleteResources(inst.Resources, inst.Namespace)

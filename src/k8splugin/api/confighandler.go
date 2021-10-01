@@ -117,6 +117,22 @@ func (h rbConfigHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // deleteHandler handles DELETE operations on a config
+func (h rbConfigHandler) deleteAllHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	instanceID := vars["instID"]
+	cfgName := vars["cfgname"]
+
+	err := h.client.DeleteAll(instanceID, cfgName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusAccepted)
+}
+
+// deleteHandler handles delete operations on a config creating its delete version
 func (h rbConfigHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
@@ -184,12 +200,13 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	var p app.ConfigRollback
-	err := json.NewDecoder(r.Body).Decode(&p)
+	err := json.NewDecoder(r.Body).Decode(&p.AnyOf)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 	err = h.client.Rollback(instanceID, cfgName, p)
+	//err = h.client.Cleanup(instanceID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

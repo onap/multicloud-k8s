@@ -55,3 +55,12 @@ func (c *MockEtcdClient) Delete(key string) error {
 	delete(c.Items, key)
 	return c.Err
 }
+
+func (c *MockEtcdClient) DeletePrefix(key string) error {
+	for kvKey := range c.Items {
+		if strings.HasPrefix(kvKey, key) {
+			delete(c.Items, key)
+		}
+	}
+	return c.Err
+}

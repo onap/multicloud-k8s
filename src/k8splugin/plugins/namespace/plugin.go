@@ -21,10 +21,10 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 	coreV1 "k8s.io/api/core/v1"
-	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/api/meta"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
@@ -60,7 +60,12 @@ func (p namespacePlugin) Create(yamlFilePath string, namespace string, client pl
 			Name: namespace,
 		},
 	}
-	_, err := client.GetStandardClient().CoreV1().Namespaces().Create(context.TODO(), namespaceObj, metaV1.CreateOptions{})
+	existingNs, err := client.GetStandardClient().CoreV1().Namespaces().Get(context.TODO(), namespace, metaV1.GetOptions{})
+	if err == nil && len(existingNs.ManagedFields) > 0 && existingNs.ManagedFields[0].Manager == "k8plugin" {
+		log.Printf("Namespace (%s) already ensured by plugin. Skip", namespace)
+		return namespace, nil
+	}
+	_, err = client.GetStandardClient().CoreV1().Namespaces().Create(context.TODO(), namespaceObj, metaV1.CreateOptions{})
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Namespace error")
 	}
@@ -128,5 +133,5 @@ func (p namespacePlugin) List(gvk schema.GroupVersionKind, namespace string, cli
 
 func (p namespacePlugin) Update(yamlFilePath string, namespace string, client plugin.KubernetesConnector) (string, error) {
 
-   return "", nil
+	return namespace, nil
 }

@@ -20,25 +20,30 @@ package app
 import (
 	"context"
 	"io/ioutil"
+
 	appsv1 "k8s.io/api/apps/v1"
+
 	//appsv1beta1 "k8s.io/api/apps/v1beta1"
 	//appsv1beta2 "k8s.io/api/apps/v1beta2"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+
 	//extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	//apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	//apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"strings"
 	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	logger "log"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
-	logger "log"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -545,9 +550,18 @@ func (k *KubernetesClient) DeleteKind(resource helm.KubernetesResource, namespac
 		return pkgerrors.Wrap(err, "Error loading plugin")
 	}
 
-	err = pluginImpl.Delete(resource, namespace, k)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Error deleting "+resource.Name)
+	name, err := pluginImpl.Get(resource, namespace, k)
+
+	if (err == nil && name == resource.Name) || (err != nil && strings.Contains(err.Error(), "not found") == false) {
+		err = pluginImpl.Delete(resource, namespace, k)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Error deleting "+resource.Name)
+		}
+	} else {
+		log.Warn("Resource does not exist, Skipping delete", log.Fields{
+			"gvk":      resource.GVK,
+			"resource": resource.Name,
+		})
 	}
 
 	return nil

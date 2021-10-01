@@ -319,3 +319,6 @@ func TestRollbackConfig(t *testing.T) {
 		})
 	}
 }
+
+func main() {
+}

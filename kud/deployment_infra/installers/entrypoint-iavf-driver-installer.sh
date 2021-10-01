@@ -27,10 +27,31 @@ download_iavf_src() {
     pushd "${IAVF_INSTALL_DIR_CONTAINER}" > /dev/null
     curl -L -sS "${IAVF_DRIVER_DOWNLOAD_URL}" -o "${IAVF_DRIVER_ARCHIVE}"
     tar xf "${IAVF_DRIVER_ARCHIVE}" --strip-components=1
+    info "Patching IAVF source ... "
+    # Ubuntu 18.04 added the skb_frag_off definitions to the kernel
+    # headers beginning with 4.15.0-159
+    cat <<'EOF' >skb-frag-off.patch
+diff --git a/src/kcompat.h b/src/kcompat.h
+index 21e9818..97abc2f 100644
+--- a/src/kcompat.h
++++ b/src/kcompat.h
+@@ -7074,7 +7074,8 @@ devlink_flash_update_status_notify(struct devlink __always_unused *devlink,
+ /*****************************************************************************/
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(5,4,0))
+ #if (!(RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8,2)) && \
+-     !(SLE_VERSION_CODE >= SLE_VERSION(15,2,0)))
++     !(SLE_VERSION_CODE >= SLE_VERSION(15,2,0)) && \
++     !(UBUNTU_VERSION_CODE >= UBUNTU_VERSION(4,15,0,159)))
+ static inline unsigned int skb_frag_off(const skb_frag_t *frag)
+ {
+        return frag->page_offset;
+EOF
+    patch -p1 < skb-frag-off.patch
     popd > /dev/null
 }
 
 build_iavf_src() {
+
     info "Building IAVF source ... "
     pushd "${IAVF_INSTALL_DIR_CONTAINER}/src" > /dev/null
     KSRC=${KERNEL_SRC_DIR} SYSTEM_MAP_FILE="${ROOT_MOUNT_DIR}/boot/System.map-$(uname -r)" INSTALL_MOD_PATH="${ROOT_MOUNT_DIR}" make install

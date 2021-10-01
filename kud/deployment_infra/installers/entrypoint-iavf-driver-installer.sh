@@ -2,6 +2,7 @@
 
 #set -x
 source _common.sh
+SCRIPT_DIR=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
 
 IAVF_DRIVER_VERSION="${IAVF_DRIVER_VERSION:-4.0.2}"
 IAVF_DRIVER_DOWNLOAD_URL_DEFAULT="https://downloadmirror.intel.com/30305/eng/iavf-${IAVF_DRIVER_VERSION}.tar.gz"
@@ -27,10 +28,15 @@ download_iavf_src() {
     pushd "${IAVF_INSTALL_DIR_CONTAINER}" > /dev/null
     curl -L -sS "${IAVF_DRIVER_DOWNLOAD_URL}" -o "${IAVF_DRIVER_ARCHIVE}"
     tar xf "${IAVF_DRIVER_ARCHIVE}" --strip-components=1
+    info "Patching IAVF source ... "
+    # Ubuntu 18.04 added the skb_frag_off definitions to the kernel
+    # headers beginning with 4.15.0-159
+    patch -p1 < "${SCRIPT_DIR}/skb-frag-off.patch"
     popd > /dev/null
 }
 
 build_iavf_src() {
+
     info "Building IAVF source ... "
     pushd "${IAVF_INSTALL_DIR_CONTAINER}/src" > /dev/null
     KSRC=${KERNEL_SRC_DIR} SYSTEM_MAP_FILE="${ROOT_MOUNT_DIR}/boot/System.map-$(uname -r)" INSTALL_MOD_PATH="${ROOT_MOUNT_DIR}" make install

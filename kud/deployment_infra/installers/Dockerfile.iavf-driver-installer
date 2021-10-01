@@ -19,6 +19,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY _common.sh /
+COPY skb-frag-off.patch /
 COPY entrypoint-iavf-driver-installer.sh /entrypoint.sh
 
 CMD /entrypoint.sh

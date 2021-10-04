@@ -30,7 +30,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/cli-runtime/pkg/resource"
@@ -225,7 +224,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 
 	//Execute the kubernetes create command
-	sortedTemplates, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
+	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
@@ -241,6 +240,12 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 
 	log.Printf("Main rss info")
 	for _, t := range sortedTemplates {
+		log.Printf("  Path: %s", t.FilePath)
+		log.Printf("    Kind: %s", t.GVK.Kind)
+	}
+
+	log.Printf("Crd rss info")
+	for _, t := range crdList {
 		log.Printf("  Path: %s", t.FilePath)
 		log.Printf("    Kind: %s", t.GVK.Kind)
 	}
@@ -278,6 +283,15 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	err = k8sClient.ensureNamespace(profile.Namespace)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
+	}
+
+	if len(crdList) > 0 {
+		log.Printf("Pre-Installing CRDs")
+		_, err = k8sClient.createResources(crdList, profile.Namespace)
+
+		if err != nil {
+			return InstanceResponse{}, pkgerrors.Wrap(err, "Pre-Installing CRDs")
+		}
 	}
 
 	hookClient := NewHookClient(profile.Namespace, id, v.storeName, v.tagInst)
@@ -561,8 +575,6 @@ func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient K
 		parsedRes = new(corev1.Service)
 	case "DaemonSet":
 		parsedRes = new(appsv1.DaemonSet)
-	case "CustomResourceDefinition":
-		parsedRes = new(apiextv1.CustomResourceDefinition)
 	case "StatefulSet":
 		parsedRes = new(appsv1.StatefulSet)
 	case "ReplicationController":
@@ -791,7 +803,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 		ID: id,
 	}
 	log.Printf("  Resolving template for release %s", instance.Request.ReleaseName)
-	_, hookList, _, err := rb.NewProfileClient().Resolve(instance.Request.RBName, instance.Request.RBVersion, instance.Request.ProfileName, overrideValues, instance.Request.ReleaseName)
+	_, _, hookList, _, err := rb.NewProfileClient().Resolve(instance.Request.RBName, instance.Request.RBVersion, instance.Request.ProfileName, overrideValues, instance.Request.ReleaseName)
 	instance.Hooks = hookList
 	err = db.DBconn.Update(v.storeName, key, v.tagInst, instance)
 	if err != nil {

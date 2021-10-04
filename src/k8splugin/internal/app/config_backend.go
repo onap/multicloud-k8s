@@ -631,14 +631,18 @@ var resolve = func(rbName, rbVersion, profileName string, p Config, releaseName 
 		finalReleaseName)
 
 	chartPath := filepath.Join(chartBasePath, t.ChartName)
-	resTemplates, _, err = helmClient.GenerateKubernetesArtifacts(chartPath,
+	resTemplates, crdList, _, err := helmClient.GenerateKubernetesArtifacts(chartPath,
 		[]string{outputfile.Name()},
 		nil)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Generate final k8s yaml")
 	}
+	for _, tmp := range resTemplates {
+		crdList = append(crdList, tmp)
+	}
+
 	crl := configResourceList{
-		resourceTemplates: resTemplates,
+		resourceTemplates: crdList,
 		profile:           profile,
 	}
 

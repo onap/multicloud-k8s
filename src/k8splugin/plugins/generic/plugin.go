@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	pkgerrors "github.com/pkg/errors"
+	"github.com/prometheus/common/log"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -305,7 +306,18 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Mapping kind to resource error")
 	}
-
+	if gvk.Kind == "CustomResourceDefinition" {
+		//according the helm spec, CRD is created only once, and we raise only warn if we try to do it once more
+		resource := helm.KubernetesResource{}
+		resource.GVK = gvk
+		resource.Name = unstruct.GetName()
+		name, err := g.Get(resource, namespace, client)
+		if err == nil && name == resource.Name {
+			//CRD update is not supported according to Helm spec
+			log.Warn(fmt.Sprintf("CRD %s create will be skipped. It already exists", name))
+			return name, nil
+		}
+	}
 	//Add the tracking label to all resources created here
 	labels := unstruct.GetLabels()
 	//Check if labels exist for this object
@@ -360,6 +372,18 @@ func (g genericPlugin) Update(yamlFilePath string, namespace string, client plug
 	mapping, err := mapper.RESTMapping(schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}, gvk.Version)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Mapping kind to resource error")
+	}
+
+	if gvk.Kind == "CustomResourceDefinition" {
+		resource := helm.KubernetesResource{}
+		resource.GVK = gvk
+		resource.Name = unstruct.GetName()
+		name, err := g.Get(resource, namespace, client)
+		if err == nil && name == resource.Name {
+			//CRD update is not supported according to Helm spec
+			log.Warn(fmt.Sprintf("CRD %s update will be skipped", name))
+			return name, nil
+		}
 	}
 
 	//Add the tracking label to all resources created here
@@ -462,6 +486,11 @@ func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string
 	deletePolicy := metav1.DeletePropagationBackground
 	opts := metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
+	}
+	if resource.GVK.Kind == "CustomResourceDefinition" {
+		//CRD deletion is not supported according to Helm spec
+		log.Warn(fmt.Sprintf("CRD %s deletion will be skipped", resource.Name))
+		return nil
 	}
 
 	switch mapping.Scope.Name() {

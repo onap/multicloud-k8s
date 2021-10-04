@@ -15,12 +15,13 @@ package app
 
 import (
 	"encoding/base64"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"io/ioutil"
 	"os"
 	"plugin"
 	"reflect"
 	"testing"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"

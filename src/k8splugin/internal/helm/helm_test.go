@@ -20,11 +20,12 @@ package helm
 import (
 	"crypto/sha256"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"gopkg.in/yaml.v2"
 )
 
 func TestProcessValues(t *testing.T) {
@@ -202,7 +203,7 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			tc := NewTemplateClient("1.12.3", "testnamespace", "testreleasename")
-			out, hooks, err := tc.GenerateKubernetesArtifacts(testCase.chartPath, testCase.valueFiles,
+			out, _, hooks, err := tc.GenerateKubernetesArtifacts(testCase.chartPath, testCase.valueFiles,
 				testCase.values)
 			if err != nil {
 				if testCase.expectedError == "" {

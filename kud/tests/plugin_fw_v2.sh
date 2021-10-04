@@ -223,6 +223,10 @@ else
         KUBECONFIG=$file kubectl get providernetwork emco-private-net -o name
         KUBECONFIG=$file kubectl get providernetwork unprotected-private-net -o name
     done
+    # Give some time for the Pods to show up on the clusters.  kubectl
+    # wait may return with "error: no matching resources found" if the
+    # Pods have not started yet.
+    sleep 30s
     for name in $(cluster_names); do
         print_msg "Wait for all pods to start on cluster $name"
         file=$(cluster_file "$name")

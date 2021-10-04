@@ -7,35 +7,33 @@ DtcPort: 30483
 ClusterProvider: kud
 ClustersLabel: kud-cluster
 Clusters:
-- KubeConfig: ${KUBE_PATH}
-  Name: cluster
+  cluster:
+    KubeConfig: ${KUBE_PATH}
 
 ProjectName: kud
 LogicalCloud: kud
 
 PackagesPath: ${PACKAGES_PATH}
-AddonsApp: addons
-AddonsProfile: addons-profile
-AddonsDeploymentIntentGroup: addons-deployment-intent-group
-AddonsDeploymentIntent: addons-deployment-intent
-AddonsPlacementIntent: addons-placement-intent
-Addons:
-- kubevirt-operator
-- cdi-operator
-- multus-cni
-- ovn4nfv
-- node-feature-discovery
-- sriov-network-operator
-- qat-device-plugin
-- cpu-manager
 
-AddonResourcesApp: addon-resources
-AddonResourcesProfile: addon-resources-profile
-AddonResourcesDeploymentIntentGroup: addon-resources-deployment-intent-group
-AddonResourcesDeploymentIntent: addon-resources-deployment-intent
-AddonResourcesPlacementIntent: addon-resources-placement-intent
-AddonResources:
-- ovn4nfv-network
-- sriov-network
-- kubevirt
-- cdi
+# Each composite app will be contained in its own deployment intent
+# group.  This is to enable instantiating the addons in a specified
+# order.
+CompositeApps:
+  addons:
+    Apps:
+    - kubevirt-operator
+    - cdi-operator
+    - multus-cni
+    - ovn4nfv
+    - node-feature-discovery
+    - sriov-network-operator
+    - qat-device-plugin
+    - cpu-manager
+  networks:
+    Apps:
+    - ovn4nfv-network
+    - sriov-network
+  kubevirt:
+    Apps:
+    - kubevirt
+    - cdi

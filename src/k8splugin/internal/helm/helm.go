@@ -19,12 +19,13 @@ package helm
 
 import (
 	"fmt"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 
 	pkgerrors "github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
@@ -47,7 +48,7 @@ type Template interface {
 	GenerateKubernetesArtifacts(
 		chartPath string,
 		valueFiles []string,
-		values []string) ([]KubernetesResourceTemplate, []*Hook, error)
+		values []string) ([]KubernetesResourceTemplate, []KubernetesResourceTemplate, []*Hook, error)
 }
 
 // TemplateClient implements the Template interface
@@ -90,10 +91,11 @@ func (h *TemplateClient) processValues(valueFiles []string, values []string) (ma
 
 // GenerateKubernetesArtifacts a mapping of type to fully evaluated helm template
 func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFiles []string,
-	values []string) ([]KubernetesResourceTemplate, []*Hook, error) {
+	values []string) ([]KubernetesResourceTemplate, []KubernetesResourceTemplate, []*Hook, error) {
 
 	var outputDir, chartPath, namespace, releaseName string
 	var retData []KubernetesResourceTemplate
+	var crdData []KubernetesResourceTemplate
 	var hookList []*Hook
 
 	releaseName = h.releaseName
@@ -102,16 +104,16 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	// verify chart path exists
 	if _, err := os.Stat(inputPath); err == nil {
 		if chartPath, err = filepath.Abs(inputPath); err != nil {
-			return retData, hookList, err
+			return retData, crdData, hookList, err
 		}
 	} else {
-		return retData, hookList, err
+		return retData, crdData, hookList, err
 	}
 
 	//Create a temp directory in the system temp folder
 	outputDir, err := ioutil.TempDir("", "helm-tmpl-")
 	if err != nil {
-		return retData, hookList, pkgerrors.Wrap(err, "Got error creating temp dir")
+		return retData, crdData, hookList, pkgerrors.Wrap(err, "Got error creating temp dir")
 	}
 
 	if namespace == "" {
@@ -121,11 +123,11 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	// get combined values and create config
 	rawVals, err := h.processValues(valueFiles, values)
 	if err != nil {
-		return retData, hookList, err
+		return retData, crdData, hookList, err
 	}
 
 	if msgs := validation.IsDNS1123Label(releaseName); releaseName != "" && len(msgs) > 0 {
-		return retData, hookList, fmt.Errorf("release name %s is not a valid DNS label: %s", releaseName, strings.Join(msgs, ";"))
+		return retData, crdData, hookList, fmt.Errorf("release name %s is not a valid DNS label: %s", releaseName, strings.Join(msgs, ";"))
 	}
 
 	// Initialize the install client
@@ -133,27 +135,52 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	client.DryRun = true
 	client.ClientOnly = true
 	client.ReleaseName = releaseName
-	client.IncludeCRDs = true
+	client.IncludeCRDs = false
 	client.DisableHooks = true //to ensure no duplicates in case of defined pre/post install hooks
 
 	// Check chart dependencies to make sure all are present in /charts
 	chartRequested, err := loader.Load(chartPath)
 	if err != nil {
-		return retData, hookList, err
+		return retData, crdData, hookList, err
 	}
 
 	if chartRequested.Metadata.Type != "" && chartRequested.Metadata.Type != "application" {
-		return retData, hookList, fmt.Errorf(
+		return retData, crdData, hookList, fmt.Errorf(
 			"chart %q has an unsupported type and is not installable: %q",
 			chartRequested.Metadata.Name,
 			chartRequested.Metadata.Type,
 		)
 	}
 
+	for _, crd := range chartRequested.CRDObjects() {
+		if strings.HasPrefix(crd.Name, "_") {
+			continue
+		}
+		filePath := filepath.Join(outputDir, crd.Name)
+		data := string(crd.File.Data)
+		// blank template after execution
+		if h.emptyRegex.MatchString(data) {
+			continue
+		}
+		utils.EnsureDirectory(filePath)
+		err = ioutil.WriteFile(filePath, []byte(crd.File.Data), 0600)
+		if err != nil {
+			return retData, crdData, hookList, err
+		}
+		gvk, err := getGroupVersionKind(data)
+		if err != nil {
+			return retData, crdData, hookList, err
+		}
+		kres := KubernetesResourceTemplate{
+			GVK:      gvk,
+			FilePath: filePath,
+		}
+		crdData = append(crdData, kres)
+	}
 	client.Namespace = namespace
 	release, err := client.Run(chartRequested, rawVals)
 	if err != nil {
-		return retData, hookList, err
+		return retData, crdData, hookList, err
 	}
 	// SplitManifests returns integer-sortable so that manifests get output
 	// in the same order as the input by `BySplitManifestsOrder`.
@@ -161,7 +188,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	// We won't get any meaningful hooks from here
 	_, m, err := releaseutil.SortManifests(rmap, nil, releaseutil.InstallOrder)
 	if err != nil {
-		return retData, hookList, err
+		return retData, crdData, hookList, err
 	}
 	for _, k := range m {
 		data := k.Content
@@ -180,11 +207,11 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 		utils.EnsureDirectory(mfilePath)
 		err = ioutil.WriteFile(mfilePath, []byte(k.Content), 0600)
 		if err != nil {
-			return retData, hookList, err
+			return retData, crdData, hookList, err
 		}
 		gvk, err := getGroupVersionKind(data)
 		if err != nil {
-			return retData, hookList, err
+			return retData, crdData, hookList, err
 		}
 		kres := KubernetesResourceTemplate{
 			GVK:      gvk,
@@ -197,15 +224,15 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 		utils.EnsureDirectory(hFilePath)
 		err = ioutil.WriteFile(hFilePath, []byte(h.Manifest), 0600)
 		if err != nil {
-			return retData, hookList, err
+			return retData, crdData, hookList, err
 		}
 		gvk, err := getGroupVersionKind(h.Manifest)
 		if err != nil {
-			return retData, hookList, err
+			return retData, crdData, hookList, err
 		}
 		hookList = append(hookList, &Hook{*h, KubernetesResourceTemplate{gvk, hFilePath}})
 	}
-	return retData, hookList, nil
+	return retData, crdData, hookList, nil
 }
 
 func getGroupVersionKind(data string) (schema.GroupVersionKind, error) {

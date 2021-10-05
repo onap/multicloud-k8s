@@ -249,3 +249,13 @@ func getGroupVersionKind(data string) (schema.GroupVersionKind, error) {
 
 	return *gvk, nil
 }
+
+//GetReverseK8sResources reverse list of resources for delete purpose
+func GetReverseK8sResources(resources []KubernetesResource) []KubernetesResource {
+	reversed := []KubernetesResource{}
+
+	for i := len(resources) - 1; i >= 0; i-- {
+		reversed = append(reversed, resources[i])
+	}
+	return reversed
+}

@@ -551,7 +551,7 @@ func scheduleResources(c chan configResourceList) {
 					//Move onto the next cloud region
 					continue
 				}
-				err = k8sClient.deleteResources(data.resources, inst.Namespace)
+				err = k8sClient.deleteResources(helm.GetReverseK8sResources(data.resources), inst.Namespace)
 				if err != nil {
 					log.Printf("Error Deleting resources: %s", err.Error())
 					continue

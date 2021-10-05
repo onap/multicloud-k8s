@@ -550,18 +550,17 @@ func (k *KubernetesClient) DeleteKind(resource helm.KubernetesResource, namespac
 		return pkgerrors.Wrap(err, "Error loading plugin")
 	}
 
-	name, err := pluginImpl.Get(resource, namespace, k)
+	err = pluginImpl.Delete(resource, namespace, k)
 
-	if (err == nil && name == resource.Name) || (err != nil && strings.Contains(err.Error(), "not found") == false) {
-		err = pluginImpl.Delete(resource, namespace, k)
-		if err != nil {
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") == false {
 			return pkgerrors.Wrap(err, "Error deleting "+resource.Name)
+		} else {
+			log.Warn("Resource already does not exist", log.Fields{
+				"gvk":      resource.GVK,
+				"resource": resource.Name,
+			})
 		}
-	} else {
-		log.Warn("Resource does not exist, Skipping delete", log.Fields{
-			"gvk":      resource.GVK,
-			"resource": resource.Name,
-		})
 	}
 
 	return nil

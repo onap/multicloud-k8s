@@ -322,7 +322,7 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	if err != nil {
 		if len(createdResources) > 0 {
 			log.Printf("[Instance] Reverting created resources on Error: %s", err.Error())
-			k8sClient.deleteResources(createdResources, profile.Namespace)
+			k8sClient.deleteResources(helm.GetReverseK8sResources(createdResources), profile.Namespace)
 		}
 		log.Printf("  Instance: %s, Main rss are failed, skip post-install and remove instance in DB", id)
 		//main rss creation failed -> remove instance in DB
@@ -764,7 +764,7 @@ func (v *InstanceClient) Delete(id string) error {
 		return pkgerrors.Wrap(err, "Cleanup Config Resources")
 	}
 
-	err = k8sClient.deleteResources(inst.Resources, inst.Namespace)
+	err = k8sClient.deleteResources(helm.GetReverseK8sResources(inst.Resources), inst.Namespace)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Deleting Instance Resources")
 	}
@@ -872,7 +872,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 				return
 			}
 
-			err = k8sClient.deleteResources(instance.Resources, instance.Namespace)
+			err = k8sClient.deleteResources(helm.GetReverseK8sResources(instance.Resources), instance.Namespace)
 			if err != nil {
 				log.Printf("  Error running deleting instance resources, error: %s", err)
 				return

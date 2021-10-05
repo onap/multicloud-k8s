@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"gopkg.in/yaml.v2"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func TestProcessValues(t *testing.T) {
@@ -264,4 +265,46 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestReverseResources(t *testing.T) {
+
+	t.Run("Successfully reverse resources", func(t *testing.T) {
+		data := []KubernetesResource{
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "apps",
+					Version: "v1",
+					Kind:    "Deployment"},
+				Name: "deployment-1",
+			},
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "apps",
+					Version: "v1",
+					Kind:    "Deployment"},
+				Name: "deployment-2",
+			},
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "",
+					Version: "v1",
+					Kind:    "Service"},
+				Name: "service-1",
+			},
+			{
+				GVK: schema.GroupVersionKind{
+					Group:   "",
+					Version: "v1",
+					Kind:    "Service"},
+				Name: "service-2",
+			},
+		}
+
+		reversed := GetReverseK8sResources(data)
+
+		if reversed[0] != data[len(data)-1] {
+			t.Fatalf("Unexpected k8s resource at position 0 %s", reversed[0])
+		}
+	})
 }

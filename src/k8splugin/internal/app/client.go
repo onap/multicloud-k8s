@@ -256,6 +256,7 @@ func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, names
 		LabelSelector: labelSelector,
 	}
 	var unstrList *unstructured.UnstructuredList
+	dynClient.Resource(gvr).Namespace(namespace).List(context.TODO(), opts)
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
 		unstrList, err = dynClient.Resource(gvr).Namespace(namespace).List(context.TODO(), opts)

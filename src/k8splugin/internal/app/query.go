@@ -33,7 +33,7 @@ type QueryStatus struct {
 
 // QueryManager is an interface exposes the instantiation functionality
 type QueryManager interface {
-	Query(namespace, cloudRegion, apiVersion, kind, name, labels, id string) (QueryStatus, error)
+	Query(namespace, cloudRegion, apiVersion, kind, name, labels string) (QueryStatus, error)
 }
 
 // QueryClient implements the InstanceManager interface
@@ -53,12 +53,12 @@ func NewQueryClient() *QueryClient {
 }
 
 // Query returns state of instance's filtered resources
-func (v *QueryClient) Query(namespace, cloudRegion, apiVersion, kind, name, labels, id string) (QueryStatus, error) {
+func (v *QueryClient) Query(namespace, cloudRegion, apiVersion, kind, name, labels string) (QueryStatus, error) {
 
 	//Read the status from the DD
 
 	k8sClient := KubernetesClient{}
-	err := k8sClient.Init(cloudRegion, id)
+	err := k8sClient.Init(cloudRegion, "dummy") //we don't care about instance id in this request
 	if err != nil {
 		return QueryStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}

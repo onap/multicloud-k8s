@@ -34,6 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/cli-runtime/pkg/resource"
 
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/namegenerator"
@@ -461,7 +462,15 @@ func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (Insta
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
 	}
 
-	resources, err := queryClient.Query(resResp.Namespace, resResp.Request.CloudRegion, apiVersion, kind, name, labels, id)
+	if labels == "" || strings.Contains(strings.ToLower(labels), config.GetConfiguration().KubernetesLabelName) == false {
+		labelValue := config.GetConfiguration().KubernetesLabelName + "=" + id
+		if labels != "" {
+			labels = labels + ","
+		}
+		labels = labels + labelValue
+	}
+
+	resources, err := queryClient.Query(resResp.Namespace, resResp.Request.CloudRegion, apiVersion, kind, name, labels)
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resources")
 	}
@@ -502,6 +511,11 @@ func (v *InstanceClient) Status(id string) (InstanceStatus, error) {
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
+	req := resResp.Request
+	profile, err := rb.NewProfileClient().Get(req.RBName, req.RBVersion, req.ProfileName)
+	if err != nil {
+		return InstanceStatus{}, pkgerrors.New("Unable to find Profile instance status")
+	}
 
 	cumulatedErrorMsg := make([]string, 0)
 	podsStatus, err := k8sClient.getPodsByLabel(resResp.Namespace)
@@ -534,12 +548,36 @@ Main:
 			}
 		}
 	}
+	generalStatus = append(generalStatus, podsStatus...)
+
+	if profile.ExtraResourceTypes != nil && len(profile.ExtraResourceTypes) > 0 {
+		queryClient := NewQueryClient()
+		labelValue := config.GetConfiguration().KubernetesLabelName + "=" + id
+		for _, extraType := range profile.ExtraResourceTypes {
+			queryStatus, err := queryClient.Query(resResp.Namespace, resResp.Request.CloudRegion, extraType.GroupVersion().Identifier(), extraType.Kind, "", labelValue)
+			if err != nil {
+				return InstanceStatus{}, pkgerrors.Wrap(err, "Querying Resources")
+			}
+			for _, rs := range queryStatus.ResourcesStatus {
+				foundRes := false
+				for _, res := range generalStatus {
+					if res.GVK == rs.GVK && res.Name == rs.Name {
+						foundRes = true
+						break
+					}
+				}
+				if !foundRes {
+					generalStatus = append(generalStatus, rs)
+				}
+			}
+		}
+	}
 	//We still need to iterate through rss list even the status is not DONE, to gather status of rss + pod for the response
 	resp := InstanceStatus{
 		Request:         resResp.Request,
-		ResourceCount:   int32(len(generalStatus) + len(podsStatus)),
+		ResourceCount:   int32(len(generalStatus)),
 		Ready:           isReady && resResp.Status == "DONE",
-		ResourcesStatus: append(generalStatus, podsStatus...),
+		ResourcesStatus: generalStatus,
 	}
 
 	if len(cumulatedErrorMsg) != 0 {

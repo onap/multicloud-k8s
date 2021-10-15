@@ -26,6 +26,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -33,13 +34,14 @@ import (
 // Profile contains the parameters needed for resource bundle (rb) profiles
 // It implements the interface for managing the profiles
 type Profile struct {
-	RBName            string            `json:"rb-name"`
-	RBVersion         string            `json:"rb-version"`
-	ProfileName       string            `json:"profile-name"`
-	ReleaseName       string            `json:"release-name"`
-	Namespace         string            `json:"namespace"`
-	KubernetesVersion string            `json:"kubernetes-version"`
-	Labels            map[string]string `json:"labels"`
+	RBName             string                    `json:"rb-name"`
+	RBVersion          string                    `json:"rb-version"`
+	ProfileName        string                    `json:"profile-name"`
+	ReleaseName        string                    `json:"release-name"`
+	Namespace          string                    `json:"namespace"`
+	KubernetesVersion  string                    `json:"kubernetes-version"`
+	Labels             map[string]string         `json:"labels"`
+	ExtraResourceTypes []schema.GroupVersionKind `json:"extra-resource-types"`
 }
 
 // ProfileManager is an interface exposes the resource bundle profile functionality

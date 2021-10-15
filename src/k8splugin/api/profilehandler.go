@@ -56,7 +56,7 @@ func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	ret, err := h.client.Create(p)
+	ret, err := h.client.CreateOrUpdate(p, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -117,6 +117,68 @@ func (h rbProfileHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// updateHandler updates Profile Key in the database
+// Returns an rb.Profile
+func (h rbProfileHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	rbName := vars["rbname"]
+	rbVersion := vars["rbversion"]
+	prName := vars["prname"]
+
+	ret, err := h.client.Get(rbName, rbVersion, prName)
+	if err != nil {
+		// Separate "Not found" from generic DB errors
+		if strings.Contains(err.Error(), "Error finding") {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	var p rb.Profile
+
+	err = json.NewDecoder(r.Body).Decode(&p)
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	if p.ProfileName != "" && p.ProfileName != ret.ProfileName {
+		http.Error(w, "Profile name mismatch", http.StatusBadRequest)
+		return
+	}
+
+	if p.RBVersion != "" && p.RBVersion != ret.RBVersion {
+		http.Error(w, "RB version mismatch", http.StatusBadRequest)
+		return
+	}
+
+	if p.RBName != "" && p.RBName != ret.RBName {
+		http.Error(w, "RB name mismatch", http.StatusBadRequest)
+		return
+	}
+
+	p.ProfileName = ret.ProfileName
+	p.RBVersion = ret.RBVersion
+	p.RBName = ret.RBName
+
+	ret, err = h.client.CreateOrUpdate(p, true)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

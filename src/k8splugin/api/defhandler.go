@@ -35,7 +35,7 @@ type rbDefinitionHandler struct {
 	client rb.DefinitionManager
 }
 
-// createHandler handles creation of the definition entry in the database
+// createOrUpdateHandler handles creation of the definition entry in the database
 func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	var v rb.Definition
 
@@ -48,20 +48,64 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
+	h.createOrUpdateHandler(v, w, false)
+}
 
+// createOrUpdateHandler handles creation of the definition entry in the database
+func (h rbDefinitionHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["rbname"]
+	version := vars["rbversion"]
+
+	var v rb.Definition
+
+	err := json.NewDecoder(r.Body).Decode(&v)
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	if v.RBVersion != "" && v.RBVersion != version {
+		http.Error(w, "RB version mismatch", http.StatusBadRequest)
+		return
+	}
+
+	if v.RBName != "" && v.RBName != name {
+		http.Error(w, "RB name mismatch", http.StatusBadRequest)
+		return
+	}
+
+	v.RBVersion = version
+	v.RBName = name
+
+	h.createOrUpdateHandler(v, w, true)
+}
+
+// createOrUpdateHandler handles creation of the definition entry in the database
+func (h rbDefinitionHandler) createOrUpdateHandler(v rb.Definition, w http.ResponseWriter, update bool) {
 	// Name is required.
 	if v.RBName == "" {
-		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+		http.Error(w, "Missing name in request", http.StatusBadRequest)
 		return
 	}
 
 	// Version is required.
 	if v.RBVersion == "" {
-		http.Error(w, "Missing version in POST request", http.StatusBadRequest)
+		http.Error(w, "Missing version in request", http.StatusBadRequest)
 		return
 	}
 
-	ret, err := h.client.Create(v)
+	var ret rb.Definition
+	var err error
+	if update {
+		ret, err = h.client.Update(v)
+	} else {
+		ret, err = h.client.Create(v)
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -61,6 +61,7 @@ func (dk DefinitionKey) String() string {
 // DefinitionManager is an interface exposes the resource bundle definition functionality
 type DefinitionManager interface {
 	Create(def Definition) (Definition, error)
+	Update(def Definition) (Definition, error)
 	List(name string) ([]Definition, error)
 	Get(name string, version string) (Definition, error)
 	Delete(name string, version string) error
@@ -104,13 +105,13 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 
 	// Create a default profile automatically
 	prc := NewProfileClient()
-	pr, err := prc.Create(Profile{
+	pr, err := prc.CreateOrUpdate(Profile{
 		RBName:      def.RBName,
 		RBVersion:   def.RBVersion,
 		ProfileName: "default",
 		Namespace:   "default",
 		ReleaseName: "default",
-	})
+	}, false)
 
 	if err != nil {
 		logutils.Error("Create Default Profile", logutils.Fields{
@@ -134,6 +135,26 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 			"profile-content": prc.getEmptyProfile(),
 		})
 		return Definition{}, pkgerrors.Wrap(err, "Upload Empty Profile")
+	}
+
+	return def, nil
+}
+
+// Update an entry for the resource in the database`
+func (v *DefinitionClient) Update(def Definition) (Definition, error) {
+
+	//Construct composite key consisting of name and version
+	key := DefinitionKey{RBName: def.RBName, RBVersion: def.RBVersion}
+
+	//Check if this definition already exists
+	_, err := v.Get(def.RBName, def.RBVersion)
+	if err != nil {
+		return Definition{}, pkgerrors.New("Definition does not exists")
+	}
+
+	err = db.DBconn.Update(v.storeName, key, v.tagMeta, def)
+	if err != nil {
+		return Definition{}, pkgerrors.Wrap(err, "Updating DB Entry")
 	}
 
 	return def, nil

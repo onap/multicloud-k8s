@@ -104,6 +104,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	resRouter.HandleFunc("/definition/{rbname}", defHandler.listVersionsHandler).Methods("GET")
 	resRouter.HandleFunc("/definition", defHandler.listAllHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", defHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", defHandler.updateHandler).Methods("PUT")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}", defHandler.deleteHandler).Methods("DELETE")
 
 	//Setup resource bundle profile routes
@@ -115,6 +116,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile", profileHandler.listHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}/content", profileHandler.uploadHandler).Methods("POST")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.updateHandler).Methods("PUT")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/profile/{prname}", profileHandler.deleteHandler).Methods("DELETE")
 
 	// Config Template
@@ -126,6 +128,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template", templateHandler.listHandler).Methods("GET")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}/content", templateHandler.uploadHandler).Methods("POST")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}", templateHandler.getHandler).Methods("GET")
+	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}", templateHandler.updateHandler).Methods("PUT")
 	resRouter.HandleFunc("/definition/{rbname}/{rbversion}/config-template/{tname}", templateHandler.deleteHandler).Methods("DELETE")
 
 	// Config value

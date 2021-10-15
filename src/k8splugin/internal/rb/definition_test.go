@@ -18,11 +18,12 @@ package rb
 
 import (
 	"bytes"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"reflect"
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
 	pkgerrors "github.com/pkg/errors"
 )

@@ -41,7 +41,7 @@ type ConfigTemplate struct {
 
 // ConfigTemplateManager is an interface exposes the resource bundle  ConfigTemplate functionality
 type ConfigTemplateManager interface {
-	Create(rbName, rbVersion string, p ConfigTemplate) error
+	CreateOrUpdate(rbName, rbVersion string, p ConfigTemplate, update bool) error
 	Get(rbName, rbVersion, templateName string) (ConfigTemplate, error)
 	List(rbName, rbVersion string) ([]ConfigTemplate, error)
 	Delete(rbName, rbVersion, templateName string) error
@@ -84,8 +84,8 @@ func NewConfigTemplateClient() *ConfigTemplateClient {
 	}
 }
 
-// Create an entry for the resource bundle  ConfigTemplate in the database
-func (v *ConfigTemplateClient) Create(rbName, rbVersion string, p ConfigTemplate) error {
+// CreateOrUpdate an entry for the resource bundle  ConfigTemplate in the database
+func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p ConfigTemplate, update bool) error {
 
 	log.Printf("[ConfigiTemplate]: create %s", rbName)
 	// Name is required
@@ -95,8 +95,11 @@ func (v *ConfigTemplateClient) Create(rbName, rbVersion string, p ConfigTemplate
 
 	//Check if  ConfigTemplate already exists
 	_, err := v.Get(rbName, rbVersion, p.TemplateName)
-	if err == nil {
+	if err == nil && !update {
 		return pkgerrors.New(" ConfigTemplate already exists for this Definition")
+	}
+	if err != nil && update {
+		return pkgerrors.New(" ConfigTemplate does not exist for this Definition")
 	}
 
 	//Check if provided resource bundle information is valid
@@ -111,9 +114,16 @@ func (v *ConfigTemplateClient) Create(rbName, rbVersion string, p ConfigTemplate
 		TemplateName: p.TemplateName,
 	}
 
-	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
+	if update {
+		err = db.DBconn.Update(v.storeName, key, v.tagMeta, p)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Updating  ConfigTemplate DB Entry")
+		}
+	} else {
+		err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
+		if err != nil {
+			return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
+		}
 	}
 
 	return nil

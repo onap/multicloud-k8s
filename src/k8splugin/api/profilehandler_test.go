@@ -42,7 +42,7 @@ type mockRBProfile struct {
 	Err   error
 }
 
-func (m *mockRBProfile) Create(inp rb.Profile) (rb.Profile, error) {
+func (m *mockRBProfile) CreateOrUpdate(inp rb.Profile, update bool) (rb.Profile, error) {
 	if m.Err != nil {
 		return rb.Profile{}, m.Err
 	}

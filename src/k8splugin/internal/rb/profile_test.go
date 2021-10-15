@@ -105,7 +105,7 @@ func TestCreateProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			got, err := impl.Create(testCase.inp)
+			got, err := impl.CreateOrUpdate(testCase.inp, false)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)

@@ -46,7 +46,7 @@ type Profile struct {
 
 // ProfileManager is an interface exposes the resource bundle profile functionality
 type ProfileManager interface {
-	Create(def Profile) (Profile, error)
+	CreateOrUpdate(def Profile, update bool) (Profile, error)
 	Get(rbName, rbVersion, prName string) (Profile, error)
 	List(rbName, rbVersion string) ([]Profile, error)
 	Delete(rbName, rbVersion, prName string) error
@@ -89,8 +89,8 @@ func NewProfileClient() *ProfileClient {
 	}
 }
 
-// Create an entry for the resource bundle profile in the database
-func (v *ProfileClient) Create(p Profile) (Profile, error) {
+// CreateOrUpdate an entry for the resource bundle profile in the database
+func (v *ProfileClient) CreateOrUpdate(p Profile, update bool) (Profile, error) {
 
 	// Name is required
 	if p.ProfileName == "" {
@@ -99,10 +99,12 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 
 	//Check if profile already exists
 	_, err := v.Get(p.RBName, p.RBVersion, p.ProfileName)
-	if err == nil {
+	if err == nil && !update {
 		return Profile{}, pkgerrors.New("Profile already exists for this Definition")
 	}
-
+	if err != nil && update {
+		return Profile{}, pkgerrors.New("Profile does not exists for this Definition")
+	}
 	//Check if provided resource bundle information is valid
 	_, err = NewDefinitionClient().Get(p.RBName, p.RBVersion)
 	if err != nil {
@@ -120,9 +122,16 @@ func (v *ProfileClient) Create(p Profile) (Profile, error) {
 		ProfileName: p.ProfileName,
 	}
 
-	err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
-	if err != nil {
-		return Profile{}, pkgerrors.Wrap(err, "Creating Profile DB Entry")
+	if update {
+		err = db.DBconn.Update(v.storeName, key, v.tagMeta, p)
+		if err != nil {
+			return Profile{}, pkgerrors.Wrap(err, "Updating Profile DB Entry")
+		}
+	} else {
+		err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
+		if err != nil {
+			return Profile{}, pkgerrors.Wrap(err, "Creating Profile DB Entry")
+		}
 	}
 
 	return p, nil

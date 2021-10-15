@@ -59,7 +59,7 @@ func (h rbTemplateHandler) createHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = h.client.Create(rbName, rbVersion, p)
+	err = h.client.CreateOrUpdate(rbName, rbVersion, p, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -117,6 +117,57 @@ func (h rbTemplateHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// createHandler handles creation of the template entry in the database
+func (h rbTemplateHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+	var p rb.ConfigTemplate
+
+	vars := mux.Vars(r)
+	rbName := vars["rbname"]
+	rbVersion := vars["rbversion"]
+	templateName := vars["tname"]
+
+	err := json.NewDecoder(r.Body).Decode(&p)
+	switch {
+	case err == io.EOF:
+		http.Error(w, "Empty body", http.StatusBadRequest)
+		return
+	case err != nil:
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Name is required.
+	if p.TemplateName == "" {
+		http.Error(w, "Missing name in POST request", http.StatusBadRequest)
+		return
+	}
+
+	ret, err := h.client.Get(rbName, rbVersion, templateName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if p.TemplateName != "" && p.TemplateName != ret.TemplateName {
+		http.Error(w, "Template name mismatch", http.StatusBadRequest)
+		return
+	}
+
+	err = h.client.CreateOrUpdate(rbName, rbVersion, p, true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

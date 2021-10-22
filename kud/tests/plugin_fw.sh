@@ -23,10 +23,8 @@ source _common.sh
 
 if [ ${1:+1} ]; then
     if [ "$1" == "--external" ]; then
-        master_ip=$(kubectl cluster-info | grep "Kubernetes master" | \
-            awk -F ":" '{print $2}' | awk -F "//" '{print $2}')
         onap_svc_node_port=30498
-        base_url="http://$master_ip:$onap_svc_node_port/v1"
+        base_url="http://$(control_plane_ip):$onap_svc_node_port/v1"
     fi
 fi
 

@@ -72,9 +72,9 @@ func NewTemplateClient(k8sversion, namespace, releasename string) *TemplateClien
 	}
 }
 
-// Combines valueFiles and values into a single values stream.
+// ProcessValues Combines valueFiles and values into a single values stream.
 // values takes precedence over valueFiles
-func (h *TemplateClient) processValues(valueFiles []string, values []string) (map[string]interface{}, error) {
+func (h *TemplateClient) ProcessValues(valueFiles []string, values []string) (map[string]interface{}, error) {
 	settings := cli.New()
 	providers := getter.All(settings)
 	options := helmOptions.Options{
@@ -121,7 +121,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	}
 
 	// get combined values and create config
-	rawVals, err := h.processValues(valueFiles, values)
+	rawVals, err := h.ProcessValues(valueFiles, values)
 	if err != nil {
 		return retData, crdData, hookList, err
 	}

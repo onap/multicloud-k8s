@@ -224,18 +224,21 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		postDeleteTimeout = 600
 	}
 
+	id := namegenerator.Generate()
+
+	overrideValues = append(overrideValues, "k8s-rb-instance-id="+id)
+
 	//Execute the kubernetes create command
 	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
 	if err != nil {
+		namegenerator.Release(id)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
-
-	// TODO: Only generate if id is not provided
-	id := namegenerator.Generate()
 
 	k8sClient := KubernetesClient{}
 	err = k8sClient.Init(i.CloudRegion, id)
 	if err != nil {
+		namegenerator.Release(id)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
 
@@ -273,17 +276,19 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		PostDeleteTimeout:  postDeleteTimeout,
 	}
 
+	err = k8sClient.ensureNamespace(profile.Namespace)
+	if err != nil {
+		namegenerator.Release(id)
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
+	}
+
 	key := InstanceKey{
 		ID: id,
 	}
 	err = db.DBconn.Create(v.storeName, key, v.tagInst, dbData)
 	if err != nil {
+		namegenerator.Release(id)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Instance DB Entry")
-	}
-
-	err = k8sClient.ensureNamespace(profile.Namespace)
-	if err != nil {
-		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
 	if len(crdList) > 0 {
@@ -303,6 +308,8 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 			err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
 			if err2 != nil {
 				log.Printf("Error cleaning failed instance in DB, please check DB.")
+			} else {
+				namegenerator.Release(id)
 			}
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Error running preinstall hooks")
 		}
@@ -314,6 +321,8 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
 		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
+		} else {
+			namegenerator.Release(id)
 		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
@@ -330,6 +339,8 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
 		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
+		} else {
+			namegenerator.Release(id)
 		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
 	}

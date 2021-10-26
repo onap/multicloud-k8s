@@ -279,6 +279,25 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 	return nil, pkgerrors.New("Error downloading Profile content")
 }
 
+//GetYamlClient GEt Yaml Files client for profile
+func (v *ProfileClient) GetYamlClient(rbName string, rbVersion string, profileName string) (ProfileYamlClient, error) {
+	prData, err := v.Download(rbName, rbVersion, profileName)
+	if err != nil {
+		return ProfileYamlClient{}, pkgerrors.Wrap(err, "Downloading Profile")
+	}
+
+	prPath, err := ExtractTarBall(bytes.NewBuffer(prData))
+	if err != nil {
+		return ProfileYamlClient{}, pkgerrors.Wrap(err, "Extracting Profile Content")
+	}
+
+	prYamlClient, err := ProcessProfileYaml(prPath, v.manifestName)
+	if err != nil {
+		return ProfileYamlClient{}, pkgerrors.Wrap(err, "Processing Profile Manifest")
+	}
+	return prYamlClient, nil
+}
+
 //Resolve returns the path where the helm chart merged with
 //configuration overrides resides and final ReleaseName picked for instantiation
 func (v *ProfileClient) Resolve(rbName string, rbVersion string,
@@ -291,17 +310,7 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 
 	//Download and process the profile first
 	//If everything seems okay, then download the definition
-	prData, err := v.Download(rbName, rbVersion, profileName)
-	if err != nil {
-		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Downloading Profile")
-	}
-
-	prPath, err := ExtractTarBall(bytes.NewBuffer(prData))
-	if err != nil {
-		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Extracting Profile Content")
-	}
-
-	prYamlClient, err := ProcessProfileYaml(prPath, v.manifestName)
+	prYamlClient, err := v.GetYamlClient(rbName, rbVersion, profileName)
 	if err != nil {
 		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}

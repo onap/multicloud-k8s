@@ -91,7 +91,7 @@ func TestCreateConfig(t *testing.T) {
 			db.Etcd = testCase.mockdb
 			db.DBconn = provideMockModelData(testCase.instanceID, testCase.rbName,
 				testCase.rbVersion, testCase.profileName)
-			resolve = func(rbName, rbVersion, profileName string, p Config, releaseName string) (configResourceList, error) {
+			resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, releaseName string) (configResourceList, error) {
 				return configResourceList{}, nil
 			}
 			impl := NewConfigClient()
@@ -204,7 +204,7 @@ func TestRollbackConfig(t *testing.T) {
 			db.Etcd = testCase.mockdb
 			db.DBconn = provideMockModelData(testCase.instanceID, testCase.rbName,
 				testCase.rbVersion, testCase.profileName)
-			resolve = func(rbName, rbVersion, profileName string, p Config, releaseName string) (configResourceList, error) {
+			resolve = func(rbName, rbVersion, profileName, instanceID string, p Config, releaseName string) (configResourceList, error) {
 				return configResourceList{}, nil
 			}
 			impl := NewConfigClient()

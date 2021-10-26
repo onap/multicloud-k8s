@@ -461,7 +461,7 @@ func applyConfig(instanceID string, p Config, pChannel chan configResourceList, 
 		return []helm.KubernetesResource{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
 	// Get Template and Resolve the template with values
-	crl, err := resolve(rbName, rbVersion, profileName, p, releaseName)
+	crl, err := resolve(rbName, rbVersion, profileName, instanceID, p, releaseName)
 	if err != nil {
 		return []helm.KubernetesResource{}, pkgerrors.Wrap(err, "Resolve Config")
 	}
@@ -571,11 +571,12 @@ func scheduleResources(c chan configResourceList) {
 
 //Resolve returns the path where the helm chart merged with
 //configuration overrides resides.
-var resolve = func(rbName, rbVersion, profileName string, p Config, releaseName string) (configResourceList, error) {
+var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, releaseName string) (configResourceList, error) {
 
 	var resTemplates []helm.KubernetesResourceTemplate
 
-	profile, err := rb.NewProfileClient().Get(rbName, rbVersion, profileName)
+	profileClient := rb.NewProfileClient()
+	profile, err := profileClient.Get(rbName, rbVersion, profileName)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Reading Profile Data")
 	}
@@ -593,8 +594,42 @@ var resolve = func(rbName, rbVersion, profileName string, p Config, releaseName 
 		return configResourceList{}, pkgerrors.Wrap(err, "Downloading Template")
 	}
 
+	ic := NewInstanceClient()
+	instance, err := ic.Get(instanceId)
+	if err != nil {
+		return configResourceList{}, pkgerrors.Wrap(err, "Getting Instance")
+	}
+
+	var finalReleaseName string
+
+	if releaseName == "" {
+		finalReleaseName = profile.ReleaseName
+	} else {
+		finalReleaseName = releaseName
+	}
+
+	helmClient := helm.NewTemplateClient(profile.KubernetesVersion,
+		profile.Namespace,
+		finalReleaseName)
+
+	//copy values from the instance
+	valuesArr := []string{}
+	if instance.Request.OverrideValues != nil {
+		for k, v := range instance.Request.OverrideValues {
+			valuesArr = append(valuesArr, k+"="+v)
+		}
+	}
+	valuesArr = append(valuesArr, "k8s-rb-instance-id="+instanceId)
+	rawValues, err := helmClient.ProcessValues([]string{}, valuesArr)
+	if err != nil {
+		return configResourceList{}, pkgerrors.Wrap(err, "Processing values")
+	}
+
+	for k, v := range p.Values {
+		rawValues[k] = v
+	}
 	//Create a temp file in the system temp folder for values input
-	b, err := json.Marshal(p.Values)
+	b, err := json.Marshal(rawValues)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Error Marshalling config data")
 	}
@@ -613,26 +648,21 @@ var resolve = func(rbName, rbVersion, profileName string, p Config, releaseName 
 	}
 	defer outputfile.Close()
 
+	//Download and process the profile first
+	//If everything seems okay, then download the config templates
+	prYamlClient, err := profileClient.GetYamlClient(rbName, rbVersion, profileName)
+	if err != nil {
+		return configResourceList{}, pkgerrors.Wrap(err, "Processing Profile Manifest")
+	}
+
 	chartBasePath, err := rb.ExtractTarBall(bytes.NewBuffer(def))
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Extracting Template")
 	}
 
-	var finalReleaseName string
-
-	if releaseName == "" {
-		finalReleaseName = profile.ReleaseName
-	} else {
-		finalReleaseName = releaseName
-	}
-
-	helmClient := helm.NewTemplateClient(profile.KubernetesVersion,
-		profile.Namespace,
-		finalReleaseName)
-
 	chartPath := filepath.Join(chartBasePath, t.ChartName)
 	resTemplates, crdList, _, err := helmClient.GenerateKubernetesArtifacts(chartPath,
-		[]string{outputfile.Name()},
+		[]string{prYamlClient.GetValues(), outputfile.Name()},
 		nil)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Generate final k8s yaml")

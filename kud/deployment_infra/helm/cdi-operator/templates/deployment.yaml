@@ -66,7 +66,5 @@ spec:
       tolerations:
         {{- toYaml . | nindent 6 }}
       {{- end }}
-      resources:
-        {{- toYaml .Values.resources | nindent 8 }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}

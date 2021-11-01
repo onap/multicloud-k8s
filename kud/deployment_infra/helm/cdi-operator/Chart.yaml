@@ -23,4 +23,4 @@ sources:
  - https://github.com/kubevirt/containerized-data-importer
 home: https://github.com/kubevirt/containerized-data-importer
 type: application
-version: 0.1.0
+version: 0.1.1

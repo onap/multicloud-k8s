@@ -47,3 +47,5 @@ affinity:
 tolerations:
 - key: CriticalAddonsOnly
   operator: Exists
+
+replicaCount: 2

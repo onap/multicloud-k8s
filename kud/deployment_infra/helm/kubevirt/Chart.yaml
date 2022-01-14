@@ -13,7 +13,7 @@
 # limitations under the License.
 
 apiVersion: v2
-appVersion: v0.41.0
+appVersion: v0.49.0
 description: |
   KubeVirt is a virtual machine management add-on for Kubernetes.
 name: kubevirt
@@ -21,4 +21,4 @@ sources:
  - https://github.com/kubevirt/kubevirt
 home: https://github.com/kubevirt/kubevirt
 type: application
-version: 0.1.0
+version: 0.1.1

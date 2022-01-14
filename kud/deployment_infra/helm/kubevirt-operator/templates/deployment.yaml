@@ -6,7 +6,7 @@ metadata:
     {{- include "kubevirt-operator.labels" . | nindent 4 }}
     kubevirt.io: virt-operator
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "kubevirt-operator.selectorLabels" . | nindent 6 }}
@@ -15,12 +15,10 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ""
       labels:
         {{- include "kubevirt-operator.selectorLabels" . | nindent 8 }}
         kubevirt.io: virt-operator
-        prometheus.kubevirt.io: ""
+        prometheus.kubevirt.io: "true"
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -64,6 +62,8 @@ spec:
         - mountPath: /etc/virt-operator/certificates
           name: kubevirt-operator-certs
           readOnly: true
+        - mountPath: /profile-data
+          name: profile-data
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -84,3 +84,5 @@ spec:
         secret:
           optional: true
           secretName: kubevirt-operator-certs
+      - emptyDir: {}
+        name: profile-data

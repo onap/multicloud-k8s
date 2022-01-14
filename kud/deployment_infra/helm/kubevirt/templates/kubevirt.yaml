@@ -1,4 +1,4 @@
-apiVersion: kubevirt.io/v1
+apiVersion: kubevirt.io/v1alpha3
 kind: KubeVirt
 metadata:
   name:  {{ include "kubevirt.fullname" . }}
@@ -35,6 +35,9 @@ spec:
   {{- end }}
   {{- with .Values.monitorNamespace }}
   monitorNamespace: {{ . }}
+  {{- end }}
+  {{- with .Values.productComponent }}
+  productComponent: {{ . }}
   {{- end }}
   {{- with .Values.productName }}
   productName: {{ . }}

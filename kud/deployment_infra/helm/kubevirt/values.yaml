@@ -36,6 +36,12 @@ imagePullPolicy: IfNotPresent
 # in. Defaults to openshift-monitor.
 #monitorNamespace: ""
 
+# produceComponent designates the apps.kubevirt.io/component label for
+# KubeVirt components. Useful if KubeVirt is included as part of a
+# product.  If ProductComponent is not specified, the component label
+# default value is kubevirt.
+#productComponent: ""
+
 # productName designates the apps.kubevirt.io/part-of label for
 # KubeVirt components. Useful if KubeVirt is included as part of a
 # product. If ProductName is not specified, the part-of label will be

@@ -13,6 +13,7 @@ set -o nounset
 set -o pipefail
 
 source _common_test.sh
+source _functions.sh
 
 rm -f $HOME/*.yaml
 pod_name=nfd-pod
@@ -107,21 +108,7 @@ if $(kubectl version &>/dev/null); then
         kubectl create -f $HOME/$pod_name-$podType.yaml --validate=false
 
         for pod in $pod_name; do
-            status_phase=""
-            while [[ $status_phase != "Running" ]]; do
-                new_phase=$(kubectl get pods $pod | awk 'NR==2{print $3}')
-                if [[ $new_phase != $status_phase ]]; then
-                    echo "$(date +%H:%M:%S) - $pod-$podType : $new_phase"
-                    status_phase=$new_phase
-                fi
-
-                if [[ $new_phase == "Running" ]]; then
-                    echo " Test is complete.."
-                fi
-                if [[ $new_phase == "Err"* ]]; then
-                    exit 1
-                fi
-            done
+            wait_for_pod $pod
         done
         kubectl delete pod $pod_name
         while kubectl get pod $pod_name &>/dev/null; do

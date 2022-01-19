@@ -10,6 +10,8 @@
 
 set -o pipefail
 
+source _functions.sh
+
 qat_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."qat.intel.com/cy2_dc2"!=null) and ((.status.capacity."qat.intel.com/cy2_dc2"|tonumber)>=1)) | .metadata.name')
 if [ -z "$qat_capable_nodes" ]; then
     echo "This test case cannot run. QAT device unavailable."
@@ -57,20 +59,7 @@ spec:
 POD
 kubectl create -f $HOME/$pod_name.yaml --validate=false
     for pod in $pod_name; do
-        status_phase=""
-        while [[ $status_phase != "Running" ]]; do
-            new_phase=$(kubectl get pods $pod | awk 'NR==2{print $3}')
-            if [[ $new_phase != $status_phase ]]; then
-                echo "$(date +%H:%M:%S) - $pod : $new_phase"
-                status_phase=$new_phase
-            fi
-            if [[ $new_phase == "Running" ]]; then
-                echo "Pod is up and running.."
-            fi
-            if [[ $new_phase == "Err"* ]]; then
-                exit 1
-            fi
-        done
+        wait_for_pod $pod_name
     done
 
 allocated_node_resource=$(kubectl describe node | grep "qat.intel.com" | tail -n1 |awk '{print $(NF)}')

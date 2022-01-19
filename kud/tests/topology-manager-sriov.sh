@@ -61,20 +61,7 @@ create_pod_yaml ${csar_id}
 kubectl delete pod $pod_name --ignore-not-found=true --now --wait
 kubectl create -f ${CSAR_DIR}/${csar_id}/$pod_name.yaml --validate=false
 
-status_phase=""
-while [[ $status_phase != "Running" ]]; do
-    new_phase=$(kubectl get pods $pod_name | awk 'NR==2{print $3}')
-    if [[ $new_phase != $status_phase ]]; then
-        echo "$(date +%H:%M:%S) - $pod_name : $new_phase"
-        status_phase=$new_phase
-    fi
-    if [[ $new_phase == "Running" ]]; then
-        echo "Pod is up and running.."
-    fi
-    if [[ $new_phase == "Err"* ]]; then
-        exit 1
-    fi
-done
+wait_for_pod $pod_name
 
 uid=$(kubectl get pod pod-topology-manager -o jsonpath='{.metadata.uid}')
 node_name=$(kubectl get pod $pod_name -o jsonpath='{.spec.nodeName}')

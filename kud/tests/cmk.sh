@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source _common.sh
+source _functions.sh
 
 ENV=$(kubectl get nodes --all-namespaces | wc -l)
 if [[ $ENV -gt 2 ]]; then
@@ -16,23 +17,6 @@ NODE=1
 CORE=2
 DIR=/tmp
 pod_name=cmk-test-pod
-
-function wait_for_pod_up {
-    status_phase=""
-    while [[ $status_phase != "Running" ]]; do
-        new_phase=$(kubectl get pods "$@" | awk 'NR==2{print $3}')
-        if [[ $new_phase != $status_phase ]]; then
-            echo "$(date +%H:%M:%S) - $@ : $new_phase"
-            status_phase=$new_phase
-        fi
-        if [[ $new_phase == "Running" ]]; then
-            echo "Pod $@ is up and running.."
-        fi
-        if [[ $new_phase == "Err"* ]]; then
-            exit 1
-        fi
-    done
-}
 
 function start_nginx_pod {
     kubectl delete deployment -n default nginx --ignore-not-found=true
@@ -110,7 +94,7 @@ EOF
         sleep 2
         echo "waiting for pod up"
         for pod in $pod_name; do
-            wait_for_pod_up $pod
+            wait_for_pod $pod
         done
         echo "waiting for CPU allocation finished ..."
         rest=$TOTAL
@@ -207,7 +191,7 @@ EOF
         sleep 2
         echo "waiting for pod up"
         for pod in $pod_name; do
-            wait_for_pod_up $pod
+            wait_for_pod $pod
         done
         echo "waiting for CPU allocation finished ..."
         rest=0

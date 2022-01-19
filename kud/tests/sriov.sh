@@ -10,6 +10,8 @@
 
 set -o pipefail
 
+source _functions.sh
+
 sriov_capable_nodes=$(kubectl get nodes -o json | jq -r '.items[] | select((.status.capacity."intel.com/intel_sriov_700"!=null) and ((.status.capacity."intel.com/intel_sriov_700"|tonumber)>=2)) | .metadata.name')
 if [ -z "$sriov_capable_nodes" ]; then
     echo "SRIOV test case cannot run on the cluster."
@@ -78,20 +80,7 @@ for podType in ${POD_TYPE:-single multiple}; do
     kubectl create -f $HOME/$pod_name-$podType.yaml --validate=false
 
         for pod in $pod_name; do
-            status_phase=""
-            while [[ $status_phase != "Running" ]]; do
-                new_phase=$(kubectl get pods $pod | awk 'NR==2{print $3}')
-                if [[ $new_phase != $status_phase ]]; then
-                    echo "$(date +%H:%M:%S) - $pod-$podType : $new_phase"
-                    status_phase=$new_phase
-                fi
-                if [[ $new_phase == "Running" ]]; then
-                    echo "Pod is up and running.."
-                fi
-                if [[ $new_phase == "Err"* ]]; then
-                    exit 1
-                fi
-            done
+            wait_for_pod $pod_name
         done
     allocated_node_resource=$(kubectl describe node | grep "intel.com/intel_sriov_700" | tail -n1 |awk '{print $(NF)}')
 

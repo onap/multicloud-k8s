@@ -36,7 +36,8 @@ type EtcdConfig struct {
 // EtcdStore Interface needed for mocking
 type EtcdStore interface {
 	Get(key string) ([]byte, error)
-	GetAll(key string) ([][]byte, error)
+	GetKeys(key string) ([]string, error)
+	GetValues(key string) ([][]byte, error)
 	Put(key, value string) error
 	Delete(key string) error
 	DeletePrefix(keyPrefix string) error
@@ -124,8 +125,24 @@ func (e EtcdClient) Get(key string) ([]byte, error) {
 	return getResp.Kvs[0].Value, nil
 }
 
-// GetAll sub values from Etcd DB
-func (e EtcdClient) GetAll(key string) ([][]byte, error) {
+// GetKeys sub values from Etcd DB
+func (e EtcdClient) GetKeys(key string) ([]string, error) {
+	if e.cli == nil {
+		return nil, pkgerrors.Errorf("Etcd Client not initialized")
+	}
+	getResp, err := e.cli.Get(context.Background(), key, clientv3.WithPrefix())
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error getting etcd entry: %s", err.Error())
+	}
+	result := make([]string, 0)
+	for _, v := range getResp.Kvs {
+		result = append(result, string(v.Key))
+	}
+	return result, nil
+}
+
+// GetValues sub values from Etcd DB
+func (e EtcdClient) GetValues(key string) ([][]byte, error) {
 	if e.cli == nil {
 		return nil, pkgerrors.Errorf("Etcd Client not initialized")
 	}

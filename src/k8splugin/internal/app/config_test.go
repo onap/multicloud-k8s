@@ -138,20 +138,23 @@ func TestRollbackConfig(t *testing.T) {
 			profileName: "testprofile1",
 			instanceID:  "testinstance1",
 			inp: Config{
-				ConfigName:   "testconfig1",
-				TemplateName: "testtemplate1",
+				ConfigName:    "testconfig1",
+				TemplateName:  "testtemplate1",
+				ConfigVersion: 1,
 				Values: map[string]interface{}{
 					"values": "{\"namespace\": \"kafka\", \"topic\": {\"name\":\"orders\", \"cluster\":\"my-cluster\", \"partitions\": 10,\"replicas\":   2, }}"},
 			},
 			inpUpdate1: Config{
-				ConfigName:   "testconfig1",
-				TemplateName: "testtemplate1",
+				ConfigName:    "testconfig1",
+				TemplateName:  "testtemplate1",
+				ConfigVersion: 2,
 				Values: map[string]interface{}{
 					"values": "{\"namespace\": \"kafka\", \"topic\": {\"name\":\"orders\", \"cluster\":\"my-cluster\", \"partitions\": 20,\"replicas\":   2, }}"},
 			},
 			inpUpdate2: Config{
-				ConfigName:   "testconfig1",
-				TemplateName: "testtemplate1",
+				ConfigName:    "testconfig1",
+				TemplateName:  "testtemplate1",
+				ConfigVersion: 3,
 				Values: map[string]interface{}{
 					"values": "{\"namespace\": \"kafka\", \"topic\": {\"name\":\"orders\", \"cluster\":\"my-cluster\", \"partitions\": 30,\"replicas\":   2, }}"},
 			},
@@ -293,7 +296,7 @@ func TestRollbackConfig(t *testing.T) {
 				}
 			}
 			testCase.rollbackConfig.AnyOf.ConfigVersion = "2"
-			err = impl.Rollback(testCase.instanceID, testCase.inp.ConfigName, testCase.rollbackConfig)
+			_, err = impl.Rollback(testCase.instanceID, testCase.inp.ConfigName, testCase.rollbackConfig, false)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)

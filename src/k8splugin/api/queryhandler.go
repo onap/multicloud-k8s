@@ -33,12 +33,12 @@ type queryHandler struct {
 
 // queryHandler retrieves information about specified resources for instance
 func (i queryHandler) queryHandler(w http.ResponseWriter, r *http.Request) {
-	namespace := r.FormValue("Namespace")
-	cloudRegion := r.FormValue("CloudRegion")
-	apiVersion := r.FormValue("ApiVersion")
-	kind := r.FormValue("Kind")
-	name := r.FormValue("Name")
-	labels := r.FormValue("Labels")
+	namespace := r.URL.Query().Get("Namespace")
+	cloudRegion := r.URL.Query().Get("CloudRegion")
+	apiVersion := r.URL.Query().Get("ApiVersion")
+	kind := r.URL.Query().Get("Kind")
+	name := r.URL.Query().Get("Name")
+	labels := r.URL.Query().Get("Labels")
 	if cloudRegion == "" {
 		http.Error(w, "Missing CloudRegion mandatory parameter", http.StatusBadRequest)
 		return

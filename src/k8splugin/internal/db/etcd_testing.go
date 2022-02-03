@@ -41,7 +41,17 @@ func (c *MockEtcdClient) Get(key string) ([]byte, error) {
 	return nil, pkgerrors.Errorf("Key doesn't exist")
 }
 
-func (c *MockEtcdClient) GetAll(key string) ([][]byte, error) {
+func (c *MockEtcdClient) GetKeys(key string) ([]string, error) {
+	result := make([]string, 0)
+	for kvKey := range c.Items {
+		if strings.HasPrefix(kvKey, key) {
+			result = append(result, kvKey)
+		}
+	}
+	return result, nil
+}
+
+func (c *MockEtcdClient) GetValues(key string) ([][]byte, error) {
 	result := make([][]byte, 0)
 	for kvKey, kvValue := range c.Items {
 		if strings.HasPrefix(kvKey, key) {

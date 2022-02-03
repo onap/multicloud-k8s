@@ -74,7 +74,7 @@ func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // getHandler handles GET operations on a particular config
-// Returns a app.Definition
+// Returns a config
 func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
@@ -95,8 +95,76 @@ func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// listHandler handles GET operations for all configs of instance
+// getVersionHandler handles GET operations on a particular config
+// Returns a config
+func (h rbConfigHandler) getVersionHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	instanceID := vars["instID"]
+	cfgName := vars["cfgname"]
+	cfgVersion := vars["cfgversion"]
+
+	ret, err := h.client.GetVersion(instanceID, cfgName, cfgVersion)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// getTagHandler handles GET operations on a particular config
+// Returns a config
+func (h rbConfigHandler) getTagHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	instanceID := vars["instID"]
+	cfgName := vars["cfgname"]
+	tagName := vars["tagname"]
+
+	ret, err := h.client.GetTag(instanceID, cfgName, tagName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// getTagListHandler handles GET tag list operations on a particular config
 // Returns a app.Definition
+func (h rbConfigHandler) tagListHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	instanceID := vars["instID"]
+	cfgName := vars["cfgname"]
+
+	ret, err := h.client.TagList(instanceID, cfgName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// listHandler handles GET operations for all configs of instance
+// Returns a config list
 func (h rbConfigHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
@@ -116,13 +184,41 @@ func (h rbConfigHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// listHandler handles GET operations for all configs of instance
+// Returns a config list
+func (h rbConfigHandler) versionListHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	instanceID := vars["instID"]
+	cfgName := vars["cfgname"]
+
+	ret, err := h.client.VersionList(instanceID, cfgName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // deleteHandler handles DELETE operations on a config
 func (h rbConfigHandler) deleteAllHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
 	cfgName := vars["cfgname"]
+	var err error
 
-	err := h.client.DeleteAll(instanceID, cfgName)
+	if r.URL.Query().Get("deleteConfigOnly") == "true" {
+		err = h.client.DeleteAll(instanceID, cfgName, true)
+	} else {
+		err = h.client.DeleteAll(instanceID, cfgName, false)
+	}
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -205,13 +301,18 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-	err = h.client.Rollback(instanceID, cfgName, p)
+	ret, err := h.client.Rollback(instanceID, cfgName, p, false)
 	//err = h.client.Cleanup(instanceID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 // tagitHandler handles TAGIT operation
@@ -232,10 +333,15 @@ func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.client.Tagit(instanceID, cfgName, p)
+	ret, err := h.client.Tagit(instanceID, cfgName, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(ret)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

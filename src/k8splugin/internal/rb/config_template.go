@@ -36,14 +36,20 @@ import (
 type ConfigTemplate struct {
 	TemplateName string `json:"template-name"`
 	Description  string `json:"description"`
-	ChartName    string
+	ChartName    string `json:"chart-name"`
+	HasContent   bool   `json:"has-content"`
+}
+
+type ConfigTemplateList struct {
+	TemplateName string `json:"template-name"`
+	Description  string `json:"description"`
 }
 
 // ConfigTemplateManager is an interface exposes the resource bundle  ConfigTemplate functionality
 type ConfigTemplateManager interface {
 	CreateOrUpdate(rbName, rbVersion string, p ConfigTemplate, update bool) error
 	Get(rbName, rbVersion, templateName string) (ConfigTemplate, error)
-	List(rbName, rbVersion string) ([]ConfigTemplate, error)
+	List(rbName, rbVersion string) ([]ConfigTemplateList, error)
 	Delete(rbName, rbVersion, templateName string) error
 	Upload(rbName, rbVersion, templateName string, inp []byte) error
 }
@@ -94,7 +100,7 @@ func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p Config
 	}
 
 	//Check if  ConfigTemplate already exists
-	_, err := v.Get(rbName, rbVersion, p.TemplateName)
+	prev, err := v.Get(rbName, rbVersion, p.TemplateName)
 	if err == nil && !update {
 		return pkgerrors.New(" ConfigTemplate already exists for this Definition")
 	}
@@ -103,7 +109,7 @@ func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p Config
 	}
 
 	//Check if provided resource bundle information is valid
-	_, err = NewDefinitionClient().Get(rbName, rbVersion)
+	rbDef, err := NewDefinitionClient().Get(rbName, rbVersion)
 	if err != nil {
 		return pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}
@@ -115,11 +121,15 @@ func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p Config
 	}
 
 	if update {
+		p.ChartName = prev.ChartName
+		p.HasContent = prev.HasContent
 		err = db.DBconn.Update(v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Updating  ConfigTemplate DB Entry")
 		}
 	} else {
+		p.ChartName = rbDef.ChartName
+		p.HasContent = false
 		err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
@@ -155,19 +165,19 @@ func (v *ConfigTemplateClient) Get(rbName, rbVersion, templateName string) (Conf
 }
 
 // List returns the Resource Bundle ConfigTemplate for corresponding ID
-func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplate, error) {
+func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplateList, error) {
 
 	//Get all config templates
 	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
 	if err != nil || len(dbres) == 0 {
-		return []ConfigTemplate{}, pkgerrors.Wrap(err, "No Config Templates Found")
+		return []ConfigTemplateList{}, pkgerrors.Wrap(err, "No Config Templates Found")
 	}
 
-	var results []ConfigTemplate
+	var results []ConfigTemplateList
 	for key, value := range dbres {
 		//value is a byte array
 		if value != nil {
-			tmp := ConfigTemplate{}
+			tmp := ConfigTemplateList{}
 			err = db.DBconn.Unmarshal(value, &tmp)
 			if err != nil {
 				log.Printf("[ConfigTemplate] Error: %s Unmarshaling value for: %s", err.Error(), key)
@@ -266,6 +276,11 @@ func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, in
 	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
+	}
+	t.HasContent = true
+	err = db.DBconn.Update(v.storeName, key, v.tagMeta, t)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Updating  ConfigTemplate DB Entry")
 	}
 
 	return nil

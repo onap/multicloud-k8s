@@ -143,6 +143,10 @@ func NewRouter(defClient rb.DefinitionManager,
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}", configHandler.deleteAllHandler).Methods("DELETE")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/delete", configHandler.deleteHandler).Methods("POST")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/rollback", configHandler.rollbackHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/tag", configHandler.tagListHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/tag/{tagname}", configHandler.getTagHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/version", configHandler.versionListHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/version/{cfgversion}", configHandler.getVersionHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/config/{cfgname}/tagit", configHandler.tagitHandler).Methods("POST")
 
 	// Instance Healthcheck API

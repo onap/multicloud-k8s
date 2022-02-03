@@ -184,10 +184,10 @@ func (i instanceHandler) statusHandler(w http.ResponseWriter, r *http.Request) {
 func (i instanceHandler) queryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["instID"]
-	apiVersion := r.FormValue("ApiVersion")
-	kind := r.FormValue("Kind")
-	name := r.FormValue("Name")
-	labels := r.FormValue("Labels")
+	apiVersion := r.URL.Query().Get("ApiVersion")
+	kind := r.URL.Query().Get("Kind")
+	name := r.URL.Query().Get("Name")
+	labels := r.URL.Query().Get("Labels")
 	if apiVersion == "" {
 		http.Error(w, "Missing ApiVersion mandatory parameter", http.StatusBadRequest)
 		return

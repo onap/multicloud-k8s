@@ -38,10 +38,10 @@ import (
 
 //ConfigStore contains the values that will be stored in the database
 type configVersionDBContent struct {
-	ConfigNew  Config                    `json:"config-new"`
-	ConfigPrev Config                    `json:"config-prev"`
-	Action     string                    `json:"action"` // CRUD opration for this config
-	Resources  []helm.KubernetesResource `json:"resources"`
+	ConfigNew  Config                     `json:"config-new"`
+	ConfigPrev Config                     `json:"config-prev"`
+	Action     string                     `json:"action"` // CRUD opration for this config
+	Resources  []KubernetesConfigResource `json:"resources"`
 }
 
 //ConfigStore to Store the Config
@@ -56,10 +56,15 @@ type ConfigVersionStore struct {
 	configName string
 }
 
+type KubernetesConfigResource struct {
+	Resource helm.KubernetesResource `json:"resource"`
+	Status   string                  `json:"status"`
+}
+
 type configResourceList struct {
 	resourceTemplates []helm.KubernetesResourceTemplate
-	resources         []helm.KubernetesResource
-	updatedResources  chan []helm.KubernetesResource
+	resources         []KubernetesConfigResource
+	updatedResources  chan []KubernetesConfigResource
 	profile           rb.Profile
 	action            string
 }
@@ -181,7 +186,7 @@ func (c ConfigStore) getConfigList() ([]Config, error) {
 		return []Config{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
 	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagConfig)
-	values, err := db.Etcd.GetAll(cfgKey)
+	values, err := db.Etcd.GetValues(cfgKey)
 	if err != nil {
 		return []Config{}, pkgerrors.Wrap(err, "Get Config DB List")
 	}
@@ -193,6 +198,9 @@ func (c ConfigStore) getConfigList() ([]Config, error) {
 			err = db.DeSerialize(string(value), &cfg)
 			if err != nil {
 				return []Config{}, pkgerrors.Wrap(err, "Unmarshaling Config Value")
+			}
+			if cfg.ConfigName == "" {
+				continue
 			}
 			result = append(result, cfg)
 		}
@@ -256,7 +264,7 @@ func (c ConfigVersionStore) cleanupIstanceTags(configName string) error {
 }
 
 // Create a version for the configuration. If previous config provided that is also stored
-func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, action string, resources []helm.KubernetesResource) (uint, error) {
+func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, action string, resources []KubernetesConfigResource) (uint, error) {
 
 	configName := ""
 	if configNew.ConfigName != "" {
@@ -281,7 +289,7 @@ func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, ac
 	cs.Action = action
 	cs.ConfigNew = configNew
 	cs.ConfigPrev = configPrev
-	cs.Resources = resources //[]helm.KubernetesResource{}
+	cs.Resources = resources //[]KubernetesConfigResource{}
 
 	configValue, err := db.Serialize(cs)
 	if err != nil {
@@ -321,27 +329,27 @@ func (c ConfigVersionStore) deleteConfigVersion(configName string) error {
 
 // Read the specified version of the configuration and return its prev and current value.
 // Also returns the action for the config version
-func (c ConfigVersionStore) getConfigVersion(configName string, version uint) (Config, Config, string, []helm.KubernetesResource, error) {
+func (c ConfigVersionStore) getConfigVersion(configName string, version uint) (Config, Config, string, []KubernetesConfigResource, error) {
 
 	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
 	if err != nil {
-		return Config{}, Config{}, "", []helm.KubernetesResource{}, pkgerrors.Wrap(err, "Retrieving model info")
+		return Config{}, Config{}, "", []KubernetesConfigResource{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
 	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, configName, strconv.Itoa(int(version)))
 	configBytes, err := db.Etcd.Get(versionKey)
 	if err != nil {
-		return Config{}, Config{}, "", []helm.KubernetesResource{}, pkgerrors.Wrap(err, "Get Config Version ")
+		return Config{}, Config{}, "", []KubernetesConfigResource{}, pkgerrors.Wrap(err, "Get Config Version ")
 	}
 
 	if configBytes != nil {
 		pr := configVersionDBContent{}
 		err = db.DeSerialize(string(configBytes), &pr)
 		if err != nil {
-			return Config{}, Config{}, "", []helm.KubernetesResource{}, pkgerrors.Wrap(err, "DeSerialize Config Version")
+			return Config{}, Config{}, "", []KubernetesConfigResource{}, pkgerrors.Wrap(err, "DeSerialize Config Version")
 		}
 		return pr.ConfigNew, pr.ConfigPrev, pr.Action, pr.Resources, nil
 	}
-	return Config{}, Config{}, "", []helm.KubernetesResource{}, pkgerrors.Wrap(err, "Invalid data ")
+	return Config{}, Config{}, "", []KubernetesConfigResource{}, pkgerrors.Wrap(err, "Invalid data ")
 }
 
 // Get the counter for the version
@@ -419,6 +427,25 @@ func (c ConfigVersionStore) decrementVersion(configName string) error {
 	return nil
 }
 
+// Get tag list
+func (c ConfigVersionStore) getTagList(configName string) ([]string, error) {
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	if err != nil {
+		return []string{}, pkgerrors.Wrap(err, "Retrieving model info")
+	}
+	tagKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagName, configName)
+
+	tagKeyList, err := db.Etcd.GetKeys(tagKey)
+	if err != nil {
+		return []string{}, pkgerrors.Wrap(err, "Config DB Entry Not found")
+	}
+	result := make([]string, 0)
+	for _, tag := range tagKeyList {
+		result = append(result, tag[len(tagKey):len(tag)-1])
+	}
+	return result, nil
+}
+
 // Get tag version
 func (c ConfigVersionStore) getTagVersion(configName, tagNameValue string) (string, error) {
 	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
@@ -444,28 +471,44 @@ func (c ConfigVersionStore) tagCurrentVersion(configName, tagNameValue string) e
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
+	currentConfig, _, _, _, err := c.getConfigVersion(configName, currentVersion)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Retrieving current configuration")
+	}
+
 	tagKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagName, configName, tagNameValue)
 
 	err = db.Etcd.Put(tagKey, strconv.Itoa(int(currentVersion)))
 	if err != nil {
 		return pkgerrors.Wrap(err, "TagIt store DB")
 	}
+
+	currentConfig.ConfigTag = tagNameValue
+	configValue, err := db.Serialize(currentConfig)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Serialize Config Value")
+	}
+	cfgKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagConfig, configName)
+	err = db.Etcd.Put(cfgKey, configValue)
+	if err != nil {
+		return pkgerrors.Wrap(err, "Config DB Entry")
+	}
 	return nil
 }
 
 // Apply Config
-func applyConfig(instanceID string, p Config, pChannel chan configResourceList, action string, resources []helm.KubernetesResource) ([]helm.KubernetesResource, error) {
+func applyConfig(instanceID string, p Config, pChannel chan configResourceList, action string, resources []KubernetesConfigResource) ([]KubernetesConfigResource, error) {
 
 	rbName, rbVersion, profileName, releaseName, err := resolveModelFromInstance(instanceID)
 	if err != nil {
-		return []helm.KubernetesResource{}, pkgerrors.Wrap(err, "Retrieving model info")
+		return []KubernetesConfigResource{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
 	// Get Template and Resolve the template with values
 	crl, err := resolve(rbName, rbVersion, profileName, instanceID, p, releaseName)
 	if err != nil {
-		return []helm.KubernetesResource{}, pkgerrors.Wrap(err, "Resolve Config")
+		return []KubernetesConfigResource{}, pkgerrors.Wrap(err, "Resolve Config")
 	}
-	var updatedResources (chan []helm.KubernetesResource) = make(chan []helm.KubernetesResource)
+	var updatedResources (chan []KubernetesConfigResource) = make(chan []KubernetesConfigResource)
 	crl.action = action
 	crl.resources = resources
 	crl.updatedResources = updatedResources
@@ -477,7 +520,7 @@ func applyConfig(instanceID string, p Config, pChannel chan configResourceList, 
 	default:
 	}
 
-	var resultResources []helm.KubernetesResource = <-updatedResources
+	var resultResources []KubernetesConfigResource = <-updatedResources
 	return resultResources, nil
 }
 
@@ -492,14 +535,14 @@ func scheduleResources(c chan configResourceList) {
 		resp, err := ic.Find(data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
 		if (err != nil || len(resp) == 0) && data.action != "STOP" {
 			log.Println("Error finding a running instance. Retrying later...")
-			data.updatedResources <- []helm.KubernetesResource{}
+			data.updatedResources <- []KubernetesConfigResource{}
 			continue
 		}
 		breakThread := false
 		switch {
-		case data.action == "POST":
-			log.Printf("[scheduleResources]: POST %v %v", data.profile, data.resourceTemplates)
-			var resources []helm.KubernetesResource
+		case data.action == "PUT" || data.action == "POST":
+			log.Printf("[scheduleResources]: %v %v %v", data.action, data.profile, data.resourceTemplates)
+			resources := []KubernetesConfigResource{}
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
 				err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
@@ -508,36 +551,30 @@ func scheduleResources(c chan configResourceList) {
 					//Move onto the next cloud region
 					continue
 				}
-				//assuming - the resource is not exist already
-				resources, err = k8sClient.createResources(data.resourceTemplates, inst.Namespace)
-				errCreate := err
-				if err != nil {
-					// assuming - the err represent the resource is already exist, so going for update
-					resources, err = k8sClient.updateResources(data.resourceTemplates, inst.Namespace)
+				for _, res := range data.resourceTemplates {
+					var resToCreateOrUpdate = []helm.KubernetesResourceTemplate{res}
+					resProceeded, err := k8sClient.createResources(resToCreateOrUpdate, inst.Namespace)
+					errCreate := err
+					var status string = ""
 					if err != nil {
-						log.Printf("Error Creating resources: %s", errCreate.Error())
-						log.Printf("Error Updating resources: %s", err.Error())
-						continue
+						// assuming - the err represent the resource already exist, so going for update
+						resProceeded, err = k8sClient.updateResources(resToCreateOrUpdate, inst.Namespace)
+						if err != nil {
+							log.Printf("Error Creating resources: %s", errCreate.Error())
+							log.Printf("Error Updating resources: %s", err.Error())
+							break
+						} else {
+							status = "UPDATED"
+						}
+					} else {
+						status = "CREATED"
 					}
-				}
-			}
-			data.updatedResources <- resources
-		case data.action == "PUT":
-			log.Printf("[scheduleResources]: PUT %v %v", data.profile, data.resourceTemplates)
-			var resources []helm.KubernetesResource
-			for _, inst := range resp {
-				k8sClient := KubernetesClient{}
-				err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
-				if err != nil {
-					log.Printf("Getting CloudRegion Information: %s", err.Error())
-					//Move onto the next cloud region
-					continue
-				}
-
-				resources, err = k8sClient.updateResources(data.resourceTemplates, inst.Namespace)
-				if err != nil {
-					log.Printf("Error Updating resources: %s", err.Error())
-					continue
+					for _, resCreated := range resProceeded {
+						resource := KubernetesConfigResource{}
+						resource.Resource = resCreated
+						resource.Status = status
+						resources = append(resources, resource)
+					}
 				}
 			}
 			data.updatedResources <- resources
@@ -551,13 +588,17 @@ func scheduleResources(c chan configResourceList) {
 					//Move onto the next cloud region
 					continue
 				}
-				err = k8sClient.deleteResources(helm.GetReverseK8sResources(data.resources), inst.Namespace)
+				var tmpResources []helm.KubernetesResource = []helm.KubernetesResource{}
+				for _, res := range data.resources {
+					tmpResources = append(tmpResources, res.Resource)
+				}
+				err = k8sClient.deleteResources(helm.GetReverseK8sResources(tmpResources), inst.Namespace)
 				if err != nil {
 					log.Printf("Error Deleting resources: %s", err.Error())
 					continue
 				}
 			}
-			data.updatedResources <- []helm.KubernetesResource{}
+			data.updatedResources <- []KubernetesConfigResource{}
 
 		case data.action == "STOP":
 			breakThread = true
@@ -581,17 +622,40 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 		return configResourceList{}, pkgerrors.Wrap(err, "Reading Profile Data")
 	}
 
-	t, err := rb.NewConfigTemplateClient().Get(rbName, rbVersion, p.TemplateName)
-	if err != nil {
-		return configResourceList{}, pkgerrors.Wrap(err, "Getting Template")
-	}
-	if t.ChartName == "" {
-		return configResourceList{}, pkgerrors.New("Invalid template no Chart.yaml file found")
+	var t rb.ConfigTemplate
+	if p.TemplateName == "" && p.ConfigName == "" {
+		//for rollback to base definition
+		t = rb.ConfigTemplate{}
+		t.HasContent = false
+	} else {
+		t, err = rb.NewConfigTemplateClient().Get(rbName, rbVersion, p.TemplateName)
+		if err != nil {
+			return configResourceList{}, pkgerrors.Wrap(err, "Getting Template")
+		}
+		if t.ChartName == "" {
+			return configResourceList{}, pkgerrors.New("Invalid template no Chart.yaml file found")
+		}
 	}
 
-	def, err := rb.NewConfigTemplateClient().Download(rbName, rbVersion, p.TemplateName)
-	if err != nil {
-		return configResourceList{}, pkgerrors.Wrap(err, "Downloading Template")
+	var def []byte
+
+	if t.HasContent {
+		def, err = rb.NewConfigTemplateClient().Download(rbName, rbVersion, p.TemplateName)
+		if err != nil {
+			return configResourceList{}, pkgerrors.Wrap(err, "Downloading Template")
+		}
+	} else {
+		log.Printf("Using Definition Template as a Configuration Template")
+		defClient := rb.NewDefinitionClient()
+		definition, err := defClient.Get(rbName, rbVersion)
+		if err != nil {
+			return configResourceList{}, pkgerrors.Wrap(err, "Get RB Definition")
+		}
+		def, err = defClient.Download(rbName, rbVersion)
+		if err != nil {
+			return configResourceList{}, pkgerrors.Wrap(err, "Downloading RB Definition Template")
+		}
+		t.ChartName = definition.ChartName
 	}
 
 	ic := NewInstanceClient()
@@ -625,8 +689,10 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 		return configResourceList{}, pkgerrors.Wrap(err, "Processing values")
 	}
 
-	for k, v := range p.Values {
-		rawValues[k] = v
+	if p.Values != nil {
+		for k, v := range p.Values {
+			rawValues[k] = v
+		}
 	}
 	//Create a temp file in the system temp folder for values input
 	b, err := json.Marshal(rawValues)

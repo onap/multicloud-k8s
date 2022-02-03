@@ -19,9 +19,6 @@
 package app
 
 import (
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -64,7 +61,7 @@ func (v *QueryClient) Query(namespace, cloudRegion, apiVersion, kind, name, labe
 	}
 
 	var resourcesStatus []ResourceStatus
-	if labels != "" {
+	if name != "" {
 		resList, err := k8sClient.queryResources(apiVersion, kind, labels, namespace)
 		if err != nil {
 			return QueryStatus{}, pkgerrors.Wrap(err, "Querying Resources")
@@ -76,22 +73,11 @@ func (v *QueryClient) Query(namespace, cloudRegion, apiVersion, kind, name, labe
 			for _, res := range resList {
 				if res.Name == name {
 					resourcesStatus = append(resourcesStatus, res)
-					break
 				}
 			}
 		} else {
 			resourcesStatus = resList
 		}
-	} else if name != "" {
-		resIdentifier := helm.KubernetesResource{
-			Name: name,
-			GVK:  schema.FromAPIVersionAndKind(apiVersion, kind),
-		}
-		res, err := k8sClient.GetResourceStatus(resIdentifier, namespace)
-		if err != nil {
-			return QueryStatus{}, pkgerrors.Wrap(err, "Querying Resource")
-		}
-		resourcesStatus = []ResourceStatus{res}
 	} else {
 		resList, err := k8sClient.queryResources(apiVersion, kind, labels, namespace)
 		if err != nil {

@@ -95,9 +95,63 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := i.client.Create(resource)
+	resp, err := i.client.Create(resource, "")
 	if err != nil {
 		log.Error("Error Creating Resource", log.Fields{
+			"error":    err,
+			"resource": resource,
+		})
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		log.Error("Error Marshaling Response", log.Fields{
+			"error":    err,
+			"response": resp,
+		})
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (i instanceHandler) upgradeHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["instID"]
+	var resource app.UpgradeRequest
+
+	err := json.NewDecoder(r.Body).Decode(&resource)
+	switch {
+	case err == io.EOF:
+		log.Error("Body Empty", log.Fields{
+			"error": io.EOF,
+		})
+		http.Error(w, "Body empty", http.StatusBadRequest)
+		return
+	case err != nil:
+		log.Error("Error unmarshaling Body", log.Fields{
+			"error": err,
+		})
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Check body for expected parameters
+	err = i.validateBody(resource)
+	if err != nil {
+		log.Error("Invalid Parameters in Body", log.Fields{
+			"error": err,
+		})
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	resp, err := i.client.Upgrade(id, resource)
+	if err != nil {
+		log.Error("Error Upgrading Resource", log.Fields{
 			"error":    err,
 			"resource": resource,
 		})

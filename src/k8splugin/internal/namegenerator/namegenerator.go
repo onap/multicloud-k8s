@@ -142,6 +142,9 @@ func (c *cache) generateName() string {
 }
 
 func (c *cache) releaseName(name string) {
+	if name == "" {
+		return
+	}
 	c.mux.Lock()
 	defer c.mux.Unlock()
 

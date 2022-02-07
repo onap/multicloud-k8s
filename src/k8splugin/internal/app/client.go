@@ -19,6 +19,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"io/ioutil"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -75,6 +76,35 @@ type ResourceStatus struct {
 	Name   string                    `json:"name"`
 	GVK    schema.GroupVersionKind   `json:"GVK"`
 	Status unstructured.Unstructured `json:"status"`
+}
+
+type ResourceStatusKey struct {
+	Name string                  `json:"name"`
+	GVK  schema.GroupVersionKind `json:"GVK"`
+}
+
+// We will use json marshalling to convert to string to
+// preserve the underlying structure.
+func (rs ResourceStatus) Key() string {
+	key := ResourceStatusKey{
+		Name: rs.Name,
+		GVK:  rs.GVK,
+	}
+	out, err := json.Marshal(key)
+	if err != nil {
+		return ""
+	}
+
+	return string(out)
+}
+
+func (rs ResourceStatus) Value() string {
+	out, err := json.Marshal(rs.Status)
+	if err != nil {
+		return ""
+	}
+
+	return string(out)
 }
 
 func (k *KubernetesClient) getObjTypeForHook(kind string) (runtime.Object, error) {
@@ -463,7 +493,7 @@ func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate, 
 }
 
 func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
-	namespace string) (helm.KubernetesResource, error) {
+	namespace string, createIfDoNotExist bool) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
 		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + " does not exists")
@@ -480,12 +510,21 @@ func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
 
 	updatedResourceName, err := pluginImpl.Update(resTempl.FilePath, namespace, k)
 	if err != nil {
-		log.Error("Error Updating Resource", log.Fields{
-			"error":    err,
-			"gvk":      resTempl.GVK,
-			"filepath": resTempl.FilePath,
-		})
-		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
+		var failed = true
+		if createIfDoNotExist && strings.Contains(err.Error(), "not found") == true {
+			updatedResourceName, err = pluginImpl.Create(resTempl.FilePath, namespace, k)
+			if err == nil {
+				failed = false
+			}
+		}
+		if failed {
+			log.Error("Error Updating Resource", log.Fields{
+				"error":    err,
+				"gvk":      resTempl.GVK,
+				"filepath": resTempl.FilePath,
+			})
+			return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
+		}
 	}
 
 	log.Info("Updated Kubernetes Resource", log.Fields{
@@ -521,7 +560,7 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 }
 
 func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesResourceTemplate,
-	namespace string) ([]helm.KubernetesResource, error) {
+	namespace string, createIfDoNotExist bool) ([]helm.KubernetesResource, error) {
 
 	err := k.ensureNamespace(namespace)
 	if err != nil {
@@ -530,7 +569,7 @@ func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesReso
 
 	var updatedResources []helm.KubernetesResource
 	for _, resTempl := range sortedTemplates {
-		resUpdated, err := k.updateKind(resTempl, namespace)
+		resUpdated, err := k.updateKind(resTempl, namespace, createIfDoNotExist)
 		if err != nil {
 			return nil, pkgerrors.Wrapf(err, "Error updating kind: %+v", resTempl.GVK)
 		}

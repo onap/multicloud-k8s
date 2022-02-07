@@ -16,12 +16,13 @@ package app
 
 import (
 	"encoding/base64"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"io/ioutil"
 	"log"
 	"reflect"
 	"sort"
 	"testing"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
@@ -172,7 +173,7 @@ func TestInstanceCreate(t *testing.T) {
 			CloudRegion: "mock_connection",
 		}
 
-		ir, err := ic.Create(input)
+		ir, err := ic.Create(input, "")
 		if err != nil {
 			t.Fatalf("TestInstanceCreate returned an error (%s)", err)
 		}
@@ -879,7 +880,7 @@ func TestInstanceWithHookCreate(t *testing.T) {
 			CloudRegion: "mock_connection",
 		}
 
-		ir, err := ic.Create(input)
+		ir, err := ic.Create(input, "")
 		if err != nil {
 			t.Fatalf("TestInstanceWithHookCreate returned an error (%s)", err)
 		}

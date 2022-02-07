@@ -48,7 +48,7 @@ type mockInstanceClient struct {
 	err        error
 }
 
-func (m *mockInstanceClient) Create(inp app.InstanceRequest) (app.InstanceResponse, error) {
+func (m *mockInstanceClient) Create(inp app.InstanceRequest, newId string) (app.InstanceResponse, error) {
 	if m.err != nil {
 		return app.InstanceResponse{}, m.err
 	}

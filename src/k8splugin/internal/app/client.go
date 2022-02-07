@@ -463,7 +463,7 @@ func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate, 
 }
 
 func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
-	namespace string) (helm.KubernetesResource, error) {
+	namespace string, createIfDoNotExist bool) (helm.KubernetesResource, error) {
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
 		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + " does not exists")
@@ -480,12 +480,21 @@ func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
 
 	updatedResourceName, err := pluginImpl.Update(resTempl.FilePath, namespace, k)
 	if err != nil {
-		log.Error("Error Updating Resource", log.Fields{
-			"error":    err,
-			"gvk":      resTempl.GVK,
-			"filepath": resTempl.FilePath,
-		})
-		return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
+		var failed = true
+		if createIfDoNotExist && strings.Contains(err.Error(), "not found") == true {
+			updatedResourceName, err = pluginImpl.Create(resTempl.FilePath, namespace, k)
+			if err == nil {
+				failed = false
+			}
+		}
+		if failed {
+			log.Error("Error Updating Resource", log.Fields{
+				"error":    err,
+				"gvk":      resTempl.GVK,
+				"filepath": resTempl.FilePath,
+			})
+			return helm.KubernetesResource{}, pkgerrors.Wrap(err, "Error in plugin "+resTempl.GVK.Kind+" plugin")
+		}
 	}
 
 	log.Info("Updated Kubernetes Resource", log.Fields{
@@ -521,7 +530,7 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 }
 
 func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesResourceTemplate,
-	namespace string) ([]helm.KubernetesResource, error) {
+	namespace string, createIfDoNotExist bool) ([]helm.KubernetesResource, error) {
 
 	err := k.ensureNamespace(namespace)
 	if err != nil {
@@ -530,7 +539,7 @@ func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesReso
 
 	var updatedResources []helm.KubernetesResource
 	for _, resTempl := range sortedTemplates {
-		resUpdated, err := k.updateKind(resTempl, namespace)
+		resUpdated, err := k.updateKind(resTempl, namespace, createIfDoNotExist)
 		if err != nil {
 			return nil, pkgerrors.Wrapf(err, "Error updating kind: %+v", resTempl.GVK)
 		}

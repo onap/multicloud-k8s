@@ -558,7 +558,7 @@ func scheduleResources(c chan configResourceList) {
 					var status string = ""
 					if err != nil {
 						// assuming - the err represent the resource already exist, so going for update
-						resProceeded, err = k8sClient.updateResources(resToCreateOrUpdate, inst.Namespace)
+						resProceeded, err = k8sClient.updateResources(resToCreateOrUpdate, inst.Namespace, false)
 						if err != nil {
 							log.Printf("Error Creating resources: %s", errCreate.Error())
 							log.Printf("Error Updating resources: %s", err.Error())

@@ -15,12 +15,13 @@ package app
 
 import (
 	"fmt"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
-	"helm.sh/helm/v3/pkg/release"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"helm.sh/helm/v3/pkg/release"
 )
 
 // Timeout used when deleting resources with a hook-delete-policy.
@@ -28,25 +29,30 @@ const defaultHookDeleteTimeoutInSeconds = int64(60)
 
 // HookClient implements the Helm Hook interface
 type HookClient struct {
-	kubeNameSpace 	string
-	id     			string
-	dbStoreName		string
-	dbTagInst		string
+	kubeNameSpace string
+	id            string
+	dbStoreName   string
+	dbTagInst     string
 }
 
-type MultiCloudHook struct{
+type MultiCloudHook struct {
 	release.Hook
 	Group   string
 	Version string
+}
+
+type HookTimeoutInfo struct {
+	preInstallTimeOut, postInstallTimeOut, preDeleteTimeout,
+	postDeleteTimeout, preUpgradeTimeout, postUpgradeTimeout int64
 }
 
 // NewHookClient returns a new instance of HookClient
 func NewHookClient(namespace, id, dbStoreName, dbTagInst string) *HookClient {
 	return &HookClient{
 		kubeNameSpace: namespace,
-		id: id,
-		dbStoreName: dbStoreName,
-		dbTagInst: dbTagInst,
+		id:            id,
+		dbStoreName:   dbStoreName,
+		dbTagInst:     dbTagInst,
 	}
 }
 
@@ -69,7 +75,7 @@ func (hc *HookClient) ExecHook(
 	hook release.HookEvent,
 	timeout int64,
 	startIndex int,
-	dbData *InstanceDbData) (error){
+	dbData *InstanceDbData) error {
 	executingHooks := hc.getHookByEvent(hs, hook)
 	key := InstanceKey{
 		ID: hc.id,
@@ -91,7 +97,7 @@ func (hc *HookClient) ExecHook(
 		//update DB here before the creation of the hook, if the plugin quits
 		//-> when it comes back, it will continue from next hook and consider that this one is done
 		if dbData != nil {
-			dbData.HookProgress = fmt.Sprintf("%d/%d", index + 1, len(executingHooks))
+			dbData.HookProgress = fmt.Sprintf("%d/%d", index+1, len(executingHooks))
 			err := db.DBconn.Update(hc.dbStoreName, key, hc.dbTagInst, dbData)
 			if err != nil {
 				return err
@@ -103,7 +109,7 @@ func (hc *HookClient) ExecHook(
 			FilePath: h.KRT.FilePath,
 		}
 		createdHook, err := k8sClient.CreateKind(resTempl, hc.kubeNameSpace)
-		if  err != nil {
+		if err != nil {
 			log.Printf("  Instance: %s, Warning: %s hook %s, filePath: %s, error: %s", hc.id, hook, h.Hook.Name, h.KRT.FilePath, err)
 			hc.deleteHookByPolicy(h, release.HookFailed, k8sClient)
 			return err
@@ -148,7 +154,7 @@ func (hc *HookClient) deleteHookByPolicy(h *helm.Hook, policy release.HookDelete
 			if strings.Contains(errHookDelete.Error(), "not found") {
 				return nil
 			} else {
-				log.Printf("  Instance: %s, Warning: hook %s, filePath %s could not be deleted: %s", hc.id, h.Hook.Name, h.KRT.FilePath ,errHookDelete)
+				log.Printf("  Instance: %s, Warning: hook %s, filePath %s could not be deleted: %s", hc.id, h.Hook.Name, h.KRT.FilePath, errHookDelete)
 				return errHookDelete
 			}
 		} else {

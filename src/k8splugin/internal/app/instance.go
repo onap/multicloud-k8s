@@ -1,7 +1,7 @@
 /*
  * Copyright 2018 Intel Corporation, Inc
  * Copyright © 2021 Samsung Electronics
- * Copyright © 2021 Orange
+ * Copyright © 2022 Orange
  * Copyright © 2021 Nokia Bell Labs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -57,6 +58,17 @@ type InstanceRequest struct {
 	OverrideValues map[string]string `json:"override-values"`
 }
 
+// UpgradeRequest contains the parameters needed for instantiation
+// of profiles
+type UpgradeRequest struct {
+	RBName         string            `json:"rb-name"`
+	RBVersion      string            `json:"rb-version"`
+	ProfileName    string            `json:"profile-name"`
+	CloudRegion    string            `json:"cloud-region"`
+	Labels         map[string]string `json:"labels"`
+	OverrideValues map[string]string `json:"override-values"`
+}
+
 // InstanceResponse contains the response from instantiation
 type InstanceResponse struct {
 	ID          string                    `json:"id"`
@@ -81,6 +93,8 @@ type InstanceDbData struct {
 	PostInstallTimeout int64                     `json:"PostInstallTimeout"`
 	PreDeleteTimeout   int64                     `json:"PreDeleteTimeout"`
 	PostDeleteTimeout  int64                     `json:"PostDeleteTimeout"`
+	PreUpgradeTimeout  int64                     `json:"PreUpgradeTimeout"`
+	PostUpgradeTimeout int64                     `json:"PostUpgradeTimeout"`
 }
 
 // InstanceMiniResponse contains the response from instantiation
@@ -103,7 +117,8 @@ type InstanceStatus struct {
 
 // InstanceManager is an interface exposes the instantiation functionality
 type InstanceManager interface {
-	Create(i InstanceRequest) (InstanceResponse, error)
+	Create(i InstanceRequest, newId string) (InstanceResponse, error)
+	Upgrade(id string, u UpgradeRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
 	GetFull(id string) (InstanceDbData, error)
 	Status(id string) (InstanceStatus, error)
@@ -159,8 +174,83 @@ func resolveModelFromInstance(instanceID string) (rbName, rbVersion, profileName
 	return resp.Request.RBName, resp.Request.RBVersion, resp.Request.ProfileName, resp.ReleaseName, nil
 }
 
+func getOverridesAndHookInfo(i InstanceRequest) ([]string, HookTimeoutInfo, error) {
+	//Convert override values from map to array of strings of the following format
+	//foo=bar
+	overrideValues := []string{}
+	var hookTimeoutInfo = HookTimeoutInfo{}
+	var err error = nil
+	if i.OverrideValues != nil {
+		preInstallTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-pre-install-timeout"]
+		if !ok {
+			preInstallTimeOutStr = "60"
+		}
+		hookTimeoutInfo.preInstallTimeOut, err = strconv.ParseInt(preInstallTimeOutStr, 10, 64)
+		if err != nil {
+			return overrideValues, hookTimeoutInfo, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-pre-install-timeout")
+		}
+
+		postInstallTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-post-install-timeout"]
+		if !ok {
+			postInstallTimeOutStr = "600"
+		}
+		hookTimeoutInfo.postInstallTimeOut, err = strconv.ParseInt(postInstallTimeOutStr, 10, 64)
+		if err != nil {
+			return overrideValues, hookTimeoutInfo, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-post-install-timeout")
+		}
+
+		preDeleteTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-pre-delete-timeout"]
+		if !ok {
+			preDeleteTimeOutStr = "60"
+		}
+		hookTimeoutInfo.preDeleteTimeout, err = strconv.ParseInt(preDeleteTimeOutStr, 10, 64)
+		if err != nil {
+			return overrideValues, hookTimeoutInfo, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-pre-delete-timeout")
+		}
+
+		postDeleteTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-post-delete-timeout"]
+		if !ok {
+			postDeleteTimeOutStr = "600"
+		}
+		hookTimeoutInfo.postDeleteTimeout, err = strconv.ParseInt(postDeleteTimeOutStr, 10, 64)
+		if err != nil {
+			return overrideValues, hookTimeoutInfo, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-post-delete-timeout")
+		}
+
+		preUpgradeTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-pre-upgrade-timeout"]
+		if !ok {
+			preUpgradeTimeOutStr = "60"
+		}
+		hookTimeoutInfo.preUpgradeTimeout, err = strconv.ParseInt(preUpgradeTimeOutStr, 10, 64)
+		if err != nil {
+			return overrideValues, hookTimeoutInfo, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-pre-upgrade-timeout")
+		}
+
+		postUpgradeTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-post-upgrade-timeout"]
+		if !ok {
+			postUpgradeTimeOutStr = "600"
+		}
+		hookTimeoutInfo.postUpgradeTimeout, err = strconv.ParseInt(postUpgradeTimeOutStr, 10, 64)
+		if err != nil {
+			return overrideValues, hookTimeoutInfo, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-post-upgrade-timeout")
+		}
+
+		for k, v := range i.OverrideValues {
+			overrideValues = append(overrideValues, k+"="+v)
+		}
+	} else {
+		hookTimeoutInfo.preInstallTimeOut = 60
+		hookTimeoutInfo.postInstallTimeOut = 600
+		hookTimeoutInfo.preDeleteTimeout = 60
+		hookTimeoutInfo.postDeleteTimeout = 600
+		hookTimeoutInfo.preUpgradeTimeout = 60
+		hookTimeoutInfo.postUpgradeTimeout = 600
+	}
+	return overrideValues, hookTimeoutInfo, nil
+}
+
 // Create an instance of rb on the cluster  in the database
-func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
+func (v *InstanceClient) Create(i InstanceRequest, newId string) (InstanceResponse, error) {
 	// Name is required
 	if i.RBName == "" || i.RBVersion == "" || i.ProfileName == "" || i.CloudRegion == "" {
 		return InstanceResponse{},
@@ -173,72 +263,295 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		return InstanceResponse{}, pkgerrors.New("Unable to find Profile to create instance")
 	}
 
-	//Convert override values from map to array of strings of the following format
-	//foo=bar
-	overrideValues := []string{}
-	var preInstallTimeOut, postInstallTimeOut, preDeleteTimeout, postDeleteTimeout int64
-	if i.OverrideValues != nil {
-		preInstallTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-pre-install-timeout"]
-		if !ok {
-			preInstallTimeOutStr = "60"
-		}
-		preInstallTimeOut, err = strconv.ParseInt(preInstallTimeOutStr, 10, 64)
-		if err != nil {
-			return InstanceResponse{}, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-pre-install-timeout")
-		}
+	overrideValues, hookTimeoutInfo, err := getOverridesAndHookInfo(i)
 
-		postInstallTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-post-install-timeout"]
-		if !ok {
-			postInstallTimeOutStr = "600"
-		}
-		postInstallTimeOut, err = strconv.ParseInt(postInstallTimeOutStr, 10, 64)
-		if err != nil {
-			return InstanceResponse{}, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-post-install-timeout")
-		}
-
-		preDeleteTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-pre-delete-timeout"]
-		if !ok {
-			preDeleteTimeOutStr = "60"
-		}
-		preDeleteTimeout, err = strconv.ParseInt(preDeleteTimeOutStr, 10, 64)
-		if err != nil {
-			return InstanceResponse{}, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-pre-delete-timeout")
-		}
-
-		postDeleteTimeOutStr, ok := i.OverrideValues["k8s-rb-instance-post-delete-timeout"]
-		if !ok {
-			postDeleteTimeOutStr = "600"
-		}
-		postDeleteTimeout, err = strconv.ParseInt(postDeleteTimeOutStr, 10, 64)
-		if err != nil {
-			return InstanceResponse{}, pkgerrors.Wrap(err, "Error parsing k8s-rb-instance-post-delete-timeout")
-		}
-
-		for k, v := range i.OverrideValues {
-			overrideValues = append(overrideValues, k+"="+v)
-		}
+	var generatedId string = ""
+	var finalId string = ""
+	if newId == "" {
+		generatedId = namegenerator.Generate()
+		finalId = generatedId
 	} else {
-		preInstallTimeOut = 60
-		postInstallTimeOut = 600
-		preDeleteTimeout = 60
-		postDeleteTimeout = 600
+		finalId = newId
 	}
 
-	id := namegenerator.Generate()
+	overrideValues = append(overrideValues, "k8s-rb-instance-id="+finalId)
+
+	//Execute the kubernetes create command
+	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
+	if err != nil {
+		namegenerator.Release(generatedId)
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
+	}
+
+	k8sClient := KubernetesClient{}
+	err = k8sClient.Init(i.CloudRegion, finalId)
+	if err != nil {
+		namegenerator.Release(generatedId)
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
+	}
+
+	log.Printf("Main rss info")
+	for _, t := range sortedTemplates {
+		log.Printf("  Path: %s", t.FilePath)
+		log.Printf("    Kind: %s", t.GVK.Kind)
+	}
+
+	log.Printf("Crd rss info")
+	for _, t := range crdList {
+		log.Printf("  Path: %s", t.FilePath)
+		log.Printf("    Kind: %s", t.GVK.Kind)
+	}
+
+	log.Printf("Hook info")
+	for _, h := range hookList {
+		log.Printf("  Name: %s", h.Hook.Name)
+		log.Printf("    Events: %s", h.Hook.Events)
+		log.Printf("    Weight: %d", h.Hook.Weight)
+		log.Printf("    DeletePolicies: %s", h.Hook.DeletePolicies)
+	}
+	dbData := InstanceDbData{
+		ID:                 finalId,
+		Request:            i,
+		Namespace:          profile.Namespace,
+		ReleaseName:        releaseName,
+		Status:             "PRE-INSTALL",
+		Resources:          []helm.KubernetesResource{},
+		Hooks:              hookList,
+		HookProgress:       "",
+		PreInstallTimeout:  hookTimeoutInfo.preInstallTimeOut,
+		PostInstallTimeout: hookTimeoutInfo.postInstallTimeOut,
+		PreDeleteTimeout:   hookTimeoutInfo.preDeleteTimeout,
+		PostDeleteTimeout:  hookTimeoutInfo.postDeleteTimeout,
+		PreUpgradeTimeout:  hookTimeoutInfo.preUpgradeTimeout,
+		PostUpgradeTimeout: hookTimeoutInfo.postUpgradeTimeout,
+	}
+
+	err = k8sClient.ensureNamespace(profile.Namespace)
+	if err != nil {
+		namegenerator.Release(generatedId)
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
+	}
+
+	key := InstanceKey{
+		ID: finalId,
+	}
+	err = db.DBconn.Create(v.storeName, key, v.tagInst, dbData)
+	if err != nil {
+		namegenerator.Release(generatedId)
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Instance DB Entry")
+	}
+
+	if len(crdList) > 0 {
+		log.Printf("Pre-Installing CRDs")
+		_, err = k8sClient.createResources(crdList, profile.Namespace)
+
+		if err != nil {
+			return InstanceResponse{}, pkgerrors.Wrap(err, "Pre-Installing CRDs")
+		}
+	}
+
+	hookClient := NewHookClient(profile.Namespace, finalId, v.storeName, v.tagInst)
+	if len(hookClient.getHookByEvent(hookList, release.HookPreInstall)) != 0 {
+		err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall, hookTimeoutInfo.preInstallTimeOut, 0, &dbData)
+		if err != nil {
+			log.Printf("Error running preinstall hooks for release %s, Error: %s. Stop here", releaseName, err)
+			err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
+			if err2 != nil {
+				log.Printf("Error cleaning failed instance in DB, please check DB.")
+			} else {
+				namegenerator.Release(generatedId)
+			}
+			return InstanceResponse{}, pkgerrors.Wrap(err, "Error running preinstall hooks")
+		}
+	}
+
+	dbData.Status = "CREATING"
+	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+	if err != nil {
+		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
+		if err2 != nil {
+			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
+		} else {
+			namegenerator.Release(generatedId)
+		}
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
+	}
+
+	//Main rss creation is supposed to be very quick -> no need to support recover for main rss
+	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace)
+	if err != nil {
+		if len(createdResources) > 0 {
+			log.Printf("[Instance] Reverting created resources on Error: %s", err.Error())
+			k8sClient.deleteResources(helm.GetReverseK8sResources(createdResources), profile.Namespace)
+		}
+		log.Printf("  Instance: %s, Main rss are failed, skip post-install and remove instance in DB", finalId)
+		//main rss creation failed -> remove instance in DB
+		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
+		if err2 != nil {
+			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
+		} else {
+			namegenerator.Release(generatedId)
+		}
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
+	}
+
+	dbData.Status = "CREATED"
+	dbData.Resources = createdResources
+	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+	if err != nil {
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
+	}
+
+	//Compose the return response
+	resp := InstanceResponse{
+		ID:          finalId,
+		Request:     i,
+		Namespace:   profile.Namespace,
+		ReleaseName: releaseName,
+		Resources:   createdResources,
+		Hooks:       hookList,
+	}
+
+	if len(hookClient.getHookByEvent(hookList, release.HookPostInstall)) != 0 {
+		go func() {
+			dbData.Status = "POST-INSTALL"
+			dbData.HookProgress = ""
+			err = hookClient.ExecHook(k8sClient, hookList, release.HookPostInstall, hookTimeoutInfo.postInstallTimeOut, 0, &dbData)
+			if err != nil {
+				dbData.Status = "POST-INSTALL-FAILED"
+				log.Printf("  Instance: %s, Error running postinstall hooks error: %s", finalId, err)
+			} else {
+				dbData.Status = "DONE"
+			}
+			err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+			if err != nil {
+				log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
+			}
+		}()
+	} else {
+		dbData.Status = "DONE"
+		err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+		if err != nil {
+			log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
+		}
+	}
+
+	return resp, nil
+}
+
+// Simplified function to retrieve model data from instance ID
+func upgradeRequestToInstanceRequest(instance InstanceResponse, u UpgradeRequest) InstanceRequest {
+	i := InstanceRequest{}
+	i.CloudRegion = u.CloudRegion
+	i.Labels = u.Labels
+	i.OverrideValues = u.OverrideValues
+	i.ProfileName = u.ProfileName
+	i.RBName = u.RBName
+	i.RBVersion = u.RBVersion
+	i.ReleaseName = instance.ReleaseName
+
+	return i
+}
+
+// Upgrade an instance of rb on the cluster  in the database
+func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse, error) {
+	key := InstanceKey{
+		ID: id,
+	}
+	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
+	if err != nil {
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Upgrade Instance")
+	}
+	if value == nil { //value is a byte array
+		return InstanceResponse{}, pkgerrors.New("Status is not available")
+	}
+	currentInstance := InstanceResponse{}
+	currentInstanceFull := InstanceDbData{}
+	err = db.DBconn.Unmarshal(value, &currentInstance)
+	if err != nil {
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Demarshaling Instance Value")
+	}
+	err = db.DBconn.Unmarshal(value, &currentInstanceFull)
+	if err != nil {
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Demarshaling Instance Value")
+	}
+	i := upgradeRequestToInstanceRequest(currentInstance, u)
+
+	// Required parameters
+	if i.RBName == "" || i.RBVersion == "" || i.ProfileName == "" || i.CloudRegion == "" {
+		return InstanceResponse{},
+			pkgerrors.New("RBName, RBversion, ProfileName, CloudRegion are required to upgrade the instance")
+	}
+
+	if reflect.DeepEqual(i, currentInstance.Request) && currentInstanceFull.Status == "DONE" {
+		log.Printf("Nothing to do for instance upgrade")
+		return currentInstance, nil
+	}
+
+	if currentInstance.Request.CloudRegion != u.CloudRegion {
+		newInstance, err := v.Create(i, "")
+		if err == nil {
+			configClient := NewConfigClient()
+			var configList []Config
+			configList, err = configClient.List(id)
+			if err != nil || currentInstance.Request.RBName != u.RBName || currentInstance.Request.RBVersion != u.RBVersion {
+				configList = []Config{}
+			}
+			err = v.Delete(id)
+			if err == nil {
+				newInstanceDb, err := v.GetFull(newInstance.ID)
+				oldKey := InstanceKey{
+					ID: newInstance.ID,
+				}
+				err2 := db.DBconn.Delete(v.storeName, oldKey, v.tagInst)
+				if err2 != nil {
+					log.Printf("Delete of the temporal instance from the DB has failed %s", err2.Error())
+				}
+				namegenerator.Release(newInstance.ID)
+				newInstanceDb.ID = id
+				newInstance.ID = id
+				err = db.DBconn.Create(v.storeName, key, v.tagInst, newInstanceDb)
+				if err != nil {
+					return newInstance, pkgerrors.Wrap(err, "Create Instance DB Entry after update failed")
+				}
+				for _, config := range configList {
+					_, err = configClient.Create(id, config)
+					if err != nil {
+						log.Printf("Failed to apply config %s in new location %s", config.ConfigName, err.Error())
+					}
+				}
+				return newInstance, nil
+			} else {
+				err2 := v.Delete(newInstance.ID)
+				if err2 != nil {
+					log.Printf("Delete of the instance from the new region failed with error %s", err2.Error())
+				}
+				return InstanceResponse{}, pkgerrors.Wrap(err, "Deletion of instance in the old region failed")
+			}
+		} else {
+			return InstanceResponse{}, pkgerrors.Wrap(err, "Creation of instance in new region failed")
+		}
+	}
+
+	//Check if profile exists
+	profile, err := rb.NewProfileClient().Get(i.RBName, i.RBVersion, i.ProfileName)
+	if err != nil {
+		return InstanceResponse{}, pkgerrors.New("Unable to find Profile to create instance")
+	}
+
+	overrideValues, hookTimeoutInfo, err := getOverridesAndHookInfo(i)
 
 	overrideValues = append(overrideValues, "k8s-rb-instance-id="+id)
 
 	//Execute the kubernetes create command
 	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
 	if err != nil {
-		namegenerator.Release(id)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
 
 	k8sClient := KubernetesClient{}
 	err = k8sClient.Init(i.CloudRegion, id)
 	if err != nil {
-		namegenerator.Release(id)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
 
@@ -266,29 +579,26 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		Request:            i,
 		Namespace:          profile.Namespace,
 		ReleaseName:        releaseName,
-		Status:             "PRE-INSTALL",
+		Status:             "PRE-UPGRADE",
 		Resources:          []helm.KubernetesResource{},
 		Hooks:              hookList,
 		HookProgress:       "",
-		PreInstallTimeout:  preInstallTimeOut,
-		PostInstallTimeout: postInstallTimeOut,
-		PreDeleteTimeout:   preDeleteTimeout,
-		PostDeleteTimeout:  postDeleteTimeout,
+		PreInstallTimeout:  hookTimeoutInfo.preInstallTimeOut,
+		PostInstallTimeout: hookTimeoutInfo.postInstallTimeOut,
+		PreDeleteTimeout:   hookTimeoutInfo.preDeleteTimeout,
+		PostDeleteTimeout:  hookTimeoutInfo.postDeleteTimeout,
+		PreUpgradeTimeout:  hookTimeoutInfo.preUpgradeTimeout,
+		PostUpgradeTimeout: hookTimeoutInfo.postUpgradeTimeout,
 	}
 
 	err = k8sClient.ensureNamespace(profile.Namespace)
 	if err != nil {
-		namegenerator.Release(id)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
-	key := InstanceKey{
-		ID: id,
-	}
-	err = db.DBconn.Create(v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
 	if err != nil {
-		namegenerator.Release(id)
-		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Instance DB Entry")
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Updating Instance DB Entry")
 	}
 
 	if len(crdList) > 0 {
@@ -301,52 +611,66 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 	}
 
 	hookClient := NewHookClient(profile.Namespace, id, v.storeName, v.tagInst)
-	if len(hookClient.getHookByEvent(hookList, release.HookPreInstall)) != 0 {
-		err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall, preInstallTimeOut, 0, &dbData)
+	if len(hookClient.getHookByEvent(hookList, release.HookPreUpgrade)) != 0 {
+		err = hookClient.ExecHook(k8sClient, hookList, release.HookPreUpgrade, hookTimeoutInfo.preUpgradeTimeout, 0, &dbData)
 		if err != nil {
-			log.Printf("Error running preinstall hooks for release %s, Error: %s. Stop here", releaseName, err)
-			err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
-			if err2 != nil {
-				log.Printf("Error cleaning failed instance in DB, please check DB.")
-			} else {
-				namegenerator.Release(id)
-			}
-			return InstanceResponse{}, pkgerrors.Wrap(err, "Error running preinstall hooks")
+			log.Printf("Error running preupgrade hooks for release %s, Error: %s. Stop here", releaseName, err)
+			return InstanceResponse{}, pkgerrors.Wrap(err, "Error running preupgrade hooks")
 		}
 	}
 
-	dbData.Status = "CREATING"
+	dbData.Status = "UPGRADING"
 	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
 	if err != nil {
-		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
-		if err2 != nil {
-			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
-		} else {
-			namegenerator.Release(id)
-		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
 
-	//Main rss creation is supposed to be very quick -> no need to support recover for main rss
-	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace)
+	upgradedResources, err := k8sClient.updateResources(sortedTemplates, profile.Namespace, true)
 	if err != nil {
-		if len(createdResources) > 0 {
-			log.Printf("[Instance] Reverting created resources on Error: %s", err.Error())
-			k8sClient.deleteResources(helm.GetReverseK8sResources(createdResources), profile.Namespace)
-		}
-		log.Printf("  Instance: %s, Main rss are failed, skip post-install and remove instance in DB", id)
-		//main rss creation failed -> remove instance in DB
-		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
-		if err2 != nil {
-			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
-		} else {
-			namegenerator.Release(id)
-		}
-		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
+		log.Printf("  Instance: %s, Main rss are failed, skip post-upgrade", id)
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Upgrade Kubernetes Resources")
 	}
 
-	dbData.Status = "CREATED"
-	dbData.Resources = createdResources
+	var resToDelete = make([]helm.KubernetesResource, 0)
+	for _, pastRes := range currentInstance.Resources {
+		var exists = false
+		for _, res := range upgradedResources {
+			if res.Name == pastRes.Name && res.GVK == pastRes.GVK {
+				if profile.Namespace == currentInstance.Namespace {
+					exists = true
+					break
+				} else {
+					status1, err := k8sClient.GetResourceStatus(res, profile.Namespace)
+					status2, err2 := k8sClient.GetResourceStatus(pastRes, currentInstance.Namespace)
+					if err == nil && err2 == nil && status1.Value() == status2.Value() {
+						//only when resource is namespace-less
+						exists = true
+						break
+					}
+				}
+			}
+		}
+		if !exists {
+			resToDelete = append(resToDelete, pastRes)
+		}
+	}
+
+	err = k8sClient.deleteResources(helm.GetReverseK8sResources(resToDelete), currentInstance.Namespace)
+
+	configClient := NewConfigClient()
+	configList, err := configClient.List(id)
+	if err != nil {
+		return InstanceResponse{}, pkgerrors.Wrap(err, "Cannot retrieve former configuration list")
+	}
+	for _, config := range configList {
+		err = configClient.DeleteAll(id, config.ConfigName, true)
+		if err != nil {
+			return InstanceResponse{}, pkgerrors.Wrap(err, "Failed to delete config after upgrade")
+		}
+	}
+
+	dbData.Status = "UPGRADED"
+	dbData.Resources = upgradedResources
 	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
@@ -358,18 +682,18 @@ func (v *InstanceClient) Create(i InstanceRequest) (InstanceResponse, error) {
 		Request:     i,
 		Namespace:   profile.Namespace,
 		ReleaseName: releaseName,
-		Resources:   createdResources,
+		Resources:   upgradedResources,
 		Hooks:       hookList,
 	}
 
-	if len(hookClient.getHookByEvent(hookList, release.HookPostInstall)) != 0 {
+	if len(hookClient.getHookByEvent(hookList, release.HookPostUpgrade)) != 0 {
 		go func() {
-			dbData.Status = "POST-INSTALL"
+			dbData.Status = "POST-UPGRADE"
 			dbData.HookProgress = ""
-			err = hookClient.ExecHook(k8sClient, hookList, release.HookPostInstall, postInstallTimeOut, 0, &dbData)
+			err = hookClient.ExecHook(k8sClient, hookList, release.HookPostUpgrade, hookTimeoutInfo.postUpgradeTimeout, 0, &dbData)
 			if err != nil {
-				dbData.Status = "POST-INSTALL-FAILED"
-				log.Printf("  Instance: %s, Error running postinstall hooks error: %s", id, err)
+				dbData.Status = "POST-UPGRADE-FAILED"
+				log.Printf("  Instance: %s, Error running postupgrade hooks error: %s", id, err)
 			} else {
 				dbData.Status = "DONE"
 			}
@@ -421,6 +745,12 @@ func (v *InstanceClient) GetFull(id string) (InstanceDbData, error) {
 			resp.PreInstallTimeout = 60
 		}
 		if resp.PostDeleteTimeout == 0 {
+			resp.PostDeleteTimeout = 600
+		}
+		if resp.PreUpgradeTimeout == 0 {
+			resp.PreInstallTimeout = 60
+		}
+		if resp.PostUpgradeTimeout == 0 {
 			resp.PostDeleteTimeout = 600
 		}
 		return resp, nil

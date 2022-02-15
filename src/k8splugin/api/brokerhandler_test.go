@@ -313,7 +313,7 @@ func TestBrokerCreateHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 
 			request := httptest.NewRequest("POST", "/cloudowner/cloudregion/infra_workload", testCase.input)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil, nil))
 			defer resp.Body.Close()
 
 			if testCase.expectedCode != resp.StatusCode {
@@ -409,7 +409,7 @@ func TestBrokerGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v",
@@ -489,7 +489,7 @@ func TestBrokerFindHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/cloudowner/cloudregion/infra_workload?name="+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v",
@@ -551,7 +551,7 @@ func TestBrokerDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/cloudowner/cloudregion/infra_workload/"+testCase.input, nil)
-			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
 				t.Fatalf("Request method returned: %v and it was expected: %v", resp.StatusCode, testCase.expectedCode)

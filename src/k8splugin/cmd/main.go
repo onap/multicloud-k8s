@@ -16,7 +16,6 @@ package main
 
 import (
 	"context"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"log"
 	"math/rand"
 	"net/http"
@@ -27,6 +26,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/api"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/auth"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 
 	"github.com/gorilla/handlers"
 )
@@ -40,7 +40,7 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	httpRouter := api.NewRouter(nil, nil, nil, nil, nil, nil, nil, nil)
+	httpRouter := api.NewRouter(nil, nil, nil, nil, nil, nil, nil, nil, nil)
 	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
 	log.Println("Starting Kubernetes Multicloud API")
 

@@ -1,7 +1,7 @@
 /*
 Copyright 2018 Intel Corporation.
 Copyright © 2021 Samsung Electronics
-Copyright © 2021 Orange
+Copyright © 2022 Orange
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	configClient app.ConfigManager,
 	connectionClient connection.ConnectionManager,
 	templateClient rb.ConfigTemplateManager,
+	subscriptionClient app.InstanceStatusSubManager,
 	healthcheckClient healthcheck.InstanceHCManager) *mux.Router {
 
 	router := mux.NewRouter()
@@ -52,7 +53,6 @@ func NewRouter(defClient rb.DefinitionManager,
 			"profile-name", "{profile-name}").Methods("GET")
 	//Want to get full Data -> add query param: /install/{instID}?full=true
 	instRouter.HandleFunc("/instance/{instID}", instHandler.getHandler).Methods("GET")
-	instRouter.HandleFunc("/instance/{instID}/status", instHandler.statusHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/upgrade", instHandler.upgradeHandler).Methods("POST")
 	instRouter.HandleFunc("/instance/{instID}/query", instHandler.queryHandler).Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}/query", instHandler.queryHandler).
@@ -61,6 +61,19 @@ func NewRouter(defClient rb.DefinitionManager,
 			"Name", "{Name}",
 			"Labels", "{Labels}").Methods("GET")
 	instRouter.HandleFunc("/instance/{instID}", instHandler.deleteHandler).Methods("DELETE")
+
+	// Status handler routes
+	if subscriptionClient == nil {
+		subscriptionClient = app.NewInstanceStatusSubClient()
+		subscriptionClient.RestoreWatchers()
+	}
+	instanceStatusSubHandler := instanceStatusSubHandler{client: subscriptionClient}
+	instRouter.HandleFunc("/instance/{instID}/status", instHandler.statusHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/status/subscription", instanceStatusSubHandler.listHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/status/subscription", instanceStatusSubHandler.createHandler).Methods("POST")
+	instRouter.HandleFunc("/instance/{instID}/status/subscription/{subID}", instanceStatusSubHandler.getHandler).Methods("GET")
+	instRouter.HandleFunc("/instance/{instID}/status/subscription/{subID}", instanceStatusSubHandler.updateHandler).Methods("PUT")
+	instRouter.HandleFunc("/instance/{instID}/status/subscription/{subID}", instanceStatusSubHandler.deleteHandler).Methods("DELETE")
 
 	// Query handler routes
 	if queryClient == nil {

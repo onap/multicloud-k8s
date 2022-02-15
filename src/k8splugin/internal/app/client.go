@@ -28,6 +28,7 @@ import (
 	//appsv1beta2 "k8s.io/api/apps/v1beta2"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 
 	//extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	//apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -53,9 +54,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery/cached/disk"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -639,4 +642,18 @@ func (k *KubernetesClient) GetStandardClient() kubernetes.Interface {
 //resources created by the plugin
 func (k *KubernetesClient) GetInstanceID() string {
 	return k.instanceID
+}
+
+func (k *KubernetesClient) GetInformer(gvk schema.GroupVersionKind) (cache.SharedInformer, error) {
+	labelOptions := dynamicinformer.TweakListOptionsFunc(func(opts *metav1.ListOptions) {
+		opts.LabelSelector = config.GetConfiguration().KubernetesLabelName + "=" + k.instanceID
+	})
+
+	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(k.GetDynamicClient(), 0, v1.NamespaceAll, labelOptions)
+	mapping, err := k.GetMapper().RESTMapping(gvk.GroupKind(), gvk.Version)
+	if err != nil {
+		return nil, pkgerrors.Wrap(err, "Preparing mapper based on GVK")
+	}
+	informer := factory.ForResource(mapping.Resource).Informer()
+	return informer, nil
 }

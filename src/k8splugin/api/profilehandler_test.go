@@ -127,7 +127,7 @@ func TestRBProfileCreateHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST", "/v1/rb/definition/test-rbdef/v1/profile",
 				testCase.reader)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -207,7 +207,7 @@ func TestRBProfileGetHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -288,7 +288,7 @@ func TestRBProfileListHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/v1/rb/definition/"+testCase.def+"/"+testCase.version+"/profile", nil)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -347,7 +347,7 @@ func TestRBProfileDeleteHandler(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("DELETE", "/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname, nil)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {
@@ -400,7 +400,7 @@ func TestRBProfileUploadHandler(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			request := httptest.NewRequest("POST",
 				"/v1/rb/definition/test-rbdef/v1/profile/"+testCase.prname+"/content", testCase.body)
-			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil))
+			resp := executeRequest(request, NewRouter(nil, testCase.rbProClient, nil, nil, nil, nil, nil, nil, nil))
 
 			//Check returned code
 			if resp.StatusCode != testCase.expectedCode {

@@ -211,7 +211,7 @@ func (i instanceHandler) statusHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["instID"]
 
-	resp, err := i.client.Status(id)
+	resp, err := i.client.Status(id, true)
 	if err != nil {
 		log.Error("Error getting Status", log.Fields{
 			"error": err,

@@ -121,7 +121,7 @@ type InstanceManager interface {
 	Upgrade(id string, u UpgradeRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
 	GetFull(id string) (InstanceDbData, error)
-	Status(id string) (InstanceStatus, error)
+	Status(id string, checkReady bool) (InstanceStatus, error)
 	Query(id, apiVersion, kind, name, labels string) (InstanceStatus, error)
 	List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error)
 	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error)
@@ -813,7 +813,7 @@ func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (Insta
 }
 
 // Status returns the status for the instance
-func (v *InstanceClient) Status(id string) (InstanceStatus, error) {
+func (v *InstanceClient) Status(id string, checkReady bool) (InstanceStatus, error) {
 	//Read the status from the DB
 	key := InstanceKey{
 		ID: id,
@@ -867,12 +867,14 @@ Main:
 			isReady = false
 		} else {
 			generalStatus = append(generalStatus, status)
-			ready, err := v.checkRssStatus(oneResource, k8sClient, resResp.Namespace, status)
+			if checkReady {
+				ready, err := v.checkRssStatus(oneResource, k8sClient, resResp.Namespace, status)
 
-			if !ready || err != nil {
-				isReady = false
-				if err != nil {
-					cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+				if !ready || err != nil {
+					isReady = false
+					if err != nil {
+						cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
+					}
 				}
 			}
 		}
@@ -905,7 +907,7 @@ Main:
 	resp := InstanceStatus{
 		Request:         resResp.Request,
 		ResourceCount:   int32(len(generalStatus)),
-		Ready:           isReady && resResp.Status == "DONE",
+		Ready:           checkReady && isReady && resResp.Status == "DONE",
 		ResourcesStatus: generalStatus,
 	}
 
@@ -914,7 +916,6 @@ Main:
 			strings.Join(cumulatedErrorMsg, "\n"))
 		return resp, err
 	}
-	//TODO Filter response content by requested verbosity (brief, ...)?
 
 	return resp, nil
 }
@@ -925,7 +926,6 @@ func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient K
 	defer cancel()
 
 	apiVersion, kind := rss.GVK.ToAPIVersionAndKind()
-	log.Printf("apiVersion: %s, Kind: %s", apiVersion, kind)
 
 	var parsedRes runtime.Object
 	//TODO: Should we care about different api version for a same kind?
@@ -1143,6 +1143,12 @@ func (v *InstanceClient) Delete(id string) error {
 			}
 		}()
 	} else {
+		subscriptionClient := NewInstanceStatusSubClient()
+		err = subscriptionClient.Cleanup(id)
+		if err != nil {
+			log.Printf(err.Error())
+		}
+
 		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Delete Instance")
@@ -1288,6 +1294,11 @@ func (v *InstanceClient) runPostDelete(k8sClient KubernetesClient, hookClient *H
 		return pkgerrors.Wrap(err, "Error running post-delete hooks")
 	}
 	if clearDb {
+		subscriptionClient := NewInstanceStatusSubClient()
+		err = subscriptionClient.Cleanup(instance.ID)
+		if err != nil {
+			log.Printf(err.Error())
+		}
 		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
 		if err != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", instance.ReleaseName)

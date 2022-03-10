@@ -937,7 +937,7 @@ func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient K
 	case "Deployment":
 		parsedRes = new(appsv1.Deployment)
 	case "PersistentVolumeClaim":
-		parsedRes = new(corev1.PersistentVolume)
+		parsedRes = new(corev1.PersistentVolumeClaim)
 	case "Service":
 		parsedRes = new(corev1.Service)
 	case "DaemonSet":

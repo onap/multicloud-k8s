@@ -35,6 +35,7 @@ type EtcdConfig struct {
 
 // EtcdStore Interface needed for mocking
 type EtcdStore interface {
+	HealthCheck() error
 	Get(key string) ([]byte, error)
 	GetKeys(key string) ([]string, error)
 	GetValues(key string) ([][]byte, error)
@@ -94,6 +95,20 @@ func newClient(store *clientv3.Client, c EtcdConfig) (EtcdClient, error) {
 	return EtcdClient{
 		cli: store,
 	}, nil
+}
+
+// HealthCheck verifies if the database is up and running
+func (e EtcdClient) HealthCheck() error {
+
+	if e.cli == nil {
+		return pkgerrors.Errorf("Etcd Client not initialized")
+	}
+	_, err := e.cli.Get(context.Background(), "HealthCheckKey")
+	if err != nil {
+		return pkgerrors.Errorf("Error getting etcd entry: %s", err.Error())
+	}
+
+	return nil
 }
 
 // Put values in Etcd DB

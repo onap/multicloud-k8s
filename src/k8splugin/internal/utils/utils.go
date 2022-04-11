@@ -76,6 +76,7 @@ func CheckDatabaseConnection() error {
 
 	err = db.DBconn.HealthCheck()
 	if err != nil {
+		log.Printf("MongoDB health problem: %s", err.Error())
 		return pkgerrors.Cause(err)
 	}
 	// TODO Convert these to configuration files instead of environment variables.
@@ -88,6 +89,7 @@ func CheckDatabaseConnection() error {
 	err = db.NewEtcdClient(nil, c)
 	if err != nil {
 		log.Printf("Etcd Client Initialization failed with error: %s", err.Error())
+		return pkgerrors.Cause(err)
 	}
 	return nil
 }

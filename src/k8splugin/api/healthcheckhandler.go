@@ -31,5 +31,10 @@ func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = db.Etcd.HealthCheck()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }

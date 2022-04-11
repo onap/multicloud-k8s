@@ -24,6 +24,10 @@ type MockEtcdClient struct {
 	Err   error
 }
 
+func (c *MockEtcdClient) HealthCheck() error {
+	return c.Err
+}
+
 func (c *MockEtcdClient) Put(key, value string) error {
 	if c.Items == nil {
 		c.Items = make(map[string]string)

@@ -34,6 +34,9 @@ func TestHealthCheckHandler(t *testing.T) {
 		db.DBconn = &db.MockDB{
 			Err: nil,
 		}
+		db.Etcd = &db.MockEtcdClient{
+			Err: nil,
+		}
 		request := httptest.NewRequest("GET", "/v1/healthcheck", nil)
 		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil, nil, nil, nil))
 
@@ -43,9 +46,28 @@ func TestHealthCheckHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("FAILED HealthCheck", func(t *testing.T) {
+	t.Run("FAILED HealthCheck DB", func(t *testing.T) {
 		db.DBconn = &db.MockDB{
 			Err: pkgerrors.New("Runtime Error in DB"),
+		}
+		db.Etcd = &db.MockEtcdClient{
+			Err: nil,
+		}
+		request := httptest.NewRequest("GET", "/v1/healthcheck", nil)
+		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil, nil, nil, nil))
+
+		//Check returned code
+		if resp.StatusCode != http.StatusInternalServerError {
+			t.Fatalf("Expected %d; Got: %d", http.StatusInternalServerError, resp.StatusCode)
+		}
+	})
+
+	t.Run("FAILED HealthCheck Etcd", func(t *testing.T) {
+		db.DBconn = &db.MockDB{
+			Err: nil,
+		}
+		db.Etcd = &db.MockEtcdClient{
+			Err: pkgerrors.New("Runtime Error in Etcd"),
 		}
 		request := httptest.NewRequest("GET", "/v1/healthcheck", nil)
 		resp := executeRequest(request, NewRouter(nil, nil, nil, nil, nil, nil, nil, nil, nil))

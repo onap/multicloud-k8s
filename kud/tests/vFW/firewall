@@ -16,7 +16,7 @@ set -o errexit
 # install_dependencies() - Install required dependencies
 function install_dependencies {
     apt-get update
-    apt-get install -y -qq wget openjdk-8-jre bridge-utils net-tools bsdmainutils make gcc libcurl4-gnutls-dev unzip
+    apt-get install -y -qq wget openjdk-8-jre bridge-utils net-tools bsdmainutils unzip
 }
 
 # install_vpp() - Install VPP
@@ -25,13 +25,16 @@ function install_vpp {
 
     apt-get update
     apt-get install -y -qq apt-transport-https
-    echo "deb [trusted=yes] https://nexus.fd.io/content/repositories/fd.io$RELEASE.ubuntu.$(lsb_release -c -s).main/ ./" | tee -a /etc/apt/sources.list.d/99fd.io.list
+    echo "deb [trusted=yes] https://packagecloud.io/fdio/release/ubuntu xenial main" | tee /etc/apt/sources.list.d/99fd.io.list
+    curl -L https://packagecloud.io/fdio/release/gpgkey | apt-key add - 
     apt-get update
-    apt-get install -y -qq vpp vpp-lib vpp-plugins vpp-dpdk-dkms
+    apt-get install -y -qq --no-install-recommends vpp
+    mkdir -p /var/log/vpp/
+    rm -rf /var/lib/apt/lists/*
 }
 
 function _untar_url {
-    local repo_url="https://nexus.onap.org/content/repositories/staging/org/onap/demo/vnf/"
+    local repo_url="https://nexus.onap.org/content/repositories/releases/org/onap/demo/vnf/"
     local file_subpath=$1
 
     wget -q -O tmp_file.tar.gz "${repo_url}/${file_subpath}"
@@ -46,12 +49,13 @@ function _untar_url {
 
 # install_vfw_scripts() -
 function install_vfw_scripts {
-    local version=$(cat /opt/config/demo_artifacts_version.txt)
+    # local version=$(cat /opt/config/demo_artifacts_version.txt)
+    local version=1.6.0
     local ves_path=VES
     local ves_reporting_path="${ves_path}/evel/evel-library"
 
     pushd /opt
-    wget -q "https://nexus.onap.org/content/repositories/staging/org/onap/demo/vnf/vfw/vfw-scripts/${version}/vfw-scripts-${version}.zip"
+    wget -q "https://nexus.onap.org/content/repositories/releases/org/onap/demo/vnf/vfw/vfw-scripts/${version}/vfw-scripts-${version}.zip"
     unzip "vfw-scripts-${version}.zip"
     chmod +x *.sh
 
@@ -59,6 +63,9 @@ function install_vfw_scripts {
     mkdir -p honeycomb
     mv sample-distribution-$version honeycomb
 
+    _untar_url "vfw/vfw_pg_streams/${version}/vfw_pg_streams-${version}-demo.tar.gz"
+    mv vfw_pg_streams-${version} pg_streams
+    
     _untar_url "ves5/ves/${version}/ves-${version}-demo.tar.gz"
     mv ves-$version $ves_path
 
@@ -75,6 +82,8 @@ function install_vfw_scripts {
 
     # TODO(electrocucaracha) Fix it in upstream
     sed -i 's/start vpp/systemctl start vpp/g' v_firewall_init.sh
+    sed -i 's/"restconf-binding-address": "127.0.0.1",/"restconf-binding-address": "0.0.0.0",/g' /opt/honeycomb/config/restconf.json
+    sed -i 's|/opt/honeycomb/sample-distribution-${version}/honeycomb|/opt/honeycomb/honeycomb|g' v_firewall_init.sh
     mv vfirewall.sh /etc/init.d
     update-rc.d vfirewall.sh defaults
     systemctl start firewall
@@ -90,6 +99,7 @@ echo "$dcae_collector_ip"      > /opt/config/dcae_collector_ip.txt
 echo "$dcae_collector_port"    > /opt/config/dcae_collector_port.txt
 
 echo 'vm.nr_hugepages = 1024' >> /etc/sysctl.conf
+echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
 sysctl -p
 
 install_dependencies

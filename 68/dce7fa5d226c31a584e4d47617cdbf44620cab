@@ -1,0 +1,7 @@
+Code-Review+2: Thomas Kulik <thomas.kulik@telekom.de>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Submitted-by: Thomas Kulik <thomas.kulik@telekom.de>
+Submitted-at: Thu, 17 Nov 2022 11:40:39 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/130571
+Project: multicloud/k8s
+Branch: refs/heads/master

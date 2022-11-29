@@ -1,0 +1,8 @@
+Verified+1: Thomas Kulik <thomas.kulik@telekom.de>
+Code-Review+2: Thomas Kulik <thomas.kulik@telekom.de>
+Code-Review+2: Bin Yang <bin.yang@windriver.com>
+Submitted-by: Thomas Kulik <thomas.kulik@telekom.de>
+Submitted-at: Tue, 29 Nov 2022 06:47:21 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/132256
+Project: multicloud/k8s
+Branch: refs/heads/master

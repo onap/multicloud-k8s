@@ -14,7 +14,7 @@
 function _clean_docker {
 local matchExp=""
 if [ "$1" == "--reset" ]; then
-  # Remove all containers regardless of state
+    # Remove all containers regardless of state
     docker rm -vf $(docker ps -a -q) 2>/dev/null || \
     echo "No more containers to remove."
     exit 0
@@ -46,7 +46,7 @@ elif [ "$1" == "--purge" ]; then
         exit 0
     fi
 else
-  # This alternate only removes "stopped" containers
+    # This alternate only removes "stopped" containers
     docker rm -vf $(docker ps -a | grep "Exited" | \
     awk '{print $2}') 2>/dev/null || echo "No stopped containers to remove."
 fi
@@ -63,7 +63,7 @@ if [ "$1" == "--nuclear" ]; then
     done </tmp/docker-list.txt
     rm /tmp/docker-list.txt
     else
-  # Remove all images which are not used by existing container
+    # Remove all images which are not used by existing container
     docker image prune -a || echo "No untagged images to delete."
 fi
 

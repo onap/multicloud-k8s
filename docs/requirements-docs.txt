@@ -5,5 +5,6 @@ sphinxcontrib-seqdiag # BSD
 sphinxcontrib-swaggerdoc
 sphinxcontrib-spelling
 sphinxcontrib-plantuml
+sphinx_toolbox>=3.2.0
 
 

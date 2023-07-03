@@ -3,11 +3,8 @@
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 # Required
+
 version: 2
-
-formats:
-  - htmlzip
-
 build:
   os: ubuntu-20.04
   tools:
@@ -15,7 +12,7 @@ build:
 
 python:
   install:
-    - requirements: docs/requirements-docs.txt
+  - requirements: docs/requirements-docs.txt
 
 sphinx:
   configuration: docs/conf.py

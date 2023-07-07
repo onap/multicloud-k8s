@@ -1,0 +1,7 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Matthew Watkins <mwatkins@linuxfoundation.org>
+Submitted-by: Matthew Watkins <mwatkins@linuxfoundation.org>
+Submitted-at: Fri, 07 Jul 2023 16:43:50 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/135294
+Project: multicloud/k8s
+Branch: refs/heads/london

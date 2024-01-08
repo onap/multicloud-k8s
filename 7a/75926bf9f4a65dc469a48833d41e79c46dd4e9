@@ -1,0 +1,10 @@
+Code-Review+2: Huang Haibin <haibin.huang@intel.com>
+Code-Review+2: Andreas Geissler <andreas-geissler@telekom.de>
+Verified+1: Andreas Geissler <andreas-geissler@telekom.de>
+Code-Review+1: Xiaohua Zhang <zhangxiaohua@chinamobile.com>
+Verified+1: ONAP Required GHA <releng+onap.required.gha@linuxfoundation.org>
+Submitted-by: Andreas Geissler <andreas-geissler@telekom.de>
+Submitted-at: Mon, 08 Jan 2024 15:49:00 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/136939
+Project: multicloud/k8s
+Branch: refs/heads/montreal

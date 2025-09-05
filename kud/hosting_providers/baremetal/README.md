@@ -74,7 +74,7 @@ cat <<EOL > ../vagrant/inventory/hosts.ini
 Localhost ansible_ssh_host=10.10.110.21 ansible_ssh_port=22
 # The ansible_ssh_host IP is an example here. Please update the ansible_ssh_host IP accordingly
 
-[kube-master]
+[kube_control_plane]
 localhost
 
 [kube-node]
@@ -94,7 +94,7 @@ localhost
 
 [k8s-cluster:children]
 kube-node
-kube-master
+kube_control_plane
 EOL
 
 ```
@@ -130,4 +130,3 @@ The *kud/tests* folder contain the health check scripts that guarantee the prope
 Apache-2.0
 
 [1]: https://git.onap.org/multicloud/k8s
-

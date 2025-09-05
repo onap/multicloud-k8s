@@ -13,7 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-- hosts: kube-master
+- hosts: kube_control_plane
   become: yes
   pre_tasks:
     - name: Load kud variables
@@ -26,4 +26,3 @@
       command: "/usr/local/bin/kubectl apply -f {{ kata_deploy_url }}"
     - name: Setup Kata runtime classes
       command: "/usr/local/bin/kubectl apply -f {{ kata_runtimeclass_url }}"
-

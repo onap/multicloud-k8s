@@ -48,7 +48,7 @@
         - cmk_use_all_hosts != true
         - (cmk_hosts_list is undefined) or (cmk_hosts_list | length == 0)
 
-- hosts: kube-master[0]
+- hosts: kube_control_plane[0]
   become: yes
   pre_tasks:
     - name: Load kud variables

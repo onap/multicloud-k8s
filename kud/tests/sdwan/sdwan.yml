@@ -16,7 +16,7 @@
     - name: create sdwan controller
       command: "/usr/local/bin/kubectl apply -f {{ playbook_dir }}/sdwan-openwrt-ovn.yml"
 
-- hosts: kube-master
+- hosts: kube_control_plane
   become: yes
   tasks:
     - name: install wget package for ubuntu systems

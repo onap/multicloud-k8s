@@ -8,7 +8,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-- hosts: kube-master
+- hosts: kube_control_plane
   tasks:
     - name: Load kud variables
       include_vars:

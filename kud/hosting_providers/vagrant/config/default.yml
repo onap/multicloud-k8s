@@ -13,7 +13,7 @@
   memory: 8192
   cpus: 2
   roles:
-    - kube-master
+    - kube_control_plane
     - etcd
     - ovn-central
 - name: "controller02"
@@ -21,7 +21,7 @@
   memory: 8192
   cpus: 2
   roles:
-    - kube-master
+    - kube_control_plane
     - etcd
     - ovn-controller
 - name: "controller03"
@@ -29,7 +29,7 @@
   memory: 8192
   cpus: 2
   roles:
-    - kube-master
+    - kube_control_plane
     - etcd
     - ovn-controller
 - name: "compute01"

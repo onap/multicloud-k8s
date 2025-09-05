@@ -78,7 +78,7 @@ $ cat /opt/kud/multi-cluster/cluster-101/hosts.ini
 [all]
 c01 ansible_ssh_host=<VAGRANT_IP_ADDRESS> ansible_ssh_port=22
 
-[kube-master]
+[kube_control_plane]
 c01
 
 [kube-node]
@@ -98,7 +98,7 @@ c01
 
 [k8s-cluster:children]
 kube-node
-kube-master
+kube_control_plane
 ```
 Do the same for the cluster-102 with c01 and IP address 10.10.10.5.
 

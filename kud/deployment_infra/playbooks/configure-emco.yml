@@ -41,7 +41,7 @@
 
     - name: Set artifacts_dir fact
       set_fact:
-        artifacts_dir: "{{ hostvars[groups['kube-master'][0]]['inventory_dir'] }}/artifacts"
+        artifacts_dir: "{{ hostvars[groups['kube_control_plane'][0]]['inventory_dir'] }}/artifacts"
 
     - name: Make emco helm charts
       command: /usr/bin/make all
@@ -144,7 +144,7 @@
         chdir: "{{ emco_dir }}/deployments/helm"
       when: "'monitor' in emco_roles"
 
-- hosts: kube-master
+- hosts: kube_control_plane
   become: yes
   tasks:
     - name: Load kud variables

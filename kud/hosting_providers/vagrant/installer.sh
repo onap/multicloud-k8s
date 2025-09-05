@@ -113,7 +113,7 @@ function install_k8s {
         | sudo tee $log_folder/setup-kubernetes.log
     if [ "$container_runtime" == "docker" ]; then
         /bin/echo -e "\n\e[1;42mDocker will be used as the container runtime interface\e[0m"
-        ansible-playbook $verbose -i $kud_inventory \
+        ansible-playbook -vvv -i $kud_inventory \
             $dest_folder/kubespray-$version/cluster.yml --become \
             --become-user=root | sudo tee $log_folder/setup-kubernetes.log
     elif [ "$container_runtime" == "containerd" ]; then
@@ -125,6 +125,7 @@ function install_k8s {
             -e ${kud_kata_override_variables} --become --become-user=root | \
             sudo tee $log_folder/setup-kubernetes.log"
         eval $ansible_kubespray_cmd
+        echo "Now configuring kata..."
         ansible-playbook $verbose -i $kud_inventory -e "base_dest=$HOME" \
             $kud_playbooks/configure-kata.yml --become --become-user=root | \
             sudo tee $log_folder/setup-kata.log
@@ -276,7 +277,7 @@ if [[ -n "${KUD_DEBUG:-}" ]]; then
 fi
 
 # Configuration values
-kubespray_version=${KUBESPRAY_VERSION:-2.14.1}
+kubespray_version=${KUBESPRAY_VERSION:-2.23.3}
 if [[ $kubespray_version == "2.16.0" ]]; then
     helm_client_version="3.5.4"
     kube_version="v1.20.7"
@@ -294,7 +295,7 @@ kud_playbooks=$kud_infra_folder/playbooks
 kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
-container_runtime=${CONTAINER_RUNTIME:-docker}
+container_runtime=${CONTAINER_RUNTIME:-containerd}
 enable_kata_webhook=${ENABLE_KATA_WEBHOOK:-false}
 kata_webhook_runtimeclass=${KATA_WEBHOOK_RUNTIMECLASS:-kata-clh}
 kata_webhook_deployed=false
@@ -307,9 +308,9 @@ kata_webhook_deployed=false
 kud_kata_override_variables="container_manager=containerd \
     -e etcd_deployment_type=host -e kubelet_cgroup_driver=cgroupfs \
     -e \"{'download_localhost': false}\" -e \"{'download_run_once': false}\""
-if [[ $kubespray_version == "2.16.0" ]]; then
-    kud_kata_override_variables=${kud_kata_override_variables//-e kubelet_cgroup_driver=cgroupfs/}
-fi
+kud_kata_override_variables=${kud_kata_override_variables//-e kubelet_cgroup_driver=cgroupfs/}
+# if [[ $kubespray_version == "2.16.0" ]]; then
+# fi
 
 sudo mkdir -p $log_folder
 sudo mkdir -p /opt/csar

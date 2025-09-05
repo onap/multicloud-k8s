@@ -13,7 +13,7 @@
   memory: 8192
   cpus: 2
   roles:
-    - kube-master
+    - kube_control_plane
     - etcd
     - ovn-central
 - name: "minion01"

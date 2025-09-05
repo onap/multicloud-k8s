@@ -113,7 +113,7 @@ function install_k8s {
         | sudo tee $log_folder/setup-kubernetes.log
     if [ "$container_runtime" == "docker" ]; then
         /bin/echo -e "\n\e[1;42mDocker will be used as the container runtime interface\e[0m"
-        ansible-playbook $verbose -i $kud_inventory \
+        ansible-playbook -vvv -i $kud_inventory \
             $dest_folder/kubespray-$version/cluster.yml --become \
             --become-user=root | sudo tee $log_folder/setup-kubernetes.log
     elif [ "$container_runtime" == "containerd" ]; then
@@ -276,7 +276,7 @@ if [[ -n "${KUD_DEBUG:-}" ]]; then
 fi
 
 # Configuration values
-kubespray_version=${KUBESPRAY_VERSION:-2.14.1}
+kubespray_version=${KUBESPRAY_VERSION:-2.15.0}
 if [[ $kubespray_version == "2.16.0" ]]; then
     helm_client_version="3.5.4"
     kube_version="v1.20.7"
@@ -294,7 +294,7 @@ kud_playbooks=$kud_infra_folder/playbooks
 kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
 testing_enabled=${KUD_ENABLE_TESTS:-false}
-container_runtime=${CONTAINER_RUNTIME:-docker}
+container_runtime=${CONTAINER_RUNTIME:-containerd}
 enable_kata_webhook=${ENABLE_KATA_WEBHOOK:-false}
 kata_webhook_runtimeclass=${KATA_WEBHOOK_RUNTIMECLASS:-kata-clh}
 kata_webhook_deployed=false

@@ -54,7 +54,7 @@ cmk_untaint_required: true
 
 go_version: '1.14.15'
 # kud playbooks not compatible with 2.8.0 - see MULTICLOUD-634
-ansible_version: 2.9.7
+ansible_version: 3.4.0
 
 sriov_pkgs: make,gcc
 sriov_dest: "{{ base_dest }}/sriov_driver"

@@ -113,7 +113,7 @@ function install_k8s {
         | sudo tee $log_folder/setup-kubernetes.log
     if [ "$container_runtime" == "docker" ]; then
         /bin/echo -e "\n\e[1;42mDocker will be used as the container runtime interface\e[0m"
-        ansible-playbook $verbose -i $kud_inventory \
+        ansible-playbook -vvv -i $kud_inventory \
             $dest_folder/kubespray-$version/cluster.yml --become \
             --become-user=root | sudo tee $log_folder/setup-kubernetes.log
     elif [ "$container_runtime" == "containerd" ]; then
@@ -276,7 +276,7 @@ if [[ -n "${KUD_DEBUG:-}" ]]; then
 fi
 
 # Configuration values
-kubespray_version=${KUBESPRAY_VERSION:-2.14.1}
+kubespray_version=${KUBESPRAY_VERSION:-2.18.1}
 if [[ $kubespray_version == "2.16.0" ]]; then
     helm_client_version="3.5.4"
     kube_version="v1.20.7"
@@ -307,9 +307,9 @@ kata_webhook_deployed=false
 kud_kata_override_variables="container_manager=containerd \
     -e etcd_deployment_type=host -e kubelet_cgroup_driver=cgroupfs \
     -e \"{'download_localhost': false}\" -e \"{'download_run_once': false}\""
-if [[ $kubespray_version == "2.16.0" ]]; then
-    kud_kata_override_variables=${kud_kata_override_variables//-e kubelet_cgroup_driver=cgroupfs/}
-fi
+kud_kata_override_variables=${kud_kata_override_variables//-e kubelet_cgroup_driver=cgroupfs/}
+# if [[ $kubespray_version == "2.16.0" ]]; then
+# fi
 
 sudo mkdir -p $log_folder
 sudo mkdir -p /opt/csar

@@ -17,7 +17,7 @@
       size: 50
       mount: /var/lib/docker/
   roles:
-    - kube-master
+    - kube_control_plane
     - etcd
     - ovn-central
     - kube-node

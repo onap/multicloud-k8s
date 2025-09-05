@@ -276,7 +276,7 @@ if [[ -n "${KUD_DEBUG:-}" ]]; then
 fi
 
 # Configuration values
-kubespray_version=${KUBESPRAY_VERSION:-2.14.1}
+kubespray_version=${KUBESPRAY_VERSION:-2.15.0}
 if [[ $kubespray_version == "2.16.0" ]]; then
     helm_client_version="3.5.4"
     kube_version="v1.20.7"

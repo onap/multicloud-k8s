@@ -50,6 +50,11 @@ function call_api_negative {
         return 2
     else
         echo "[INFO] Server replied with status: ${status}" >&2
+        if [[ "${status}" -gt 400 ]]; then
+            echo "[DEBUG] curl_response_file path: ${curl_response_file}"
+            echo "[DEBUG] Listing contents of /tmp:"
+            ls -lh /tmp
+        fi
         cat "${curl_response_file}"
         rm "${curl_response_file}"
         return_status=$status

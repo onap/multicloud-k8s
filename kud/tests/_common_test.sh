@@ -17,6 +17,7 @@ function install_deps {
     if ! $(jq --version &>/dev/null); then
         function ubuntu_deps {
             sudo apt-get install -y jq
+            sudo apt-get install -y helm
         }
         install_packages "" ubuntu_deps ""
     fi

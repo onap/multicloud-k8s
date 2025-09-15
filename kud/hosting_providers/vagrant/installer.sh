@@ -30,7 +30,7 @@ function _install_go {
         return
     fi
 
-    wget https://dl.google.com/go/$tarball
+    wget -nv https://dl.google.com/go/$tarball
     sudo tar -C /usr/local -xzf $tarball
     rm $tarball
 
@@ -60,9 +60,9 @@ function _set_environment_file {
     OVN_CENTRAL_INTERFACE="${OVN_CENTRAL_INTERFACE:-$(ip addr show | awk '/inet.*brd/{print $NF; exit}')}"
     echo "export OVN_CENTRAL_INTERFACE=${OVN_CENTRAL_INTERFACE}" | sudo tee --append /etc/environment
     echo "export OVN_CENTRAL_ADDRESS=$(get_ovn_central_address)" | sudo tee --append /etc/environment
-    echo "export KUBE_CONFIG_DIR=/opt/kubeconfig" | sudo tee --append /etc/environment
+    echo "export KUBE_CONFIG_DIR=$HOME/.kube" | sudo tee --append /etc/environment
     echo "export CSAR_DIR=/opt/csar" | sudo tee --append /etc/environment
-    echo "export ANSIBLE_CONFIG=${ANSIBLE_CONFIG}" | sudo tee --append /etc/environment
+    # echo "export ANSIBLE_CONFIG=${ANSIBLE_CONFIG}" | sudo tee --append /etc/environment
 }
 
 # install_k8s() - Install Kubernetes using kubespray tool
@@ -139,6 +139,23 @@ function install_k8s {
     cp $kud_inventory_folder/artifacts/admin.conf $HOME/.kube/config
     # Copy Kubespray kubectl to be usable in host running Ansible. Requires kubectl_localhost: true in inventory/group_vars/k8s-cluster.yml
     sudo cp $kud_inventory_folder/artifacts/kubectl /usr/local/bin/
+}
+
+function install_k3s {
+    curl -sfL https://get.k3s.io | sh -
+
+    systemctl status k3s
+
+    sudo kubectl get all -n kube-system
+
+    sudo kubectl cluster-info
+
+    mkdir -p $HOME/.kube
+    sudo kubectl config view > $HOME/.kube/config
+
+    ls -lh ~/.kube
+
+    cat ~/.kube/config
 }
 
 # install_addons() - Install Kubenertes AddOns
@@ -219,7 +236,6 @@ function install_addons {
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
 function install_plugin {
     echo "Installing multicloud/k8s plugin"
-    sudo -E pip install --no-cache-dir docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
     sudo cp $HOME/.kube/config /opt/kubeconfig/kud
@@ -326,10 +342,11 @@ sudo ls /etc/apt/sources.list.d/ || true
 sudo find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
 sudo apt-get update
 _install_go
-install_k8s
+# install_k8s
+install_k3s
 _set_environment_file
-install_addons
-if ${KUD_PLUGIN_ENABLED:-false}; then
+# install_addons
+if ${KUD_PLUGIN_ENABLED:-true}; then
     install_plugin
 fi
 _print_kubernetes_info

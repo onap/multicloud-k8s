@@ -42,7 +42,7 @@ function _cleanup {
 
 function _build_docker {
     echo "Building docker image"
-    docker-compose build --no-cache
+    docker compose build --no-cache
 }
 
 function _push_image {

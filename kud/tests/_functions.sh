@@ -186,8 +186,8 @@ function _destroy {
     local name=$2
 
     echo "$(date +%H:%M:%S) - $name : Destroying $type"
-    kubectl delete $type $name --ignore-not-found=true --now
-    while kubectl get $type $name &>/dev/null; do
+    sudo kubectl delete $type $name --ignore-not-found=true --now
+    while sudo kubectl get $type $name &>/dev/null; do
         echo "$(date +%H:%M:%S) - $name : Destroying $type"
     done
 }

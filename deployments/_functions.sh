@@ -9,12 +9,12 @@
 ##############################################################################
 
 function stop_all {
-    docker-compose kill
-    docker-compose down
+    docker compose kill
+    docker compose down
 }
 
 function start_mongo {
-    docker-compose up -d mongo
+    docker compose up -d mongo
     export DATABASE_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aqf "name=mongo"))
     export no_proxy=${no_proxy:-},${DATABASE_IP}
     export NO_PROXY=${NO_PROXY:-},${DATABASE_IP}
@@ -32,7 +32,7 @@ EOF
 }
 
 function start_all {
-    docker-compose up -d
+    docker compose up -d
 }
 
 function wait_for_service {
@@ -43,5 +43,7 @@ function wait_for_service {
             return 0
         fi
     done
+    echo Wait failed
+    docker compose logs
     exit 1
 }

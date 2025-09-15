@@ -20,6 +20,12 @@ function install_deps {
         }
         install_packages "" ubuntu_deps ""
     fi
+    if ! $(helm --version &>/dev/null); then
+        function ubuntu_deps {
+            sudo snap install helm
+        }
+        install_packages "" ubuntu_deps ""
+    fi
 }
 
 # install_ipcalc() - Install ipcalc for tests

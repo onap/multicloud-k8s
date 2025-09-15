@@ -30,7 +30,7 @@ function _install_go {
         return
     fi
 
-    wget https://dl.google.com/go/$tarball
+    wget -nv https://dl.google.com/go/$tarball
     sudo tar -C /usr/local -xzf $tarball
     rm $tarball
 
@@ -138,6 +138,26 @@ function install_k8s {
     cp $kud_inventory_folder/artifacts/admin.conf $HOME/.kube/config
     # Copy Kubespray kubectl to be usable in host running Ansible. Requires kubectl_localhost: true in inventory/group_vars/k8s-cluster.yml
     sudo cp $kud_inventory_folder/artifacts/kubectl /usr/local/bin/
+}
+
+function install_k3s {
+    curl -sfL https://get.k3s.io | sh -
+
+    systemctl status k3s
+
+    sudo kubectl get all -n kube-system
+
+    sudo kubectl cluster-info
+
+    mkdir -p $HOME/.kube
+    sudo kubectl config view > $HOME/.kube/config
+    ls -lh
+
+    ls -lh ~
+
+    ls -lh ~/.kube
+
+    cat ~/.kube/config
 }
 
 # install_addons() - Install Kubenertes AddOns
@@ -325,10 +345,11 @@ sudo ls /etc/apt/sources.list.d/ || true
 sudo find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
 sudo apt-get update
 _install_go
-install_k8s
+# install_k8s
+install_k3s
 _set_environment_file
-install_addons
-if ${KUD_PLUGIN_ENABLED:-false}; then
+# install_addons
+if ${KUD_PLUGIN_ENABLED:-true}; then
     install_plugin
 fi
 _print_kubernetes_info

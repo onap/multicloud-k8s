@@ -94,7 +94,7 @@ if [[ "$rb_list" != *"${rb_name}"* ]]; then
 fi
 
 print_msg "Create Resource Bundle Profile Metadata"
-kubeversion=$(kubectl version | grep 'Server Version' | awk -F '"' '{print $6}')
+kubeversion=$(sudo kubectl version | grep 'Server Version' | awk -F '"' '{print $6}')
 payload="
 {
     \"profile-name\": \"${profile_name}\",
@@ -121,7 +121,14 @@ if [[ "$rbp_ret" != *"${profile_name}"* ]]; then
     exit 1
 fi
 
+
 print_msg "Setup cloud data"
+sudo cat /etc/rancher/k3s/k3s.yaml > $kubeconfig_path
+ls -lh
+cat $kubeconfig_path
+# sudo kubectl get pod -v6
+# sudo cat $kubeconfig_path > config
+cat config
 payload="$(cat <<EOF
 {
     "cloud-region": "$cloud_region_id",
@@ -147,8 +154,8 @@ echo "$inst_id"
 inst_id=$(jq -r '.id' <<< "$inst_id")
 
 print_msg "Validating Kubernetes"
-kubectl get --no-headers=true --namespace=${namespace} deployment ${release_name}-vault-consul-dev
-kubectl get --no-headers=true --namespace=${namespace} service override-vault-consul
+sudo kubectl get --no-headers=true --namespace=${namespace} deployment ${release_name}-vault-consul-dev
+sudo kubectl get --no-headers=true --namespace=${namespace} service override-vault-consul
 echo "VNF Instance created succesfully with id: $inst_id"
 
 print_msg "Getting $inst_id VNF Instance information"

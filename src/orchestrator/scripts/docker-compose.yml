@@ -33,7 +33,7 @@ services:
     ports:
       - 9015:9015
   mongo:
-    image: mongo
+    image: mongo:5.0.31
     environment:
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}

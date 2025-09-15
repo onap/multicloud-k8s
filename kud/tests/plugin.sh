@@ -94,7 +94,7 @@ if [[ "$rb_list" != *"${rb_name}"* ]]; then
 fi
 
 print_msg "Create Resource Bundle Profile Metadata"
-kubeversion=$(kubectl version | grep 'Server Version' | awk -F '"' '{print $6}')
+kubeversion=$(sudo kubectl version | grep 'Server Version' | awk -F '"' '{print $6}')
 payload="
 {
     \"profile-name\": \"${profile_name}\",
@@ -147,8 +147,8 @@ echo "$inst_id"
 inst_id=$(jq -r '.id' <<< "$inst_id")
 
 print_msg "Validating Kubernetes"
-kubectl get --no-headers=true --namespace=${namespace} deployment ${release_name}-vault-consul-dev
-kubectl get --no-headers=true --namespace=${namespace} service override-vault-consul
+sudo kubectl get --no-headers=true --namespace=${namespace} deployment ${release_name}-vault-consul-dev
+sudo kubectl get --no-headers=true --namespace=${namespace} service override-vault-consul
 echo "VNF Instance created succesfully with id: $inst_id"
 
 print_msg "Getting $inst_id VNF Instance information"

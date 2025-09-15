@@ -18,7 +18,10 @@ export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 
 function _compile_src {
     echo "Compiling source code"
+    go version
+    ls
     pushd $k8s_path/src/k8splugin/
+    pwd
     make
     popd
 }
@@ -42,6 +45,7 @@ function _cleanup {
 
 function _build_docker {
     echo "Building docker image"
+    # apt-get update && apt-get install docker-compose-plugin
     docker-compose build --no-cache
 }
 

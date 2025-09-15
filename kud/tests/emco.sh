@@ -32,7 +32,7 @@ app1_profile_path="$CSAR_DIR/$csar_id/prometheus-operator_profile.tar.gz"
 app2_helm_path="$CSAR_DIR/$csar_id/collectd.tar.gz"
 app2_profile_path="$CSAR_DIR/$csar_id/collectd_profile.tar.gz"
 
-kubeconfig_path="$HOME/.kube/config"
+kubeconfig_path="$WORKSPACE/.kube/config"
 
 function populate_CSAR_composite_app_helm {
     _checks_args "$1"

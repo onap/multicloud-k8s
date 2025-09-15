@@ -91,6 +91,13 @@ function call_api {
         return 2
     else
         echo "[INFO] Server replied with status: ${status}" >&2
+        echo "."
+        echo "[DEBUG] curl_response_file: ${curl_response_file}"
+        echo "[DEBUG] Listing contents of /tmp:"
+        ls -lh /tmp
+        # if [[ "${status}" -gt 400 ]]; then
+
+        # fi
         cat "${curl_response_file}"
         rm "${curl_response_file}"
         if [[ "${status:0:1}" =~ [45] ]]; then
@@ -186,8 +193,8 @@ function _destroy {
     local name=$2
 
     echo "$(date +%H:%M:%S) - $name : Destroying $type"
-    kubectl delete $type $name --ignore-not-found=true --now
-    while kubectl get $type $name &>/dev/null; do
+    sudo kubectl delete $type $name --ignore-not-found=true --now
+    while sudo kubectl get $type $name &>/dev/null; do
         echo "$(date +%H:%M:%S) - $name : Destroying $type"
     done
 }

@@ -25,7 +25,7 @@ if [ ${1:+1} ]; then
 fi
 
 base_url=${base_url:-"http://localhost:9015/v1"}
-kubeconfig_path="$HOME/.kube/config"
+kubeconfig_path="$WORKSPACE/.kube/config"
 csar_id=cb009bfe-bbee-11e8-9766-525400435678
 rb_name="edgex"
 rb_version="plugin_test"
@@ -100,10 +100,12 @@ vnf_id="$(jq -r '.id' <<< "${response}")"
 
 print_msg "Waiting for EdgeX instances"
 sleep 240
+# sudo timeout 240s bash -c 'until kubectl get --no-headers=true --namespace=${namespace} deployment edgex-core-command; do sleep 10s; done'
+
 
 print_msg "Validating Kubernetes"
-kubectl get --no-headers=true --namespace=${namespace} deployment edgex-core-command
-kubectl get --no-headers=true --namespace=${namespace} service edgex-core-command
+sudo kubectl get --no-headers=true --namespace=${namespace} deployment edgex-core-command
+sudo kubectl get --no-headers=true --namespace=${namespace} service edgex-core-command
 # TODO: Add health checks to verify EdgeX services
 
 print_msg "Retrieving VNF details"

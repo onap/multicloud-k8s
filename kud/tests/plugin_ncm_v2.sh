@@ -25,7 +25,7 @@ source _common.sh
 
 base_url=${base_url:-"http://localhost:9019/v2"}
 
-kubeconfig_path="$HOME/.kube/config"
+kubeconfig_path="$WORKSPACE/.kube/config"
 
 cluster_provider_name1="cluster_provider1"
 cluster_provider_name2="cluster_provider2"

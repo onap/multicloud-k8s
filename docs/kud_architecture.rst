@@ -130,7 +130,7 @@ This bash script is used for the installation and configuration of
 dependencies required for the usage of the KUD via Virtual Machines.
 Some of this dependencies are:
 
-  - `Vagrant <https://www.vagrantup.com/>`_,
+  - Vagrant,
   - `Libvirt <https://libvirt.org/>`_ or `VirtualBox <https://www.virtualbox.org/>`_
 
 The *-p* argument determines the Virtualization provider to be used

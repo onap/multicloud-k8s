@@ -9,12 +9,12 @@
 ##############################################################################
 
 function stop_all {
-    docker-compose kill
-    docker-compose down
+    docker compose kill
+    docker compose down
 }
 
 function start_mongo {
-    docker-compose up -d mongo
+    docker compose up -d mongo
     export DATABASE_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aqf "name=mongo"))
     export no_proxy=${no_proxy:-},${DATABASE_IP}
     export NO_PROXY=${NO_PROXY:-},${DATABASE_IP}
@@ -32,16 +32,18 @@ EOF
 }
 
 function start_all {
-    docker-compose up -d
+    docker compose up -d
 }
 
 function wait_for_service {
-    for try in {0..59}; do
+    for try in {0..30}; do
         echo "$(date +%H:%M:%S) - Waiting for service up"
         sleep 1
         if $(curl http://localhost:9015/v1 &>/dev/null); then
             return 0
         fi
     done
+    docker compose logs
+    echo wait failed
     exit 1
 }

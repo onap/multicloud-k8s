@@ -1285,8 +1285,8 @@ function populate_CSAR_m3db_helm {
     pushd "${CSAR_DIR}/$1"
     print_msg "Create Helm Chart Archives for m3db"
     rm -f *.tar.gz
-   #tar -czf m3db.tar.gz -C $test_folder/vnfs/comp-app/collection/app3-latest/helm .
-   #tar -czf m3db_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app3-latest/profile .
+    #tar -czf m3db.tar.gz -C $test_folder/vnfs/comp-app/collection/app3-latest/helm .
+    #tar -czf m3db_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/app3-latest/profile .
     tar -czf m3db.tar.gz -C $test_folder/vnfs/comp-app/collection/m3db/helm .
     tar -czf m3db_profile.tar.gz -C $test_folder/vnfs/comp-app/collection/m3db/profile .
     export m3db_helm_path="${CSAR_DIR}/$1/m3db.tar.gz"

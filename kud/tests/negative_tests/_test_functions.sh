@@ -37,7 +37,8 @@ function call_api_negative {
     #and performs validation of http_code
 
     local status
-    local curl_response_file="$(mktemp -p /tmp)"
+    local curl_response_file
+    curl_response_file="$(mktemp -p /tmp)" || return 1
     local curl_common_flags=(-s -w "%{http_code}" -o "${curl_response_file}")
     local command=(curl "${curl_common_flags[@]}" "$@")
 
@@ -71,7 +72,7 @@ function get_resource_negative {
 }
 
 
-# Create a test rpoject 
+# Create a test rpoject
 # EOF must start as first chracter in a line for cat to identify the end
 function create_project {
         project_name="test_project"
@@ -331,7 +332,7 @@ payload="$(cat <<EOF
    "spec":{
       "intent":{
          "${genericPlacementIntent}":"${genericPlacementIntentName}",
-         "${hpaIntent}" : "${hpaControllerIntentName}", 
+         "${hpaIntent}" : "${hpaControllerIntentName}",
          "${trafficIntent}" : "${trafficControllerIntentName}",
          "${CostBasedIntent}" : "${CostBasedIntentName}",
          "${OVNintent}" : "${OVNintentName}"
@@ -343,4 +344,3 @@ EOF
 call_api -d "${payload}" "${base_url}/projects/${project_name}/composite-apps/${composite_app_name}/${composite_app_version}/deployment-intent-groups/${deploymentIntentGroupName}/intents"
 # END: Adding intents to an intent group
 }
-

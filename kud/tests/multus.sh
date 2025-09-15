@@ -41,7 +41,8 @@ NET
 
 function generate_CRD_for_macvlan_cni {
     local csar_id=$1
-    local master_name=$(ssh_cluster ip route | grep 'default' | awk '{print $5}' |head -n 1)
+    local master_name
+    master_name=$(ssh_cluster ip route | grep 'default' | awk '{print $5}' |head -n 1) || return 1
     _checks_args $csar_id
     pushd ${CSAR_DIR}/${csar_id}
 
@@ -67,7 +68,8 @@ NET
 
 function generate_CRD_for_ipvlan_cni {
     local csar_id=$1
-    local master_name=$(ssh_cluster ip route | grep 'default' | awk '{print $5}' |head -n 1)
+    local master_name
+    master_name=$(ssh_cluster ip route | grep 'default' | awk '{print $5}' |head -n 1) || return 1
     _checks_args $csar_id
     pushd ${CSAR_DIR}/${csar_id}
 

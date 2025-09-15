@@ -78,7 +78,8 @@ function call_api {
     #and performs validation of http_code
 
     local status
-    local curl_response_file="$(mktemp -p /tmp)"
+    local curl_response_file
+    curl_response_file="$(mktemp -p /tmp)" || return 1
     local curl_common_flags=(-s -w "%{http_code}" -o "${curl_response_file}")
     local command=(curl "${curl_common_flags[@]}" "$@")
 
@@ -111,7 +112,8 @@ function call_api_nox {
     #and performs validation of http_code
 
     local status
-    local curl_response_file="$(mktemp -p /tmp)"
+    local curl_response_file
+    curl_response_file="$(mktemp -p /tmp)" || return 1
     local curl_common_flags=(-s -w "%{http_code}" -o "${curl_response_file}")
     local command=(curl "${curl_common_flags[@]}" "$@")
 

@@ -25,7 +25,7 @@ if [ ${1:+1} ]; then
 fi
 
 base_url=${base_url:-"http://localhost:9015/v1"}
-kubeconfig_path="$HOME/.kube/config"
+kubeconfig_path="$WORKSPACE/.kube/config"
 csar_eaa_id=8030a02a-7253-11ea-bc55-0242ac130003
 csar_sample_app_id=150da0b3-aa8c-481e-b661-2620b810765e
 rb_eaa_name="eaa"

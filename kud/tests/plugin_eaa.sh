@@ -25,7 +25,7 @@ if [ ${1:+1} ]; then
 fi
 
 base_url=${base_url:-"http://localhost:9015/v1"}
-kubeconfig_path="$HOME/.kube/config"
+kubeconfig_path="$WORKSPACE/.kube/config"
 csar_eaa_id=8030a02a-7253-11ea-bc55-0242ac130003
 csar_sample_app_id=150da0b3-aa8c-481e-b661-2620b810765e
 rb_eaa_name="eaa"
@@ -158,23 +158,23 @@ wait_for_deployment producer 1
 wait_for_deployment consumer 1
 
 print_msg "Validating EAA is running"
-kubectl get --namespace=${namespace_eaa} pods | grep eaa
+sudo kubectl get --namespace=${namespace_eaa} pods | grep eaa
 
 print_msg "Validating sample producer and sample consumer are running"
-kubectl get --namespace=${namespace_sample_app}  pods | grep producer
-kubectl get --namespace=${namespace_sample_app} pods | grep consumer
+sudo kubectl get --namespace=${namespace_sample_app}  pods | grep producer
+sudo kubectl get --namespace=${namespace_sample_app} pods | grep consumer
 
 print_msg "Validating logs of EAA"
-EAA=`kubectl get --namespace=${namespace_eaa} pods | grep eaa | awk '{print $1}'`
-kubectl logs --namespace=${namespace_eaa}  ${EAA}
+EAA=`sudo kubectl get --namespace=${namespace_eaa} pods | grep eaa | awk '{print $1}'`
+sudo kubectl logs --namespace=${namespace_eaa}  ${EAA}
 
 print_msg "Validating logs of sample producer and sample consumer"
 # sleep 5 seconds to let producer and consumer generate some logs
 sleep 5
-PRODUCER=`kubectl get --namespace=${namespace_sample_app} pods | grep producer | awk '{print $1}'`
-CONSUMER=`kubectl get --namespace=${namespace_sample_app} pods | grep consumer | awk '{print $1}'`
-kubectl logs --namespace=${namespace_sample_app} ${PRODUCER}
-kubectl logs --namespace=${namespace_sample_app} ${CONSUMER}
+PRODUCER=`sudo kubectl get --namespace=${namespace_sample_app} pods | grep producer | awk '{print $1}'`
+CONSUMER=`sudo kubectl get --namespace=${namespace_sample_app} pods | grep consumer | awk '{print $1}'`
+sudo kubectl logs --namespace=${namespace_sample_app} ${PRODUCER}
+sudo kubectl logs --namespace=${namespace_sample_app} ${CONSUMER}
 
 print_msg "Retrieving EAA details"
 call_api "${base_url}/instance/${vnf_eaa_id}"

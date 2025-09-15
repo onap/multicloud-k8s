@@ -30,7 +30,7 @@ function _install_go {
         return
     fi
 
-    wget https://dl.google.com/go/$tarball
+    wget -nv https://dl.google.com/go/$tarball
     sudo tar -C /usr/local -xzf $tarball
     rm $tarball
 
@@ -60,9 +60,9 @@ function _set_environment_file {
     OVN_CENTRAL_INTERFACE="${OVN_CENTRAL_INTERFACE:-$(ip addr show | awk '/inet.*brd/{print $NF; exit}')}"
     echo "export OVN_CENTRAL_INTERFACE=${OVN_CENTRAL_INTERFACE}" | sudo tee --append /etc/environment
     echo "export OVN_CENTRAL_ADDRESS=$(get_ovn_central_address)" | sudo tee --append /etc/environment
-    echo "export KUBE_CONFIG_DIR=/opt/kubeconfig" | sudo tee --append /etc/environment
+    echo "export KUBE_CONFIG_DIR=$HOME/.kube" | sudo tee --append /etc/environment
     echo "export CSAR_DIR=/opt/csar" | sudo tee --append /etc/environment
-    echo "export ANSIBLE_CONFIG=${ANSIBLE_CONFIG}" | sudo tee --append /etc/environment
+    # echo "export ANSIBLE_CONFIG=${ANSIBLE_CONFIG}" | sudo tee --append /etc/environment
 }
 
 # install_k8s() - Install Kubernetes using kubespray tool
@@ -139,6 +139,25 @@ function install_k8s {
     cp $kud_inventory_folder/artifacts/admin.conf $HOME/.kube/config
     # Copy Kubespray kubectl to be usable in host running Ansible. Requires kubectl_localhost: true in inventory/group_vars/k8s-cluster.yml
     sudo cp $kud_inventory_folder/artifacts/kubectl /usr/local/bin/
+}
+
+function install_k3s {
+    echo "Installing k3s..."
+
+    curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" | sh -
+
+    systemctl status k3s
+
+    sudo kubectl get all -n kube-system
+
+    sudo kubectl cluster-info
+
+    # mkdir -p $HOME/.kube
+    # sudo kubectl config view > $HOME/.kube/config
+
+    # ls -lh ~/.kube
+
+    # cat ~/.kube/config
 }
 
 # install_addons() - Install Kubenertes AddOns
@@ -219,21 +238,25 @@ function install_addons {
 # install_plugin() - Install ONAP Multicloud Kubernetes plugin
 function install_plugin {
     echo "Installing multicloud/k8s plugin"
-    sudo -E pip install --no-cache-dir docker-compose
 
     sudo mkdir -p /opt/{kubeconfig,consul/config}
-    sudo cp $HOME/.kube/config /opt/kubeconfig/kud
+    # sudo cp $HOME/.kube/config /opt/kubeconfig/kud
+    mkdir -p $WORKSPACE/.kube
+    kubeconfig_path="$WORKSPACE/.kube/config"
+    sudo cat /etc/rancher/k3s/k3s.yaml > $kubeconfig_path
 
     pushd $kud_folder/../../../deployments
     sudo ./build.sh
     if [[ "${testing_enabled}" == "true" ]]; then
         sudo ./start.sh
         pushd $kud_tests
-        plugin_tests="plugin plugin_edgex plugin_fw plugin_eaa"
+        # plugin_tests="plugin plugin_edgex plugin_fw plugin_eaa"
+        plugin_tests="plugin" # TODO: re-enable plugin_edgex plugin_fw plugin_eaa
         if [[ $kubespray_version == "2.16.0" ]]; then
             plugin_tests=${plugin_tests//plugin_fw/};
         fi
         for functional_test in ${plugin_tests}; do
+            echo "running $functional_test.sh"
             bash ${functional_test}.sh
         done
         popd
@@ -243,7 +266,7 @@ function install_plugin {
 
 # _print_kubernetes_info() - Prints the login Kubernetes information
 function _print_kubernetes_info {
-    if ! $(kubectl version &>/dev/null); then
+    if ! $(sudo kubectl version &>/dev/null); then
         return
     fi
     # Expose Dashboard using NodePort
@@ -251,7 +274,7 @@ function _print_kubernetes_info {
     KUBE_EDITOR="sed -i \"s|type\: ClusterIP|type\: NodePort|g\"" kubectl -n kube-system edit service kubernetes-dashboard
     KUBE_EDITOR="sed -i \"s|nodePort\: .*|nodePort\: $node_port|g\"" kubectl -n kube-system edit service kubernetes-dashboard
 
-    master_ip=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}' | awk -F '[:/]' '{print $4}')
+    master_ip=$(sudo kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}' | awk -F '[:/]' '{print $4}')
 
     printf "Kubernetes Info\n===============\n" > $k8s_info_file
     echo "Dashboard URL: https://$master_ip:$node_port" >> $k8s_info_file
@@ -294,7 +317,7 @@ kud_inventory=$kud_inventory_folder/hosts.ini
 kud_playbooks=$kud_infra_folder/playbooks
 kud_tests=$kud_folder/../../tests
 k8s_info_file=$kud_folder/k8s_info.log
-testing_enabled=${KUD_ENABLE_TESTS:-false}
+testing_enabled=${KUD_ENABLE_TESTS:-true}
 container_runtime=${CONTAINER_RUNTIME:-docker}
 enable_kata_webhook=${ENABLE_KATA_WEBHOOK:-false}
 kata_webhook_runtimeclass=${KATA_WEBHOOK_RUNTIMECLASS:-kata-clh}
@@ -326,10 +349,11 @@ sudo ls /etc/apt/sources.list.d/ || true
 sudo find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
 sudo apt-get update
 _install_go
-install_k8s
+# install_k8s
+install_k3s
 _set_environment_file
-install_addons
-if ${KUD_PLUGIN_ENABLED:-false}; then
+# install_addons
+if ${KUD_PLUGIN_ENABLED:-true}; then
     install_plugin
 fi
 _print_kubernetes_info

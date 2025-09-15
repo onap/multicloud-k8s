@@ -13,13 +13,17 @@ set -o pipefail
 
 k8s_path="$(git rev-parse --show-toplevel)"
 
-VERSION="0.10.1-SNAPSHOT"
+VERSION="0.10.2-SNAPSHOT"
 export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 
 function _compile_src {
     echo "Compiling source code"
+    go version
+    ls
     pushd $k8s_path/src/k8splugin/
-    make
+    pwd
+    # mount directory and build in container (thus not relying on the state of the runner)
+    docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:1.14 make
     popd
 }
 
@@ -37,11 +41,19 @@ function _cleanup {
     if [[ -n ${image} ]]; then
         docker images ${image#*:} -q | xargs docker rmi -f
     fi
-    docker ps -a --filter "status=exited" -q | xargs docker rm
+
+    exited_containers=$(docker ps -a --filter "status=exited" -q)
+    if [[ -n "$exited_containers" ]]; then
+        echo "Removing exited containers..."
+        echo "$exited_containers" | xargs docker rm
+    else
+        echo "Nothing to remove"
+    fi
 }
 
 function _build_docker {
     echo "Building docker image"
+    apt-get update && apt-get install -y docker-compose-plugin
     docker-compose build --no-cache
 }
 

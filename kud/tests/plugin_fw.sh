@@ -29,7 +29,7 @@ if [ ${1:+1} ]; then
 fi
 
 base_url=${base_url:-"http://localhost:9015/v1"}
-kubeconfig_path="$HOME/.kube/config"
+kubeconfig_path="$WORKSPACE/.kube/config"
 csar_id=cc009bfe-bbee-11e8-9766-525400435678
 rb_name="vfw"
 rb_version="plugin_test"
@@ -107,7 +107,7 @@ vnf_id="$(jq -r '.id' <<< "${response}")"
 
 print_msg "[BEGIN] Basic checks for instantiated resource"
 print_msg "Check if override value has been applied correctly"
-kubectl get network -n "${namespace}" onap-private-net-test
+sudo kubectl get network -n "${namespace}" onap-private-net-test
 print_msg "Wait for all pods to start"
 wait_for_pod -n "${namespace}" -l app=sink
 wait_for_pod -n "${namespace}" -l app=firewall

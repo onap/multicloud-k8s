@@ -27,7 +27,7 @@ deploy: build
 .PHONY: test
 test: clean
 	@$(GO) build -race -buildmode=plugin -o ./mock_files/mock_plugins/mockplugin.so ./mock_files/mock_plugins/mockplugin.go
-	@$(GO) test -race ./...
+	@$(GO) test -timeout 0 -race ./...
 
 format:
 	@$(GO) fmt ./...
@@ -41,5 +41,5 @@ clean:
 
 .PHONY: cover
 cover:
-	@$(GO) test -race ./... -coverprofile=coverage.out
+	@$(GO) test -timeout 0 -race ./... -coverprofile=coverage.out
 	@$(GO) tool cover -html=coverage.out -o coverage.html

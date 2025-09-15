@@ -18,7 +18,7 @@ source _common_test.sh
 source _functions.sh
 
 base_url="http://localhost:9015/v1"
-kubeconfig_path="$HOME/.kube/config"
+kubeconfig_path="$WORKSPACE/.kube/config"
 #Will resolve to file $KUBE_CONFIG_DIR/kud
 cloud_region_id="kud"
 cloud_region_owner="test_owner"
@@ -94,7 +94,7 @@ if [[ "$rb_list" != *"${rb_name}"* ]]; then
 fi
 
 print_msg "Create Resource Bundle Profile Metadata"
-kubeversion=$(kubectl version | grep 'Server Version' | awk -F '"' '{print $6}')
+kubeversion=$(sudo kubectl version | grep 'Server Version' | awk -F '"' '{print $6}')
 payload="
 {
     \"profile-name\": \"${profile_name}\",
@@ -121,7 +121,9 @@ if [[ "$rbp_ret" != *"${profile_name}"* ]]; then
     exit 1
 fi
 
+
 print_msg "Setup cloud data"
+
 payload="$(cat <<EOF
 {
     "cloud-region": "$cloud_region_id",
@@ -147,8 +149,8 @@ echo "$inst_id"
 inst_id=$(jq -r '.id' <<< "$inst_id")
 
 print_msg "Validating Kubernetes"
-kubectl get --no-headers=true --namespace=${namespace} deployment ${release_name}-vault-consul-dev
-kubectl get --no-headers=true --namespace=${namespace} service override-vault-consul
+sudo kubectl get --no-headers=true --namespace=${namespace} deployment ${release_name}-vault-consul-dev
+sudo kubectl get --no-headers=true --namespace=${namespace} service override-vault-consul
 echo "VNF Instance created succesfully with id: $inst_id"
 
 print_msg "Getting $inst_id VNF Instance information"

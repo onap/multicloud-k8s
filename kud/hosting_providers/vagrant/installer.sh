@@ -140,6 +140,14 @@ function install_k8s {
     sudo cp $kud_inventory_folder/artifacts/kubectl /usr/local/bin/
 }
 
+function install_k3s{
+    curl -sfL https://get.k3s.io | sh -
+
+    systemctl status k3s
+
+    sudo kubectl get all -n kube-system
+}
+
 # install_addons() - Install Kubenertes AddOns
 function install_addons {
     source /etc/environment
@@ -325,7 +333,8 @@ sudo ls /etc/apt/sources.list.d/ || true
 sudo find /etc/apt/sources.list.d -maxdepth 1 -name '*jonathonf*' -delete || true
 sudo apt-get update
 _install_go
-install_k8s
+# install_k8s
+install_k3s
 _set_environment_file
 install_addons
 if ${KUD_PLUGIN_ENABLED:-false}; then

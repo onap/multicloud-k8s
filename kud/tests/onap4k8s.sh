@@ -29,7 +29,7 @@ function check_onap_svc {
             echo "onap svc health check is success"
             exit 0
         fi
-        ((timeout-=1))
+        $((timeout-=1))
     done
 }
 

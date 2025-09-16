@@ -69,8 +69,12 @@ POD
 function create_pod_yaml_with_nodeSelector {
     # Get the major kernel version of a worker node in the cluster:
     # this will be used below in the node selector of the test pod
-    local -r node_name=$(kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name} {.spec.taints[?(@.effect=="NoSchedule")].effect}{"\n"}{end}' | awk 'NF==1 {print $0;exit}')
-    local -r kernel_version=$(kubectl get node ${node_name} -o jsonpath='{.metadata.labels.feature\.node\.kubernetes\.io/kernel-version\.major}')
+    local node_name
+    node_name=$(kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name} {.spec.taints[?(@.effect=="NoSchedule")].effect}{"\n"}{end}' | awk 'NF==1 {print $0;exit}') || return 1
+    local kernel_version
+    kernel_version=$(kubectl get node ${node_name} -o jsonpath='{.metadata.labels.feature\.node\.kubernetes\.io/kernel-version\.major}') || return 1
+    readonly node_name
+    readonly kernel_version
 
     cat << POD > $HOME/$pod_name-nodeSelector.yaml
 apiVersion: v1

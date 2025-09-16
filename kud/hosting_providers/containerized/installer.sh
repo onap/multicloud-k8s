@@ -38,8 +38,9 @@ function install_prerequisites {
 
 # _install_ansible() - Install and Configure Ansible program
 function _install_ansible {
-    local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml |
-        awk -F ': ' '{print $2}')
+    local version
+    version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml |
+        awk -F ': ' '{print $2}') || return 1
     mkdir -p /etc/ansible/
     pip install --no-cache-dir ansible==$version
 }

@@ -49,7 +49,8 @@ function _install_ansible {
     if $(ansible --version &>/dev/null); then
         sudo pip uninstall -y ansible
     fi
-    local version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}')
+    local version
+    version=$(grep "ansible_version" ${kud_playbooks}/kud-vars.yml | awk -F ': ' '{print $2}') || return 1
     sudo mkdir -p /etc/ansible/
     sudo -E pip install --no-cache-dir ansible==$version
 }
@@ -74,7 +75,7 @@ function install_k8s {
     sudo apt-get install -y sshpass make unzip # install make to run mitogen target and unzip is mitogen playbook dependency
     sudo apt-get install -y gnupg2 software-properties-common
     _install_ansible
-    wget https://github.com/kubernetes-incubator/kubespray/archive/$tarball
+    wget -nv https://github.com/kubernetes-incubator/kubespray/archive/$tarball
     sudo tar -C $dest_folder -xzf $tarball
     sudo chown -R $USER $dest_folder/kubespray-$version
     sudo mkdir -p ${local_release_dir}/containers

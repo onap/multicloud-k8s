@@ -94,7 +94,7 @@ rsynccontrollerdata="$(cat<<EOF
   },
   "spec": {
     "host": "${rsynccontrollername}",
-    "port": 9041 
+    "port": 9041
   }
 }
 EOF
@@ -318,7 +318,7 @@ function createOrchestratorData {
 }
 
 function deleteOrchestratorData {
-   # TODO- delete rsync controller and any other controller
+    # TODO- delete rsync controller and any other controller
     delete_resource "${base_url_orchestrator}/controllers/${rsynccontrollername}"
 
     delete_resource "${base_url_orchestrator}/projects/${projectname}/composite-apps/${operators_compositeapp_name}/${compositeapp_version}/deployment-intent-groups/${deployment_intent_group_name}/intents/${deployment_intents_in_group_name}"
@@ -383,4 +383,3 @@ populate_CSAR_operator_helm "$csar_id"
 deleteData
 createData
 instantiate
-

@@ -1,21 +1,21 @@
 module github.com/onap/multicloud-k8s/src/dcm
 
 require (
+	github.com/Sirupsen/logrus v0.0.0-00010101000000-000000000000 // indirect
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-20200630152613-7c20f73e7c5d
 	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200818155723-a5ffa8aadf49
 	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200818155723-a5ffa8aadf49
 	github.com/pkg/errors v0.9.1
-	github.com/russross/blackfriday/v2 v2.0.1
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.7.0
 	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/api v0.18.2
 	k8s.io/apimachinery v0.18.2
-	k8s.io/kubernetes v1.16.9
 )
 
 replace (
+	github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
 	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator

@@ -31,7 +31,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	pkgerrors "github.com/pkg/errors"
-	"github.com/prometheus/common/log"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -314,7 +313,7 @@ func (g genericPlugin) Create(yamlFilePath string, namespace string, client plug
 		name, err := g.Get(resource, namespace, client)
 		if err == nil && name == resource.Name {
 			//CRD update is not supported according to Helm spec
-			log.Warn(fmt.Sprintf("CRD %s create will be skipped. It already exists", name))
+			logger.Printf("CRD %s create will be skipped. It already exists", name)
 			return name, nil
 		}
 	}
@@ -381,7 +380,7 @@ func (g genericPlugin) Update(yamlFilePath string, namespace string, client plug
 		name, err := g.Get(resource, namespace, client)
 		if err == nil && name == resource.Name {
 			//CRD update is not supported according to Helm spec
-			log.Warn(fmt.Sprintf("CRD %s update will be skipped", name))
+			logger.Printf("CRD %s update will be skipped", name)
 			return name, nil
 		}
 	}
@@ -489,7 +488,7 @@ func (g genericPlugin) Delete(resource helm.KubernetesResource, namespace string
 	}
 	if resource.GVK.Kind == "CustomResourceDefinition" {
 		//CRD deletion is not supported according to Helm spec
-		log.Warn(fmt.Sprintf("CRD %s deletion will be skipped", resource.Name))
+		logger.Printf("CRD %s deletion will be skipped", resource.Name)
 		return nil
 	}
 

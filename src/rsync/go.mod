@@ -5,7 +5,6 @@ go 1.13
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.1
-	github.com/googleapis/gnostic v0.4.0
 	github.com/jonboulle/clockwork v0.1.0
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-20250926072925-94c66cbc97eb
 	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200818155723-a5ffa8aadf49
@@ -21,10 +20,10 @@ require (
 	k8s.io/client-go v12.0.0+incompatible
 	k8s.io/kube-openapi v0.0.0-20200410163147-594e756bea31
 	k8s.io/kubectl v0.18.2
-	k8s.io/kubernetes v1.16.9
 )
 
 replace (
+	github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
 	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator

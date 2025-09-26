@@ -1,22 +1,17 @@
 module github.com/onap/multicloud-k8s/src/ncm
 
 require (
-	github.com/ghodss/yaml v1.0.0
+	github.com/emicklei/go-restful v2.10.0+incompatible // indirect
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
-	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20200127152046-0ee521d56061
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-20250926072925-94c66cbc97eb
 	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20250926072925-94c66cbc97eb
 	github.com/pkg/errors v0.9.1
-	google.golang.org/grpc v1.28.0
 	gopkg.in/yaml.v2 v2.2.8
-	k8s.io/api v0.18.2
-	k8s.io/apimachinery v0.18.2
-	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/kubernetes v1.16.9
 )
 
 replace (
+	github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
 	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator

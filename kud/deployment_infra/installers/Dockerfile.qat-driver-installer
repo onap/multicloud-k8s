@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM nexus3.onap.org:10001/ubuntu:18.04
 
 ENV QAT_DRIVER_VERSION=1.7.l.4.12.0-00011
 ENV QAT_DRIVER_DOWNLOAD_URL=https://01.org/sites/default/files/downloads/qat${QAT_DRIVER_VERSION}.tar.gz

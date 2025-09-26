@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM nexus3.onap.org:10001/ubuntu:18.04
 MAINTAINER Victor Morales <electrocucaracha@gmail.com>
 
 ENV VERSION "19.01.2-release"

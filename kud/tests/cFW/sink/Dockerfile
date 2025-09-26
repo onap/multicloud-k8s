@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM nexus3.onap.org:10001/ubuntu:18.04
 MAINTAINER Ritu Sood <ritu.sood@intel.com>
 
 COPY init.sh /opt/init.sh

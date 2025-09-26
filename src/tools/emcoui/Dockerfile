@@ -14,7 +14,7 @@
 # ========================================================================
 
 # => Build container
-FROM node:alpine as builder
+FROM nexus3.onap.org:10001/node:alpine as builder
 WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
@@ -25,7 +25,7 @@ COPY public ./public
 RUN REACT_APP_VERSION=v1.2.0 npm run build
 
 # => Run container
-FROM nginx:1.15.2-alpine
+FROM nexus3.onap.org:10001/nginx:1.15.2-alpine
 
 # Nginx config
 COPY default.conf /etc/nginx/conf.d/

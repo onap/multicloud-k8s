@@ -23,7 +23,7 @@ function _compile_src {
     pushd $k8s_path/src/k8splugin/
     pwd
     # mount directory and build in container (thus not relying on the state of the runner)
-    docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:1.14 make
+    docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp nexus3.onap.org:10001/golang:1.14.1 make
     popd
 }
 

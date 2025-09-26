@@ -1,4 +1,4 @@
-FROM openwrt-1806-4-base
+FROM nexus3.onap.org:10001/openwrt-1806-4-base
 
 #EXPOSE 80
 

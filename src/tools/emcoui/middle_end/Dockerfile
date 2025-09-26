@@ -13,15 +13,15 @@
 # limitations under the License.
 # ========================================================================
 
-FROM golang:1.14.1
+FROM nexus3.onap.org:10001/golang:1.14.1
 
 # Set the Current Working Directory inside the container
 WORKDIR /src
 COPY ./ ./
-RUN make all 
+RUN make all
 
 # Build the Go app
-FROM ubuntu:16.04
+FROM nexus3.onap.org:10001/ubuntu:16.04
 WORKDIR /opt/emco
 RUN groupadd -r emco && useradd -r -g emco emco
 RUN chown emco:emco /opt/emco -R

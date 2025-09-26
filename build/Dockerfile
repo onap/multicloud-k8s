@@ -18,7 +18,7 @@ RUN cd src/rsync && make all
 RUN cd src/ovnaction && make all
 RUN cd src/clm && make all
 
-FROM ubuntu:16.04
+FROM nexus3.onap.org:10001/ubuntu:16.04
 
 WORKDIR /opt/emco
 RUN groupadd -r emco && useradd -r -g emco emco

@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as builder
+FROM nexus3.onap.org:10001/ubuntu:18.04 as builder
 MAINTAINER Victor Morales <electrocucaracha@gmail.com>
 
 ENV demo_artifacts_version "1.6.0"

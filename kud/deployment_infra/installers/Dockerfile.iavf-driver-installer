@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM nexus3.onap.org:10001/ubuntu:18.04
 
 ENV IAVF_DRIVER_VERSION=4.0.2
 ENV IAVF_DRIVER_DOWNLOAD_URL=https://downloadmirror.intel.com/30305/eng/iavf-${IAVF_DRIVER_VERSION}.tar.gz

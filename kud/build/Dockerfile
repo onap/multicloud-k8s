@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base
+FROM nexus3.onap.org:10001/ubuntu:18.04 as base
 ARG KUD_ENABLE_TESTS=false
 ARG KUD_PLUGIN_ENABLED=false
 ARG CONTAINER_RUNTIME=docker

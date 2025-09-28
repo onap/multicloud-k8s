@@ -812,6 +812,7 @@ github.com/olekukonko/tablewriter v0.0.2/go.mod h1:rSAaSIOAGT9odnlyGlUfAJaoc5w2f
 github.com/onap/multicloud-k8s/src/ncm v0.0.0-20200515060444-c77850a75eee/go.mod h1:q6s8c45A2NN2V4lxciJ7OmCZFaS1uQSWaGxGG3UM3kM=
 github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200601021239-7959bd4c6fd4/go.mod h1:7baSFNf73xk4L/8+GZLGqE9F4TFEOYVGMAnabx4kNBY=
 github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200818155723-a5ffa8aadf49/go.mod h1:JLh0q1V8qFVS6rSk9Zx5NyWAcsoLh4qbMCDFlp9AKWY=
+github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20250926072925-94c66cbc97eb/go.mod h1:fQFLHu00Mj1xbEsmUkYlCm8aFzmWlV5awDIUb1q9foo=
 github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d h1:0aXmwqPN8MjyqjKK5L1IhhP/hpP5nGj6xMgo6AOzCPI=
 github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d/go.mod h1:pVhhvg5N0Qy8QDJkYRnWCQbxLDV5GYLmPyzlndbGx7w=
 github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

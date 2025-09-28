@@ -7,7 +7,7 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v0.0.0-20200127152046-0ee521d56061
 	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200818155723-a5ffa8aadf49
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200818155723-a5ffa8aadf49
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20250926072925-94c66cbc97eb
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1
 	google.golang.org/grpc v1.28.0
@@ -42,7 +42,7 @@ replace (
 	k8s.io/kubernetes => github.com/kubernetes/kubernetes v1.16.9
 	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.16.9
 	k8s.io/metrics => k8s.io/metrics v0.16.9
-	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.16.9	
+	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.16.9
 )
 
 go 1.13

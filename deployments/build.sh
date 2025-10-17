@@ -13,17 +13,17 @@ set -o pipefail
 
 k8s_path="$(git rev-parse --show-toplevel)"
 
-VERSION="0.10.2-SNAPSHOT"
+VERSION="0.10.3-SNAPSHOT"
+GO_VERSION="1.14"
 export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 
 function _compile_src {
     echo "Compiling source code"
-    go version
     ls
     pushd $k8s_path/src/k8splugin/
     pwd
     # mount directory and build in container (thus not relying on the state of the runner)
-    docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp nexus3.onap.org:10001/golang:1.14.1 make
+    docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp nexus3.onap.org:10001/golang:${GO_VERSION}-alpine make
     popd
 }
 

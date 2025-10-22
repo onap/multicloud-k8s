@@ -6,15 +6,16 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
-	github.com/hashicorp/consul/api v1.3.0
+	github.com/hashicorp/consul/api v1.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
+	github.com/spf13/cobra v1.1.3 // indirect
 	github.com/xdg/scram v1.0.5 // indirect
 	github.com/xdg/stringprep v1.0.3 // indirect
-	go.etcd.io/etcd v3.3.12+incompatible
+	go.etcd.io/etcd/client/v3 v3.5.3
 	go.mongodb.org/mongo-driver v1.1.2
-	golang.org/x/net v0.0.0-20200707034311-ab3426394381
-	gopkg.in/yaml.v2 v2.3.0
+	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
+	gopkg.in/yaml.v2 v2.4.0
 	helm.sh/helm/v3 v3.5.0
 	k8s.io/api v0.20.1
 	k8s.io/apiextensions-apiserver v0.20.1

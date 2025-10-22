@@ -21,7 +21,7 @@ import (
 	"time"
 
 	pkgerrors "github.com/pkg/errors"
-	"go.etcd.io/etcd/clientv3"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/pkg/transport"
 )
 

@@ -3,7 +3,7 @@ module github.com/onap/multicloud-k8s/src/clm
 require (
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20200818155723-a5ffa8aadf49
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20251205113806-246f4e4b1e9f
 	github.com/pkg/errors v0.9.1
 )
 

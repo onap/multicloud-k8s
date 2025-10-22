@@ -15,11 +15,12 @@ package contextdb
 
 import (
 	"context"
-	mvccpb "github.com/coreos/etcd/mvcc/mvccpb"
-	pkgerrors "github.com/pkg/errors"
-	"go.etcd.io/etcd/clientv3"
 	"strings"
 	"testing"
+
+	pkgerrors "github.com/pkg/errors"
+	mvccpb "go.etcd.io/etcd/api/v3/mvccpb"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 type kv struct {

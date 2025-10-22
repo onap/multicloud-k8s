@@ -18,11 +18,13 @@ package db
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
 	"time"
 
 	pkgerrors "github.com/pkg/errors"
-	"go.etcd.io/etcd/clientv3"
-	"go.etcd.io/etcd/pkg/transport"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 // EtcdConfig Configuration values needed for Etcd Client
@@ -59,21 +61,40 @@ func NewEtcdClient(store *clientv3.Client, c EtcdConfig) error {
 	return err
 }
 
+func getTlsConfig(c EtcdConfig) (*tls.Config, error) {
+	cert, err := tls.LoadX509KeyPair(c.CertFile, c.KeyFile)
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error loading X509 key pair: %s", err.Error())
+	}
+
+	// Load CA cert
+	caCert, err := ioutil.ReadFile(c.CAFile)
+	if err != nil {
+		return nil, pkgerrors.Errorf("Error loading ca file: %s", err.Error())
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	// Setup HTTPS client
+	return &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}, nil
+}
+
 func newClient(store *clientv3.Client, c EtcdConfig) (EtcdClient, error) {
+	var err error
 	if store == nil {
-		tlsInfo := transport.TLSInfo{
-			CertFile: c.CertFile,
-			KeyFile:  c.KeyFile,
-			CAFile:   c.CAFile,
-		}
-		tlsConfig, err := tlsInfo.ClientConfig()
-		if err != nil {
-			return EtcdClient{}, pkgerrors.Errorf("Error creating etcd TLSInfo: %s", err.Error())
-		}
+		var tlsConfig *tls.Config
 		// NOTE: Client relies on nil tlsConfig
 		// for non-secure connections, update the implicit variable
 		if len(c.CertFile) == 0 && len(c.KeyFile) == 0 && len(c.CAFile) == 0 {
 			tlsConfig = nil
+		} else {
+			tlsConfig, err = getTlsConfig(c)
+			if err != nil {
+				return EtcdClient{}, err
+			}
 		}
 		endpoint := ""
 		if tlsConfig == nil {

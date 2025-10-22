@@ -36,6 +36,10 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "http://localhost:9015/v1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
   mongo:
     image: nexus3.onap.org:10001/mongo:5.0.28
     environment:
@@ -44,11 +48,17 @@ services:
       - NO_PROXY=${NO_PROXY}
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
     ports:
       - 27017:27017
     restart: always
   etcd:
-    image: nexus3.onap.org:10001/bitnami/etcd:3
+    # image tag is just the latest version available
+    # it can be updated any time there is a new version available
+    image: quay.io/coreos/etcd:v3.6.4
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - HTTP_PROXY=${HTTP_PROXY}

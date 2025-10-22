@@ -28,6 +28,8 @@ services:
     restart: always
   etcd-service:
     container_name: etcd-service
+    # image tag is just the latest version available
+    # it can be updated any time there is a new version available
     image: quay.io/coreos/etcd:v3.6.6
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes

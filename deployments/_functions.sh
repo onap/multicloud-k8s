@@ -36,7 +36,7 @@ function start_all {
 }
 
 function wait_for_service {
-    for try in {0..29}; do
+    for try in {0..60}; do
         echo "$(date +%H:%M:%S) - Waiting for service up"
         sleep 1
         if $(curl http://localhost:9015/v1 &>/dev/null); then

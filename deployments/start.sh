@@ -18,7 +18,5 @@ source _functions.sh
 # Start k8splugin from containers. build.sh should be run prior this script.
 #
 stop_all
-start_mongo
-generate_k8sconfig
 start_all
 wait_for_service

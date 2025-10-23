@@ -12,6 +12,22 @@
 version: '3'
 
 services:
+  mongo-service:
+    container_name: mongo-service
+    image: nexus3.onap.org:10001/mongo:5.0.28
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY}
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    ports:
+      - 27017:27017
+    restart: always
   multicloud-k8s:
     image: ${IMAGE_NAME}
     build:
@@ -23,11 +39,10 @@ services:
     environment:
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY},mongo
+      - NO_PROXY=${NO_PROXY},mongo-service
     depends_on:
-      mongo:
+      mongo-service:
         condition: service_healthy
-    network_mode: host
     ports:
       - 9015:9015
     volumes:
@@ -36,30 +51,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "http://localhost:9015/v1"]
-  mongo:
-    image: nexus3.onap.org:10001/mongo:5.0.28
-    environment:
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY}
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-    ports:
-      - 27017:27017
-    restart: always
-  etcd:
-    image: nexus3.onap.org:10001/bitnami/etcd:3
-    environment:
-      - ALLOW_NONE_AUTHENTICATION=yes
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY}
-    volumes:
-      - etcd_data:/bitnami/etcd
-    ports:
-      - 2379:2379
-      - 2380:2380
-
-volumes:
-  etcd_data:
-    driver: local
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s

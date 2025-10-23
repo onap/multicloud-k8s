@@ -19,7 +19,6 @@ export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 
 function _compile_src {
     echo "Compiling source code"
-    ls
     pushd $k8s_path/src/k8splugin/
     pwd
     # mount directory and build in container (thus not relying on the state of the runner)

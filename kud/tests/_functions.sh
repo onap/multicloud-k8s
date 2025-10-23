@@ -91,11 +91,13 @@ function call_api {
         return 2
     else
         echo "[INFO] Server replied with status: ${status}" >&2
-        cat "${curl_response_file}"
-        rm "${curl_response_file}"
         if [[ "${status:0:1}" =~ [45] ]]; then
+            echo $(cat "${curl_response_file}") >&2
+            rm "${curl_response_file}"
+            echo $(docker compose logs --tail=30 multicloud-k8s) >&2
             return 1
         else
+            rm "${curl_response_file}"
             return 0
         fi
     fi

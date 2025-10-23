@@ -48,6 +48,7 @@ var gConfig *Configuration
 func readConfigFile(file string) (*Configuration, error) {
 	f, err := os.Open(file)
 	if err != nil {
+		log.Printf("Error loading config file: %v. Using defaults.", err)
 		return defaultConfiguration(), err
 	}
 	defer f.Close()
@@ -96,7 +97,7 @@ func GetConfiguration() *Configuration {
 	if gConfig == nil {
 		conf, err := readConfigFile("k8sconfig.json")
 		if err != nil {
-			log.Println("Error loading config file. Using defaults.")
+			log.Printf("Error loading config file: %v", err)
 		}
 		gConfig = conf
 	}

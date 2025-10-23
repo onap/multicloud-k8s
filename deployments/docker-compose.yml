@@ -12,31 +12,8 @@
 version: '3'
 
 services:
-  multicloud-k8s:
-    image: ${IMAGE_NAME}
-    build:
-      context: ./
-      args:
-        - HTTP_PROXY=${HTTP_PROXY}
-        - HTTPS_PROXY=${HTTPS_PROXY}
-        - NO_PROXY=${NO_PROXY}
-    environment:
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY},mongo
-    depends_on:
-      mongo:
-        condition: service_healthy
-    network_mode: host
-    ports:
-      - 9015:9015
-    volumes:
-      - /opt/csar:/opt/csar
-      - ${PWD}/k8sconfig.json:/opt/multicloud/k8splugin/k8sconfig.json:ro
-    restart: always
-    healthcheck:
-      test: ["CMD", "curl", "http://localhost:9015/v1"]
-  mongo:
+  mongo-service:
+    container_name: mongo-service
     image: nexus3.onap.org:10001/mongo:5.0.28
     environment:
       - HTTP_PROXY=${HTTP_PROXY}
@@ -44,6 +21,10 @@ services:
       - NO_PROXY=${NO_PROXY}
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     ports:
       - 27017:27017
     restart: always
@@ -59,6 +40,33 @@ services:
     ports:
       - 2379:2379
       - 2380:2380
+  multicloud-k8s:
+    image: ${IMAGE_NAME}
+    build:
+      context: ./
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY},mongo-service
+    depends_on:
+      mongo-service:
+        condition: service_healthy
+    ports:
+      - 9015:9015
+    volumes:
+      - /opt/csar:/opt/csar
+      - ${PWD}/k8sconfig.json:/opt/multicloud/k8splugin/k8sconfig.json:ro
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:9015/v1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
 volumes:
   etcd_data:

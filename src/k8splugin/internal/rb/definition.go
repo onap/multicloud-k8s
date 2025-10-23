@@ -181,7 +181,10 @@ func (v *DefinitionClient) List(name string) ([]Definition, error) {
 			//Select only the definitions that match name provided
 			//If name is empty, return all
 			if def.RBName == name || name == "" {
+				log.Printf("Found definition: %s", def.RBName)
 				results = append(results, def)
+			} else {
+				log.Printf("Definition: %s != %s", def.RBName, name)
 			}
 
 		}

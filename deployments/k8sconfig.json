@@ -1,0 +1,9 @@
+{
+    "database-address": "mongo-service",
+    "database-ip": "mongo-service",
+    "etcd-ip": "etcd-service",
+    "database-type": "mongo",
+    "plugin-dir": "plugins",
+    "service-port": "9015"
+
+}

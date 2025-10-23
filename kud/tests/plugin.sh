@@ -86,6 +86,7 @@ print_msg "Upload Resource Bundle Definition Content"
 call_api --data-binary "@${CSAR_DIR}/${csar_id}/vault-consul-dev-0.0.0.tgz" "${base_url}/rb/definition/$rb_name/$rb_version/content"
 
 print_msg "Listing Resource Bundle Definitions"
+sleep 2
 rb_list=$(call_api "${base_url}/rb/definition/$rb_name")
 if [[ "$rb_list" != *"${rb_name}"* ]]; then
     echo $rb_list

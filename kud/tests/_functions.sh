@@ -91,7 +91,7 @@ function call_api {
         return 2
     else
         echo "[INFO] Server replied with status: ${status}" >&2
-        cat "${curl_response_file}"
+        cat "${curl_response_file}" >&2
         rm "${curl_response_file}"
         if [[ "${status:0:1}" =~ [45] ]]; then
             return 1

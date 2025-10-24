@@ -1,7 +1,8 @@
 module github.com/onap/multicloud-k8s/src/dcm
 
 require (
-	github.com/Sirupsen/logrus v0.0.0-00010101000000-000000000000 // indirect
+	github.com/Masterminds/semver v1.5.0 // indirect
+	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-20250926072925-94c66cbc97eb

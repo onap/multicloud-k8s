@@ -3,7 +3,6 @@ module github.com/onap/multicloud-k8s/src/orchestrator
 require (
 	github.com/Sirupsen/logrus v0.0.0-00010101000000-000000000000 // indirect
 	github.com/coreos/etcd v3.3.17+incompatible
-	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.1
 	github.com/gorilla/handlers v1.3.0

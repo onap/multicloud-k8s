@@ -1,0 +1,9 @@
+Code-Review+2: Byung-Woo Jun <byung-woo.jun@est.tech>
+Verified+1: ONAP Required GHA <releng+onap.required.gha@linuxfoundation.org>
+Verified+1: ONAP Bypass GHA <releng+onap.bypass.gha@linuxfoundation.org>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Submitted-by: Byung-Woo Jun <byung-woo.jun@est.tech>
+Submitted-at: Tue, 11 Nov 2025 17:28:27 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/141747
+Project: multicloud/k8s
+Branch: refs/heads/master

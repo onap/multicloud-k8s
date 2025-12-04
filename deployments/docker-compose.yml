@@ -28,11 +28,11 @@ services:
     restart: always
   etcd-service:
     container_name: etcd-service
-    image: nexus3.onap.org:10001/bitnami/etcd:3
+    image: quay.io/coreos/etcd:v3.6.6
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
     volumes:
-      - etcd_data:/bitnami/etcd
+      - etcd_data:/data.etcd
     network_mode: host
     # ports:
     #   - 2379:2379

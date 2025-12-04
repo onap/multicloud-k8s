@@ -41,14 +41,14 @@ services:
     ports:
       - 27017:27017
   etcd:
-    image: bitnami/etcd:3
+    image: quay.io/coreos/etcd:v3.6.6
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
       - NO_PROXY=${NO_PROXY}
     volumes:
-      - etcd_data:/bitnami/etcd
+      - etcd_data:/data.etcd
     ports:
       - 2379:2379
       - 2380:2380

@@ -186,6 +186,10 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
+		if err.Error() == "Get Instance: Error finding master table: mongo: no documents in result" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		log.Error("Error getting Instance", log.Fields{
 			"error": err,
 			"id":    id,

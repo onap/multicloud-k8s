@@ -13,7 +13,7 @@ set -o pipefail
 
 k8s_path="$(git rev-parse --show-toplevel)"
 
-VERSION="0.10.3-SNAPSHOT"
+VERSION="0.11.0-SNAPSHOT"
 GO_VERSION="1.14"
 export IMAGE_NAME="nexus3.onap.org:10003/onap/multicloud/k8s"
 

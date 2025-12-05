@@ -7,12 +7,11 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
-	github.com/onap/multicloud-k8s/src/clm v0.0.0-20200630152613-7c20f73e7c5d
-	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20200818155723-a5ffa8aadf49
-	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20200630152613-7c20f73e7c5d
+	github.com/onap/multicloud-k8s/src/clm v0.0.0-20251205073433-cd019185faf1
+	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20251205073433-cd019185faf1
+	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20251205073433-cd019185faf1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.5.0
-	github.com/technosophos/moniker v0.0.0-20180509230615-a5dbd03a2245 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.etcd.io/etcd v3.3.12+incompatible
 	go.mongodb.org/mongo-driver v1.1.0
@@ -22,7 +21,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200506231410-2ff61e1afc86
 	k8s.io/apimachinery v0.18.2
 	k8s.io/helm v2.16.12+incompatible
-	k8s.io/kubernetes v1.16.9 // indirect
 )
 
 replace (

@@ -7,7 +7,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-FROM nexus3.onap.org:10001/golang:1.14.1
+FROM nexus3.onap.org:10001/golang:1.15
 
 WORKDIR /go/src/github.com/onap/multicloud-k8s
 COPY ./ ./

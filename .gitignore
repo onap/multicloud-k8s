@@ -23,6 +23,7 @@ deployments/k8plugin
 *.so
 src/k8splugin/csar/mock_plugins/*.so
 src/k8splugin/plugins/**/*.so
+src/monitor/monitor
 
 # Tests
 kud/tests/plugin_fw_v2_config.yaml

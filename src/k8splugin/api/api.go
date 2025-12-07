@@ -17,12 +17,12 @@ limitations under the License.
 package api
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/healthcheck"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
-
-	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 )
 
 // NewRouter creates a router that registers the various urls that are supported
@@ -37,6 +37,9 @@ func NewRouter(defClient rb.DefinitionManager,
 	healthcheckClient healthcheck.InstanceHCManager) *mux.Router {
 
 	router := mux.NewRouter()
+
+	// adds a opentelemetry middleware for tracing
+	router.Use(otelmux.Middleware("multicloud-k8s"))
 
 	// Setup Instance handler routes
 	if instClient == nil {

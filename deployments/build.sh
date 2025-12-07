@@ -57,12 +57,18 @@ function _build_docker {
 }
 
 function _push_image {
+    local timestamp=$(date -u +%Y%m%dT%H%M%SZ)
     local tag_name=${IMAGE_NAME}:${1:-latest}
+    local tag_name_with_timestamp=${tag_name}-${timestamp}
 
-    echo "Start push {$tag_name}"
-    docker push ${IMAGE_NAME}:latest
+    echo "Pushing ${tag_name}"
     docker tag ${IMAGE_NAME}:latest ${tag_name}
     docker push ${tag_name}
+
+    docker tag ${IMAGE_NAME}:latest ${tag_name_with_timestamp}
+
+    echo "Pushing ${tag_name_with_timestamp}"
+    docker push ${tag_name_with_timestamp}
 }
 
 if [[ -n "${JENKINS_HOME+x}" ]]; then

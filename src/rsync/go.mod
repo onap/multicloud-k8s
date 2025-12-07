@@ -1,6 +1,6 @@
 module github.com/onap/multicloud-k8s/src/rsync
 
-go 1.15
+go 1.16
 
 require (
 	github.com/ghodss/yaml v1.0.0

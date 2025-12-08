@@ -17,6 +17,8 @@ limitations under the License.
 package api
 
 import (
+	"os"
+
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
@@ -39,7 +41,9 @@ func NewRouter(defClient rb.DefinitionManager,
 	router := mux.NewRouter()
 
 	// adds a opentelemetry middleware for tracing
-	router.Use(otelmux.Middleware("multicloud-k8s"))
+	if os.Getenv("TRACING_ENABLED") == "true" {
+		router.Use(otelmux.Middleware("multicloud-k8s"))
+	}
 
 	// Setup Instance handler routes
 	if instClient == nil {

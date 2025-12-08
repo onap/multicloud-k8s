@@ -26,6 +26,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/api"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/auth"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/tracing"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 
 	"github.com/gorilla/handlers"
@@ -39,6 +40,13 @@ func main() {
 	}
 
 	rand.Seed(time.Now().UnixNano())
+
+	i := tracing.NewInstrumentation()
+	defer func() {
+		if err := i.TracerProvider.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
 
 	httpRouter := api.NewRouter(nil, nil, nil, nil, nil, nil, nil, nil, nil)
 	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)

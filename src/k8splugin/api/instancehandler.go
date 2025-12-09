@@ -211,7 +211,7 @@ func (i instanceHandler) statusHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["instID"]
 
-	resp, err := i.client.Status(id, true)
+	resp, err := i.client.Status(r.Context(), id, true)
 	if err != nil {
 		log.Error("Error getting Status", log.Fields{
 			"error": err,
@@ -314,7 +314,7 @@ func (i instanceHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["instID"]
 
-	err := i.client.Delete(id)
+	err := i.client.Delete(r.Context(), id)
 	if err != nil {
 		log.Error("Error Deleting Instance", log.Fields{
 			"error": err,

@@ -652,7 +652,7 @@ func runNotifyThread(instanceId, subName string) {
 			} else {
 				timeInSeconds = 5
 			}
-			newStatus, err := v.Status(instanceId, false)
+			newStatus, err := v.Status(context.Background(), instanceId, false)
 			if err != nil {
 				log.Error("Error getting current status", log.Fields{
 					"error":    err.Error(),

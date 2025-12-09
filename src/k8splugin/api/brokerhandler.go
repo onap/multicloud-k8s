@@ -276,7 +276,7 @@ func (b brokerInstanceHandler) deleteHandler(w http.ResponseWriter, r *http.Requ
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
 
-	err := b.client.Delete(instanceID)
+	err := b.client.Delete(r.Context(), instanceID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

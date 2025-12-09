@@ -15,6 +15,7 @@ limitations under the License.
 package app
 
 import (
+	"context"
 	"encoding/base64"
 	"io/ioutil"
 	"log"
@@ -747,7 +748,7 @@ func TestInstanceDelete(t *testing.T) {
 
 		ic := NewInstanceClient()
 		id := "HaKpys8e"
-		err := ic.Delete(id)
+		err := ic.Delete(context.TODO(), id)
 		if err != nil {
 			t.Fatalf("TestInstanceDelete returned an error (%s)", err)
 		}
@@ -790,14 +791,14 @@ func TestInstanceDelete(t *testing.T) {
 
 		ic := NewInstanceClient()
 		id := "non-existing"
-		err := ic.Delete(id)
+		err := ic.Delete(context.TODO(), id)
 		if err == nil {
 			t.Fatal("Expected error, got pass", err)
 		}
 	})
 }
 
-//TODO: add a test when pre-hook is failed (if possible)
+// TODO: add a test when pre-hook is failed (if possible)
 func TestInstanceWithHookCreate(t *testing.T) {
 	err := LoadMockPlugins(utils.LoadedPlugins)
 	if err != nil {

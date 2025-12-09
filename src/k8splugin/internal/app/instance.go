@@ -121,11 +121,11 @@ type InstanceManager interface {
 	Upgrade(id string, u UpgradeRequest) (InstanceResponse, error)
 	Get(id string) (InstanceResponse, error)
 	GetFull(id string) (InstanceDbData, error)
-	Status(id string, checkReady bool) (InstanceStatus, error)
+	Status(ctx context.Context, id string, checkReady bool) (InstanceStatus, error)
 	Query(id, apiVersion, kind, name, labels string) (InstanceStatus, error)
 	List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error)
 	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error)
-	Delete(id string) error
+	Delete(ctx context.Context, id string) error
 	RecoverCreateOrDelete(id string) error
 }
 
@@ -491,7 +491,7 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 	if currentInstance.Request.CloudRegion != u.CloudRegion {
 		newInstance, err := v.Create(i, "")
 		if err == nil {
-			err = v.Delete(id)
+			err = v.Delete(context.TODO(), id)
 			if err == nil {
 				newInstanceDb, err := v.GetFull(newInstance.ID)
 				oldKey := InstanceKey{
@@ -510,7 +510,7 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 				}
 				return newInstance, nil
 			} else {
-				err2 := v.Delete(newInstance.ID)
+				err2 := v.Delete(context.TODO(), newInstance.ID)
 				if err2 != nil {
 					log.Printf("Delete of the instance from the new region failed with error %s", err2.Error())
 				}
@@ -813,13 +813,13 @@ func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (Insta
 }
 
 // Status returns the status for the instance
-func (v *InstanceClient) Status(id string, checkReady bool) (InstanceStatus, error) {
+func (v *InstanceClient) Status(ctx context.Context, id string, checkReady bool) (InstanceStatus, error) {
 	//Read the status from the DB
 	key := InstanceKey{
 		ID: id,
 	}
 
-	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagInst)
+	value, err := db.DBconn.Read(ctx, v.storeName, key, v.tagInst)
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Get Instance")
 	}
@@ -1071,7 +1071,7 @@ func (v *InstanceClient) Find(rbName string, version string, profile string, lab
 }
 
 // Delete the Instance from database
-func (v *InstanceClient) Delete(id string) error {
+func (v *InstanceClient) Delete(ctx context.Context, id string) error {
 	inst, err := v.GetFull(id)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error getting Instance")
@@ -1081,7 +1081,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 	if inst.Status == "DELETED" {
 		//The instance is deleted when the plugin comes back -> just remove from Db
-		err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
+		err = db.DBconn.Delete(ctx, v.storeName, key, v.tagInst)
 		if err != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", inst.ReleaseName)
 		}
@@ -1100,7 +1100,7 @@ func (v *InstanceClient) Delete(id string) error {
 
 	inst.Status = "PRE-DELETE"
 	inst.HookProgress = ""
-	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, inst)
+	err = db.DBconn.Update(ctx, v.storeName, key, v.tagInst, inst)
 	if err != nil {
 		log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 	}
@@ -1111,7 +1111,7 @@ func (v *InstanceClient) Delete(id string) error {
 		if err != nil {
 			log.Printf("  Instance: %s, Error running pre-delete hooks error: %s", id, err)
 			inst.Status = "PRE-DELETE-FAILED"
-			err2 := db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, inst)
+			err2 := db.DBconn.Update(ctx, v.storeName, key, v.tagInst, inst)
 			if err2 != nil {
 				log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 			}
@@ -1120,7 +1120,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 
 	inst.Status = "DELETING"
-	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, inst)
+	err = db.DBconn.Update(ctx, v.storeName, key, v.tagInst, inst)
 	if err != nil {
 		log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 	}
@@ -1149,7 +1149,7 @@ func (v *InstanceClient) Delete(id string) error {
 			log.Printf(err.Error())
 		}
 
-		err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
+		err = db.DBconn.Delete(ctx, v.storeName, key, v.tagInst)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Delete Instance")
 		}
@@ -1158,7 +1158,7 @@ func (v *InstanceClient) Delete(id string) error {
 	return nil
 }
 
-//Continue the instantiation
+// Continue the instantiation
 func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 	instance, err := v.GetFull(id)
 	if err != nil {

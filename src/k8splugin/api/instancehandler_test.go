@@ -15,6 +15,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -35,9 +36,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-//Creating an embedded interface via anonymous variable
-//This allows us to make mockDB satisfy the DatabaseConnection
-//interface even if we are not implementing all the methods in it
+// Creating an embedded interface via anonymous variable
+// This allows us to make mockDB satisfy the DatabaseConnection
+// interface even if we are not implementing all the methods in it
 type mockInstanceClient struct {
 	app.InstanceManager
 	// Items and err will be used to customize each test
@@ -72,7 +73,7 @@ func (m *mockInstanceClient) Query(id, apiVersion, kind, name, labels string) (a
 	return m.statusItem, nil
 }
 
-func (m *mockInstanceClient) Status(id string, checkReady bool) (app.InstanceStatus, error) {
+func (m *mockInstanceClient) Status(ctx context.Context, id string, checkReady bool) (app.InstanceStatus, error) {
 	if m.err != nil {
 		return app.InstanceStatus{}, m.err
 	}
@@ -96,7 +97,7 @@ func (m *mockInstanceClient) Find(rbName string, ver string, profile string, lab
 	return m.miniitems, nil
 }
 
-func (m *mockInstanceClient) Delete(id string) error {
+func (m *mockInstanceClient) Delete(ctx context.Context, id string) error {
 	return m.err
 }
 

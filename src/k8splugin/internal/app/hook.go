@@ -25,9 +25,6 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-// Timeout used when deleting resources with a hook-delete-policy.
-const defaultHookDeleteTimeoutInSeconds = int64(60)
-
 // HookClient implements the Helm Hook interface
 type HookClient struct {
 	kubeNameSpace string
@@ -90,7 +87,7 @@ func (hc *HookClient) ExecHook(
 			continue
 		}
 		// Set default delete policy to before-hook-creation
-		if h.Hook.DeletePolicies == nil || len(h.Hook.DeletePolicies) == 0 {
+		if len(h.Hook.DeletePolicies) == 0 {
 			h.Hook.DeletePolicies = []release.HookDeletePolicy{release.HookBeforeHookCreation}
 		}
 		if err := hc.deleteHookByPolicy(h, release.HookBeforeHookCreation, k8sClient); err != nil {

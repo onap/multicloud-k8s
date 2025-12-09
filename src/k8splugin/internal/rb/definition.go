@@ -333,7 +333,7 @@ func (v *DefinitionClient) Download(ctx context.Context, name string, version st
 			return nil, pkgerrors.Wrap(err, "Decode base64 string")
 		}
 
-		if out != nil && len(out) != 0 {
+		if len(out) != 0 {
 			return out, nil
 		}
 	}

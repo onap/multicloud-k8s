@@ -35,7 +35,7 @@ type Config struct {
 	ConfigTag     string                 `json:"config-tag"`
 }
 
-//ConfigResult output for Create, Update and delete
+// ConfigResult output for Create, Update and delete
 type ConfigResult struct {
 	InstanceName      string `json:"instance-id"`
 	DefinitionName    string `json:"rb-name"`
@@ -46,7 +46,7 @@ type ConfigResult struct {
 	ConfigVersion     uint   `json:"config-version"`
 }
 
-//ConfigRollback input
+// ConfigRollback input
 type ConfigRollback struct {
 	AnyOf struct {
 		ConfigVersion string `json:"config-version,omitempty"`
@@ -54,13 +54,13 @@ type ConfigRollback struct {
 	} `json:"anyOf"`
 }
 
-//ConfigRollback input
+// ConfigRollback input
 type ConfigTag struct {
 	ConfigVersion uint   `json:"config-version"`
 	ConfigTag     string `json:"config-tag"`
 }
 
-//ConfigTagit for Tagging configurations
+// ConfigTagit for Tagging configurations
 type ConfigTagit struct {
 	TagName string `json:"tag-name"`
 }
@@ -125,7 +125,7 @@ func (v *ConfigClient) Create(instanceID string, p Config) (ConfigResult, error)
 	if err == nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Error - Config exists")
 	} else {
-		if strings.Contains(err.Error(), "Key doesn't exist") == false {
+		if !strings.Contains(err.Error(), "Key doesn't exist") {
 			return ConfigResult{}, pkgerrors.Wrap(err, "Create Error")
 		}
 	}
@@ -276,7 +276,7 @@ func (v *ConfigClient) GetVersion(instanceID, configName, version string) (Confi
 		instanceID: instanceID,
 		configName: configName,
 	}
-	cfg, err := cs.getConfig()
+	cfg, _ := cs.getConfig()
 
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,

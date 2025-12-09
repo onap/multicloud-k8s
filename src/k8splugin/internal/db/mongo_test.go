@@ -332,7 +332,7 @@ func TestRead(t *testing.T) {
 					t.Fatalf("Read method returned an error (%s)", err)
 				}
 			} else {
-				if bytes.Compare(got, testCase.expected) != 0 {
+				if !bytes.Equal(got, testCase.expected) {
 					t.Fatalf("Read returned unexpected data: %v, expected: %v",
 						string(got), testCase.expected)
 				}
@@ -496,7 +496,7 @@ func TestReadAll(t *testing.T) {
 				mCursorCount: 1,
 			},
 			expected: map[string][]byte{
-				`{"name": "testdef","version": "v1"}`: []byte{
+				`{"name": "testdef","version": "v1"}`: {
 					92, 17, 81, 86, 119, 127, 248, 86, 84, 36, 138, 225},
 			},
 		},
@@ -558,15 +558,15 @@ func TestReadAll(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			m, _ := NewMongoStore("name", &mongo.Database{})
 			// Override the getCollection function with our mocked version
-			getCollection = func(coll string, m *MongoStore) MongoCollection {
+			getCollection = func(_ string, _ *MongoStore) MongoCollection {
 				return testCase.mockColl
 			}
 
-			decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
+			decodeBytes = func(_ *mongo.SingleResult) (bson.Raw, error) {
 				return testCase.mockColl.mCursor.Current, testCase.mockColl.Err
 			}
 
-			cursorNext = func(ctx context.Context, cursor *mongo.Cursor) bool {
+			cursorNext = func(_ context.Context, _ *mongo.Cursor) bool {
 				if testCase.mockColl.mCursorCount > 0 {
 					testCase.mockColl.mCursorCount -= 1
 					return true
@@ -574,7 +574,7 @@ func TestReadAll(t *testing.T) {
 				return false
 			}
 
-			cursorClose = func(ctx context.Context, cursor *mongo.Cursor) error {
+			cursorClose = func(_ context.Context, _ *mongo.Cursor) error {
 				return nil
 			}
 

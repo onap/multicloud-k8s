@@ -335,7 +335,7 @@ func (v *InstanceClient) Create(i InstanceRequest, newId string) (InstanceRespon
 	key := InstanceKey{
 		ID: finalId,
 	}
-	err = db.DBconn.Create(v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagInst, dbData)
 	if err != nil {
 		namegenerator.Release(generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Instance DB Entry")
@@ -355,7 +355,7 @@ func (v *InstanceClient) Create(i InstanceRequest, newId string) (InstanceRespon
 		err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall, hookTimeoutInfo.preInstallTimeOut, 0, &dbData)
 		if err != nil {
 			log.Printf("Error running preinstall hooks for release %s, Error: %s. Stop here", releaseName, err)
-			err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
+			err2 := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
 			if err2 != nil {
 				log.Printf("Error cleaning failed instance in DB, please check DB.")
 			} else {
@@ -366,9 +366,9 @@ func (v *InstanceClient) Create(i InstanceRequest, newId string) (InstanceRespon
 	}
 
 	dbData.Status = "CREATING"
-	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 	if err != nil {
-		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
+		err2 := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
 		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
 		} else {
@@ -386,7 +386,7 @@ func (v *InstanceClient) Create(i InstanceRequest, newId string) (InstanceRespon
 		}
 		log.Printf("  Instance: %s, Main rss are failed, skip post-install and remove instance in DB", finalId)
 		//main rss creation failed -> remove instance in DB
-		err2 := db.DBconn.Delete(v.storeName, key, v.tagInst)
+		err2 := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
 		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
 		} else {
@@ -397,7 +397,7 @@ func (v *InstanceClient) Create(i InstanceRequest, newId string) (InstanceRespon
 
 	dbData.Status = "CREATED"
 	dbData.Resources = createdResources
-	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
@@ -423,14 +423,14 @@ func (v *InstanceClient) Create(i InstanceRequest, newId string) (InstanceRespon
 			} else {
 				dbData.Status = "DONE"
 			}
-			err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+			err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 			if err != nil {
 				log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
 			}
 		}()
 	} else {
 		dbData.Status = "DONE"
-		err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+		err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 		if err != nil {
 			log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
 		}
@@ -458,7 +458,7 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 	key := InstanceKey{
 		ID: id,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagInst)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Upgrade Instance")
 	}
@@ -497,14 +497,14 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 				oldKey := InstanceKey{
 					ID: newInstance.ID,
 				}
-				err2 := db.DBconn.Delete(v.storeName, oldKey, v.tagInst)
+				err2 := db.DBconn.Delete(context.TODO(), v.storeName, oldKey, v.tagInst)
 				if err2 != nil {
 					log.Printf("Delete of the temporal instance from the DB has failed %s", err2.Error())
 				}
 				namegenerator.Release(newInstance.ID)
 				newInstanceDb.ID = id
 				newInstance.ID = id
-				err = db.DBconn.Create(v.storeName, key, v.tagInst, newInstanceDb)
+				err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagInst, newInstanceDb)
 				if err != nil {
 					return newInstance, pkgerrors.Wrap(err, "Create Instance DB Entry after update failed")
 				}
@@ -584,7 +584,7 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
-	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Updating Instance DB Entry")
 	}
@@ -608,7 +608,7 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 	}
 
 	dbData.Status = "UPGRADING"
-	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
@@ -659,7 +659,7 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 
 	dbData.Status = "UPGRADED"
 	dbData.Resources = upgradedResources
-	err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
@@ -685,14 +685,14 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 			} else {
 				dbData.Status = "DONE"
 			}
-			err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+			err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 			if err != nil {
 				log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
 			}
 		}()
 	} else {
 		dbData.Status = "DONE"
-		err = db.DBconn.Update(v.storeName, key, v.tagInst, dbData)
+		err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
 		if err != nil {
 			log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
 		}
@@ -706,7 +706,7 @@ func (v *InstanceClient) GetFull(id string) (InstanceDbData, error) {
 	key := InstanceKey{
 		ID: id,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagInst)
 	if err != nil {
 		return InstanceDbData{}, pkgerrors.Wrap(err, "Get Instance")
 	}
@@ -752,7 +752,7 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 	key := InstanceKey{
 		ID: id,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagInst)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Get Instance")
 	}
@@ -778,7 +778,7 @@ func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (Insta
 	key := InstanceKey{
 		ID: id,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagInst)
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Get Instance")
 	}
@@ -819,7 +819,7 @@ func (v *InstanceClient) Status(id string, checkReady bool) (InstanceStatus, err
 		ID: id,
 	}
 
-	value, err := db.DBconn.Read(v.storeName, key, v.tagInst)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagInst)
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Get Instance")
 	}
@@ -985,7 +985,7 @@ func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient K
 // Empty string returns all
 func (v *InstanceClient) List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error) {
 
-	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagInst)
+	dbres, err := db.DBconn.ReadAll(context.TODO(), v.storeName, v.tagInst)
 	if err != nil || len(dbres) == 0 {
 		return []InstanceMiniResponse{}, pkgerrors.Wrap(err, "Listing Instances")
 	}
@@ -1081,7 +1081,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 	if inst.Status == "DELETED" {
 		//The instance is deleted when the plugin comes back -> just remove from Db
-		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
+		err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
 		if err != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", inst.ReleaseName)
 		}
@@ -1100,7 +1100,7 @@ func (v *InstanceClient) Delete(id string) error {
 
 	inst.Status = "PRE-DELETE"
 	inst.HookProgress = ""
-	err = db.DBconn.Update(v.storeName, key, v.tagInst, inst)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, inst)
 	if err != nil {
 		log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 	}
@@ -1111,7 +1111,7 @@ func (v *InstanceClient) Delete(id string) error {
 		if err != nil {
 			log.Printf("  Instance: %s, Error running pre-delete hooks error: %s", id, err)
 			inst.Status = "PRE-DELETE-FAILED"
-			err2 := db.DBconn.Update(v.storeName, key, v.tagInst, inst)
+			err2 := db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, inst)
 			if err2 != nil {
 				log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 			}
@@ -1120,7 +1120,7 @@ func (v *InstanceClient) Delete(id string) error {
 	}
 
 	inst.Status = "DELETING"
-	err = db.DBconn.Update(v.storeName, key, v.tagInst, inst)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, inst)
 	if err != nil {
 		log.Printf("Update Instance DB Entry for release %s has error.", inst.ReleaseName)
 	}
@@ -1149,7 +1149,7 @@ func (v *InstanceClient) Delete(id string) error {
 			log.Printf(err.Error())
 		}
 
-		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
+		err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Delete Instance")
 		}
@@ -1178,7 +1178,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 	log.Printf("  Resolving template for release %s", instance.Request.ReleaseName)
 	_, _, hookList, _, err := rb.NewProfileClient().Resolve(instance.Request.RBName, instance.Request.RBVersion, instance.Request.ProfileName, overrideValues, instance.Request.ReleaseName)
 	instance.Hooks = hookList
-	err = db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, instance)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
@@ -1225,7 +1225,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 			} else {
 				instance.Status = "DONE"
 			}
-			err = db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+			err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, instance)
 			if err != nil {
 				log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
 			}
@@ -1238,7 +1238,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
 			if err != nil {
 				log.Printf("  Instance: %s, Error running pre-delete hooks error: %s", id, err)
 				instance.Status = "PRE-DELETE-FAILED"
-				err = db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+				err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, instance)
 				if err != nil {
 					log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
 				}
@@ -1277,7 +1277,7 @@ func (v *InstanceClient) runPostDelete(k8sClient KubernetesClient, hookClient *H
 		ID: instance.ID,
 	}
 	instance.Status = "POST-DELETE"
-	err := db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+	err := db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, instance)
 	if err != nil {
 		log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
 	}
@@ -1286,7 +1286,7 @@ func (v *InstanceClient) runPostDelete(k8sClient KubernetesClient, hookClient *H
 		//If this case happen, user should clean the cluster
 		log.Printf("  Instance: %s, Error running post-delete hooks error: %s", instance.ID, err)
 		instance.Status = "POST-DELETE-FAILED"
-		err2 := db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+		err2 := db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, instance)
 		if err2 != nil {
 			log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
 			return pkgerrors.Wrap(err2, "Delete Instance DB Entry")
@@ -1299,14 +1299,14 @@ func (v *InstanceClient) runPostDelete(k8sClient KubernetesClient, hookClient *H
 		if err != nil {
 			log.Printf(err.Error())
 		}
-		err = db.DBconn.Delete(v.storeName, key, v.tagInst)
+		err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
 		if err != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", instance.ReleaseName)
 			return pkgerrors.Wrap(err, "Delete Instance DB Entry")
 		}
 	} else {
 		instance.Status = "DELETED"
-		err := db.DBconn.Update(v.storeName, key, v.tagInst, instance)
+		err := db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, instance)
 		if err != nil {
 			log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
 			return pkgerrors.Wrap(err, "Update Instance DB Entry")

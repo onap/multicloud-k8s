@@ -17,6 +17,7 @@
 package connection
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
@@ -92,7 +93,7 @@ func (v *ConnectionClient) Create(c Connection) (Connection, error) {
 		return Connection{}, pkgerrors.New("Connection already exists")
 	}
 
-	err = db.DBconn.Create(v.storeName, key, v.tagMeta, c)
+	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, c)
 	if err != nil {
 		return Connection{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -105,7 +106,7 @@ func (v *ConnectionClient) Get(name string) (Connection, error) {
 
 	//Construct the composite key to select the entry
 	key := ConnectionKey{CloudRegion: name}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Connection{}, pkgerrors.Wrap(err, "Get Connection")
 	}
@@ -126,18 +127,19 @@ func (v *ConnectionClient) Get(name string) (Connection, error) {
 // GetConnectivityRecordByName returns Connection for corresponding to name
 // JSON example:
 // "connectivity-records" :
-// 	[
-// 		{
-// 			“connectivity-record-name” : “<name>”,   // example: OVN
-// 			“FQDN-or-ip” : “<fqdn>”,
-// 			“ca-cert-to-verify-server” : “<contents of CA certificate to validate the OVN server>”,
-// 			“ssl-initiator” : “<true/false”>,
-// 			“user-name”:  “<user name>”,   //valid if ssl-initator is false
-// 			“password” : “<password>”,      // valid if ssl-initiator is false
-// 			“private-key” :  “<contents of private key in PEM>”, // valid if ssl-initiator is true
-// 			“cert-to-present” :  “<contents of certificate to present to server>” , //valid if ssl-initiator is true
-// 		},
-// 	]
+//
+//	[
+//		{
+//			“connectivity-record-name” : “<name>”,   // example: OVN
+//			“FQDN-or-ip” : “<fqdn>”,
+//			“ca-cert-to-verify-server” : “<contents of CA certificate to validate the OVN server>”,
+//			“ssl-initiator” : “<true/false”>,
+//			“user-name”:  “<user name>”,   //valid if ssl-initator is false
+//			“password” : “<password>”,      // valid if ssl-initiator is false
+//			“private-key” :  “<contents of private key in PEM>”, // valid if ssl-initiator is true
+//			“cert-to-present” :  “<contents of certificate to present to server>” , //valid if ssl-initiator is true
+//		},
+//	]
 func (v *ConnectionClient) GetConnectivityRecordByName(connectionName string,
 	connectivityRecordName string) (map[string]string, error) {
 
@@ -160,7 +162,7 @@ func (v *ConnectionClient) Delete(name string) error {
 
 	//Construct the composite key to select the entry
 	key := ConnectionKey{CloudRegion: name}
-	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
+	err := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Connection")
 	}

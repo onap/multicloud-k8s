@@ -18,6 +18,7 @@ package rb
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
@@ -98,7 +99,7 @@ func (v *DefinitionClient) Create(def Definition) (Definition, error) {
 		return Definition{}, pkgerrors.New("Definition already exists")
 	}
 
-	err = db.DBconn.Create(v.storeName, key, v.tagMeta, def)
+	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, def)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -152,7 +153,7 @@ func (v *DefinitionClient) Update(def Definition) (Definition, error) {
 		return Definition{}, pkgerrors.New("Definition does not exists")
 	}
 
-	err = db.DBconn.Update(v.storeName, key, v.tagMeta, def)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagMeta, def)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Updating DB Entry")
 	}
@@ -162,7 +163,7 @@ func (v *DefinitionClient) Update(def Definition) (Definition, error) {
 
 // List all resource entry's versions in the database
 func (v *DefinitionClient) List(name string) ([]Definition, error) {
-	res, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
+	res, err := db.DBconn.ReadAll(context.TODO(), v.storeName, v.tagMeta)
 	if err != nil || len(res) == 0 {
 		return []Definition{}, pkgerrors.Wrap(err, "Listing Resource Bundle Definitions")
 	}
@@ -195,7 +196,7 @@ func (v *DefinitionClient) Get(name string, version string) (Definition, error) 
 
 	//Construct the composite key to select the entry
 	key := DefinitionKey{RBName: name, RBVersion: version}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Definition{}, pkgerrors.Wrap(err, "Get Resource Bundle definition")
 	}
@@ -218,13 +219,13 @@ func (v *DefinitionClient) Delete(name string, version string) error {
 
 	//Construct the composite key to select the entry
 	key := DefinitionKey{RBName: name, RBVersion: version}
-	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
+	err := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition")
 	}
 
 	//Delete the content when the delete operation happens
-	err = db.DBconn.Delete(v.storeName, key, v.tagContent)
+	err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagContent)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Definition Content")
 	}
@@ -290,7 +291,7 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 		}
 
 		//TODO: Use db update api once db supports it.
-		err = db.DBconn.Create(v.storeName, key, v.tagMeta, def)
+		err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, def)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Storing updated chart metadata")
 		}
@@ -298,7 +299,7 @@ func (v *DefinitionClient) Upload(name string, version string, inp []byte) error
 
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
+	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db: %s", err.Error())
 	}
@@ -320,7 +321,7 @@ func (v *DefinitionClient) Download(name string, version string) ([]byte, error)
 
 	//Construct the composite key to select the entry
 	key := DefinitionKey{RBName: name, RBVersion: version}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle definition content")
 	}

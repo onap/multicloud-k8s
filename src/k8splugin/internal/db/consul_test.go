@@ -14,6 +14,7 @@ limitations under the License.
 package db
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
@@ -124,7 +125,7 @@ func TestConsulCreate(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			err := client.Create(testCase.input["root"], testCase.key,
+			err := client.Create(context.TODO(), testCase.input["root"], testCase.key,
 				testCase.input["tag"], testCase.input["value"])
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -181,7 +182,7 @@ func TestConsulRead(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			result, err := client.Read(testCase.input["root"], testCase.key,
+			result, err := client.Read(context.TODO(), testCase.input["root"], testCase.key,
 				testCase.input["tag"])
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -230,7 +231,7 @@ func TestConsulDelete(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			err := client.Delete(testCase.input["root"], testCase.key,
+			err := client.Delete(context.TODO(), testCase.input["root"], testCase.key,
 				testCase.input["tag"])
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -292,7 +293,7 @@ func TestConsulReadAll(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
 			client, _ := NewConsulStore(testCase.mock)
-			result, err := client.ReadAll(testCase.input["root"],
+			result, err := client.ReadAll(context.TODO(), testCase.input["root"],
 				testCase.input["tag"])
 			if err != nil {
 				if testCase.expectedError == "" {

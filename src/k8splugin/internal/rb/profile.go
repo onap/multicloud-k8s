@@ -19,6 +19,7 @@ package rb
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"log"
@@ -123,12 +124,12 @@ func (v *ProfileClient) CreateOrUpdate(p Profile, update bool) (Profile, error) 
 	}
 
 	if update {
-		err = db.DBconn.Update(v.storeName, key, v.tagMeta, p)
+		err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return Profile{}, pkgerrors.Wrap(err, "Updating Profile DB Entry")
 		}
 	} else {
-		err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
+		err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return Profile{}, pkgerrors.Wrap(err, "Creating Profile DB Entry")
 		}
@@ -144,7 +145,7 @@ func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
 		RBVersion:   rbVersion,
 		ProfileName: prName,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Profile{}, pkgerrors.Wrap(err, "Get Resource Bundle Profile")
 	}
@@ -166,7 +167,7 @@ func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
 func (v *ProfileClient) List(rbName, rbVersion string) ([]Profile, error) {
 
 	//Get all profiles
-	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
+	dbres, err := db.DBconn.ReadAll(context.TODO(), v.storeName, v.tagMeta)
 	if err != nil || len(dbres) == 0 {
 		return []Profile{}, pkgerrors.Wrap(err, "No Profiles Found")
 	}
@@ -201,12 +202,12 @@ func (v *ProfileClient) Delete(rbName, rbVersion, prName string) error {
 		RBVersion:   rbVersion,
 		ProfileName: prName,
 	}
-	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
+	err := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile")
 	}
 
-	err = db.DBconn.Delete(v.storeName, key, v.tagContent)
+	err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagContent)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile Content")
 	}
@@ -235,7 +236,7 @@ func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) err
 	}
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
+	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
 	}
@@ -260,7 +261,7 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 		RBVersion:   rbVersion,
 		ProfileName: prName,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle Profile content")
 	}
@@ -279,7 +280,7 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 	return nil, pkgerrors.New("Error downloading Profile content")
 }
 
-//GetYamlClient GEt Yaml Files client for profile
+// GetYamlClient GEt Yaml Files client for profile
 func (v *ProfileClient) GetYamlClient(rbName string, rbVersion string, profileName string) (ProfileYamlClient, error) {
 	prData, err := v.Download(rbName, rbVersion, profileName)
 	if err != nil {
@@ -298,8 +299,8 @@ func (v *ProfileClient) GetYamlClient(rbName string, rbVersion string, profileNa
 	return prYamlClient, nil
 }
 
-//Resolve returns the path where the helm chart merged with
-//configuration overrides resides and final ReleaseName picked for instantiation
+// Resolve returns the path where the helm chart merged with
+// configuration overrides resides and final ReleaseName picked for instantiation
 func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 	profileName string, values []string, overrideReleaseName string) ([]helm.KubernetesResourceTemplate, []helm.KubernetesResourceTemplate, []*helm.Hook, string, error) {
 

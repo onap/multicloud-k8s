@@ -19,12 +19,13 @@ package rb
 import (
 	"archive/tar"
 	"compress/gzip"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
-	pkgerrors "github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
+	pkgerrors "github.com/pkg/errors"
 )
 
 func isTarGz(r io.Reader) error {
@@ -39,7 +40,7 @@ func isTarGz(r io.Reader) error {
 	tarR := tar.NewReader(gzf)
 	first := true
 
-	for true {
+	for {
 		header, err := tarR.Next()
 
 		if err == io.EOF {
@@ -68,9 +69,9 @@ func isTarGz(r io.Reader) error {
 	return nil
 }
 
-//ExtractTarBall provides functionality to extract a tar.gz file
-//into a temporary location for later use.
-//It returns the path to the new location
+// ExtractTarBall provides functionality to extract a tar.gz file
+// into a temporary location for later use.
+// It returns the path to the new location
 func ExtractTarBall(r io.Reader) (string, error) {
 	//Check if it is a valid gz
 	gzf, err := gzip.NewReader(r)
@@ -85,7 +86,7 @@ func ExtractTarBall(r io.Reader) (string, error) {
 
 	outDir, _ := ioutil.TempDir("", "k8s-ext-")
 
-	for true {
+	for {
 		header, err := tarR.Next()
 
 		if err == io.EOF {

@@ -103,7 +103,7 @@ func NewMongoStore(name string, store *mongo.Database) (Store, error) {
 // HealthCheck verifies if the database is up and running
 func (m *MongoStore) HealthCheck() error {
 
-	_, err := decodeBytes(m.db.RunCommand(context.Background(), bson.D{{"serverStatus", 1}}))
+	_, err := decodeBytes(m.db.RunCommand(context.Background(), bson.D{{Key: "serverStatus", Value: 1}}))
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error getting server status")
 	}
@@ -139,7 +139,7 @@ func (m *MongoStore) Create(ctx context.Context, coll string, key Key, tag strin
 
 	//Insert the data and then add the objectID to the masterTable
 	res, err := c.InsertOne(ctx, bson.D{
-		{tag, data},
+		{Key: tag, Value: data},
 	})
 	if err != nil {
 		return pkgerrors.Errorf("Error inserting into database: %s", err.Error())
@@ -147,15 +147,15 @@ func (m *MongoStore) Create(ctx context.Context, coll string, key Key, tag strin
 
 	//Add objectID of created data to masterKey document
 	//Create masterkey document if it does not exist
-	filter := bson.D{{"key", key}}
+	filter := bson.D{{Key: "key", Value: key}}
 
 	_, err = decodeBytes(
 		c.FindOneAndUpdate(
 			ctx,
 			filter,
 			bson.D{
-				{"$set", bson.D{
-					{tag, res.InsertedID},
+				{Key: "$set", Value: bson.D{
+					{Key: tag, Value: res.InsertedID},
 				}},
 			},
 			options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After)))
@@ -176,7 +176,7 @@ func (m *MongoStore) Update(ctx context.Context, coll string, key Key, tag strin
 	c := getCollection(coll, m)
 
 	//Get the masterkey document based on given key
-	filter := bson.D{{"key", key}}
+	filter := bson.D{{Key: "key", Value: key}}
 	keydata, err := decodeBytes(c.FindOne(ctx, filter))
 	if err != nil {
 		return pkgerrors.Errorf("Error finding master table: %s", err.Error())
@@ -189,15 +189,15 @@ func (m *MongoStore) Update(ctx context.Context, coll string, key Key, tag strin
 	}
 
 	//Update the document with new data
-	filter = bson.D{{"_id", tagoid}}
+	filter = bson.D{{Key: "_id", Value: tagoid}}
 
 	_, err = decodeBytes(
 		c.FindOneAndUpdate(
 			ctx,
 			filter,
 			bson.D{
-				{"$set", bson.D{
-					{tag, data},
+				{Key: "$set", Value: bson.D{
+					{Key: tag, Value: data},
 				}},
 			},
 			options.FindOneAndUpdate().SetReturnDocument(options.After)))
@@ -228,7 +228,7 @@ func (m *MongoStore) Read(ctx context.Context, coll string, key Key, tag string)
 	c := getCollection(coll, m)
 
 	//Get the masterkey document based on given key
-	filter := bson.D{{"key", key}}
+	filter := bson.D{{Key: "key", Value: key}}
 	keydata, err := decodeBytes(c.FindOne(ctx, filter))
 	if err != nil {
 		return nil, pkgerrors.Errorf("Error finding master table: %s", err.Error())
@@ -241,7 +241,7 @@ func (m *MongoStore) Read(ctx context.Context, coll string, key Key, tag string)
 	}
 
 	//Use tag objectID to read the data from store
-	filter = bson.D{{"_id", tagoid}}
+	filter = bson.D{{Key: "_id", Value: tagoid}}
 	tagdata, err := decodeBytes(c.FindOne(ctx, filter))
 	if err != nil {
 		return nil, pkgerrors.Errorf("Error reading found object: %s", err.Error())
@@ -262,7 +262,7 @@ func (m *MongoStore) deleteObjectByID(ctx context.Context, coll string, objID pr
 
 	c := getCollection(coll, m)
 
-	_, err := c.DeleteOne(ctx, bson.D{{"_id", objID}})
+	_, err := c.DeleteOne(ctx, bson.D{{Key: "_id", Value: objID}})
 	if err != nil {
 		return pkgerrors.Errorf("Error Deleting from database: %s", err.Error())
 	}
@@ -281,12 +281,12 @@ func (m *MongoStore) Delete(ctx context.Context, coll string, key Key, tag strin
 	c := getCollection(coll, m)
 
 	//Get the masterkey document based on given key
-	filter := bson.D{{"key", key}}
+	filter := bson.D{{Key: "key", Value: key}}
 	//Remove the tag ID entry from masterkey table
 	update := bson.D{
 		{
-			"$unset", bson.D{
-				{tag, ""},
+			Key: "$unset", Value: bson.D{
+				{Key: tag, Value: ""},
 			},
 		},
 	}
@@ -346,8 +346,8 @@ func (m *MongoStore) ReadAll(ctx context.Context, coll, tag string) (map[string]
 
 	//Get all master tables in this collection
 	filter := bson.D{
-		{"key", bson.D{
-			{"$exists", true},
+		{Key: "key", Value: bson.D{
+			{Key: "$exists", Value: true},
 		}},
 	}
 	cursor, err := c.Find(ctx, filter)
@@ -376,7 +376,7 @@ func (m *MongoStore) ReadAll(ctx context.Context, coll, tag string) (map[string]
 		}
 
 		//Find tag document and unmarshal it into []byte
-		tagData, err := decodeBytes(c.FindOne(ctx, bson.D{{"_id", tid}}))
+		tagData, err := decodeBytes(c.FindOne(ctx, bson.D{{Key: "_id", Value: tid}}))
 		if err != nil {
 			log.Printf("Unable to decode tag data %s", err.Error())
 			continue

@@ -28,7 +28,6 @@ import (
 	//appsv1beta2 "k8s.io/api/apps/v1beta2"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 
 	//extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	//apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -434,7 +433,7 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 
 	// Check for errors getting the namespace while ignoring errors where the namespace does not exist
 	// Error message when namespace does not exist: "namespaces "namespace-name" not found"
-	if err != nil && strings.Contains(err.Error(), "not found") == false {
+	if err != nil && !strings.Contains(err.Error(), "not found") {
 		log.Error("Error checking for namespace", log.Fields{
 			"error":     err,
 			"namespace": namespace,
@@ -514,7 +513,7 @@ func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
 	updatedResourceName, err := pluginImpl.Update(resTempl.FilePath, namespace, k)
 	if err != nil {
 		var failed = true
-		if createIfDoNotExist && strings.Contains(err.Error(), "not found") == true {
+		if createIfDoNotExist && strings.Contains(err.Error(), "not found") {
 			updatedResourceName, err = pluginImpl.Create(resTempl.FilePath, namespace, k)
 			if err == nil {
 				failed = false
@@ -596,7 +595,7 @@ func (k *KubernetesClient) DeleteKind(resource helm.KubernetesResource, namespac
 	err = pluginImpl.Delete(resource, namespace, k)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") == false {
+		if !strings.Contains(err.Error(), "not found") {
 			return pkgerrors.Wrap(err, "Error deleting "+resource.Name)
 		} else {
 			log.Warn("Resource already does not exist", log.Fields{
@@ -621,13 +620,13 @@ func (k *KubernetesClient) deleteResources(resources []helm.KubernetesResource, 
 	return nil
 }
 
-//GetMapper returns the RESTMapper that was created for this client
+// GetMapper returns the RESTMapper that was created for this client
 func (k *KubernetesClient) GetMapper() meta.RESTMapper {
 	return k.restMapper
 }
 
-//GetDynamicClient returns the dynamic client that is needed for
-//unstructured REST calls to the apiserver
+// GetDynamicClient returns the dynamic client that is needed for
+// unstructured REST calls to the apiserver
 func (k *KubernetesClient) GetDynamicClient() dynamic.Interface {
 	return k.dynamicClient
 }
@@ -638,8 +637,8 @@ func (k *KubernetesClient) GetStandardClient() kubernetes.Interface {
 	return k.clientSet
 }
 
-//GetInstanceID returns the instanceID that is injected into all the
-//resources created by the plugin
+// GetInstanceID returns the instanceID that is injected into all the
+// resources created by the plugin
 func (k *KubernetesClient) GetInstanceID() string {
 	return k.instanceID
 }
@@ -649,7 +648,7 @@ func (k *KubernetesClient) GetInformer(gvk schema.GroupVersionKind) (cache.Share
 		opts.LabelSelector = config.GetConfiguration().KubernetesLabelName + "=" + k.instanceID
 	})
 
-	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(k.GetDynamicClient(), 0, v1.NamespaceAll, labelOptions)
+	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(k.GetDynamicClient(), 0, corev1.NamespaceAll, labelOptions)
 	mapping, err := k.GetMapper().RESTMapping(gvk.GroupKind(), gvk.Version)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Preparing mapper based on GVK")

@@ -55,8 +55,8 @@ func (h Hook) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Name     string              `json:"name"`
 		Kind     string              `json:"kind"`
-		Path     string              `json:"kind"`
-		Manifest string              `json:"kind"`
+		Path     string              `json:"path"`
+		Manifest string              `json:"manifest"`
 		Events   []release.HookEvent `json:"events"`
 	}{h.Hook.Name, h.Hook.Kind, h.Hook.Path,
 		h.Hook.Manifest, h.Hook.Events})

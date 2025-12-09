@@ -57,11 +57,11 @@ type attribute struct {
 
 type templateData struct {
 	StackName       string `json:"stack_name"` //Only this property is relevant (exported)
-	disableRollback string `json:"disable_rollback"`
-	environment     string `json:"environment"`
-	parameters      string `json:"parameters"`
-	template        string `json:"template"`
-	timeoutMins     string `json:"timeout_mins"`
+	disableRollback string
+	environment     string
+	parameters      string
+	template        string
+	timeoutMins     string
 }
 
 type brokerPOSTResponse struct {

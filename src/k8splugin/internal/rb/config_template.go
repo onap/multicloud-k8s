@@ -18,16 +18,15 @@ package rb
 
 import (
 	"bytes"
+	"context"
+	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
-
-	"encoding/base64"
-
-	"log"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -123,14 +122,14 @@ func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p Config
 	if update {
 		p.ChartName = prev.ChartName
 		p.HasContent = prev.HasContent
-		err = db.DBconn.Update(v.storeName, key, v.tagMeta, p)
+		err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Updating  ConfigTemplate DB Entry")
 		}
 	} else {
 		p.ChartName = rbDef.ChartName
 		p.HasContent = false
-		err = db.DBconn.Create(v.storeName, key, v.tagMeta, p)
+		err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
 		}
@@ -146,7 +145,7 @@ func (v *ConfigTemplateClient) Get(rbName, rbVersion, templateName string) (Conf
 		RBVersion:    rbVersion,
 		TemplateName: templateName,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagMeta)
 	if err != nil {
 		return ConfigTemplate{}, pkgerrors.Wrap(err, "Get ConfigTemplate")
 	}
@@ -168,7 +167,7 @@ func (v *ConfigTemplateClient) Get(rbName, rbVersion, templateName string) (Conf
 func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplateList, error) {
 
 	//Get all config templates
-	dbres, err := db.DBconn.ReadAll(v.storeName, v.tagMeta)
+	dbres, err := db.DBconn.ReadAll(context.TODO(), v.storeName, v.tagMeta)
 	if err != nil || len(dbres) == 0 {
 		return []ConfigTemplateList{}, pkgerrors.Wrap(err, "No Config Templates Found")
 	}
@@ -188,7 +187,7 @@ func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplateL
 				RBVersion:    rbVersion,
 				TemplateName: tmp.TemplateName,
 			}
-			_, err := db.DBconn.Read(v.storeName, keyTmp, v.tagMeta)
+			_, err := db.DBconn.Read(context.TODO(), v.storeName, keyTmp, v.tagMeta)
 			if err == nil && keyTmp.RBName == rbName && keyTmp.RBVersion == rbVersion {
 				results = append(results, tmp)
 			}
@@ -209,12 +208,12 @@ func (v *ConfigTemplateClient) Delete(rbName, rbVersion, templateName string) er
 		RBVersion:    rbVersion,
 		TemplateName: templateName,
 	}
-	err := db.DBconn.Delete(v.storeName, key, v.tagMeta)
+	err := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ConfigTemplate")
 	}
 
-	err = db.DBconn.Delete(v.storeName, key, v.tagContent)
+	err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagContent)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete  ConfigTemplate Content")
 	}
@@ -266,19 +265,19 @@ func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, in
 		return pkgerrors.New("Invalid template no Chart.yaml file found")
 	}
 
-	err = db.DBconn.Create(v.storeName, key, v.tagMeta, t)
+	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, t)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
 	}
 
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(v.storeName, key, v.tagContent, encodedStr)
+	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
 	}
 	t.HasContent = true
-	err = db.DBconn.Update(v.storeName, key, v.tagMeta, t)
+	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagMeta, t)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Updating  ConfigTemplate DB Entry")
 	}
@@ -303,7 +302,7 @@ func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) 
 		RBVersion:    rbVersion,
 		TemplateName: templateName,
 	}
-	value, err := db.DBconn.Read(v.storeName, key, v.tagContent)
+	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource ConfigTemplate content")
 	}

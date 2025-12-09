@@ -14,6 +14,7 @@ limitations under the License.
 package healthcheck
 
 import (
+	"context"
 	"encoding/json"
 	"strings"
 	"sync"
@@ -162,7 +163,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 			retErr := "Starting hook " + h.Status.Name
 
 			// Dump to DB
-			err = db.DBconn.Create(ihc.storeName, key, ihc.tagInst, ihcs)
+			err = db.DBconn.Create(context.TODO(), ihc.storeName, key, ihc.tagInst, ihcs)
 			if err != nil {
 				retErr = retErr + " and couldn't save to DB"
 			}
@@ -174,7 +175,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 			h.Status.KR = kr
 		}
 	}
-	err = db.DBconn.Create(ihc.storeName, key, ihc.tagInst, ihcs)
+	err = db.DBconn.Create(context.TODO(), ihc.storeName, key, ihc.tagInst, ihcs)
 	if err != nil {
 		return instanceMiniHCStatusFromStatus(ihcs),
 			pkgerrors.Wrap(err, "Creating Instance DB Entry")
@@ -221,7 +222,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 					"Reason":        map[bool]string{true: "Hook finished", false: "All hooks finished"}[b],
 				})
 				if b { //Some hook finished - need to update DB
-					err = db.DBconn.Update(ihc.storeName, key, ihc.tagInst, ihcs)
+					err = db.DBconn.Update(context.TODO(), ihc.storeName, key, ihc.tagInst, ihcs)
 					if err != nil {
 						log.Error("Couldn't update database", log.Fields{
 							"Store":   ihc.storeName,
@@ -248,7 +249,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 						}
 					}
 					ihcs.Status = finalResult
-					err = db.DBconn.Update(ihc.storeName, key, ihc.tagInst, ihcs)
+					err = db.DBconn.Update(context.TODO(), ihc.storeName, key, ihc.tagInst, ihcs)
 					if err != nil {
 						log.Error("Couldn't update database", log.Fields{
 							"Store":   ihc.storeName,
@@ -269,7 +270,7 @@ func (ihc InstanceHCClient) Get(instanceId, healthcheckId string) (InstanceHCSta
 		InstanceId:    instanceId,
 		HealthcheckId: healthcheckId,
 	}
-	DBResp, err := db.DBconn.Read(ihc.storeName, key, ihc.tagInst)
+	DBResp, err := db.DBconn.Read(context.TODO(), ihc.storeName, key, ihc.tagInst)
 	if err != nil || DBResp == nil {
 		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Error retrieving Healthcheck data")
 	}
@@ -309,7 +310,7 @@ func (ihc InstanceHCClient) Delete(instanceId, healthcheckId string) error {
 	if cumulatedErr != "" {
 		return pkgerrors.New("Removing hooks failed with errors:\n" + cumulatedErr)
 	}
-	err = db.DBconn.Delete(ihc.storeName, key, ihc.tagInst)
+	err = db.DBconn.Delete(context.TODO(), ihc.storeName, key, ihc.tagInst)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Removing Healthcheck in DB")
 	}
@@ -330,7 +331,7 @@ func (ihc InstanceHCClient) List(instanceId string) (InstanceHCOverview, error) 
 	ihco.Hooks = instance.Hooks
 
 	// Retrieve info about running/completed healthchecks
-	dbResp, err := db.DBconn.ReadAll(ihc.storeName, ihc.tagInst)
+	dbResp, err := db.DBconn.ReadAll(context.TODO(), ihc.storeName, ihc.tagInst)
 	if err != nil {
 		if !strings.Contains(err.Error(), "Did not find any objects with tag") {
 			return ihco, pkgerrors.Wrap(err, "Getting Healthcheck data")

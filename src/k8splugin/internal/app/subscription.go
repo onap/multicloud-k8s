@@ -18,6 +18,7 @@ package app
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net"
@@ -181,7 +182,7 @@ func (iss *InstanceStatusSubClient) Create(instanceId string, subDetails Subscri
 	lock.Lock()
 	defer lock.Unlock()
 
-	err = db.DBconn.Create(iss.storeName, key, iss.tagInst, sub)
+	err = db.DBconn.Create(context.TODO(), iss.storeName, key, iss.tagInst, sub)
 	if err != nil {
 		return sub, pkgerrors.Wrap(err, "Creating Status Subscription DB Entry")
 	}
@@ -205,7 +206,7 @@ func (iss *InstanceStatusSubClient) Get(instanceId, subId string) (StatusSubscri
 		InstanceId:       instanceId,
 		SubscriptionName: subId,
 	}
-	DBResp, err := db.DBconn.Read(iss.storeName, key, iss.tagInst)
+	DBResp, err := db.DBconn.Read(context.TODO(), iss.storeName, key, iss.tagInst)
 	if err != nil || DBResp == nil {
 		return StatusSubscription{}, pkgerrors.Wrap(err, "Error retrieving Subscription data")
 	}
@@ -247,7 +248,7 @@ func (iss *InstanceStatusSubClient) Update(instanceId, subId string, subDetails 
 	lock.Lock()
 	defer lock.Unlock()
 
-	err = db.DBconn.Update(iss.storeName, key, iss.tagInst, sub)
+	err = db.DBconn.Update(context.TODO(), iss.storeName, key, iss.tagInst, sub)
 	if err != nil {
 		return sub, pkgerrors.Wrap(err, "Updating Status Subscription DB Entry")
 	}
@@ -267,7 +268,7 @@ func (iss *InstanceStatusSubClient) List(instanceId string) ([]StatusSubscriptio
 	lock.Lock()
 	defer lock.Unlock()
 	// Retrieve info about created status subscriptions
-	dbResp, err := db.DBconn.ReadAll(iss.storeName, iss.tagInst)
+	dbResp, err := db.DBconn.ReadAll(context.TODO(), iss.storeName, iss.tagInst)
 	if err != nil {
 		if !strings.Contains(err.Error(), "Did not find any objects with tag") {
 			return []StatusSubscription{}, pkgerrors.Wrap(err, "Getting Status Subscription data")
@@ -322,7 +323,7 @@ func (iss *InstanceStatusSubClient) Delete(instanceId, subId string) error {
 		InstanceId:       instanceId,
 		SubscriptionName: subId,
 	}
-	err = db.DBconn.Delete(iss.storeName, key, iss.tagInst)
+	err = db.DBconn.Delete(context.TODO(), iss.storeName, key, iss.tagInst)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Removing Status Subscription in DB")
 	}
@@ -704,7 +705,7 @@ func runNotifyThread(instanceId, subName string) {
 						})
 						currentSub.LastNotifyStatus = notifyResult.result
 						currentSub.LastNotifyTime = notifyResult.time
-						err = db.DBconn.Update(iss.storeName, key, iss.tagInst, currentSub)
+						err = db.DBconn.Update(context.TODO(), iss.storeName, key, iss.tagInst, currentSub)
 						if err != nil {
 							log.Error("Error updating subscription status", log.Fields{
 								"error":    err.Error(),

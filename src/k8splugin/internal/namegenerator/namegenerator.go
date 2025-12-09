@@ -17,6 +17,7 @@
 package namegenerator
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"strings"
@@ -83,7 +84,7 @@ func (c *cache) isAlreadyUsed(name string) bool {
 func (c *cache) readCacheFromDB() error {
 
 	// Read the latest from cache
-	data, err := db.DBconn.Read(storeName, cacheKeyGlobal, tag)
+	data, err := db.DBconn.Read(context.TODO(), storeName, cacheKeyGlobal, tag)
 	if err != nil {
 		log.Println("Error reading name cache from Database: ", err)
 		return pkgerrors.Wrap(err, "Reading cache from DB")
@@ -102,11 +103,11 @@ func (c *cache) readCacheFromDB() error {
 func (c *cache) writeCacheToDB() {
 
 	//Update the database as well
-	err := db.DBconn.Update(storeName, cacheKeyGlobal, tag, c.cache)
+	err := db.DBconn.Update(context.TODO(), storeName, cacheKeyGlobal, tag, c.cache)
 	if err != nil {
 		// TODO: Replace with DBconn variable
 		if strings.Contains(err.Error(), "Error finding master table") {
-			err = db.DBconn.Create(storeName, cacheKeyGlobal, tag, c.cache)
+			err = db.DBconn.Create(context.TODO(), storeName, cacheKeyGlobal, tag, c.cache)
 			if err != nil {
 				log.Println("Error creating the entry in DB. Will try later...")
 				return

@@ -39,9 +39,10 @@ type connectionHandler struct {
 
 // CreateHandler handles creation of the connectivity entry in the database
 // This is a multipart handler. See following example curl request
-// curl -i -F "metadata={\"cloud-region\":\"kud\",\"cloud-owner\":\"me\"};type=application/json" \
-//         -F file=@/home/user/.kube/config \
-//         -X POST http://localhost:8081/v1/connectivity-info
+//
+//	curl -i -F "metadata={\"cloud-region\":\"kud\",\"cloud-owner\":\"me\"};type=application/json" \
+//	        -F file=@/home/user/.kube/config \
+//	        -X POST http://localhost:8081/v1/connectivity-info
 func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 	var v connection.Connection
 
@@ -95,7 +96,7 @@ func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request)
 
 	v.Kubeconfig = base64.StdEncoding.EncodeToString(content)
 
-	ret, err := h.client.Create(v)
+	ret, err := h.client.Create(r.Context(), v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -116,7 +117,7 @@ func (h connectionHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["connname"]
 
-	ret, err := h.client.Get(name)
+	ret, err := h.client.Get(r.Context(), name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -136,7 +137,7 @@ func (h connectionHandler) deleteHandler(w http.ResponseWriter, r *http.Request)
 	vars := mux.Vars(r)
 	name := vars["connname"]
 
-	err := h.client.Delete(name)
+	err := h.client.Delete(r.Context(), name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

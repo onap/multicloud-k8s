@@ -108,7 +108,7 @@ func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p Config
 	}
 
 	//Check if provided resource bundle information is valid
-	rbDef, err := NewDefinitionClient().Get(rbName, rbVersion)
+	rbDef, err := NewDefinitionClient().Get(context.TODO(), rbName, rbVersion)
 	if err != nil {
 		return pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}

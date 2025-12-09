@@ -648,11 +648,11 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 	} else {
 		log.Printf("Using Definition Template as a Configuration Template")
 		defClient := rb.NewDefinitionClient()
-		definition, err := defClient.Get(rbName, rbVersion)
+		definition, err := defClient.Get(context.TODO(), rbName, rbVersion)
 		if err != nil {
 			return configResourceList{}, pkgerrors.Wrap(err, "Get RB Definition")
 		}
-		def, err = defClient.Download(rbName, rbVersion)
+		def, err = defClient.Download(context.TODO(), rbName, rbVersion)
 		if err != nil {
 			return configResourceList{}, pkgerrors.Wrap(err, "Downloading RB Definition Template")
 		}

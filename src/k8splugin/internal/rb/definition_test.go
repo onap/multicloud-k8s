@@ -18,6 +18,7 @@ package rb
 
 import (
 	"bytes"
+	"context"
 	"reflect"
 	"sort"
 	"strings"
@@ -66,7 +67,7 @@ func TestCreateDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			got, err := impl.Create(testCase.inp)
+			got, err := impl.Create(context.TODO(), testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -143,7 +144,7 @@ func TestListDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			got, err := impl.List(testCase.name)
+			got, err := impl.List(context.TODO(), testCase.name)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("List returned an unexpected error %s", err)
@@ -219,7 +220,7 @@ func TestGetDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			got, err := impl.Get(testCase.name, testCase.version)
+			got, err := impl.Get(context.TODO(), testCase.name, testCase.version)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get returned an unexpected error %s", err)
@@ -265,7 +266,7 @@ func TestDeleteDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			err := impl.Delete(testCase.name, testCase.version)
+			err := impl.Delete(context.TODO(), testCase.name, testCase.version)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Delete returned an unexpected error %s", err)
@@ -503,7 +504,7 @@ func TestUploadDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			err := impl.Upload(testCase.name, testCase.version, testCase.content)
+			err := impl.Upload(context.TODO(), testCase.name, testCase.version, testCase.content)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Errorf("Upload returned an unexpected error %s", err)
@@ -595,7 +596,7 @@ func TestDownloadDefinition(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewDefinitionClient()
-			data, err := impl.Download(testCase.name, testCase.version)
+			data, err := impl.Download(context.TODO(), testCase.name, testCase.version)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Errorf("Download returned an unexpected error %s", err)

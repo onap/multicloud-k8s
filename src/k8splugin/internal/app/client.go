@@ -348,7 +348,7 @@ func (k *KubernetesClient) GetResourceStatus(res helm.KubernetesResource, namesp
 func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
 
 	conn := connection.NewConnectionClient()
-	kubeConfigPath, err := conn.Download(cloudregion)
+	kubeConfigPath, err := conn.Download(context.TODO(), cloudregion)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Downloading kubeconfig")
 	}
@@ -621,13 +621,13 @@ func (k *KubernetesClient) deleteResources(resources []helm.KubernetesResource, 
 	return nil
 }
 
-//GetMapper returns the RESTMapper that was created for this client
+// GetMapper returns the RESTMapper that was created for this client
 func (k *KubernetesClient) GetMapper() meta.RESTMapper {
 	return k.restMapper
 }
 
-//GetDynamicClient returns the dynamic client that is needed for
-//unstructured REST calls to the apiserver
+// GetDynamicClient returns the dynamic client that is needed for
+// unstructured REST calls to the apiserver
 func (k *KubernetesClient) GetDynamicClient() dynamic.Interface {
 	return k.dynamicClient
 }
@@ -638,8 +638,8 @@ func (k *KubernetesClient) GetStandardClient() kubernetes.Interface {
 	return k.clientSet
 }
 
-//GetInstanceID returns the instanceID that is injected into all the
-//resources created by the plugin
+// GetInstanceID returns the instanceID that is injected into all the
+// resources created by the plugin
 func (k *KubernetesClient) GetInstanceID() string {
 	return k.instanceID
 }

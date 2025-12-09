@@ -107,7 +107,7 @@ func (v *ProfileClient) CreateOrUpdate(p Profile, update bool) (Profile, error) 
 		return Profile{}, pkgerrors.New("Profile does not exists for this Definition")
 	}
 	//Check if provided resource bundle information is valid
-	_, err = NewDefinitionClient().Get(p.RBName, p.RBVersion)
+	_, err = NewDefinitionClient().Get(context.TODO(), p.RBName, p.RBVersion)
 	if err != nil {
 		return Profile{}, pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}
@@ -318,12 +318,12 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 
 	definitionClient := NewDefinitionClient()
 
-	definition, err := definitionClient.Get(rbName, rbVersion)
+	definition, err := definitionClient.Get(context.TODO(), rbName, rbVersion)
 	if err != nil {
 		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Getting Definition Metadata")
 	}
 
-	defData, err := definitionClient.Download(rbName, rbVersion)
+	defData, err := definitionClient.Download(context.TODO(), rbName, rbVersion)
 	if err != nil {
 		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Downloading Definition")
 	}

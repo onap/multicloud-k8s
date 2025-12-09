@@ -17,6 +17,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -48,7 +49,7 @@ func (h rbDefinitionHandler) createHandler(w http.ResponseWriter, r *http.Reques
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-	h.createOrUpdateHandler(v, w, false)
+	h.createOrUpdateHandler(r.Context(), v, w, false)
 }
 
 // createOrUpdateHandler handles creation of the definition entry in the database
@@ -82,11 +83,11 @@ func (h rbDefinitionHandler) updateHandler(w http.ResponseWriter, r *http.Reques
 	v.RBVersion = version
 	v.RBName = name
 
-	h.createOrUpdateHandler(v, w, true)
+	h.createOrUpdateHandler(r.Context(), v, w, true)
 }
 
 // createOrUpdateHandler handles creation of the definition entry in the database
-func (h rbDefinitionHandler) createOrUpdateHandler(v rb.Definition, w http.ResponseWriter, update bool) {
+func (h rbDefinitionHandler) createOrUpdateHandler(ctx context.Context, v rb.Definition, w http.ResponseWriter, update bool) {
 	// Name is required.
 	if v.RBName == "" {
 		http.Error(w, "Missing name in request", http.StatusBadRequest)
@@ -102,9 +103,9 @@ func (h rbDefinitionHandler) createOrUpdateHandler(v rb.Definition, w http.Respo
 	var ret rb.Definition
 	var err error
 	if update {
-		ret, err = h.client.Update(v)
+		ret, err = h.client.Update(ctx, v)
 	} else {
-		ret, err = h.client.Create(v)
+		ret, err = h.client.Create(ctx, v)
 	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -137,7 +138,7 @@ func (h rbDefinitionHandler) uploadHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = h.client.Upload(name, version, inpBytes)
+	err = h.client.Upload(r.Context(), name, version, inpBytes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -152,7 +153,7 @@ func (h rbDefinitionHandler) listVersionsHandler(w http.ResponseWriter, r *http.
 	vars := mux.Vars(r)
 	name := vars["rbname"]
 
-	ret, err := h.client.List(name)
+	ret, err := h.client.List(r.Context(), name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -171,7 +172,7 @@ func (h rbDefinitionHandler) listVersionsHandler(w http.ResponseWriter, r *http.
 // Returns a list of rb.Definitions
 func (h rbDefinitionHandler) listAllHandler(w http.ResponseWriter, r *http.Request) {
 
-	ret, err := h.client.List("")
+	ret, err := h.client.List(r.Context(), "")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -193,7 +194,7 @@ func (h rbDefinitionHandler) getHandler(w http.ResponseWriter, r *http.Request) 
 	name := vars["rbname"]
 	version := vars["rbversion"]
 
-	ret, err := h.client.Get(name, version)
+	ret, err := h.client.Get(r.Context(), name, version)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -214,7 +215,7 @@ func (h rbDefinitionHandler) deleteHandler(w http.ResponseWriter, r *http.Reques
 	name := vars["rbname"]
 	version := vars["rbversion"]
 
-	err := h.client.Delete(name, version)
+	err := h.client.Delete(r.Context(), name, version)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

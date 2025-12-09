@@ -18,6 +18,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -31,9 +32,9 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-//Creating an embedded interface via anonymous variable
-//This allows us to make mockDB satisfy the DatabaseConnection
-//interface even if we are not implementing all the methods in it
+// Creating an embedded interface via anonymous variable
+// This allows us to make mockDB satisfy the DatabaseConnection
+// interface even if we are not implementing all the methods in it
 type mockRBDefinition struct {
 	rb.DefinitionManager
 	// Items and err will be used to customize each test
@@ -42,7 +43,7 @@ type mockRBDefinition struct {
 	Err   error
 }
 
-func (m *mockRBDefinition) Create(inp rb.Definition) (rb.Definition, error) {
+func (m *mockRBDefinition) Create(ctx context.Context, inp rb.Definition) (rb.Definition, error) {
 	if m.Err != nil {
 		return rb.Definition{}, m.Err
 	}
@@ -50,7 +51,7 @@ func (m *mockRBDefinition) Create(inp rb.Definition) (rb.Definition, error) {
 	return m.Items[0], nil
 }
 
-func (m *mockRBDefinition) List(name string) ([]rb.Definition, error) {
+func (m *mockRBDefinition) List(ctx context.Context, name string) ([]rb.Definition, error) {
 	if m.Err != nil {
 		return []rb.Definition{}, m.Err
 	}
@@ -58,7 +59,7 @@ func (m *mockRBDefinition) List(name string) ([]rb.Definition, error) {
 	return m.Items, nil
 }
 
-func (m *mockRBDefinition) Get(name, version string) (rb.Definition, error) {
+func (m *mockRBDefinition) Get(ctx context.Context, name, version string) (rb.Definition, error) {
 	if m.Err != nil {
 		return rb.Definition{}, m.Err
 	}
@@ -66,11 +67,11 @@ func (m *mockRBDefinition) Get(name, version string) (rb.Definition, error) {
 	return m.Items[0], nil
 }
 
-func (m *mockRBDefinition) Delete(name, version string) error {
+func (m *mockRBDefinition) Delete(ctx context.Context, name, version string) error {
 	return m.Err
 }
 
-func (m *mockRBDefinition) Upload(name, version string, inp []byte) error {
+func (m *mockRBDefinition) Upload(ctx context.Context, name, version string, inp []byte) error {
 	return m.Err
 }
 

@@ -59,10 +59,10 @@ func (dk ConnectionKey) String() string {
 
 // ConnectionManager is an interface exposes the Connection functionality
 type ConnectionManager interface {
-	Create(c Connection) (Connection, error)
-	Get(name string) (Connection, error)
-	Delete(name string) error
-	GetConnectivityRecordByName(connname string, name string) (map[string]string, error)
+	Create(ctx context.Context, c Connection) (Connection, error)
+	Get(ctx context.Context, name string) (Connection, error)
+	Delete(ctx context.Context, name string) error
+	GetConnectivityRecordByName(ctx context.Context, connname string, name string) (map[string]string, error)
 }
 
 // ConnectionClient implements the  ConnectionManager
@@ -82,18 +82,18 @@ func NewConnectionClient() *ConnectionClient {
 }
 
 // Create an entry for the Connection resource in the database`
-func (v *ConnectionClient) Create(c Connection) (Connection, error) {
+func (v *ConnectionClient) Create(ctx context.Context, c Connection) (Connection, error) {
 
 	//Construct composite key consisting of name
 	key := ConnectionKey{CloudRegion: c.CloudRegion}
 
 	//Check if this Connection already exists
-	_, err := v.Get(c.CloudRegion)
+	_, err := v.Get(ctx, c.CloudRegion)
 	if err == nil {
 		return Connection{}, pkgerrors.New("Connection already exists")
 	}
 
-	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, c)
+	err = db.DBconn.Create(ctx, v.storeName, key, v.tagMeta, c)
 	if err != nil {
 		return Connection{}, pkgerrors.Wrap(err, "Creating DB Entry")
 	}
@@ -102,11 +102,11 @@ func (v *ConnectionClient) Create(c Connection) (Connection, error) {
 }
 
 // Get returns Connection for corresponding to name
-func (v *ConnectionClient) Get(name string) (Connection, error) {
+func (v *ConnectionClient) Get(ctx context.Context, name string) (Connection, error) {
 
 	//Construct the composite key to select the entry
 	key := ConnectionKey{CloudRegion: name}
-	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Read(ctx, v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Connection{}, pkgerrors.Wrap(err, "Get Connection")
 	}
@@ -140,10 +140,10 @@ func (v *ConnectionClient) Get(name string) (Connection, error) {
 //			“cert-to-present” :  “<contents of certificate to present to server>” , //valid if ssl-initiator is true
 //		},
 //	]
-func (v *ConnectionClient) GetConnectivityRecordByName(connectionName string,
+func (v *ConnectionClient) GetConnectivityRecordByName(ctx context.Context, connectionName string,
 	connectivityRecordName string) (map[string]string, error) {
 
-	conn, err := v.Get(connectionName)
+	conn, err := v.Get(ctx, connectionName)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Error getting connection")
 	}
@@ -158,11 +158,11 @@ func (v *ConnectionClient) GetConnectivityRecordByName(connectionName string,
 }
 
 // Delete the Connection from database
-func (v *ConnectionClient) Delete(name string) error {
+func (v *ConnectionClient) Delete(ctx context.Context, name string) error {
 
 	//Construct the composite key to select the entry
 	key := ConnectionKey{CloudRegion: name}
-	err := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagMeta)
+	err := db.DBconn.Delete(ctx, v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Connection")
 	}
@@ -172,9 +172,9 @@ func (v *ConnectionClient) Delete(name string) error {
 // Download the connection information onto a kubeconfig file
 // The file is named after the name of the connection and will
 // be placed in the provided parent directory
-func (v *ConnectionClient) Download(name string) (string, error) {
+func (v *ConnectionClient) Download(ctx context.Context, name string) (string, error) {
 
-	conn, err := v.Get(name)
+	conn, err := v.Get(ctx, name)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Getting Connection info")
 	}

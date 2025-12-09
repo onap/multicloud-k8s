@@ -364,7 +364,7 @@ func (c ConfigVersionStore) getCurrentVersion(configName string) (uint, error) {
 
 	value, err := db.Etcd.Get(cfgKey)
 	if err != nil {
-		if strings.Contains(err.Error(), "Key doesn't exist") == true {
+		if strings.Contains(err.Error(), "Key doesn't exist") {
 			// Counter not started yet, 0 is invalid value
 			return 0, nil
 		} else {
@@ -734,9 +734,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Generate final k8s yaml")
 	}
-	for _, tmp := range resTemplates {
-		crdList = append(crdList, tmp)
-	}
+	crdList = append(crdList, resTemplates...)
 
 	crl := configResourceList{
 		resourceTemplates: crdList,

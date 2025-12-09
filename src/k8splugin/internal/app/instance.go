@@ -263,7 +263,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 		return InstanceResponse{}, pkgerrors.New("Unable to find Profile to create instance")
 	}
 
-	overrideValues, hookTimeoutInfo, err := getOverridesAndHookInfo(i)
+	overrideValues, hookTimeoutInfo, _ := getOverridesAndHookInfo(i)
 
 	var generatedId string = ""
 	var finalId string = ""
@@ -493,7 +493,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 		if err == nil {
 			err = v.Delete(context.TODO(), id)
 			if err == nil {
-				newInstanceDb, err := v.GetFull(ctx, newInstance.ID)
+				newInstanceDb, _ := v.GetFull(ctx, newInstance.ID)
 				oldKey := InstanceKey{
 					ID: newInstance.ID,
 				}
@@ -527,7 +527,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 		return InstanceResponse{}, pkgerrors.New("Unable to find Profile to create instance")
 	}
 
-	overrideValues, hookTimeoutInfo, err := getOverridesAndHookInfo(i)
+	overrideValues, hookTimeoutInfo, _ := getOverridesAndHookInfo(i)
 
 	overrideValues = append(overrideValues, "k8s-rb-instance-id="+id)
 
@@ -643,7 +643,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 		}
 	}
 
-	err = k8sClient.deleteResources(helm.GetReverseK8sResources(resToDelete), currentInstance.Namespace)
+	k8sClient.deleteResources(helm.GetReverseK8sResources(resToDelete), currentInstance.Namespace)
 
 	configClient := NewConfigClient()
 	configList, err := configClient.List(id)
@@ -791,7 +791,7 @@ func (v *InstanceClient) Query(ctx context.Context, id, apiVersion, kind, name, 
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Unmarshaling Instance Value")
 	}
 
-	if labels == "" || strings.Contains(strings.ToLower(labels), config.GetConfiguration().KubernetesLabelName) == false {
+	if labels == "" || !strings.Contains(strings.ToLower(labels), config.GetConfiguration().KubernetesLabelName) {
 		labelValue := config.GetConfiguration().KubernetesLabelName + "=" + id
 		if labels != "" {
 			labels = labels + ","
@@ -881,7 +881,7 @@ Main:
 	}
 	generalStatus = append(generalStatus, podsStatus...)
 
-	if profile.ExtraResourceTypes != nil && len(profile.ExtraResourceTypes) > 0 {
+	if len(profile.ExtraResourceTypes) > 0 {
 		queryClient := NewQueryClient()
 		labelValue := config.GetConfiguration().KubernetesLabelName + "=" + id
 		for _, extraType := range profile.ExtraResourceTypes {
@@ -958,7 +958,7 @@ func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient K
 		return false, err
 	}
 	mapper := k8sClient.GetMapper()
-	mapping, err := mapper.RESTMapping(schema.GroupKind{
+	mapping, _ := mapper.RESTMapping(schema.GroupKind{
 		Group: rss.GVK.Group,
 		Kind:  rss.GVK.Kind,
 	}, rss.GVK.Version)
@@ -1139,14 +1139,14 @@ func (v *InstanceClient) Delete(ctx context.Context, id string) error {
 		go func() {
 			inst.HookProgress = ""
 			if err := v.runPostDelete(k8sClient, hookClient, &inst, 0, true); err != nil {
-				log.Printf(err.Error())
+				log.Print(err.Error())
 			}
 		}()
 	} else {
 		subscriptionClient := NewInstanceStatusSubClient()
 		err = subscriptionClient.Cleanup(id)
 		if err != nil {
-			log.Printf(err.Error())
+			log.Print(err.Error())
 		}
 
 		err = db.DBconn.Delete(ctx, v.storeName, key, v.tagInst)
@@ -1176,7 +1176,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) e
 		ID: id,
 	}
 	log.Printf("  Resolving template for release %s", instance.Request.ReleaseName)
-	_, _, hookList, _, err := rb.NewProfileClient().Resolve(instance.Request.RBName, instance.Request.RBVersion, instance.Request.ProfileName, overrideValues, instance.Request.ReleaseName)
+	_, _, hookList, _, _ := rb.NewProfileClient().Resolve(instance.Request.RBName, instance.Request.RBVersion, instance.Request.ProfileName, overrideValues, instance.Request.ReleaseName)
 	instance.Hooks = hookList
 	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, instance)
 	if err != nil {
@@ -1254,7 +1254,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) e
 			//the instance in DB will be deleted when SO call delete again.
 			instance.HookProgress = ""
 			if err := v.runPostDelete(k8sClient, hookClient, &instance, 0, false); err != nil {
-				log.Printf(err.Error())
+				log.Print(err.Error())
 			}
 		}()
 	case "POST-DELETE":
@@ -1262,7 +1262,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) e
 		go func() {
 			log.Printf("  The plugin quits during post-delete hook of this instance, continue post-delete hook")
 			if err := v.runPostDelete(k8sClient, hookClient, &instance, completedHooks, true); err != nil {
-				log.Printf(err.Error())
+				log.Print(err.Error())
 			}
 		}()
 	default:
@@ -1297,7 +1297,7 @@ func (v *InstanceClient) runPostDelete(k8sClient KubernetesClient, hookClient *H
 		subscriptionClient := NewInstanceStatusSubClient()
 		err = subscriptionClient.Cleanup(instance.ID)
 		if err != nil {
-			log.Printf(err.Error())
+			log.Print(err.Error())
 		}
 		err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
 		if err != nil {

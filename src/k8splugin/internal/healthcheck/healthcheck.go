@@ -109,7 +109,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 
 	//Determine Cloud Region and namespace
 	v := app.NewInstanceClient()
-	instance, err := v.Get(instanceId)
+	instance, err := v.Get(context.TODO(), instanceId)
 	if err != nil {
 		return InstanceMiniHCStatus{}, pkgerrors.Wrap(err, "Getting instance")
 	}
@@ -286,7 +286,7 @@ func (ihc InstanceHCClient) Get(instanceId, healthcheckId string) (InstanceHCSta
 func (ihc InstanceHCClient) Delete(instanceId, healthcheckId string) error {
 	key := HealthcheckKey{instanceId, healthcheckId}
 	v := app.NewInstanceClient()
-	instance, err := v.Get(instanceId)
+	instance, err := v.Get(context.TODO(), instanceId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting instance")
 	}
@@ -324,7 +324,7 @@ func (ihc InstanceHCClient) List(instanceId string) (InstanceHCOverview, error) 
 
 	// Retrieve info about available hooks
 	v := app.NewInstanceClient()
-	instance, err := v.Get(instanceId)
+	instance, err := v.Get(context.TODO(), instanceId)
 	if err != nil {
 		return ihco, pkgerrors.Wrap(err, "Getting Instance data")
 	}

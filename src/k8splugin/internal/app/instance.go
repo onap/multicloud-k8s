@@ -117,16 +117,16 @@ type InstanceStatus struct {
 
 // InstanceManager is an interface exposes the instantiation functionality
 type InstanceManager interface {
-	Create(i InstanceRequest, newId string) (InstanceResponse, error)
-	Upgrade(id string, u UpgradeRequest) (InstanceResponse, error)
-	Get(id string) (InstanceResponse, error)
-	GetFull(id string) (InstanceDbData, error)
+	Create(ctx context.Context, i InstanceRequest, newId string) (InstanceResponse, error)
+	Upgrade(ctx context.Context, id string, u UpgradeRequest) (InstanceResponse, error)
+	Get(ctx context.Context, id string) (InstanceResponse, error)
+	GetFull(ctx context.Context, id string) (InstanceDbData, error)
 	Status(ctx context.Context, id string, checkReady bool) (InstanceStatus, error)
-	Query(id, apiVersion, kind, name, labels string) (InstanceStatus, error)
-	List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error)
-	Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error)
+	Query(ctx context.Context, id, apiVersion, kind, name, labels string) (InstanceStatus, error)
+	List(ctx context.Context, rbname, rbversion, profilename string) ([]InstanceMiniResponse, error)
+	Find(ctx context.Context, rbName string, ver string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error)
 	Delete(ctx context.Context, id string) error
-	RecoverCreateOrDelete(id string) error
+	RecoverCreateOrDelete(ctx context.Context, id string) error
 }
 
 // InstanceKey is used as the primary key in the db
@@ -167,7 +167,7 @@ func NewInstanceClient() *InstanceClient {
 // Simplified function to retrieve model data from instance ID
 func resolveModelFromInstance(instanceID string) (rbName, rbVersion, profileName, releaseName string, err error) {
 	v := NewInstanceClient()
-	resp, err := v.Get(instanceID)
+	resp, err := v.Get(context.TODO(), instanceID)
 	if err != nil {
 		return "", "", "", "", pkgerrors.Wrap(err, "Getting instance")
 	}
@@ -250,7 +250,7 @@ func getOverridesAndHookInfo(i InstanceRequest) ([]string, HookTimeoutInfo, erro
 }
 
 // Create an instance of rb on the cluster  in the database
-func (v *InstanceClient) Create(i InstanceRequest, newId string) (InstanceResponse, error) {
+func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId string) (InstanceResponse, error) {
 	// Name is required
 	if i.RBName == "" || i.RBVersion == "" || i.ProfileName == "" || i.CloudRegion == "" {
 		return InstanceResponse{},
@@ -454,7 +454,7 @@ func upgradeRequestToInstanceRequest(instance InstanceResponse, u UpgradeRequest
 }
 
 // Upgrade an instance of rb on the cluster  in the database
-func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse, error) {
+func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeRequest) (InstanceResponse, error) {
 	key := InstanceKey{
 		ID: id,
 	}
@@ -489,11 +489,11 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 	}
 
 	if currentInstance.Request.CloudRegion != u.CloudRegion {
-		newInstance, err := v.Create(i, "")
+		newInstance, err := v.Create(ctx, i, "")
 		if err == nil {
 			err = v.Delete(context.TODO(), id)
 			if err == nil {
-				newInstanceDb, err := v.GetFull(newInstance.ID)
+				newInstanceDb, err := v.GetFull(ctx, newInstance.ID)
 				oldKey := InstanceKey{
 					ID: newInstance.ID,
 				}
@@ -702,7 +702,7 @@ func (v *InstanceClient) Upgrade(id string, u UpgradeRequest) (InstanceResponse,
 }
 
 // Get returns the full instance for corresponding ID
-func (v *InstanceClient) GetFull(id string) (InstanceDbData, error) {
+func (v *InstanceClient) GetFull(ctx context.Context, id string) (InstanceDbData, error) {
 	key := InstanceKey{
 		ID: id,
 	}
@@ -748,7 +748,7 @@ func (v *InstanceClient) GetFull(id string) (InstanceDbData, error) {
 }
 
 // Get returns the instance for corresponding ID
-func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
+func (v *InstanceClient) Get(ctx context.Context, id string) (InstanceResponse, error) {
 	key := InstanceKey{
 		ID: id,
 	}
@@ -771,7 +771,7 @@ func (v *InstanceClient) Get(id string) (InstanceResponse, error) {
 }
 
 // Query returns state of instance's filtered resources
-func (v *InstanceClient) Query(id, apiVersion, kind, name, labels string) (InstanceStatus, error) {
+func (v *InstanceClient) Query(ctx context.Context, id, apiVersion, kind, name, labels string) (InstanceStatus, error) {
 
 	queryClient := NewQueryClient()
 	//Read the status from the DB
@@ -983,7 +983,7 @@ func (v *InstanceClient) checkRssStatus(rss helm.KubernetesResource, k8sClient K
 
 // List returns the instance for corresponding ID
 // Empty string returns all
-func (v *InstanceClient) List(rbname, rbversion, profilename string) ([]InstanceMiniResponse, error) {
+func (v *InstanceClient) List(ctx context.Context, rbname, rbversion, profilename string) ([]InstanceMiniResponse, error) {
 
 	dbres, err := db.DBconn.ReadAll(context.TODO(), v.storeName, v.tagInst)
 	if err != nil || len(dbres) == 0 {
@@ -1039,12 +1039,12 @@ func (v *InstanceClient) List(rbname, rbversion, profilename string) ([]Instance
 // If profile is empty, it will return all instances for a given rbName+version
 // If labelKeys are provided, the results are filtered based on that.
 // It is an AND operation for labelkeys.
-func (v *InstanceClient) Find(rbName string, version string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error) {
+func (v *InstanceClient) Find(ctx context.Context, rbName string, version string, profile string, labelKeys map[string]string) ([]InstanceMiniResponse, error) {
 	if rbName == "" && len(labelKeys) == 0 {
 		return []InstanceMiniResponse{}, pkgerrors.New("rbName or labelkeys is required and cannot be empty")
 	}
 
-	responses, err := v.List(rbName, version, profile)
+	responses, err := v.List(ctx, rbName, version, profile)
 	if err != nil {
 		return []InstanceMiniResponse{}, pkgerrors.Wrap(err, "Listing Instances")
 	}
@@ -1072,7 +1072,7 @@ func (v *InstanceClient) Find(rbName string, version string, profile string, lab
 
 // Delete the Instance from database
 func (v *InstanceClient) Delete(ctx context.Context, id string) error {
-	inst, err := v.GetFull(id)
+	inst, err := v.GetFull(ctx, id)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error getting Instance")
 	}
@@ -1159,8 +1159,8 @@ func (v *InstanceClient) Delete(ctx context.Context, id string) error {
 }
 
 // Continue the instantiation
-func (v *InstanceClient) RecoverCreateOrDelete(id string) error {
-	instance, err := v.GetFull(id)
+func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) error {
+	instance, err := v.GetFull(ctx, id)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error getting instance "+id+", skip this instance.  Error detail")
 	}

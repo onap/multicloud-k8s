@@ -174,7 +174,7 @@ func TestInstanceCreate(t *testing.T) {
 			CloudRegion: "mock_connection",
 		}
 
-		ir, err := ic.Create(input, "")
+		ir, err := ic.Create(context.TODO(), input, "")
 		if err != nil {
 			t.Fatalf("TestInstanceCreate returned an error (%s)", err)
 		}
@@ -265,7 +265,7 @@ func TestInstanceGet(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		id := "HaKpys8e"
-		data, err := ic.Get(id)
+		data, err := ic.Get(context.TODO(), id)
 		if err != nil {
 			t.Fatalf("TestInstanceGet returned an error (%s)", err)
 		}
@@ -314,7 +314,7 @@ func TestInstanceGet(t *testing.T) {
 
 		ic := NewInstanceClient()
 		id := "non-existing"
-		_, err := ic.Get(id)
+		_, err := ic.Get(context.TODO(), id)
 		if err == nil {
 			t.Fatal("Expected error, got pass", err)
 		}
@@ -474,7 +474,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "", "", nil)
+		data, err := ic.Find(context.TODO(), name, "", "", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -521,7 +521,7 @@ func TestInstanceFind(t *testing.T) {
 		labels := map[string]string{
 			"vf_module_id": "test-vf-module-id",
 		}
-		data, err := ic.Find(name, "", "", labels)
+		data, err := ic.Find(context.TODO(), name, "", "", labels)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -575,7 +575,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "v1", "", nil)
+		data, err := ic.Find(context.TODO(), name, "v1", "", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -619,7 +619,7 @@ func TestInstanceFind(t *testing.T) {
 		}
 		ic := NewInstanceClient()
 		name := "test-rbdef"
-		data, err := ic.Find(name, "v1", "profile1", nil)
+		data, err := ic.Find(context.TODO(), name, "v1", "profile1", nil)
 		if err != nil {
 			t.Fatalf("TestInstanceFind returned an error (%s)", err)
 		}
@@ -678,7 +678,7 @@ func TestInstanceFind(t *testing.T) {
 
 		ic := NewInstanceClient()
 		name := "non-existing"
-		resp, _ := ic.Find(name, "", "", nil)
+		resp, _ := ic.Find(context.TODO(), name, "", "", nil)
 		if len(resp) != 0 {
 			t.Fatalf("Expected 0 responses, but got %d", len(resp))
 		}
@@ -881,7 +881,7 @@ func TestInstanceWithHookCreate(t *testing.T) {
 			CloudRegion: "mock_connection",
 		}
 
-		ir, err := ic.Create(input, "")
+		ir, err := ic.Create(context.TODO(), input, "")
 		if err != nil {
 			t.Fatalf("TestInstanceWithHookCreate returned an error (%s)", err)
 		}

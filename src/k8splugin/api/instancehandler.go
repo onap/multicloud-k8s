@@ -95,7 +95,7 @@ func (i instanceHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := i.client.Create(resource, "")
+	resp, err := i.client.Create(r.Context(), resource, "")
 	if err != nil {
 		log.Error("Error Creating Resource", log.Fields{
 			"error":    err,
@@ -149,7 +149,7 @@ func (i instanceHandler) upgradeHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	resp, err := i.client.Upgrade(id, resource)
+	resp, err := i.client.Upgrade(r.Context(), id, resource)
 	if err != nil {
 		log.Error("Error Upgrading Resource", log.Fields{
 			"error":    err,
@@ -180,9 +180,9 @@ func (i instanceHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if r.URL.Query().Get("full") == "true" {
-		resp, err = i.client.GetFull(id)
+		resp, err = i.client.GetFull(r.Context(), id)
 	} else {
-		resp, err = i.client.Get(id)
+		resp, err = i.client.Get(r.Context(), id)
 	}
 
 	if err != nil {
@@ -250,7 +250,7 @@ func (i instanceHandler) queryHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Missing Kind mandatory parameter", http.StatusBadRequest)
 		return
 	}
-	resp, err := i.client.Query(id, apiVersion, kind, name, labels)
+	resp, err := i.client.Query(r.Context(), id, apiVersion, kind, name, labels)
 	if err != nil {
 		log.Error("Error getting Query results", log.Fields{
 			"error":      err,
@@ -284,7 +284,7 @@ func (i instanceHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	rbVersion := r.FormValue("rb-version")
 	profileName := r.FormValue("profile-name")
 
-	resp, err := i.client.List(rbName, rbVersion, profileName)
+	resp, err := i.client.List(r.Context(), rbName, rbVersion, profileName)
 	if err != nil {
 		log.Error("Error listing instances", log.Fields{
 			"error":        err,

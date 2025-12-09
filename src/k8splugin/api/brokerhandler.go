@@ -14,6 +14,7 @@ limitations under the License.
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -175,7 +176,7 @@ func (b brokerInstanceHandler) createHandler(w http.ResponseWriter, r *http.Requ
 	log.Info("Instance API Payload", log.Fields{
 		"payload": instReq,
 	})
-	resp, err := b.client.Create(instReq, "")
+	resp, err := b.client.Create(r.Context(), instReq, "")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -205,7 +206,7 @@ func (b brokerInstanceHandler) getHandler(w http.ResponseWriter, r *http.Request
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
 
-	resp, err := b.client.Get(instanceID)
+	resp, err := b.client.Get(context.TODO(), instanceID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -234,7 +235,7 @@ func (b brokerInstanceHandler) findHandler(w http.ResponseWriter, r *http.Reques
 	vars := mux.Vars(r)
 	//name is an alias for stack-name from the so adapter
 	name := vars["name"]
-	responses, _ := b.client.Find("", "", "", map[string]string{"stack-name": name})
+	responses, _ := b.client.Find(r.Context(), "", "", "", map[string]string{"stack-name": name})
 
 	brokerResp := brokerGETResponse{
 		TemplateType:   "heat",

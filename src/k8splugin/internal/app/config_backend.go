@@ -19,6 +19,7 @@ package app
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -36,7 +37,7 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-//ConfigStore contains the values that will be stored in the database
+// ConfigStore contains the values that will be stored in the database
 type configVersionDBContent struct {
 	ConfigNew  Config                     `json:"config-new"`
 	ConfigPrev Config                     `json:"config-prev"`
@@ -44,13 +45,13 @@ type configVersionDBContent struct {
 	Resources  []KubernetesConfigResource `json:"resources"`
 }
 
-//ConfigStore to Store the Config
+// ConfigStore to Store the Config
 type ConfigStore struct {
 	instanceID string
 	configName string
 }
 
-//ConfigVersionStore to Store the Versions of the Config
+// ConfigVersionStore to Store the Versions of the Config
 type ConfigVersionStore struct {
 	instanceID string
 	configName string
@@ -234,7 +235,7 @@ func (c ConfigStore) deleteConfig() (Config, error) {
 	return configPrev, nil
 }
 
-//Cleanup stored data in etcd before instance is being deleted
+// Cleanup stored data in etcd before instance is being deleted
 func (c ConfigVersionStore) cleanupIstanceTags(configName string) error {
 
 	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
@@ -532,7 +533,7 @@ func scheduleResources(c chan configResourceList) {
 		data := <-c
 		//TODO: ADD Check to see if Application running
 		ic := NewInstanceClient()
-		resp, err := ic.Find(data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
+		resp, err := ic.Find(context.TODO(), data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
 		if (err != nil || len(resp) == 0) && data.action != "STOP" {
 			log.Println("Error finding a running instance. Retrying later...")
 			data.updatedResources <- []KubernetesConfigResource{}
@@ -610,8 +611,8 @@ func scheduleResources(c chan configResourceList) {
 	log.Printf("[scheduleResources]: STOP thread")
 }
 
-//Resolve returns the path where the helm chart merged with
-//configuration overrides resides.
+// Resolve returns the path where the helm chart merged with
+// configuration overrides resides.
 var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, releaseName string) (configResourceList, error) {
 
 	var resTemplates []helm.KubernetesResourceTemplate
@@ -659,7 +660,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 	}
 
 	ic := NewInstanceClient()
-	instance, err := ic.Get(instanceId)
+	instance, err := ic.Get(context.TODO(), instanceId)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Getting Instance")
 	}

@@ -355,7 +355,7 @@ func (iss *InstanceStatusSubClient) RestoreWatchers() {
 		time.Sleep(time.Second * 10)
 		log.Info("Restoring status subscription notifications", log.Fields{})
 		v := NewInstanceClient()
-		instances, err := v.List("", "", "")
+		instances, err := v.List(context.TODO(), "", "", "")
 		if err != nil {
 			log.Error("Error reading instance list", log.Fields{
 				"error": err.Error(),
@@ -394,7 +394,7 @@ func (iss *InstanceStatusSubClient) refreshWatchers(instanceId, subId string) er
 	})
 	v := NewInstanceClient()
 	k8sClient := KubernetesClient{}
-	instance, err := v.Get(instanceId)
+	instance, err := v.Get(context.TODO(), instanceId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Cannot get instance for notify thread")
 	}

@@ -49,7 +49,7 @@ type mockInstanceClient struct {
 	err        error
 }
 
-func (m *mockInstanceClient) Create(inp app.InstanceRequest, newId string) (app.InstanceResponse, error) {
+func (m *mockInstanceClient) Create(ctx context.Context, inp app.InstanceRequest, newId string) (app.InstanceResponse, error) {
 	if m.err != nil {
 		return app.InstanceResponse{}, m.err
 	}
@@ -57,7 +57,7 @@ func (m *mockInstanceClient) Create(inp app.InstanceRequest, newId string) (app.
 	return m.items[0], nil
 }
 
-func (m *mockInstanceClient) Get(id string) (app.InstanceResponse, error) {
+func (m *mockInstanceClient) Get(ctx context.Context, id string) (app.InstanceResponse, error) {
 	if m.err != nil {
 		return app.InstanceResponse{}, m.err
 	}
@@ -65,7 +65,7 @@ func (m *mockInstanceClient) Get(id string) (app.InstanceResponse, error) {
 	return m.items[0], nil
 }
 
-func (m *mockInstanceClient) Query(id, apiVersion, kind, name, labels string) (app.InstanceStatus, error) {
+func (m *mockInstanceClient) Query(ctx context.Context, id, apiVersion, kind, name, labels string) (app.InstanceStatus, error) {
 	if m.err != nil {
 		return app.InstanceStatus{}, m.err
 	}
@@ -81,7 +81,7 @@ func (m *mockInstanceClient) Status(ctx context.Context, id string, checkReady b
 	return m.statusItem, nil
 }
 
-func (m *mockInstanceClient) List(rbname, rbversion, profilename string) ([]app.InstanceMiniResponse, error) {
+func (m *mockInstanceClient) List(ctx context.Context, rbname, rbversion, profilename string) ([]app.InstanceMiniResponse, error) {
 	if m.err != nil {
 		return []app.InstanceMiniResponse{}, m.err
 	}
@@ -89,7 +89,7 @@ func (m *mockInstanceClient) List(rbname, rbversion, profilename string) ([]app.
 	return m.miniitems, nil
 }
 
-func (m *mockInstanceClient) Find(rbName string, ver string, profile string, labelKeys map[string]string) ([]app.InstanceMiniResponse, error) {
+func (m *mockInstanceClient) Find(ctx context.Context, rbName string, ver string, profile string, labelKeys map[string]string) ([]app.InstanceMiniResponse, error) {
 	if m.err != nil {
 		return nil, m.err
 	}

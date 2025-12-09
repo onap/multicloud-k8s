@@ -14,6 +14,7 @@ limitations under the License.
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -98,7 +99,7 @@ func (hc *HookClient) ExecHook(
 		//-> when it comes back, it will continue from next hook and consider that this one is done
 		if dbData != nil {
 			dbData.HookProgress = fmt.Sprintf("%d/%d", index+1, len(executingHooks))
-			err := db.DBconn.Update(hc.dbStoreName, key, hc.dbTagInst, dbData)
+			err := db.DBconn.Update(context.TODO(), hc.dbStoreName, key, hc.dbTagInst, dbData)
 			if err != nil {
 				return err
 			}

@@ -29,7 +29,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//Implements the functions used currently in mongo.go
+// Implements the functions used currently in mongo.go
 type mockCollection struct {
 	Err          error
 	mCursor      *mongo.Cursor
@@ -127,7 +127,7 @@ func TestCreate(t *testing.T) {
 				return testCase.bson, testCase.mockColl.Err
 			}
 
-			err := m.Create(testCase.input["coll"].(string), testCase.input["key"].(Key),
+			err := m.Create(context.TODO(), testCase.input["coll"].(string), testCase.input["key"].(Key),
 				testCase.input["tag"].(string), testCase.input["data"])
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -205,7 +205,7 @@ func TestUpdate(t *testing.T) {
 				return testCase.bson, testCase.mockColl.Err
 			}
 
-			err := m.Update(testCase.input["coll"].(string), testCase.input["key"].(Key),
+			err := m.Update(context.TODO(), testCase.input["coll"].(string), testCase.input["key"].(Key),
 				testCase.input["tag"].(string), testCase.input["data"])
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -322,7 +322,7 @@ func TestRead(t *testing.T) {
 			decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
 				return testCase.bson, testCase.mockColl.Err
 			}
-			got, err := m.Read(testCase.input["coll"].(string), testCase.input["key"].(Key),
+			got, err := m.Read(context.TODO(), testCase.input["coll"].(string), testCase.input["key"].(Key),
 				testCase.input["tag"].(string))
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -441,7 +441,7 @@ func TestDelete(t *testing.T) {
 			decodeBytes = func(sr *mongo.SingleResult) (bson.Raw, error) {
 				return testCase.bson, testCase.mockColl.Err
 			}
-			err := m.Delete(testCase.input["coll"].(string), testCase.input["key"].(Key),
+			err := m.Delete(context.TODO(), testCase.input["coll"].(string), testCase.input["key"].(Key),
 				testCase.input["tag"].(string))
 			if err != nil {
 				if testCase.expectedError == "" {
@@ -578,7 +578,7 @@ func TestReadAll(t *testing.T) {
 				return nil
 			}
 
-			got, err := m.ReadAll(testCase.input["coll"].(string), testCase.input["tag"].(string))
+			got, err := m.ReadAll(context.TODO(), testCase.input["coll"].(string), testCase.input["tag"].(string))
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Readall method returned an un-expected (%s)", err)

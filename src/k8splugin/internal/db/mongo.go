@@ -130,13 +130,12 @@ func (m *MongoStore) validateParams(args ...interface{}) bool {
 }
 
 // Create is used to create a DB entry
-func (m *MongoStore) Create(coll string, key Key, tag string, data interface{}) error {
+func (m *MongoStore) Create(ctx context.Context, coll string, key Key, tag string, data interface{}) error {
 	if data == nil || !m.validateParams(coll, key, tag) {
 		return pkgerrors.New("No Data to store")
 	}
 
 	c := getCollection(coll, m)
-	ctx := context.Background()
 
 	//Insert the data and then add the objectID to the masterTable
 	res, err := c.InsertOne(ctx, bson.D{
@@ -169,17 +168,16 @@ func (m *MongoStore) Create(coll string, key Key, tag string, data interface{}) 
 }
 
 // Update is used to update a DB entry
-func (m *MongoStore) Update(coll string, key Key, tag string, data interface{}) error {
+func (m *MongoStore) Update(ctx context.Context, coll string, key Key, tag string, data interface{}) error {
 	if data == nil || !m.validateParams(coll, key, tag) {
 		return pkgerrors.New("No Data to update")
 	}
 
 	c := getCollection(coll, m)
-	ctx := context.Background()
 
 	//Get the masterkey document based on given key
 	filter := bson.D{{"key", key}}
-	keydata, err := decodeBytes(c.FindOne(context.Background(), filter))
+	keydata, err := decodeBytes(c.FindOne(ctx, filter))
 	if err != nil {
 		return pkgerrors.Errorf("Error finding master table: %s", err.Error())
 	}
@@ -222,17 +220,16 @@ func (m *MongoStore) Unmarshal(inp []byte, out interface{}) error {
 }
 
 // Read method returns the data stored for this key and for this particular tag
-func (m *MongoStore) Read(coll string, key Key, tag string) ([]byte, error) {
+func (m *MongoStore) Read(ctx context.Context, coll string, key Key, tag string) ([]byte, error) {
 	if !m.validateParams(coll, key, tag) {
 		return nil, pkgerrors.New("Mandatory fields are missing")
 	}
 
 	c := getCollection(coll, m)
-	ctx := context.Background()
 
 	//Get the masterkey document based on given key
 	filter := bson.D{{"key", key}}
-	keydata, err := decodeBytes(c.FindOne(context.Background(), filter))
+	keydata, err := decodeBytes(c.FindOne(ctx, filter))
 	if err != nil {
 		return nil, pkgerrors.Errorf("Error finding master table: %s", err.Error())
 	}
@@ -261,10 +258,9 @@ func (m *MongoStore) Read(coll string, key Key, tag string) ([]byte, error) {
 }
 
 // Helper function that deletes an object by its ID
-func (m *MongoStore) deleteObjectByID(coll string, objID primitive.ObjectID) error {
+func (m *MongoStore) deleteObjectByID(ctx context.Context, coll string, objID primitive.ObjectID) error {
 
 	c := getCollection(coll, m)
-	ctx := context.Background()
 
 	_, err := c.DeleteOne(ctx, bson.D{{"_id", objID}})
 	if err != nil {
@@ -277,13 +273,12 @@ func (m *MongoStore) deleteObjectByID(coll string, objID primitive.ObjectID) err
 
 // Delete method removes a document from the Database that matches key
 // TODO: delete all referenced docs if tag is empty string
-func (m *MongoStore) Delete(coll string, key Key, tag string) error {
+func (m *MongoStore) Delete(ctx context.Context, coll string, key Key, tag string) error {
 	if !m.validateParams(coll, key, tag) {
 		return pkgerrors.New("Mandatory fields are missing")
 	}
 
 	c := getCollection(coll, m)
-	ctx := context.Background()
 
 	//Get the masterkey document based on given key
 	filter := bson.D{{"key", key}}
@@ -319,7 +314,7 @@ func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 	}
 
 	//Use tag objectID to read the data from store
-	err = m.deleteObjectByID(coll, tagoid)
+	err = m.deleteObjectByID(ctx, coll, tagoid)
 	if err != nil {
 		return pkgerrors.Errorf("Error deleting from database: %s", err.Error())
 	}
@@ -332,7 +327,7 @@ func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 		if !ok {
 			return pkgerrors.Errorf("Error finding objectID for key %s", key)
 		}
-		err = m.deleteObjectByID(coll, keyid)
+		err = m.deleteObjectByID(ctx, coll, keyid)
 		if err != nil {
 			return pkgerrors.Errorf("Error deleting master table from database: %s", err.Error())
 		}
@@ -342,13 +337,12 @@ func (m *MongoStore) Delete(coll string, key Key, tag string) error {
 }
 
 // ReadAll is used to get all documents in db of a particular tag
-func (m *MongoStore) ReadAll(coll, tag string) (map[string][]byte, error) {
+func (m *MongoStore) ReadAll(ctx context.Context, coll, tag string) (map[string][]byte, error) {
 	if !m.validateParams(coll, tag) {
 		return nil, pkgerrors.New("Missing collection or tag name")
 	}
 
 	c := getCollection(coll, m)
-	ctx := context.Background()
 
 	//Get all master tables in this collection
 	filter := bson.D{

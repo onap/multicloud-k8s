@@ -14,6 +14,8 @@ limitations under the License.
 package db
 
 import (
+	"context"
+
 	k8sconfig "github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 
 	"github.com/hashicorp/consul/api"
@@ -67,7 +69,7 @@ func (c *ConsulStore) Unmarshal(inp []byte, out interface{}) error {
 }
 
 // Create is used to create a DB entry
-func (c *ConsulStore) Create(root string, key Key, tag string, data interface{}) error {
+func (c *ConsulStore) Create(ctx context.Context, root string, key Key, tag string, data interface{}) error {
 
 	//Convert to string as Consul only supports string based keys
 	k := key.String()
@@ -89,12 +91,12 @@ func (c *ConsulStore) Create(root string, key Key, tag string, data interface{})
 }
 
 // Update is used to update a DB entry
-func (c *ConsulStore) Update(root string, key Key, tag string, data interface{}) error {
-	return c.Create(root, key, tag, data)
+func (c *ConsulStore) Update(ctx context.Context, root string, key Key, tag string, data interface{}) error {
+	return c.Create(ctx, root, key, tag, data)
 }
 
 // Read method returns the internalID for a particular externalID
-func (c *ConsulStore) Read(root string, key Key, tag string) ([]byte, error) {
+func (c *ConsulStore) Read(ctx context.Context, root string, key Key, tag string) ([]byte, error) {
 
 	//Convert to string as Consul only supports string based keys
 	k := key.String()
@@ -114,7 +116,7 @@ func (c *ConsulStore) Read(root string, key Key, tag string) ([]byte, error) {
 }
 
 // Delete method removes an internalID from the Database
-func (c *ConsulStore) Delete(root string, key Key, tag string) error {
+func (c *ConsulStore) Delete(ctx context.Context, root string, key Key, tag string) error {
 
 	//Convert to string as Consul only supports string based keys
 	k := key.String()
@@ -126,7 +128,7 @@ func (c *ConsulStore) Delete(root string, key Key, tag string) error {
 }
 
 // ReadAll is used to get all ExternalIDs in a namespace
-func (c *ConsulStore) ReadAll(root string, tag string) (map[string][]byte, error) {
+func (c *ConsulStore) ReadAll(ctx context.Context, root string, tag string) (map[string][]byte, error) {
 	pairs, _, err := c.client.List(root, nil)
 	if err != nil {
 		return nil, err

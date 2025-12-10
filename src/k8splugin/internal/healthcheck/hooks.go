@@ -14,6 +14,7 @@ limitations under the License.
 package healthcheck
 
 import (
+	"context"
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
@@ -67,7 +68,7 @@ func getHookState(hookStatus HookStatus, k8sClient app.KubernetesClient, namespa
 	}
 
 	for {
-		res, err := k8sClient.GetResourceStatus(hookStatus.KR, namespace)
+		res, err := k8sClient.GetResourceStatus(context.TODO(), hookStatus.KR, namespace)
 		if err != nil {
 			log.Error("Unable to check Resource Status", log.Fields{
 				"Resource":  hookStatus.KR,

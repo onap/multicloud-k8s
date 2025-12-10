@@ -77,6 +77,7 @@ func (hc *HookClient) ExecHook(
 	timeout int64,
 	startIndex int,
 	dbData *InstanceDbData) error {
+	ctx := context.TODO()
 	executingHooks := hc.getHookByEvent(hs, hook)
 	key := InstanceKey{
 		ID: hc.id,
@@ -109,7 +110,7 @@ func (hc *HookClient) ExecHook(
 			GVK:      h.KRT.GVK,
 			FilePath: h.KRT.FilePath,
 		}
-		createdHook, err := k8sClient.CreateKind(resTempl, hc.kubeNameSpace)
+		createdHook, err := k8sClient.CreateKind(ctx, resTempl, hc.kubeNameSpace)
 		if err != nil {
 			log.Printf("  Instance: %s, Warning: %s hook %s, filePath: %s, error: %s", hc.id, hook, h.Hook.Name, h.KRT.FilePath, err)
 			hc.deleteHookByPolicy(h, release.HookFailed, k8sClient)
@@ -151,7 +152,7 @@ func (hc *HookClient) deleteHookByPolicy(h *helm.Hook, policy release.HookDelete
 	}
 	if hookHasDeletePolicy(h, policy) {
 		log.Printf("  Instance: %s, Deleting hook %s due to %q policy", hc.id, h.Hook.Name, policy)
-		if errHookDelete := k8sClient.deleteResources(append([]helm.KubernetesResource{}, rss), hc.kubeNameSpace); errHookDelete != nil {
+		if errHookDelete := k8sClient.deleteResources(context.TODO(), append([]helm.KubernetesResource{}, rss), hc.kubeNameSpace); errHookDelete != nil {
 			if strings.Contains(errHookDelete.Error(), "not found") {
 				return nil
 			} else {
@@ -163,7 +164,7 @@ func (hc *HookClient) deleteHookByPolicy(h *helm.Hook, policy release.HookDelete
 			isDeleted := false
 			for !isDeleted {
 				log.Printf("  Instance: %s, Waiting on deleting hook %s for release %s due to %q policy", hc.id, h.Hook.Name, hc.id, policy)
-				if _, err := k8sClient.GetResourceStatus(rss, hc.kubeNameSpace); err != nil {
+				if _, err := k8sClient.GetResourceStatus(context.TODO(), rss, hc.kubeNameSpace); err != nil {
 					if strings.Contains(err.Error(), "not found") {
 						log.Printf("  Instance: %s, Deleted hook %s for release %s due to %q policy", hc.id, h.Hook.Name, hc.id, policy)
 						return nil

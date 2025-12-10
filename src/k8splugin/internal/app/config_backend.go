@@ -530,10 +530,11 @@ func scheduleResources(c chan configResourceList) {
 	// Keep thread running
 	log.Printf("[scheduleResources]: START thread")
 	for {
+		ctx := context.TODO()
 		data := <-c
 		//TODO: ADD Check to see if Application running
 		ic := NewInstanceClient()
-		resp, err := ic.Find(context.TODO(), data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
+		resp, err := ic.Find(ctx, data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
 		if (err != nil || len(resp) == 0) && data.action != "STOP" {
 			log.Println("Error finding a running instance. Retrying later...")
 			data.updatedResources <- []KubernetesConfigResource{}
@@ -546,7 +547,7 @@ func scheduleResources(c chan configResourceList) {
 			resources := []KubernetesConfigResource{}
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
-				err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
+				err = k8sClient.Init(ctx, inst.Request.CloudRegion, inst.ID)
 				if err != nil {
 					log.Printf("Getting CloudRegion Information: %s", err.Error())
 					//Move onto the next cloud region
@@ -554,12 +555,12 @@ func scheduleResources(c chan configResourceList) {
 				}
 				for _, res := range data.resourceTemplates {
 					var resToCreateOrUpdate = []helm.KubernetesResourceTemplate{res}
-					resProceeded, err := k8sClient.createResources(resToCreateOrUpdate, inst.Namespace)
+					resProceeded, err := k8sClient.createResources(ctx, resToCreateOrUpdate, inst.Namespace)
 					errCreate := err
 					var status string = ""
 					if err != nil {
 						// assuming - the err represent the resource already exist, so going for update
-						resProceeded, err = k8sClient.updateResources(resToCreateOrUpdate, inst.Namespace, false)
+						resProceeded, err = k8sClient.updateResources(ctx, resToCreateOrUpdate, inst.Namespace, false)
 						if err != nil {
 							log.Printf("Error Creating resources: %s", errCreate.Error())
 							log.Printf("Error Updating resources: %s", err.Error())
@@ -583,7 +584,7 @@ func scheduleResources(c chan configResourceList) {
 			log.Printf("[scheduleResources]: DELETE %v %v", data.profile, data.resources)
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
-				err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
+				err = k8sClient.Init(ctx, inst.Request.CloudRegion, inst.ID)
 				if err != nil {
 					log.Printf("Getting CloudRegion Information: %s", err.Error())
 					//Move onto the next cloud region
@@ -593,7 +594,7 @@ func scheduleResources(c chan configResourceList) {
 				for _, res := range data.resources {
 					tmpResources = append(tmpResources, res.Resource)
 				}
-				err = k8sClient.deleteResources(helm.GetReverseK8sResources(tmpResources), inst.Namespace)
+				err = k8sClient.deleteResources(context.TODO(), helm.GetReverseK8sResources(tmpResources), inst.Namespace)
 				if err != nil {
 					log.Printf("Error Deleting resources: %s", err.Error())
 					continue

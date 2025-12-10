@@ -14,36 +14,38 @@ limitations under the License.
 package app
 
 import (
+	"context"
 	"encoding/base64"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
+	"io/ioutil"
+	"testing"
+
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/time"
-	"io/ioutil"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"testing"
 )
 
 func generateHookList() []*helm.Hook {
 	var hookList []*helm.Hook
 	preInstallHook1 := helm.Hook{
 		Hook: release.Hook{
-			Name : "preinstall1",
-			Kind : "Job",
-			Path : "",
-			Manifest : "",
-			Events : []release.HookEvent{release.HookPreInstall},
-			LastRun : release.HookExecution{
+			Name:     "preinstall1",
+			Kind:     "Job",
+			Path:     "",
+			Manifest: "",
+			Events:   []release.HookEvent{release.HookPreInstall},
+			LastRun: release.HookExecution{
 				StartedAt:   time.Now(),
 				CompletedAt: time.Now(),
 				Phase:       "",
 			},
-			Weight : -5,
-			DeletePolicies : []release.HookDeletePolicy{},
+			Weight:         -5,
+			DeletePolicies: []release.HookDeletePolicy{},
 		},
-		KRT:  helm.KubernetesResourceTemplate{
+		KRT: helm.KubernetesResourceTemplate{
 			GVK: schema.GroupVersionKind{
 				Group:   "batch",
 				Version: "v1",
@@ -54,20 +56,20 @@ func generateHookList() []*helm.Hook {
 	}
 	preInstallHook2 := helm.Hook{
 		Hook: release.Hook{
-			Name : "preinstall2",
-			Kind : "Deployment",
-			Path : "",
-			Manifest : "",
-			Events : []release.HookEvent{release.HookPreInstall},
-			LastRun : release.HookExecution{
+			Name:     "preinstall2",
+			Kind:     "Deployment",
+			Path:     "",
+			Manifest: "",
+			Events:   []release.HookEvent{release.HookPreInstall},
+			LastRun: release.HookExecution{
 				StartedAt:   time.Now(),
 				CompletedAt: time.Now(),
 				Phase:       "",
 			},
-			Weight : 0,
-			DeletePolicies : []release.HookDeletePolicy{},
+			Weight:         0,
+			DeletePolicies: []release.HookDeletePolicy{},
 		},
-		KRT:  helm.KubernetesResourceTemplate{
+		KRT: helm.KubernetesResourceTemplate{
 			GVK: schema.GroupVersionKind{
 				Group:   "batch",
 				Version: "v1",
@@ -78,20 +80,20 @@ func generateHookList() []*helm.Hook {
 	}
 	postInstallHook := helm.Hook{
 		Hook: release.Hook{
-			Name : "postinstall",
-			Kind : "Job",
-			Path : "",
-			Manifest : "",
-			Events : []release.HookEvent{release.HookPostInstall},
-			LastRun : release.HookExecution{
+			Name:     "postinstall",
+			Kind:     "Job",
+			Path:     "",
+			Manifest: "",
+			Events:   []release.HookEvent{release.HookPostInstall},
+			LastRun: release.HookExecution{
 				StartedAt:   time.Now(),
 				CompletedAt: time.Now(),
 				Phase:       "",
 			},
-			Weight : -5,
-			DeletePolicies : []release.HookDeletePolicy{},
+			Weight:         -5,
+			DeletePolicies: []release.HookDeletePolicy{},
 		},
-		KRT:  helm.KubernetesResourceTemplate{
+		KRT: helm.KubernetesResourceTemplate{
 			GVK: schema.GroupVersionKind{
 				Group:   "batch",
 				Version: "v1",
@@ -102,20 +104,20 @@ func generateHookList() []*helm.Hook {
 	}
 	preDeleteHook := helm.Hook{
 		Hook: release.Hook{
-			Name : "predelete",
-			Kind : "Job",
-			Path : "",
-			Manifest : "",
-			Events : []release.HookEvent{release.HookPreDelete},
-			LastRun : release.HookExecution{
+			Name:     "predelete",
+			Kind:     "Job",
+			Path:     "",
+			Manifest: "",
+			Events:   []release.HookEvent{release.HookPreDelete},
+			LastRun: release.HookExecution{
 				StartedAt:   time.Now(),
 				CompletedAt: time.Now(),
 				Phase:       "",
 			},
-			Weight : -5,
-			DeletePolicies : []release.HookDeletePolicy{},
+			Weight:         -5,
+			DeletePolicies: []release.HookDeletePolicy{},
 		},
-		KRT:  helm.KubernetesResourceTemplate{
+		KRT: helm.KubernetesResourceTemplate{
 			GVK: schema.GroupVersionKind{
 				Group:   "batch",
 				Version: "v1",
@@ -126,20 +128,20 @@ func generateHookList() []*helm.Hook {
 	}
 	postDeleteHook := helm.Hook{
 		Hook: release.Hook{
-			Name : "postdelete",
-			Kind : "Job",
-			Path : "",
-			Manifest : "",
-			Events : []release.HookEvent{release.HookPostDelete},
-			LastRun : release.HookExecution{
+			Name:     "postdelete",
+			Kind:     "Job",
+			Path:     "",
+			Manifest: "",
+			Events:   []release.HookEvent{release.HookPostDelete},
+			LastRun: release.HookExecution{
 				StartedAt:   time.Now(),
 				CompletedAt: time.Now(),
 				Phase:       "",
 			},
-			Weight : -5,
-			DeletePolicies : []release.HookDeletePolicy{},
+			Weight:         -5,
+			DeletePolicies: []release.HookDeletePolicy{},
 		},
-		KRT:  helm.KubernetesResourceTemplate{
+		KRT: helm.KubernetesResourceTemplate{
 			GVK: schema.GroupVersionKind{
 				Group:   "batch",
 				Version: "v1",
@@ -241,23 +243,23 @@ func TestExecHook(t *testing.T) {
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.Init("mock_connection", "test")
+	err = k8sClient.Init(context.TODO(), "mock_connection", "test")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall,10,0, nil)
+	err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall, 10, 0, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	err = hookClient.ExecHook(k8sClient, hookList, release.HookPostInstall,10,0, nil)
+	err = hookClient.ExecHook(k8sClient, hookList, release.HookPostInstall, 10, 0, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	err = hookClient.ExecHook(k8sClient, hookList, release.HookPreDelete,10,0, nil)
+	err = hookClient.ExecHook(k8sClient, hookList, release.HookPreDelete, 10, 0, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	err = hookClient.ExecHook(k8sClient, hookList, release.HookPostDelete,10,0, nil)
+	err = hookClient.ExecHook(k8sClient, hookList, release.HookPostDelete, 10, 0, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}

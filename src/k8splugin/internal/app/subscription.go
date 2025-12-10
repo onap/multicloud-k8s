@@ -394,7 +394,8 @@ func (iss *InstanceStatusSubClient) refreshWatchers(instanceId, subId string) er
 	})
 	v := NewInstanceClient()
 	k8sClient := KubernetesClient{}
-	instance, err := v.Get(context.TODO(), instanceId)
+	ctx := context.TODO()
+	instance, err := v.Get(ctx, instanceId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Cannot get instance for notify thread")
 	}
@@ -403,7 +404,7 @@ func (iss *InstanceStatusSubClient) refreshWatchers(instanceId, subId string) er
 	if err != nil {
 		return pkgerrors.Wrap(err, "Unable to find Profile instance status")
 	}
-	err = k8sClient.Init(instance.Request.CloudRegion, instanceId)
+	err = k8sClient.Init(ctx, instance.Request.CloudRegion, instanceId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Cannot set k8s client for instance")
 	}

@@ -109,13 +109,14 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 
 	//Determine Cloud Region and namespace
 	v := app.NewInstanceClient()
-	instance, err := v.Get(context.TODO(), instanceId)
+	ctx := context.TODO()
+	instance, err := v.Get(ctx, instanceId)
 	if err != nil {
 		return InstanceMiniHCStatus{}, pkgerrors.Wrap(err, "Getting instance")
 	}
 
 	k8sClient := app.KubernetesClient{}
-	err = k8sClient.Init(instance.Request.CloudRegion, instanceId)
+	err = k8sClient.Init(ctx, instance.Request.CloudRegion, instanceId)
 	if err != nil {
 		return InstanceMiniHCStatus{}, pkgerrors.Wrap(err, "Preparing KubeClient")
 	}
@@ -153,7 +154,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 
 	for _, h := range hooks {
 		h.Status.StartedAt = time.Now()
-		kr, err := k8sClient.CreateKind(h.Definition.KRT, instance.Namespace)
+		kr, err := k8sClient.CreateKind(ctx, h.Definition.KRT, instance.Namespace)
 		if err != nil {
 			// Set status fields
 			h.Status.Status = release.HookPhaseFailed
@@ -163,7 +164,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 			retErr := "Starting hook " + h.Status.Name
 
 			// Dump to DB
-			err = db.DBconn.Create(context.TODO(), ihc.storeName, key, ihc.tagInst, ihcs)
+			err = db.DBconn.Create(ctx, ihc.storeName, key, ihc.tagInst, ihcs)
 			if err != nil {
 				retErr = retErr + " and couldn't save to DB"
 			}
@@ -175,7 +176,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 			h.Status.KR = kr
 		}
 	}
-	err = db.DBconn.Create(context.TODO(), ihc.storeName, key, ihc.tagInst, ihcs)
+	err = db.DBconn.Create(ctx, ihc.storeName, key, ihc.tagInst, ihcs)
 	if err != nil {
 		return instanceMiniHCStatusFromStatus(ihcs),
 			pkgerrors.Wrap(err, "Creating Instance DB Entry")
@@ -222,7 +223,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 					"Reason":        map[bool]string{true: "Hook finished", false: "All hooks finished"}[b],
 				})
 				if b { //Some hook finished - need to update DB
-					err = db.DBconn.Update(context.TODO(), ihc.storeName, key, ihc.tagInst, ihcs)
+					err = db.DBconn.Update(ctx, ihc.storeName, key, ihc.tagInst, ihcs)
 					if err != nil {
 						log.Error("Couldn't update database", log.Fields{
 							"Store":   ihc.storeName,
@@ -249,7 +250,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 						}
 					}
 					ihcs.Status = finalResult
-					err = db.DBconn.Update(context.TODO(), ihc.storeName, key, ihc.tagInst, ihcs)
+					err = db.DBconn.Update(ctx, ihc.storeName, key, ihc.tagInst, ihcs)
 					if err != nil {
 						log.Error("Couldn't update database", log.Fields{
 							"Store":   ihc.storeName,
@@ -295,7 +296,7 @@ func (ihc InstanceHCClient) Delete(instanceId, healthcheckId string) error {
 		return pkgerrors.Wrap(err, "Error querying Healthcheck status")
 	}
 	k8sClient := app.KubernetesClient{}
-	err = k8sClient.Init(instance.Request.CloudRegion, instanceId)
+	err = k8sClient.Init(context.TODO(), instance.Request.CloudRegion, instanceId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Preparing KubeClient")
 	}

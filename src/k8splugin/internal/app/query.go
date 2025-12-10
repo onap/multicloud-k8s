@@ -19,6 +19,8 @@
 package app
 
 import (
+	"context"
+
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -55,14 +57,14 @@ func (v *QueryClient) Query(namespace, cloudRegion, apiVersion, kind, name, labe
 	//Read the status from the DD
 
 	k8sClient := KubernetesClient{}
-	err := k8sClient.Init(cloudRegion, "dummy") //we don't care about instance id in this request
+	err := k8sClient.Init(context.TODO(), cloudRegion, "dummy") //we don't care about instance id in this request
 	if err != nil {
 		return QueryStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
 
 	var resourcesStatus []ResourceStatus
 	if name != "" {
-		resList, err := k8sClient.queryResources(apiVersion, kind, labels, namespace)
+		resList, err := k8sClient.queryResources(context.TODO(), apiVersion, kind, labels, namespace)
 		if err != nil {
 			return QueryStatus{}, pkgerrors.Wrap(err, "Querying Resources")
 		}
@@ -79,7 +81,7 @@ func (v *QueryClient) Query(namespace, cloudRegion, apiVersion, kind, name, labe
 			resourcesStatus = resList
 		}
 	} else {
-		resList, err := k8sClient.queryResources(apiVersion, kind, labels, namespace)
+		resList, err := k8sClient.queryResources(context.TODO(), apiVersion, kind, labels, namespace)
 		if err != nil {
 			return QueryStatus{}, pkgerrors.Wrap(err, "Querying Resources")
 		}

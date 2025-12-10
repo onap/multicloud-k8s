@@ -14,6 +14,7 @@ limitations under the License.
 package app
 
 import (
+	"context"
 	"encoding/base64"
 	"io/ioutil"
 	"os"
@@ -73,7 +74,7 @@ func TestInit(t *testing.T) {
 
 		kubeClient := KubernetesClient{}
 		// Refer to the connection via its name
-		err = kubeClient.Init("mock_connection", "abcdefg")
+		err = kubeClient.Init(context.TODO(), "mock_connection", "abcdefg")
 		if err != nil {
 			t.Fatalf("TestGetKubeClient returned an error (%s)", err)
 		}
@@ -120,7 +121,7 @@ func TestCreateResources(t *testing.T) {
 			},
 		}
 
-		_, err := k8.createResources(data, "testnamespace")
+		_, err := k8.createResources(context.TODO(), data, "testnamespace")
 		if err != nil {
 			t.Fatalf("TestCreateResources returned an error (%s)", err)
 		}
@@ -175,7 +176,7 @@ func TestDeleteResources(t *testing.T) {
 			},
 		}
 
-		err := k8.deleteResources(data, "test")
+		err := k8.deleteResources(context.TODO(), data, "test")
 		if err != nil {
 			t.Fatalf("TestCreateVNF returned an error (%s)", err)
 		}

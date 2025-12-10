@@ -242,12 +242,12 @@ func (k *KubernetesClient) WatchHookUntilReady(timeout time.Duration, ns string,
 }
 
 // getPodsByLabel yields status of all pods under given instance ID
-func (k *KubernetesClient) getPodsByLabel(namespace string) ([]ResourceStatus, error) {
+func (k *KubernetesClient) getPodsByLabel(ctx context.Context, namespace string) ([]ResourceStatus, error) {
 	client := k.GetStandardClient().CoreV1().Pods(namespace)
 	listOpts := metav1.ListOptions{
 		LabelSelector: config.GetConfiguration().KubernetesLabelName + "=" + k.instanceID,
 	}
-	podList, err := client.List(context.TODO(), listOpts)
+	podList, err := client.List(ctx, listOpts)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Retrieving PodList from cluster")
 	}
@@ -275,7 +275,10 @@ func (k *KubernetesClient) getPodsByLabel(namespace string) ([]ResourceStatus, e
 	return resp, nil
 }
 
-func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, namespace string) ([]ResourceStatus, error) {
+func (k *KubernetesClient) queryResources(ctx context.Context, apiVersion, kind, labelSelector, namespace string) ([]ResourceStatus, error) {
+	ctx, span := tracer.Start(ctx, "KubernetesClient.queryResources")
+	defer span.End()
+
 	dynClient := k.GetDynamicClient()
 	mapper := k.GetMapper()
 	gvk := schema.FromAPIVersionAndKind(apiVersion, kind)
@@ -289,12 +292,12 @@ func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, names
 		LabelSelector: labelSelector,
 	}
 	var unstrList *unstructured.UnstructuredList
-	dynClient.Resource(gvr).Namespace(namespace).List(context.TODO(), opts)
+	dynClient.Resource(gvr).Namespace(namespace).List(ctx, opts)
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		unstrList, err = dynClient.Resource(gvr).Namespace(namespace).List(context.TODO(), opts)
+		unstrList, err = dynClient.Resource(gvr).Namespace(namespace).List(ctx, opts)
 	case meta.RESTScopeNameRoot:
-		unstrList, err = dynClient.Resource(gvr).List(context.TODO(), opts)
+		unstrList, err = dynClient.Resource(gvr).List(ctx, opts)
 	default:
 		return nil, pkgerrors.New("Got an unknown RESTScopeName for mapping: " + gvk.String())
 	}
@@ -312,7 +315,9 @@ func (k *KubernetesClient) queryResources(apiVersion, kind, labelSelector, names
 }
 
 // GetResourcesStatus yields status of given generic resource
-func (k *KubernetesClient) GetResourceStatus(res helm.KubernetesResource, namespace string) (ResourceStatus, error) {
+func (k *KubernetesClient) GetResourceStatus(ctx context.Context, res helm.KubernetesResource, namespace string) (ResourceStatus, error) {
+	ctx, span := tracer.Start(ctx, "KubernetesClient.GetResourceStatus")
+	defer span.End()
 	dynClient := k.GetDynamicClient()
 	mapper := k.GetMapper()
 	mapping, err := mapper.RESTMapping(schema.GroupKind{
@@ -329,9 +334,9 @@ func (k *KubernetesClient) GetResourceStatus(res helm.KubernetesResource, namesp
 	var unstruct *unstructured.Unstructured
 	switch mapping.Scope.Name() {
 	case meta.RESTScopeNameNamespace:
-		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(context.TODO(), res.Name, opts)
+		unstruct, err = dynClient.Resource(gvr).Namespace(namespace).Get(ctx, res.Name, opts)
 	case meta.RESTScopeNameRoot:
-		unstruct, err = dynClient.Resource(gvr).Get(context.TODO(), res.Name, opts)
+		unstruct, err = dynClient.Resource(gvr).Get(ctx, res.Name, opts)
 	default:
 		return ResourceStatus{}, pkgerrors.New("Got an unknown RESTSCopeName for mapping: " + res.GVK.String())
 	}
@@ -345,10 +350,12 @@ func (k *KubernetesClient) GetResourceStatus(res helm.KubernetesResource, namesp
 
 // getKubeConfig uses the connectivity client to get the kubeconfig based on the name
 // of the cloudregion. This is written out to a file.
-func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
+func (k *KubernetesClient) getKubeConfig(ctx context.Context, cloudregion string) (string, error) {
+	ctx, span := tracer.Start(ctx, "KubernetesClient.getKubeConfig")
+	defer span.End()
 
 	conn := connection.NewConnectionClient()
-	kubeConfigPath, err := conn.Download(context.TODO(), cloudregion)
+	kubeConfigPath, err := conn.Download(ctx, cloudregion)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Downloading kubeconfig")
 	}
@@ -356,8 +363,11 @@ func (k *KubernetesClient) getKubeConfig(cloudregion string) (string, error) {
 	return kubeConfigPath, nil
 }
 
-// Init loads the Kubernetes configuation values stored into the local configuration file
-func (k *KubernetesClient) Init(cloudregion string, iid string) error {
+// Init loads the Kubernetes configuration values stored into the local configuration file
+func (k *KubernetesClient) Init(ctx context.Context, cloudregion string, iid string) error {
+	ctx, span := tracer.Start(ctx, "KubernetesClient.Init")
+	defer span.End()
+
 	if cloudregion == "" {
 		return pkgerrors.New("Cloudregion is empty")
 	}
@@ -368,7 +378,7 @@ func (k *KubernetesClient) Init(cloudregion string, iid string) error {
 
 	k.instanceID = iid
 
-	configPath, err := k.getKubeConfig(cloudregion)
+	configPath, err := k.getKubeConfig(ctx, cloudregion)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get kubeconfig file")
 	}
@@ -416,7 +426,9 @@ func (k *KubernetesClient) Init(cloudregion string, iid string) error {
 	return nil
 }
 
-func (k *KubernetesClient) ensureNamespace(namespace string) error {
+func (k *KubernetesClient) ensureNamespace(ctx context.Context, namespace string) error {
+	_, span := tracer.Start(ctx, "KubernetesClient.ensureNamespace")
+	defer span.End()
 
 	pluginImpl, err := plugin.GetPluginByKind("Namespace")
 	if err != nil {
@@ -459,7 +471,9 @@ func (k *KubernetesClient) ensureNamespace(namespace string) error {
 	return nil
 }
 
-func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate, namespace string) (helm.KubernetesResource, error) {
+func (k *KubernetesClient) CreateKind(ctx context.Context, resTempl helm.KubernetesResourceTemplate, namespace string) (helm.KubernetesResource, error) {
+	_, span := tracer.Start(ctx, "KubernetesClient.CreateKind")
+	defer span.End()
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
 		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + "does not exists")
@@ -495,8 +509,10 @@ func (k *KubernetesClient) CreateKind(resTempl helm.KubernetesResourceTemplate, 
 	}, nil
 }
 
-func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
+func (k *KubernetesClient) updateKind(ctx context.Context, resTempl helm.KubernetesResourceTemplate,
 	namespace string, createIfDoNotExist bool) (helm.KubernetesResource, error) {
+	_, span := tracer.Start(ctx, "KubernetesClient.updateKind")
+	defer span.End()
 
 	if _, err := os.Stat(resTempl.FilePath); os.IsNotExist(err) {
 		return helm.KubernetesResource{}, pkgerrors.New("File " + resTempl.FilePath + " does not exists")
@@ -541,18 +557,20 @@ func (k *KubernetesClient) updateKind(resTempl helm.KubernetesResourceTemplate,
 	}, nil
 }
 
-func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesResourceTemplate,
+func (k *KubernetesClient) createResources(ctx context.Context, sortedTemplates []helm.KubernetesResourceTemplate,
 	namespace string) ([]helm.KubernetesResource, error) {
+	ctx, span := tracer.Start(ctx, "KubernetesClient.createResources")
+	defer span.End()
 
 	var createdResources []helm.KubernetesResource
 
-	err := k.ensureNamespace(namespace)
+	err := k.ensureNamespace(ctx, namespace)
 	if err != nil {
 		return createdResources, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
 	for _, resTempl := range sortedTemplates {
-		resCreated, err := k.CreateKind(resTempl, namespace)
+		resCreated, err := k.CreateKind(ctx, resTempl, namespace)
 		if err != nil {
 			return createdResources, pkgerrors.Wrapf(err, "Error creating kind: %+v", resTempl.GVK)
 		}
@@ -562,17 +580,19 @@ func (k *KubernetesClient) createResources(sortedTemplates []helm.KubernetesReso
 	return createdResources, nil
 }
 
-func (k *KubernetesClient) updateResources(sortedTemplates []helm.KubernetesResourceTemplate,
+func (k *KubernetesClient) updateResources(ctx context.Context, sortedTemplates []helm.KubernetesResourceTemplate,
 	namespace string, createIfDoNotExist bool) ([]helm.KubernetesResource, error) {
+	ctx, span := tracer.Start(ctx, "KubernetesClient.updateResources")
+	defer span.End()
 
-	err := k.ensureNamespace(namespace)
+	err := k.ensureNamespace(ctx, namespace)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
 	var updatedResources []helm.KubernetesResource
 	for _, resTempl := range sortedTemplates {
-		resUpdated, err := k.updateKind(resTempl, namespace, createIfDoNotExist)
+		resUpdated, err := k.updateKind(ctx, resTempl, namespace, createIfDoNotExist)
 		if err != nil {
 			return nil, pkgerrors.Wrapf(err, "Error updating kind: %+v", resTempl.GVK)
 		}
@@ -609,7 +629,9 @@ func (k *KubernetesClient) DeleteKind(resource helm.KubernetesResource, namespac
 	return nil
 }
 
-func (k *KubernetesClient) deleteResources(resources []helm.KubernetesResource, namespace string) error {
+func (k *KubernetesClient) deleteResources(ctx context.Context, resources []helm.KubernetesResource, namespace string) error {
+	_, deleteSpan := tracer.Start(ctx, "KubernetesClient.deleteResources")
+	defer deleteSpan.End()
 	//TODO: Investigate if deletion should be in a particular order
 	for _, res := range resources {
 		err := k.DeleteKind(res, namespace)

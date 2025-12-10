@@ -28,6 +28,9 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -133,6 +136,8 @@ type InstanceManager interface {
 type InstanceKey struct {
 	ID string `json:"id"`
 }
+
+var tracer = otel.Tracer("internal/app")
 
 // We will use json marshalling to convert to string to
 // preserve the underlying structure.
@@ -284,7 +289,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.Init(i.CloudRegion, finalId)
+	err = k8sClient.Init(ctx, i.CloudRegion, finalId)
 	if err != nil {
 		namegenerator.Release(generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
@@ -326,7 +331,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 		PostUpgradeTimeout: hookTimeoutInfo.postUpgradeTimeout,
 	}
 
-	err = k8sClient.ensureNamespace(profile.Namespace)
+	err = k8sClient.ensureNamespace(ctx, profile.Namespace)
 	if err != nil {
 		namegenerator.Release(generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
@@ -335,7 +340,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	key := InstanceKey{
 		ID: finalId,
 	}
-	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Create(ctx, v.storeName, key, v.tagInst, dbData)
 	if err != nil {
 		namegenerator.Release(generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Instance DB Entry")
@@ -343,7 +348,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 
 	if len(crdList) > 0 {
 		log.Printf("Pre-Installing CRDs")
-		_, err = k8sClient.createResources(crdList, profile.Namespace)
+		_, err = k8sClient.createResources(ctx, crdList, profile.Namespace)
 
 		if err != nil {
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Pre-Installing CRDs")
@@ -355,7 +360,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 		err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall, hookTimeoutInfo.preInstallTimeOut, 0, &dbData)
 		if err != nil {
 			log.Printf("Error running preinstall hooks for release %s, Error: %s. Stop here", releaseName, err)
-			err2 := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
+			err2 := db.DBconn.Delete(ctx, v.storeName, key, v.tagInst)
 			if err2 != nil {
 				log.Printf("Error cleaning failed instance in DB, please check DB.")
 			} else {
@@ -366,9 +371,9 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	}
 
 	dbData.Status = "CREATING"
-	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Update(ctx, v.storeName, key, v.tagInst, dbData)
 	if err != nil {
-		err2 := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
+		err2 := db.DBconn.Delete(ctx, v.storeName, key, v.tagInst)
 		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
 		} else {
@@ -378,15 +383,15 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	}
 
 	//Main rss creation is supposed to be very quick -> no need to support recover for main rss
-	createdResources, err := k8sClient.createResources(sortedTemplates, profile.Namespace)
+	createdResources, err := k8sClient.createResources(ctx, sortedTemplates, profile.Namespace)
 	if err != nil {
 		if len(createdResources) > 0 {
 			log.Printf("[Instance] Reverting created resources on Error: %s", err.Error())
-			k8sClient.deleteResources(helm.GetReverseK8sResources(createdResources), profile.Namespace)
+			k8sClient.deleteResources(ctx, helm.GetReverseK8sResources(createdResources), profile.Namespace)
 		}
 		log.Printf("  Instance: %s, Main rss are failed, skip post-install and remove instance in DB", finalId)
 		//main rss creation failed -> remove instance in DB
-		err2 := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagInst)
+		err2 := db.DBconn.Delete(ctx, v.storeName, key, v.tagInst)
 		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
 		} else {
@@ -397,7 +402,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 
 	dbData.Status = "CREATED"
 	dbData.Resources = createdResources
-	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
+	err = db.DBconn.Update(ctx, v.storeName, key, v.tagInst, dbData)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
@@ -423,14 +428,14 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 			} else {
 				dbData.Status = "DONE"
 			}
-			err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
+			err = db.DBconn.Update(ctx, v.storeName, key, v.tagInst, dbData)
 			if err != nil {
 				log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
 			}
 		}()
 	} else {
 		dbData.Status = "DONE"
-		err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagInst, dbData)
+		err = db.DBconn.Update(ctx, v.storeName, key, v.tagInst, dbData)
 		if err != nil {
 			log.Printf("Update Instance DB Entry for release %s has error.", releaseName)
 		}
@@ -538,7 +543,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.Init(i.CloudRegion, id)
+	err = k8sClient.Init(ctx, i.CloudRegion, id)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
@@ -579,7 +584,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 		PostUpgradeTimeout: hookTimeoutInfo.postUpgradeTimeout,
 	}
 
-	err = k8sClient.ensureNamespace(profile.Namespace)
+	err = k8sClient.ensureNamespace(ctx, profile.Namespace)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
 	}
@@ -591,7 +596,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 
 	if len(crdList) > 0 {
 		log.Printf("Pre-Installing CRDs")
-		_, err = k8sClient.createResources(crdList, profile.Namespace)
+		_, err = k8sClient.createResources(ctx, crdList, profile.Namespace)
 
 		if err != nil {
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Pre-Installing CRDs")
@@ -613,7 +618,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
 
-	upgradedResources, err := k8sClient.updateResources(sortedTemplates, profile.Namespace, true)
+	upgradedResources, err := k8sClient.updateResources(ctx, sortedTemplates, profile.Namespace, true)
 	if err != nil {
 		log.Printf("  Instance: %s, Main rss are failed, skip post-upgrade", id)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Upgrade Kubernetes Resources")
@@ -628,8 +633,8 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 					exists = true
 					break
 				} else {
-					status1, err := k8sClient.GetResourceStatus(res, profile.Namespace)
-					status2, err2 := k8sClient.GetResourceStatus(pastRes, currentInstance.Namespace)
+					status1, err := k8sClient.GetResourceStatus(ctx, res, profile.Namespace)
+					status2, err2 := k8sClient.GetResourceStatus(ctx, pastRes, currentInstance.Namespace)
 					if err == nil && err2 == nil && status1.Value() == status2.Value() {
 						//only when resource is namespace-less
 						exists = true
@@ -643,7 +648,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 		}
 	}
 
-	err = k8sClient.deleteResources(helm.GetReverseK8sResources(resToDelete), currentInstance.Namespace)
+	err = k8sClient.deleteResources(ctx, helm.GetReverseK8sResources(resToDelete), currentInstance.Namespace)
 
 	configClient := NewConfigClient()
 	configList, err := configClient.List(id)
@@ -814,6 +819,12 @@ func (v *InstanceClient) Query(ctx context.Context, id, apiVersion, kind, name, 
 
 // Status returns the status for the instance
 func (v *InstanceClient) Status(ctx context.Context, id string, checkReady bool) (InstanceStatus, error) {
+	ctx, statusSpan := tracer.Start(ctx, "InstanceClient.Status")
+	statusSpan.SetAttributes(
+		attribute.String(string(semconv.CodeFunctionKey), "Status"),
+		attribute.String(string(semconv.CodeNamespaceKey), "k8splugin/internal/app.InstanceClient"),
+	)
+	defer statusSpan.End()
 	//Read the status from the DB
 	key := InstanceKey{
 		ID: id,
@@ -836,7 +847,7 @@ func (v *InstanceClient) Status(ctx context.Context, id string, checkReady bool)
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.Init(resResp.Request.CloudRegion, id)
+	err = k8sClient.Init(ctx, resResp.Request.CloudRegion, id)
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
@@ -847,7 +858,7 @@ func (v *InstanceClient) Status(ctx context.Context, id string, checkReady bool)
 	}
 
 	cumulatedErrorMsg := make([]string, 0)
-	podsStatus, err := k8sClient.getPodsByLabel(resResp.Namespace)
+	podsStatus, err := k8sClient.getPodsByLabel(ctx, resResp.Namespace)
 	if err != nil {
 		cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
 	}
@@ -861,7 +872,7 @@ Main:
 				continue Main //Don't double check pods if someone decided to define pod explicitly in helm chart
 			}
 		}
-		status, err := k8sClient.GetResourceStatus(oneResource, resResp.Namespace)
+		status, err := k8sClient.GetResourceStatus(ctx, oneResource, resResp.Namespace)
 		if err != nil {
 			cumulatedErrorMsg = append(cumulatedErrorMsg, err.Error())
 			isReady = false
@@ -1093,7 +1104,7 @@ func (v *InstanceClient) Delete(ctx context.Context, id string) error {
 	}
 
 	k8sClient := KubernetesClient{}
-	err = k8sClient.Init(inst.Request.CloudRegion, inst.ID)
+	err = k8sClient.Init(ctx, inst.Request.CloudRegion, inst.ID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
@@ -1131,7 +1142,7 @@ func (v *InstanceClient) Delete(ctx context.Context, id string) error {
 		return pkgerrors.Wrap(err, "Cleanup Config Resources")
 	}
 
-	err = k8sClient.deleteResources(helm.GetReverseK8sResources(inst.Resources), inst.Namespace)
+	err = k8sClient.deleteResources(ctx, helm.GetReverseK8sResources(inst.Resources), inst.Namespace)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Deleting Instance Resources")
 	}
@@ -1206,7 +1217,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) e
 		return nil
 	}
 	k8sClient := KubernetesClient{}
-	err = k8sClient.Init(instance.Request.CloudRegion, id)
+	err = k8sClient.Init(ctx, instance.Request.CloudRegion, id)
 	if err != nil {
 		log.Printf("  Error getting CloudRegion %s", instance.Request.CloudRegion)
 		return nil
@@ -1245,7 +1256,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) e
 				return
 			}
 
-			err = k8sClient.deleteResources(helm.GetReverseK8sResources(instance.Resources), instance.Namespace)
+			err = k8sClient.deleteResources(ctx, helm.GetReverseK8sResources(instance.Resources), instance.Namespace)
 			if err != nil {
 				log.Printf("  Error running deleting instance resources, error: %s", err)
 				return
@@ -1322,13 +1333,13 @@ func (v *InstanceClient) runPostDelete(k8sClient KubernetesClient, hookClient *H
 				GVK:  h.KRT.GVK,
 				Name: h.Hook.Name,
 			}
-			if _, err := k8sClient.GetResourceStatus(res, hookClient.kubeNameSpace); err == nil {
+			if _, err := k8sClient.GetResourceStatus(context.TODO(), res, hookClient.kubeNameSpace); err == nil {
 				remainHookRss = append(remainHookRss, res)
 				log.Printf("  Rss %s will be deleted.", res.Name)
 			}
 		}
 		if len(remainHookRss) > 0 {
-			err = k8sClient.deleteResources(remainHookRss, hookClient.kubeNameSpace)
+			err = k8sClient.deleteResources(context.TODO(), remainHookRss, hookClient.kubeNameSpace)
 			if err != nil {
 				log.Printf("Error cleaning Hook Rss, please do it manually if needed. Error: %s", err.Error())
 			}

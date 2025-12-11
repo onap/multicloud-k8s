@@ -273,7 +273,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	var generatedId string = ""
 	var finalId string = ""
 	if newId == "" {
-		generatedId = namegenerator.Generate()
+		generatedId = namegenerator.Generate(ctx)
 		finalId = generatedId
 	} else {
 		finalId = newId
@@ -284,14 +284,14 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	//Execute the kubernetes create command
 	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
 	if err != nil {
-		namegenerator.Release(generatedId)
+		namegenerator.Release(ctx, generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
 
 	k8sClient := KubernetesClient{}
 	err = k8sClient.Init(ctx, i.CloudRegion, finalId)
 	if err != nil {
-		namegenerator.Release(generatedId)
+		namegenerator.Release(ctx, generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
 
@@ -333,7 +333,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 
 	err = k8sClient.ensureNamespace(ctx, profile.Namespace)
 	if err != nil {
-		namegenerator.Release(generatedId)
+		namegenerator.Release(ctx, generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Namespace")
 	}
 
@@ -342,7 +342,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	}
 	err = db.DBconn.Create(ctx, v.storeName, key, v.tagInst, dbData)
 	if err != nil {
-		namegenerator.Release(generatedId)
+		namegenerator.Release(ctx, generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Creating Instance DB Entry")
 	}
 
@@ -357,14 +357,14 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 
 	hookClient := NewHookClient(profile.Namespace, finalId, v.storeName, v.tagInst)
 	if len(hookClient.getHookByEvent(hookList, release.HookPreInstall)) != 0 {
-		err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall, hookTimeoutInfo.preInstallTimeOut, 0, &dbData)
+		err = hookClient.ExecHook(ctx, k8sClient, hookList, release.HookPreInstall, hookTimeoutInfo.preInstallTimeOut, 0, &dbData)
 		if err != nil {
 			log.Printf("Error running preinstall hooks for release %s, Error: %s. Stop here", releaseName, err)
 			err2 := db.DBconn.Delete(ctx, v.storeName, key, v.tagInst)
 			if err2 != nil {
 				log.Printf("Error cleaning failed instance in DB, please check DB.")
 			} else {
-				namegenerator.Release(generatedId)
+				namegenerator.Release(ctx, generatedId)
 			}
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Error running preinstall hooks")
 		}
@@ -377,7 +377,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
 		} else {
-			namegenerator.Release(generatedId)
+			namegenerator.Release(ctx, generatedId)
 		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Update Instance DB Entry")
 	}
@@ -395,7 +395,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 		if err2 != nil {
 			log.Printf("Delete Instance DB Entry for release %s has error.", releaseName)
 		} else {
-			namegenerator.Release(generatedId)
+			namegenerator.Release(ctx, generatedId)
 		}
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Create Kubernetes Resources")
 	}
@@ -421,7 +421,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 		go func() {
 			dbData.Status = "POST-INSTALL"
 			dbData.HookProgress = ""
-			err = hookClient.ExecHook(k8sClient, hookList, release.HookPostInstall, hookTimeoutInfo.postInstallTimeOut, 0, &dbData)
+			err = hookClient.ExecHook(ctx, k8sClient, hookList, release.HookPostInstall, hookTimeoutInfo.postInstallTimeOut, 0, &dbData)
 			if err != nil {
 				dbData.Status = "POST-INSTALL-FAILED"
 				log.Printf("  Instance: %s, Error running postinstall hooks error: %s", finalId, err)
@@ -506,7 +506,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 				if err2 != nil {
 					log.Printf("Delete of the temporal instance from the DB has failed %s", err2.Error())
 				}
-				namegenerator.Release(newInstance.ID)
+				namegenerator.Release(ctx, newInstance.ID)
 				newInstanceDb.ID = id
 				newInstance.ID = id
 				err = db.DBconn.Create(ctx, v.storeName, key, v.tagInst, newInstanceDb)
@@ -605,7 +605,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 
 	hookClient := NewHookClient(profile.Namespace, id, v.storeName, v.tagInst)
 	if len(hookClient.getHookByEvent(hookList, release.HookPreUpgrade)) != 0 {
-		err = hookClient.ExecHook(k8sClient, hookList, release.HookPreUpgrade, hookTimeoutInfo.preUpgradeTimeout, 0, &dbData)
+		err = hookClient.ExecHook(ctx, k8sClient, hookList, release.HookPreUpgrade, hookTimeoutInfo.preUpgradeTimeout, 0, &dbData)
 		if err != nil {
 			log.Printf("Error running preupgrade hooks for release %s, Error: %s. Stop here", releaseName, err)
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Error running preupgrade hooks")
@@ -683,7 +683,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 		go func() {
 			dbData.Status = "POST-UPGRADE"
 			dbData.HookProgress = ""
-			err = hookClient.ExecHook(k8sClient, hookList, release.HookPostUpgrade, hookTimeoutInfo.postUpgradeTimeout, 0, &dbData)
+			err = hookClient.ExecHook(ctx, k8sClient, hookList, release.HookPostUpgrade, hookTimeoutInfo.postUpgradeTimeout, 0, &dbData)
 			if err != nil {
 				dbData.Status = "POST-UPGRADE-FAILED"
 				log.Printf("  Instance: %s, Error running postupgrade hooks error: %s", id, err)
@@ -1120,7 +1120,7 @@ func (v *InstanceClient) Delete(ctx context.Context, id string) error {
 
 	hookClient := NewHookClient(inst.Namespace, id, v.storeName, v.tagInst)
 	if len(hookClient.getHookByEvent(inst.Hooks, release.HookPreDelete)) != 0 {
-		err = hookClient.ExecHook(k8sClient, inst.Hooks, release.HookPreDelete, inst.PreDeleteTimeout, 0, &inst)
+		err = hookClient.ExecHook(ctx, k8sClient, inst.Hooks, release.HookPreDelete, inst.PreDeleteTimeout, 0, &inst)
 		if err != nil {
 			log.Printf("  Instance: %s, Error running pre-delete hooks error: %s", id, err)
 			inst.Status = "PRE-DELETE-FAILED"
@@ -1232,7 +1232,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) e
 		//Plugin quits during post-install hooks -> continue
 		go func() {
 			log.Printf("  The plugin quits during post-install hook of this instance, continue post-install hook")
-			err = hookClient.ExecHook(k8sClient, instance.Hooks, release.HookPostInstall, instance.PostInstallTimeout, completedHooks, &instance)
+			err = hookClient.ExecHook(ctx, k8sClient, instance.Hooks, release.HookPostInstall, instance.PostInstallTimeout, completedHooks, &instance)
 			log.Printf("dbData.HookProgress %s", instance.HookProgress)
 			if err != nil {
 				instance.Status = "POST-INSTALL-FAILED"
@@ -1249,7 +1249,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) e
 		//Plugin quits during pre-delete hooks -> This already effects the instance -> should continue the deletion
 		go func() {
 			log.Printf("  The plugin quits during pre-delete hook of this instance, continue pre-delete hook")
-			err = hookClient.ExecHook(k8sClient, instance.Hooks, release.HookPreDelete, instance.PreDeleteTimeout, completedHooks, &instance)
+			err = hookClient.ExecHook(ctx, k8sClient, instance.Hooks, release.HookPreDelete, instance.PreDeleteTimeout, completedHooks, &instance)
 			if err != nil {
 				log.Printf("  Instance: %s, Error running pre-delete hooks error: %s", id, err)
 				instance.Status = "PRE-DELETE-FAILED"
@@ -1298,7 +1298,7 @@ func (v *InstanceClient) runPostDelete(ctx context.Context, k8sClient Kubernetes
 	if err != nil {
 		log.Printf("Update Instance DB Entry for release %s has error.", instance.ReleaseName)
 	}
-	err = hookClient.ExecHook(k8sClient, instance.Hooks, release.HookPostDelete, instance.PostDeleteTimeout, startIndex, instance)
+	err = hookClient.ExecHook(ctx, k8sClient, instance.Hooks, release.HookPostDelete, instance.PostDeleteTimeout, startIndex, instance)
 	if err != nil {
 		//If this case happen, user should clean the cluster
 		log.Printf("  Instance: %s, Error running post-delete hooks error: %s", instance.ID, err)

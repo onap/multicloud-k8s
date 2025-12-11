@@ -19,6 +19,7 @@ import (
 	"strings"
 	"sync"
 
+	"go.opentelemetry.io/otel"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/time"
 
@@ -90,6 +91,8 @@ type InstanceHCOverview struct {
 	Hooks      []*helm.Hook           `json:"hooks"`
 }
 
+var tracer = otel.Tracer("internal/healthcheck")
+
 func NewHCClient() *InstanceHCClient {
 	return &InstanceHCClient{
 		storeName: "rbdef",
@@ -102,14 +105,15 @@ func instanceMiniHCStatusFromStatus(ihcs InstanceHCStatus) InstanceMiniHCStatus 
 }
 
 func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, error) {
+	ctx, span := tracer.Start(context.TODO(), "InstanceHCClient.Create")
+	defer span.End()
 	//TODO Handle hook delete policies
 
 	//Generate ID
-	id := namegenerator.Generate()
+	id := namegenerator.Generate(ctx)
 
 	//Determine Cloud Region and namespace
 	v := app.NewInstanceClient()
-	ctx := context.TODO()
 	instance, err := v.Get(ctx, instanceId)
 	if err != nil {
 		return InstanceMiniHCStatus{}, pkgerrors.Wrap(err, "Getting instance")
@@ -202,7 +206,6 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 				})
 				update <- true
 				wg.Done()
-				return
 			}(h.Status)
 		}
 		go func() {
@@ -212,7 +215,6 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 				"InstanceId":    instanceId,
 			})
 			update <- false
-			return
 		}()
 		for {
 			select {

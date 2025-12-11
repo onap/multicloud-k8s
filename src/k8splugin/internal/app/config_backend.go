@@ -594,7 +594,7 @@ func scheduleResources(c chan configResourceList) {
 				for _, res := range data.resources {
 					tmpResources = append(tmpResources, res.Resource)
 				}
-				err = k8sClient.deleteResources(context.TODO(), helm.GetReverseK8sResources(tmpResources), inst.Namespace)
+				err = k8sClient.deleteResources(ctx, helm.GetReverseK8sResources(tmpResources), inst.Namespace)
 				if err != nil {
 					log.Printf("Error Deleting resources: %s", err.Error())
 					continue

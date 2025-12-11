@@ -52,7 +52,7 @@ func (i queryHandler) queryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// instance id is irrelevant here
-	resp, err := i.client.Query(namespace, cloudRegion, apiVersion, kind, name, labels)
+	resp, err := i.client.Query(r.Context(), namespace, cloudRegion, apiVersion, kind, name, labels)
 	if err != nil {
 		log.Error("Error getting Query results", log.Fields{
 			"error":       err,

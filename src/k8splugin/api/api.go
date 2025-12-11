@@ -17,6 +17,7 @@ limitations under the License.
 package api
 
 import (
+	"context"
 	"os"
 
 	"github.com/gorilla/mux"
@@ -72,7 +73,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	// Status handler routes
 	if subscriptionClient == nil {
 		subscriptionClient = app.NewInstanceStatusSubClient()
-		subscriptionClient.RestoreWatchers()
+		subscriptionClient.RestoreWatchers(context.TODO())
 	}
 	instanceStatusSubHandler := instanceStatusSubHandler{client: subscriptionClient}
 	instRouter.HandleFunc("/instance/{instID}/status", instHandler.statusHandler).Methods("GET")

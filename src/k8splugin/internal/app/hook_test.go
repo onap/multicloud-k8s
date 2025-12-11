@@ -247,19 +247,19 @@ func TestExecHook(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	err = hookClient.ExecHook(k8sClient, hookList, release.HookPreInstall, 10, 0, nil)
+	err = hookClient.ExecHook(context.TODO(), k8sClient, hookList, release.HookPreInstall, 10, 0, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	err = hookClient.ExecHook(k8sClient, hookList, release.HookPostInstall, 10, 0, nil)
+	err = hookClient.ExecHook(context.TODO(), k8sClient, hookList, release.HookPostInstall, 10, 0, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	err = hookClient.ExecHook(k8sClient, hookList, release.HookPreDelete, 10, 0, nil)
+	err = hookClient.ExecHook(context.TODO(), k8sClient, hookList, release.HookPreDelete, 10, 0, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	err = hookClient.ExecHook(k8sClient, hookList, release.HookPostDelete, 10, 0, nil)
+	err = hookClient.ExecHook(context.TODO(), k8sClient, hookList, release.HookPostDelete, 10, 0, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}

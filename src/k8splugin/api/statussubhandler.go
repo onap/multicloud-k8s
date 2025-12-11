@@ -71,7 +71,7 @@ func (iss instanceStatusSubHandler) createHandler(w http.ResponseWriter, r *http
 		return
 	}
 
-	resp, err := iss.client.Create(id, subRequest)
+	resp, err := iss.client.Create(r.Context(), id, subRequest)
 	if err != nil {
 		log.Error("Error creating subscription", log.Fields{
 			"error":    err,
@@ -100,7 +100,7 @@ func (iss instanceStatusSubHandler) getHandler(w http.ResponseWriter, r *http.Re
 	instanceId := vars["instID"]
 	subId := vars["subID"]
 
-	resp, err := iss.client.Get(instanceId, subId)
+	resp, err := iss.client.Get(r.Context(), instanceId, subId)
 	if err != nil {
 		log.Error("Error getting instance's Status Subscription", log.Fields{
 			"error":          err,
@@ -159,7 +159,7 @@ func (iss instanceStatusSubHandler) updateHandler(w http.ResponseWriter, r *http
 		return
 	}
 
-	resp, err := iss.client.Update(instanceId, subId, subRequest)
+	resp, err := iss.client.Update(r.Context(), instanceId, subId, subRequest)
 	if err != nil {
 		log.Error("Error updating instance's Status Subscription", log.Fields{
 			"error":          err,
@@ -188,7 +188,7 @@ func (iss instanceStatusSubHandler) deleteHandler(w http.ResponseWriter, r *http
 	instanceId := vars["instID"]
 	subId := vars["subID"]
 
-	err := iss.client.Delete(instanceId, subId)
+	err := iss.client.Delete(r.Context(), instanceId, subId)
 	if err != nil {
 		log.Error("Error deleting instance's Status Subscription", log.Fields{
 			"error":          err,
@@ -205,7 +205,7 @@ func (iss instanceStatusSubHandler) listHandler(w http.ResponseWriter, r *http.R
 	vars := mux.Vars(r)
 	id := vars["instID"]
 
-	resp, err := iss.client.List(id)
+	resp, err := iss.client.List(r.Context(), id)
 	if err != nil {
 		log.Error("Error listing instance Status Subscriptions", log.Fields{
 			"error":       err,

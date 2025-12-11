@@ -137,19 +137,19 @@ var subscriptionNotifyData = subscriptionNotifyManager{
 
 // InstanceStatusSubManager is an interface exposes the status subscription functionality
 type InstanceStatusSubManager interface {
-	Create(instanceId string, subDetails SubscriptionRequest) (StatusSubscription, error)
-	Get(instanceId, subId string) (StatusSubscription, error)
-	Update(instanceId, subId string, subDetails SubscriptionRequest) (StatusSubscription, error)
-	List(instanceId string) ([]StatusSubscription, error)
-	Delete(instanceId, subId string) error
-	Cleanup(instanceId string) error
-	RestoreWatchers()
+	Create(ctx context.Context, instanceId string, subDetails SubscriptionRequest) (StatusSubscription, error)
+	Get(ctx context.Context, instanceId, subId string) (StatusSubscription, error)
+	Update(ctx context.Context, instanceId, subId string, subDetails SubscriptionRequest) (StatusSubscription, error)
+	List(ctx context.Context, instanceId string) ([]StatusSubscription, error)
+	Delete(ctx context.Context, instanceId, subId string) error
+	Cleanup(ctx context.Context, instanceId string) error
+	RestoreWatchers(ctx context.Context)
 }
 
 // Create Status Subscription
-func (iss *InstanceStatusSubClient) Create(instanceId string, subDetails SubscriptionRequest) (StatusSubscription, error) {
+func (iss *InstanceStatusSubClient) Create(ctx context.Context, instanceId string, subDetails SubscriptionRequest) (StatusSubscription, error) {
 
-	_, err := iss.Get(instanceId, subDetails.Name)
+	_, err := iss.Get(ctx, instanceId, subDetails.Name)
 	if err == nil {
 		return StatusSubscription{}, pkgerrors.New("Subscription already exists")
 	}
@@ -182,7 +182,7 @@ func (iss *InstanceStatusSubClient) Create(instanceId string, subDetails Subscri
 	lock.Lock()
 	defer lock.Unlock()
 
-	err = db.DBconn.Create(context.TODO(), iss.storeName, key, iss.tagInst, sub)
+	err = db.DBconn.Create(ctx, iss.storeName, key, iss.tagInst, sub)
 	if err != nil {
 		return sub, pkgerrors.Wrap(err, "Creating Status Subscription DB Entry")
 	}
@@ -191,13 +191,13 @@ func (iss *InstanceStatusSubClient) Create(instanceId string, subDetails Subscri
 		"SubscriptionName": subDetails.Name,
 	})
 
-	go runNotifyThread(instanceId, sub.Name)
+	go runNotifyThread(ctx, instanceId, sub.Name)
 
 	return sub, nil
 }
 
 // Get Status subscription
-func (iss *InstanceStatusSubClient) Get(instanceId, subId string) (StatusSubscription, error) {
+func (iss *InstanceStatusSubClient) Get(ctx context.Context, instanceId, subId string) (StatusSubscription, error) {
 	lock, _, _ := getSubscriptionData(instanceId)
 	// Acquire Mutex
 	lock.Lock()
@@ -206,7 +206,7 @@ func (iss *InstanceStatusSubClient) Get(instanceId, subId string) (StatusSubscri
 		InstanceId:       instanceId,
 		SubscriptionName: subId,
 	}
-	DBResp, err := db.DBconn.Read(context.TODO(), iss.storeName, key, iss.tagInst)
+	DBResp, err := db.DBconn.Read(ctx, iss.storeName, key, iss.tagInst)
 	if err != nil || DBResp == nil {
 		return StatusSubscription{}, pkgerrors.Wrap(err, "Error retrieving Subscription data")
 	}
@@ -220,8 +220,8 @@ func (iss *InstanceStatusSubClient) Get(instanceId, subId string) (StatusSubscri
 }
 
 // Update status subscription
-func (iss *InstanceStatusSubClient) Update(instanceId, subId string, subDetails SubscriptionRequest) (StatusSubscription, error) {
-	sub, err := iss.Get(instanceId, subDetails.Name)
+func (iss *InstanceStatusSubClient) Update(ctx context.Context, instanceId, subId string, subDetails SubscriptionRequest) (StatusSubscription, error) {
+	sub, err := iss.Get(ctx, instanceId, subDetails.Name)
 	if err != nil {
 		return StatusSubscription{}, pkgerrors.Wrap(err, "Subscription does not exist")
 	}
@@ -248,7 +248,7 @@ func (iss *InstanceStatusSubClient) Update(instanceId, subId string, subDetails 
 	lock.Lock()
 	defer lock.Unlock()
 
-	err = db.DBconn.Update(context.TODO(), iss.storeName, key, iss.tagInst, sub)
+	err = db.DBconn.Update(ctx, iss.storeName, key, iss.tagInst, sub)
 	if err != nil {
 		return sub, pkgerrors.Wrap(err, "Updating Status Subscription DB Entry")
 	}
@@ -261,14 +261,14 @@ func (iss *InstanceStatusSubClient) Update(instanceId, subId string, subDetails 
 }
 
 // Get list of status subscriptions
-func (iss *InstanceStatusSubClient) List(instanceId string) ([]StatusSubscription, error) {
+func (iss *InstanceStatusSubClient) List(ctx context.Context, instanceId string) ([]StatusSubscription, error) {
 
 	lock, _, _ := getSubscriptionData(instanceId)
 	// Acquire Mutex
 	lock.Lock()
 	defer lock.Unlock()
 	// Retrieve info about created status subscriptions
-	dbResp, err := db.DBconn.ReadAll(context.TODO(), iss.storeName, iss.tagInst)
+	dbResp, err := db.DBconn.ReadAll(ctx, iss.storeName, iss.tagInst)
 	if err != nil {
 		if !strings.Contains(err.Error(), "Did not find any objects with tag") {
 			return []StatusSubscription{}, pkgerrors.Wrap(err, "Getting Status Subscription data")
@@ -306,8 +306,8 @@ func (iss *InstanceStatusSubClient) List(instanceId string) ([]StatusSubscriptio
 }
 
 // Delete status subscription
-func (iss *InstanceStatusSubClient) Delete(instanceId, subId string) error {
-	_, err := iss.Get(instanceId, subId)
+func (iss *InstanceStatusSubClient) Delete(ctx context.Context, instanceId, subId string) error {
+	_, err := iss.Get(ctx, instanceId, subId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Subscription does not exist")
 	}
@@ -323,7 +323,7 @@ func (iss *InstanceStatusSubClient) Delete(instanceId, subId string) error {
 		InstanceId:       instanceId,
 		SubscriptionName: subId,
 	}
-	err = db.DBconn.Delete(context.TODO(), iss.storeName, key, iss.tagInst)
+	err = db.DBconn.Delete(ctx, iss.storeName, key, iss.tagInst)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Removing Status Subscription in DB")
 	}
@@ -331,14 +331,14 @@ func (iss *InstanceStatusSubClient) Delete(instanceId, subId string) error {
 }
 
 // Cleanup status subscriptions for instance
-func (iss *InstanceStatusSubClient) Cleanup(instanceId string) error {
-	subList, err := iss.List(instanceId)
+func (iss *InstanceStatusSubClient) Cleanup(ctx context.Context, instanceId string) error {
+	subList, err := iss.List(ctx, instanceId)
 	if err != nil {
 		return err
 	}
 
 	for _, sub := range subList {
-		err = iss.Delete(instanceId, sub.Name)
+		err = iss.Delete(ctx, instanceId, sub.Name)
 		if err != nil {
 			log.Error("Error deleting ", log.Fields{
 				"error": err.Error(),
@@ -350,19 +350,19 @@ func (iss *InstanceStatusSubClient) Cleanup(instanceId string) error {
 }
 
 // Restore status subscriptions notify threads
-func (iss *InstanceStatusSubClient) RestoreWatchers() {
+func (iss *InstanceStatusSubClient) RestoreWatchers(ctx context.Context) {
 	go func() {
 		time.Sleep(time.Second * 10)
 		log.Info("Restoring status subscription notifications", log.Fields{})
 		v := NewInstanceClient()
-		instances, err := v.List(context.TODO(), "", "", "")
+		instances, err := v.List(ctx, "", "", "")
 		if err != nil {
 			log.Error("Error reading instance list", log.Fields{
 				"error": err.Error(),
 			})
 		}
 		for _, instance := range instances {
-			subList, err := iss.List(instance.ID)
+			subList, err := iss.List(ctx, instance.ID)
 			if err != nil {
 				log.Error("Error reading subscription list for instance", log.Fields{
 					"error":    err.Error(),
@@ -381,7 +381,7 @@ func (iss *InstanceStatusSubClient) RestoreWatchers() {
 					})
 					continue
 				}
-				go runNotifyThread(instance.ID, sub.Name)
+				go runNotifyThread(ctx, instance.ID, sub.Name)
 			}
 		}
 	}()
@@ -608,7 +608,7 @@ func gvkListForInstance(instance InstanceResponse, profile rb.Profile) []schema.
 	return list
 }
 
-func runNotifyThread(instanceId, subName string) {
+func runNotifyThread(ctx context.Context, instanceId, subName string) {
 	v := NewInstanceClient()
 	iss := NewInstanceStatusSubClient()
 	var status = InstanceStatus{
@@ -641,7 +641,7 @@ func runNotifyThread(instanceId, subName string) {
 			break
 		}
 		if changeDetected || status.ResourceCount < 0 {
-			currentSub, err := iss.Get(instanceId, subName)
+			currentSub, err := iss.Get(ctx, instanceId, subName)
 			if err != nil {
 				log.Error("Error getting current status", log.Fields{
 					"error":    err.Error(),
@@ -653,7 +653,7 @@ func runNotifyThread(instanceId, subName string) {
 			} else {
 				timeInSeconds = 5
 			}
-			newStatus, err := v.Status(context.Background(), instanceId, false)
+			newStatus, err := v.Status(ctx, instanceId, false)
 			if err != nil {
 				log.Error("Error getting current status", log.Fields{
 					"error":    err.Error(),
@@ -706,7 +706,7 @@ func runNotifyThread(instanceId, subName string) {
 						})
 						currentSub.LastNotifyStatus = notifyResult.result
 						currentSub.LastNotifyTime = notifyResult.time
-						err = db.DBconn.Update(context.TODO(), iss.storeName, key, iss.tagInst, currentSub)
+						err = db.DBconn.Update(ctx, iss.storeName, key, iss.tagInst, currentSub)
 						if err != nil {
 							log.Error("Error updating subscription status", log.Fields{
 								"error":    err.Error(),

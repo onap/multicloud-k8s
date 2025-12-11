@@ -7,7 +7,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-FROM nexus3.onap.org:10001/ubuntu:18.04
+FROM nexus3.onap.org:10001/ubuntu:24.04
 
 ARG HTTP_PROXY=${HTTP_PROXY}
 ARG HTTPS_PROXY=${HTTPS_PROXY}

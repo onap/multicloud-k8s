@@ -56,7 +56,7 @@ func (h rbProfileHandler) createHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	ret, err := h.client.CreateOrUpdate(p, false)
+	ret, err := h.client.CreateOrUpdate(r.Context(), p, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -89,7 +89,7 @@ func (h rbProfileHandler) uploadHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.client.Upload(rbName, rbVersion, prName, inpBytes)
+	err = h.client.Upload(r.Context(), rbName, rbVersion, prName, inpBytes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -106,7 +106,7 @@ func (h rbProfileHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	rbVersion := vars["rbversion"]
 	prName := vars["prname"]
 
-	ret, err := h.client.Get(rbName, rbVersion, prName)
+	ret, err := h.client.Get(r.Context(), rbName, rbVersion, prName)
 	if err != nil {
 		// Separate "Not found" from generic DB errors
 		if strings.Contains(err.Error(), "Error finding") {
@@ -135,7 +135,7 @@ func (h rbProfileHandler) updateHandler(w http.ResponseWriter, r *http.Request) 
 	rbVersion := vars["rbversion"]
 	prName := vars["prname"]
 
-	ret, err := h.client.Get(rbName, rbVersion, prName)
+	ret, err := h.client.Get(r.Context(), rbName, rbVersion, prName)
 	if err != nil {
 		// Separate "Not found" from generic DB errors
 		if strings.Contains(err.Error(), "Error finding") {
@@ -178,7 +178,7 @@ func (h rbProfileHandler) updateHandler(w http.ResponseWriter, r *http.Request) 
 	p.RBVersion = ret.RBVersion
 	p.RBName = ret.RBName
 
-	ret, err = h.client.CreateOrUpdate(p, true)
+	ret, err = h.client.CreateOrUpdate(r.Context(), p, true)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -196,7 +196,7 @@ func (h rbProfileHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	rbName := vars["rbname"]
 	rbVersion := vars["rbversion"]
 
-	ret, err := h.client.List(rbName, rbVersion)
+	ret, err := h.client.List(r.Context(), rbName, rbVersion)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -218,7 +218,7 @@ func (h rbProfileHandler) deleteHandler(w http.ResponseWriter, r *http.Request) 
 	rbVersion := vars["rbversion"]
 	prName := vars["prname"]
 
-	err := h.client.Delete(rbName, rbVersion, prName)
+	err := h.client.Delete(r.Context(), rbName, rbVersion, prName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

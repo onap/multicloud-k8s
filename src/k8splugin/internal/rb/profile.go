@@ -47,11 +47,11 @@ type Profile struct {
 
 // ProfileManager is an interface exposes the resource bundle profile functionality
 type ProfileManager interface {
-	CreateOrUpdate(def Profile, update bool) (Profile, error)
-	Get(rbName, rbVersion, prName string) (Profile, error)
-	List(rbName, rbVersion string) ([]Profile, error)
-	Delete(rbName, rbVersion, prName string) error
-	Upload(rbName, rbVersion, prName string, inp []byte) error
+	CreateOrUpdate(ctx context.Context, def Profile, update bool) (Profile, error)
+	Get(ctx context.Context, rbName, rbVersion, prName string) (Profile, error)
+	List(ctx context.Context, rbName, rbVersion string) ([]Profile, error)
+	Delete(ctx context.Context, rbName, rbVersion, prName string) error
+	Upload(ctx context.Context, rbName, rbVersion, prName string, inp []byte) error
 }
 
 type ProfileKey struct {
@@ -91,7 +91,7 @@ func NewProfileClient() *ProfileClient {
 }
 
 // CreateOrUpdate an entry for the resource bundle profile in the database
-func (v *ProfileClient) CreateOrUpdate(p Profile, update bool) (Profile, error) {
+func (v *ProfileClient) CreateOrUpdate(ctx context.Context, p Profile, update bool) (Profile, error) {
 
 	// Name is required
 	if p.ProfileName == "" {
@@ -99,7 +99,7 @@ func (v *ProfileClient) CreateOrUpdate(p Profile, update bool) (Profile, error) 
 	}
 
 	//Check if profile already exists
-	_, err := v.Get(p.RBName, p.RBVersion, p.ProfileName)
+	_, err := v.Get(ctx, p.RBName, p.RBVersion, p.ProfileName)
 	if err == nil && !update {
 		return Profile{}, pkgerrors.New("Profile already exists for this Definition")
 	}
@@ -107,7 +107,7 @@ func (v *ProfileClient) CreateOrUpdate(p Profile, update bool) (Profile, error) 
 		return Profile{}, pkgerrors.New("Profile does not exists for this Definition")
 	}
 	//Check if provided resource bundle information is valid
-	_, err = NewDefinitionClient().Get(context.TODO(), p.RBName, p.RBVersion)
+	_, err = NewDefinitionClient().Get(ctx, p.RBName, p.RBVersion)
 	if err != nil {
 		return Profile{}, pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}
@@ -124,12 +124,12 @@ func (v *ProfileClient) CreateOrUpdate(p Profile, update bool) (Profile, error) 
 	}
 
 	if update {
-		err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagMeta, p)
+		err = db.DBconn.Update(ctx, v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return Profile{}, pkgerrors.Wrap(err, "Updating Profile DB Entry")
 		}
 	} else {
-		err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, p)
+		err = db.DBconn.Create(ctx, v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return Profile{}, pkgerrors.Wrap(err, "Creating Profile DB Entry")
 		}
@@ -139,13 +139,13 @@ func (v *ProfileClient) CreateOrUpdate(p Profile, update bool) (Profile, error) 
 }
 
 // Get returns the Resource Bundle Profile for corresponding ID
-func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
+func (v *ProfileClient) Get(ctx context.Context, rbName, rbVersion, prName string) (Profile, error) {
 	key := ProfileKey{
 		RBName:      rbName,
 		RBVersion:   rbVersion,
 		ProfileName: prName,
 	}
-	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Read(ctx, v.storeName, key, v.tagMeta)
 	if err != nil {
 		return Profile{}, pkgerrors.Wrap(err, "Get Resource Bundle Profile")
 	}
@@ -164,10 +164,10 @@ func (v *ProfileClient) Get(rbName, rbVersion, prName string) (Profile, error) {
 }
 
 // List returns the Resource Bundle Profile for corresponding ID
-func (v *ProfileClient) List(rbName, rbVersion string) ([]Profile, error) {
+func (v *ProfileClient) List(ctx context.Context, rbName, rbVersion string) ([]Profile, error) {
 
 	//Get all profiles
-	dbres, err := db.DBconn.ReadAll(context.TODO(), v.storeName, v.tagMeta)
+	dbres, err := db.DBconn.ReadAll(ctx, v.storeName, v.tagMeta)
 	if err != nil || len(dbres) == 0 {
 		return []Profile{}, pkgerrors.Wrap(err, "No Profiles Found")
 	}
@@ -196,18 +196,18 @@ func (v *ProfileClient) List(rbName, rbVersion string) ([]Profile, error) {
 }
 
 // Delete the Resource Bundle Profile from database
-func (v *ProfileClient) Delete(rbName, rbVersion, prName string) error {
+func (v *ProfileClient) Delete(ctx context.Context, rbName, rbVersion, prName string) error {
 	key := ProfileKey{
 		RBName:      rbName,
 		RBVersion:   rbVersion,
 		ProfileName: prName,
 	}
-	err := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagMeta)
+	err := db.DBconn.Delete(ctx, v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile")
 	}
 
-	err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagContent)
+	err = db.DBconn.Delete(ctx, v.storeName, key, v.tagContent)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Resource Bundle Profile Content")
 	}
@@ -216,10 +216,10 @@ func (v *ProfileClient) Delete(rbName, rbVersion, prName string) error {
 }
 
 // Upload the contents of resource bundle into database
-func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) error {
+func (v *ProfileClient) Upload(ctx context.Context, rbName, rbVersion, prName string, inp []byte) error {
 
 	//ignore the returned data here.
-	_, err := v.Get(rbName, rbVersion, prName)
+	_, err := v.Get(ctx, rbName, rbVersion, prName)
 	if err != nil {
 		return pkgerrors.Errorf("Invalid Profile Name provided %s", err.Error())
 	}
@@ -236,7 +236,7 @@ func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) err
 	}
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagContent, encodedStr)
+	err = db.DBconn.Create(ctx, v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
 	}
@@ -247,11 +247,11 @@ func (v *ProfileClient) Upload(rbName, rbVersion, prName string, inp []byte) err
 // Download the contents of the resource bundle profile from DB
 // Returns a byte array of the contents which is used by the
 // ExtractTarBall code to create the folder structure on disk
-func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, error) {
+func (v *ProfileClient) Download(ctx context.Context, rbName, rbVersion, prName string) ([]byte, error) {
 
 	//ignore the returned data here
 	//Check if id is valid
-	_, err := v.Get(rbName, rbVersion, prName)
+	_, err := v.Get(ctx, rbName, rbVersion, prName)
 	if err != nil {
 		return nil, pkgerrors.Errorf("Invalid Profile Name provided: %s", err.Error())
 	}
@@ -261,7 +261,7 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 		RBVersion:   rbVersion,
 		ProfileName: prName,
 	}
-	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagContent)
+	value, err := db.DBconn.Read(ctx, v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource Bundle Profile content")
 	}
@@ -281,8 +281,8 @@ func (v *ProfileClient) Download(rbName, rbVersion, prName string) ([]byte, erro
 }
 
 // GetYamlClient GEt Yaml Files client for profile
-func (v *ProfileClient) GetYamlClient(rbName string, rbVersion string, profileName string) (ProfileYamlClient, error) {
-	prData, err := v.Download(rbName, rbVersion, profileName)
+func (v *ProfileClient) GetYamlClient(ctx context.Context, rbName string, rbVersion string, profileName string) (ProfileYamlClient, error) {
+	prData, err := v.Download(ctx, rbName, rbVersion, profileName)
 	if err != nil {
 		return ProfileYamlClient{}, pkgerrors.Wrap(err, "Downloading Profile")
 	}
@@ -301,7 +301,7 @@ func (v *ProfileClient) GetYamlClient(rbName string, rbVersion string, profileNa
 
 // Resolve returns the path where the helm chart merged with
 // configuration overrides resides and final ReleaseName picked for instantiation
-func (v *ProfileClient) Resolve(rbName string, rbVersion string,
+func (v *ProfileClient) Resolve(ctx context.Context, rbName string, rbVersion string,
 	profileName string, values []string, overrideReleaseName string) ([]helm.KubernetesResourceTemplate, []helm.KubernetesResourceTemplate, []*helm.Hook, string, error) {
 
 	var sortedTemplates []helm.KubernetesResourceTemplate
@@ -311,19 +311,19 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 
 	//Download and process the profile first
 	//If everything seems okay, then download the definition
-	prYamlClient, err := v.GetYamlClient(rbName, rbVersion, profileName)
+	prYamlClient, err := v.GetYamlClient(ctx, rbName, rbVersion, profileName)
 	if err != nil {
 		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}
 
 	definitionClient := NewDefinitionClient()
 
-	definition, err := definitionClient.Get(context.TODO(), rbName, rbVersion)
+	definition, err := definitionClient.Get(ctx, rbName, rbVersion)
 	if err != nil {
 		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Getting Definition Metadata")
 	}
 
-	defData, err := definitionClient.Download(context.TODO(), rbName, rbVersion)
+	defData, err := definitionClient.Download(ctx, rbName, rbVersion)
 	if err != nil {
 		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Downloading Definition")
 	}
@@ -334,7 +334,7 @@ func (v *ProfileClient) Resolve(rbName string, rbVersion string,
 	}
 
 	//Get the definition ID and download its contents
-	profile, err := v.Get(rbName, rbVersion, profileName)
+	profile, err := v.Get(ctx, rbName, rbVersion, profileName)
 	if err != nil {
 		return sortedTemplates, crdList, hookList, finalReleaseName, pkgerrors.Wrap(err, "Getting Profile")
 	}

@@ -106,7 +106,7 @@ func (v *DefinitionClient) Create(ctx context.Context, def Definition) (Definiti
 
 	// Create a default profile automatically
 	prc := NewProfileClient()
-	pr, err := prc.CreateOrUpdate(Profile{
+	pr, err := prc.CreateOrUpdate(ctx, Profile{
 		RBName:      def.RBName,
 		RBVersion:   def.RBVersion,
 		ProfileName: "default",
@@ -126,7 +126,7 @@ func (v *DefinitionClient) Create(ctx context.Context, def Definition) (Definiti
 		return Definition{}, pkgerrors.Wrap(err, "Creating Default Profile")
 	}
 
-	err = prc.Upload(pr.RBName, pr.RBVersion, pr.ProfileName, prc.getEmptyProfile())
+	err = prc.Upload(ctx, pr.RBName, pr.RBVersion, pr.ProfileName, prc.getEmptyProfile())
 	if err != nil {
 		logutils.Error("Upload Empty Profile", logutils.Fields{
 			"error":           err,
@@ -232,7 +232,7 @@ func (v *DefinitionClient) Delete(ctx context.Context, name string, version stri
 
 	//Delete the default profile as well
 	prc := NewProfileClient()
-	err = prc.Delete(name, version, "default")
+	err = prc.Delete(ctx, name, version, "default")
 	if err != nil {
 		logutils.Error("Delete Default Profile", logutils.Fields{
 			"error":        err,

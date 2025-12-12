@@ -619,7 +619,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 	var resTemplates []helm.KubernetesResourceTemplate
 
 	profileClient := rb.NewProfileClient()
-	profile, err := profileClient.Get(rbName, rbVersion, profileName)
+	profile, err := profileClient.Get(context.TODO(), rbName, rbVersion, profileName)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Reading Profile Data")
 	}
@@ -718,7 +718,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 
 	//Download and process the profile first
 	//If everything seems okay, then download the config templates
-	prYamlClient, err := profileClient.GetYamlClient(rbName, rbVersion, profileName)
+	prYamlClient, err := profileClient.GetYamlClient(context.TODO(), rbName, rbVersion, profileName)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}

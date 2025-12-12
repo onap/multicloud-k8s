@@ -18,6 +18,7 @@ package rb
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"reflect"
 	"sort"
@@ -105,7 +106,7 @@ func TestCreateProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			got, err := impl.CreateOrUpdate(testCase.inp, false)
+			got, err := impl.CreateOrUpdate(context.TODO(), testCase.inp, false)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -173,7 +174,7 @@ func TestGetProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			got, err := impl.Get(testCase.rbname, testCase.rbversion, testCase.prname)
+			got, err := impl.Get(context.TODO(), testCase.rbname, testCase.rbversion, testCase.prname)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get returned an unexpected error %s", err)
@@ -262,7 +263,7 @@ func TestListProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			got, err := impl.List(testCase.rbdef, testCase.version)
+			got, err := impl.List(context.TODO(), testCase.rbdef, testCase.version)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("List returned an unexpected error %s", err)
@@ -319,7 +320,7 @@ func TestDeleteProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			err := impl.Delete(testCase.rbname, testCase.rbversion, testCase.prname)
+			err := impl.Delete(context.TODO(), testCase.rbname, testCase.rbversion, testCase.prname)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Delete returned an unexpected error %s", err)
@@ -479,7 +480,7 @@ func TestUploadProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			err := impl.Upload(testCase.rbname, testCase.rbversion, testCase.prname, testCase.content)
+			err := impl.Upload(context.TODO(), testCase.rbname, testCase.rbversion, testCase.prname, testCase.content)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Errorf("Upload returned an unexpected error %s", err)
@@ -580,7 +581,7 @@ func TestDownloadProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			data, err := impl.Download(testCase.rbname, testCase.rbversion, testCase.prname)
+			data, err := impl.Download(context.TODO(), testCase.rbname, testCase.rbversion, testCase.prname)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Errorf("Download returned an unexpected error %s", err)
@@ -773,7 +774,7 @@ func TestResolveProfile(t *testing.T) {
 		t.Run(testCase.label, func(t *testing.T) {
 			db.DBconn = testCase.mockdb
 			impl := NewProfileClient()
-			data, _, _, releaseName, err := impl.Resolve(testCase.rbname,
+			data, _, _, releaseName, err := impl.Resolve(context.TODO(), testCase.rbname,
 				testCase.rbversion, testCase.prname, []string{}, testCase.releaseName)
 			defer cleanup(data)
 			if err != nil {

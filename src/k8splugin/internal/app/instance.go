@@ -263,7 +263,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	}
 
 	//Check if profile exists
-	profile, err := rb.NewProfileClient().Get(i.RBName, i.RBVersion, i.ProfileName)
+	profile, err := rb.NewProfileClient().Get(ctx, i.RBName, i.RBVersion, i.ProfileName)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.New("Unable to find Profile to create instance")
 	}
@@ -282,7 +282,7 @@ func (v *InstanceClient) Create(ctx context.Context, i InstanceRequest, newId st
 	overrideValues = append(overrideValues, "k8s-rb-instance-id="+finalId)
 
 	//Execute the kubernetes create command
-	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
+	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(ctx, i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
 	if err != nil {
 		namegenerator.Release(ctx, generatedId)
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
@@ -527,7 +527,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 	}
 
 	//Check if profile exists
-	profile, err := rb.NewProfileClient().Get(i.RBName, i.RBVersion, i.ProfileName)
+	profile, err := rb.NewProfileClient().Get(ctx, i.RBName, i.RBVersion, i.ProfileName)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.New("Unable to find Profile to create instance")
 	}
@@ -537,7 +537,7 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 	overrideValues = append(overrideValues, "k8s-rb-instance-id="+id)
 
 	//Execute the kubernetes create command
-	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
+	sortedTemplates, crdList, hookList, releaseName, err := rb.NewProfileClient().Resolve(ctx, i.RBName, i.RBVersion, i.ProfileName, overrideValues, i.ReleaseName)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Error resolving helm charts")
 	}
@@ -852,7 +852,7 @@ func (v *InstanceClient) Status(ctx context.Context, id string, checkReady bool)
 		return InstanceStatus{}, pkgerrors.Wrap(err, "Getting CloudRegion Information")
 	}
 	req := resResp.Request
-	profile, err := rb.NewProfileClient().Get(req.RBName, req.RBVersion, req.ProfileName)
+	profile, err := rb.NewProfileClient().Get(ctx, req.RBName, req.RBVersion, req.ProfileName)
 	if err != nil {
 		return InstanceStatus{}, pkgerrors.New("Unable to find Profile instance status")
 	}
@@ -1191,7 +1191,7 @@ func (v *InstanceClient) RecoverCreateOrDelete(ctx context.Context, id string) e
 		ID: id,
 	}
 	log.Printf("  Resolving template for release %s", instance.Request.ReleaseName)
-	_, _, hookList, _, _ := rb.NewProfileClient().Resolve(instance.Request.RBName, instance.Request.RBVersion, instance.Request.ProfileName, overrideValues, instance.Request.ReleaseName)
+	_, _, hookList, _, _ := rb.NewProfileClient().Resolve(ctx, instance.Request.RBName, instance.Request.RBVersion, instance.Request.ProfileName, overrideValues, instance.Request.ReleaseName)
 	instance.Hooks = hookList
 	err = db.DBconn.Update(ctx, v.storeName, key, v.tagInst, instance)
 	if err != nil {

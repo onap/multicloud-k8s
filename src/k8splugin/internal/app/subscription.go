@@ -148,7 +148,8 @@ type InstanceStatusSubManager interface {
 
 // Create Status Subscription
 func (iss *InstanceStatusSubClient) Create(ctx context.Context, instanceId string, subDetails SubscriptionRequest) (StatusSubscription, error) {
-
+	ctx, span := tracer.Start(ctx, "InstanceStatusSubClient.Create")
+	defer span.End()
 	_, err := iss.Get(ctx, instanceId, subDetails.Name)
 	if err == nil {
 		return StatusSubscription{}, pkgerrors.New("Subscription already exists")
@@ -174,7 +175,7 @@ func (iss *InstanceStatusSubClient) Create(ctx context.Context, instanceId strin
 		sub.NotifyMetadata = make(map[string]interface{})
 	}
 
-	err = iss.refreshWatchers(instanceId, subDetails.Name)
+	err = iss.refreshWatchers(ctx, instanceId, subDetails.Name)
 	if err != nil {
 		return sub, pkgerrors.Wrap(err, "Creating Status Subscription DB Entry")
 	}
@@ -198,6 +199,8 @@ func (iss *InstanceStatusSubClient) Create(ctx context.Context, instanceId strin
 
 // Get Status subscription
 func (iss *InstanceStatusSubClient) Get(ctx context.Context, instanceId, subId string) (StatusSubscription, error) {
+	ctx, span := tracer.Start(ctx, "InstanceStatusSubClient.Get")
+	defer span.End()
 	lock, _, _ := getSubscriptionData(instanceId)
 	// Acquire Mutex
 	lock.Lock()
@@ -240,7 +243,7 @@ func (iss *InstanceStatusSubClient) Update(ctx context.Context, instanceId, subI
 		sub.NotifyMetadata = make(map[string]interface{})
 	}
 
-	err = iss.refreshWatchers(instanceId, subDetails.Name)
+	err = iss.refreshWatchers(ctx, instanceId, subDetails.Name)
 	if err != nil {
 		return sub, pkgerrors.Wrap(err, "Updating Status Subscription DB Entry")
 	}
@@ -372,7 +375,7 @@ func (iss *InstanceStatusSubClient) RestoreWatchers(ctx context.Context) {
 			}
 
 			for _, sub := range subList {
-				err = iss.refreshWatchers(instance.ID, sub.Name)
+				err = iss.refreshWatchers(ctx, instance.ID, sub.Name)
 				if err != nil {
 					log.Error("Error on refreshing watchers", log.Fields{
 						"error":        err.Error(),
@@ -387,19 +390,18 @@ func (iss *InstanceStatusSubClient) RestoreWatchers(ctx context.Context) {
 	}()
 }
 
-func (iss *InstanceStatusSubClient) refreshWatchers(instanceId, subId string) error {
+func (iss *InstanceStatusSubClient) refreshWatchers(ctx context.Context, instanceId, subId string) error {
 	log.Info("REFRESH WATCHERS", log.Fields{
 		"instance":     instanceId,
 		"subscription": subId,
 	})
 	v := NewInstanceClient()
 	k8sClient := KubernetesClient{}
-	ctx := context.TODO()
 	instance, err := v.Get(ctx, instanceId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Cannot get instance for notify thread")
 	}
-	profile, err := rb.NewProfileClient().Get(instance.Request.RBName, instance.Request.RBVersion,
+	profile, err := rb.NewProfileClient().Get(ctx, instance.Request.RBName, instance.Request.RBVersion,
 		instance.Request.ProfileName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Unable to find Profile instance status")

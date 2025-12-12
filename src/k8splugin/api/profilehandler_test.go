@@ -18,6 +18,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -31,9 +32,9 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-//Creating an embedded interface via anonymous variable
-//This allows us to make mockDB satisfy the DatabaseConnection
-//interface even if we are not implementing all the methods in it
+// Creating an embedded interface via anonymous variable
+// This allows us to make mockDB satisfy the DatabaseConnection
+// interface even if we are not implementing all the methods in it
 type mockRBProfile struct {
 	rb.ProfileManager
 	// Items and err will be used to customize each test
@@ -42,7 +43,7 @@ type mockRBProfile struct {
 	Err   error
 }
 
-func (m *mockRBProfile) CreateOrUpdate(inp rb.Profile, update bool) (rb.Profile, error) {
+func (m *mockRBProfile) CreateOrUpdate(ctx context.Context, inp rb.Profile, update bool) (rb.Profile, error) {
 	if m.Err != nil {
 		return rb.Profile{}, m.Err
 	}
@@ -50,7 +51,7 @@ func (m *mockRBProfile) CreateOrUpdate(inp rb.Profile, update bool) (rb.Profile,
 	return m.Items[0], nil
 }
 
-func (m *mockRBProfile) Get(rbname, rbversion, prname string) (rb.Profile, error) {
+func (m *mockRBProfile) Get(ctx context.Context, rbname, rbversion, prname string) (rb.Profile, error) {
 	if m.Err != nil {
 		return rb.Profile{}, m.Err
 	}
@@ -58,7 +59,7 @@ func (m *mockRBProfile) Get(rbname, rbversion, prname string) (rb.Profile, error
 	return m.Items[0], nil
 }
 
-func (m *mockRBProfile) List(rbname, rbversion string) ([]rb.Profile, error) {
+func (m *mockRBProfile) List(ctx context.Context, rbname, rbversion string) ([]rb.Profile, error) {
 	if m.Err != nil {
 		return []rb.Profile{}, m.Err
 	}
@@ -66,11 +67,11 @@ func (m *mockRBProfile) List(rbname, rbversion string) ([]rb.Profile, error) {
 	return m.Items, nil
 }
 
-func (m *mockRBProfile) Delete(rbname, rbversion, prname string) error {
+func (m *mockRBProfile) Delete(ctx context.Context, rbname, rbversion, prname string) error {
 	return m.Err
 }
 
-func (m *mockRBProfile) Upload(rbname, rbversion, prname string, inp []byte) error {
+func (m *mockRBProfile) Upload(ctx context.Context, rbname, rbversion, prname string, inp []byte) error {
 	return m.Err
 }
 

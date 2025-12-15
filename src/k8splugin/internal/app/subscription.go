@@ -463,7 +463,10 @@ func (iss *InstanceStatusSubClient) refreshWatchers(ctx context.Context, instanc
 }
 
 // Get the Mutex for the Subscription
-func getSubscriptionData(instanceId string) (*sync.Mutex, chan notifyChannelData, subscriptionWatchManager) {
+func getSubscriptionData(ctx context.Context, instanceId string) (*sync.Mutex, chan notifyChannelData, subscriptionWatchManager) {
+	ctx, span := tracer.Start(ctx, "InstanceStatusSubClient.getSubscriptionData")
+	defer span.End()
+
 	var key string = instanceId
 	subscriptionNotifyData.Lock()
 	defer subscriptionNotifyData.Unlock()

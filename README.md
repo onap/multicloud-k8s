@@ -16,7 +16,7 @@ MultiCloud Kubernetes plugin for ONAP multicloud.
 # Installation
 
 Requirements:
-* Go 1.16
+* go 1.17
 
 Steps:
 

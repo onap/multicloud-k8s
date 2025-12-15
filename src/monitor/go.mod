@@ -1,6 +1,6 @@
 module github.com/onap/multicloud-k8s/src/monitor
 
-go 1.16
+go 1.17
 
 require (
 	github.com/go-openapi/spec v0.19.4

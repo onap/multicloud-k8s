@@ -1,13 +1,63 @@
 module github.com/onap/multicloud-k8s/src/ncm
 
 require (
-	github.com/emicklei/go-restful v2.10.0+incompatible // indirect
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-20251205073433-cd019185faf1
 	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20251205113806-246f4e4b1e9f
 	github.com/pkg/errors v0.9.1
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
+)
+
+require (
+	github.com/PuerkitoBio/purell v1.1.1 // indirect
+	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
+	github.com/coreos/go-semver v0.3.0 // indirect
+	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
+	github.com/emicklei/go-restful v2.10.0+incompatible // indirect
+	github.com/go-openapi/jsonpointer v0.19.3 // indirect
+	github.com/go-openapi/jsonreference v0.19.3 // indirect
+	github.com/go-openapi/spec v0.19.4 // indirect
+	github.com/go-openapi/swag v0.19.5 // indirect
+	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/snappy v1.0.0 // indirect
+	github.com/google/gofuzz v1.1.0 // indirect
+	github.com/json-iterator/go v1.1.11 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
+	github.com/mailru/easyjson v0.7.0 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20251205073433-cd019185faf1 // indirect
+	github.com/sirupsen/logrus v1.6.0 // indirect
+	github.com/xdg/scram v1.0.5 // indirect
+	github.com/xdg/stringprep v1.0.3 // indirect
+	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
+	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
+	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.0 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.0 // indirect
+	go.etcd.io/etcd/client/v3 v3.5.0 // indirect
+	go.mongodb.org/mongo-driver v1.1.0 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
+	go.uber.org/zap v1.17.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
+	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c // indirect
+	google.golang.org/grpc v1.38.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
+	gopkg.in/inf.v0 v0.9.1 // indirect
+	k8s.io/api v0.18.2 // indirect
+	k8s.io/apimachinery v0.18.2 // indirect
+	k8s.io/klog v1.0.0 // indirect
+	k8s.io/kube-openapi v0.0.0-20200410145947-bcb3869e6f29 // indirect
+	sigs.k8s.io/controller-runtime v0.6.0 // indirect
+	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
 replace (
@@ -40,4 +90,4 @@ replace (
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.16.9
 )
 
-go 1.16
+go 1.24.0

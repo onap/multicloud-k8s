@@ -14,21 +14,22 @@ limitations under the License.
 package utils
 
 import (
-	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-	k8splugin "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"net/http"
 	"os"
 	"reflect"
+
+	con "github.com/onap/multicloud-k8s/src/inventory/constants"
+	k8splugin "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 )
 
 /* Building relationship json to attach vserver details to vf-module*/
 func BuildRelationshipDataForVFModule(vserverName, vserverID, cloudOwner, cloudRegion, tenantId string) con.RelationList {
 
-	rl := con.RelationList{"vserver", "/aai/v14/cloud-infrastructure/cloud-regions/cloud-region/" + cloudOwner + "/" + cloudRegion + "/tenants/tenant/" + tenantId + "/vservers/vserver/" + vserverID, []con.RData{con.RData{"cloud-region.cloud-owner", cloudOwner},
-		con.RData{"cloud-region.cloud-region-id", cloudRegion},
-		con.RData{"tenant.tenant-id", tenantId},
-		con.RData{"vserver.vserver-id", vserverID}},
-		[]con.Property{con.Property{"vserver.vserver-name", vserverName}}}
+	rl := con.RelationList{RelatedTo: "vserver", RelatedLink: "/aai/v14/cloud-infrastructure/cloud-regions/cloud-region/" + cloudOwner + "/" + cloudRegion + "/tenants/tenant/" + tenantId + "/vservers/vserver/" + vserverID, RelationshipData: []con.RData{con.RData{RelationshipKey: "cloud-region.cloud-owner", RelationshipValue: cloudOwner},
+		con.RData{RelationshipKey: "cloud-region.cloud-region-id", RelationshipValue: cloudRegion},
+		con.RData{RelationshipKey: "tenant.tenant-id", RelationshipValue: tenantId},
+		con.RData{RelationshipKey: "vserver.vserver-id", RelationshipValue: vserverID}},
+		RelatedToProperty: []con.Property{con.Property{PropertyKey: "vserver.vserver-name", PropertyValue: vserverName}}}
 
 	return rl
 

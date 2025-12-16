@@ -15,17 +15,17 @@ package api
 
 import (
 	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-	log "github.com/onap/multicloud-k8s/src/inventory/logutils"
 	utils "github.com/onap/multicloud-k8s/src/inventory/utils"
 	k8sint "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	k8scon "github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
+	log "github.com/sirupsen/logrus"
 
 	"encoding/json"
 	"net/http"
 	"os"
 )
 
-func ListInstances() []string {
+func ListInstances() ([]string, error) {
 
 	MK8S_URI := os.Getenv("onap-multicloud-k8s")
 	MK8S_Port := os.Getenv("multicloud-k8s-port")
@@ -34,16 +34,16 @@ func ListInstances() []string {
 	req, err := http.NewRequest(http.MethodGet, instancelist, nil)
 	if err != nil {
 
-		log.Error("Something went wrong while listing resources - contructing request")
-		return
+		log.Error("Something went wrong while listing resources - contructing request: ", err)
+		return nil, err
 	}
 
 	client := http.DefaultClient
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Error("Something went wrong while listing resources - executing request")
-		return
+		log.Error("Something went wrong while listing resources - executing request: ", err)
+		return nil, err
 	}
 
 	defer res.Body.Close()
@@ -54,11 +54,11 @@ func ListInstances() []string {
 
 	resourceList := utils.ParseListInstanceResponse(rlist)
 
-	return resourceList
+	return resourceList, nil
 
 }
 
-func GetConnection(cregion string) k8scon.Connection {
+func GetConnection(cregion string) (k8scon.Connection, error) {
 
 	MK8S_URI := os.Getenv("onap-multicloud-k8s")
 	MK8S_Port := os.Getenv("multicloud-k8s-port")
@@ -67,16 +67,16 @@ func GetConnection(cregion string) k8scon.Connection {
 	req, err := http.NewRequest(http.MethodGet, instancelist, nil)
 	if err != nil {
 
-		log.Error("Something went wrong while getting Connection resource - contructing request")
-		return
+		log.Error("Something went wrong while getting Connection resource - contructing request: ", err)
+		return k8scon.Connection{}, err
 	}
 
 	client := http.DefaultClient
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Error("Something went wrong while getting Connection resource - executing request")
-		return
+		log.Error("Something went wrong while getting Connection resource - executing request: ", err)
+		return k8scon.Connection{}, err
 	}
 
 	defer res.Body.Close()
@@ -85,7 +85,7 @@ func GetConnection(cregion string) k8scon.Connection {
 	var connection k8scon.Connection
 	err = decoder.Decode(&connection)
 
-	return connection
+	return connection, nil
 
 }
 
@@ -98,16 +98,16 @@ func CheckStatusForEachInstance(instanceID string) k8sint.InstanceStatus {
 
 	req, err := http.NewRequest(http.MethodGet, instancelist, nil)
 	if err != nil {
-		log.Error("Error while checking instance status - building http request")
-		return
+		log.Error("Error while checking instance status - building http request: ", err)
+		return k8sint.InstanceStatus{}
 	}
 
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
 
-		log.Error("Error while checking instance status - making rest request")
-		return
+		log.Error("Error while checking instance status - making rest request: ", err)
+		return k8sint.InstanceStatus{}
 	}
 
 	defer resp.Body.Close()

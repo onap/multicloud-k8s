@@ -14,20 +14,24 @@ limitations under the License.
 package main
 
 import (
-	executor "github.com/onap/multicloud-k8s/src/inventory/api"
-	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-        k8splugin "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
-	utils "github.com/onap/multicloud-k8s/src/inventory/utils"
 	"os"
 	"os/signal"
 	"time"
+
+	executor "github.com/onap/multicloud-k8s/src/inventory/api"
+	con "github.com/onap/multicloud-k8s/src/inventory/constants"
+	utils "github.com/onap/multicloud-k8s/src/inventory/utils"
+	k8splugin "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 )
 
 /* Root function which periodically polls status api for all the instances in the k8splugin and update the status information accordingly to AAI  */
 func QueryAAI() {
 
 	for {
-		instanceList := executor.ListInstances()
+		instanceList, err := executor.ListInstances()
+		if err != nil {
+			continue
+		}
 		statusList := CheckInstanceStatus(instanceList)
 		podList := utils.ParseStatusInstanceResponse(statusList)
 		PushPodInfoToAAI(podList)
@@ -57,16 +61,28 @@ func PushPodInfoToAAI(podList []con.PodInfoToAAI) {
 
 	for _, pod := range podList {
 
-		connection := executor.GetConnection(pod.CloudRegion)
+		connection, err := executor.GetConnection(pod.CloudRegion)
+		if err != nil {
+			continue
+		}
 
-		tenantId := executor.GetTenant(connection.CloudOwner, pod.CloudRegion)
+		tenantId, err := executor.GetTenant(connection.CloudOwner, pod.CloudRegion)
+		if err != nil {
+			continue
+		}
 
-		vserverID := executor.PushVservers(pod, connection.CloudOwner, pod.CloudRegion, tenantId)
+		vserverID, err := executor.PushVservers(pod, connection.CloudOwner, pod.CloudRegion, tenantId)
+		if err != nil {
+			continue
+		}
 
 		rl := utils.BuildRelationshipDataForVFModule(pod.VserverName, vserverID, connection.CloudOwner, pod.CloudRegion, tenantId)
 		relList = append(relList, rl)
 
-		executor.LinkVserverVFM(pod.VnfId, pod.VfmId, connection.CloudOwner, pod.CloudRegion, tenantId, relList)
+		err = executor.LinkVserverVFM(pod.VnfId, pod.VfmId, connection.CloudOwner, pod.CloudRegion, tenantId, relList)
+		if err != nil {
+			continue
+		}
 	}
 
 }

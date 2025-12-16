@@ -16,15 +16,16 @@ package api
 import (
 	"crypto/tls"
 	"encoding/json"
-	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-	log "github.com/onap/multicloud-k8s/src/inventory/logutils"
-	util "github.com/onap/multicloud-k8s/src/inventory/utils"
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	con "github.com/onap/multicloud-k8s/src/inventory/constants"
+	util "github.com/onap/multicloud-k8s/src/inventory/utils"
+	log "github.com/sirupsen/logrus"
 )
 
-func GetTenant(cloudOwner, cloudRegion string) string {
+func GetTenant(cloudOwner, cloudRegion string) (string, error) {
 
 	AAI_URI := os.Getenv("onap-aai")
 	AAI_Port := os.Getenv("aai-port")
@@ -34,8 +35,8 @@ func GetTenant(cloudOwner, cloudRegion string) string {
 	apiToCR := AAI_URI + ":" + AAI_Port + con.AAI_EP + con.AAI_CREP + "cloud-region/" + cloudOwner + "/" + cloudRegion + "?depth=all"
 	req, err := http.NewRequest(http.MethodGet, apiToCR, nil)
 	if err != nil {
-		log.Error("Error while constructing request for Tenant API")
-		return
+		log.Error("Error while constructing request for Tenant API: ", err)
+		return "", err
 
 	}
 
@@ -45,8 +46,8 @@ func GetTenant(cloudOwner, cloudRegion string) string {
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Error("Error while executing request for Tenant API")
-		return
+		log.Error("Error while executing request for Tenant API: ", err)
+		return "", err
 	}
 
 	defer res.Body.Close()
@@ -54,8 +55,8 @@ func GetTenant(cloudOwner, cloudRegion string) string {
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 
-		log.Error("Can't read Tenant response")
-		return
+		log.Error("Can't read Tenant response: ", err)
+		return "", err
 
 	}
 
@@ -66,12 +67,12 @@ func GetTenant(cloudOwner, cloudRegion string) string {
 	for k, v := range tenant.Tenants {
 		if k == "tenant" {
 			for _, val := range v {
-				return val.TenantId
+				return val.TenantId, nil
 
 			}
 		}
 	}
 
-	return ""
+	return "", nil
 
 }

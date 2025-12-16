@@ -17,41 +17,42 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
-	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-	log "github.com/onap/multicloud-k8s/src/inventory/logutils"
-	util "github.com/onap/multicloud-k8s/src/inventory/utils"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
+
+	con "github.com/onap/multicloud-k8s/src/inventory/constants"
+	util "github.com/onap/multicloud-k8s/src/inventory/utils"
+	log "github.com/sirupsen/logrus"
 )
 
-/* Pushes each pod related details as vservers inot A&AI
+/*
+Pushes each pod related details as vservers inot A&AI
 
-{
-                "vserver-id": "example20",
-                "vserver-name": "POD-NAME",
-                "vserver-name2": "Relese-name/Profile-name of the POD (Labels:release=profile-k8s)",
-                "prov-status": "NAMESPACEofthPOD",
-                "vserver-selflink": "example-vserver-selflink-val-57201",
-                "in-maint": true,
-                "is-closed-loop-disabled": true,
-                "l-interfaces": {
-                                "l-interface": [{
-                                                "interface-name": "example-interface-name-val-20080",
-												"is-port-mirrored": true,
-												"in-maint": true,
-												"is-ip-unnumbered": true,
-                                                "l3-interface-ipv4-address-list": [{
-                                                                "l3-interface-ipv4-address": "IP_Address",
-                                                                "l3-interface-ipv4-prefix-length": "PORT"
-                                                }]
-                                }]
-                }
-}
-
+	{
+	                "vserver-id": "example20",
+	                "vserver-name": "POD-NAME",
+	                "vserver-name2": "Relese-name/Profile-name of the POD (Labels:release=profile-k8s)",
+	                "prov-status": "NAMESPACEofthPOD",
+	                "vserver-selflink": "example-vserver-selflink-val-57201",
+	                "in-maint": true,
+	                "is-closed-loop-disabled": true,
+	                "l-interfaces": {
+	                                "l-interface": [{
+	                                                "interface-name": "example-interface-name-val-20080",
+													"is-port-mirrored": true,
+													"in-maint": true,
+													"is-ip-unnumbered": true,
+	                                                "l3-interface-ipv4-address-list": [{
+	                                                                "l3-interface-ipv4-address": "IP_Address",
+	                                                                "l3-interface-ipv4-prefix-length": "PORT"
+	                                                }]
+	                                }]
+	                }
+	}
 */
-func PushVservers(podInfo con.PodInfoToAAI, cloudOwner, cloudRegion, tenantId string) string {
+func PushVservers(podInfo con.PodInfoToAAI, cloudOwner, cloudRegion, tenantId string) (string, error) {
 
 	AAI_URI := os.Getenv("onap-aai")
 	AAI_Port := os.Getenv("aai-port")
@@ -67,8 +68,8 @@ func PushVservers(podInfo con.PodInfoToAAI, cloudOwner, cloudRegion, tenantId st
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonStr))
 
 	if err != nil {
-		log.Error("Error while constructing Vserver PUT request")
-		return
+		log.Error("Error while constructing Vserver PUT request: ", err)
+		return "", err
 	}
 
 	util.SetRequestHeaders(req)
@@ -76,16 +77,16 @@ func PushVservers(podInfo con.PodInfoToAAI, cloudOwner, cloudRegion, tenantId st
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error("Error while executing Vserver PUT api")
-		return
+		log.Error("Error while executing Vserver PUT api: ", err)
+		return "", err
 	}
 	defer resp.Body.Close()
 
-	return podInfo.VserverName
+	return podInfo.VserverName, nil
 }
 
 /* This links vservers to vf-module request payload */
-func LinkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relList []con.RelationList) {
+func LinkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relList []con.RelationList) error {
 
 	AAI_URI := os.Getenv("onap-aai")
 	AAI_Port := os.Getenv("aai-port")
@@ -95,8 +96,8 @@ func LinkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relL
 	apiToCR := AAI_URI + ":" + AAI_Port + con.AAI_EP + con.AAI_NEP + "/" + vnfID + "/vf-modules"
 	req, err := http.NewRequest(http.MethodGet, apiToCR, nil)
 	if err != nil {
-		log.Error("Error while constructing VFModules GET api request")
-		return
+		log.Error("Error while constructing VFModules GET api request: ", err)
+		return err
 
 	}
 
@@ -106,8 +107,8 @@ func LinkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relL
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Error("Error while executing VFModules GET api")
-		return
+		log.Error("Error while executing VFModules GET api: ", err)
+		return err
 	}
 
 	defer res.Body.Close()
@@ -115,8 +116,8 @@ func LinkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relL
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 
-		log.Error("Error while reading vfmodules API response")
-		return
+		log.Error("Error while reading vfmodules API response: ", err)
+		return err
 
 	}
 
@@ -143,8 +144,8 @@ func LinkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relL
 
 			if err != nil {
 
-				log.Error("Error while marshalling vfmodule linked vserver info response")
-				return
+				log.Error("Error while marshalling vfmodule linked vserver info response: ", err)
+				return err
 
 			}
 
@@ -153,6 +154,7 @@ func LinkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relL
 
 	}
 
+	return nil
 }
 
 /*  Pushes vf-module enriched with vserver information */
@@ -169,7 +171,7 @@ func pushVFModuleToAAI(vfmPayload, vfmID, vnfID string) {
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonStr))
 
 	if err != nil {
-		log.Error("Error while constructing a VFModule request to AAI")
+		log.Error("Error while constructing a VFModule request to AAI: ", err)
 		return
 	}
 
@@ -179,7 +181,7 @@ func pushVFModuleToAAI(vfmPayload, vfmID, vnfID string) {
 	resp, err := client.Do(req)
 	if err != nil {
 
-		log.Error("Error while executing PUT request of VFModule to AAI")
+		log.Error("Error while executing PUT request of VFModule to AAI: ", err)
 		return
 
 	}

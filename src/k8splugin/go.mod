@@ -2,11 +2,11 @@ module github.com/onap/multicloud-k8s/src/k8splugin
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/docker/engine v0.0.0-20190620014054-c513a4c6c298
 	github.com/ghodss/yaml v1.0.0
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/consul/api v1.5.0
+	github.com/moby/moby v23.0.18+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/cobra v1.1.3 // indirect
@@ -14,19 +14,18 @@ require (
 	go.mongodb.org/mongo-driver v1.7.5
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.24.0
-	go.opentelemetry.io/contrib/propagators/b3 v0.24.0 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v0.24.0
 	go.opentelemetry.io/otel v1.2.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.2.0
 	go.opentelemetry.io/otel/sdk v1.2.0
 	go.opentelemetry.io/otel/trace v1.2.0
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
 	gopkg.in/yaml.v2 v2.4.0
 	helm.sh/helm/v3 v3.5.0
 	k8s.io/api v0.20.1
 	k8s.io/apiextensions-apiserver v0.20.1
 	k8s.io/apimachinery v0.20.1
 	k8s.io/cli-runtime v0.20.1
-	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
+	k8s.io/client-go v0.20.1
 	rsc.io/letsencrypt v0.0.3 // indirect
 )
 

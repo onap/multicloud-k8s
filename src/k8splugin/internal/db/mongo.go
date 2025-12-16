@@ -17,9 +17,8 @@
 package db
 
 import (
+	"context"
 	"log"
-
-	"golang.org/x/net/context"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"

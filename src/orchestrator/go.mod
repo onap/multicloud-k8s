@@ -1,28 +1,23 @@
 module github.com/onap/multicloud-k8s/src/orchestrator
 
 require (
-	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
-	github.com/Sirupsen/logrus v0.0.0-00010101000000-000000000000 // indirect
-	github.com/coreos/etcd v3.3.17+incompatible
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
-	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/onap/multicloud-k8s/src/clm v0.0.0-20251205073433-cd019185faf1
 	github.com/onap/multicloud-k8s/src/monitor v0.0.0-20251205073433-cd019185faf1
 	github.com/onap/multicloud-k8s/src/rsync v0.0.0-20251205073433-cd019185faf1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/xeipuuv/gojsonschema v1.2.0
-	go.etcd.io/etcd/client/v3 v3.5.0 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.0
+	go.etcd.io/etcd/client/v3 v3.5.0
 	go.mongodb.org/mongo-driver v1.1.0
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.26.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apimachinery v0.18.2
-	k8s.io/client-go v12.0.0+incompatible // indirect
 	k8s.io/helm v2.16.12+incompatible
 )
 

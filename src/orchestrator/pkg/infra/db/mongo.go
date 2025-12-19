@@ -17,10 +17,9 @@
 package db
 
 import (
+	"context"
 	"encoding/json"
 	"sort"
-
-	"golang.org/x/net/context"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 

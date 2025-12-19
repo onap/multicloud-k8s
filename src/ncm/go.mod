@@ -4,10 +4,10 @@ require (
 	github.com/emicklei/go-restful v2.10.0+incompatible // indirect
 	github.com/gorilla/handlers v1.3.0
 	github.com/gorilla/mux v1.7.3
-	github.com/onap/multicloud-k8s/src/clm v0.0.0-20250926072925-94c66cbc97eb
-	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20250926072925-94c66cbc97eb
+	github.com/onap/multicloud-k8s/src/clm v0.0.0-20251205073433-cd019185faf1
+	github.com/onap/multicloud-k8s/src/orchestrator v0.0.0-20251205113806-246f4e4b1e9f
 	github.com/pkg/errors v0.9.1
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.3.0
 )
 
 replace (

@@ -20,8 +20,8 @@ import (
 
 	executor "github.com/onap/multicloud-k8s/src/inventory/api"
 	con "github.com/onap/multicloud-k8s/src/inventory/constants"
+	"github.com/onap/multicloud-k8s/src/inventory/model"
 	utils "github.com/onap/multicloud-k8s/src/inventory/utils"
-	k8splugin "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 )
 
 /* Root function which periodically polls status api for all the instances in the k8splugin and update the status information accordingly to AAI  */
@@ -40,9 +40,9 @@ func QueryAAI() {
 
 }
 
-func CheckInstanceStatus(instanceList []string) []k8splugin.InstanceStatus {
+func CheckInstanceStatus(instanceList []string) []model.InstanceStatus {
 
-	var instStatusList []k8splugin.InstanceStatus
+	var instStatusList []model.InstanceStatus
 
 	for _, instance := range instanceList {
 

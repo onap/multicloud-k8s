@@ -14,9 +14,9 @@ limitations under the License.
 package utils
 
 import (
-	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-	k8splugin "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"testing"
+
+	"github.com/onap/multicloud-k8s/src/inventory/model"
 )
 
 func TestBuildRelationshipDataForVFModule(t *testing.T) {
@@ -92,10 +92,25 @@ func TestBuildRelationshipDataForVFModule(t *testing.T) {
 
 func TestParseStatusInstanceResponse(t *testing.T) {
 
-	var resourceIdList []k8splugin.InstanceStatus
+	var resourceIdList []model.InstanceStatus
 
-	instanceRequest := k8splugin.InstanceRequest{"rb_name", "rb_version", "profile123456", "c_region", map[string]string{"generic-vnf-id": "123456789", "vf-module-id": "987654321"}}
-	instanceStatus := k8splugin.InstanceStatus{instanceRequest, true, 12, []con.PodStatus{con.PodStatus{"pod123", "onap", true, []string{"10.211.1.100", "10.211.1.101"}}, con.PodStatus{"pod456", "default", true, []string{"10.211.1.200", "10.211.1.201"}}}}
+	instanceRequest := model.InstanceRequest{
+		RBName:      "rb_name",
+		RBVersion:   "rb_version",
+		ProfileName: "profile123456",
+		ReleaseName: "release1",
+		CloudRegion: "c_region",
+		Labels:      map[string]string{"generic-vnf-id": "123456789", "vf-module-id": "987654321"},
+	}
+	instanceStatus := model.InstanceStatus{
+		Request:       instanceRequest,
+		Ready:         true,
+		ResourceCount: 12,
+		ResourcesStatus: []model.ResourceStatus{
+			{Name: "pod123", GVK: model.GroupVersionKind{Group: "", Version: "v1", Kind: "Pod"}},
+			{Name: "pod456", GVK: model.GroupVersionKind{Group: "", Version: "v1", Kind: "Pod"}},
+		},
+	}
 
 	resourceIdList = append(resourceIdList, instanceStatus)
 
@@ -103,22 +118,25 @@ func TestParseStatusInstanceResponse(t *testing.T) {
 
 	for _, podInfo := range podInfoToAAI {
 
-		if podInfo.VserverName == "pod123" {
-
-			t.Error("Failed")
-
+		if podInfo.VserverName2 != "profile123456" {
+			t.Error("Expected VserverName2 to be profile123456")
 		}
 
-		if podInfo.VserverName2 == "default" {
-
-			t.Error("Failed")
-
+		if podInfo.CloudRegion != "c_region" {
+			t.Error("Expected CloudRegion to be c_region")
 		}
 
-		if podInfo.ProvStatus == "profile123456" {
+		if podInfo.VnfId != "123456789" {
+			t.Error("Expected VnfId to be 123456789")
+		}
 
-			t.Error("Failed")
+		if podInfo.VfmId != "987654321" {
+			t.Error("Expected VfmId to be 987654321")
+		}
 
+		// Last resource name wins in the loop
+		if podInfo.VserverName != "pod456" {
+			t.Error("Expected VserverName to be pod456")
 		}
 
 	}

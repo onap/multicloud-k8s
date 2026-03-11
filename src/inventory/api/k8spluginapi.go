@@ -15,9 +15,8 @@ package api
 
 import (
 	con "github.com/onap/multicloud-k8s/src/inventory/constants"
+	"github.com/onap/multicloud-k8s/src/inventory/model"
 	utils "github.com/onap/multicloud-k8s/src/inventory/utils"
-	k8sint "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
-	k8scon "github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	log "github.com/sirupsen/logrus"
 
 	"encoding/json"
@@ -49,7 +48,7 @@ func ListInstances() ([]string, error) {
 	defer res.Body.Close()
 
 	decoder := json.NewDecoder(res.Body)
-	var rlist []k8sint.InstanceMiniResponse
+	var rlist []model.InstanceMiniResponse
 	err = decoder.Decode(&rlist)
 
 	resourceList := utils.ParseListInstanceResponse(rlist)
@@ -58,7 +57,7 @@ func ListInstances() ([]string, error) {
 
 }
 
-func GetConnection(cregion string) (k8scon.Connection, error) {
+func GetConnection(cregion string) (model.Connection, error) {
 
 	MK8S_URI := os.Getenv("onap-multicloud-k8s")
 	MK8S_Port := os.Getenv("multicloud-k8s-port")
@@ -68,7 +67,7 @@ func GetConnection(cregion string) (k8scon.Connection, error) {
 	if err != nil {
 
 		log.Error("Something went wrong while getting Connection resource - contructing request: ", err)
-		return k8scon.Connection{}, err
+		return model.Connection{}, err
 	}
 
 	client := http.DefaultClient
@@ -76,20 +75,20 @@ func GetConnection(cregion string) (k8scon.Connection, error) {
 
 	if err != nil {
 		log.Error("Something went wrong while getting Connection resource - executing request: ", err)
-		return k8scon.Connection{}, err
+		return model.Connection{}, err
 	}
 
 	defer res.Body.Close()
 
 	decoder := json.NewDecoder(res.Body)
-	var connection k8scon.Connection
+	var connection model.Connection
 	err = decoder.Decode(&connection)
 
 	return connection, nil
 
 }
 
-func CheckStatusForEachInstance(instanceID string) k8sint.InstanceStatus {
+func CheckStatusForEachInstance(instanceID string) model.InstanceStatus {
 
 	MK8S_URI := os.Getenv("onap-multicloud-k8s")
 	MK8S_Port := os.Getenv("multicloud-k8s-port")
@@ -99,7 +98,7 @@ func CheckStatusForEachInstance(instanceID string) k8sint.InstanceStatus {
 	req, err := http.NewRequest(http.MethodGet, instancelist, nil)
 	if err != nil {
 		log.Error("Error while checking instance status - building http request: ", err)
-		return k8sint.InstanceStatus{}
+		return model.InstanceStatus{}
 	}
 
 	client := http.DefaultClient
@@ -107,13 +106,13 @@ func CheckStatusForEachInstance(instanceID string) k8sint.InstanceStatus {
 	if err != nil {
 
 		log.Error("Error while checking instance status - making rest request: ", err)
-		return k8sint.InstanceStatus{}
+		return model.InstanceStatus{}
 	}
 
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
-	var instStatus k8sint.InstanceStatus
+	var instStatus model.InstanceStatus
 	err = decoder.Decode(&instStatus)
 
 	return instStatus

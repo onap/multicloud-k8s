@@ -16,10 +16,9 @@ package utils
 import (
 	"net/http"
 	"os"
-	"reflect"
 
 	con "github.com/onap/multicloud-k8s/src/inventory/constants"
-	k8splugin "github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
+	"github.com/onap/multicloud-k8s/src/inventory/model"
 )
 
 /* Building relationship json to attach vserver details to vf-module*/
@@ -35,7 +34,7 @@ func BuildRelationshipDataForVFModule(vserverName, vserverID, cloudOwner, cloudR
 
 }
 
-func ParseListInstanceResponse(rlist []k8splugin.InstanceMiniResponse) []string {
+func ParseListInstanceResponse(rlist []model.InstanceMiniResponse) []string {
 
 	var resourceIdList []string
 
@@ -49,7 +48,7 @@ func ParseListInstanceResponse(rlist []k8splugin.InstanceMiniResponse) []string 
 }
 
 /* Parse status api response to pull required information like Pod name, Profile name, namespace, ip details, vnf-id and vf-module-id*/
-func ParseStatusInstanceResponse(instanceStatusses []k8splugin.InstanceStatus) []con.PodInfoToAAI {
+func ParseStatusInstanceResponse(instanceStatusses []model.InstanceStatus) []con.PodInfoToAAI {
 
 	var infoToAAI []con.PodInfoToAAI
 
@@ -57,46 +56,20 @@ func ParseStatusInstanceResponse(instanceStatusses []k8splugin.InstanceStatus) [
 
 		var podInfo con.PodInfoToAAI
 
-		sa := reflect.ValueOf(&instanceStatus).Elem()
-		typeOf := sa.Type()
-		for i := 0; i < sa.NumField(); i++ {
-			f := sa.Field(i)
-			if typeOf.Field(i).Name == "Request" {
-				request := f.Interface()
-				if ireq, ok := request.(k8splugin.InstanceRequest); ok {
-					podInfo.VserverName2 = ireq.ProfileName
-					podInfo.CloudRegion = ireq.CloudRegion
+		podInfo.VserverName2 = instanceStatus.Request.ProfileName
+		podInfo.CloudRegion = instanceStatus.Request.CloudRegion
 
-					for key, value := range ireq.Labels {
-						if key == "generic-vnf-id" {
-
-							podInfo.VnfId = value
-
-						}
-						if key == "vfmodule-id" {
-
-							podInfo.VfmId = value
-
-						}
-					}
-
-				} else {
-					//fmt.Printf("it's not a InstanceRequest \n")
-				}
+		for key, value := range instanceStatus.Request.Labels {
+			if key == "generic-vnf-id" {
+				podInfo.VnfId = value
 			}
-
-			if typeOf.Field(i).Name == "PodStatuses" {
-				ready := f.Interface()
-				if pss, ok := ready.([]con.PodStatus); ok {
-					for _, ps := range pss {
-						podInfo.VserverName = ps.Name
-						podInfo.ProvStatus = ps.Namespace
-					}
-
-				} else {
-					//fmt.Printf("it's not a InstanceRequest \n")
-				}
+			if key == "vfmodule-id" {
+				podInfo.VfmId = value
 			}
+		}
+
+		for _, rs := range instanceStatus.ResourcesStatus {
+			podInfo.VserverName = rs.Name
 		}
 
 		infoToAAI = append(infoToAAI, podInfo)

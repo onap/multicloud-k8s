@@ -242,7 +242,15 @@ func TestInstanceGetHandler(t *testing.T) {
 			},
 		},
 		{
-			label:        "Succesful get an Instance",
+			label:        "Not found Instance",
+			input:        "HaKpys8e",
+			expectedCode: http.StatusNotFound,
+			instClient: &mockInstanceClient{
+				err: pkgerrors.New("Get Instance: Error finding master table: mongo: no documents in result"),
+			},
+		},
+		{
+			label:        "Successful get an Instance",
 			input:        "HaKpys8e",
 			expectedCode: http.StatusOK,
 			expectedResponse: &app.InstanceResponse{

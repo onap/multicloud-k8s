@@ -15,14 +15,15 @@ package main
 
 import (
 	"fmt"
-	register "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc"
-	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
-	"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installappserver"
 	"log"
 	"math/rand"
 	"net"
 	"strings"
 	"time"
+
+	installpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installapp"
+	register "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc"
+	"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installappserver"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/config"
 	contextDb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/contextdb"

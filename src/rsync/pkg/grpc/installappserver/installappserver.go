@@ -16,9 +16,10 @@ package installappserver
 import (
 	"context"
 	"encoding/json"
-	con "github.com/onap/multicloud-k8s/src/rsync/pkg/context"
-	"github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
 	"log"
+
+	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installapp"
+	con "github.com/onap/multicloud-k8s/src/rsync/pkg/context"
 )
 
 type installappServer struct {

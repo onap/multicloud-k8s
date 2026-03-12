@@ -18,9 +18,9 @@ import (
 	"sync"
 	"time"
 
+	installpb "github.com/onap/multicloud-k8s/src/orchestrator/pkg/grpc/installapp"
 	log "github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/logutils"
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/infra/rpc"
-	installpb "github.com/onap/multicloud-k8s/src/rsync/pkg/grpc/installapp"
 	pkgerrors "github.com/pkg/errors"
 )
 

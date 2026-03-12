@@ -119,6 +119,10 @@ func (h connectionHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := h.client.Get(r.Context(), name)
 	if err != nil {
+		if err.Error() == "Get Connection: Error finding master table: mongo: no documents in result" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -139,6 +143,10 @@ func (h connectionHandler) deleteHandler(w http.ResponseWriter, r *http.Request)
 
 	err := h.client.Delete(r.Context(), name)
 	if err != nil {
+		if err.Error() == "Delete Connection: Error finding master table: mongo: no documents in result" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

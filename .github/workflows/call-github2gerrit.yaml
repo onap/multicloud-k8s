@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2026 The Linux Foundation
 
-name: 'GitHub2Gerrit'
+name: "GitHub2Gerrit"
 
 # yamllint disable-line rule:truthy
 on:
@@ -19,39 +19,39 @@ on:
   workflow_dispatch:
     inputs:
       GERRIT_BRANCH:
-        description: 'Branch that change is against'
+        description: "Branch that change is against"
         required: false
         type: string
       GERRIT_CHANGE_ID:
-        description: 'The ID for the change'
+        description: "The ID for the change"
         required: false
         type: string
       GERRIT_CHANGE_NUMBER:
-        description: 'The Gerrit number'
+        description: "The Gerrit number"
         required: false
         type: string
       GERRIT_CHANGE_URL:
-        description: 'URL to the change'
+        description: "URL to the change"
         required: false
         type: string
       GERRIT_EVENT_TYPE:
-        description: 'Gerrit event type'
+        description: "Gerrit event type"
         required: false
         type: string
       GERRIT_PATCHSET_NUMBER:
-        description: 'The patch number for the change'
+        description: "The patch number for the change"
         required: false
         type: string
       GERRIT_PATCHSET_REVISION:
-        description: 'The revision sha'
+        description: "The revision sha"
         required: false
         type: string
       GERRIT_PROJECT:
-        description: 'Project in Gerrit'
+        description: "Project in Gerrit"
         required: false
         type: string
       GERRIT_REFSPEC:
-        description: 'Gerrit refspec of change'
+        description: "Gerrit refspec of change"
         required: false
         type: string
       GERRIT_DISABLED:
@@ -77,8 +77,11 @@ concurrency:
   # - Workflow dispatch: Group by run_id (unique), never cancel
   group: >-
     ${{
-      github.event_name == 'pull_request_target' && format('{0}-pr-{1}', github.workflow, github.event.pull_request.number) ||
-      format('{0}-{1}-{2}', github.workflow, github.event_name, github.run_id)
+      github.event_name == 'pull_request_target'
+      && format('{0}-pr-{1}', github.workflow,
+                github.event.pull_request.number)
+      || format('{0}-{1}-{2}', github.workflow, github.event_name,
+                github.run_id)
     }}
   # Only cancel in-progress runs for PR events (newer commit supersedes older)
   # Never cancel push events (each Gerrit merge should process independently)
@@ -109,10 +112,10 @@ jobs:
         uses: lfreleng-actions/repository-metadata-action@61e837ecf6a21ef991c14991b43560f592a50a24  # v0.2.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          github_summary: 'true'
-          files_summary: 'true'
-          artifact_upload: 'true'
-          artifact_formats: 'json'
+          github_summary: "true"
+          files_summary: "true"
+          artifact_upload: "true"
+          artifact_formats: "json"
 
   notify:
     if: github.event_name == 'workflow_dispatch' && inputs.GERRIT_DISABLED != true
@@ -139,7 +142,7 @@ jobs:
         run: sleep 10s
 
   github2gerrit:
-    name: 'GitHub2Gerrit'
+    name: "GitHub2Gerrit"
     runs-on: ubuntu-latest
     if: always()
     needs: [notify]
@@ -156,14 +159,14 @@ jobs:
         with:
           egress-policy: audit
 
-      - name: 'Checkout repository'
+      - name: "Checkout repository"
         # yamllint disable-line rule:line-length
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           fetch-depth: 10
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: 'Run GitHub2Gerrit'
+      - name: "Run GitHub2Gerrit"
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/github2gerrit-action@761b950d3cf40ebad66a87cb3dc666d9df8df67c  # v1.4.0
         env:
@@ -178,9 +181,6 @@ jobs:
           GERRIT_PROJECT: ${{ github.event.inputs.GERRIT_PROJECT || '' }}
           GERRIT_REFSPEC: ${{ github.event.inputs.GERRIT_REFSPEC || '' }}
         with:
-          # Only for testing in LF Gerrit/sandbox; remove AUTOMATION_ONLY from production workflows
-          AUTOMATION_ONLY: "false"
-          USE_LOCAL_ACTION: true  # Use branch code for testing, not PyPI
           USE_PR_AS_COMMIT: true
           VERBOSE: false
 

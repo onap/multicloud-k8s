@@ -29,7 +29,9 @@ const DefaultValidation = false
 
 // Client is a kubernetes client, like `kubectl`
 type Client struct {
-	Clientset        *kubernetes.Clientset
+	// Clientset is a kubernetes.Interface (rather than the concrete
+	// *kubernetes.Clientset) so tests can inject a fake clientset.
+	Clientset        kubernetes.Interface
 	factory          *factory
 	validator        validation.Schema
 	namespace        string

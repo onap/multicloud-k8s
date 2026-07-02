@@ -66,7 +66,7 @@ func (c *Client) NodesReady() (ready int, total int, err error) {
 // Version returns the cluster version. It can be used to verify if the cluster
 // is reachable. It will return an error if failed to connect.
 func (c *Client) Version() (string, error) {
-	v, err := c.Clientset.ServerVersion()
+	v, err := c.Clientset.Discovery().ServerVersion()
 	if err != nil {
 		return "", err
 	}

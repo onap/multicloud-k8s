@@ -61,6 +61,10 @@ function start_aai_service {
 
 # Setup
 install_deps
+# install_deps runs "snap install helm", which triggers a snapd restart that
+# can briefly make the k3s API server unreachable. Wait for it before the
+# first kubectl call below.
+wait_for_apiserver
 destroy_deployment $plugin_deployment_name
 
 #start_aai_service

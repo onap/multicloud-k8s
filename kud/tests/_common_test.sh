@@ -21,10 +21,13 @@ function install_deps {
         install_packages "" ubuntu_deps ""
     fi
     if ! $(helm --version &>/dev/null); then
-        function ubuntu_deps {
-            sudo snap install --classic helm
-        }
-        install_packages "" ubuntu_deps ""
+        # Install helm from the official static binary rather than via snap.
+        # "snap install helm" triggers a snapd restart that briefly disrupts
+        # networking and repeatedly knocks the k3s API server offline, causing
+        # subsequent kubectl calls to fail with "connection refused" and abort
+        # the test under 'set -o errexit'. The helm CLI here only needs to
+        # exist to satisfy this check; a static binary avoids the daemon churn.
+        curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sudo bash
     fi
 }
 

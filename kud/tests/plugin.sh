@@ -61,6 +61,9 @@ function start_aai_service {
 
 # Setup
 install_deps
+# Make sure the k3s API server is reachable before the first kubectl call
+# below; installing test dependencies can briefly disrupt networking.
+wait_for_apiserver
 destroy_deployment $plugin_deployment_name
 
 #start_aai_service

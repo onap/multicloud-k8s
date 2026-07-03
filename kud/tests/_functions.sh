@@ -344,4 +344,29 @@ function check_ip_range {
     return 1
 }
 
+# wait_for_apiserver() - Wait until the Kubernetes API server is reachable.
+# Heavy setup steps (docker builds, "snap install helm" which triggers a
+# snapd restart) can briefly disrupt networking and leave the API server
+# momentarily unreachable, causing the next kubectl call to fail with
+# "connection refused" and abort the test under 'set -o errexit'. Poll the
+# /readyz endpoint (up to 180s) so tests only proceed once it is serving.
+#
+# The functional tests reach the cluster via "sudo kubectl" (the k3s
+# pipeline does not create a kubeconfig for the current user), so probe the
+# same way and point explicitly at the k3s kubeconfig to avoid depending on
+# an ambient KUBECONFIG.
+function wait_for_apiserver {
+    echo "$(date +%H:%M:%S) - Waiting for Kubernetes API server to be ready"
+    for attempt in $(seq 1 36); do
+        if sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl get --raw='/readyz' &>/dev/null; then
+            echo "$(date +%H:%M:%S) - Kubernetes API server is ready"
+            return 0
+        fi
+        sleep 5
+    done
+    echo "ERROR: Kubernetes API server did not become ready within 180s"
+    sudo journalctl -u k3s --no-pager | tail -n 50 || true
+    return 1
+}
+
 test_folder=${FUNCTIONS_DIR}

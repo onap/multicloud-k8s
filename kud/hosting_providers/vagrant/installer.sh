@@ -146,11 +146,31 @@ function install_k3s {
 
     curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -
 
-    systemctl status k3s
+    systemctl status k3s || true
 
-    sudo kubectl get all -n kube-system
+    # k3s.service reports "active (running)" as soon as the process starts,
+    # which is before the kube-apiserver is listening on :6443. Issuing a
+    # kubectl call before then fails with "connection refused" and, because
+    # this script runs under 'set -o errexit', aborts the whole deployment.
+    # Wait for the API server to report ready before using kubectl.
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    echo "Waiting for k3s API server to become ready..."
+    for attempt in $(seq 1 36); do
+        if sudo KUBECONFIG="${KUBECONFIG}" kubectl get --raw='/readyz' &>/dev/null; then
+            echo "k3s API server is ready"
+            break
+        fi
+        if [[ ${attempt} -eq 36 ]]; then
+            echo "ERROR: k3s API server did not become ready within 180s"
+            sudo journalctl -u k3s --no-pager | tail -n 50 || true
+            exit 1
+        fi
+        sleep 5
+    done
 
-    sudo kubectl cluster-info
+    sudo KUBECONFIG="${KUBECONFIG}" kubectl get all -n kube-system
+
+    sudo KUBECONFIG="${KUBECONFIG}" kubectl cluster-info
 }
 
 # install_addons() - Install Kubenertes AddOns

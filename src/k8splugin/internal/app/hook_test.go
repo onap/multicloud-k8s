@@ -15,11 +15,8 @@ package app
 
 import (
 	"context"
-	"encoding/base64"
-	"io/ioutil"
 	"testing"
 
-	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
@@ -226,21 +223,10 @@ func TestExecHook(t *testing.T) {
 		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
 	}
 
-	// Load the mock kube config file into memory
-	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
-	if err != nil {
-		t.Fatal("Unable to read mock_kube_config")
-	}
-	db.DBconn = &db.MockDB{
-		Items: map[string]map[string][]byte{
-			connection.ConnectionKey{CloudRegion: "mock_connection"}.String(): {
-				"metadata": []byte(
-					"{\"cloud-region\":\"mock_connection\"," +
-						"\"cloud-owner\":\"mock_owner\"," +
-						"\"kubeconfig\": \"" + base64.StdEncoding.EncodeToString(fd) + "\"}"),
-			},
-		},
-	}
+	// Use fake clients so hook execution never dials a real apiserver.
+	defer useFakeClients()()
+
+	db.DBconn = mockConnectionDB(t)
 
 	k8sClient := KubernetesClient{}
 	err = k8sClient.Init(context.TODO(), "mock_connection", "test")

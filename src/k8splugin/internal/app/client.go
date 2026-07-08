@@ -64,13 +64,41 @@ import (
 // KubernetesClient encapsulates the different clients' interfaces
 // we need when interacting with a Kubernetes cluster
 type KubernetesClient struct {
-	rawConfig      clientcmd.ClientConfig
-	restConfig     *rest.Config
-	clientSet      kubernetes.Interface
-	dynamicClient  dynamic.Interface
-	discoverClient *disk.CachedDiscoveryClient
-	restMapper     meta.RESTMapper
-	instanceID     string
+	rawConfig     clientcmd.ClientConfig
+	restConfig    *rest.Config
+	clientSet     kubernetes.Interface
+	dynamicClient dynamic.Interface
+	restMapper    meta.RESTMapper
+	instanceID    string
+}
+
+// buildClientsFunc constructs the cluster-facing clients from a rest.Config.
+type buildClientsFunc func(*rest.Config) (kubernetes.Interface, dynamic.Interface, meta.RESTMapper, error)
+
+// buildClients constructs the cluster-facing clients from a rest.Config. It is
+// a package variable so that unit tests can inject fakes (see setBuildClients),
+// keeping Init free of real, cluster-dialing clients while leaving the
+// production path unchanged.
+var buildClients buildClientsFunc = defaultBuildClients
+
+func defaultBuildClients(config *rest.Config) (kubernetes.Interface, dynamic.Interface, meta.RESTMapper, error) {
+	clientSet, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	dynamicClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		return nil, nil, nil, pkgerrors.Wrap(err, "Creating dynamic client")
+	}
+
+	discoverClient, err := disk.NewCachedDiscoveryClientForConfig(config, os.TempDir(), "", 10*time.Minute)
+	if err != nil {
+		return nil, nil, nil, pkgerrors.Wrap(err, "Creating discovery client")
+	}
+
+	restMapper := restmapper.NewDeferredDiscoveryRESTMapper(discoverClient)
+	return clientSet, dynamicClient, restMapper, nil
 }
 
 // ResourceStatus holds Resource Runtime Data
@@ -390,22 +418,10 @@ func (k *KubernetesClient) Init(ctx context.Context, cloudregion string, iid str
 		return pkgerrors.Wrap(err, "setConfig: Build config from flags raised an error")
 	}
 
-	k.clientSet, err = kubernetes.NewForConfig(config)
+	k.clientSet, k.dynamicClient, k.restMapper, err = buildClients(config)
 	if err != nil {
 		return err
 	}
-
-	k.dynamicClient, err = dynamic.NewForConfig(config)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Creating dynamic client")
-	}
-
-	k.discoverClient, err = disk.NewCachedDiscoveryClientForConfig(config, os.TempDir(), "", 10*time.Minute)
-	if err != nil {
-		return pkgerrors.Wrap(err, "Creating discovery client")
-	}
-
-	k.restMapper = restmapper.NewDeferredDiscoveryRESTMapper(k.discoverClient)
 	k.restConfig = config
 
 	//Spawn ClientConfig

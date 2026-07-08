@@ -18,7 +18,7 @@ deploy: test build
 
 build: clean test cover
 	CGO_ENABLED=0 GOOS=$(PLATFORM) GOARCH=amd64
-	go build -a -ldflags '-extldflags "-static"' \
+	go build -ldflags '-extldflags "-static"' \
 	-o $(PWD)/$(BINARY) cmd/manager/main.go
 
 deploy: build

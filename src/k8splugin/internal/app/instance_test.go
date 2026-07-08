@@ -697,6 +697,13 @@ func TestInstanceDelete(t *testing.T) {
 		t.Fatalf("TestInstanceDelete returned an error (%s)", err)
 	}
 
+	// Use fake clients so instance deletion never dials a real apiserver.
+	defer useFakeClients()()
+
+	// Delete triggers config cleanup, which reads db.Etcd; set it here so the
+	// test does not depend on an earlier test having initialized the global.
+	db.Etcd = &db.MockEtcdClient{}
+
 	// Load the mock kube config file into memory
 	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
 	if err != nil {
@@ -804,6 +811,9 @@ func TestInstanceWithHookCreate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("LoadMockPlugins returned an error (%s)", err)
 	}
+
+	// Use fake clients so instance creation never dials a real apiserver.
+	defer useFakeClients()()
 
 	// Load the mock kube config file into memory
 	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")

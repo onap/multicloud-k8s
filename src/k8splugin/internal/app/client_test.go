@@ -33,6 +33,15 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// setBuildClients overrides the buildClients seam so tests can inject fake
+// clients that perform no network I/O. It returns a function that restores the
+// original factory, intended to be deferred.
+func setBuildClients(fn buildClientsFunc) func() {
+	prev := buildClients
+	buildClients = fn
+	return func() { buildClients = prev }
+}
+
 func LoadMockPlugins(krdLoadedPlugins map[string]*plugin.Plugin) error {
 	if _, err := os.Stat("../../mock_files/mock_plugins/mockplugin.so"); os.IsNotExist(err) {
 		return pkgerrors.New("mockplugin.so does not exist. Please compile mockplugin.go to generate")

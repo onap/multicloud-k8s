@@ -89,6 +89,11 @@ var profileData = profileDataManager{
 	resourceChannel: map[string]chan configResourceList{},
 }
 
+// scheduleResourcesStartupDelay is the grace period getProfileData waits after
+// spawning a scheduleResources goroutine so the goroutine is ready to receive.
+// It is a package variable so unit tests can shorten it to avoid a real delay.
+var scheduleResourcesStartupDelay = 5 * time.Second
+
 // Construct key for storing data
 func constructKey(strs ...string) string {
 
@@ -757,7 +762,7 @@ func getProfileData(key string) (*sync.Mutex, chan configResourceList) {
 	if !ok {
 		profileData.resourceChannel[key] = make(chan configResourceList)
 		go scheduleResources(profileData.resourceChannel[key])
-		time.Sleep(time.Second * 5)
+		time.Sleep(scheduleResourcesStartupDelay)
 	}
 	return profileData.profileLockMap[key], profileData.resourceChannel[key]
 }

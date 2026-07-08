@@ -135,6 +135,11 @@ var subscriptionNotifyData = subscriptionNotifyManager{
 	watchersStatus: map[string]subscriptionWatchManager{},
 }
 
+// scheduleNotificationsStartupDelay is the grace period getSubscriptionData
+// waits after spawning a scheduleNotifications goroutine so the goroutine is
+// ready to receive. It is a package variable so unit tests can shorten it.
+var scheduleNotificationsStartupDelay = 5 * time.Second
+
 // InstanceStatusSubManager is an interface exposes the status subscription functionality
 type InstanceStatusSubManager interface {
 	Create(ctx context.Context, instanceId string, subDetails SubscriptionRequest) (StatusSubscription, error)
@@ -475,7 +480,7 @@ func getSubscriptionData(instanceId string) (*sync.Mutex, chan notifyChannelData
 	if !ok {
 		subscriptionNotifyData.notifyChannel[key] = make(chan notifyChannelData)
 		go scheduleNotifications(instanceId, subscriptionNotifyData.notifyChannel[key])
-		time.Sleep(time.Second * 5)
+		time.Sleep(scheduleNotificationsStartupDelay)
 	}
 	_, ok = subscriptionNotifyData.watchersStatus[key]
 	if !ok {

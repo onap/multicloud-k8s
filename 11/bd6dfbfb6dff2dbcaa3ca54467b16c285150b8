@@ -1,0 +1,9 @@
+Verified+1: ONAP Bypass GHA <releng+onap.bypass.gha@linuxfoundation.org>
+Verified+1: ONAP GitHub Actions <collab-it+ecomp-jobbuilder@linuxfoundation.org>
+Verified+1: ONAP Required GHA <releng+onap.required.gha@linuxfoundation.org>
+Code-Review+2: Matthew Watkins <mwatkins@linuxfoundation.org>
+Submitted-by: Matthew Watkins <mwatkins@linuxfoundation.org>
+Submitted-at: Thu, 09 Jul 2026 07:42:40 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/multicloud/k8s/+/144863
+Project: multicloud/k8s
+Branch: refs/heads/master

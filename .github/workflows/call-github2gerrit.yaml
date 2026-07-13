@@ -168,7 +168,7 @@ jobs:
 
       - name: "Run GitHub2Gerrit"
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/github2gerrit-action@761b950d3cf40ebad66a87cb3dc666d9df8df67c  # v1.4.0
+        uses: lfreleng-actions/github2gerrit-action@f21a57072b372a58da37cbbe1e36f9814b27ee7d  # v1.4.1
         env:
           # Pass GERRIT_* inputs as environment variables when dispatched from Gerrit
           GERRIT_BRANCH: ${{ github.event.inputs.GERRIT_BRANCH || '' }}

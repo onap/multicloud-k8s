@@ -38,7 +38,7 @@ jobs:
       id-token: write       # OIDC for build provenance attestations
       attestations: write   # Build provenance attestations
     # yamllint disable-line rule:line-length
-    uses: lfreleng-actions/go-workflows/.github/workflows/build-test-release.yaml@c707bcbf120c2a7f826f6a2e1600bc8d1e11209e  # v0.0.4
+    uses: lfreleng-actions/go-workflows/.github/workflows/build-test-release.yaml@4e136bc6f8aff4acfd6bab39ac98617882892250  # v0.1.0
     with:
       path_prefix: 'src/k8splugin'
       # go.mod declares Go 1.16, too old for the release toolchain

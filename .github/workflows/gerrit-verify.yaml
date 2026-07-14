@@ -74,6 +74,7 @@ permissions: {}
 jobs:
   # Clear any previous Verified vote so the change starts from a clean state.
   clear-vote:
+    name: 'Clear vote'
     if: inputs.GERRIT_DISABLED != true
     runs-on: ubuntu-latest
     permissions:
@@ -91,7 +92,9 @@ jobs:
         with:
           host: ${{ vars.GERRIT_SERVER }}
           username: ${{ vars.GERRIT_SSH_USER }}
-          key: ${{ secrets.GERRIT_SSH_PRIVKEY }}
+          # Review-only Gerrit SSH voting key; not gated by an Environment
+          # yamllint disable-line rule:line-length
+          key: ${{ secrets.GERRIT_SSH_PRIVKEY }}  # zizmor: ignore[secrets-outside-env]
           known_hosts: ${{ vars.GERRIT_KNOWN_HOSTS }}
           gerrit-change-number: ${{ inputs.GERRIT_CHANGE_NUMBER }}
           gerrit-patchset-number: ${{ inputs.GERRIT_PATCHSET_NUMBER }}
@@ -113,7 +116,7 @@ jobs:
       contents: read
       pull-requests: read  # repository-metadata-action queries PR data
     # yamllint disable-line rule:line-length
-    uses: lfreleng-actions/go-workflows/.github/workflows/build-test.yaml@c707bcbf120c2a7f826f6a2e1600bc8d1e11209e  # v0.0.4
+    uses: lfreleng-actions/go-workflows/.github/workflows/build-test.yaml@4e136bc6f8aff4acfd6bab39ac98617882892250  # v0.1.0
     with:
       # When GERRIT_DISABLED is true the gerrit_* values are blanked so the
       # reusable workflow falls back to a standard checkout.
@@ -143,13 +146,14 @@ jobs:
 
   # Report the overall workflow conclusion back to Gerrit as a Verified vote.
   vote:
+    name: 'Set Verified vote'
     if: ${{ always() && inputs.GERRIT_DISABLED != true }}
     needs: [clear-vote, build-test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
       # workflow-conclusion queries the Actions API to list run jobs
-      actions: read
+      actions: read  # workflow-conclusion queries the Actions API
     timeout-minutes: 5
     steps:
       - name: 'Harden runner'
@@ -166,7 +170,9 @@ jobs:
         with:
           host: ${{ vars.GERRIT_SERVER }}
           username: ${{ vars.GERRIT_SSH_USER }}
-          key: ${{ secrets.GERRIT_SSH_PRIVKEY }}
+          # Review-only Gerrit SSH voting key; not gated by an Environment
+          # yamllint disable-line rule:line-length
+          key: ${{ secrets.GERRIT_SSH_PRIVKEY }}  # zizmor: ignore[secrets-outside-env]
           known_hosts: ${{ vars.GERRIT_KNOWN_HOSTS }}
           gerrit-change-number: ${{ inputs.GERRIT_CHANGE_NUMBER }}
           gerrit-patchset-number: ${{ inputs.GERRIT_PATCHSET_NUMBER }}

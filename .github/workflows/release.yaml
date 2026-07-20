@@ -38,7 +38,7 @@ jobs:
       id-token: write       # OIDC for build provenance attestations
       attestations: write   # Build provenance attestations
     # yamllint disable-line rule:line-length
-    uses: lfreleng-actions/go-workflows/.github/workflows/build-test-release.yaml@e7a30dac1bf0db8c1ab00f7096752b1fbd852b0f  # v0.2.0
+    uses: lfreleng-actions/go-workflows/.github/workflows/build-test-release.yaml@a1a9d4d574d6de4c71a7b05dfd1f15027e73b08a  # v0.3.0
     with:
       path_prefix: 'src/k8splugin'
       # The internal/app tests load a Go plugin (mockplugin.so) that

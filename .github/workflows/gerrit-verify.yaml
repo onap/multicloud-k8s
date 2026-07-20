@@ -116,7 +116,7 @@ jobs:
       contents: read
       pull-requests: read  # repository-metadata-action queries PR data
     # yamllint disable-line rule:line-length
-    uses: lfreleng-actions/go-workflows/.github/workflows/build-test.yaml@e7a30dac1bf0db8c1ab00f7096752b1fbd852b0f  # v0.2.0
+    uses: lfreleng-actions/go-workflows/.github/workflows/build-test.yaml@a1a9d4d574d6de4c71a7b05dfd1f15027e73b08a  # v0.3.0
     with:
       # When GERRIT_DISABLED is true the gerrit_* values are blanked so the
       # reusable workflow falls back to a standard checkout.

@@ -518,13 +518,14 @@ func applyConfig(instanceID string, p Config, pChannel chan configResourceList, 
 	crl.action = action
 	crl.resources = resources
 	crl.updatedResources = updatedResources
-	// Send the configResourceList to the channel. Using select for non-blocking channel
+	// Send the configResourceList to the scheduler goroutine. The send must
+	// block: the channel is unbuffered and the goroutine is not always parked
+	// on its receive (it may still be finishing the previous request), so a
+	// non-blocking send could drop the message and leave the receive below
+	// waiting forever.
 	log.Printf("Before Sent to goroutine %v", crl.profile)
-	select {
-	case pChannel <- crl:
-		log.Printf("Message Sent to goroutine %v", crl.profile)
-	default:
-	}
+	pChannel <- crl
+	log.Printf("Message Sent to goroutine %v", crl.profile)
 
 	var resultResources []KubernetesConfigResource = <-updatedResources
 	return resultResources, nil

@@ -35,10 +35,7 @@ import (
 )
 
 // TestMain shrinks the scheduleResources startup delay for the whole package so
-// config-touching tests do not each pay the production 5s grace period. The
-// delay must stay non-zero: applyConfig sends to the scheduler goroutine with a
-// non-blocking select, so the goroutine has to reach its receive first or the
-// message is dropped and applyConfig blocks forever.
+// config-touching tests do not each pay the production 5s grace period.
 func TestMain(m *testing.M) {
 	scheduleResourcesStartupDelay = 50 * time.Millisecond
 	scheduleNotificationsStartupDelay = 50 * time.Millisecond

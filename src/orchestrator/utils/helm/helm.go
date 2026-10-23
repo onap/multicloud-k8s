@@ -45,7 +45,6 @@ import (
 	"k8s.io/helm/pkg/proto/hapi/chart"
 	"k8s.io/helm/pkg/releaseutil"
 	"k8s.io/helm/pkg/renderutil"
-	"k8s.io/helm/pkg/tiller"
 	"k8s.io/helm/pkg/timeconv"
 )
 
@@ -241,7 +240,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	var manifestsToRender []manifest.Manifest
 	//render all manifests in the chart
 	manifestsToRender = listManifests
-	for _, m := range tiller.SortByKind(manifestsToRender) {
+	for _, m := range SortByKind(manifestsToRender) {
 		data := m.Content
 		b := filepath.Base(m.Name)
 		if b == "NOTES.txt" {

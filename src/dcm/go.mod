@@ -143,6 +143,8 @@ replace (
 	github.com/onap/multicloud-k8s/src/clm => ../clm
 	github.com/onap/multicloud-k8s/src/monitor => ../monitor
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
+	// k8s.io/kubernetes requires these at v0.0.0 and the tier is held on
+	// Kubernetes 1.16; each module needs its own copy.
 	k8s.io/api => k8s.io/api v0.16.9
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.16.9
 	k8s.io/apimachinery => k8s.io/apimachinery v0.16.10-beta.0

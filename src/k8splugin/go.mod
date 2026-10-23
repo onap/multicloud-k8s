@@ -72,7 +72,7 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7 // indirect
+	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/btree v1.0.0 // indirect
@@ -136,7 +136,7 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.etcd.io/etcd/api/v3 v3.5.3 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.3 // indirect
-	go.opencensus.io v0.22.2 // indirect
+	go.opencensus.io v0.22.3 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.2.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
@@ -148,7 +148,7 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40 // indirect
 	golang.org/x/text v0.3.5 // indirect
-	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
+	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c // indirect
 	google.golang.org/grpc v1.42.0 // indirect
@@ -156,26 +156,15 @@ require (
 	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/apiserver v0.20.1 // indirect
-	k8s.io/component-base v0.19.4 // indirect
+	k8s.io/component-base v0.20.1 // indirect
 	k8s.io/klog/v2 v2.4.0 // indirect
-	k8s.io/kube-openapi v0.0.0-20200805222855-6aeccd4b50c6 // indirect
+	k8s.io/kube-openapi v0.0.0-20201113171705-d219536bb9fd // indirect
 	k8s.io/kubectl v0.20.1 // indirect
-	k8s.io/utils v0.0.0-20200729134348-d5654de09c73 // indirect
+	k8s.io/utils v0.0.0-20201110183641-67b214c5f920 // indirect
 	rsc.io/letsencrypt v0.0.3 // indirect
 	sigs.k8s.io/kustomize v2.0.3+incompatible // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.0.1 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.0.2 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
-)
-
-replace (
-	k8s.io/api => k8s.io/api v0.19.4
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.19.4
-	k8s.io/apimachinery => k8s.io/apimachinery v0.19.4
-	k8s.io/apiserver => k8s.io/apiserver v0.19.4
-	k8s.io/cli-runtime => k8s.io/cli-runtime v0.19.4
-	k8s.io/client-go => k8s.io/client-go v0.19.4
-	k8s.io/component-base => k8s.io/component-base v0.19.4
-	k8s.io/kubectl => k8s.io/kubectl v0.19.4
 )
 
 go 1.17

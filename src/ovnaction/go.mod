@@ -11,7 +11,7 @@ require (
 	k8s.io/api v0.18.2
 	k8s.io/apimachinery v0.18.2
 	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/kubernetes v1.16.9
+	k8s.io/kubernetes v1.16.15
 )
 
 require (
@@ -59,7 +59,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	k8s.io/apiextensions-apiserver v0.18.2 // indirect
-	k8s.io/apiserver v0.16.9 // indirect
+	k8s.io/apiserver v0.16.15 // indirect
 	k8s.io/component-base v0.18.2 // indirect
 	k8s.io/klog v1.0.0 // indirect
 	k8s.io/utils v0.0.0-20200619165400-6e3d28b6ed19 // indirect
@@ -73,28 +73,28 @@ replace (
 	github.com/onap/multicloud-k8s/src/orchestrator => ../orchestrator
 	// k8s.io/kubernetes requires these at v0.0.0 and the tier is held on
 	// Kubernetes 1.16; each module needs its own copy.
-	k8s.io/api => k8s.io/api v0.16.9
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.16.9
-	k8s.io/apimachinery => k8s.io/apimachinery v0.16.10-beta.0
-	k8s.io/apiserver => k8s.io/apiserver v0.16.9
-	k8s.io/cli-runtime => k8s.io/cli-runtime v0.16.9
-	k8s.io/client-go => k8s.io/client-go v0.16.9
-	k8s.io/cloud-provider => k8s.io/cloud-provider v0.16.9
-	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.16.9
-	k8s.io/code-generator => k8s.io/code-generator v0.16.10-beta.0
-	k8s.io/component-base => k8s.io/component-base v0.16.9
-	k8s.io/cri-api => k8s.io/cri-api v0.16.13-rc.0
-	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.16.9
-	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.16.9
-	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.16.9
-	k8s.io/kube-proxy => k8s.io/kube-proxy v0.16.9
-	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.16.9
-	k8s.io/kubectl => k8s.io/kubectl v0.16.9
-	k8s.io/kubelet => k8s.io/kubelet v0.16.9
-	k8s.io/kubernetes => github.com/kubernetes/kubernetes v1.16.9
-	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.16.9
-	k8s.io/metrics => k8s.io/metrics v0.16.9
-	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.16.9
+	k8s.io/api => k8s.io/api v0.16.15
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.16.15
+	k8s.io/apimachinery => k8s.io/apimachinery v0.16.15
+	k8s.io/apiserver => k8s.io/apiserver v0.16.15
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.16.15
+	k8s.io/client-go => k8s.io/client-go v0.16.15
+	k8s.io/cloud-provider => k8s.io/cloud-provider v0.16.15
+	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.16.15
+	k8s.io/code-generator => k8s.io/code-generator v0.16.15
+	k8s.io/component-base => k8s.io/component-base v0.16.15
+	k8s.io/cri-api => k8s.io/cri-api v0.16.15
+	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.16.15
+	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.16.15
+	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.16.15
+	k8s.io/kube-proxy => k8s.io/kube-proxy v0.16.15
+	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.16.15
+	k8s.io/kubectl => k8s.io/kubectl v0.16.15
+	k8s.io/kubelet => k8s.io/kubelet v0.16.15
+	k8s.io/kubernetes => github.com/kubernetes/kubernetes v1.16.15
+	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.16.15
+	k8s.io/metrics => k8s.io/metrics v0.16.15
+	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.16.15
 )
 
 go 1.17

@@ -12,6 +12,7 @@ require (
 	go.mongodb.org/mongo-driver v1.7.5
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.24.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.24.0
 	go.opentelemetry.io/contrib/propagators/b3 v0.24.0
 	go.opentelemetry.io/otel v1.2.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.2.0
@@ -139,6 +140,8 @@ require (
 	go.etcd.io/etcd/client/pkg/v3 v3.5.3 // indirect
 	go.opencensus.io v0.22.3 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.2.0 // indirect
+	go.opentelemetry.io/otel/internal/metric v0.23.0 // indirect
+	go.opentelemetry.io/otel/metric v0.23.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect

@@ -45,6 +45,7 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/tracing"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -417,6 +418,8 @@ func (k *KubernetesClient) Init(ctx context.Context, cloudregion string, iid str
 	if err != nil {
 		return pkgerrors.Wrap(err, "setConfig: Build config from flags raised an error")
 	}
+
+	config.Wrap(tracing.ChildTransport)
 
 	k.clientSet, k.dynamicClient, k.restMapper, err = buildClients(config)
 	if err != nil {

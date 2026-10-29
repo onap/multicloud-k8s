@@ -19,13 +19,13 @@ package api
 import (
 	"context"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/app"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/healthcheck"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/tracing"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 )
 
@@ -43,7 +43,7 @@ func NewRouter(defClient rb.DefinitionManager,
 	router := mux.NewRouter()
 
 	// adds a opentelemetry middleware for tracing
-	if os.Getenv("TRACING_ENABLED") == "true" {
+	if tracing.Enabled() {
 		router.Use(otelmux.Middleware("multicloud-k8s"))
 	}
 	router.Use(accessLog)

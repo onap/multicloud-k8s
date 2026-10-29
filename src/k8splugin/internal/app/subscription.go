@@ -31,6 +31,7 @@ import (
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 	pkgerrors "github.com/pkg/errors"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 )
@@ -545,7 +546,7 @@ func scheduleNotifications(instanceId string, c chan notifyChannelData) {
 					Dial: notifyTimeout,
 				}
 				client := http.Client{
-					Transport: &transport,
+					Transport: otelhttp.NewTransport(&transport),
 				}
 				resp, errReq := client.Post(data.subscription.CallbackUrl, "application/json", notifyBodyBuffer)
 				if errReq == nil {

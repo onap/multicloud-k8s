@@ -16,7 +16,12 @@ package tracing
 
 import (
 	"context"
+	"net/http"
+	"os"
+	"strconv"
 
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -54,12 +59,72 @@ func initTracerProvider() *sdktrace.TracerProvider {
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(resources),
+		sdktrace.WithSampler(samplerFromEnv()),
 	)
 
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}, b3.New(b3.WithInjectEncoding(b3.B3MultipleHeader))))
 
 	return tp
+}
+
+// Enabled reports whether tracing is switched on with TRACING_ENABLED=true.
+func Enabled() bool {
+	return os.Getenv("TRACING_ENABLED") == "true"
+}
+
+// samplerFromEnv reads OTEL_TRACES_SAMPLER and OTEL_TRACES_SAMPLER_ARG as
+// defined by the OpenTelemetry specification. The SDK version in use does
+// not read them itself.
+func samplerFromEnv() sdktrace.Sampler {
+	name := os.Getenv("OTEL_TRACES_SAMPLER")
+	arg := os.Getenv("OTEL_TRACES_SAMPLER_ARG")
+	ratio := 1.0
+	if arg != "" {
+		r, err := strconv.ParseFloat(arg, 64)
+		if err != nil || r < 0 || r > 1 {
+			log.Warn("Invalid OTEL_TRACES_SAMPLER_ARG, using 1.0", log.Fields{"value": arg})
+		} else {
+			ratio = r
+		}
+	}
+
+	switch name {
+	case "always_on":
+		return sdktrace.AlwaysSample()
+	case "always_off":
+		return sdktrace.NeverSample()
+	case "traceidratio":
+		return sdktrace.TraceIDRatioBased(ratio)
+	case "parentbased_always_off":
+		return sdktrace.ParentBased(sdktrace.NeverSample())
+	case "parentbased_traceidratio":
+		return sdktrace.ParentBased(sdktrace.TraceIDRatioBased(ratio))
+	case "", "parentbased_always_on":
+		return sdktrace.ParentBased(sdktrace.AlwaysSample())
+	default:
+		log.Warn("Unknown OTEL_TRACES_SAMPLER, using parentbased_always_on", log.Fields{"value": name})
+		return sdktrace.ParentBased(sdktrace.AlwaysSample())
+	}
+}
+
+// ChildTransport traces requests that are made within an existing span and
+// passes all others through untraced. Most Kubernetes API calls are made
+// with context.TODO(), and tracing those would start a new trace per call.
+func ChildTransport(rt http.RoundTripper) http.RoundTripper {
+	return childTransport{traced: otelhttp.NewTransport(rt), plain: rt}
+}
+
+type childTransport struct {
+	traced http.RoundTripper
+	plain  http.RoundTripper
+}
+
+func (t childTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	if trace.SpanContextFromContext(r.Context()).IsValid() {
+		return t.traced.RoundTrip(r)
+	}
+	return t.plain.RoundTrip(r)
 }
 
 func NewInstrumentation() *Instrumentation {

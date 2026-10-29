@@ -39,12 +39,14 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	i := tracing.NewInstrumentation()
-	defer func() {
-		if err := i.TracerProvider.Shutdown(context.Background()); err != nil {
-			log.Error("Error shutting down tracer provider", log.Fields{"error": err})
-		}
-	}()
+	if tracing.Enabled() {
+		i := tracing.NewInstrumentation()
+		defer func() {
+			if err := i.TracerProvider.Shutdown(context.Background()); err != nil {
+				log.Error("Error shutting down tracer provider", log.Fields{"error": err})
+			}
+		}()
+	}
 
 	httpRouter := api.NewRouter(nil, nil, nil, nil, nil, nil, nil, nil, nil)
 	log.Info("Starting Kubernetes Multicloud API", nil)

@@ -323,7 +323,7 @@ Loop:
 
 	deleteChan(instca, ch)
 	if forceDone {
-		return pkgerrors.Errorf("Termination of rsync cluster retry: " + cluster)
+		return pkgerrors.New("Termination of rsync cluster retry: " + cluster)
 	}
 	return nil
 }

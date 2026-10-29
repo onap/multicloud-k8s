@@ -341,6 +341,6 @@ func GetURL(anchor string) (string, error) {
 	default:
 		return "", fmt.Errorf("Invalid Anchor")
 	}
-	fmt.Printf(baseUrl)
+	fmt.Print(baseUrl)
 	return (baseUrl + "/" + anchor), nil
 }

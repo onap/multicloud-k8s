@@ -145,7 +145,7 @@ func (v *SchedulerClient) ApplyNetworkIntents(clusterProvider, cluster string) e
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+		return pkgerrors.New("Error getting current state from Cluster stateInfo: " + cluster)
 	}
 	switch stateVal {
 	case state.StateEnum.Approved:
@@ -268,7 +268,7 @@ func (v *SchedulerClient) TerminateNetworkIntents(clusterProvider, cluster strin
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+		return pkgerrors.New("Error getting current state from Cluster stateInfo: " + cluster)
 	}
 	switch stateVal {
 	case state.StateEnum.Approved:

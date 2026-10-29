@@ -16,7 +16,6 @@ package app
 import (
 	"context"
 	"encoding/base64"
-	"io/ioutil"
 	"os"
 	"plugin"
 	"reflect"
@@ -62,7 +61,7 @@ func LoadMockPlugins(krdLoadedPlugins map[string]*plugin.Plugin) error {
 func TestInit(t *testing.T) {
 	t.Run("Successfully create Kube Client", func(t *testing.T) {
 		// Load the mock kube config file into memory
-		fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+		fd, err := os.ReadFile("../../mock_files/mock_configs/mock_kube_config")
 		if err != nil {
 			t.Fatal("Unable to read mock_kube_config")
 		}

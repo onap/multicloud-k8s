@@ -19,7 +19,6 @@ package helm
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -111,7 +110,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	}
 
 	//Create a temp directory in the system temp folder
-	outputDir, err := ioutil.TempDir("", "helm-tmpl-")
+	outputDir, err := os.MkdirTemp("", "helm-tmpl-")
 	if err != nil {
 		return retData, crdData, hookList, pkgerrors.Wrap(err, "Got error creating temp dir")
 	}
@@ -163,7 +162,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 			continue
 		}
 		utils.EnsureDirectory(filePath)
-		err = ioutil.WriteFile(filePath, []byte(crd.File.Data), 0600)
+		err = os.WriteFile(filePath, []byte(crd.File.Data), 0600)
 		if err != nil {
 			return retData, crdData, hookList, err
 		}
@@ -205,7 +204,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 		}
 		mfilePath := filepath.Join(outputDir, k.Name)
 		utils.EnsureDirectory(mfilePath)
-		err = ioutil.WriteFile(mfilePath, []byte(k.Content), 0600)
+		err = os.WriteFile(mfilePath, []byte(k.Content), 0600)
 		if err != nil {
 			return retData, crdData, hookList, err
 		}
@@ -222,7 +221,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	for _, h := range release.Hooks {
 		hFilePath := filepath.Join(outputDir, h.Name)
 		utils.EnsureDirectory(hFilePath)
-		err = ioutil.WriteFile(hFilePath, []byte(h.Manifest), 0600)
+		err = os.WriteFile(hFilePath, []byte(h.Manifest), 0600)
 		if err != nil {
 			return retData, crdData, hookList, err
 		}

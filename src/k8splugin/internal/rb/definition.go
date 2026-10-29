@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -269,7 +268,7 @@ func (v *DefinitionClient) Upload(ctx context.Context, name string, version stri
 			return pkgerrors.Wrap(err, "Detecting chart name")
 		}
 
-		finfo, err := ioutil.ReadDir(path)
+		finfo, err := os.ReadDir(path)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Detecting chart name")
 		}

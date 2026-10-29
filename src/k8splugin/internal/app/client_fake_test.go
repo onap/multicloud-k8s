@@ -16,7 +16,6 @@ package app
 import (
 	"context"
 	"encoding/base64"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -76,7 +75,7 @@ func useFakeClients(objects ...runtime.Object) func() {
 // KubernetesClient.Init can build a rest.Config without touching a cluster.
 func mockConnectionDB(t *testing.T) *db.MockDB {
 	t.Helper()
-	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+	fd, err := os.ReadFile("../../mock_files/mock_configs/mock_kube_config")
 	if err != nil {
 		t.Fatal("Unable to read mock_kube_config")
 	}

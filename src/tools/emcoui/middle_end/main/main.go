@@ -21,7 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -51,7 +51,7 @@ func main() {
 	defer configFile.Close()
 
 	// Read the configuration json
-	byteValue, _ := ioutil.ReadAll(configFile)
+	byteValue, _ := io.ReadAll(configFile)
 	json.Unmarshal(byteValue, &depHandler.MiddleendConf)
 	json.Unmarshal(byteValue, &authProxyHandler.AuthProxyConf)
 

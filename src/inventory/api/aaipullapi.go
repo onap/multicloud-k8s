@@ -16,7 +16,7 @@ package api
 import (
 	"crypto/tls"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 
@@ -52,7 +52,7 @@ func GetTenant(cloudOwner, cloudRegion string) (string, error) {
 
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 
 		log.Error("Can't read Tenant response: ", err)

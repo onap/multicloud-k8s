@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strings"
@@ -552,7 +552,7 @@ func scheduleNotifications(instanceId string, c chan notifyChannelData) {
 				if errReq == nil {
 					result.result = int32(resp.StatusCode)
 					if resp.StatusCode >= 400 {
-						respBody, _ := ioutil.ReadAll(resp.Body)
+						respBody, _ := io.ReadAll(resp.Body)
 						log.Error("Status notification request failed", log.Fields{
 							"instance": instanceId,
 							"name":     data.subscription.Name,

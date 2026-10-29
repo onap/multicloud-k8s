@@ -26,7 +26,7 @@ import (
 	pkgerrors "github.com/pkg/errors"
 
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -101,9 +101,9 @@ func (h *TemplateClient) processValues(valueFiles []string, values []string) ([]
 		var bytes []byte
 		var err error
 		if strings.TrimSpace(filePath) == "-" {
-			bytes, err = ioutil.ReadAll(os.Stdin)
+			bytes, err = io.ReadAll(os.Stdin)
 		} else {
-			bytes, err = ioutil.ReadFile(filePath)
+			bytes, err = os.ReadFile(filePath)
 		}
 
 		if err != nil {
@@ -173,7 +173,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 	}
 
 	//Create a temp directory in the system temp folder
-	outputDir, err := ioutil.TempDir("", "helm-tmpl-")
+	outputDir, err := os.MkdirTemp("", "helm-tmpl-")
 	if err != nil {
 		return retData, pkgerrors.Wrap(err, "Got error creating temp dir")
 	}
@@ -257,7 +257,7 @@ func (h *TemplateClient) GenerateKubernetesArtifacts(inputPath string, valueFile
 
 		mfilePath := filepath.Join(outputDir, m.Name)
 		utils.EnsureDirectory(mfilePath)
-		err = ioutil.WriteFile(mfilePath, []byte(data), 0666)
+		err = os.WriteFile(mfilePath, []byte(data), 0666)
 		if err != nil {
 			return retData, err
 		}

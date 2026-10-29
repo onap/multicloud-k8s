@@ -20,7 +20,6 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -84,7 +83,7 @@ func ExtractTarBall(r io.Reader) (string, error) {
 	tarR := tar.NewReader(gzf)
 	first := true
 
-	outDir, _ := ioutil.TempDir("", "k8s-ext-")
+	outDir, _ := os.MkdirTemp("", "k8s-ext-")
 
 	for {
 		header, err := tarR.Next()

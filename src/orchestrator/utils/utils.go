@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -88,7 +87,7 @@ func (y YamlStruct) isValid() bool {
 // and returns a struct accordingly
 func ExtractYamlParameters(f string) (YamlStruct, error) {
 	filename, _ := filepath.Abs(f)
-	yamlFile, err := ioutil.ReadFile(filename)
+	yamlFile, err := os.ReadFile(filename)
 
 	var yamlStruct YamlStruct
 
@@ -135,7 +134,7 @@ func ExtractTarBall(r io.Reader) (string, error) {
 	tarR := tar.NewReader(gzf)
 	first := true
 
-	outDir, _ := ioutil.TempDir("", "k8s-ext-")
+	outDir, _ := os.MkdirTemp("", "k8s-ext-")
 
 	for true {
 		header, err := tarR.Next()

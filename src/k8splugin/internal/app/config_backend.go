@@ -21,7 +21,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -710,7 +710,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 		return configResourceList{}, pkgerrors.Wrap(err, "JSON to YAML")
 	}
 
-	outputfile, err := ioutil.TempFile("", "helm-config-values-")
+	outputfile, err := os.CreateTemp("", "helm-config-values-")
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Got error creating temp file")
 	}

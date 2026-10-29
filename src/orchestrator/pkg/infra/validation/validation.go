@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -339,7 +338,7 @@ func ValidateJsonSchemaData(jsonSchemaFile string, jsonData interface{}) (error,
 		}
 		return err, http.StatusInternalServerError
 	}
-	rawBytes, err := ioutil.ReadFile(jsonSchemaFile)
+	rawBytes, err := os.ReadFile(jsonSchemaFile)
 	if err != nil {
 		return pkgerrors.Wrap(err, "JsonSchemaValidation: Read JSON file error"), http.StatusInternalServerError
 	}

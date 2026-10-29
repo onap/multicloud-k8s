@@ -17,7 +17,6 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -39,14 +38,14 @@ func TestReadConfigFile(t *testing.T) {
 	})
 
 	t.Run("Values in file override defaults", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "rsync-config-test")
+		dir, err := os.MkdirTemp("", "rsync-config-test")
 		if err != nil {
 			t.Fatalf("Failed to create temp dir: %s", err)
 		}
 		defer os.RemoveAll(dir)
 		file := filepath.Join(dir, "k8sconfig.json")
 		content := `{"database-type": "etcd", "service-port": "9999"}`
-		if err := ioutil.WriteFile(file, []byte(content), 0644); err != nil {
+		if err := os.WriteFile(file, []byte(content), 0644); err != nil {
 			t.Fatalf("Failed to write temp config: %s", err)
 		}
 
@@ -67,13 +66,13 @@ func TestReadConfigFile(t *testing.T) {
 	})
 
 	t.Run("Malformed json returns an error", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "rsync-config-test")
+		dir, err := os.MkdirTemp("", "rsync-config-test")
 		if err != nil {
 			t.Fatalf("Failed to create temp dir: %s", err)
 		}
 		defer os.RemoveAll(dir)
 		file := filepath.Join(dir, "bad.json")
-		if err := ioutil.WriteFile(file, []byte("{not valid json"), 0644); err != nil {
+		if err := os.WriteFile(file, []byte("{not valid json"), 0644); err != nil {
 			t.Fatalf("Failed to write temp config: %s", err)
 		}
 		if _, err := readConfigFile(file); err == nil {

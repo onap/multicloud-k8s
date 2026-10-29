@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -255,7 +254,7 @@ func (h OrchestrationHandler) apiGet(url string, statusKey string) (interface{},
 	defer resp.Body.Close()
 
 	// Prepare the response
-	data, _ := ioutil.ReadAll(resp.Body)
+	data, _ := io.ReadAll(resp.Body)
 	h.response.payload[statusKey] = data
 	h.response.status[statusKey] = resp.StatusCode
 
@@ -275,7 +274,7 @@ func (h OrchestrationHandler) apiDel(url string, statusKey string) (interface{},
 	defer resp.Body.Close()
 
 	// Prepare the response
-	data, _ := ioutil.ReadAll(resp.Body)
+	data, _ := io.ReadAll(resp.Body)
 	h.response.payload[statusKey] = data
 	h.response.status[statusKey] = resp.StatusCode
 
@@ -295,7 +294,7 @@ func (h OrchestrationHandler) apiPost(jsonLoad []byte, url string, statusKey str
 	defer resp.Body.Close()
 
 	// Prepare the response
-	data, _ := ioutil.ReadAll(resp.Body)
+	data, _ := io.ReadAll(resp.Body)
 	h.response.payload[statusKey] = data
 	h.response.status[statusKey] = resp.StatusCode
 
@@ -358,7 +357,7 @@ func (h OrchestrationHandler) apiPostMultipart(jsonLoad []byte,
 	}
 	defer resp.Body.Close()
 	// Prepare the response
-	data, _ := ioutil.ReadAll(resp.Body)
+	data, _ := io.ReadAll(resp.Body)
 	h.response.payload[statusKey] = data
 	h.response.status[statusKey] = resp.StatusCode
 
@@ -960,7 +959,7 @@ func (h *OrchestrationHandler) CheckConnection(w http.ResponseWriter, r *http.Re
 	defer file.Close()
 
 	// Read the kconfig
-	kubeconfig, _ := ioutil.ReadAll(file)
+	kubeconfig, _ := io.ReadAll(file)
 
 	jsonData := ClusterMetadata{}
 	jsn := ([]byte(r.FormValue("metadata")))

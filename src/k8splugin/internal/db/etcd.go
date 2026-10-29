@@ -20,7 +20,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"os"
 	"time"
 
 	pkgerrors "github.com/pkg/errors"
@@ -68,7 +68,7 @@ func getTlsConfig(c EtcdConfig) (*tls.Config, error) {
 	}
 
 	// Load CA cert
-	caCert, err := ioutil.ReadFile(c.CAFile)
+	caCert, err := os.ReadFile(c.CAFile)
 	if err != nil {
 		return nil, pkgerrors.Errorf("Error loading ca file: %s", err.Error())
 	}

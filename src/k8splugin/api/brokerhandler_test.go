@@ -17,7 +17,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -317,7 +316,7 @@ func TestBrokerCreateHandler(t *testing.T) {
 			defer resp.Body.Close()
 
 			if testCase.expectedCode != resp.StatusCode {
-				body, _ := ioutil.ReadAll(resp.Body)
+				body, _ := io.ReadAll(resp.Body)
 				t.Log(string(body))
 				t.Fatalf("Request method returned code '%v', but '%v' was expected",
 					resp.StatusCode, testCase.expectedCode)
@@ -334,7 +333,7 @@ func TestBrokerCreateHandler(t *testing.T) {
 						response, testCase.expected)
 				}
 			} else if testCase.expectedError != "" {
-				body, err := ioutil.ReadAll(resp.Body)
+				body, err := io.ReadAll(resp.Body)
 				if err == nil {
 					if !strings.Contains(string(body), testCase.expectedError) {
 						t.Fatalf("Request method returned body '%s', but '%s' wasn't found",

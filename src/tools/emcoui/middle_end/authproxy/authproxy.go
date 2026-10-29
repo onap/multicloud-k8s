@@ -20,7 +20,7 @@ package authproxy
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -83,7 +83,7 @@ func getOpenIDConfig(issuer string) OpenIDConfiguration {
 	}
 
 	defer response.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(response.Body)
+	bodyBytes, _ := io.ReadAll(response.Body)
 	json.Unmarshal(bodyBytes, &openIDConfig)
 	return *openIDConfig
 }
@@ -167,7 +167,7 @@ func (h AuthProxy) CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("[CallbackHandler] Error while reading response from tokenEndpoint")
 		log.Println(err)
@@ -251,7 +251,7 @@ func validateToken(issuer string, reqToken string) error {
 			return err
 		}
 		defer response.Body.Close()
-		bodyBytes, _ := ioutil.ReadAll(response.Body)
+		bodyBytes, _ := io.ReadAll(response.Body)
 		json.Unmarshal(bodyBytes, &realmConfig)
 	}
 	SecretKey := "-----BEGIN CERTIFICATE-----\n" + realmConfig.PublicKey + "\n-----END CERTIFICATE-----"

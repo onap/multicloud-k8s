@@ -46,8 +46,8 @@ func NewRouter(defClient rb.DefinitionManager,
 	if tracing.Enabled() {
 		router.Use(otelmux.Middleware("multicloud-k8s"))
 	}
-	router.Use(accessLog)
-	router.NotFoundHandler = accessLog(http.NotFoundHandler())
+	router.Use(accessLog, instrumentRequests)
+	router.NotFoundHandler = accessLog(instrumentRequests(http.NotFoundHandler()))
 
 	// Setup Instance handler routes
 	if instClient == nil {

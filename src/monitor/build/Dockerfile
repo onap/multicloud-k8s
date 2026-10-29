@@ -1,4 +1,4 @@
-FROM nexus3.onap.org:10001/golang:1.17
+FROM nexus3.onap.org:10001/golang:1.27
 
 WORKDIR /go/src/github.com/onap/multicloud-k8s/src/monitor
 COPY ./ ./

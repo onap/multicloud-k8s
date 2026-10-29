@@ -13,7 +13,8 @@
 # limitations under the License.
 # ========================================================================
 
-FROM nexus3.onap.org:10001/golang:1.17
+FROM nexus3.onap.org:10001/golang:1.27
+ENV CGO_ENABLED=0
 
 # Set the Current Working Directory inside the container
 WORKDIR /src

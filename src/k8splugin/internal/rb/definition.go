@@ -22,7 +22,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -175,7 +174,7 @@ func (v *DefinitionClient) List(ctx context.Context, name string) ([]Definition,
 			def := Definition{}
 			err = db.DBconn.Unmarshal(value, &def)
 			if err != nil {
-				log.Printf("[Definition] Error Unmarshaling value for: %s", key)
+				logutils.ErrorContext(ctx, "Definition: Error unmarshaling value", logutils.Fields{"key": key, "error": err})
 				continue
 			}
 

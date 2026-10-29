@@ -16,7 +16,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"time"
 
 	pkgerrors "github.com/pkg/errors"
@@ -30,6 +29,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 )
@@ -106,7 +106,7 @@ func (p servicePlugin) List(gvk schema.GroupVersionKind, namespace string, clien
 	result := make([]helm.KubernetesResource, 0, utils.ResourcesListLimit)
 	if list != nil {
 		for _, service := range list.Items {
-			log.Printf("%v", service.Name)
+			log.Info("Service found", log.Fields{"service": service.Name})
 			result = append(result,
 				helm.KubernetesResource{
 					GVK: schema.GroupVersionKind{
@@ -133,7 +133,7 @@ func (p servicePlugin) Delete(resource helm.KubernetesResource, namespace string
 		PropagationPolicy: &deletePolicy,
 	}
 
-	log.Println("Deleting service: " + resource.Name)
+	log.Info("Deleting service", log.Fields{"service": resource.Name})
 	if err := client.GetStandardClient().CoreV1().Services(namespace).Delete(context.TODO(), resource.Name, opts); err != nil {
 		return pkgerrors.Wrap(err, "Delete service error")
 	}

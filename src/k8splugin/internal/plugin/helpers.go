@@ -19,12 +19,12 @@ package plugin
 
 import (
 	"k8s.io/client-go/rest"
-	"log"
 	"strings"
 	"time"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 
 	pkgerrors "github.com/pkg/errors"
@@ -93,7 +93,7 @@ func GetPluginByKind(kind string) (Reference, error) {
 
 	typePlugin, ok := utils.LoadedPlugins[strings.ToLower(kind)]
 	if !ok {
-		log.Println("No plugin for kind " + kind + " found. Using generic Plugin")
+		log.Info("No plugin for kind found. Using generic Plugin", log.Fields{"kind": kind})
 		typePlugin, ok = utils.LoadedPlugins["generic"]
 		if !ok {
 			return nil, pkgerrors.New("No generic plugin found")
@@ -120,13 +120,13 @@ func TagPodsIfPresent(unstruct *unstructured.Unstructured, tag string) {
 
 	spec, ok := unstruct.Object["spec"].(map[string]interface{})
 	if !ok {
-		log.Println("Error converting spec to map")
+		log.Warn("Error converting spec to map", nil)
 		return
 	}
 
 	template, ok := spec["template"].(map[string]interface{})
 	if !ok {
-		log.Println("Error converting template to map")
+		log.Warn("Error converting template to map", nil)
 		return
 	}
 
@@ -135,7 +135,7 @@ func TagPodsIfPresent(unstruct *unstructured.Unstructured, tag string) {
 	podTemplateSpec := &corev1.PodTemplateSpec{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(template, podTemplateSpec)
 	if err != nil {
-		log.Println("Did not find a podTemplateSpec: " + err.Error())
+		log.Info("Did not find a podTemplateSpec", log.Fields{"error": err})
 		return
 	}
 

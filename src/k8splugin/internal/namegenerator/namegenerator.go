@@ -19,12 +19,12 @@ package namegenerator
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"strings"
 	"sync"
 
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -67,7 +67,7 @@ func (c *cache) init() {
 		c.cache = make(map[string]bool)
 		err := c.readCacheFromDB()
 		if err != nil {
-			log.Println("Error Reading from DB: ", err.Error())
+			log.Error("Error Reading from DB", log.Fields{"error": err})
 			return
 		}
 	}
@@ -86,13 +86,13 @@ func (c *cache) readCacheFromDB() error {
 	// Read the latest from cache
 	data, err := db.DBconn.Read(context.TODO(), storeName, cacheKeyGlobal, tag)
 	if err != nil {
-		log.Println("Error reading name cache from Database: ", err)
+		log.Error("Error reading name cache from Database", log.Fields{"error": err})
 		return pkgerrors.Wrap(err, "Reading cache from DB")
 	}
 
 	err = db.DBconn.Unmarshal(data, &c.cache)
 	if err != nil {
-		log.Println("Error unmarshaling data into cache: ", err)
+		log.Error("Error unmarshaling data into cache", log.Fields{"error": err})
 		return pkgerrors.Wrap(err, "Unmarshaling cache from DB")
 	}
 
@@ -109,11 +109,11 @@ func (c *cache) writeCacheToDB(ctx context.Context) {
 		if strings.Contains(err.Error(), "Error finding master table") {
 			err = db.DBconn.Create(ctx, storeName, cacheKeyGlobal, tag, c.cache)
 			if err != nil {
-				log.Println("Error creating the entry in DB. Will try later...")
+				log.WarnContext(ctx, "Error creating the entry in DB. Will try later...", log.Fields{"error": err})
 				return
 			}
 		} else {
-			log.Println("Error updating DB: ", err.Error())
+			log.ErrorContext(ctx, "Error updating DB", log.Fields{"error": err})
 			return
 		}
 	}
@@ -130,7 +130,7 @@ func (c *cache) generateName(ctx context.Context) string {
 		name := namesgenerator.GetRandomName(0)
 		if c.isAlreadyUsed(name) {
 			// Generate another name
-			log.Printf("Name %s already used", name)
+			log.InfoContext(ctx, "Name already used", log.Fields{"name": name})
 			continue
 		}
 

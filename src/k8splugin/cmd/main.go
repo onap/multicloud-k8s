@@ -16,7 +16,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -26,17 +25,16 @@ import (
 	"github.com/onap/multicloud-k8s/src/k8splugin/api"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/auth"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/tracing"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
-
-	"github.com/gorilla/handlers"
 )
 
 func main() {
 
 	err := utils.CheckInitialSettings()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Invalid initial settings", log.Fields{"error": err})
 	}
 
 	rand.Seed(time.Now().UnixNano())
@@ -44,16 +42,15 @@ func main() {
 	i := tracing.NewInstrumentation()
 	defer func() {
 		if err := i.TracerProvider.Shutdown(context.Background()); err != nil {
-			log.Printf("Error shutting down tracer provider: %v", err)
+			log.Error("Error shutting down tracer provider", log.Fields{"error": err})
 		}
 	}()
 
 	httpRouter := api.NewRouter(nil, nil, nil, nil, nil, nil, nil, nil, nil)
-	loggedRouter := handlers.LoggingHandler(os.Stdout, httpRouter)
-	log.Println("Starting Kubernetes Multicloud API")
+	log.Info("Starting Kubernetes Multicloud API", nil)
 
 	httpServer := &http.Server{
-		Handler: loggedRouter,
+		Handler: httpRouter,
 		Addr:    ":" + config.GetConfiguration().ServicePort,
 	}
 
@@ -68,8 +65,8 @@ func main() {
 
 	tlsConfig, err := auth.GetTLSConfig("ca.cert", "server.cert", "server.key")
 	if err != nil {
-		log.Println("Error Getting TLS Configuration. Starting without TLS...")
-		log.Fatal(httpServer.ListenAndServe())
+		log.Warn("Error Getting TLS Configuration. Starting without TLS...", log.Fields{"error": err})
+		log.Fatal("HTTP server stopped", log.Fields{"error": httpServer.ListenAndServe()})
 	} else {
 		httpServer.TLSConfig = tlsConfig
 		// empty strings because tlsconfig already has this information

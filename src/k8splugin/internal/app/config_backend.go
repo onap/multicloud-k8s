@@ -22,7 +22,6 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -31,6 +30,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
 
 	"github.com/ghodss/yaml"
@@ -251,19 +251,19 @@ func (c ConfigVersionStore) cleanupIstanceTags(configName string) error {
 	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, configName)
 	err = db.Etcd.DeletePrefix(versionKey)
 	if err != nil {
-		log.Printf("Deleting versions of instance failed: %s", err.Error())
+		log.Error("Deleting versions of instance failed", log.Fields{"error": err})
 	}
 
 	counterKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagCounter, configName)
 	err = db.Etcd.DeletePrefix(counterKey)
 	if err != nil {
-		log.Printf("Deleting counters of instance failed: %s", err.Error())
+		log.Error("Deleting counters of instance failed", log.Fields{"error": err})
 	}
 
 	nameKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagName, configName)
 	err = db.Etcd.DeletePrefix(nameKey)
 	if err != nil {
-		log.Printf("Deleting counters of instance failed: %s", err.Error())
+		log.Error("Deleting counters of instance failed", log.Fields{"error": err})
 	}
 
 	return nil
@@ -519,10 +519,10 @@ func applyConfig(instanceID string, p Config, pChannel chan configResourceList, 
 	crl.resources = resources
 	crl.updatedResources = updatedResources
 	// Send the configResourceList to the channel. Using select for non-blocking channel
-	log.Printf("Before Sent to goroutine %v", crl.profile)
+	log.Info("Before Sent to goroutine", log.Fields{"profile": crl.profile})
 	select {
 	case pChannel <- crl:
-		log.Printf("Message Sent to goroutine %v", crl.profile)
+		log.Info("Message Sent to goroutine", log.Fields{"profile": crl.profile})
 	default:
 	}
 
@@ -533,7 +533,7 @@ func applyConfig(instanceID string, p Config, pChannel chan configResourceList, 
 // Per Profile Go routine to apply the configuration to Cloud Region
 func scheduleResources(c chan configResourceList) {
 	// Keep thread running
-	log.Printf("[scheduleResources]: START thread")
+	log.Info("scheduleResources: START thread", nil)
 	for {
 		ctx := context.TODO()
 		data := <-c
@@ -541,20 +541,20 @@ func scheduleResources(c chan configResourceList) {
 		ic := NewInstanceClient()
 		resp, err := ic.Find(ctx, data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
 		if (err != nil || len(resp) == 0) && data.action != "STOP" {
-			log.Println("Error finding a running instance. Retrying later...")
+			log.Warn("Error finding a running instance. Retrying later...", log.Fields{"error": err})
 			data.updatedResources <- []KubernetesConfigResource{}
 			continue
 		}
 		breakThread := false
 		switch {
 		case data.action == "PUT" || data.action == "POST":
-			log.Printf("[scheduleResources]: %v %v %v", data.action, data.profile, data.resourceTemplates)
+			log.Info("scheduleResources", log.Fields{"action": data.action, "profile": data.profile, "resourceTemplates": data.resourceTemplates})
 			resources := []KubernetesConfigResource{}
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
 				err = k8sClient.Init(ctx, inst.Request.CloudRegion, inst.ID)
 				if err != nil {
-					log.Printf("Getting CloudRegion Information: %s", err.Error())
+					log.Error("Getting CloudRegion Information", log.Fields{"error": err})
 					//Move onto the next cloud region
 					continue
 				}
@@ -567,8 +567,7 @@ func scheduleResources(c chan configResourceList) {
 						// assuming - the err represent the resource already exist, so going for update
 						resProceeded, err = k8sClient.updateResources(ctx, resToCreateOrUpdate, inst.Namespace, false)
 						if err != nil {
-							log.Printf("Error Creating resources: %s", errCreate.Error())
-							log.Printf("Error Updating resources: %s", err.Error())
+							log.Error("Error Creating or Updating resources", log.Fields{"createError": errCreate, "updateError": err})
 							break
 						} else {
 							status = "UPDATED"
@@ -586,12 +585,12 @@ func scheduleResources(c chan configResourceList) {
 			}
 			data.updatedResources <- resources
 		case data.action == "DELETE":
-			log.Printf("[scheduleResources]: DELETE %v %v", data.profile, data.resources)
+			log.Info("scheduleResources: DELETE", log.Fields{"profile": data.profile, "resources": data.resources})
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
 				err = k8sClient.Init(ctx, inst.Request.CloudRegion, inst.ID)
 				if err != nil {
-					log.Printf("Getting CloudRegion Information: %s", err.Error())
+					log.Error("Getting CloudRegion Information", log.Fields{"error": err})
 					//Move onto the next cloud region
 					continue
 				}
@@ -601,7 +600,7 @@ func scheduleResources(c chan configResourceList) {
 				}
 				err = k8sClient.deleteResources(ctx, helm.GetReverseK8sResources(tmpResources), inst.Namespace)
 				if err != nil {
-					log.Printf("Error Deleting resources: %s", err.Error())
+					log.Error("Error Deleting resources", log.Fields{"error": err})
 					continue
 				}
 			}
@@ -614,7 +613,7 @@ func scheduleResources(c chan configResourceList) {
 			break
 		}
 	}
-	log.Printf("[scheduleResources]: STOP thread")
+	log.Info("scheduleResources: STOP thread", nil)
 }
 
 // Resolve returns the path where the helm chart merged with
@@ -652,7 +651,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 			return configResourceList{}, pkgerrors.Wrap(err, "Downloading Template")
 		}
 	} else {
-		log.Printf("Using Definition Template as a Configuration Template")
+		log.Info("Using Definition Template as a Configuration Template", nil)
 		defClient := rb.NewDefinitionClient()
 		definition, err := defClient.Get(context.TODO(), rbName, rbVersion)
 		if err != nil {
@@ -776,7 +775,7 @@ func removeProfileData(key string) {
 	}
 	_, ok = profileData.resourceChannel[key]
 	if ok {
-		log.Printf("Stop config thread for %s", key)
+		log.Info("Stop config thread", log.Fields{"key": key})
 		crl := configResourceList{
 			action: "STOP",
 		}

@@ -22,11 +22,11 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"log"
 	"path/filepath"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	pkgerrors "github.com/pkg/errors"
@@ -179,7 +179,7 @@ func (v *ProfileClient) List(ctx context.Context, rbName, rbVersion string) ([]P
 			pr := Profile{}
 			err = db.DBconn.Unmarshal(value, &pr)
 			if err != nil {
-				log.Printf("[Profile] Error: %s Unmarshaling value for: %s", err.Error(), key)
+				log.ErrorContext(ctx, "Profile: Error unmarshaling value", log.Fields{"key": key, "error": err})
 				continue
 			}
 			if pr.RBName == rbName && pr.RBVersion == rbVersion {

@@ -22,11 +22,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -92,7 +92,7 @@ func NewConfigTemplateClient() *ConfigTemplateClient {
 // CreateOrUpdate an entry for the resource bundle  ConfigTemplate in the database
 func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p ConfigTemplate, update bool) error {
 
-	log.Printf("[ConfigiTemplate]: create %s", rbName)
+	log.Info("ConfigTemplate: create", log.Fields{"rbName": rbName})
 	// Name is required
 	if p.TemplateName == "" {
 		return pkgerrors.New("Name is required for Resource Bundle  ConfigTemplate")
@@ -179,7 +179,7 @@ func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplateL
 			tmp := ConfigTemplateList{}
 			err = db.DBconn.Unmarshal(value, &tmp)
 			if err != nil {
-				log.Printf("[ConfigTemplate] Error: %s Unmarshaling value for: %s", err.Error(), key)
+				log.Error("ConfigTemplate: Error unmarshaling value", log.Fields{"key": key, "error": err})
 				continue
 			}
 			keyTmp := ConfigTemplateKey{
@@ -224,7 +224,7 @@ func (v *ConfigTemplateClient) Delete(rbName, rbVersion, templateName string) er
 // Upload the contents of resource bundle into database
 func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, inp []byte) error {
 
-	log.Printf("[ConfigTemplate]: Upload %s", templateName)
+	log.Info("ConfigTemplate: Upload", log.Fields{"template": templateName})
 	key := ConfigTemplateKey{
 		RBName:       rbName,
 		RBVersion:    rbVersion,
@@ -289,7 +289,7 @@ func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, in
 // Returns a byte array of the contents
 func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) ([]byte, error) {
 
-	log.Printf("[ConfigTemplate]: Download %s", templateName)
+	log.Info("ConfigTemplate: Download", log.Fields{"template": templateName})
 	//ignore the returned data here
 	//Check if rb is valid
 	_, err := v.Get(rbName, rbVersion, templateName)

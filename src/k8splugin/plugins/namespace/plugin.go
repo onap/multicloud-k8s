@@ -16,7 +16,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"time"
 
 	pkgerrors "github.com/pkg/errors"
@@ -29,6 +28,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/helm"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/plugin"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 )
@@ -62,14 +62,14 @@ func (p namespacePlugin) Create(yamlFilePath string, namespace string, client pl
 	}
 	existingNs, err := client.GetStandardClient().CoreV1().Namespaces().Get(context.TODO(), namespace, metaV1.GetOptions{})
 	if err == nil && len(existingNs.ManagedFields) > 0 && existingNs.ManagedFields[0].Manager == "k8plugin" {
-		log.Printf("Namespace (%s) already ensured by plugin. Skip", namespace)
+		log.Info("Namespace already ensured by plugin. Skip", log.Fields{"namespace": namespace})
 		return namespace, nil
 	}
 	_, err = client.GetStandardClient().CoreV1().Namespaces().Create(context.TODO(), namespaceObj, metaV1.CreateOptions{})
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Create Namespace error")
 	}
-	log.Printf("Namespace (%s) created", namespace)
+	log.Info("Namespace created", log.Fields{"namespace": namespace})
 
 	return namespace, nil
 }
@@ -92,7 +92,7 @@ func (p namespacePlugin) Delete(resource helm.KubernetesResource, namespace stri
 		PropagationPolicy: &deletePolicy,
 	}
 
-	log.Println("Deleting namespace: " + resource.Name)
+	log.Info("Deleting namespace", log.Fields{"namespace": resource.Name})
 	if err := client.GetStandardClient().CoreV1().Namespaces().Delete(context.TODO(), resource.Name, opts); err != nil {
 		return pkgerrors.Wrap(err, "Delete namespace error")
 	}
@@ -115,7 +115,7 @@ func (p namespacePlugin) List(gvk schema.GroupVersionKind, namespace string, cli
 	result := make([]helm.KubernetesResource, 0, utils.ResourcesListLimit)
 	if list != nil {
 		for _, ns := range list.Items {
-			log.Printf("%v", ns.Name)
+			log.Info("Namespace found", log.Fields{"namespace": ns.Name})
 			result = append(result,
 				helm.KubernetesResource{
 					GVK: schema.GroupVersionKind{

@@ -21,8 +21,8 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"io/ioutil"
-	"log"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -77,7 +77,7 @@ func readPEMBlock(filename string) ([]byte, error) {
 
 	pemBlock, rest := pem.Decode(pemData)
 	if len(rest) > 0 {
-		log.Println("Pemfile has extra data")
+		log.Warn("Pemfile has extra data", log.Fields{"file": filename})
 	}
 
 	if x509.IsEncryptedPEMBlock(pemBlock) {

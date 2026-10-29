@@ -18,6 +18,7 @@ package statuscheck // import "helm.sh/helm/v3/pkg/kube"
 
 import (
 	"context"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	appsv1beta1 "k8s.io/api/apps/v1beta1"
@@ -33,7 +34,6 @@ import (
 	"k8s.io/cli-runtime/pkg/resource"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-	"log"
 )
 
 // ReadyCheckerOption is a function that configures a ReadyChecker.
@@ -214,17 +214,17 @@ func (c *ReadyChecker) isPodReady(pod *corev1.Pod) bool {
 			return true
 		}
 	}
-	log.Printf("Pod is not ready: %s/%s", pod.GetNamespace(), pod.GetName())
+	log.Info("Pod is not ready", log.Fields{"namespace": pod.GetNamespace(), "name": pod.GetName()})
 	return false
 }
 
 func (c *ReadyChecker) jobReady(job *batchv1.Job) bool {
 	if job.Status.Failed > *job.Spec.BackoffLimit {
-		log.Printf("Job is failed: %s/%s", job.GetNamespace(), job.GetName())
+		log.Warn("Job is failed", log.Fields{"namespace": job.GetNamespace(), "name": job.GetName()})
 		return false
 	}
 	if job.Status.Succeeded < *job.Spec.Completions {
-		log.Printf("Job is not completed: %s/%s", job.GetNamespace(), job.GetName())
+		log.Info("Job is not completed", log.Fields{"namespace": job.GetNamespace(), "name": job.GetName()})
 		return false
 	}
 	return true
@@ -238,7 +238,7 @@ func (c *ReadyChecker) serviceReady(s *corev1.Service) bool {
 
 	// Ensure that the service cluster IP is not empty
 	if s.Spec.ClusterIP == "" {
-		log.Printf("Service does not have cluster IP address: %s/%s", s.GetNamespace(), s.GetName())
+		log.Info("Service does not have cluster IP address", log.Fields{"namespace": s.GetNamespace(), "name": s.GetName()})
 		return false
 	}
 
@@ -246,12 +246,12 @@ func (c *ReadyChecker) serviceReady(s *corev1.Service) bool {
 	if s.Spec.Type == corev1.ServiceTypeLoadBalancer {
 		// do not wait when at least 1 external IP is set
 		if len(s.Spec.ExternalIPs) > 0 {
-			log.Printf("Service %s/%s has external IP addresses (%v), marking as ready", s.GetNamespace(), s.GetName(), s.Spec.ExternalIPs)
+			log.Info("Service has external IP addresses, marking as ready", log.Fields{"namespace": s.GetNamespace(), "name": s.GetName(), "externalIPs": s.Spec.ExternalIPs})
 			return true
 		}
 
 		if s.Status.LoadBalancer.Ingress == nil {
-			log.Printf("Service does not have load balancer ingress IP address: %s/%s", s.GetNamespace(), s.GetName())
+			log.Info("Service does not have load balancer ingress IP address", log.Fields{"namespace": s.GetNamespace(), "name": s.GetName()})
 			return false
 		}
 	}
@@ -261,7 +261,7 @@ func (c *ReadyChecker) serviceReady(s *corev1.Service) bool {
 
 func (c *ReadyChecker) volumeReady(v *corev1.PersistentVolumeClaim) bool {
 	if v.Status.Phase != corev1.ClaimBound {
-		log.Printf("PersistentVolumeClaim is not bound: %s/%s", v.GetNamespace(), v.GetName())
+		log.Info("PersistentVolumeClaim is not bound", log.Fields{"namespace": v.GetNamespace(), "name": v.GetName()})
 		return false
 	}
 	return true
@@ -270,7 +270,7 @@ func (c *ReadyChecker) volumeReady(v *corev1.PersistentVolumeClaim) bool {
 func (c *ReadyChecker) deploymentReady(rs *appsv1.ReplicaSet, dep *appsv1.Deployment) bool {
 	expectedReady := *dep.Spec.Replicas - utils.MaxUnavailable(*dep)
 	if !(rs.Status.ReadyReplicas >= expectedReady) {
-		log.Printf("Deployment is not ready: %s/%s. %d out of %d expected pods are ready", dep.Namespace, dep.Name, rs.Status.ReadyReplicas, expectedReady)
+		log.Info("Deployment is not ready", log.Fields{"namespace": dep.Namespace, "name": dep.Name, "ready": rs.Status.ReadyReplicas, "expected": expectedReady})
 		return false
 	}
 	return true
@@ -284,7 +284,7 @@ func (c *ReadyChecker) daemonSetReady(ds *appsv1.DaemonSet) bool {
 
 	// Make sure all the updated pods have been scheduled
 	if ds.Status.UpdatedNumberScheduled != ds.Status.DesiredNumberScheduled {
-		log.Printf("DaemonSet is not ready: %s/%s. %d out of %d expected pods have been scheduled", ds.Namespace, ds.Name, ds.Status.UpdatedNumberScheduled, ds.Status.DesiredNumberScheduled)
+		log.Info("DaemonSet is not ready: not all expected pods have been scheduled", log.Fields{"namespace": ds.Namespace, "name": ds.Name, "scheduled": ds.Status.UpdatedNumberScheduled, "expected": ds.Status.DesiredNumberScheduled})
 		return false
 	}
 	maxUnavailable, err := intstr.GetValueFromIntOrPercent(ds.Spec.UpdateStrategy.RollingUpdate.MaxUnavailable, int(ds.Status.DesiredNumberScheduled), true)
@@ -297,7 +297,7 @@ func (c *ReadyChecker) daemonSetReady(ds *appsv1.DaemonSet) bool {
 
 	expectedReady := int(ds.Status.DesiredNumberScheduled) - maxUnavailable
 	if !(int(ds.Status.NumberReady) >= expectedReady) {
-		log.Printf("DaemonSet is not ready: %s/%s. %d out of %d expected pods are ready", ds.Namespace, ds.Name, ds.Status.NumberReady, expectedReady)
+		log.Info("DaemonSet is not ready", log.Fields{"namespace": ds.Namespace, "name": ds.Name, "ready": ds.Status.NumberReady, "expected": expectedReady})
 		return false
 	}
 	return true
@@ -374,12 +374,12 @@ func (c *ReadyChecker) statefulSetReady(sts *appsv1.StatefulSet) bool {
 
 	// Make sure all the updated pods have been scheduled
 	if int(sts.Status.UpdatedReplicas) != expectedReplicas {
-		log.Printf("StatefulSet is not ready: %s/%s. %d out of %d expected pods have been scheduled", sts.Namespace, sts.Name, sts.Status.UpdatedReplicas, expectedReplicas)
+		log.Info("StatefulSet is not ready: not all expected pods have been scheduled", log.Fields{"namespace": sts.Namespace, "name": sts.Name, "scheduled": sts.Status.UpdatedReplicas, "expected": expectedReplicas})
 		return false
 	}
 
 	if int(sts.Status.ReadyReplicas) != replicas {
-		log.Printf("StatefulSet is not ready: %s/%s. %d out of %d expected pods are ready", sts.Namespace, sts.Name, sts.Status.ReadyReplicas, replicas)
+		log.Info("StatefulSet is not ready", log.Fields{"namespace": sts.Namespace, "name": sts.Name, "ready": sts.Status.ReadyReplicas, "expected": replicas})
 		return false
 	}
 	return true

@@ -17,8 +17,8 @@
 package rb
 
 import (
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"io/ioutil"
-	"log"
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
@@ -59,18 +59,18 @@ type ProfileYamlClient struct {
 }
 
 func (p ProfileYamlClient) Print() {
-	log.Println(p.override)
+	log.Info("Profile override", log.Fields{"override": p.override})
 }
 
-//GetValues returns a path to the override values.yam
-//that was part of the profile
+// GetValues returns a path to the override values.yam
+// that was part of the profile
 func (p ProfileYamlClient) GetValues() string {
 	return filepath.Join(p.path, p.override.Type.Values)
 }
 
-//CopyConfigurationOverrides copies the various files that are
-//provided as overrides to their corresponding locations within
-//the destination chart.
+// CopyConfigurationOverrides copies the various files that are
+// provided as overrides to their corresponding locations within
+// the destination chart.
 func (p ProfileYamlClient) CopyConfigurationOverrides(chartPath string) error {
 
 	//Iterate over each configresource and copy that file into
@@ -89,8 +89,8 @@ func (p ProfileYamlClient) CopyConfigurationOverrides(chartPath string) error {
 	return nil
 }
 
-//ProcessProfileYaml parses the manifest.yaml file that is part of the profile
-//package and creates the appropriate structures out of it.
+// ProcessProfileYaml parses the manifest.yaml file that is part of the profile
+// package and creates the appropriate structures out of it.
 func ProcessProfileYaml(fpath string, manifestFileName string) (ProfileYamlClient, error) {
 
 	p := filepath.Join(fpath, manifestFileName)

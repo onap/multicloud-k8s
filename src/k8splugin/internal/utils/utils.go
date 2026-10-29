@@ -15,7 +15,6 @@ package utils
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -24,6 +23,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 
 	pkgerrors "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -76,7 +76,7 @@ func CheckDatabaseConnection() error {
 
 	err = db.DBconn.HealthCheck()
 	if err != nil {
-		log.Printf("MongoDB health problem: %s", err.Error())
+		log.Error("MongoDB health problem", log.Fields{"error": err})
 		return pkgerrors.Cause(err)
 	}
 	// TODO Convert these to configuration files instead of environment variables.
@@ -88,7 +88,7 @@ func CheckDatabaseConnection() error {
 	}
 	err = db.NewEtcdClient(nil, c)
 	if err != nil {
-		log.Printf("Etcd Client Initialization failed with error: %s", err.Error())
+		log.Error("Etcd Client Initialization failed", log.Fields{"error": err})
 		return pkgerrors.Cause(err)
 	}
 	return nil

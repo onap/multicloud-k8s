@@ -18,6 +18,7 @@ package api
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
@@ -45,6 +46,8 @@ func NewRouter(defClient rb.DefinitionManager,
 	if os.Getenv("TRACING_ENABLED") == "true" {
 		router.Use(otelmux.Middleware("multicloud-k8s"))
 	}
+	router.Use(accessLog)
+	router.NotFoundHandler = accessLog(http.NotFoundHandler())
 
 	// Setup Instance handler routes
 	if instClient == nil {

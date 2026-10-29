@@ -18,9 +18,9 @@ package db
 
 import (
 	"context"
-	"log"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
+	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
 
 	pkgerrors "github.com/pkg/errors"
@@ -266,7 +266,7 @@ func (m *MongoStore) deleteObjectByID(ctx context.Context, coll string, objID pr
 		return pkgerrors.Errorf("Error Deleting from database: %s", err.Error())
 	}
 
-	log.Printf("Deleted Obj with ID %s", objID.String())
+	log.InfoContext(ctx, "Deleted Obj", log.Fields{"id": objID.String()})
 	return nil
 }
 
@@ -377,7 +377,7 @@ func (m *MongoStore) ReadAll(ctx context.Context, coll, tag string) (map[string]
 		//Find tag document and unmarshal it into []byte
 		tagData, err := decodeBytes(c.FindOne(ctx, bson.D{{Key: "_id", Value: tid}}))
 		if err != nil {
-			log.Printf("Unable to decode tag data %s", err.Error())
+			log.ErrorContext(ctx, "Unable to decode tag data", log.Fields{"error": err})
 			continue
 		}
 		result[key.String()] = tagData.Lookup(tag).Value

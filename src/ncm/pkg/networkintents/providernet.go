@@ -92,7 +92,7 @@ func (v *ProviderNetClient) CreateProviderNet(p ProviderNet, clusterProvider, cl
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return ProviderNet{}, pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+		return ProviderNet{}, pkgerrors.New("Error getting current state from Cluster stateInfo: " + cluster)
 	}
 	switch stateVal {
 	case state.StateEnum.Approved:
@@ -195,7 +195,7 @@ func (v *ProviderNetClient) DeleteProviderNet(name, clusterProvider, cluster str
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+		return pkgerrors.New("Error getting current state from Cluster stateInfo: " + cluster)
 	}
 	switch stateVal {
 	case state.StateEnum.Approved:

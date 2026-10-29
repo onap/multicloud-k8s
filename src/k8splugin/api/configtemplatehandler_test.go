@@ -18,6 +18,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -35,29 +36,29 @@ type mockConfigTemplateClient struct {
 	err      error
 }
 
-func (m *mockConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p rb.ConfigTemplate, update bool) error {
+func (m *mockConfigTemplateClient) CreateOrUpdate(ctx context.Context, rbName, rbVersion string, p rb.ConfigTemplate, update bool) error {
 	return m.err
 }
 
-func (m *mockConfigTemplateClient) Get(rbName, rbVersion, templateName string) (rb.ConfigTemplate, error) {
+func (m *mockConfigTemplateClient) Get(ctx context.Context, rbName, rbVersion, templateName string) (rb.ConfigTemplate, error) {
 	if m.err != nil {
 		return rb.ConfigTemplate{}, m.err
 	}
 	return m.template, nil
 }
 
-func (m *mockConfigTemplateClient) List(rbName, rbVersion string) ([]rb.ConfigTemplateList, error) {
+func (m *mockConfigTemplateClient) List(ctx context.Context, rbName, rbVersion string) ([]rb.ConfigTemplateList, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
 	return m.list, nil
 }
 
-func (m *mockConfigTemplateClient) Delete(rbName, rbVersion, templateName string) error {
+func (m *mockConfigTemplateClient) Delete(ctx context.Context, rbName, rbVersion, templateName string) error {
 	return m.err
 }
 
-func (m *mockConfigTemplateClient) Upload(rbName, rbVersion, templateName string, inp []byte) error {
+func (m *mockConfigTemplateClient) Upload(ctx context.Context, rbName, rbVersion, templateName string, inp []byte) error {
 	return m.err
 }
 

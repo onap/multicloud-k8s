@@ -46,11 +46,11 @@ type ConfigTemplateList struct {
 
 // ConfigTemplateManager is an interface exposes the resource bundle  ConfigTemplate functionality
 type ConfigTemplateManager interface {
-	CreateOrUpdate(rbName, rbVersion string, p ConfigTemplate, update bool) error
-	Get(rbName, rbVersion, templateName string) (ConfigTemplate, error)
-	List(rbName, rbVersion string) ([]ConfigTemplateList, error)
-	Delete(rbName, rbVersion, templateName string) error
-	Upload(rbName, rbVersion, templateName string, inp []byte) error
+	CreateOrUpdate(ctx context.Context, rbName, rbVersion string, p ConfigTemplate, update bool) error
+	Get(ctx context.Context, rbName, rbVersion, templateName string) (ConfigTemplate, error)
+	List(ctx context.Context, rbName, rbVersion string) ([]ConfigTemplateList, error)
+	Delete(ctx context.Context, rbName, rbVersion, templateName string) error
+	Upload(ctx context.Context, rbName, rbVersion, templateName string, inp []byte) error
 }
 
 // ConfigTemplateKey is key struct
@@ -90,16 +90,16 @@ func NewConfigTemplateClient() *ConfigTemplateClient {
 }
 
 // CreateOrUpdate an entry for the resource bundle  ConfigTemplate in the database
-func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p ConfigTemplate, update bool) error {
+func (v *ConfigTemplateClient) CreateOrUpdate(ctx context.Context, rbName, rbVersion string, p ConfigTemplate, update bool) error {
 
-	log.Info("ConfigTemplate: create", log.Fields{"rbName": rbName})
+	log.InfoContext(ctx, "ConfigTemplate: create", log.Fields{"rbName": rbName})
 	// Name is required
 	if p.TemplateName == "" {
 		return pkgerrors.New("Name is required for Resource Bundle  ConfigTemplate")
 	}
 
 	//Check if  ConfigTemplate already exists
-	prev, err := v.Get(rbName, rbVersion, p.TemplateName)
+	prev, err := v.Get(ctx, rbName, rbVersion, p.TemplateName)
 	if err == nil && !update {
 		return pkgerrors.New(" ConfigTemplate already exists for this Definition")
 	}
@@ -108,7 +108,7 @@ func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p Config
 	}
 
 	//Check if provided resource bundle information is valid
-	rbDef, err := NewDefinitionClient().Get(context.TODO(), rbName, rbVersion)
+	rbDef, err := NewDefinitionClient().Get(ctx, rbName, rbVersion)
 	if err != nil {
 		return pkgerrors.Errorf("Invalid Resource Bundle ID provided: %s", err.Error())
 	}
@@ -122,14 +122,14 @@ func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p Config
 	if update {
 		p.ChartName = prev.ChartName
 		p.HasContent = prev.HasContent
-		err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagMeta, p)
+		err = db.DBconn.Update(ctx, v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Updating  ConfigTemplate DB Entry")
 		}
 	} else {
 		p.ChartName = rbDef.ChartName
 		p.HasContent = false
-		err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, p)
+		err = db.DBconn.Create(ctx, v.storeName, key, v.tagMeta, p)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
 		}
@@ -139,13 +139,13 @@ func (v *ConfigTemplateClient) CreateOrUpdate(rbName, rbVersion string, p Config
 }
 
 // Get returns the Resource Bundle  ConfigTemplate for corresponding ID
-func (v *ConfigTemplateClient) Get(rbName, rbVersion, templateName string) (ConfigTemplate, error) {
+func (v *ConfigTemplateClient) Get(ctx context.Context, rbName, rbVersion, templateName string) (ConfigTemplate, error) {
 	key := ConfigTemplateKey{
 		RBName:       rbName,
 		RBVersion:    rbVersion,
 		TemplateName: templateName,
 	}
-	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagMeta)
+	value, err := db.DBconn.Read(ctx, v.storeName, key, v.tagMeta)
 	if err != nil {
 		return ConfigTemplate{}, pkgerrors.Wrap(err, "Get ConfigTemplate")
 	}
@@ -164,10 +164,10 @@ func (v *ConfigTemplateClient) Get(rbName, rbVersion, templateName string) (Conf
 }
 
 // List returns the Resource Bundle ConfigTemplate for corresponding ID
-func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplateList, error) {
+func (v *ConfigTemplateClient) List(ctx context.Context, rbName, rbVersion string) ([]ConfigTemplateList, error) {
 
 	//Get all config templates
-	dbres, err := db.DBconn.ReadAll(context.TODO(), v.storeName, v.tagMeta)
+	dbres, err := db.DBconn.ReadAll(ctx, v.storeName, v.tagMeta)
 	if err != nil || len(dbres) == 0 {
 		return []ConfigTemplateList{}, pkgerrors.Wrap(err, "No Config Templates Found")
 	}
@@ -179,7 +179,7 @@ func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplateL
 			tmp := ConfigTemplateList{}
 			err = db.DBconn.Unmarshal(value, &tmp)
 			if err != nil {
-				log.Error("ConfigTemplate: Error unmarshaling value", log.Fields{"key": key, "error": err})
+				log.ErrorContext(ctx, "ConfigTemplate: Error unmarshaling value", log.Fields{"key": key, "error": err})
 				continue
 			}
 			keyTmp := ConfigTemplateKey{
@@ -187,7 +187,7 @@ func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplateL
 				RBVersion:    rbVersion,
 				TemplateName: tmp.TemplateName,
 			}
-			_, err := db.DBconn.Read(context.TODO(), v.storeName, keyTmp, v.tagMeta)
+			_, err := db.DBconn.Read(ctx, v.storeName, keyTmp, v.tagMeta)
 			if err == nil && keyTmp.RBName == rbName && keyTmp.RBVersion == rbVersion {
 				results = append(results, tmp)
 			}
@@ -202,18 +202,18 @@ func (v *ConfigTemplateClient) List(rbName, rbVersion string) ([]ConfigTemplateL
 }
 
 // Delete the Resource Bundle  ConfigTemplate from database
-func (v *ConfigTemplateClient) Delete(rbName, rbVersion, templateName string) error {
+func (v *ConfigTemplateClient) Delete(ctx context.Context, rbName, rbVersion, templateName string) error {
 	key := ConfigTemplateKey{
 		RBName:       rbName,
 		RBVersion:    rbVersion,
 		TemplateName: templateName,
 	}
-	err := db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagMeta)
+	err := db.DBconn.Delete(ctx, v.storeName, key, v.tagMeta)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete ConfigTemplate")
 	}
 
-	err = db.DBconn.Delete(context.TODO(), v.storeName, key, v.tagContent)
+	err = db.DBconn.Delete(ctx, v.storeName, key, v.tagContent)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete  ConfigTemplate Content")
 	}
@@ -222,16 +222,16 @@ func (v *ConfigTemplateClient) Delete(rbName, rbVersion, templateName string) er
 }
 
 // Upload the contents of resource bundle into database
-func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, inp []byte) error {
+func (v *ConfigTemplateClient) Upload(ctx context.Context, rbName, rbVersion, templateName string, inp []byte) error {
 
-	log.Info("ConfigTemplate: Upload", log.Fields{"template": templateName})
+	log.InfoContext(ctx, "ConfigTemplate: Upload", log.Fields{"template": templateName})
 	key := ConfigTemplateKey{
 		RBName:       rbName,
 		RBVersion:    rbVersion,
 		TemplateName: templateName,
 	}
 	//ignore the returned data here.
-	t, err := v.Get(rbName, rbVersion, templateName)
+	t, err := v.Get(ctx, rbName, rbVersion, templateName)
 	if err != nil {
 		return pkgerrors.Errorf("Invalid  ConfigTemplate Name  provided %s", err.Error())
 	}
@@ -265,19 +265,19 @@ func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, in
 		return pkgerrors.New("Invalid template no Chart.yaml file found")
 	}
 
-	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagMeta, t)
+	err = db.DBconn.Create(ctx, v.storeName, key, v.tagMeta, t)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Creating  ConfigTemplate DB Entry")
 	}
 
 	//Encode given byte stream to text for storage
 	encodedStr := base64.StdEncoding.EncodeToString(inp)
-	err = db.DBconn.Create(context.TODO(), v.storeName, key, v.tagContent, encodedStr)
+	err = db.DBconn.Create(ctx, v.storeName, key, v.tagContent, encodedStr)
 	if err != nil {
 		return pkgerrors.Errorf("Error uploading data to db %s", err.Error())
 	}
 	t.HasContent = true
-	err = db.DBconn.Update(context.TODO(), v.storeName, key, v.tagMeta, t)
+	err = db.DBconn.Update(ctx, v.storeName, key, v.tagMeta, t)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Updating  ConfigTemplate DB Entry")
 	}
@@ -287,12 +287,12 @@ func (v *ConfigTemplateClient) Upload(rbName, rbVersion, templateName string, in
 
 // Download the contents of the ConfigTemplate from DB
 // Returns a byte array of the contents
-func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) ([]byte, error) {
+func (v *ConfigTemplateClient) Download(ctx context.Context, rbName, rbVersion, templateName string) ([]byte, error) {
 
-	log.Info("ConfigTemplate: Download", log.Fields{"template": templateName})
+	log.InfoContext(ctx, "ConfigTemplate: Download", log.Fields{"template": templateName})
 	//ignore the returned data here
 	//Check if rb is valid
-	_, err := v.Get(rbName, rbVersion, templateName)
+	_, err := v.Get(ctx, rbName, rbVersion, templateName)
 	if err != nil {
 		return nil, pkgerrors.Errorf("Invalid  ConfigTemplate Name provided: %s", err.Error())
 	}
@@ -302,7 +302,7 @@ func (v *ConfigTemplateClient) Download(rbName, rbVersion, templateName string) 
 		RBVersion:    rbVersion,
 		TemplateName: templateName,
 	}
-	value, err := db.DBconn.Read(context.TODO(), v.storeName, key, v.tagContent)
+	value, err := db.DBconn.Read(ctx, v.storeName, key, v.tagContent)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Get Resource ConfigTemplate content")
 	}

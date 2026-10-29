@@ -20,6 +20,7 @@ import (
 	"sync"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/time"
 
@@ -34,10 +35,10 @@ import (
 
 // InstanceHCManager interface exposes instance Healthcheck fuctionalities
 type InstanceHCManager interface {
-	Create(instanceId string) (InstanceMiniHCStatus, error)
-	Get(instanceId, healthcheckId string) (InstanceHCStatus, error)
-	List(instanceId string) (InstanceHCOverview, error)
-	Delete(instanceId, healthcheckId string) error
+	Create(ctx context.Context, instanceId string) (InstanceMiniHCStatus, error)
+	Get(ctx context.Context, instanceId, healthcheckId string) (InstanceHCStatus, error)
+	List(ctx context.Context, instanceId string) (InstanceHCOverview, error)
+	Delete(ctx context.Context, instanceId, healthcheckId string) error
 }
 
 // HealthcheckKey is used as the primary key in the db
@@ -104,8 +105,8 @@ func instanceMiniHCStatusFromStatus(ihcs InstanceHCStatus) InstanceMiniHCStatus 
 	return InstanceMiniHCStatus{ihcs.HealthcheckId, ihcs.Status}
 }
 
-func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, error) {
-	ctx, span := tracer.Start(context.TODO(), "InstanceHCClient.Create")
+func (ihc InstanceHCClient) Create(ctx context.Context, instanceId string) (InstanceMiniHCStatus, error) {
+	ctx, span := tracer.Start(ctx, "InstanceHCClient.Create")
 	defer span.End()
 	//TODO Handle hook delete policies
 
@@ -189,6 +190,8 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 		"InstanceId":    instanceId,
 		"HealthcheckId": id,
 	})
+	// The hooks outlive the request: keep its span as parent, drop its cancellation.
+	hookCtx := trace.ContextWithSpan(context.Background(), span)
 	go func() {
 		var wg sync.WaitGroup
 		update := make(chan bool) //True - hook finished, False - all hooks finished
@@ -225,7 +228,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 					"Reason":        map[bool]string{true: "Hook finished", false: "All hooks finished"}[b],
 				})
 				if b { //Some hook finished - need to update DB
-					err = db.DBconn.Update(ctx, ihc.storeName, key, ihc.tagInst, ihcs)
+					err = db.DBconn.Update(hookCtx, ihc.storeName, key, ihc.tagInst, ihcs)
 					if err != nil {
 						log.Error("Couldn't update database", log.Fields{
 							"Store":   ihc.storeName,
@@ -252,7 +255,7 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 						}
 					}
 					ihcs.Status = finalResult
-					err = db.DBconn.Update(ctx, ihc.storeName, key, ihc.tagInst, ihcs)
+					err = db.DBconn.Update(hookCtx, ihc.storeName, key, ihc.tagInst, ihcs)
 					if err != nil {
 						log.Error("Couldn't update database", log.Fields{
 							"Store":   ihc.storeName,
@@ -268,12 +271,12 @@ func (ihc InstanceHCClient) Create(instanceId string) (InstanceMiniHCStatus, err
 	return instanceMiniHCStatusFromStatus(ihcs), nil
 }
 
-func (ihc InstanceHCClient) Get(instanceId, healthcheckId string) (InstanceHCStatus, error) {
+func (ihc InstanceHCClient) Get(ctx context.Context, instanceId, healthcheckId string) (InstanceHCStatus, error) {
 	key := HealthcheckKey{
 		InstanceId:    instanceId,
 		HealthcheckId: healthcheckId,
 	}
-	DBResp, err := db.DBconn.Read(context.TODO(), ihc.storeName, key, ihc.tagInst)
+	DBResp, err := db.DBconn.Read(ctx, ihc.storeName, key, ihc.tagInst)
 	if err != nil || DBResp == nil {
 		return InstanceHCStatus{}, pkgerrors.Wrap(err, "Error retrieving Healthcheck data")
 	}
@@ -286,19 +289,19 @@ func (ihc InstanceHCClient) Get(instanceId, healthcheckId string) (InstanceHCSta
 	return resp, nil
 }
 
-func (ihc InstanceHCClient) Delete(instanceId, healthcheckId string) error {
+func (ihc InstanceHCClient) Delete(ctx context.Context, instanceId, healthcheckId string) error {
 	key := HealthcheckKey{instanceId, healthcheckId}
 	v := app.NewInstanceClient()
-	instance, err := v.Get(context.TODO(), instanceId)
+	instance, err := v.Get(ctx, instanceId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Getting instance")
 	}
-	ihcs, err := ihc.Get(instanceId, healthcheckId)
+	ihcs, err := ihc.Get(ctx, instanceId, healthcheckId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Error querying Healthcheck status")
 	}
 	k8sClient := app.KubernetesClient{}
-	err = k8sClient.Init(context.TODO(), instance.Request.CloudRegion, instanceId)
+	err = k8sClient.Init(ctx, instance.Request.CloudRegion, instanceId)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Preparing KubeClient")
 	}
@@ -313,28 +316,28 @@ func (ihc InstanceHCClient) Delete(instanceId, healthcheckId string) error {
 	if cumulatedErr != "" {
 		return pkgerrors.New("Removing hooks failed with errors:\n" + cumulatedErr)
 	}
-	err = db.DBconn.Delete(context.TODO(), ihc.storeName, key, ihc.tagInst)
+	err = db.DBconn.Delete(ctx, ihc.storeName, key, ihc.tagInst)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Removing Healthcheck in DB")
 	}
 	return nil
 }
 
-func (ihc InstanceHCClient) List(instanceId string) (InstanceHCOverview, error) {
+func (ihc InstanceHCClient) List(ctx context.Context, instanceId string) (InstanceHCOverview, error) {
 	ihco := InstanceHCOverview{
 		InstanceId: instanceId,
 	}
 
 	// Retrieve info about available hooks
 	v := app.NewInstanceClient()
-	instance, err := v.Get(context.TODO(), instanceId)
+	instance, err := v.Get(ctx, instanceId)
 	if err != nil {
 		return ihco, pkgerrors.Wrap(err, "Getting Instance data")
 	}
 	ihco.Hooks = instance.Hooks
 
 	// Retrieve info about running/completed healthchecks
-	dbResp, err := db.DBconn.ReadAll(context.TODO(), ihc.storeName, ihc.tagInst)
+	dbResp, err := db.DBconn.ReadAll(ctx, ihc.storeName, ihc.tagInst)
 	if err != nil {
 		if !strings.Contains(err.Error(), "Did not find any objects with tag") {
 			return ihco, pkgerrors.Wrap(err, "Getting Healthcheck data")

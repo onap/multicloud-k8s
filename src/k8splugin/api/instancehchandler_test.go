@@ -14,6 +14,7 @@ limitations under the License.
 package api
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -31,28 +32,28 @@ type mockInstanceHCClient struct {
 	err        error
 }
 
-func (m *mockInstanceHCClient) Create(instanceId string) (healthcheck.InstanceMiniHCStatus, error) {
+func (m *mockInstanceHCClient) Create(ctx context.Context, instanceId string) (healthcheck.InstanceMiniHCStatus, error) {
 	if m.err != nil {
 		return healthcheck.InstanceMiniHCStatus{}, m.err
 	}
 	return m.miniStatus, nil
 }
 
-func (m *mockInstanceHCClient) Get(instanceId, healthcheckId string) (healthcheck.InstanceHCStatus, error) {
+func (m *mockInstanceHCClient) Get(ctx context.Context, instanceId, healthcheckId string) (healthcheck.InstanceHCStatus, error) {
 	if m.err != nil {
 		return healthcheck.InstanceHCStatus{}, m.err
 	}
 	return m.status, nil
 }
 
-func (m *mockInstanceHCClient) List(instanceId string) (healthcheck.InstanceHCOverview, error) {
+func (m *mockInstanceHCClient) List(ctx context.Context, instanceId string) (healthcheck.InstanceHCOverview, error) {
 	if m.err != nil {
 		return healthcheck.InstanceHCOverview{}, m.err
 	}
 	return m.overview, nil
 }
 
-func (m *mockInstanceHCClient) Delete(instanceId, healthcheckId string) error {
+func (m *mockInstanceHCClient) Delete(ctx context.Context, instanceId, healthcheckId string) error {
 	return m.err
 }
 

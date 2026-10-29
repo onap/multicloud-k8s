@@ -18,6 +18,7 @@
 package app
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
@@ -67,20 +68,20 @@ type ConfigTagit struct {
 
 // ConfigManager is an interface exposes the config functionality
 type ConfigManager interface {
-	Create(instanceID string, p Config) (ConfigResult, error)
-	Get(instanceID, configName string) (Config, error)
-	GetVersion(instanceID, configName, version string) (Config, error)
-	GetTag(instanceID, configName, tagName string) (Config, error)
-	List(instanceID string) ([]Config, error)
-	VersionList(instanceID, configName string) ([]Config, error)
+	Create(ctx context.Context, instanceID string, p Config) (ConfigResult, error)
+	Get(ctx context.Context, instanceID, configName string) (Config, error)
+	GetVersion(ctx context.Context, instanceID, configName, version string) (Config, error)
+	GetTag(ctx context.Context, instanceID, configName, tagName string) (Config, error)
+	List(ctx context.Context, instanceID string) ([]Config, error)
+	VersionList(ctx context.Context, instanceID, configName string) ([]Config, error)
 	Help() map[string]string
-	Update(instanceID, configName string, p Config) (ConfigResult, error)
-	Delete(instanceID, configName string) (ConfigResult, error)
-	DeleteAll(instanceID, configName string, deleteConfigOnly bool) error
-	Rollback(instanceID string, configName string, p ConfigRollback, acceptRevert bool) (ConfigResult, error)
-	Cleanup(instanceID string) error
-	Tagit(instanceID string, configName string, p ConfigTagit) (ConfigTag, error)
-	TagList(instanceID, configName string) ([]ConfigTag, error)
+	Update(ctx context.Context, instanceID, configName string, p Config) (ConfigResult, error)
+	Delete(ctx context.Context, instanceID, configName string) (ConfigResult, error)
+	DeleteAll(ctx context.Context, instanceID, configName string, deleteConfigOnly bool) error
+	Rollback(ctx context.Context, instanceID string, configName string, p ConfigRollback, acceptRevert bool) (ConfigResult, error)
+	Cleanup(ctx context.Context, instanceID string) error
+	Tagit(ctx context.Context, instanceID string, configName string, p ConfigTagit) (ConfigTag, error)
+	TagList(ctx context.Context, instanceID, configName string) ([]ConfigTag, error)
 }
 
 // ConfigClient implements the ConfigManager
@@ -106,14 +107,14 @@ func (v *ConfigClient) Help() map[string]string {
 }
 
 // Create an entry for the config in the database
-func (v *ConfigClient) Create(instanceID string, p Config) (ConfigResult, error) {
-	log.Info("Config Create", log.Fields{"instance": instanceID})
+func (v *ConfigClient) Create(ctx context.Context, instanceID string, p Config) (ConfigResult, error) {
+	log.InfoContext(ctx, "Config Create", log.Fields{"instance": instanceID})
 	// Check required fields
 	if p.ConfigName == "" || p.TemplateName == "" {
 		return ConfigResult{}, pkgerrors.New("Incomplete Configuration Provided")
 	}
 	// Resolving rbName, Version, etc. not to break response
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, instanceID)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -121,7 +122,7 @@ func (v *ConfigClient) Create(instanceID string, p Config) (ConfigResult, error)
 		instanceID: instanceID,
 		configName: p.ConfigName,
 	}
-	_, err = cs.getConfig()
+	_, err = cs.getConfig(ctx)
 	if err == nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Error - Config exists")
 	} else {
@@ -134,13 +135,13 @@ func (v *ConfigClient) Create(instanceID string, p Config) (ConfigResult, error)
 	lock.Lock()
 	defer lock.Unlock()
 	var appliedResources ([]KubernetesConfigResource)
-	appliedResources, err = applyConfig(instanceID, p, profileChannel, "POST", nil)
+	appliedResources, err = applyConfig(ctx, instanceID, p, profileChannel, "POST", nil)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config failed")
 	}
-	log.Info("POST result", log.Fields{"resources": appliedResources})
+	log.InfoContext(ctx, "POST result", log.Fields{"resources": appliedResources})
 	// Create Config DB Entry
-	err = cs.createConfig(p)
+	err = cs.createConfig(ctx, p)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Config DB Entry")
 	}
@@ -149,7 +150,7 @@ func (v *ConfigClient) Create(instanceID string, p Config) (ConfigResult, error)
 		instanceID: instanceID,
 		configName: p.ConfigName,
 	}
-	version, err := cvs.createConfigVersion(p, Config{}, "POST", appliedResources)
+	version, err := cvs.createConfigVersion(ctx, p, Config{}, "POST", appliedResources)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Config Version DB Entry")
 	}
@@ -168,10 +169,10 @@ func (v *ConfigClient) Create(instanceID string, p Config) (ConfigResult, error)
 }
 
 // Update an entry for the config in the database
-func (v *ConfigClient) Update(instanceID, configName string, p Config) (ConfigResult, error) {
-	log.Info("Config Update", log.Fields{"instance": instanceID, "config": configName})
+func (v *ConfigClient) Update(ctx context.Context, instanceID, configName string, p Config) (ConfigResult, error) {
+	log.InfoContext(ctx, "Config Update", log.Fields{"instance": instanceID, "config": configName})
 	// Resolving rbName, Version, etc. not to break response
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, instanceID)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -180,7 +181,7 @@ func (v *ConfigClient) Update(instanceID, configName string, p Config) (ConfigRe
 		instanceID: instanceID,
 		configName: configName,
 	}
-	_, err = cs.getConfig()
+	_, err = cs.getConfig(ctx)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Error - Config doesn't exist")
 	}
@@ -189,13 +190,13 @@ func (v *ConfigClient) Update(instanceID, configName string, p Config) (ConfigRe
 	lock.Lock()
 	defer lock.Unlock()
 	var appliedResources ([]KubernetesConfigResource)
-	appliedResources, err = applyConfig(instanceID, p, profileChannel, "PUT", nil)
+	appliedResources, err = applyConfig(ctx, instanceID, p, profileChannel, "PUT", nil)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 	}
-	log.Info("PUT result", log.Fields{"resources": appliedResources})
+	log.InfoContext(ctx, "PUT result", log.Fields{"resources": appliedResources})
 	// Update Config DB Entry
-	configPrev, err := cs.updateConfig(p)
+	configPrev, err := cs.updateConfig(ctx, p)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Config DB Entry")
 	}
@@ -204,7 +205,7 @@ func (v *ConfigClient) Update(instanceID, configName string, p Config) (ConfigRe
 		instanceID: instanceID,
 		configName: configName,
 	}
-	version, err := cvs.createConfigVersion(p, configPrev, "PUT", appliedResources)
+	version, err := cvs.createConfigVersion(ctx, p, configPrev, "PUT", appliedResources)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Config Version DB Entry")
 	}
@@ -223,7 +224,7 @@ func (v *ConfigClient) Update(instanceID, configName string, p Config) (ConfigRe
 }
 
 // Get config entry in the database
-func (v *ConfigClient) Get(instanceID, configName string) (Config, error) {
+func (v *ConfigClient) Get(ctx context.Context, instanceID, configName string) (Config, error) {
 
 	// Acquire per profile Mutex
 	lock, _ := getProfileData(instanceID)
@@ -234,7 +235,7 @@ func (v *ConfigClient) Get(instanceID, configName string) (Config, error) {
 		instanceID: instanceID,
 		configName: configName,
 	}
-	cfg, err := cs.getConfig()
+	cfg, err := cs.getConfig(ctx)
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Get Config DB Entry")
 	}
@@ -243,7 +244,7 @@ func (v *ConfigClient) Get(instanceID, configName string) (Config, error) {
 		instanceID: instanceID,
 		configName: configName,
 	}
-	currentVersion, err := cvs.getCurrentVersion(configName)
+	currentVersion, err := cvs.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Get Config Version Entry")
 	}
@@ -252,20 +253,20 @@ func (v *ConfigClient) Get(instanceID, configName string) (Config, error) {
 }
 
 // Get version config entry in the database
-func (v *ConfigClient) GetTag(instanceID, configName, tagName string) (Config, error) {
+func (v *ConfigClient) GetTag(ctx context.Context, instanceID, configName, tagName string) (Config, error) {
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
 		configName: configName,
 	}
-	version, err := cvs.getTagVersion(configName, tagName)
+	version, err := cvs.getTagVersion(ctx, configName, tagName)
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Get Config Tag Version Entry")
 	}
-	return v.GetVersion(instanceID, configName, version)
+	return v.GetVersion(ctx, instanceID, configName, version)
 }
 
 // Get version config entry in the database
-func (v *ConfigClient) GetVersion(instanceID, configName, version string) (Config, error) {
+func (v *ConfigClient) GetVersion(ctx context.Context, instanceID, configName, version string) (Config, error) {
 
 	// Acquire per profile Mutex
 	lock, _ := getProfileData(instanceID)
@@ -276,7 +277,7 @@ func (v *ConfigClient) GetVersion(instanceID, configName, version string) (Confi
 		instanceID: instanceID,
 		configName: configName,
 	}
-	cfg, _ := cs.getConfig()
+	cfg, _ := cs.getConfig(ctx)
 
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
@@ -286,7 +287,7 @@ func (v *ConfigClient) GetVersion(instanceID, configName, version string) (Confi
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Parsint version string")
 	}
-	_, _, _, _, err = cvs.getConfigVersion(configName, uint(versionInt))
+	_, _, _, _, err = cvs.getConfigVersion(ctx, configName, uint(versionInt))
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Get Config Version Entry")
 	}
@@ -295,7 +296,7 @@ func (v *ConfigClient) GetVersion(instanceID, configName, version string) (Confi
 }
 
 // List config entry in the database
-func (v *ConfigClient) List(instanceID string) ([]Config, error) {
+func (v *ConfigClient) List(ctx context.Context, instanceID string) ([]Config, error) {
 
 	// Acquire per profile Mutex
 	lock, _ := getProfileData(instanceID)
@@ -305,14 +306,14 @@ func (v *ConfigClient) List(instanceID string) ([]Config, error) {
 	cs := ConfigStore{
 		instanceID: instanceID,
 	}
-	cfg, err := cs.getConfigList()
+	cfg, err := cs.getConfigList(ctx)
 	result := make([]Config, 0)
 	for _, config := range cfg {
 		cvs := ConfigVersionStore{
 			instanceID: instanceID,
 			configName: config.ConfigName,
 		}
-		currentVersion, err := cvs.getCurrentVersion(config.ConfigName)
+		currentVersion, err := cvs.getCurrentVersion(ctx, config.ConfigName)
 		if err != nil {
 			return []Config{}, pkgerrors.Wrap(err, "Get Current Config Version ")
 		}
@@ -326,7 +327,7 @@ func (v *ConfigClient) List(instanceID string) ([]Config, error) {
 }
 
 // Version List config entry in the database
-func (v *ConfigClient) VersionList(instanceID string, configName string) ([]Config, error) {
+func (v *ConfigClient) VersionList(ctx context.Context, instanceID string, configName string) ([]Config, error) {
 
 	// Acquire per profile Mutex
 	lock, _ := getProfileData(instanceID)
@@ -337,7 +338,7 @@ func (v *ConfigClient) VersionList(instanceID string, configName string) ([]Conf
 		instanceID: instanceID,
 		configName: configName,
 	}
-	currentVersion, err := cvs.getCurrentVersion(configName)
+	currentVersion, err := cvs.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return []Config{}, pkgerrors.Wrap(err, "Get Current Config Version ")
 	}
@@ -345,7 +346,7 @@ func (v *ConfigClient) VersionList(instanceID string, configName string) ([]Conf
 	var i uint
 	cfgList := make([]Config, 0)
 	for i = 1; i <= currentVersion; i++ {
-		config, _, _, _, err := cvs.getConfigVersion(configName, i)
+		config, _, _, _, err := cvs.getConfigVersion(ctx, configName, i)
 		config.ConfigVersion = i
 		if err != nil {
 			return []Config{}, pkgerrors.Wrap(err, "Get Config Version")
@@ -356,7 +357,7 @@ func (v *ConfigClient) VersionList(instanceID string, configName string) ([]Conf
 	return cfgList, nil
 }
 
-func (v *ConfigClient) TagList(instanceID, configName string) ([]ConfigTag, error) {
+func (v *ConfigClient) TagList(ctx context.Context, instanceID, configName string) ([]ConfigTag, error) {
 
 	// Acquire per profile Mutex
 	lock, _ := getProfileData(instanceID)
@@ -367,7 +368,7 @@ func (v *ConfigClient) TagList(instanceID, configName string) ([]ConfigTag, erro
 		instanceID: instanceID,
 		configName: configName,
 	}
-	_, err := cs.getConfig()
+	_, err := cs.getConfig(ctx)
 	if err != nil {
 		return []ConfigTag{}, pkgerrors.Wrap(err, "Get Config DB Entry")
 	}
@@ -376,14 +377,14 @@ func (v *ConfigClient) TagList(instanceID, configName string) ([]ConfigTag, erro
 		configName: configName,
 	}
 
-	tagList, err := cvs.getTagList(configName)
+	tagList, err := cvs.getTagList(ctx, configName)
 	if err != nil {
 		return []ConfigTag{}, pkgerrors.Wrap(err, "Get Tag list")
 	}
 	result := make([]ConfigTag, 0)
 	for _, tag := range tagList {
 		tagData := ConfigTag{}
-		version, err := cvs.getTagVersion(configName, tag)
+		version, err := cvs.getTagVersion(ctx, configName, tag)
 		if err != nil {
 			return []ConfigTag{}, pkgerrors.Wrap(err, "Get Tag version")
 		}
@@ -399,14 +400,14 @@ func (v *ConfigClient) TagList(instanceID, configName string) ([]ConfigTag, erro
 }
 
 // Delete the Config from database
-func (v *ConfigClient) DeleteAll(instanceID, configName string, deleteConfigOnly bool) error {
-	log.Info("Config Delete All", log.Fields{"instance": instanceID, "config": configName})
+func (v *ConfigClient) DeleteAll(ctx context.Context, instanceID, configName string, deleteConfigOnly bool) error {
+	log.InfoContext(ctx, "Config Delete All", log.Fields{"instance": instanceID, "config": configName})
 	// Check if Config exists
 	cs := ConfigStore{
 		instanceID: instanceID,
 		configName: configName,
 	}
-	_, err := cs.getConfig()
+	_, err := cs.getConfig(ctx)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Update Error - Config doesn't exist")
 	}
@@ -419,25 +420,25 @@ func (v *ConfigClient) DeleteAll(instanceID, configName string, deleteConfigOnly
 	if !deleteConfigOnly {
 		var rollbackConfig = ConfigRollback{}
 		rollbackConfig.AnyOf.ConfigVersion = "0"
-		_, err = v.Rollback(instanceID, configName, rollbackConfig, true)
+		_, err = v.Rollback(ctx, instanceID, configName, rollbackConfig, true)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Rollback to base version")
 		}
 	}
 	// Delete Config from DB
-	_, err = cs.deleteConfig()
+	_, err = cs.deleteConfig(ctx)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Config DB Entry")
 	}
-	cvs.cleanupIstanceTags(configName)
+	cvs.cleanupIstanceTags(ctx, configName)
 	return nil
 }
 
 // Apply update with delete operation
-func (v *ConfigClient) Delete(instanceID, configName string) (ConfigResult, error) {
-	log.Info("Config Delete", log.Fields{"instance": instanceID, "config": configName})
+func (v *ConfigClient) Delete(ctx context.Context, instanceID, configName string) (ConfigResult, error) {
+	log.InfoContext(ctx, "Config Delete", log.Fields{"instance": instanceID, "config": configName})
 	// Resolving rbName, Version, etc. not to break response
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, instanceID)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -446,7 +447,7 @@ func (v *ConfigClient) Delete(instanceID, configName string) (ConfigResult, erro
 		instanceID: instanceID,
 		configName: configName,
 	}
-	p, err := cs.getConfig()
+	p, err := cs.getConfig(ctx)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Delete Error - Config doesn't exist")
 	}
@@ -459,26 +460,26 @@ func (v *ConfigClient) Delete(instanceID, configName string) (ConfigResult, erro
 		instanceID: instanceID,
 		configName: configName,
 	}
-	currentVersion, err := cvs.getCurrentVersion(configName)
+	currentVersion, err := cvs.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Current version get failed")
 	}
-	_, _, _, resources, err := cvs.getConfigVersion(configName, currentVersion)
+	_, _, _, resources, err := cvs.getConfigVersion(ctx, configName, currentVersion)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Config version get failed")
 	}
 
-	_, err = applyConfig(instanceID, p, profileChannel, "DELETE", resources)
+	_, err = applyConfig(ctx, instanceID, p, profileChannel, "DELETE", resources)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 	}
-	log.Info("DELETE resources", log.Fields{"resources": resources})
+	log.InfoContext(ctx, "DELETE resources", log.Fields{"resources": resources})
 	// Update Config from DB
-	configPrev, err := cs.updateConfig(p)
+	configPrev, err := cs.updateConfig(ctx, p)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Config DB Entry")
 	}
-	version, err := cvs.createConfigVersion(p, configPrev, "DELETE", []KubernetesConfigResource{})
+	version, err := cvs.createConfigVersion(ctx, p, configPrev, "DELETE", []KubernetesConfigResource{})
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Create Delete Config Version DB Entry")
 	}
@@ -497,16 +498,16 @@ func (v *ConfigClient) Delete(instanceID, configName string) (ConfigResult, erro
 }
 
 // Rollback starts from current version and rollbacks to the version desired
-func (v *ConfigClient) Rollback(instanceID string, configName string, rback ConfigRollback, acceptRevert bool) (ConfigResult, error) {
-	log.Info("Config Rollback", log.Fields{"instance": instanceID, "config": configName})
+func (v *ConfigClient) Rollback(ctx context.Context, instanceID string, configName string, rback ConfigRollback, acceptRevert bool) (ConfigResult, error) {
+	log.InfoContext(ctx, "Config Rollback", log.Fields{"instance": instanceID, "config": configName})
 	var reqVersion string
 	var err error
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, instanceID)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
 	if rback.AnyOf.ConfigTag != "" {
-		reqVersion, err = v.GetTagVersion(instanceID, configName, rback.AnyOf.ConfigTag)
+		reqVersion, err = v.GetTagVersion(ctx, instanceID, configName, rback.AnyOf.ConfigTag)
 		if err != nil {
 			return ConfigResult{}, pkgerrors.Wrap(err, "Rollback Invalid tag")
 		}
@@ -531,7 +532,7 @@ func (v *ConfigClient) Rollback(instanceID string, configName string, rback Conf
 		instanceID: instanceID,
 		configName: configName,
 	}
-	currentVersion, err := cvs.getCurrentVersion(configName)
+	currentVersion, err := cvs.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Rollback Get Current Config Version ")
 	}
@@ -546,7 +547,7 @@ func (v *ConfigClient) Rollback(instanceID string, configName string, rback Conf
 
 	//Rollback all the intermettinent configurations
 	for i := currentVersion; i > rollbackIndex; i-- {
-		configNew, configPrev, _, resources, err := cvs.getConfigVersion(configName, i)
+		configNew, configPrev, _, resources, err := cvs.getConfigVersion(ctx, configName, i)
 		if err != nil {
 			return ConfigResult{}, pkgerrors.Wrap(err, "Rollback Get Config Version")
 		}
@@ -557,9 +558,9 @@ func (v *ConfigClient) Rollback(instanceID string, configName string, rback Conf
 			configPrev.TemplateName = ""
 			configPrev.Values = make(map[string]interface{})
 		} else {
-			_, _, prevAction, _, err = cvs.getConfigVersion(configName, i-1)
+			_, _, prevAction, _, err = cvs.getConfigVersion(ctx, configName, i-1)
 		}
-		log.Info("ROLLBACK to version", log.Fields{"version": i - 1})
+		log.InfoContext(ctx, "ROLLBACK to version", log.Fields{"version": i - 1})
 		if err != nil {
 			return ConfigResult{}, pkgerrors.Wrap(err, "Rollback Get Prev Config Version")
 		}
@@ -575,28 +576,28 @@ func (v *ConfigClient) Rollback(instanceID string, configName string, rback Conf
 				}
 			}
 			if len(resourcesToDelete) > 0 {
-				_, err := applyConfig(instanceID, configPrev, profileChannel, "DELETE", resources)
+				_, err := applyConfig(ctx, instanceID, configPrev, profileChannel, "DELETE", resources)
 				if err != nil {
 					return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 				}
 			}
-			appliedResources, err := applyConfig(instanceID, configPrev, profileChannel, prevAction, nil)
+			appliedResources, err := applyConfig(ctx, instanceID, configPrev, profileChannel, prevAction, nil)
 			if err != nil {
 				return ConfigResult{}, pkgerrors.Wrap(err, "Apply Config  failed")
 			}
-			log.Info("Rollback result", log.Fields{"action": prevAction, "resources": appliedResources})
-			_, err = cs.updateConfig(configPrev)
+			log.InfoContext(ctx, "Rollback result", log.Fields{"action": prevAction, "resources": appliedResources})
+			_, err = cs.updateConfig(ctx, configPrev)
 			if err != nil {
 				return ConfigResult{}, pkgerrors.Wrap(err, "Update Config DB Entry")
 			}
 		} else {
 			// POST is always preceeded by Config not existing
-			_, err := applyConfig(instanceID, configPrev, profileChannel, prevAction, resources)
+			_, err := applyConfig(ctx, instanceID, configPrev, profileChannel, prevAction, resources)
 			if err != nil {
 				return ConfigResult{}, pkgerrors.Wrap(err, "Delete Config  failed")
 			}
-			log.Info("DELETE resources", log.Fields{"resources": resources})
-			_, err = cs.updateConfig(configPrev)
+			log.InfoContext(ctx, "DELETE resources", log.Fields{"resources": resources})
+			_, err = cs.updateConfig(ctx, configPrev)
 			if err != nil {
 				return ConfigResult{}, pkgerrors.Wrap(err, "Update Config DB Entry")
 			}
@@ -608,12 +609,12 @@ func (v *ConfigClient) Rollback(instanceID string, configName string, rback Conf
 	}
 	for i := currentVersion; i > rollbackIndex; i-- {
 		// Delete rolled back items
-		err = cvs.deleteConfigVersion(configName)
+		err = cvs.deleteConfigVersion(ctx, configName)
 		if err != nil {
 			return ConfigResult{}, pkgerrors.Wrap(err, "Delete Config Version ")
 		}
 	}
-	currentVersion, err = cvs.getCurrentVersion(configName)
+	currentVersion, err = cvs.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Rollback Get Current Config Version ")
 	}
@@ -622,7 +623,7 @@ func (v *ConfigClient) Rollback(instanceID string, configName string, rback Conf
 		instanceID: instanceID,
 		configName: configName,
 	}
-	currentConfig, err := cs.getConfig()
+	currentConfig, err := cs.getConfig(ctx)
 	if err != nil {
 		return ConfigResult{}, pkgerrors.Wrap(err, "Update Error - Config doesn't exist")
 	}
@@ -640,8 +641,8 @@ func (v *ConfigClient) Rollback(instanceID string, configName string, rback Conf
 }
 
 // Tagit tags the current version with the tag provided
-func (v *ConfigClient) Tagit(instanceID string, configName string, tag ConfigTagit) (ConfigTag, error) {
-	log.Info("Config Tag It", log.Fields{"instance": instanceID, "config": configName})
+func (v *ConfigClient) Tagit(ctx context.Context, instanceID string, configName string, tag ConfigTagit) (ConfigTag, error) {
+	log.InfoContext(ctx, "Config Tag It", log.Fields{"instance": instanceID, "config": configName})
 	lock, _ := getProfileData(instanceID)
 	// Acquire per profile Mutex
 	lock.Lock()
@@ -651,11 +652,11 @@ func (v *ConfigClient) Tagit(instanceID string, configName string, tag ConfigTag
 		instanceID: instanceID,
 		configName: configName,
 	}
-	err := cvs.tagCurrentVersion(configName, tag.TagName)
+	err := cvs.tagCurrentVersion(ctx, configName, tag.TagName)
 	if err != nil {
 		return ConfigTag{}, pkgerrors.Wrap(err, "Tag of current version failed")
 	}
-	currentVersion, err := cvs.getCurrentVersion(configName)
+	currentVersion, err := cvs.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return ConfigTag{}, pkgerrors.Wrap(err, "Rollback Get Current Config Version ")
 	}
@@ -667,13 +668,13 @@ func (v *ConfigClient) Tagit(instanceID string, configName string, tag ConfigTag
 }
 
 // GetTagVersion returns the version associated with the tag
-func (v *ConfigClient) GetTagVersion(instanceID, configName string, tagName string) (string, error) {
-	log.Info("Config Get Tag Version", log.Fields{"instance": instanceID, "config": configName})
+func (v *ConfigClient) GetTagVersion(ctx context.Context, instanceID, configName string, tagName string) (string, error) {
+	log.InfoContext(ctx, "Config Get Tag Version", log.Fields{"instance": instanceID, "config": configName})
 	cvs := ConfigVersionStore{
 		instanceID: instanceID,
 		configName: configName,
 	}
-	value, err := cvs.getTagVersion(configName, tagName)
+	value, err := cvs.getTagVersion(ctx, configName, tagName)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Tag of current version failed")
 	}
@@ -682,33 +683,33 @@ func (v *ConfigClient) GetTagVersion(instanceID, configName string, tagName stri
 }
 
 // Cleanup version used only when instance is being deleted. We do not pass errors and we try to delete data
-func (v *ConfigClient) Cleanup(instanceID string) error {
-	log.Info("Config Cleanup", log.Fields{"instance": instanceID})
-	configs, err := v.List(instanceID)
+func (v *ConfigClient) Cleanup(ctx context.Context, instanceID string) error {
+	log.InfoContext(ctx, "Config Cleanup", log.Fields{"instance": instanceID})
+	configs, err := v.List(ctx, instanceID)
 
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving active config list info")
 	}
 
 	for _, config := range configs {
-		_, err = v.Delete(instanceID, config.ConfigName)
+		_, err = v.Delete(ctx, instanceID, config.ConfigName)
 		if err != nil {
-			log.Error("Config delete failed", log.Fields{"config": config.ConfigName, "error": err})
+			log.ErrorContext(ctx, "Config delete failed", log.Fields{"config": config.ConfigName, "error": err})
 		}
-		err = v.DeleteAll(instanceID, config.ConfigName, true)
+		err = v.DeleteAll(ctx, instanceID, config.ConfigName, true)
 		if err != nil {
-			log.Error("Config delete failed", log.Fields{"config": config.ConfigName, "error": err})
+			log.ErrorContext(ctx, "Config delete failed", log.Fields{"config": config.ConfigName, "error": err})
 		}
 	}
 
-	removeProfileData(instanceID)
+	removeProfileData(ctx, instanceID)
 
 	return nil
 }
 
 // ApplyAllConfig starts from first configuration version and applies all versions in sequence
-func (v *ConfigClient) ApplyAllConfig(instanceID string, configName string) error {
-	log.Info("Config Apply All", log.Fields{"instance": instanceID, "config": configName})
+func (v *ConfigClient) ApplyAllConfig(ctx context.Context, instanceID string, configName string) error {
+	log.InfoContext(ctx, "Config Apply All", log.Fields{"instance": instanceID, "config": configName})
 	lock, profileChannel := getProfileData(instanceID)
 	// Acquire per profile Mutex
 	lock.Lock()
@@ -718,7 +719,7 @@ func (v *ConfigClient) ApplyAllConfig(instanceID string, configName string) erro
 		instanceID: instanceID,
 		configName: configName,
 	}
-	currentVersion, err := cvs.getCurrentVersion(configName)
+	currentVersion, err := cvs.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Current Config Version ")
 	}
@@ -728,7 +729,7 @@ func (v *ConfigClient) ApplyAllConfig(instanceID string, configName string) erro
 	//Apply all configurations
 	var i uint
 	for i = 1; i <= currentVersion; i++ {
-		configNew, _, action, resources, err := cvs.getConfigVersion(configName, i)
+		configNew, _, action, resources, err := cvs.getConfigVersion(ctx, configName, i)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Get Config Version")
 		}
@@ -736,11 +737,11 @@ func (v *ConfigClient) ApplyAllConfig(instanceID string, configName string) erro
 			resources = nil
 		}
 		var appliedResources ([]KubernetesConfigResource)
-		appliedResources, err = applyConfig(instanceID, configNew, profileChannel, action, resources)
+		appliedResources, err = applyConfig(ctx, instanceID, configNew, profileChannel, action, resources)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Apply Config  failed")
 		}
-		log.Info("Apply result", log.Fields{"action": action, "resources": appliedResources})
+		log.InfoContext(ctx, "Apply result", log.Fields{"action": action, "resources": appliedResources})
 	}
 	return nil
 }

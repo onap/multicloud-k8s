@@ -59,7 +59,7 @@ func (h rbTemplateHandler) createHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = h.client.CreateOrUpdate(rbName, rbVersion, p, false)
+	err = h.client.CreateOrUpdate(r.Context(), rbName, rbVersion, p, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -92,7 +92,7 @@ func (h rbTemplateHandler) uploadHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = h.client.Upload(rbName, rbVersion, templateName, inpBytes)
+	err = h.client.Upload(r.Context(), rbName, rbVersion, templateName, inpBytes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -108,7 +108,7 @@ func (h rbTemplateHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	rbVersion := vars["rbversion"]
 	templateName := vars["tname"]
 
-	ret, err := h.client.Get(rbName, rbVersion, templateName)
+	ret, err := h.client.Get(r.Context(), rbName, rbVersion, templateName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -148,7 +148,7 @@ func (h rbTemplateHandler) updateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	ret, err := h.client.Get(rbName, rbVersion, templateName)
+	ret, err := h.client.Get(r.Context(), rbName, rbVersion, templateName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -159,7 +159,7 @@ func (h rbTemplateHandler) updateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = h.client.CreateOrUpdate(rbName, rbVersion, p, true)
+	err = h.client.CreateOrUpdate(r.Context(), rbName, rbVersion, p, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -180,7 +180,7 @@ func (h rbTemplateHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	rbName := vars["rbname"]
 	rbVersion := vars["rbversion"]
 
-	ret, err := h.client.List(rbName, rbVersion)
+	ret, err := h.client.List(r.Context(), rbName, rbVersion)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -202,7 +202,7 @@ func (h rbTemplateHandler) deleteHandler(w http.ResponseWriter, r *http.Request)
 	rbVersion := vars["rbversion"]
 	templateName := vars["tname"]
 
-	err := h.client.Delete(rbName, rbVersion, templateName)
+	err := h.client.Delete(r.Context(), rbName, rbVersion, templateName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

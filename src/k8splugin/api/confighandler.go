@@ -58,7 +58,7 @@ func (h rbConfigHandler) createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.Create(instanceID, p)
+	ret, err := h.client.Create(r.Context(), instanceID, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -80,7 +80,7 @@ func (h rbConfigHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	instanceID := vars["instID"]
 	cfgName := vars["cfgname"]
 
-	ret, err := h.client.Get(instanceID, cfgName)
+	ret, err := h.client.Get(r.Context(), instanceID, cfgName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -103,7 +103,7 @@ func (h rbConfigHandler) getVersionHandler(w http.ResponseWriter, r *http.Reques
 	cfgName := vars["cfgname"]
 	cfgVersion := vars["cfgversion"]
 
-	ret, err := h.client.GetVersion(instanceID, cfgName, cfgVersion)
+	ret, err := h.client.GetVersion(r.Context(), instanceID, cfgName, cfgVersion)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -126,7 +126,7 @@ func (h rbConfigHandler) getTagHandler(w http.ResponseWriter, r *http.Request) {
 	cfgName := vars["cfgname"]
 	tagName := vars["tagname"]
 
-	ret, err := h.client.GetTag(instanceID, cfgName, tagName)
+	ret, err := h.client.GetTag(r.Context(), instanceID, cfgName, tagName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -148,7 +148,7 @@ func (h rbConfigHandler) tagListHandler(w http.ResponseWriter, r *http.Request) 
 	instanceID := vars["instID"]
 	cfgName := vars["cfgname"]
 
-	ret, err := h.client.TagList(instanceID, cfgName)
+	ret, err := h.client.TagList(r.Context(), instanceID, cfgName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -169,7 +169,7 @@ func (h rbConfigHandler) listHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
 
-	ret, err := h.client.List(instanceID)
+	ret, err := h.client.List(r.Context(), instanceID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -191,7 +191,7 @@ func (h rbConfigHandler) versionListHandler(w http.ResponseWriter, r *http.Reque
 	instanceID := vars["instID"]
 	cfgName := vars["cfgname"]
 
-	ret, err := h.client.VersionList(instanceID, cfgName)
+	ret, err := h.client.VersionList(r.Context(), instanceID, cfgName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -214,9 +214,9 @@ func (h rbConfigHandler) deleteAllHandler(w http.ResponseWriter, r *http.Request
 	var err error
 
 	if r.URL.Query().Get("deleteConfigOnly") == "true" {
-		err = h.client.DeleteAll(instanceID, cfgName, true)
+		err = h.client.DeleteAll(r.Context(), instanceID, cfgName, true)
 	} else {
-		err = h.client.DeleteAll(instanceID, cfgName, false)
+		err = h.client.DeleteAll(r.Context(), instanceID, cfgName, false)
 	}
 
 	if err != nil {
@@ -234,7 +234,7 @@ func (h rbConfigHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	instanceID := vars["instID"]
 	cfgName := vars["cfgname"]
 
-	ret, err := h.client.Delete(instanceID, cfgName)
+	ret, err := h.client.Delete(r.Context(), instanceID, cfgName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -269,7 +269,7 @@ func (h rbConfigHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.Update(instanceID, cfgName, p)
+	ret, err := h.client.Update(r.Context(), instanceID, cfgName, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -301,8 +301,8 @@ func (h rbConfigHandler) rollbackHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-	ret, err := h.client.Rollback(instanceID, cfgName, p, false)
-	//err = h.client.Cleanup(instanceID)
+	ret, err := h.client.Rollback(r.Context(), instanceID, cfgName, p, false)
+	//err = h.client.Cleanup(r.Context(), instanceID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -333,7 +333,7 @@ func (h rbConfigHandler) tagitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := h.client.Tagit(instanceID, cfgName, p)
+	ret, err := h.client.Tagit(r.Context(), instanceID, cfgName, p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

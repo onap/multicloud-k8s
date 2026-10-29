@@ -34,7 +34,7 @@ func (ih instanceHCHandler) createHandler(w http.ResponseWriter, r *http.Request
 	vars := mux.Vars(r)
 	id := vars["instID"]
 
-	resp, err := ih.client.Create(id)
+	resp, err := ih.client.Create(r.Context(), id)
 	if err != nil {
 		log.Error("Error scheduling healhtcheck", log.Fields{
 			"error":    err,
@@ -63,7 +63,7 @@ func (ih instanceHCHandler) getHandler(w http.ResponseWriter, r *http.Request) {
 	instanceId := vars["instID"]
 	healthcheckId := vars["hcID"]
 
-	resp, err := ih.client.Get(instanceId, healthcheckId)
+	resp, err := ih.client.Get(r.Context(), instanceId, healthcheckId)
 	if err != nil {
 		log.Error("Error getting Instance's healthcheck", log.Fields{
 			"error":         err,
@@ -92,7 +92,7 @@ func (ih instanceHCHandler) deleteHandler(w http.ResponseWriter, r *http.Request
 	instanceId := vars["instID"]
 	healthcheckId := vars["hcID"]
 
-	err := ih.client.Delete(instanceId, healthcheckId)
+	err := ih.client.Delete(r.Context(), instanceId, healthcheckId)
 	if err != nil {
 		log.Error("Error deleting Instance's healthcheck", log.Fields{
 			"error":         err,
@@ -109,7 +109,7 @@ func (ih instanceHCHandler) listHandler(w http.ResponseWriter, r *http.Request) 
 	vars := mux.Vars(r)
 	id := vars["instID"]
 
-	resp, err := ih.client.List(id)
+	resp, err := ih.client.List(r.Context(), id)
 	if err != nil {
 		log.Error("Error getting instance healthcheck overview", log.Fields{
 			"error":       err,

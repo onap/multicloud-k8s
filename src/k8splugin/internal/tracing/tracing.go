@@ -21,6 +21,7 @@ import (
 	"strconv"
 
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
+	"go.mongodb.org/mongo-driver/event"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
@@ -125,6 +126,23 @@ func (t childTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 		return t.traced.RoundTrip(r)
 	}
 	return t.plain.RoundTrip(r)
+}
+
+// ChildCommandMonitor is the Mongo counterpart of ChildTransport: it only
+// passes commands issued within an existing span on to m, so background work
+// such as the database health check does not start a trace per command.
+func ChildCommandMonitor(m *event.CommandMonitor) *event.CommandMonitor {
+	return &event.CommandMonitor{
+		Started: func(ctx context.Context, evt *event.CommandStartedEvent) {
+			if trace.SpanContextFromContext(ctx).IsValid() {
+				m.Started(ctx, evt)
+			}
+		},
+		// Ending a command that m never started is a no-op, so these need no
+		// guard of their own and cannot leave a started span open.
+		Succeeded: m.Succeeded,
+		Failed:    m.Failed,
+	}
 }
 
 func NewInstrumentation() *Instrumentation {

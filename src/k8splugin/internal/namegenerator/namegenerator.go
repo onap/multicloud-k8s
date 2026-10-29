@@ -58,16 +58,16 @@ func (c cacheKey) String() string {
 	return string(out)
 }
 
-func (c *cache) init() {
+func (c *cache) init(ctx context.Context) {
 
 	// We have either restarted or this is the first time
 	// that a name is being requested since the service came
 	// up.
 	if c.cache == nil {
 		c.cache = make(map[string]bool)
-		err := c.readCacheFromDB()
+		err := c.readCacheFromDB(ctx)
 		if err != nil {
-			log.Error("Error Reading from DB", log.Fields{"error": err})
+			log.ErrorContext(ctx, "Error Reading from DB", log.Fields{"error": err})
 			return
 		}
 	}
@@ -81,18 +81,18 @@ func (c *cache) isAlreadyUsed(name string) bool {
 	return false
 }
 
-func (c *cache) readCacheFromDB() error {
+func (c *cache) readCacheFromDB(ctx context.Context) error {
 
 	// Read the latest from cache
-	data, err := db.DBconn.Read(context.TODO(), storeName, cacheKeyGlobal, tag)
+	data, err := db.DBconn.Read(ctx, storeName, cacheKeyGlobal, tag)
 	if err != nil {
-		log.Error("Error reading name cache from Database", log.Fields{"error": err})
+		log.ErrorContext(ctx, "Error reading name cache from Database", log.Fields{"error": err})
 		return pkgerrors.Wrap(err, "Reading cache from DB")
 	}
 
 	err = db.DBconn.Unmarshal(data, &c.cache)
 	if err != nil {
-		log.Error("Error unmarshaling data into cache", log.Fields{"error": err})
+		log.ErrorContext(ctx, "Error unmarshaling data into cache", log.Fields{"error": err})
 		return pkgerrors.Wrap(err, "Unmarshaling cache from DB")
 	}
 
@@ -123,7 +123,7 @@ func (c *cache) generateName(ctx context.Context) string {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
-	c.init()
+	c.init(ctx)
 
 	for {
 		//Call moby package here to generate name
@@ -149,7 +149,7 @@ func (c *cache) releaseName(ctx context.Context, name string) {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
-	c.init()
+	c.init(ctx)
 
 	if c.isAlreadyUsed(name) {
 		c.cache[name] = false

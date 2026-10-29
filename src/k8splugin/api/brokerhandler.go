@@ -14,7 +14,6 @@ limitations under the License.
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -206,7 +205,7 @@ func (b brokerInstanceHandler) getHandler(w http.ResponseWriter, r *http.Request
 	vars := mux.Vars(r)
 	instanceID := vars["instID"]
 
-	resp, err := b.client.Get(context.TODO(), instanceID)
+	resp, err := b.client.Get(r.Context(), instanceID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

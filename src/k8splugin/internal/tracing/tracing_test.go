@@ -20,7 +20,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/event"
+	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
@@ -109,5 +113,57 @@ func TestChildTransport(t *testing.T) {
 	}
 	if spans[0].Parent().SpanID() != parent.SpanContext().SpanID() {
 		t.Error("client span is not a child of the caller's span")
+	}
+}
+
+func TestChildCommandMonitor(t *testing.T) {
+	recorder := tracetest.NewSpanRecorder()
+	provider := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(recorder))
+	monitor := ChildCommandMonitor(otelmongo.NewMonitor(otelmongo.WithTracerProvider(provider)))
+
+	command, err := bson.Marshal(bson.D{{Key: "find", Value: "rbdef"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var requestID int64
+	run := func(ctx context.Context, fail bool) {
+		t.Helper()
+		requestID++
+		monitor.Started(ctx, &event.CommandStartedEvent{
+			Command: command, CommandName: "find", DatabaseName: "k8splugin",
+			RequestID: requestID, ConnectionID: "mongo:27017[-1]",
+		})
+		finished := event.CommandFinishedEvent{CommandName: "find", RequestID: requestID, ConnectionID: "mongo:27017[-1]"}
+		if fail {
+			monitor.Failed(ctx, &event.CommandFailedEvent{CommandFinishedEvent: finished, Failure: "boom"})
+		} else {
+			monitor.Succeeded(ctx, &event.CommandSucceededEvent{CommandFinishedEvent: finished})
+		}
+	}
+
+	run(context.Background(), false)
+	run(context.Background(), true)
+	if n := len(recorder.Started()); n != 0 {
+		t.Fatalf("commands without a span were traced: %d spans", n)
+	}
+
+	ctx, parent := provider.Tracer("test").Start(context.Background(), "parent")
+	run(ctx, false)
+	run(ctx, true)
+	parent.End()
+	spans := recorder.Ended()
+	if len(spans) != 3 {
+		t.Fatalf("expected two command spans and the parent, got %d spans", len(spans))
+	}
+	for _, span := range spans[:2] {
+		if span.Name() != "rbdef.find" {
+			t.Errorf("unexpected span name %q", span.Name())
+		}
+		if span.Parent().SpanID() != parent.SpanContext().SpanID() {
+			t.Errorf("span %q is not a child of the caller's span", span.Name())
+		}
+	}
+	if spans[1].Status().Code != codes.Error {
+		t.Error("failed command span does not have error status")
 	}
 }

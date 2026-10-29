@@ -18,6 +18,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"strings"
@@ -91,11 +92,11 @@ func TestCreateConfig(t *testing.T) {
 			db.Etcd = testCase.mockdb
 			db.DBconn = provideMockModelData(testCase.instanceID, testCase.rbName,
 				testCase.rbVersion, testCase.profileName)
-			resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, releaseName string) (configResourceList, error) {
+			resolve = func(ctx context.Context, rbName, rbVersion, profileName, instanceId string, p Config, releaseName string) (configResourceList, error) {
 				return configResourceList{}, nil
 			}
 			impl := NewConfigClient()
-			got, err := impl.Create(testCase.instanceID, testCase.inp)
+			got, err := impl.Create(context.TODO(), testCase.instanceID, testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -207,11 +208,11 @@ func TestRollbackConfig(t *testing.T) {
 			db.Etcd = testCase.mockdb
 			db.DBconn = provideMockModelData(testCase.instanceID, testCase.rbName,
 				testCase.rbVersion, testCase.profileName)
-			resolve = func(_, _, _, _ string, _ Config, _ string) (configResourceList, error) {
+			resolve = func(_ context.Context, _, _, _, _ string, _ Config, _ string) (configResourceList, error) {
 				return configResourceList{}, nil
 			}
 			impl := NewConfigClient()
-			got, err := impl.Create(testCase.instanceID, testCase.inp)
+			got, err := impl.Create(context.TODO(), testCase.instanceID, testCase.inp)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -225,7 +226,7 @@ func TestRollbackConfig(t *testing.T) {
 						" expected %v", got, testCase.expected1)
 				}
 			}
-			get, err := impl.Get(testCase.instanceID, testCase.inp.ConfigName)
+			get, err := impl.Get(context.TODO(), testCase.instanceID, testCase.inp.ConfigName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Get returned an unexpected error %s", err)
@@ -239,7 +240,7 @@ func TestRollbackConfig(t *testing.T) {
 						" expected %v", get, testCase.inp)
 				}
 			}
-			getList, err := impl.List(testCase.instanceID)
+			getList, err := impl.List(context.TODO(), testCase.instanceID)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("List returned an unexpected error %s", err)
@@ -253,7 +254,7 @@ func TestRollbackConfig(t *testing.T) {
 						" expected %v", getList, []Config{testCase.inp})
 				}
 			}
-			got, err = impl.Update(testCase.instanceID, testCase.inp.ConfigName, testCase.inpUpdate1)
+			got, err = impl.Update(context.TODO(), testCase.instanceID, testCase.inp.ConfigName, testCase.inpUpdate1)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -267,7 +268,7 @@ func TestRollbackConfig(t *testing.T) {
 						" expected %v", got, testCase.expected2)
 				}
 			}
-			got, err = impl.Update(testCase.instanceID, testCase.inp.ConfigName, testCase.inpUpdate2)
+			got, err = impl.Update(context.TODO(), testCase.instanceID, testCase.inp.ConfigName, testCase.inpUpdate2)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -281,7 +282,7 @@ func TestRollbackConfig(t *testing.T) {
 						" expected %v", got, testCase.expected3)
 				}
 			}
-			got, err = impl.Delete(testCase.instanceID, testCase.inp.ConfigName)
+			got, err = impl.Delete(context.TODO(), testCase.instanceID, testCase.inp.ConfigName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -296,7 +297,7 @@ func TestRollbackConfig(t *testing.T) {
 				}
 			}
 			testCase.rollbackConfig.AnyOf.ConfigVersion = "2"
-			_, err = impl.Rollback(testCase.instanceID, testCase.inp.ConfigName, testCase.rollbackConfig, false)
+			_, err = impl.Rollback(context.TODO(), testCase.instanceID, testCase.inp.ConfigName, testCase.rollbackConfig, false)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)
@@ -305,7 +306,7 @@ func TestRollbackConfig(t *testing.T) {
 					t.Fatalf("Create returned an unexpected error %s", err)
 				}
 			}
-			rollbackConfig, err := impl.Get(testCase.instanceID, testCase.inp.ConfigName)
+			rollbackConfig, err := impl.Get(context.TODO(), testCase.instanceID, testCase.inp.ConfigName)
 			if err != nil {
 				if testCase.expectedError == "" {
 					t.Fatalf("Create returned an unexpected error %s", err)

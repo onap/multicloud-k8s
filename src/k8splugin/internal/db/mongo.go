@@ -21,6 +21,7 @@ import (
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/config"
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
+	"github.com/onap/multicloud-k8s/src/k8splugin/internal/tracing"
 	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
 
 	pkgerrors "github.com/pkg/errors"
@@ -81,7 +82,7 @@ func NewMongoStore(name string, store *mongo.Database) (Store, error) {
 		ip := "mongodb://" + config.GetConfiguration().DatabaseAddress + ":27017"
 		clientOptions := options.Client()
 		clientOptions.ApplyURI(ip)
-		clientOptions.Monitor = otelmongo.NewMonitor()
+		clientOptions.Monitor = tracing.ChildCommandMonitor(otelmongo.NewMonitor())
 		mongoClient, err := mongo.NewClient(clientOptions)
 		if err != nil {
 			return nil, err

@@ -18,6 +18,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -38,42 +39,42 @@ type mockConfigClient struct {
 	err     error
 }
 
-func (m *mockConfigClient) Create(instanceID string, p app.Config) (app.ConfigResult, error) {
+func (m *mockConfigClient) Create(ctx context.Context, instanceID string, p app.Config) (app.ConfigResult, error) {
 	if m.err != nil {
 		return app.ConfigResult{}, m.err
 	}
 	return m.result, nil
 }
 
-func (m *mockConfigClient) Get(instanceID, configName string) (app.Config, error) {
+func (m *mockConfigClient) Get(ctx context.Context, instanceID, configName string) (app.Config, error) {
 	if m.err != nil {
 		return app.Config{}, m.err
 	}
 	return m.config, nil
 }
 
-func (m *mockConfigClient) GetVersion(instanceID, configName, version string) (app.Config, error) {
+func (m *mockConfigClient) GetVersion(ctx context.Context, instanceID, configName, version string) (app.Config, error) {
 	if m.err != nil {
 		return app.Config{}, m.err
 	}
 	return m.config, nil
 }
 
-func (m *mockConfigClient) GetTag(instanceID, configName, tagName string) (app.Config, error) {
+func (m *mockConfigClient) GetTag(ctx context.Context, instanceID, configName, tagName string) (app.Config, error) {
 	if m.err != nil {
 		return app.Config{}, m.err
 	}
 	return m.config, nil
 }
 
-func (m *mockConfigClient) List(instanceID string) ([]app.Config, error) {
+func (m *mockConfigClient) List(ctx context.Context, instanceID string) ([]app.Config, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
 	return m.configs, nil
 }
 
-func (m *mockConfigClient) VersionList(instanceID, configName string) ([]app.Config, error) {
+func (m *mockConfigClient) VersionList(ctx context.Context, instanceID, configName string) ([]app.Config, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
@@ -84,43 +85,43 @@ func (m *mockConfigClient) Help() map[string]string {
 	return map[string]string{}
 }
 
-func (m *mockConfigClient) Update(instanceID, configName string, p app.Config) (app.ConfigResult, error) {
+func (m *mockConfigClient) Update(ctx context.Context, instanceID, configName string, p app.Config) (app.ConfigResult, error) {
 	if m.err != nil {
 		return app.ConfigResult{}, m.err
 	}
 	return m.result, nil
 }
 
-func (m *mockConfigClient) Delete(instanceID, configName string) (app.ConfigResult, error) {
+func (m *mockConfigClient) Delete(ctx context.Context, instanceID, configName string) (app.ConfigResult, error) {
 	if m.err != nil {
 		return app.ConfigResult{}, m.err
 	}
 	return m.result, nil
 }
 
-func (m *mockConfigClient) DeleteAll(instanceID, configName string, deleteConfigOnly bool) error {
+func (m *mockConfigClient) DeleteAll(ctx context.Context, instanceID, configName string, deleteConfigOnly bool) error {
 	return m.err
 }
 
-func (m *mockConfigClient) Rollback(instanceID string, configName string, p app.ConfigRollback, acceptRevert bool) (app.ConfigResult, error) {
+func (m *mockConfigClient) Rollback(ctx context.Context, instanceID string, configName string, p app.ConfigRollback, acceptRevert bool) (app.ConfigResult, error) {
 	if m.err != nil {
 		return app.ConfigResult{}, m.err
 	}
 	return m.result, nil
 }
 
-func (m *mockConfigClient) Cleanup(instanceID string) error {
+func (m *mockConfigClient) Cleanup(ctx context.Context, instanceID string) error {
 	return m.err
 }
 
-func (m *mockConfigClient) Tagit(instanceID string, configName string, p app.ConfigTagit) (app.ConfigTag, error) {
+func (m *mockConfigClient) Tagit(ctx context.Context, instanceID string, configName string, p app.ConfigTagit) (app.ConfigTag, error) {
 	if m.err != nil {
 		return app.ConfigTag{}, m.err
 	}
 	return m.tag, nil
 }
 
-func (m *mockConfigClient) TagList(instanceID, configName string) ([]app.ConfigTag, error) {
+func (m *mockConfigClient) TagList(ctx context.Context, instanceID, configName string) ([]app.ConfigTag, error) {
 	if m.err != nil {
 		return nil, m.err
 	}

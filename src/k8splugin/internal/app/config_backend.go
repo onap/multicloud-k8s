@@ -68,6 +68,8 @@ type configResourceList struct {
 	updatedResources  chan []KubernetesConfigResource
 	profile           rb.Profile
 	action            string
+	// ctx is the context of the request waiting on updatedResources.
+	ctx context.Context
 }
 
 type profileDataManager struct {
@@ -111,9 +113,9 @@ func constructKey(strs ...string) string {
 }
 
 // Create an entry for the config in the database
-func (c ConfigStore) createConfig(p Config) error {
+func (c ConfigStore) createConfig(ctx context.Context, p Config) error {
 
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -135,9 +137,9 @@ func (c ConfigStore) createConfig(p Config) error {
 
 // Update the config entry in the database. Updates with the new value
 // Returns the previous value of the Config
-func (c ConfigStore) updateConfig(p Config) (Config, error) {
+func (c ConfigStore) updateConfig(ctx context.Context, p Config) (Config, error) {
 
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -163,8 +165,8 @@ func (c ConfigStore) updateConfig(p Config) (Config, error) {
 }
 
 // Read the config entry in the database
-func (c ConfigStore) getConfig() (Config, error) {
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+func (c ConfigStore) getConfig(ctx context.Context) (Config, error) {
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -186,8 +188,8 @@ func (c ConfigStore) getConfig() (Config, error) {
 }
 
 // Read the config entry in the database
-func (c ConfigStore) getConfigList() ([]Config, error) {
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+func (c ConfigStore) getConfigList(ctx context.Context) ([]Config, error) {
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return []Config{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -216,9 +218,9 @@ func (c ConfigStore) getConfigList() ([]Config, error) {
 }
 
 // Delete the config entry in the database
-func (c ConfigStore) deleteConfig() (Config, error) {
+func (c ConfigStore) deleteConfig(ctx context.Context) (Config, error) {
 
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return Config{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -241,9 +243,9 @@ func (c ConfigStore) deleteConfig() (Config, error) {
 }
 
 // Cleanup stored data in etcd before instance is being deleted
-func (c ConfigVersionStore) cleanupIstanceTags(configName string) error {
+func (c ConfigVersionStore) cleanupIstanceTags(ctx context.Context, configName string) error {
 
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -251,26 +253,26 @@ func (c ConfigVersionStore) cleanupIstanceTags(configName string) error {
 	versionKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagVersion, configName)
 	err = db.Etcd.DeletePrefix(versionKey)
 	if err != nil {
-		log.Error("Deleting versions of instance failed", log.Fields{"error": err})
+		log.ErrorContext(ctx, "Deleting versions of instance failed", log.Fields{"error": err})
 	}
 
 	counterKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagCounter, configName)
 	err = db.Etcd.DeletePrefix(counterKey)
 	if err != nil {
-		log.Error("Deleting counters of instance failed", log.Fields{"error": err})
+		log.ErrorContext(ctx, "Deleting counters of instance failed", log.Fields{"error": err})
 	}
 
 	nameKey := constructKey(rbName, rbVersion, profileName, c.instanceID, tagName, configName)
 	err = db.Etcd.DeletePrefix(nameKey)
 	if err != nil {
-		log.Error("Deleting counters of instance failed", log.Fields{"error": err})
+		log.ErrorContext(ctx, "Deleting counters of instance failed", log.Fields{"error": err})
 	}
 
 	return nil
 }
 
 // Create a version for the configuration. If previous config provided that is also stored
-func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, action string, resources []KubernetesConfigResource) (uint, error) {
+func (c ConfigVersionStore) createConfigVersion(ctx context.Context, configNew, configPrev Config, action string, resources []KubernetesConfigResource) (uint, error) {
 
 	configName := ""
 	if configNew.ConfigName != "" {
@@ -279,12 +281,12 @@ func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, ac
 		configName = configPrev.ConfigName
 	}
 
-	version, err := c.incrementVersion(configName)
+	version, err := c.incrementVersion(ctx, configName)
 
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Get Next Version")
 	}
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -309,14 +311,14 @@ func (c ConfigVersionStore) createConfigVersion(configNew, configPrev Config, ac
 }
 
 // Delete current version of the configuration. Configuration always deleted from top
-func (c ConfigVersionStore) deleteConfigVersion(configName string) error {
+func (c ConfigVersionStore) deleteConfigVersion(ctx context.Context, configName string) error {
 
-	counter, err := c.getCurrentVersion(configName)
+	counter, err := c.getCurrentVersion(ctx, configName)
 
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Next Version")
 	}
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -326,7 +328,7 @@ func (c ConfigVersionStore) deleteConfigVersion(configName string) error {
 	if err != nil {
 		return pkgerrors.Wrap(err, "Delete Config DB Entry")
 	}
-	err = c.decrementVersion(configName)
+	err = c.decrementVersion(ctx, configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Decrement Version")
 	}
@@ -335,9 +337,9 @@ func (c ConfigVersionStore) deleteConfigVersion(configName string) error {
 
 // Read the specified version of the configuration and return its prev and current value.
 // Also returns the action for the config version
-func (c ConfigVersionStore) getConfigVersion(configName string, version uint) (Config, Config, string, []KubernetesConfigResource, error) {
+func (c ConfigVersionStore) getConfigVersion(ctx context.Context, configName string, version uint) (Config, Config, string, []KubernetesConfigResource, error) {
 
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return Config{}, Config{}, "", []KubernetesConfigResource{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -359,9 +361,9 @@ func (c ConfigVersionStore) getConfigVersion(configName string, version uint) (C
 }
 
 // Get the counter for the version
-func (c ConfigVersionStore) getCurrentVersion(configName string) (uint, error) {
+func (c ConfigVersionStore) getCurrentVersion(ctx context.Context, configName string) (uint, error) {
 
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -385,9 +387,9 @@ func (c ConfigVersionStore) getCurrentVersion(configName string) (uint, error) {
 }
 
 // Update the counter for the version
-func (c ConfigVersionStore) updateVersion(configName string, counter uint) error {
+func (c ConfigVersionStore) updateVersion(ctx context.Context, configName string, counter uint) error {
 
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -400,15 +402,15 @@ func (c ConfigVersionStore) updateVersion(configName string, counter uint) error
 }
 
 // Increment the version counter
-func (c ConfigVersionStore) incrementVersion(configName string) (uint, error) {
+func (c ConfigVersionStore) incrementVersion(ctx context.Context, configName string) (uint, error) {
 
-	counter, err := c.getCurrentVersion(configName)
+	counter, err := c.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Get Next Counter Value")
 	}
 	//This is done while Profile lock is taken
 	counter++
-	err = c.updateVersion(configName, counter)
+	err = c.updateVersion(ctx, configName, counter)
 	if err != nil {
 		return 0, pkgerrors.Wrap(err, "Store Next Counter Value")
 	}
@@ -417,15 +419,15 @@ func (c ConfigVersionStore) incrementVersion(configName string) (uint, error) {
 }
 
 // Decrement the version counter
-func (c ConfigVersionStore) decrementVersion(configName string) error {
+func (c ConfigVersionStore) decrementVersion(ctx context.Context, configName string) error {
 
-	counter, err := c.getCurrentVersion(configName)
+	counter, err := c.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Next Counter Value")
 	}
 	//This is done while Profile lock is taken
 	counter--
-	err = c.updateVersion(configName, counter)
+	err = c.updateVersion(ctx, configName, counter)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Store Next Counter Value")
 	}
@@ -434,8 +436,8 @@ func (c ConfigVersionStore) decrementVersion(configName string) error {
 }
 
 // Get tag list
-func (c ConfigVersionStore) getTagList(configName string) ([]string, error) {
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+func (c ConfigVersionStore) getTagList(ctx context.Context, configName string) ([]string, error) {
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return []string{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -453,8 +455,8 @@ func (c ConfigVersionStore) getTagList(configName string) ([]string, error) {
 }
 
 // Get tag version
-func (c ConfigVersionStore) getTagVersion(configName, tagNameValue string) (string, error) {
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+func (c ConfigVersionStore) getTagVersion(ctx context.Context, configName, tagNameValue string) (string, error) {
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Retrieving model info")
 	}
@@ -468,16 +470,16 @@ func (c ConfigVersionStore) getTagVersion(configName, tagNameValue string) (stri
 }
 
 // Tag current version
-func (c ConfigVersionStore) tagCurrentVersion(configName, tagNameValue string) error {
-	currentVersion, err := c.getCurrentVersion(configName)
+func (c ConfigVersionStore) tagCurrentVersion(ctx context.Context, configName, tagNameValue string) error {
+	currentVersion, err := c.getCurrentVersion(ctx, configName)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Get Current Config Version ")
 	}
-	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(c.instanceID)
+	rbName, rbVersion, profileName, _, err := resolveModelFromInstance(ctx, c.instanceID)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving model info")
 	}
-	currentConfig, _, _, _, err := c.getConfigVersion(configName, currentVersion)
+	currentConfig, _, _, _, err := c.getConfigVersion(ctx, configName, currentVersion)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Retrieving current configuration")
 	}
@@ -503,14 +505,14 @@ func (c ConfigVersionStore) tagCurrentVersion(configName, tagNameValue string) e
 }
 
 // Apply Config
-func applyConfig(instanceID string, p Config, pChannel chan configResourceList, action string, resources []KubernetesConfigResource) ([]KubernetesConfigResource, error) {
+func applyConfig(ctx context.Context, instanceID string, p Config, pChannel chan configResourceList, action string, resources []KubernetesConfigResource) ([]KubernetesConfigResource, error) {
 
-	rbName, rbVersion, profileName, releaseName, err := resolveModelFromInstance(instanceID)
+	rbName, rbVersion, profileName, releaseName, err := resolveModelFromInstance(ctx, instanceID)
 	if err != nil {
 		return []KubernetesConfigResource{}, pkgerrors.Wrap(err, "Retrieving model info")
 	}
 	// Get Template and Resolve the template with values
-	crl, err := resolve(rbName, rbVersion, profileName, instanceID, p, releaseName)
+	crl, err := resolve(ctx, rbName, rbVersion, profileName, instanceID, p, releaseName)
 	if err != nil {
 		return []KubernetesConfigResource{}, pkgerrors.Wrap(err, "Resolve Config")
 	}
@@ -518,11 +520,12 @@ func applyConfig(instanceID string, p Config, pChannel chan configResourceList, 
 	crl.action = action
 	crl.resources = resources
 	crl.updatedResources = updatedResources
+	crl.ctx = ctx
 	// Send the configResourceList to the channel. Using select for non-blocking channel
-	log.Info("Before Sent to goroutine", log.Fields{"profile": crl.profile})
+	log.InfoContext(ctx, "Before Sent to goroutine", log.Fields{"profile": crl.profile})
 	select {
 	case pChannel <- crl:
-		log.Info("Message Sent to goroutine", log.Fields{"profile": crl.profile})
+		log.InfoContext(ctx, "Message Sent to goroutine", log.Fields{"profile": crl.profile})
 	default:
 	}
 
@@ -535,26 +538,26 @@ func scheduleResources(c chan configResourceList) {
 	// Keep thread running
 	log.Info("scheduleResources: START thread", nil)
 	for {
-		ctx := context.TODO()
 		data := <-c
+		ctx := data.ctx
 		//TODO: ADD Check to see if Application running
 		ic := NewInstanceClient()
 		resp, err := ic.Find(ctx, data.profile.RBName, data.profile.RBVersion, data.profile.ProfileName, nil)
 		if (err != nil || len(resp) == 0) && data.action != "STOP" {
-			log.Warn("Error finding a running instance. Retrying later...", log.Fields{"error": err})
+			log.WarnContext(ctx, "Error finding a running instance. Retrying later...", log.Fields{"error": err})
 			data.updatedResources <- []KubernetesConfigResource{}
 			continue
 		}
 		breakThread := false
 		switch {
 		case data.action == "PUT" || data.action == "POST":
-			log.Info("scheduleResources", log.Fields{"action": data.action, "profile": data.profile, "resourceTemplates": data.resourceTemplates})
+			log.InfoContext(ctx, "scheduleResources", log.Fields{"action": data.action, "profile": data.profile, "resourceTemplates": data.resourceTemplates})
 			resources := []KubernetesConfigResource{}
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
 				err = k8sClient.Init(ctx, inst.Request.CloudRegion, inst.ID)
 				if err != nil {
-					log.Error("Getting CloudRegion Information", log.Fields{"error": err})
+					log.ErrorContext(ctx, "Getting CloudRegion Information", log.Fields{"error": err})
 					//Move onto the next cloud region
 					continue
 				}
@@ -567,7 +570,7 @@ func scheduleResources(c chan configResourceList) {
 						// assuming - the err represent the resource already exist, so going for update
 						resProceeded, err = k8sClient.updateResources(ctx, resToCreateOrUpdate, inst.Namespace, false)
 						if err != nil {
-							log.Error("Error Creating or Updating resources", log.Fields{"createError": errCreate, "updateError": err})
+							log.ErrorContext(ctx, "Error Creating or Updating resources", log.Fields{"createError": errCreate, "updateError": err})
 							break
 						} else {
 							status = "UPDATED"
@@ -585,12 +588,12 @@ func scheduleResources(c chan configResourceList) {
 			}
 			data.updatedResources <- resources
 		case data.action == "DELETE":
-			log.Info("scheduleResources: DELETE", log.Fields{"profile": data.profile, "resources": data.resources})
+			log.InfoContext(ctx, "scheduleResources: DELETE", log.Fields{"profile": data.profile, "resources": data.resources})
 			for _, inst := range resp {
 				k8sClient := KubernetesClient{}
 				err = k8sClient.Init(ctx, inst.Request.CloudRegion, inst.ID)
 				if err != nil {
-					log.Error("Getting CloudRegion Information", log.Fields{"error": err})
+					log.ErrorContext(ctx, "Getting CloudRegion Information", log.Fields{"error": err})
 					//Move onto the next cloud region
 					continue
 				}
@@ -600,7 +603,7 @@ func scheduleResources(c chan configResourceList) {
 				}
 				err = k8sClient.deleteResources(ctx, helm.GetReverseK8sResources(tmpResources), inst.Namespace)
 				if err != nil {
-					log.Error("Error Deleting resources", log.Fields{"error": err})
+					log.ErrorContext(ctx, "Error Deleting resources", log.Fields{"error": err})
 					continue
 				}
 			}
@@ -618,12 +621,12 @@ func scheduleResources(c chan configResourceList) {
 
 // Resolve returns the path where the helm chart merged with
 // configuration overrides resides.
-var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, releaseName string) (configResourceList, error) {
+var resolve = func(ctx context.Context, rbName, rbVersion, profileName, instanceId string, p Config, releaseName string) (configResourceList, error) {
 
 	var resTemplates []helm.KubernetesResourceTemplate
 
 	profileClient := rb.NewProfileClient()
-	profile, err := profileClient.Get(context.TODO(), rbName, rbVersion, profileName)
+	profile, err := profileClient.Get(ctx, rbName, rbVersion, profileName)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Reading Profile Data")
 	}
@@ -634,7 +637,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 		t = rb.ConfigTemplate{}
 		t.HasContent = false
 	} else {
-		t, err = rb.NewConfigTemplateClient().Get(rbName, rbVersion, p.TemplateName)
+		t, err = rb.NewConfigTemplateClient().Get(ctx, rbName, rbVersion, p.TemplateName)
 		if err != nil {
 			return configResourceList{}, pkgerrors.Wrap(err, "Getting Template")
 		}
@@ -646,18 +649,18 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 	var def []byte
 
 	if t.HasContent {
-		def, err = rb.NewConfigTemplateClient().Download(rbName, rbVersion, p.TemplateName)
+		def, err = rb.NewConfigTemplateClient().Download(ctx, rbName, rbVersion, p.TemplateName)
 		if err != nil {
 			return configResourceList{}, pkgerrors.Wrap(err, "Downloading Template")
 		}
 	} else {
-		log.Info("Using Definition Template as a Configuration Template", nil)
+		log.InfoContext(ctx, "Using Definition Template as a Configuration Template", nil)
 		defClient := rb.NewDefinitionClient()
-		definition, err := defClient.Get(context.TODO(), rbName, rbVersion)
+		definition, err := defClient.Get(ctx, rbName, rbVersion)
 		if err != nil {
 			return configResourceList{}, pkgerrors.Wrap(err, "Get RB Definition")
 		}
-		def, err = defClient.Download(context.TODO(), rbName, rbVersion)
+		def, err = defClient.Download(ctx, rbName, rbVersion)
 		if err != nil {
 			return configResourceList{}, pkgerrors.Wrap(err, "Downloading RB Definition Template")
 		}
@@ -665,7 +668,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 	}
 
 	ic := NewInstanceClient()
-	instance, err := ic.Get(context.TODO(), instanceId)
+	instance, err := ic.Get(ctx, instanceId)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Getting Instance")
 	}
@@ -722,7 +725,7 @@ var resolve = func(rbName, rbVersion, profileName, instanceId string, p Config, 
 
 	//Download and process the profile first
 	//If everything seems okay, then download the config templates
-	prYamlClient, err := profileClient.GetYamlClient(context.TODO(), rbName, rbVersion, profileName)
+	prYamlClient, err := profileClient.GetYamlClient(ctx, rbName, rbVersion, profileName)
 	if err != nil {
 		return configResourceList{}, pkgerrors.Wrap(err, "Processing Profile Manifest")
 	}
@@ -766,7 +769,7 @@ func getProfileData(key string) (*sync.Mutex, chan configResourceList) {
 	return profileData.profileLockMap[key], profileData.resourceChannel[key]
 }
 
-func removeProfileData(key string) {
+func removeProfileData(ctx context.Context, key string) {
 	profileData.Lock()
 	defer profileData.Unlock()
 	_, ok := profileData.profileLockMap[key]
@@ -775,9 +778,10 @@ func removeProfileData(key string) {
 	}
 	_, ok = profileData.resourceChannel[key]
 	if ok {
-		log.Info("Stop config thread", log.Fields{"key": key})
+		log.InfoContext(ctx, "Stop config thread", log.Fields{"key": key})
 		crl := configResourceList{
 			action: "STOP",
+			ctx:    ctx,
 		}
 		profileData.resourceChannel[key] <- crl
 		delete(profileData.resourceChannel, key)

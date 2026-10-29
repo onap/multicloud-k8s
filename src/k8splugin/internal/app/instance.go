@@ -170,9 +170,9 @@ func NewInstanceClient() *InstanceClient {
 }
 
 // Simplified function to retrieve model data from instance ID
-func resolveModelFromInstance(instanceID string) (rbName, rbVersion, profileName, releaseName string, err error) {
+func resolveModelFromInstance(ctx context.Context, instanceID string) (rbName, rbVersion, profileName, releaseName string, err error) {
 	v := NewInstanceClient()
-	resp, err := v.Get(context.TODO(), instanceID)
+	resp, err := v.Get(ctx, instanceID)
 	if err != nil {
 		return "", "", "", "", pkgerrors.Wrap(err, "Getting instance")
 	}
@@ -615,12 +615,12 @@ func (v *InstanceClient) Upgrade(ctx context.Context, id string, u UpgradeReques
 	k8sClient.deleteResources(ctx, helm.GetReverseK8sResources(resToDelete), currentInstance.Namespace)
 
 	configClient := NewConfigClient()
-	configList, err := configClient.List(id)
+	configList, err := configClient.List(ctx, id)
 	if err != nil {
 		return InstanceResponse{}, pkgerrors.Wrap(err, "Cannot retrieve former configuration list")
 	}
 	for _, config := range configList {
-		err = configClient.DeleteAll(id, config.ConfigName, true)
+		err = configClient.DeleteAll(ctx, id, config.ConfigName, true)
 		if err != nil {
 			return InstanceResponse{}, pkgerrors.Wrap(err, "Failed to delete config after upgrade")
 		}
@@ -1103,7 +1103,7 @@ func (v *InstanceClient) Delete(ctx context.Context, id string) error {
 	}
 
 	configClient := NewConfigClient()
-	err = configClient.Cleanup(id)
+	err = configClient.Cleanup(ctx, id)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Cleanup Config Resources")
 	}

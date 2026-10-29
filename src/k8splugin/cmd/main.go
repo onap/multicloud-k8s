@@ -52,7 +52,7 @@ func main() {
 	log.Info("Starting Kubernetes Multicloud API", nil)
 
 	httpServer := &http.Server{
-		Handler: httpRouter,
+		Handler: api.WithMetricsEndpoint(httpRouter),
 		Addr:    ":" + config.GetConfiguration().ServicePort,
 	}
 

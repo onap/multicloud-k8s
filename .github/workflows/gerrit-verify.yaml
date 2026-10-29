@@ -138,8 +138,7 @@ jobs:
       # func main) that break a plain ./... build; compile the CLI
       # entry point and libraries instead.
       build_target: './cmd ./internal/...'
-      # go.mod declares Go 1.16, too old to derive a matrix from
-      go_version_matrix: '["1.25"]'
+      go_version_matrix: '["1.27"]'
       gosec: true
       staticcheck: true
       # Tests now run via the Makefile 'test' target (test_make_args

@@ -21,7 +21,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/connection"
@@ -88,7 +87,7 @@ func (h connectionHandler) createHandler(w http.ResponseWriter, r *http.Request)
 	defer file.Close()
 
 	//Convert the file content to base64 for storage
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		http.Error(w, "Unable to read file", http.StatusUnprocessableEntity)
 		return

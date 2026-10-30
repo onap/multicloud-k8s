@@ -18,7 +18,7 @@ package rb
 
 import (
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
@@ -76,11 +76,11 @@ func (p ProfileYamlClient) CopyConfigurationOverrides(chartPath string) error {
 	//Iterate over each configresource and copy that file into
 	//the respective path in the chart.
 	for _, v := range p.override.Type.ConfigResource {
-		data, err := ioutil.ReadFile(filepath.Join(p.path, v.FilePath))
+		data, err := os.ReadFile(filepath.Join(p.path, v.FilePath))
 		if err != nil {
 			return pkgerrors.Wrap(err, "Reading configuration file")
 		}
-		err = ioutil.WriteFile(filepath.Join(chartPath, v.ChartPath), data, 0644)
+		err = os.WriteFile(filepath.Join(chartPath, v.ChartPath), data, 0644)
 		if err != nil {
 			return pkgerrors.Wrap(err, "Writing configuration file into chartpath")
 		}
@@ -94,7 +94,7 @@ func (p ProfileYamlClient) CopyConfigurationOverrides(chartPath string) error {
 func ProcessProfileYaml(fpath string, manifestFileName string) (ProfileYamlClient, error) {
 
 	p := filepath.Join(fpath, manifestFileName)
-	data, err := ioutil.ReadFile(p)
+	data, err := os.ReadFile(p)
 	if err != nil {
 		return ProfileYamlClient{}, pkgerrors.Wrap(err, "Reading manifest file")
 	}

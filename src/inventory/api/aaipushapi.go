@@ -17,7 +17,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -113,7 +113,7 @@ func LinkVserverVFM(vnfID, vfmID, cloudOwner, cloudRegion, tenantId string, relL
 
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 
 		log.Error("Error while reading vfmodules API response: ", err)

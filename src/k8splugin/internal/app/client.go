@@ -20,7 +20,7 @@ package app
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 
 	appsv1 "k8s.io/api/apps/v1"
 
@@ -432,7 +432,7 @@ func (k *KubernetesClient) Init(ctx context.Context, cloudregion string, iid str
 	if err != nil {
 		return pkgerrors.Wrap(err, "Opening kubeConfig")
 	}
-	kubeData, err := ioutil.ReadAll(kubeFile)
+	kubeData, err := io.ReadAll(kubeFile)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Reading kubeConfig")
 	}

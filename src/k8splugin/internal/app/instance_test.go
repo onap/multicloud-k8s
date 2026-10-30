@@ -17,8 +17,8 @@ package app
 import (
 	"context"
 	"encoding/base64"
-	"io/ioutil"
 	"log"
+	"os"
 	"reflect"
 	"sort"
 	"testing"
@@ -44,7 +44,7 @@ func TestInstanceCreate(t *testing.T) {
 	}
 
 	// Load the mock kube config file into memory
-	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+	fd, err := os.ReadFile("../../mock_files/mock_configs/mock_kube_config")
 	if err != nil {
 		t.Fatal("Unable to read mock_kube_config")
 	}
@@ -705,7 +705,7 @@ func TestInstanceDelete(t *testing.T) {
 	db.Etcd = &db.MockEtcdClient{}
 
 	// Load the mock kube config file into memory
-	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+	fd, err := os.ReadFile("../../mock_files/mock_configs/mock_kube_config")
 	if err != nil {
 		t.Fatal("Unable to read mock_kube_config")
 	}
@@ -816,7 +816,7 @@ func TestInstanceWithHookCreate(t *testing.T) {
 	defer useFakeClients()()
 
 	// Load the mock kube config file into memory
-	fd, err := ioutil.ReadFile("../../mock_files/mock_configs/mock_kube_config")
+	fd, err := os.ReadFile("../../mock_files/mock_configs/mock_kube_config")
 	if err != nil {
 		t.Fatal("Unable to read mock_kube_config")
 	}

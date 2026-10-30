@@ -17,7 +17,7 @@ import (
 	"crypto/tls"
 	con "github.com/onap/multicloud-k8s/src/inventory/constants"
 	util "github.com/onap/multicloud-k8s/src/inventory/utils"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -56,7 +56,7 @@ func TestGetTenant(t *testing.T) {
 		t.Fail()
 	}
 
-	if p, err := ioutil.ReadAll(res.Body); err != nil {
+	if p, err := io.ReadAll(res.Body); err != nil {
 		t.Fail()
 	} else {
 		if strings.Contains(string(p), "Error") {

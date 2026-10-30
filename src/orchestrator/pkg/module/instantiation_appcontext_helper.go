@@ -23,7 +23,7 @@ It contains methods for creating appContext, saving cluster and resource details
 */
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 
 	"github.com/onap/multicloud-k8s/src/orchestrator/pkg/appcontext"
 	gpic "github.com/onap/multicloud-k8s/src/orchestrator/pkg/gpic"
@@ -87,7 +87,7 @@ func getResources(st []helm.KubernetesResourceTemplate) ([]resource, error) {
 	var resources []resource
 	for _, t := range st {
 		yamlStruct, err := utils.ExtractYamlParameters(t.FilePath)
-		yamlFile, err := ioutil.ReadFile(t.FilePath)
+		yamlFile, err := os.ReadFile(t.FilePath)
 		if err != nil {
 			return nil, pkgerrors.Wrap(err, "Failed to get the resources..")
 		}

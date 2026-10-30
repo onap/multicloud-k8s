@@ -21,7 +21,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -176,7 +175,7 @@ func (h clusterHandler) createClusterHandler(w http.ResponseWriter, r *http.Requ
 	defer file.Close()
 
 	//Convert the file content to base64 for storage
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		http.Error(w, "Unable to read file", http.StatusUnprocessableEntity)
 		return

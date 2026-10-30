@@ -18,7 +18,6 @@ package rb
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -107,7 +106,7 @@ func TestExtractTarBall(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error reading valid tar.gz file %s", err.Error())
 		}
-		fcontent, err := ioutil.ReadFile(filepath.Join(path, "test.txt"))
+		fcontent, err := os.ReadFile(filepath.Join(path, "test.txt"))
 		if err != nil {
 			t.Errorf("Error reading content of valid tar.gz file %s", err.Error())
 		}

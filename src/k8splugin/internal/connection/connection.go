@@ -20,7 +20,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/db"
 
@@ -187,7 +187,7 @@ func (v *ConnectionClient) Download(ctx context.Context, name string) (string, e
 
 	//Create temp file to write kubeconfig
 	//Assume this file will be deleted after usage by the consumer
-	tempF, err := ioutil.TempFile("", "kube-config-temp-")
+	tempF, err := os.CreateTemp("", "kube-config-temp-")
 	if err != nil {
 		return "", pkgerrors.Wrap(err, "Creating temp file")
 	}

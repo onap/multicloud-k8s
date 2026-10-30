@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/onap/multicloud-k8s/src/k8splugin/internal/rb"
@@ -127,7 +126,7 @@ func (h rbDefinitionHandler) uploadHandler(w http.ResponseWriter, r *http.Reques
 	name := vars["rbname"]
 	version := vars["rbversion"]
 
-	inpBytes, err := ioutil.ReadAll(r.Body)
+	inpBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Unable to read body", http.StatusBadRequest)
 		return

@@ -22,7 +22,7 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
-	"io/ioutil"
+	"os"
 
 	pkgerrors "github.com/pkg/errors"
 )
@@ -32,7 +32,7 @@ import (
 func GetTLSConfig(caCertFile string, certFile string, keyFile string) (*tls.Config, error) {
 
 	// Initialize tlsConfig once
-	caCert, err := ioutil.ReadFile(caCertFile)
+	caCert, err := os.ReadFile(caCertFile)
 
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Read CA Cert file")
@@ -70,7 +70,7 @@ func GetTLSConfig(caCertFile string, certFile string, keyFile string) (*tls.Conf
 
 func readPEMBlock(filename string) ([]byte, error) {
 
-	pemData, err := ioutil.ReadFile(filename)
+	pemData, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Read PEM File")
 	}
@@ -81,7 +81,7 @@ func readPEMBlock(filename string) ([]byte, error) {
 	}
 
 	if x509.IsEncryptedPEMBlock(pemBlock) {
-		password, err := ioutil.ReadFile(filename + ".pass")
+		password, err := os.ReadFile(filename + ".pass")
 		if err != nil {
 			return nil, pkgerrors.Wrap(err, "Read Password File")
 		}

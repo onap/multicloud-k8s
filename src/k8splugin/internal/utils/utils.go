@@ -14,7 +14,6 @@ limitations under the License.
 package utils
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -52,7 +51,7 @@ func DecodeYAML(path string, into runtime.Object) (runtime.Object, error) {
 		}
 	}
 
-	rawBytes, err := ioutil.ReadFile(path)
+	rawBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, pkgerrors.Wrap(err, "Read YAML file error")
 	}

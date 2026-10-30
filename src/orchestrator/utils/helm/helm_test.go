@@ -20,7 +20,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -176,7 +176,7 @@ func TestGenerateKubernetesArtifacts(t *testing.T) {
 				//Compute the hash of returned data and compare
 				for _, v := range out {
 					f := v.FilePath
-					data, err := ioutil.ReadFile(f)
+					data, err := os.ReadFile(f)
 					if err != nil {
 						t.Errorf("Unable to read file %s", v)
 					}

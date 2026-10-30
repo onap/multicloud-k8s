@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -246,7 +245,7 @@ func (v *ConfigTemplateClient) Upload(ctx context.Context, rbName, rbVersion, te
 		return pkgerrors.Wrap(err, "Extracting Template")
 	}
 
-	finfo, err := ioutil.ReadDir(chartBasePath)
+	finfo, err := os.ReadDir(chartBasePath)
 	if err != nil {
 		return pkgerrors.Wrap(err, "Detecting chart name")
 	}

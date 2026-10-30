@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	neturl "net/url"
 	"os"
 	"strings"
@@ -156,7 +155,7 @@ func (r RestyClient) RestClientMultipartPost(anchor string, body []byte, file st
 	}
 
 	// Read file for multipart
-	f, err := ioutil.ReadFile(file)
+	f, err := os.ReadFile(file)
 	if err != nil {
 		fmt.Printf("Error %s reading file %s\n", err, file)
 		return err

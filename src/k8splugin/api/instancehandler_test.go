@@ -18,7 +18,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	neturl "net/url"
@@ -209,7 +208,7 @@ func TestInstanceCreateHandler(t *testing.T) {
 			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
-				body, _ := ioutil.ReadAll(resp.Body)
+				body, _ := io.ReadAll(resp.Body)
 				t.Log(string(body))
 				t.Fatalf("Request method returned: \n%v\n and it was expected: \n%v", resp.StatusCode, testCase.expectedCode)
 			}
@@ -746,7 +745,7 @@ func TestInstanceQueryHandler(t *testing.T) {
 			resp := executeRequest(request, NewRouter(nil, nil, testCase.instClient, nil, nil, nil, nil, nil, nil))
 
 			if testCase.expectedCode != resp.StatusCode {
-				body, _ := ioutil.ReadAll(resp.Body)
+				body, _ := io.ReadAll(resp.Body)
 				t.Fatalf("Request method returned: %v and it was expected: %v\nReturned body: %s",
 					resp.StatusCode, testCase.expectedCode, body)
 			}

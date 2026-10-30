@@ -1,6 +1,6 @@
 module github.com/onap/multicloud-k8s/src/inventory
 
-go 1.17
+go 1.27
 
 require github.com/sirupsen/logrus v1.4.2
 

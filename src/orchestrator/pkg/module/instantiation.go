@@ -105,7 +105,7 @@ func (c InstantiationClient) Approve(p string, ca string, v string, di string) e
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
 		log.Info("Error getting current state from DeploymentIntentGroup stateInfo", log.Fields{"DeploymentIntentGroup ": di})
-		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
+		return pkgerrors.New("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
 	}
 	switch stateVal {
 	case state.StateEnum.Approved:
@@ -115,11 +115,11 @@ func (c InstantiationClient) Approve(p string, ca string, v string, di string) e
 	case state.StateEnum.Created:
 		break
 	case state.StateEnum.Applied:
-		return pkgerrors.Errorf("DeploymentIntentGroup is in an invalid state" + stateVal)
+		return pkgerrors.New("DeploymentIntentGroup is in an invalid state" + stateVal)
 	case state.StateEnum.Instantiated:
-		return pkgerrors.Errorf("DeploymentIntentGroup has already been instantiated" + di)
+		return pkgerrors.New("DeploymentIntentGroup has already been instantiated" + di)
 	default:
-		return pkgerrors.Errorf("DeploymentIntentGroup is in an unknown state" + stateVal)
+		return pkgerrors.New("DeploymentIntentGroup is in an unknown state" + stateVal)
 	}
 
 	key := DeploymentIntentGroupKey{
@@ -260,11 +260,11 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 
 	s, err := NewDeploymentIntentGroupClient().GetDeploymentIntentGroupState(di, p, ca, v)
 	if err != nil {
-		return pkgerrors.Errorf("Error retrieving DeploymentIntentGroup stateInfo: " + di)
+		return pkgerrors.New("Error retrieving DeploymentIntentGroup stateInfo: " + di)
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
+		return pkgerrors.New("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
 	}
 	switch stateVal {
 	case state.StateEnum.Approved:
@@ -272,13 +272,13 @@ func (c InstantiationClient) Instantiate(p string, ca string, v string, di strin
 	case state.StateEnum.Terminated:
 		break // TODO - ideally, should check that all resources have completed being terminated
 	case state.StateEnum.Created:
-		return pkgerrors.Errorf("DeploymentIntentGroup must be Approved before instantiating" + di)
+		return pkgerrors.New("DeploymentIntentGroup must be Approved before instantiating" + di)
 	case state.StateEnum.Applied:
-		return pkgerrors.Errorf("DeploymentIntentGroup is in an invalid state" + di)
+		return pkgerrors.New("DeploymentIntentGroup is in an invalid state" + di)
 	case state.StateEnum.Instantiated:
-		return pkgerrors.Errorf("DeploymentIntentGroup has already been instantiated" + di)
+		return pkgerrors.New("DeploymentIntentGroup has already been instantiated" + di)
 	default:
-		return pkgerrors.Errorf("DeploymentIntentGroup is in an unknown state" + stateVal)
+		return pkgerrors.New("DeploymentIntentGroup is in an unknown state" + stateVal)
 	}
 
 	rName := dIGrp.Spec.Version //rName is releaseName
@@ -510,11 +510,11 @@ func (c InstantiationClient) Terminate(p string, ca string, v string, di string)
 
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
+		return pkgerrors.New("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
 	}
 
 	if stateVal != state.StateEnum.Instantiated {
-		return pkgerrors.Errorf("DeploymentIntentGroup is not instantiated :" + di)
+		return pkgerrors.New("DeploymentIntentGroup is not instantiated :" + di)
 	}
 
 	currentCtxId := state.GetLastContextIdFromStateInfo(s)

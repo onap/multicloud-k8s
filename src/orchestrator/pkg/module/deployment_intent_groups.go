@@ -259,16 +259,16 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 	}
 	s, err := c.GetDeploymentIntentGroupState(di, p, ca, v)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting stateInfo from DeploymentIntentGroup: " + di)
+		return pkgerrors.New("Error getting stateInfo from DeploymentIntentGroup: " + di)
 	}
 
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
+		return pkgerrors.New("Error getting current state from DeploymentIntentGroup stateInfo: " + di)
 	}
 
 	if stateVal == state.StateEnum.Instantiated {
-		return pkgerrors.Errorf("DeploymentIntentGroup must be terminated before it can be deleted " + di)
+		return pkgerrors.New("DeploymentIntentGroup must be terminated before it can be deleted " + di)
 	}
 
 	// remove the app contexts associated with thie Deployment Intent Group
@@ -278,7 +278,7 @@ func (c *DeploymentIntentGroupClient) DeleteDeploymentIntentGroup(di string, p s
 		acStatus, err := state.GetAppContextStatus(ctxid)
 		if err == nil &&
 			!(acStatus.Status == appcontext.AppContextStatusEnum.Terminated || acStatus.Status == appcontext.AppContextStatusEnum.TerminateFailed) {
-			return pkgerrors.Errorf("DeploymentIntentGroup has not completed terminating: " + di)
+			return pkgerrors.New("DeploymentIntentGroup has not completed terminating: " + di)
 		}
 
 		for _, id := range state.GetContextIdsFromStateInfo(s) {

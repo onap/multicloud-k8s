@@ -83,7 +83,7 @@ func CreateDBClient(dbType string, dbName string, svcEp string) error {
 func (m *MongoStore) HealthCheck() error {
 	_, err := (*mongo.SingleResult).DecodeBytes(m.db.RunCommand(context.Background(), bson.D{{"serverStatus", 1}}))
 	if err != nil {
-		fmt.Println("Error getting DB server status: err %s", err)
+		fmt.Printf("Error getting DB server status: err %s\n", err)
 	}
 	return nil
 }
@@ -102,7 +102,7 @@ func (m *MongoStore) Find(coll string, key []byte, tag string) ([][]byte, error)
 	var bsonMap bson.M
 	err := json.Unmarshal([]byte(key), &bsonMap)
 	if err != nil {
-		fmt.Println("Failed to unmarshall %s\n", key)
+		fmt.Printf("Failed to unmarshall %s\n", key)
 		return nil, err
 	}
 
@@ -120,7 +120,7 @@ func (m *MongoStore) Find(coll string, key []byte, tag string) ([][]byte, error)
 
 	cursor, err := c.Find(context.Background(), filter, options.Find().SetProjection(projection))
 	if err != nil {
-		fmt.Println("Failed to find the document %s\n", err)
+		fmt.Printf("Failed to find the document %s\n", err)
 		return nil, err
 	}
 
@@ -135,7 +135,7 @@ func (m *MongoStore) Find(coll string, key []byte, tag string) ([][]byte, error)
 		default:
 			r, err := d.LookupErr(tag)
 			if err != nil {
-				fmt.Println("Unable to read data %s %s\n", string(r.Value), err)
+				fmt.Printf("Unable to read data %s %s\n", string(r.Value), err)
 			}
 			data = r.Value
 		}

@@ -501,3 +501,27 @@ func TestIsValidNumber(t *testing.T) {
 		}
 	})
 }
+
+func TestIsValidParameterPresent(t *testing.T) {
+	t.Run("All parameters present", func(t *testing.T) {
+		vars := map[string]string{"project-name": "p1", "composite-app-name": "ca1"}
+		if err := IsValidParameterPresent(vars, []string{"project-name", "composite-app-name"}); err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("Missing parameter", func(t *testing.T) {
+		vars := map[string]string{"project-name": "p1"}
+		err := IsValidParameterPresent(vars, []string{"project-name", "composite-app-name"})
+		if err == nil || err.Error() != "Missing composite-app-name in GET request" {
+			t.Errorf("got %v, want \"Missing composite-app-name in GET request\"", err)
+		}
+	})
+
+	t.Run("Missing parameter name containing a percent sign", func(t *testing.T) {
+		err := IsValidParameterPresent(map[string]string{}, []string{"a%sb"})
+		if err == nil || err.Error() != "Missing a%sb in GET request" {
+			t.Errorf("got %v, want \"Missing a%%sb in GET request\"", err)
+		}
+	})
+}

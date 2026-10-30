@@ -97,21 +97,21 @@ func (v *NetworkClient) CreateNetwork(p Network, clusterProvider, cluster string
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return Network{}, pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+		return Network{}, pkgerrors.New("Error getting current state from Cluster stateInfo: " + cluster)
 	}
 	switch stateVal {
 	case state.StateEnum.Approved:
-		return Network{}, pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Approved)
+		return Network{}, pkgerrors.New("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Approved)
 	case state.StateEnum.Terminated:
 		break
 	case state.StateEnum.Created:
 		break
 	case state.StateEnum.Applied:
-		return Network{}, pkgerrors.Errorf("Existing cluster network intents must be terminated before creating: " + cluster)
+		return Network{}, pkgerrors.New("Existing cluster network intents must be terminated before creating: " + cluster)
 	case state.StateEnum.Instantiated:
-		return Network{}, pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Instantiated)
+		return Network{}, pkgerrors.New("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Instantiated)
 	default:
-		return Network{}, pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + stateVal)
+		return Network{}, pkgerrors.New("Cluster is in an invalid state: " + cluster + " " + stateVal)
 	}
 
 	//Check if this Network already exists
@@ -193,21 +193,21 @@ func (v *NetworkClient) DeleteNetwork(name, clusterProvider, cluster string) err
 	}
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + cluster)
+		return pkgerrors.New("Error getting current state from Cluster stateInfo: " + cluster)
 	}
 	switch stateVal {
 	case state.StateEnum.Approved:
-		return pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Approved)
+		return pkgerrors.New("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Approved)
 	case state.StateEnum.Terminated:
 		break
 	case state.StateEnum.Created:
 		break
 	case state.StateEnum.Applied:
-		return pkgerrors.Errorf("Cluster network intents must be terminated before deleting: " + cluster)
+		return pkgerrors.New("Cluster network intents must be terminated before deleting: " + cluster)
 	case state.StateEnum.Instantiated:
-		return pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Instantiated)
+		return pkgerrors.New("Cluster is in an invalid state: " + cluster + " " + state.StateEnum.Instantiated)
 	default:
-		return pkgerrors.Errorf("Cluster is in an invalid state: " + cluster + " " + stateVal)
+		return pkgerrors.New("Cluster is in an invalid state: " + cluster + " " + stateVal)
 	}
 
 	//Construct key and tag to select the entry

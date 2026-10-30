@@ -319,8 +319,7 @@ func IsValidParameterPresent(vars map[string]string, sp []string) error {
 	for i := range sp {
 		v := vars[sp[i]]
 		if v == "" {
-			errMessage := fmt.Sprintf("Missing %v in GET request", sp[i])
-			return fmt.Errorf(errMessage)
+			return fmt.Errorf("Missing %v in GET request", sp[i])
 		}
 
 	}

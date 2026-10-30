@@ -410,16 +410,16 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 	}
 	s, err := v.GetClusterState(provider, name)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from Cluster: " + name)
+		return pkgerrors.New("Error getting current state from Cluster: " + name)
 	}
 
 	stateVal, err := state.GetCurrentStateFromStateInfo(s)
 	if err != nil {
-		return pkgerrors.Errorf("Error getting current state from Cluster stateInfo: " + name)
+		return pkgerrors.New("Error getting current state from Cluster stateInfo: " + name)
 	}
 
 	if stateVal == state.StateEnum.Applied {
-		return pkgerrors.Errorf("Cluster network intents must be terminated before it can be deleted " + name)
+		return pkgerrors.New("Cluster network intents must be terminated before it can be deleted " + name)
 	}
 
 	// remove the app contexts associated with this cluster
@@ -429,7 +429,7 @@ func (v *ClusterClient) DeleteCluster(provider, name string) error {
 		acStatus, err := state.GetAppContextStatus(ctxid)
 		if err == nil &&
 			!(acStatus.Status == appcontext.AppContextStatusEnum.Terminated || acStatus.Status == appcontext.AppContextStatusEnum.TerminateFailed) {
-			return pkgerrors.Errorf("Network intents for cluster have not completed terminating " + name)
+			return pkgerrors.New("Network intents for cluster have not completed terminating " + name)
 		}
 
 		for _, id := range state.GetContextIdsFromStateInfo(s) {

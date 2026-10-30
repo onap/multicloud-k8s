@@ -47,8 +47,7 @@ jobs:
       # project Makefile 'test' target via go-test-action's make_args,
       # which compiles the plugin before running the full suite.
       test_make_args: 'test'
-      # go.mod declares Go 1.16, too old for the release toolchain
-      go_version: '1.25'
+      go_version: '1.27'
       # The tree carries Go plugin sources (package main without
       # func main) that break a plain ./... probe; build the CLI
       # entry point, named to match the Makefile binary output

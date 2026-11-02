@@ -32,7 +32,12 @@ import (
 
 func main() {
 
-	err := utils.CheckInitialSettings()
+	authConfiguration, err := config.LoadAuthConfiguration()
+	if err != nil {
+		log.Fatal("Invalid authentication settings", log.Fields{"error": err})
+	}
+
+	err = utils.CheckInitialSettings()
 	if err != nil {
 		log.Fatal("Invalid initial settings", log.Fields{"error": err})
 	}
@@ -52,7 +57,7 @@ func main() {
 	log.Info("Starting Kubernetes Multicloud API", nil)
 
 	httpServer := &http.Server{
-		Handler: httpRouter,
+		Handler: auth.NewBasicAuth(authConfiguration)(httpRouter),
 		Addr:    ":" + config.GetConfiguration().ServicePort,
 	}
 

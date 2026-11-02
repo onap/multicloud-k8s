@@ -18,10 +18,67 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	log "github.com/onap/multicloud-k8s/src/k8splugin/internal/logutils"
 	"os"
 	"reflect"
+	"strings"
 )
+
+type AuthUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type AuthConfiguration struct {
+	Enabled bool
+	Users   []AuthUser
+}
+
+func LoadAuthConfiguration() (AuthConfiguration, error) {
+	var configuration AuthConfiguration
+	if value, present := os.LookupEnv("MULTICLOUD_AUTH_ENABLED"); present {
+		switch strings.ToLower(strings.TrimSpace(value)) {
+		case "true":
+			configuration.Enabled = true
+		case "false":
+			configuration.Enabled = false
+		default:
+			return AuthConfiguration{}, errors.New("MULTICLOUD_AUTH_ENABLED must be true or false")
+		}
+	}
+	if !configuration.Enabled {
+		return configuration, nil
+	}
+	path := os.Getenv("MULTICLOUD_AUTH_USERS_FILE")
+	if strings.TrimSpace(path) == "" {
+		return AuthConfiguration{}, errors.New("MULTICLOUD_AUTH_USERS_FILE is required when authentication is enabled")
+	}
+	contents, err := os.ReadFile(path)
+	if err != nil {
+		return AuthConfiguration{}, errors.New("cannot read MULTICLOUD_AUTH_USERS_FILE")
+	}
+	if err := json.Unmarshal(contents, &configuration.Users); err != nil {
+		return AuthConfiguration{}, errors.New("MULTICLOUD_AUTH_USERS_FILE must contain a JSON array of username/password objects")
+	}
+	if len(configuration.Users) == 0 {
+		return AuthConfiguration{}, errors.New("MULTICLOUD_AUTH_USERS_FILE must contain at least one user")
+	}
+	names := make(map[string]bool, len(configuration.Users))
+	for _, user := range configuration.Users {
+		if strings.TrimSpace(user.Username) == "" || strings.TrimSpace(user.Password) == "" {
+			return AuthConfiguration{}, errors.New("authentication usernames and passwords must not be blank")
+		}
+		if strings.Contains(user.Username, ":") {
+			return AuthConfiguration{}, errors.New("authentication usernames must not contain a colon")
+		}
+		if names[user.Username] {
+			return AuthConfiguration{}, errors.New("authentication usernames must be unique")
+		}
+		names[user.Username] = true
+	}
+	return configuration, nil
+}
 
 // Configuration loads up all the values that are used to configure
 // backend implementations

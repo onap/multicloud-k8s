@@ -1,0 +1,8 @@
+distribution_type: 'container'
+container_release_tag: '0.14.0'
+project: 'multicloud-k8s'
+log_dir: 'multicloud-k8s-master-docker-golang-shell-daily/1917/'
+ref: 0879b4bdf4c7e8f5a606bbf23e44a89f4f466838
+containers:
+    - name: 'multicloud/k8s'
+      version: '0.14.0-SNAPSHOT-20261104T121318Z'

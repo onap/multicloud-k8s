@@ -22,7 +22,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// klogAdapter is the logr.Logger that klog (used by client-go) writes to.
+// klogAdapter is the logr.LogSink that klog (used by client-go) writes to.
 // klog does its own verbosity filtering before calling it.
 type klogAdapter struct {
 	name   string
@@ -43,11 +43,13 @@ func (k klogAdapter) entry(keysAndValues []interface{}) *log.Entry {
 	return log.WithFields(fields)
 }
 
-func (k klogAdapter) Enabled() bool {
+func (k klogAdapter) Init(logr.RuntimeInfo) {}
+
+func (k klogAdapter) Enabled(int) bool {
 	return true
 }
 
-func (k klogAdapter) Info(msg string, keysAndValues ...interface{}) {
+func (k klogAdapter) Info(_ int, msg string, keysAndValues ...interface{}) {
 	k.entry(keysAndValues).Info(strings.TrimRight(msg, "\n"))
 }
 
@@ -59,15 +61,11 @@ func (k klogAdapter) Error(err error, msg string, keysAndValues ...interface{}) 
 	e.Error(strings.TrimRight(msg, "\n"))
 }
 
-func (k klogAdapter) V(level int) logr.Logger {
-	return k
-}
-
-func (k klogAdapter) WithValues(keysAndValues ...interface{}) logr.Logger {
+func (k klogAdapter) WithValues(keysAndValues ...interface{}) logr.LogSink {
 	return klogAdapter{name: k.name, fields: k.entry(keysAndValues).Data}
 }
 
-func (k klogAdapter) WithName(name string) logr.Logger {
+func (k klogAdapter) WithName(name string) logr.LogSink {
 	if k.name != "" {
 		name = k.name + "." + name
 	}

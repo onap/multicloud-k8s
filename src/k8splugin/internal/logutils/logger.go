@@ -19,6 +19,7 @@ import (
 	stdlog "log"
 	"strings"
 
+	"github.com/go-logr/logr"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/trace"
 	"k8s.io/klog/v2"
@@ -36,7 +37,7 @@ func init() {
 	// through logrus so every line on stdout is JSON.
 	stdlog.SetFlags(0)
 	stdlog.SetOutput(stdlogWriter{})
-	klog.SetLogger(klogAdapter{})
+	klog.SetLogger(logr.New(klogAdapter{}))
 }
 
 // Error uses the fields provided and logs

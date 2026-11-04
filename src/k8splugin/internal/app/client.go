@@ -178,10 +178,6 @@ func (k *KubernetesClient) getRestApi(apiVersion string) (rest.Interface, error)
 		return k.clientSet.AuthorizationV1beta1().RESTClient(), nil
 	case "autoscaling/v1":
 		return k.clientSet.AutoscalingV1().RESTClient(), nil
-	case "autoscaling/v2beta1":
-		return k.clientSet.AutoscalingV2beta1().RESTClient(), nil
-	case "autoscaling/v2beta2":
-		return k.clientSet.AutoscalingV2beta2().RESTClient(), nil
 	case "batch/v1":
 		return k.clientSet.BatchV1().RESTClient(), nil
 	case "batch/v1beta1":
@@ -204,8 +200,6 @@ func (k *KubernetesClient) getRestApi(apiVersion string) (rest.Interface, error)
 		return k.clientSet.EventsV1beta1().RESTClient(), nil
 	case "extensions/v1beta1":
 		return k.clientSet.ExtensionsV1beta1().RESTClient(), nil
-	case "flowcontrol.apiserver.k8s.io/v1alpha1":
-		return k.clientSet.FlowcontrolV1alpha1().RESTClient(), nil
 	case "networking.k8s.io/v1":
 		return k.clientSet.NetworkingV1().RESTClient(), nil
 	case "networking.k8s.io/v1beta1":
@@ -224,8 +218,6 @@ func (k *KubernetesClient) getRestApi(apiVersion string) (rest.Interface, error)
 		return k.clientSet.RbacV1beta1().RESTClient(), nil
 	case "scheduling.k8s.io/v1":
 		return k.clientSet.SchedulingV1().RESTClient(), nil
-	case "scheduling.k8s.io/v1alpha1":
-		return k.clientSet.SchedulingV1alpha1().RESTClient(), nil
 	case "scheduling.k8s.io/v1beta1":
 		return k.clientSet.SchedulingV1beta1().RESTClient(), nil
 	case "storage.k8s.io/v1":
